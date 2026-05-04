@@ -76,7 +76,7 @@ None. §12 unchanged.
 ## Correction Pass 3 — §2.1 in-vehicle LTE/WiFi routers + §12 device_cluster_id question
 
 **Date:** 2026-05-04
-**Commit:** _backfill on commit_ (this entry written before the commit lands; commit hash will be backfilled on the same edit cycle, mirroring Correction Pass 2)
+**Commit:** `76231f0` — `docs(bible): correction pass 3 — §2.1 in-vehicle LTE/WiFi routers + §12 device_cluster_id`
 **Source:** MAC-1 user comment [d08ee4a8](/MAC/issues/MAC-1#comment-d08ee4a8-e525-4c19-9886-89f0f95bf1c3)
 **Status:** Approved by user in the same comment ("Approved as Correction Pass 3"). Bible edit applied; manufacturers seed updated (32 → 34); device_cluster_id question added to §12; research leads logged in PROJECT_STATE.md per same comment.
 
