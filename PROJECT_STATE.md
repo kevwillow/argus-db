@@ -1,12 +1,13 @@
 # Argus — Project State
 
-**Current phase:** 1 — Schema & Foundation **(Checkpoint 1 signed off; Correction Pass 3 applied; ready to dispatch Phase 2)**
+**Current phase:** 2 — Tier 1 Structured Sources (dispatched, source 1 of 4 in flight)
 **Last checkpoint passed:** 1 (signed off 2026-05-04T03:23:31Z by user comment [d08ee4a8](/MAC/issues/MAC-1#comment-d08ee4a8-e525-4c19-9886-89f0f95bf1c3))
-**Next checkpoint:** 2 — Tier 1 structured-source staging populated. Spot-check 20 random records. User approval to proceed.
-**Status:** MAC-2 cleared (closing this heartbeat). MAC-1 reassigned to CEO `in_progress` for Phase 2 hire request + dispatch. Source Worker(s) to be hired per the from-scratch hiring rule.
+**Next checkpoint:** 2 — Tier 1 structured-source staging populated (all four sources). Spot-check 20 random records. User approval to proceed.
+**Status:** SourceWorker hire approved 2026-05-04T04:00:01Z. MAC-3 (IEEE OUI registry ingest) dispatched 2026-05-04T04:01:26Z. MAC-1 stays `in_review` with user as the standing kickoff thread.
 
 ## Active sub-agents
 - **DBArchitect** (`6c93a466-d498-49e0-b7af-3fc0d08eb2b0`) — Phase 1 complete. Off-rotation until Phase 5 export design (or sooner if §4.1 enum extension for `in_vehicle_router` becomes blocking).
+- **SourceWorker** (`9cf8ff12-53c3-4f83-837f-3142d8d1d151`) — hired and idle 2026-05-04T04:00:01Z (approval [`9bd70f48`](/MAC/approvals/9bd70f48-0703-47cc-bf86-99544b33bc60) approved by user). Assigned MAC-3 IEEE OUI ingest. Sequential single-worker dispatch through Tier 1 unless user authorizes sibling hires for parallelism.
 
 ## Last action
 CEO heartbeat 2026-05-04T03:2xZ — Correction Pass 3 + Phase 2 dispatch prep:
@@ -47,6 +48,9 @@ These are leads to follow — not commitments, not active work. Captured per use
 - 2026-05-04T03:13:41Z  Wake — MAC-1 comment 13461971: user clarified Flock + cop cars is a soft prior, NOT scope narrowing or priority reweighting. No SAR-3, no Correction Pass 3 from this steer alone.
 - 2026-05-04T03:23:31Z  Wake — MAC-1 comment d08ee4a8: 🟢 **Checkpoint 1 signed off.** Cradlepoint/Sierra Wireless gap approved as Correction Pass 3 (independent of the Flock advisory). device_cluster_id → §12. Research leads → PROJECT_STATE. Phase 2 hire request next, brief Source Workers with the standing Flock + cop-cars advisory.
 - 2026-05-04T03:2xZ      CEO this heartbeat: applied Correction Pass 3 (§2.1 #5 added — option b; renumbered #5–#11 → #6–#12); added device_cluster_id question to §12 Open; updated manufacturers seed (32 → 34) with Cradlepoint + Sierra Wireless; renumbered §2.1 # references in seed comments; rebuilt argus.db; 25/25 dedup tests pass; argus_cli status clean; logged Correction Pass 3 in BIBLE_AMENDMENTS; added research leads section above. Closing MAC-2 done. Phase 2 Source Worker hire request next.
+- 2026-05-04T03:33:43Z   CEO submitted SourceWorker hire request (approval `9bd70f48`, agent `9cf8ff12-...`); AGENTS.md staged with Phase 2 Tier 1 scope + Bible §7.2 + standing Flock+cop-cars advisory.
+- 2026-05-04T04:00:01Z   User approved SourceWorker hire (`9bd70f48`). Agent transitioned `pending_approval → idle`.
+- 2026-05-04T04:01:26Z   CEO dispatched MAC-3 IEEE OUI registry ingest as Phase 2 source 1/4 to SourceWorker. parentId=MAC-1, goalId=`374f4ac8-...`, status=todo. SourceWorker will pull MA-L/MA-M/MA-S registry CSVs into `raw/ieee_oui/<ts>/`, populate `sources` + `raw_observations`, and report back `in_review` to CEO with vendor-cluster flags.
 
 ## Notes for human review
 - **Cradlepoint/Sierra Wireless seeded with `primary_category=NULL`.** The §4.1 device_category enum does not yet have an `in_vehicle_router` value. Mirrors the Motorola Solutions / L3Harris multi-purpose-vendor pattern. The enum extension is a deliberate future decision: surface at Phase 2 dispatch if/when the first router OUI/MAC actually needs a category, not a Correction Pass 3 deliverable.
