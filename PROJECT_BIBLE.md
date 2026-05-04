@@ -109,7 +109,7 @@ The schema is the contract. All sub-agents output rows conforming to this.
 | `id` | INTEGER PK | autoincrement |
 | `identifier` | TEXT NOT NULL | the actual MAC/OUI/UUID/SSID/BSSID, normalized |
 | `identifier_type` | TEXT NOT NULL | enum: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint` |
-| `device_category` | TEXT NOT NULL | enum from §2.1 (alpr, imsi_catcher, body_cam, police_radio, drone, gunshot_detect, hacking_tool, covert_cam, gps_tracker, face_recog, drone_detect) |
+| `device_category` | TEXT NOT NULL | enum from §2.1 (alpr, imsi_catcher, body_cam, police_radio, in_vehicle_router, drone, gunshot_detect, hacking_tool, covert_cam, gps_tracker, face_recog, drone_detect) |
 | `manufacturer` | TEXT | normalized vendor name |
 | `model` | TEXT | when known |
 | `confidence` | INTEGER | 0–100, see §8.2 |
@@ -127,6 +127,7 @@ The schema is the contract. All sub-agents output rows conforming to this.
 - **`sources`** — registry of every source crawled, with last-fetch timestamp and status
 - **`raw_observations`** — staging table; raw extracted records before normalization (preserve forever for audit). Holds rows that carry an actual or candidate identifier (MAC/OUI/BSSID/SSID/UUID) in `candidate_identifier` keyed by §4.1 `identifier_type`.
 - **`deployment_observations`** — staging table for Tier 1 sources that yield agency × technology × location × vendor metadata but **no** MAC/OUI/SSID/UUID identifier (EFF Atlas of Surveillance, DeFlock). Identifier columns intentionally absent — promotion to `identifiers` requires a Phase 3+ inference linking a deployment to a concrete identifier candidate (§11 #1). Idempotency keyed by `(source_id, source_row_key)` where `source_row_key` is the source's stable per-row natural key (e.g. Atlas's `AOSNUMBER`). Added in Correction Pass 4 (BIBLE_AMENDMENTS).
+- **`procurement_records`** — staging table for Tier 2/3 procurement-only rows (SAM.gov, city council minutes, FOIA-released procurement docs) that name an agency × vendor purchase but carry **no** MAC/OUI/SSID/UUID identifier. Schema includes a nullable `linked_identifier_id` FK back to `identifiers` for the upgrade path when a later source attaches a concrete identifier to the same purchase. Per §4.5 procurement-only carveout / §11 #14, these rows are NEVER exported to Talos — they are analytical only. Created in MAC-2 / Phase 1 (signed off at Checkpoint 1); documented in §4.2 in Correction Pass 5 (BIBLE_AMENDMENTS).
 - **`extraction_runs`** — log of every extraction job: agent id, source, started_at, finished_at, records_in, records_out, errors
 - **`conflicts`** — when two sources disagree on the same identifier; reviewed and resolved by CEO
 
@@ -176,6 +177,7 @@ The export worker (§7.5) derives Talos severity from Argus `device_category` us
 | `body_cam` | `med` | worn by visible LE; less alarming than covert |
 | `drone` | `med` | |
 | `police_radio` | `low` | routine LE presence |
+| `in_vehicle_router` | `low` | routine LE infrastructure (data backhaul, not covert and not personal-threat-model) |
 | `gunshot_detect` | `low` | fixed infrastructure, informational |
 
 **Confidence vs. severity rule.** Confidence affects whether a record is exported (threshold 70 for the high-confidence file — see §6 Phase 5 and §7.5), not severity. A high-severity record at confidence 50 is dropped from the high-confidence export entirely; it is NOT downgraded to low severity.
@@ -604,7 +606,8 @@ These are hard rules. Violating any of these is a stop-the-line event.
 - **How aggressive on inference?** Bible says inferences are capped at 70 confidence. Confirm acceptable, or lower.
 - **Project name.** "Argus" is a working name. Confirm or replace before README is written. (Provisionally accepted at Checkpoint 0; final confirm at Checkpoint 5 alongside the coverage matrix.)
 - **`argus_record_id` upsert semantics in Talos seeder.** Does Talos's seeder need to support stable-id upsert (update-existing vs. insert-new) in v0.2, or can re-imports be destructive (drop-and-reload)? The bible (§7.5) requires `argus_record_id` to be stable across re-runs because the human asked for it; the answer affects re-run UX on the Pi side. Worth resolving before Phase 5 export design.
-- **`device_cluster_id` for vehicle / operator correlation.** Should the schema add a `device_cluster_id` column to support correlating multiple emitters to one vehicle/operator (e.g., 6 MACs = 1 patrol car = APX radio + Cradlepoint router + Axon dashcam + Getac laptop + body cam + driver phone), or leave clustering to scanner-side logic? Argus's current job is identifiers; Talos's job is correlation. User's initial lean is scanner-side (correlation belongs in Talos), but holding for explicit decision. Surface at Checkpoint 5 if unresolved by then. (Added by Correction Pass 3.)
+- **`device_cluster_id` for vehicle / operator correlation.** Should the schema add a `device_cluster_id` column to support correlating multiple emitters to one vehicle/operator (e.g., 6 MACs = 1 patrol car = APX radio + Cradlepoint router + Axon dashcam + Getac laptop + body cam + driver phone), or leave clustering to scanner-side logic? Argus's current job is identifiers; Talos's job is correlation. User's initial lean is scanner-side (correlation belongs in Talos), but holding for explicit decision. Surface at Checkpoint 5 if unresolved by then. (Added by Correction Pass 3; lean ratified as binding-but-not-final by SAR-3 at CP5 — Argus identifies, Talos correlates.)
+- **Configurable `geographic_scope` filter for the high-confidence Talos export.** Should the high-confidence export filter records by configurable geographic scope (e.g., default = `US`)? Two adjacent realities surfaced this question at Checkpoint 2: (a) DeFlock ingest holds ~849 international ALPR nodes (Netherlands, Australia, Italy, Denmark, plus Polizia/Politie blocks) — Talos is currently a US-deployed scanner, so non-US deployment records are dead weight in the watchlist; (b) DeFlock also holds private-sector retail ALPR records (HOA / shopping-mall installations) which the Phase-2 board call placed out-of-scope for V1 but kept in-staging for potential V2 reconsideration. A single export-time categorical filter (geographic + sector) handles both axes without separate ingestion paths. Records stay in `deployment_observations` regardless; export shape is the only thing that changes. Decide at Phase 5 alongside the Talos export design. (Added by Correction Pass 5.)
 
 **Resolved during 2026-05-04 correction pass**
 

@@ -175,6 +175,50 @@ These are routine §8.2 / §11 #3 / §7.2 applications, not bible edits — so t
 
 ---
 
+## Correction Pass 5 — Phase 2 → Phase 3 ride-along: §4.1 in_vehicle_router enum + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope
+
+**Date:** 2026-05-04
+**Commit:** `<backfilled>` — `docs(bible): correction pass 5 — §4.1 in_vehicle_router + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope`
+**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [a7edae6f](/MAC/issues/MAC-1#comment-a7edae6f-6c7a-493e-82f2-fa088942a1a9) (Checkpoint 2 sign-off + Phase 3 dispatch decisions)
+**Status:** Bible edits applied this commit; SAR-3 (separate entry below) ratifies the `device_cluster_id` lean as binding-but-not-final.
+
+### Corrections applied
+
+1. **§4.1 main-table `device_category` enum** — added `in_vehicle_router` between `police_radio` and `drone`. Bible enum now lists 12 §2.1-derived values (was 11). Pairs with §2.1 #5 (added in CP3) so the bible-text enum and §2.1's category list are in sync. The schema CHECK on `identifiers.device_category` in `db/migrations/0001_initial.sql` still carries the 11-value enum + `unknown` (12 total) — see "Schema follow-through" below for the deferral reasoning.
+
+2. **§4.5 severity-derivation table** — added `in_vehicle_router | low | routine LE infrastructure (data backhaul, not covert and not personal-threat-model)` between `police_radio` and `gunshot_detect`. Severity = `low` per board direction in `a7edae6f` ("matches `police_radio` reasoning: routine LE infrastructure, not covert or personal-threat-model"). Reasoning column phrasing parallels the existing `police_radio` row.
+
+3. **§4.2 supporting tables — `procurement_records` documentation gap filled.** Added `procurement_records` bullet between `deployment_observations` and `extraction_runs`. The table itself was created in MAC-2 / Phase 1 per the §4.5 procurement carveout (option a, separate-table; signed off at Checkpoint 1) but was never reflected in the §4.2 enumeration — surfaced as out-of-bible observation at CP4, held per the strategic-steers-as-soft-priors rule, ratified for fix at Checkpoint 2 sign-off (`a7edae6f` decision #3 third bullet). Bullet wording follows the `deployment_observations` precedent — single sentence, identifies the role + idempotency upgrade-path (`linked_identifier_id` FK) + §4.5 / §11 #14 cross-reference.
+
+4. **§12 — added `geographic_scope` Open Question.** Bundles two adjacent realities surfaced at Checkpoint 2: (a) DeFlock holds ~849 international ALPR nodes that are dead weight in a US-deployed Talos scanner; (b) DeFlock holds private-sector retail-ALPR records that the Phase-2 board call placed out-of-scope for V1 but kept in staging for potential V2 reconsideration. Single export-time categorical filter handles both axes — records stay in `deployment_observations`, export shape changes. Decision deferred to Phase 5 alongside the Talos export design (§7.5).
+
+### Schema follow-through (deferred — no migration in this pass)
+
+The §4.1 enum text in the bible now lists `in_vehicle_router`. The schema CHECK constraint on `identifiers.device_category` in `db/migrations/0001_initial.sql` (lines 61–66) does **not** yet include the new value, and `manufacturers.primary_category` for Cradlepoint/Sierra Wireless is still `NULL` rather than `'in_vehicle_router'`. This drift is intentional and time-boxed:
+
+1. **Staging is unaffected.** `raw_observations.candidate_category` carries no CHECK constraint (line 167 of the migration), so Phase 3 staging works without any schema change. MAC-7 onwards can record `candidate_category='in_vehicle_router'` immediately if a Cradlepoint/Sierra grantee FCC filing is found.
+2. **`manufacturers.primary_category` carries no CHECK either** (line 104), so updating Cradlepoint/Sierra's `primary_category` from `NULL` to `'in_vehicle_router'` is a pure data update — no schema migration needed when the time comes — but it would clobber existing seed state on `init_db.py` re-run. Defer to a paired DBArchitect task that touches the seed and updates the row in place rather than re-init.
+3. **The CHECK only fires on promotion.** `identifiers.device_category` is the only CHECK that needs extending, and that fires only when Phase 4/5 promotes a candidate to `identifiers`. Until that happens, the bible-text enum and the schema CHECK can disagree without ingest impact.
+
+A future migration `db/migrations/0003_*.sql` will extend the CHECK to 13 values when the first Cradlepoint/Sierra promotion is on the table — DBArchitect work, paired with the manufacturers seed update for primary_category. Tracked in PROJECT_STATE.md "Open" for visibility.
+
+### Why CP5 bundles four edits as one pass
+
+The board explicitly framed all four items as a single "bible-tidy ride-along" landing before Phase 3 dispatch. Each edit is small (1–4 lines) and they all derive from a single user decision in `a7edae6f`. Bundling matches the CP3 ride-along precedent (one user decision → one CP entry → multiple in-place edits) and avoids the noise of CP5/CP6/CP7/CP8 spread across the same heartbeat.
+
+### §12 Open Questions impact
+
+- **Net add of one question** (`geographic_scope` filter for the high-confidence Talos export, decision deferred to Phase 5).
+- **`device_cluster_id`** stays open in §12 but its lean is now ratified as binding-but-not-final via SAR-3 below.
+- **No struck-through resolutions** in this pass.
+
+### Out-of-bible artifact updates that pair with this pass
+
+- **`PROJECT_STATE.md`** — Header flipped to "Phase 2 closed, Phase 3 dispatching"; CP5 + SAR-3 entries logged in the bible-amendments status section; queued schema follow-through (`db/migrations/0003_*.sql` for `identifiers.device_category` CHECK extension + Cradlepoint/Sierra `primary_category` seed update) noted as deferred DBArchitect task.
+- **No code change.** No migration authored, no module touched, no test re-run — this pass is bible text only.
+
+---
+
 ## Sub-agent rule additions and interpretive guidance
 
 This section captures rules that bind sub-agents but do not edit the bible text. New entries append below; do not rewrite history.
@@ -207,3 +251,19 @@ The user's stated lean for the open question on Talos v0.2 upsert semantics is *
 - Keep `argus_record_id` stable across re-exports of the same canonical record (already required by §7.5).
 - Assume upsert is the likely target so the export shape and the Talos seeder contract converge.
 - Surface this assumption explicitly at Checkpoint 5 if Talos design has not formally resolved it by then.
+
+### SAR-3 — `device_cluster_id` lean is scanner-side: Argus identifies, Talos correlates
+
+**Date:** 2026-05-04
+**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [a7edae6f](/MAC/issues/MAC-1#comment-a7edae6f-6c7a-493e-82f2-fa088942a1a9) (Checkpoint 2 sign-off, decision #3 second bullet)
+**Bible commit:** paired with CP5 (no §12 edit — the question stays open per the user's "lean = scanner-side, but holding for explicit Phase 5 close" framing)
+**Binds:** future Export Worker (when hired for Phase 5), DBArchitect (when designing the export shape and any cluster-correlation join), Phase 5 export design generally
+
+The §12 open question on `device_cluster_id` (added in CP3) is now ratified as **lean = scanner-side** with binding-but-not-final force:
+
+- **Argus's job is identifiers.** The canonical Argus database holds atomic identifier records (one MAC = one row; one OUI = one row; one SSID pattern = one row). Each row already carries enough metadata (`device_category`, `manufacturer`, `geographic_scope`, `notes`) to participate in a cluster join *at scan time* without Argus pre-computing the cluster.
+- **Talos's job is correlation.** Cluster recognition (e.g., "these 6 MACs co-located within 30s within 50m = 1 patrol car") is a streaming inference over scanner observations, not a static property of the watchlist. Encoding `device_cluster_id` in the Argus export bakes in a single clustering hypothesis that the scanner cannot override or refine, which is the wrong split of responsibilities.
+- **Phase 5 export shape consequence.** The Talos export schema (§7.5 / §4.4) does **not** include a `device_cluster_id` column. The Export Worker's job is per-record emission; the Pi scanner's correlation logic builds clusters from observed co-occurrence using the per-record metadata Argus already provides.
+- **Schema consequence.** No `device_cluster_id` column is added to the `identifiers` table or any export view. If a future Phase 5 review surfaces a concrete correlation use case Argus can serve better than the scanner (e.g., grantee-FCC-ID-derived OEM bundling that Talos can't reconstruct), the question reopens.
+
+The §12 entry stays open under the strategic-steers-as-soft-priors discipline — final close happens at Phase 5 export design alongside the geographic_scope decision (CP5).
