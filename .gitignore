@@ -1,0 +1,28 @@
+# --- Argus repo hygiene -----------------------------------------------
+# Per Bible §6 Phase 0: keep raw/ and large db/ artifacts out of git.
+
+# Raw scraped sources — frequently large, regenerable from `sources` table.
+raw/
+
+# Built sqlite databases — regenerable from raw + extraction pipeline.
+db/*.db
+db/*.db-journal
+db/*.db-wal
+db/*.db-shm
+
+# Exports are intentionally tracked when small; large ones via Phase 5 only.
+exports/*.db
+
+# Python tooling / venv noise (argus_cli.py and any extraction workers).
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+.env.*
+
+# Editor / OS detritus.
+.DS_Store
+.idea/
+.vscode/
+*.swp
