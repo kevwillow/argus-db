@@ -330,3 +330,47 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
 - **Phase 3 sources (FCC EAS, SAM.gov, council minutes, WiGLE) are expected to have zero robots.txt friction** — all have explicit public-access paths. WiGLE's constraint is rate-limiting, which is a budget question (Checkpoint 3a), not a robots.txt question. Source Workers should not invent robots.txt issues where none exist.
 
 **Application precedent recorded:** MAC-6 DeFlock — `deflock.org/robots.txt` carries `Disallow: /api/` for `User-agent: *`; SourceWorker chose Path B (`cdn.deflock.me`, the DeFlock-published frontend's own CDN host) over Path A (`deflock.org/api/`, blocked); CEO ratified at 2026-05-04T~05:38Z; Phase 2 source 4/4 staged 101,597 deployment records under this rule. SAR-4 codifies the implementation pattern that worked.
+
+### SAR-5 — [MAC-11](/MAC/issues/MAC-11) council-minutes scope discipline: format-fit cap, not jurisdiction-count cap
+
+**Date:** 2026-05-04
+**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [1c5831f3](/MAC/issues/MAC-1#comment-1c5831f3-a673-4da2-a449-f3a47683a68a)
+**Bible commit:** none (no §6 / §7.2 / §11 edit; binds the implementation pattern for the MAC-11 dispatch + Step-1 ratification + Step-2 ingest). Codified at user direction ("Codify the revised scope as a SAR before `MAC-11` dispatch.")
+**Binds:** Source Worker (MAC-11 source discovery, Step-1 ratification proposal, Step-2 ingest), CEO (when ratifying Step-1 proposal and Step-2 delivery)
+
+**The rule (board-stated, paraphrased decision-bearing language verbatim).** For [MAC-11](/MAC/issues/MAC-11) (city/county council minutes + municipal procurement portals — Phase 3 source 4/4), the scope discipline is **format-fit, not jurisdiction-count**. The earlier "top-10 jurisdiction cap" framing is rescinded ("that was overcautious on my part"). The 10-jurisdiction list below is a **starting batch**, not a ceiling.
+
+**How to apply:**
+
+1. **Starting batch (anchor, not ceiling).** Begin with the top-10 jurisdictions:
+   - San Diego (CA)
+   - Detroit (MI)
+   - San Francisco (CA)
+   - Chicago (IL)
+   - New York City (NY)
+   - Norfolk (VA)
+   - Las Vegas Metro (NV)
+   - Irvine (CA)
+   - Albuquerque (NM)
+   - Hampton (VA)
+   These validate the scrape pattern and confirm yield-per-effort. After the starting batch closes, fan out by feasibility — any US jurisdiction with a structured procurement portal or machine-readable agenda is in scope.
+   - **Why:** Argus is a national database. Capping at top metros bakes in urban bias. Smaller jurisdictions are exactly where surveillance gear lands without journalism coverage — that is where Argus adds the most marginal value over Atlas of Surveillance.
+
+2. **Format restriction is the real cap.** Structured procurement portals and machine-readable agendas only. If a jurisdiction's data is PDF-locked or requires OCR/LLM extraction, **stop and relocate that jurisdiction to Phase 4** (LLM extraction worker). Do not invent in-Phase-3 OCR pipelines for individual jurisdictions.
+   - **Why:** Phase 3 owns structured public-data ingest. PDF / OCR / LLM extraction is the Phase-4 pattern per §6 and the Phase-4 worker is designed for it. Forcing PDF mining inside Phase 3 erodes the structural distinction between phases and inflates the per-jurisdiction effort budget past calibration.
+
+3. **Vendor sweep restriction.** Use the existing 24-vendor target list from [MAC-8](/MAC/issues/MAC-8) (Group A + Group B union, including the 16 [MAC-7](/MAC/issues/MAC-7)-gap vendors). Do **not** run open-ended `"ALPR"` / `"surveillance"` / similar generic keyword queries against jurisdiction portals.
+   - **Why:** Argus is a vendor-attribution database, not a generic surveillance-mention database. Vendor-name keyword discipline has held since [MAC-3](/MAC/issues/MAC-3) and stays binding here.
+
+4. **Per-jurisdiction effort stop rule (worker-defined, ratified at Step 1).** The Source Worker MUST propose a concrete per-jurisdiction extraction-effort budget in the Step-1 ratification proposal (units worker-chosen — e.g., HTTP-call count, wall-clock minutes, parser-line count, retries, page-cap, or a composite). The CEO ratifies the budget at Step-1. Once Step-2 begins, if a jurisdiction's structured-data extraction exceeds the ratified budget, **stop, log the partial state in `extraction_runs.notes`, and move on**. The effort/yield ratio is the cap, not raw row count.
+   - **Why:** A small town with one record at low extraction cost is fine; a mid-size city requiring custom per-page parsing is not. Yield-per-effort is the load-bearing fitness signal. Worker-defined budget keeps the cap calibrated to actual jurisdiction data shapes the worker discovers, rather than CEO-guessed numbers ahead of discovery.
+
+5. **No PII surfacing — §11 #3 same posture as [MAC-5](/MAC/issues/MAC-5).** Aggressive person-regex redaction. Log redaction sites in `extraction_runs.notes` (count + site descriptors, never raw redacted strings). Raw artifacts preserved per §7.2 audit trail. The §11 #3 corporate-comms read carved out at [MAC-7](/MAC/issues/MAC-7) for FCC `contact_name` does **not** apply here — council minutes name elected officials, contracting officers, citizen commenters, and police-department personnel, all squarely inside §11 #3's worked-example shape ("officer's name, badge, home address"). Default-to-redact, not stage-as-is.
+   - **Why:** Council minutes mix structured procurement metadata with unstructured public-comment narrative; the §11 #3 surveillance-target framing applies. The recall-first redaction posture from MAC-5 ("redact even at FP cost when source can carry PII") is the calibrated choice, not the zero-PII whitelist posture from MAC-6 (which presumed a PII-excluding source schema) or the corporate-comms carve-out from MAC-7 (which presumed a federal-regulatory disclosure surface).
+
+6. **Discovery approach (worker-proposed at Step-1).** The Source Worker MUST propose a strategy in the Step-1 ratification proposal for *finding* US jurisdictions with structured procurement portals or machine-readable agendas beyond the top-10 starting batch. Concrete starting points the board named: USA.gov state and local government directory, Munirevs, Granicus, OpenGov, or whatever directory infrastructure the worker discovers. Do **not** attempt to enumerate every US municipality manually.
+   - **Why:** A "find every US municipality with a structured portal" enumeration is multiplicatively expensive and brittle. Directory-driven discovery (vendor-of-vendors infrastructure like Granicus / OpenGov / Munirevs) lets one HTTP call return many qualifying jurisdictions. The worker proposes the discovery approach because they will be the one running it; CEO ratifies it.
+
+**Application timing.** SAR-5 binds at **MAC-11 dispatch** (the council-minutes / municipal-procurement source). It does NOT bind [MAC-10](/MAC/issues/MAC-10) (DeFlock vendor-attribution backfill — derivation against existing `procurement_records` reseller chains, no jurisdiction-portal scraping). Sequence per board direction at [comment 1c5831f3](/MAC/issues/MAC-1#comment-1c5831f3-a673-4da2-a449-f3a47683a68a): [MAC-9](/MAC/issues/MAC-9) (WiGLE Step-0 budget, `in_progress`) continues in parallel; [MAC-10](/MAC/issues/MAC-10) (easy win) → [MAC-11](/MAC/issues/MAC-11) (council minutes, this SAR binds).
+
+**Why this is a SAR, not a Correction Pass.** No bible text is being edited. The bible's existing §6 Phase 3 / §7.2 source-discovery / §11 #3 PII / §11 #6 robots.txt rules already cover the contractual surface; SAR-5 captures the implementation pattern for the council-minutes source-class specifically. CP convention is reserved for in-place bible edits + multi-edit bundles from a single user decision (see CP1–CP6 precedent); SAR convention covers single-source-class operational guidance (see SAR-3 / SAR-4 precedent).
