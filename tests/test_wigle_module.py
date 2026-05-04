@@ -386,9 +386,16 @@ def test_wigle_anchor_priority_table_exists_and_has_indexes():
         assert "idx_wigle_anchor_priority_state" in idx_names
         assert "idx_wigle_anchor_priority_method" in idx_names
         assert "idx_wigle_anchor_priority_run" in idx_names
+        # Forward-compatible: subsequent migrations (e.g. MAC-11 council_minutes_matters
+        # at 0005) will bump schema_version higher — the wigle_anchor_priority assertions
+        # only need ver >= 4.
         ver = conn.execute(
             "SELECT version FROM schema_version ORDER BY version DESC LIMIT 1"
         ).fetchone()[0]
-        assert ver == 4
+        assert ver >= 4
+        # And the specific 0004 row exists.
+        assert conn.execute(
+            "SELECT 1 FROM schema_version WHERE version = 4"
+        ).fetchone() is not None
     finally:
         conn.close()
