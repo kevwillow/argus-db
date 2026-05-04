@@ -219,6 +219,50 @@ The board explicitly framed all four items as a single "bible-tidy ride-along" l
 
 ---
 
+## Correction Pass 6 — §4.2 add `fcc_grantees` staging table; document stale-mirror handling pattern
+
+**Date:** 2026-05-04
+**Commit:** _(filled at backfill — paired with the bible edit + this entry)_
+**Source:** [MAC-7](/MAC/issues/MAC-7) Step-2 ratification + Step-2 ingest delivery [comment 094eae0a](/MAC/issues/MAC-7#comment-094eae0a-701e-4925-97c7-11493a2af60e). CP6 ride-along reservation was made at Step-2 ratification (CEO-owned, lands at MAC-7 close per the dispatch contract).
+**Status:** Bible edit applied this commit. Two operational ratifications (§11 #3 corporate-comms read for FCC `contact_name`; staleness-ceiling notes-shape pattern) bundle as ride-along context inside this CP entry — NOT separate SARs (per the MAC-5 codification: routine §11 #3 / §7.2 / §8.2 applications inside a Correction Pass don't need SAR numbering).
+
+### Corrections applied
+
+1. **§4.2 supporting tables — `fcc_grantees` documentation added.** New bullet between `procurement_records` and `extraction_runs`. Mirrors the `deployment_observations` precedent (CP4) and the `procurement_records` precedent (CP5) — single bullet, identifies role + idempotency + stale-mirror requirement + identifier-free reasoning. The table itself was created in MAC-7 Step 2 via `db/migrations/0003_fcc_grantees.sql` (12 columns + UNIQUE on `(source_id, source_row_key)` + 4 indexes; mirrors `0002_deployment_observations.sql` shape; staged 50,153 rows from opendata.fcc.gov dataset `3b3k-34jp`).
+
+### Operational ratifications bundled as ride-along context
+
+These are routine rule applications, not new interpretive guidance — they ride here under the MAC-5 codification rather than spawning separate SARs.
+
+1. **§11 #3 corporate-comms read.** FCC `contact_name` is mandatory federal-regulatory disclosure of a corporate-comms compliance contact (per FCC EAS form structure). The §11 #3 worked example ("officer's name, badge, home address") targets law-enforcement-personnel PII in a surveillance-target context. FCC corporate compliance contacts are a structurally distinct shape:
+   - The MAC-5/MAC-6 person regex (`rank-token + [A-Z][a-z]+`) does NOT fire on this column in practice — independent CEO verification across all 44,241 populated `contact_name` rows returns exactly 2 corporate false positives (`Michael Chief Executive Officer`, `Captain Giannakos`) and zero officer-shape PII.
+   - Stage-as-is on `contact_name` per Q4 ratification at Step 2 with explicit Phase-5 reconsider hook recorded in both `extraction_runs.notes` rows for source_id=7. Raw CSV preserved verbatim on disk per §7.2 audit trail (sha256 `5cd60fbe…0ee80cbd`).
+   - **Reversibility:** if Phase 5 review (or board direction earlier) calls for a stricter PII gate, the column is recoverable via raw-CSV replay + simple DROP/redact migration; data shape is preserved.
+
+2. **Staleness-ceiling handling pattern.** When an upstream mirror is documented stale (here: opendata.fcc.gov 3b3k-34jp frozen at 2021-03-22; `rowsUpdatedAt=2021-03-22T07:04:51Z`), the source `notes` JSON MUST carry:
+   - `dataset_freeze_date` — ISO date of the upstream's last refresh, sourced verbatim from the mirror's metadata
+   - `rows_updated_at_utc` — the upstream's own claimed timestamp, sourced verbatim
+   - `staleness_warning` — human-readable description of what the freeze means for coverage and which Phase owns the gap
+   - `extraction_runs.notes` for every run on a stale-mirror source carries the same staleness block + a Phase-5 reconsider hook tying the staleness to its downstream consequence
+   - Tier classification is unaffected by staleness (USGOV public-domain authority is tier=1 regardless of mirror freshness; staleness affects fitness-for-purpose, not source authority — `tier` and `last_status` describe what the source IS, while `notes` describes what it currently HAS)
+   - The Checkpoint brief that closes the Phase MUST surface stale-mirror coverage gaps as load-bearing findings (here: Flock Safety + 2021-04→2026-05 grantee gap routed to Phase 4 LLM-extraction worker)
+
+### Schema follow-through (no further deferral introduced by this pass)
+
+CP6 lands an applied migration (`0003_fcc_grantees.sql`) — no deferral. The CP5 schema-follow-through deferral (§4.1 `device_category` CHECK extension + Cradlepoint/Sierra `primary_category` seed update) **renumbers**: CP5's reference to "A future migration `db/migrations/0003_*.sql`" should now be read as **`0004_*.sql`** (DBArchitect recall trigger for the next promotion event or before MAC-8/9/10 if a Cradlepoint/Sierra grantee surfaces in Phase 3 staging requiring promotion). PROJECT_STATE.md "Open" section will reflect the renumber on the next state commit.
+
+### Why CP6 stands alone
+
+CP6 derives from a single source-ingest delivery (MAC-7 Step 2) with one new staging table + one operational read of an existing rule + one new operational pattern. CP5 was the multi-edit bundle from a single user decision; CP6 is a single per-source ride-along, matching the CP4 precedent (one source delivery → one CP → one new bullet + ride-along context).
+
+### Out-of-bible artifact updates that pair with this pass
+
+- **`db/migrations/0003_fcc_grantees.sql`** — applied at MAC-7 Step 2 (commit `b5df4e5`); 12 columns + UNIQUE backstop + 4 indexes. The migration shape was approved at Step 2 ratification ([comment 0e95c40a](/MAC/issues/MAC-7#comment-0e95c40a-54fd-4690-b582-e3892cfa8450)).
+- **`db/sources/fcc_id.py`** — applied at MAC-7 Step 2 (commit `b5df4e5`); mirrors `eff_atlas.py` shape; uses `--raw-subdir` flag for no-re-fetch idempotency replay (MAC-5/MAC-6 precedent).
+- **`PROJECT_STATE.md`** — flipped to reflect MAC-7 Step 2 closed + MAC-8 SAM.gov queued; CP6 entry logged in the bible-amendments status section; CP5's deferred-migration reference renumber noted (was `0003_*.sql`, now `0004_*.sql`).
+
+---
+
 ## Sub-agent rule additions and interpretive guidance
 
 This section captures rules that bind sub-agents but do not edit the bible text. New entries append below; do not rewrite history.
