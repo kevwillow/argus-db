@@ -374,3 +374,57 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
 **Application timing.** SAR-5 binds at **MAC-11 dispatch** (the council-minutes / municipal-procurement source). It does NOT bind [MAC-10](/MAC/issues/MAC-10) (DeFlock vendor-attribution backfill — derivation against existing `procurement_records` reseller chains, no jurisdiction-portal scraping). Sequence per board direction at [comment 1c5831f3](/MAC/issues/MAC-1#comment-1c5831f3-a673-4da2-a449-f3a47683a68a): [MAC-9](/MAC/issues/MAC-9) (WiGLE Step-0 budget, `in_progress`) continues in parallel; [MAC-10](/MAC/issues/MAC-10) (easy win) → [MAC-11](/MAC/issues/MAC-11) (council minutes, this SAR binds).
 
 **Why this is a SAR, not a Correction Pass.** No bible text is being edited. The bible's existing §6 Phase 3 / §7.2 source-discovery / §11 #3 PII / §11 #6 robots.txt rules already cover the contractual surface; SAR-5 captures the implementation pattern for the council-minutes source-class specifically. CP convention is reserved for in-place bible edits + multi-edit bundles from a single user decision (see CP1–CP6 precedent); SAR convention covers single-source-class operational guidance (see SAR-3 / SAR-4 precedent).
+
+### SAR-6 — Phase 4 per-wave checkpoint discipline (Step 0 ratification, status-class wave-end comment, ~50% yield-per-heartbeat stop-line)
+
+**Date:** 2026-05-04
+**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [05af14d6](/MAC/issues/MAC-1#comment-05af14d6-2c0c-45b8-b166-647d27e35c9e) (Checkpoint 3 sign-off + Phase 4 dispatch authorization). Codified at user direction ("One additional discipline for Phase 4 (not a blocker, just lock it in)").
+**Bible commit:** none (binds Phase 4 implementation pattern; no §6 Phase 4 / §7 / §8 / §11 text edit needed — the bible's existing Phase 4 wave-list, §7.3 Extraction Worker spec, and §10 "ship narrow, then widen" / yield-per-effort posture already cover the contractual surface; SAR-6 captures the operational discipline the board added at Phase 4 dispatch authorization)
+**Binds:** Source Worker (when assigned Phase 4 wave components within their structural-format competence), Extraction Worker (when hired/assigned for Phase 4 PDF/HTML/text mining waves per §7.3), CEO (per-wave Step-0 ratification + status-class wave-end review + stop-line authorization decisions)
+
+**The rule (board-stated, paraphrased decision-bearing language verbatim):**
+
+- Each wave gets a **Step 0 ratification** (worker proposes scope + target vendor/source list, CEO ratifies before any extraction fires) — same two-step pattern as Phase 3.
+- **Wave-end status comments** to the board (not full wakes — status-class only) reporting yield-per-effort. Format: records added, confidence distribution, vendor coverage delta vs prior waves, time elapsed.
+- **Stop-line if any wave's yield-per-heartbeat falls below ~50% of expected.** That's a "stop, comment, reassign" trigger so the board can authorize early-cut, scope adjustment, or move to next wave. "Don't burn 12 heartbeats on Wave A if waves 1–4 are returning nothing."
+
+**Rationale (board-stated):** "Phase 4 is the longest phase and the most LLM-cost-intensive. Per-wave checkpoints prevent runaway scope without requiring full board wakes."
+
+**How to apply:**
+
+1. **Per-wave Step 0 ratification (mandatory, mirrors Phase 3 two-step shape).** Each Phase 4 wave (B → A → C → D → E per board endorsement, see #4 below) opens with a Step 0 dispatch where the worker proposes:
+   - **Scope:** target vendor/source list (vendors for Wave B, repos/keyword anchors for Wave A, paper venues + keywords for Wave C, jurisdictions/case categories for Wave D, news outlets / forum subreddits + cap rationale for Wave E).
+   - **Per-source effort budget unit** (worker-chosen — e.g., HTTP-call count, wall-clock minutes, parser-line count, page-cap, retries, or composite — mirroring SAR-5 #4).
+   - **Expected yield bands** (records / unique identifiers / confidence distribution by `source_type` per §8.2).
+   - **Wave success-vs-stop-line decision criteria** (the worker's own ~50% baseline projection that the stop-line below tests against).
+   - **Schema-fit recommendation** with draft DDL if a new staging table is needed (mirroring MAC-5 / MAC-6 / MAC-7 / MAC-11 Step-1 shape; CP ride-along reserved if new §4.2 entry warranted).
+   CEO ratifies before any extraction fires. **No code commits, DB writes, migration authoring, or network fetches between dispatch and ratification.** Step 0 is non-fire by construction.
+
+2. **Status-class wave-end comments (visibility, not action-required).** On wave close (success-end OR stop-line trip), the worker posts a status comment to the wave's [MAC-N](/MAC/issues/MAC-1) (and a one-line summary to MAC-1 for board visibility). Verbatim format the board prescribed:
+   - **Records added** (count by `source_type`, `device_category`, `identifier_type`)
+   - **Confidence distribution** (bucketed against §8.2 bands — `≥90`, `75–89`, `50–74`, `<50`)
+   - **Vendor coverage delta vs prior waves** (which §2.1 vendors gained identifier-bearing rows that did not have them before this wave)
+   - **Time elapsed** (heartbeats consumed; CEO-class clock, not wall-clock)
+   These comments are **status-class, not wake-class**. Board reads them on the standing wake-board cadence per board steer [`31445dcf`](/MAC/issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) — they do **not** trigger immediate board action.
+
+3. **~50% yield-per-heartbeat stop-line (worker-derived baseline, ratified at Step 0).** The "expected" baseline is the worker's own Step-0 yield projection (item 1 above). If observed yield-per-heartbeat falls **below ~50% of that projection** sustained across the measurement window the worker proposed at Step 0, the worker MUST:
+   - **Stop** further extraction in the wave.
+   - **Comment** on the wave's MAC-N with: current observed yield, the Step-0 baseline being tested against, what's been tried, and a recommended path forward.
+   - **Reassign** the wave issue to CEO `in_review`.
+   The CEO authorizes one of: (a) early-cut at current state and move to next wave, (b) scope adjustment / target-list trim and resume, or (c) wave abandonment with carry-forward to Phase 5 deferred-enrichment.
+   - **Why ~50% (board-stated rationale):** matches the SAR-5 spirit (yield/effort ratio is the cap) and the bible §10 "ship narrow, then widen" / "prefer fewer high-quality records to many low-quality ones" posture. The threshold is approximate, not pixel-perfect — the binding is "trip when measurable underperformance is sustained," not a precise arithmetic gate. The worker's Step-0 projection IS the gate; the ~50% is the stop-line band against that projection.
+   - **Do not** burn additional heartbeats past stop-line trip without explicit CEO authorization. Mirrors the bible §11 "Stop. Comment. Reassign. Do not guess." rule, scoped to wave-level yield rather than schema/source ambiguity.
+
+4. **Wave ordering: B → A → C → D → E** (board-endorsed at this comment).
+   - **Why B first (board-stated rationale):** "Wave B yields a richer vendor lexicon (default SSIDs, BLE UUIDs, model numbers, FCC test-report content) that *then* makes Wave A's GitHub discovery far more targeted. Searching GitHub for 'Flock' alone is noisy; searching for specific SSID patterns or model numbers extracted from Wave B manufacturer docs is precise. B → A compounds yield in a way A → B does not."
+   - **Compounding effect.** Each wave's output anchors the next wave's search. Wave A's GitHub discovery uses Wave B's SSID/UUID/model lexicon. Wave C's academic search uses cumulative B+A vendor-specific terminology. Wave D's court/FOIA targeting uses cumulative B+A+C deployment-and-vendor knowledge. Wave E's news/forum cap inherits all prior precision.
+   - **Step-0 dispatches reuse this lexicon:** the Step-0 proposal for waves A onward MUST include "search anchors derived from prior waves" as part of the scope justification. CEO ratifies the anchor list at each wave's Step 0.
+
+5. **CEO autonomy class for Phase 4 (consistent with board steer [`31445dcf`](/MAC/issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) 21:40Z + Phase 4 dispatch authorization at this comment).**
+   - **CEO-class (autonomous, no board wake):** per-wave Step-0 ratifications, mid-wave Step-1/Step-2 ratifications on the existing two-step shape, wave success-end status comments (status-class), CP4 brief authoring at Phase 4 close, and CP6+ ride-along bible amendments triggered by per-wave schema-fit decisions.
+   - **Board-class (wake-board criteria):** wave stop-line trips (CEO comments on wave + MAC-1 with the stop-line + recommended path; board authorizes early-cut / scope adjustment / abandonment), CP4 sign-off at Phase 4 close, and §11 hard-rule triggers within a wave (PII surface beyond bounded redaction, ToS violation, recurrent fabrication).
+   - **Status-class (visibility, not action-required):** per-wave wave-end status comments (item 2 above), including stop-line-adjacent informational reports the worker chooses to surface that don't trip the stop-line definition.
+
+**Application timing.** SAR-6 binds at **Wave B Step 0 dispatch** (this heartbeat, post-CP3 sign-off) and applies to every subsequent Phase 4 wave (A, C, D, E) until CP4 closes Phase 4. It does **not** retroactively bind Phase 3 (closed at MAC-11 ratification per board steer [`31445dcf`](/MAC/issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) 21:40Z). It does **not** alter the WiGLE deferred-enrichment posture (independent decision frame, 2026-05-18 timeout, see [`feedback_wigle_deferred_enrichment.md`](feedback_wigle_deferred_enrichment.md)).
+
+**Why this is a SAR, not a Correction Pass.** No bible text is edited. The bible's existing §6 Phase 4 wave list (A/B/C/D/E definition), §7.3 Extraction Worker spec, §8.2 confidence bands, §10 ship-narrow-then-widen / yield-per-effort posture, and §11 #1/#7/#8 hard rules already define the structural surface; SAR-6 captures the per-wave operational discipline the board added at Phase 4 dispatch authorization. Mirrors SAR-5's relationship to §6 Phase 3 / §7.2 / §11 (single-phase-class operational guidance bundle, board-stated, no in-place edit). The CP convention remains reserved for in-place bible edits driven by per-wave schema-fit decisions during Phase 4 (e.g., a future CP7 if Wave B chooses a new `vendor_doc_observations` staging table).
