@@ -267,3 +267,22 @@ The §12 open question on `device_cluster_id` (added in CP3) is now ratified as 
 - **Schema consequence.** No `device_cluster_id` column is added to the `identifiers` table or any export view. If a future Phase 5 review surfaces a concrete correlation use case Argus can serve better than the scanner (e.g., grantee-FCC-ID-derived OEM bundling that Talos can't reconstruct), the question reopens.
 
 The §12 entry stays open under the strategic-steers-as-soft-priors discipline — final close happens at Phase 5 export design alongside the geographic_scope decision (CP5).
+
+### SAR-4 — §11 #6 robots.txt routing rule: legitimate alternatives only, never ignore
+
+**Date:** 2026-05-04
+**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [ae94e4eb](/MAC/issues/MAC-1#comment-ae94e4eb-e56e-4d2e-9141-2171b438ae0a)
+**Bible commit:** none (codifies the §11 #6 application standard for source discovery; no §11 text edit needed — the hard rule already exists, this entry binds the implementation pattern)
+**Binds:** Source Worker (during source discovery + Step-1 ratification proposal), DBArchitect (when designing source-discovery flow or evaluating new endpoints), future Extraction Worker (when discovering supplementary sources), CEO (when ratifying source-fit proposals that mention robots.txt friction)
+
+**The rule (board-stated, verbatim):** "§11 #6 hard rule means we route around robots.txt blocks by finding legitimate alternative endpoints (CDN, bulk download, official API, FOIA archive), never by ignoring the block. If no legitimate alternative exists, the source is skipped and documented in `coverage_report.md`."
+
+**How to apply:**
+
+- When a source's `robots.txt` blocks an automated path (e.g. `Disallow: /api/`), the Source Worker MUST search for a legitimate alternative: a CDN endpoint the site's own frontend reads, a published bulk-download URL, an official API with explicit terms, a FOIA archive, or an upstream the site is mirroring (e.g. OSM under DeFlock).
+- A legitimate alternative is **not a workaround**. It is a different access path the data publisher openly provides. The disallow is about the API contract, not about the data being forbidden. Hitting `cdn.deflock.me` instead of the robots-disallowed `deflock.org/api/` (MAC-6) is the canonical example.
+- If no legitimate alternative exists, the source is **skipped**. Document the skip + the alternatives considered + why none qualified in `coverage_report.md` (Phase 5 deliverable per §6 + §13). Do NOT escalate to "ask user for permission to ignore" — §11 #6 is a hard rule, not a soft preference, and there is no escape hatch.
+- The Step-1 ratification proposal (MAC-5 / MAC-6 / MAC-7 onwards two-step shape) MUST quote the source's `robots.txt` verbatim and state the chosen endpoint's relationship to the disallow rule (covered by Allow / different host / different path / explicit license override).
+- **Phase 3 sources (FCC EAS, SAM.gov, council minutes, WiGLE) are expected to have zero robots.txt friction** — all have explicit public-access paths. WiGLE's constraint is rate-limiting, which is a budget question (Checkpoint 3a), not a robots.txt question. Source Workers should not invent robots.txt issues where none exist.
+
+**Application precedent recorded:** MAC-6 DeFlock — `deflock.org/robots.txt` carries `Disallow: /api/` for `User-agent: *`; SourceWorker chose Path B (`cdn.deflock.me`, the DeFlock-published frontend's own CDN host) over Path A (`deflock.org/api/`, blocked); CEO ratified at 2026-05-04T~05:38Z; Phase 2 source 4/4 staged 101,597 deployment records under this rule. SAR-4 codifies the implementation pattern that worked.
