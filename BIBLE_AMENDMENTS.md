@@ -51,7 +51,7 @@ New open question added by Correction 8 review:
 ## Correction Pass 2 — §11 #11 placeholder filled with bible-amendment-log discipline
 
 **Date:** 2026-05-04
-**Commit:** _(filled in by the commit that applies this entry)_
+**Commit:** `1cfbbd4` — `docs(bible): fill §11 #11 placeholder — bible amendment log discipline`
 **Source:** MAC-1 user comment [f08cd82b](/MAC/issues/MAC-1#comment-f08cd82b-747e-4b34-aa6a-11bbfd0cc067) decision #4
 **Status:** Applied as a normal in-place edit; logged here per §11 #11 (now self-binding).
 
