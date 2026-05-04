@@ -41,13 +41,14 @@ The database must aim to cover, in priority order:
 2. **IMSI catchers / cell-site simulators** — Harris StingRay/Hailstorm/Crossbow, Digital Receiver Technology DRTBox, Septier, KeyW, Jacobs/Engility variants
 3. **Body cameras** — Axon (Body 2/3/4), Motorola Solutions V300/V500, Reveal, WatchGuard, Getac
 4. **Police radios** — Motorola APX series (APX 6000/8000/N70), L3Harris XL series, Kenwood VP/NX series (when used by LE)
-5. **Police drones** — DJI Matrice (LE configurations), Skydio X-series, BRINC LEMUR, Parrot ANAFI USA
-6. **Acoustic gunshot detection** — SoundThinking (formerly ShotSpotter) sensors
-7. **Hacking / forensics gear** — Hak5 (WiFi Pineapple, Bash Bunny, Packet Squirrel), Cellebrite UFED, Magnet GrayKey, Berla iVe
-8. **Covert / surveillance cameras** — pole cameras, body-worn covert, common LE-deployed IP cam models
-9. **GPS trackers and tags** — common LE-deployed tracker models (covert vehicle trackers); also AirTag/Tile/SmartTag for the recurrence-detection feature
-10. **Facial recognition / video analytics** — BriefCam, Rekor, Clearview-deployed endpoints (where detectable)
-11. **Drone detection systems** — Dedrone, DroneShield (these are themselves wireless emitters)
+5. **In-vehicle LTE/WiFi routers** — Cradlepoint (IBR900/R1900-class mobile routers), Sierra Wireless (MG90 / AirLink GX/RV-class). Distinct from police radios in §2.1 #4: these are LTE backhaul + in-cabin WiFi routers, not P25/VHF voice radios. Every modern patrol car carries one as the data link for laptops, dashcams, and body-cam offload. Added in Correction Pass 3 (BIBLE_AMENDMENTS).
+6. **Police drones** — DJI Matrice (LE configurations), Skydio X-series, BRINC LEMUR, Parrot ANAFI USA
+7. **Acoustic gunshot detection** — SoundThinking (formerly ShotSpotter) sensors
+8. **Hacking / forensics gear** — Hak5 (WiFi Pineapple, Bash Bunny, Packet Squirrel), Cellebrite UFED, Magnet GrayKey, Berla iVe
+9. **Covert / surveillance cameras** — pole cameras, body-worn covert, common LE-deployed IP cam models
+10. **GPS trackers and tags** — common LE-deployed tracker models (covert vehicle trackers); also AirTag/Tile/SmartTag for the recurrence-detection feature
+11. **Facial recognition / video analytics** — BriefCam, Rekor, Clearview-deployed endpoints (where detectable)
+12. **Drone detection systems** — Dedrone, DroneShield (these are themselves wireless emitters)
 
 ### 2.2 Out of Scope
 
@@ -602,6 +603,7 @@ These are hard rules. Violating any of these is a stop-the-line event.
 - **How aggressive on inference?** Bible says inferences are capped at 70 confidence. Confirm acceptable, or lower.
 - **Project name.** "Argus" is a working name. Confirm or replace before README is written. (Provisionally accepted at Checkpoint 0; final confirm at Checkpoint 5 alongside the coverage matrix.)
 - **`argus_record_id` upsert semantics in Talos seeder.** Does Talos's seeder need to support stable-id upsert (update-existing vs. insert-new) in v0.2, or can re-imports be destructive (drop-and-reload)? The bible (§7.5) requires `argus_record_id` to be stable across re-runs because the human asked for it; the answer affects re-run UX on the Pi side. Worth resolving before Phase 5 export design.
+- **`device_cluster_id` for vehicle / operator correlation.** Should the schema add a `device_cluster_id` column to support correlating multiple emitters to one vehicle/operator (e.g., 6 MACs = 1 patrol car = APX radio + Cradlepoint router + Axon dashcam + Getac laptop + body cam + driver phone), or leave clustering to scanner-side logic? Argus's current job is identifiers; Talos's job is correlation. User's initial lean is scanner-side (correlation belongs in Talos), but holding for explicit decision. Surface at Checkpoint 5 if unresolved by then. (Added by Correction Pass 3.)
 
 **Resolved during 2026-05-04 correction pass**
 
