@@ -178,7 +178,7 @@ These are routine §8.2 / §11 #3 / §7.2 applications, not bible edits — so t
 ## Correction Pass 5 — Phase 2 → Phase 3 ride-along: §4.1 in_vehicle_router enum + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope
 
 **Date:** 2026-05-04
-**Commit:** `<backfilled>` — `docs(bible): correction pass 5 — §4.1 in_vehicle_router + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope`
+**Commit:** `b2a8dac` — `docs(bible): correction pass 5 — §4.1 in_vehicle_router + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope`
 **Source:** [MAC-1](/MAC/issues/MAC-1) user comment [a7edae6f](/MAC/issues/MAC-1#comment-a7edae6f-6c7a-493e-82f2-fa088942a1a9) (Checkpoint 2 sign-off + Phase 3 dispatch decisions)
 **Status:** Bible edits applied this commit; SAR-3 (separate entry below) ratifies the `device_cluster_id` lean as binding-but-not-final.
 
