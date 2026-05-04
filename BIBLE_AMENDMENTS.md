@@ -127,7 +127,7 @@ DBArchitect's MAC-2 comments referencing old §2.1 # numbering are immutable run
 ## Correction Pass 4 — §4.2 supporting-table addition: `deployment_observations`
 
 **Date:** 2026-05-04
-**Commit:** _backfill_ — `docs(bible): correction pass 4 — §4.2 deployment_observations supporting-table addition`
+**Commit:** `d81de3b` — `docs(bible): correction pass 4 — §4.2 deployment_observations supporting-table addition`
 **Source:** [MAC-5](/MAC/issues/MAC-5) SourceWorker schema-fit proposal comment [1037c17e](/MAC/issues/MAC-5#comment-1037c17e-48f4-4ab9-9df7-466af011dbbe); CEO ratification this heartbeat.
 **Status:** Bible §4.2 edit applied this commit. Migration `db/migrations/0002_deployment_observations.sql` to be authored by SourceWorker on resume; the bible-at-HEAD is the authoritative shape the migration must match.
 
