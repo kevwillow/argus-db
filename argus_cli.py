@@ -37,6 +37,7 @@ EXPECTED_TABLES = (
     "manufacturers",
     "sources",
     "raw_observations",
+    "deployment_observations",
     "extraction_runs",
     "conflicts",
     "schema_version",
