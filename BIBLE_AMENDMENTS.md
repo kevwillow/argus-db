@@ -222,7 +222,7 @@ The board explicitly framed all four items as a single "bible-tidy ride-along" l
 ## Correction Pass 6 — §4.2 add `fcc_grantees` staging table; document stale-mirror handling pattern
 
 **Date:** 2026-05-04
-**Commit:** _(filled at backfill — paired with the bible edit + this entry)_
+**Commit:** `35900f0` — `docs(bible): correction pass 6 — §4.2 add fcc_grantees + stale-mirror handling pattern (MAC-7)`
 **Source:** [MAC-7](/MAC/issues/MAC-7) Step-2 ratification + Step-2 ingest delivery [comment 094eae0a](/MAC/issues/MAC-7#comment-094eae0a-701e-4925-97c7-11493a2af60e). CP6 ride-along reservation was made at Step-2 ratification (CEO-owned, lands at MAC-7 close per the dispatch contract).
 **Status:** Bible edit applied this commit. Two operational ratifications (§11 #3 corporate-comms read for FCC `contact_name`; staleness-ceiling notes-shape pattern) bundle as ride-along context inside this CP entry — NOT separate SARs (per the MAC-5 codification: routine §11 #3 / §7.2 / §8.2 applications inside a Correction Pass don't need SAR numbering).
 
