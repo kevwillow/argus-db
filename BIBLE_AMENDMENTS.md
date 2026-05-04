@@ -6,6 +6,8 @@ This file is the audit trail for every in-place edit to `PROJECT_BIBLE.md`. Per 
 - Sub-agent-level rule additions and interpretive guidance also go here, even when they do not modify the bible text itself.
 - Each amendment entry must link the git commit that applied the change.
 
+**SAR convention.** A "SAR" (Sub-Agent Rule) entry captures interpretive guidance, clarifications, or rules that bind one or more sub-agents but do not warrant editing the bible text. Use a SAR when the bible's existing wording is correct as written and the additional guidance is contextual, illustrative, or operational rather than contractual. SAR entries live in the **Sub-agent rule additions and interpretive guidance** section below, are numbered SAR-1, SAR-2, …, and identify the sub-agent(s) they bind.
+
 The bible itself is the contract; this file is the changelog.
 
 ---
@@ -43,6 +45,31 @@ Resolved by this pass (struck through in §12):
 
 New open question added by Correction 8 review:
 - Does Talos's seeder need to support `argus_record_id` stable-id upsert in v0.2, or can re-imports be destructive (drop-and-reload)?
+
+---
+
+## Correction Pass 2 — §11 #11 placeholder filled with bible-amendment-log discipline
+
+**Date:** 2026-05-04
+**Commit:** _(filled in by the commit that applies this entry)_
+**Source:** MAC-1 user comment [f08cd82b](/MAC/issues/MAC-1#comment-f08cd82b-747e-4b34-aa6a-11bbfd0cc067) decision #4
+**Status:** Applied as a normal in-place edit; logged here per §11 #11 (now self-binding).
+
+### Correction applied
+
+1. **§11 #11** — replaced the `(reserved)` placeholder with:
+
+   > **Do not skip the `BIBLE_AMENDMENTS.md` log entry when making in-place bible edits or adding sub-agent-level rules.** The git diff is the source of truth, but the amendment log is the human-readable trail. An undocumented amendment is a process violation regardless of whether the edit itself is correct.
+
+   This makes BIBLE_AMENDMENTS discipline a Critical Don't, on par with the other §11 hard rules. Numbering of #12/#13/#14 is unchanged (placeholder fill, not insertion).
+
+### Why this is a single-entry pass
+
+This pass touches a single line of bible text. The user explicitly authorized it as a one-line correction (decision #4 of the f08cd82b sign-off) and asked that it nonetheless be logged here so the meta rule is itself documented under the very discipline it codifies — preserving the audit-trail invariant from heartbeat zero.
+
+### §12 Open Questions impact
+
+None. §12 unchanged.
 
 ---
 

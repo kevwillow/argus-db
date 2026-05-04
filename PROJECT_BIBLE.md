@@ -584,7 +584,7 @@ These are hard rules. Violating any of these is a stop-the-line event.
 8. **Do not let confidence drift upward without corroboration.** Confidence only rises when a second independent source confirms.
 9. **Do not skip checkpoints.** Even if a phase looks easy, stop and report.
 10. **Do not categorize at the OUI level for multi-purpose vendors** (see §8.4).
-11. *(reserved — leave numbering aligned with §11 references throughout the bible)*
+11. **Do not skip the `BIBLE_AMENDMENTS.md` log entry when making in-place bible edits or adding sub-agent-level rules.** The git diff is the source of truth, but the amendment log is the human-readable trail. An undocumented amendment is a process violation regardless of whether the edit itself is correct.
 12. **Do not export OUIs that match the running scanner's hardware family** (Raspberry Pi OUIs as enumerated in §8.4) in the high-confidence Talos export. They go in the standard export at `severity='low'` only.
 13. **Do not export records with `device_category='unknown'` to Talos** under any confidence level. They remain canonical-only (see §8.4).
 14. **Do not export procurement-only records (no concrete identifier) to Talos.** Procurement records establish vendor-agency relationships, not device presence. They are analytical only (see §4.5).
