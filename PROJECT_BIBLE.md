@@ -125,7 +125,8 @@ The schema is the contract. All sub-agents output rows conforming to this.
 ### 4.2 Supporting tables
 
 - **`sources`** — registry of every source crawled, with last-fetch timestamp and status
-- **`raw_observations`** — staging table; raw extracted records before normalization (preserve forever for audit)
+- **`raw_observations`** — staging table; raw extracted records before normalization (preserve forever for audit). Holds rows that carry an actual or candidate identifier (MAC/OUI/BSSID/SSID/UUID) in `candidate_identifier` keyed by §4.1 `identifier_type`.
+- **`deployment_observations`** — staging table for Tier 1 sources that yield agency × technology × location × vendor metadata but **no** MAC/OUI/SSID/UUID identifier (EFF Atlas of Surveillance, DeFlock). Identifier columns intentionally absent — promotion to `identifiers` requires a Phase 3+ inference linking a deployment to a concrete identifier candidate (§11 #1). Idempotency keyed by `(source_id, source_row_key)` where `source_row_key` is the source's stable per-row natural key (e.g. Atlas's `AOSNUMBER`). Added in Correction Pass 4 (BIBLE_AMENDMENTS).
 - **`extraction_runs`** — log of every extraction job: agent id, source, started_at, finished_at, records_in, records_out, errors
 - **`conflicts`** — when two sources disagree on the same identifier; reviewed and resolved by CEO
 
