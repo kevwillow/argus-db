@@ -4,6 +4,10 @@
 # Raw scraped sources — frequently large, regenerable from `sources` table.
 raw/
 
+# Operational logs + per-runtime state (pacer ledgers, fetch logs, etc.).
+# Per-runtime state lives here; not provenance, not tracked.
+logs/
+
 # Built sqlite databases — regenerable from raw + extraction pipeline.
 db/*.db
 db/*.db-journal
