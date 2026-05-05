@@ -1,0 +1,22 @@
+# Wave-B2 Phase 4 vendor-docs ingest dependencies (MAC-18 Step 0 dispatch).
+#
+# Pinned per CEO ratification of architecture reframe (board-signed-off
+# bce8a0ab 2026-05-05T14:00Z) — LLM-tier extraction runs in agent context
+# under claude_local; no separate ANTHROPIC_API_KEY / no `anthropic` SDK.
+#
+# Install:  pip install -r requirements-vendor-docs.txt
+#
+# Bible §1 stdlib-first preference: stdlib genuinely doesn't suffice for
+# PDF text extraction. Pure-Python pdfminer.six honors stdlib spirit
+# (no native compile / no system deps).
+#
+# DroneShield SPA + Cradlepoint Salesforce + Hak5 GitBook surfaces are
+# handled via Wayback fallback (BRINC MAC-14 precedent at b76eedc),
+# NOT via headless browser. Decision reasoning surfaces in MAC-18 Step-0
+# ratification comment: Playwright/Selenium adds ~500MB browser binary +
+# permission complexity for a corpus shape that likely has no anchored
+# identifiers anyway. Wayback is the simpler, ratified-precedent path.
+
+pdfminer.six==20240706
+
+# Transitive: cryptography, charset-normalizer (PDF parsing infra).
