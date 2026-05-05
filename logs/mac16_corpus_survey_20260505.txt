@@ -1,0 +1,70 @@
+MAC-16 Step 2.1 — corpus regex+context-anchor survey (2026-05-05T13:00Z)
+================================================================
+21-vendor active manifest (DroneShield + BRINC excluded per ratification).
+
+Methodology:
+  * For each vendor: walk all entries with status=200 and kind ∈ {product_landing, docs_landing}
+  * Strip HTML tags via re.sub(r'<[^>]+>', ' ', text); collapse whitespace
+  * Count keyword hits: BLE/GATT/Bluetooth/advertising/peripheral; SSID/default network/WPA;
+    MAC address/MAC range/OUI/hardware address
+  * Count UUID-shape hits (8-4-4-4-12 hex) AND MAC-shape hits (xx:xx:xx:xx:xx:xx)
+  * Anchor: UUID/MAC counted as "anchored" only if a relevant keyword appears within ±200 chars
+
+vendor                       files clean_bytes ble_kw ssid_kw mac_kw uuid_anchor mac_anchor
+flock_safety                     3      106354      0       0      0           0          0
+motorola_solutions_apx           1      208046      0       0      0           0          0
+axon                             4      231530      0       0      0           0          0
+cradlepoint_docs                 3       83828      0       0      0           0          0
+skydio                           3     4773533      0       0      0           0          0
+sierra_wireless                  2      831372      0       0      0           0          0
+l3harris                         0           0      0       0      0           0          0
+genetec                          1       13743      0       0      0           0          0
+vigilant_solutions               1      213545      0       0      0           0          0
+avigilon_alta                    1      278674      0       0      0           0          0
+rekor                            3       59478      0       0      0           0          0
+reveal_media                     2       34881      4       0      0           0          0
+watchguard                       0           0      0       0      0           0          0
+getac                            4       83805      9       0      0           0          0
+dji                              5      801772     18       0      0           0          0
+parrot                           2      210561      0       0      0           0          0
+soundthinking                    1      200244      0       0      0           0          0
+hak5                             6         691      0       0      0           0          0
+cellebrite                       4      197318      0       0      0           0          0
+magnet_forensics                 4     1108237      0       0      0           0          0
+dedrone                          0           0      0       0      0           0          0
+
+21-vendor totals: ble_uuid_anchored=0  mac_anchored=0  ssid_kw_total=0  ble_kw_total=31
+
+Vendor-by-vendor corpus shape:
+  * Webflow/SPA marketing surfaces (UUID-shape hits = CSS class IDs):
+      flock_safety, axon, dji, skydio, motorola_solutions_apx, vigilant_solutions,
+      avigilon_alta, rekor, reveal_media, getac, soundthinking, parrot, sierra_wireless
+  * SPA shell with no extractable content (291–439 bytes per file, body = <script> tags only):
+      hak5 (6 files × ~115 bytes avg = 691 bytes total clean text)
+  * Marketing pages with zero spec content:
+      cellebrite, magnet_forensics, cradlepoint_docs, genetec
+  * Zero accessible HTML (all status=404 / status=None):
+      l3harris, watchguard, dedrone
+  * BLE keyword hits but radio-spec marketing copy only (no UUID/MAC near the keyword):
+      dji  ("Bluetooth Protocol: Bluetooth 5.1" — verbatim radio spec, no UUID)
+      getac (9 keyword hits — all marketing copy)
+      reveal_media ("Bluetooth Aware Bluetooth triggers" — feature copy, no UUID/MAC)
+
+Conclusion:
+The 21-vendor active manifest's HTML corpus does NOT contain the identifier surface
+that Wave-B Step 2.1 was scoped to extract (BLE UUID / SSID pattern / MAC range /
+default device-name pattern). Across 21 vendors and ~9MB of cleaned text, ZERO
+context-anchored UUID hits, ZERO context-anchored MAC hits, ZERO SSID-keyword hits.
+
+Even with full LLM-tier infrastructure (which is itself absent — see comment body),
+the LLM cannot extract identifiers that are not present in the source material.
+The corpus shape does not match the Step-2.0-ratified yield projection (30–86 rows
+wave-aggregate).
+
+Identifier-bearing content for these vendors lives in:
+  * Manufacturer install/setup PDFs (Wave-B2 deferred per ratification #1)
+  * FCC test report PDFs (Wave-B2 deferred + MAC-7 fcc_search follow-up parked)
+  * SDK reference docs / dev portals (NOT in current Step-1 manifest)
+  * Vendor support portal articles (often behind login = §11 #2 territory)
+
+Source: db/sources/__queried_at__/manifest = 23 vendors, 21 active. See raw/vendor_docs/20260505T040929Z/.
