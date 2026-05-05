@@ -399,3 +399,180 @@ def test_wigle_anchor_priority_table_exists_and_has_indexes():
         ).fetchone() is not None
     finally:
         conn.close()
+
+
+# ─── 11. T1 MD live-fire driver — pacer + bbox + idempotency ──────────────
+
+
+from datetime import datetime, timedelta, timezone
+
+
+def test_compute_bbox_md_lat():
+    """50m bbox at MD latitude (~39.18°): delta_lat ≈ 0.00045°,
+    delta_lon ≈ 0.00058°. Validate symmetry + magnitude."""
+    lat, lon = 39.179, -76.741
+    lat1, lat2, lon1, lon2 = wigle.compute_bbox(lat, lon, radius_m=50.0)
+    assert lat1 < lat < lat2
+    assert lon1 < lon < lon2
+    # ~0.00045° lat / ~0.00058° lon at lat=39.18 (within 5%)
+    assert 0.00040 < (lat2 - lat1) / 2 < 0.00050
+    assert 0.00050 < (lon2 - lon1) / 2 < 0.00065
+
+
+def test_compute_bbox_refuses_pole():
+    with pytest.raises(ValueError):
+        wigle.compute_bbox(89.5, 0.0, radius_m=50.0)
+
+
+def test_derive_source_row_key_deterministic():
+    k1 = wigle.derive_source_row_key(wap_id=321157, netid="aa:bb:cc:dd:ee:ff")
+    k2 = wigle.derive_source_row_key(wap_id=321157, netid="aa:bb:cc:dd:ee:ff")
+    k3 = wigle.derive_source_row_key(wap_id=321157, netid="aa:bb:cc:dd:ee:00")
+    assert k1 == k2
+    assert k1 != k3
+    assert len(k1) == 64  # sha256 hex
+
+
+def test_pacer_evaluate_fresh_state_can_fire():
+    state = wigle.PacerState()
+    v = wigle.evaluate_pacer(state, now=datetime(2026, 5, 5, 17, 55, tzinfo=timezone.utc))
+    assert v.can_fire
+    assert v.reason == "ok"
+    assert v.seconds_until_ok == 0
+
+
+def test_pacer_min_gap_blocks_within_window():
+    state = wigle.PacerState(
+        last_query_at_iso="2026-05-05T17:55:00Z",
+        today_utc_iso="2026-05-05",
+        today_count=1,
+    )
+    # 5 minutes later — must wait
+    v = wigle.evaluate_pacer(
+        state, now=datetime(2026, 5, 5, 18, 0, 0, tzinfo=timezone.utc),
+        min_gap_seconds=900,
+    )
+    assert not v.can_fire
+    assert v.reason.startswith("min_gap_not_met")
+    assert 595 <= v.seconds_until_ok <= 605
+
+
+def test_pacer_min_gap_allows_after_window():
+    state = wigle.PacerState(
+        last_query_at_iso="2026-05-05T17:55:00Z",
+        today_utc_iso="2026-05-05",
+        today_count=1,
+    )
+    # 16 minutes later — allowed
+    v = wigle.evaluate_pacer(
+        state, now=datetime(2026, 5, 5, 18, 11, 0, tzinfo=timezone.utc),
+        min_gap_seconds=900,
+    )
+    assert v.can_fire
+
+
+def test_pacer_daily_quota_blocks_at_cap():
+    state = wigle.PacerState(
+        last_query_at_iso="2026-05-05T08:00:00Z",
+        today_utc_iso="2026-05-05",
+        today_count=100,
+    )
+    v = wigle.evaluate_pacer(
+        state, now=datetime(2026, 5, 5, 23, 0, 0, tzinfo=timezone.utc),
+        daily_quota=100,
+    )
+    assert not v.can_fire
+    assert "daily_quota_exhausted" in v.reason
+    # ~3600s until UTC midnight
+    assert 3500 < v.seconds_until_ok < 3700
+
+
+def test_pacer_day_rollover_resets_count():
+    """Yesterday's 100 must not block today's first fire."""
+    state = wigle.PacerState(
+        last_query_at_iso="2026-05-05T23:30:00Z",
+        today_utc_iso="2026-05-05",
+        today_count=100,
+    )
+    v = wigle.evaluate_pacer(
+        state, now=datetime(2026, 5, 6, 0, 1, 0, tzinfo=timezone.utc),
+        daily_quota=100, min_gap_seconds=900,
+    )
+    # gap from yesterday's last fire is 31 min (>15) so no min_gap block
+    # day rolled over so today_count is 0
+    assert v.can_fire
+
+
+def test_pacer_record_fire_increments():
+    state = wigle.PacerState(
+        last_query_at_iso="2026-05-05T17:55:00Z",
+        today_utc_iso="2026-05-05",
+        today_count=5,
+        all_time_count=42,
+    )
+    new = wigle.record_pacer_fire(
+        state, now=datetime(2026, 5, 5, 18, 11, 0, tzinfo=timezone.utc),
+    )
+    assert new.today_count == 6
+    assert new.all_time_count == 43
+    assert new.last_query_at_iso == "2026-05-05T18:11:00Z"
+
+
+def test_pacer_record_fire_day_rollover_resets_today():
+    state = wigle.PacerState(
+        last_query_at_iso="2026-05-05T23:50:00Z",
+        today_utc_iso="2026-05-05",
+        today_count=99,
+        all_time_count=99,
+    )
+    new = wigle.record_pacer_fire(
+        state, now=datetime(2026, 5, 6, 0, 5, 0, tzinfo=timezone.utc),
+    )
+    assert new.today_utc_iso == "2026-05-06"
+    assert new.today_count == 1
+    assert new.all_time_count == 100
+
+
+def test_pacer_persistence_round_trip(tmp_path):
+    p = tmp_path / "pacer.json"
+    state = wigle.PacerState(
+        last_query_at_iso="2026-05-05T17:55:00Z",
+        today_utc_iso="2026-05-05",
+        today_count=3,
+        all_time_count=7,
+        wave_dirs={"t1_md": "raw/wigle/t1_md/20260505T175500Z"},
+    )
+    state.save(p)
+    loaded = wigle.PacerState.load(p)
+    assert loaded.last_query_at_iso == state.last_query_at_iso
+    assert loaded.today_count == 3
+    assert loaded.all_time_count == 7
+    assert loaded.wave_dirs == {"t1_md": "raw/wigle/t1_md/20260505T175500Z"}
+
+
+def test_pacer_load_missing_returns_fresh(tmp_path):
+    p = tmp_path / "nonexistent.json"
+    state = wigle.PacerState.load(p)
+    assert state.today_count == 0
+    assert state.last_query_at_iso is None
+
+
+def test_t1_md_confirm_token_rejection():
+    """Driver MUST refuse without the exact confirm token."""
+    with pytest.raises(RuntimeError, match="confirm"):
+        wigle.run_t1_md_wave(
+            agent_id="test",
+            confirm_token="WRONG",
+            max_queries=1,
+            dry_run=True,
+        )
+
+
+def test_wigle_query_url_shape():
+    url = wigle._wigle_query_url(39.17, 39.18, -76.75, -76.74)
+    assert url.startswith(wigle.SEARCH_ENDPOINT + "?")
+    assert "latrange1=39.17" in url
+    assert "latrange2=39.18" in url
+    assert "longrange1=-76.75" in url
+    assert "longrange2=-76.74" in url
+    assert "resultsPerPage=100" in url

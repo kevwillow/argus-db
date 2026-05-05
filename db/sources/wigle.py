@@ -137,6 +137,7 @@ import hashlib
 import http.client
 import json
 import logging
+import math
 import os
 import re
 import sqlite3
@@ -147,7 +148,7 @@ import urllib.request
 from base64 import b64encode
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Iterable, Optional
@@ -1131,6 +1132,796 @@ def run_live_query(
     return obj, sig
 
 
+# ─── T1 MD live-fire (Step 1; gated on dispatch contract 251a65f3) ────────
+#
+# WiGLE-admin grant landed 2026-05-05 at 100 q/day; pacing 4 q/h, ~15-min
+# minimum gap. Dispatch contract at MAC-9 [`251a65f3`]: T1 MD only / strict-
+# set 549 anchors / no promotion / no SAR. DRY_RUN flip OFF authorized for
+# T1 MD wave (CEO-class to flip back ON or transition to T2).
+#
+# Pacer is on-disk so cross-heartbeat enforcement holds (a single agent
+# heartbeat does not see the prior heartbeat's in-memory state). Ledger
+# at logs/wigle_pacer.json. Quota days roll over at UTC midnight (matches
+# the implicit WiGLE quota-day convention; we will tighten on first
+# observation if responses indicate otherwise).
+#
+# 50m bbox per anchor: a Flock camera's nearby WiFi/BSSIDs (the camera
+# itself, patrol cars passing, colocated infrastructure) sit within
+# ~10–50m. Larger radius dilutes attribution; smaller may miss sniffs.
+# CEO-overridable via --bbox-radius-m.
+
+WIGLE_DAILY_QUOTA = 100                # ratified at MAC-1 bd667afb #1
+WIGLE_HOURLY_QUOTA = 4                 # ratified at MAC-1 bd667afb #2
+WIGLE_MIN_GAP_SECONDS = 900            # ~15 min — ratified at MAC-1 bd667afb #2
+DEFAULT_BBOX_RADIUS_M = 50.0           # see comment above; CEO-overridable
+T1_MD_CONFIRM_TOKEN = "I-AUTHORIZE-T1-MD-LIVE-FIRE-2026-05-05"
+
+DEFAULT_PACER_LEDGER = REPO_ROOT / "logs" / "wigle_pacer.json"
+DEFAULT_T1_MD_RAW_ROOT = DEFAULT_RAW_ROOT / "t1_md"
+
+
+def compute_bbox(
+    lat: float, lon: float, radius_m: float = DEFAULT_BBOX_RADIUS_M
+) -> tuple[float, float, float, float]:
+    """Square bbox of half-side ≈ radius_m around (lat, lon).
+
+    Returns (latrange1, latrange2, longrange1, longrange2) — WiGLE swagger
+    convention: range1 = lesser, range2 = greater. Approximation:
+      1° lat ≈ 111,000 m
+      1° lon ≈ 111,320 × cos(lat) m
+    Good to ~0.3% at typical latitudes. Refuses lat outside [-89, 89] to
+    avoid cos→0 blowup.
+    """
+    if not -89.0 <= lat <= 89.0:
+        raise ValueError(f"lat {lat!r} outside [-89, 89]; refuses bbox")
+    delta_lat = radius_m / 111_000.0
+    cos_lat = math.cos(math.radians(lat))
+    if cos_lat < 1e-6:
+        raise ValueError(f"cos(lat={lat!r}) too small; refuses bbox")
+    delta_lon = radius_m / (111_320.0 * cos_lat)
+    return (lat - delta_lat, lat + delta_lat, lon - delta_lon, lon + delta_lon)
+
+
+@dataclass
+class PacerState:
+    """On-disk pacer ledger. Persisted as JSON at DEFAULT_PACER_LEDGER.
+
+    `today_utc_iso` is YYYY-MM-DD (UTC). When today rolls over,
+    today_count resets to 0. `last_query_at_iso` is the timestamp of the
+    most recent successful WiGLE call (any HTTP status; quota was burned
+    even on 4xx). Wave dirs are tracked per-wave so a dispatch can
+    resume cleanly across heartbeats.
+    """
+
+    schema_version: int = 1
+    last_query_at_iso: Optional[str] = None
+    today_utc_iso: Optional[str] = None
+    today_count: int = 0
+    all_time_count: int = 0
+    wave_dirs: dict[str, str] = field(default_factory=dict)
+
+    @classmethod
+    def load(cls, path: Path = DEFAULT_PACER_LEDGER) -> "PacerState":
+        if not path.exists():
+            return cls()
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        return cls(
+            schema_version=int(raw.get("schema_version", 1)),
+            last_query_at_iso=raw.get("last_query_at_iso"),
+            today_utc_iso=raw.get("today_utc_iso"),
+            today_count=int(raw.get("today_count", 0)),
+            all_time_count=int(raw.get("all_time_count", 0)),
+            wave_dirs=dict(raw.get("wave_dirs", {})),
+        )
+
+    def save(self, path: Path = DEFAULT_PACER_LEDGER) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(
+                {
+                    "schema_version": self.schema_version,
+                    "last_query_at_iso": self.last_query_at_iso,
+                    "today_utc_iso": self.today_utc_iso,
+                    "today_count": self.today_count,
+                    "all_time_count": self.all_time_count,
+                    "wave_dirs": self.wave_dirs,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+
+@dataclass
+class PacerVerdict:
+    can_fire: bool
+    reason: str
+    seconds_until_ok: int
+
+
+def _today_utc_iso(now: datetime) -> str:
+    return now.strftime("%Y-%m-%d")
+
+
+def evaluate_pacer(
+    state: PacerState,
+    *,
+    now: Optional[datetime] = None,
+    daily_quota: int = WIGLE_DAILY_QUOTA,
+    min_gap_seconds: int = WIGLE_MIN_GAP_SECONDS,
+) -> PacerVerdict:
+    """Pure pacer decision. No I/O. Day-rollover handled here so callers
+    don't accidentally treat yesterday's count as today's.
+    """
+    if now is None:
+        now = datetime.now(timezone.utc)
+    today = _today_utc_iso(now)
+    today_count = state.today_count if state.today_utc_iso == today else 0
+    if today_count >= daily_quota:
+        # seconds until next UTC midnight
+        midnight = (now + timedelta(days=1)).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        return PacerVerdict(
+            can_fire=False,
+            reason=f"daily_quota_exhausted ({today_count}/{daily_quota} on {today})",
+            seconds_until_ok=int((midnight - now).total_seconds()),
+        )
+    if state.last_query_at_iso:
+        last = datetime.strptime(state.last_query_at_iso, "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=timezone.utc
+        )
+        elapsed = (now - last).total_seconds()
+        if elapsed < min_gap_seconds:
+            return PacerVerdict(
+                can_fire=False,
+                reason=f"min_gap_not_met (elapsed={int(elapsed)}s, need {min_gap_seconds}s)",
+                seconds_until_ok=int(min_gap_seconds - elapsed),
+            )
+    return PacerVerdict(can_fire=True, reason="ok", seconds_until_ok=0)
+
+
+def record_pacer_fire(
+    state: PacerState, *, now: Optional[datetime] = None
+) -> PacerState:
+    """Pure update: returns a new state with this fire recorded.
+    Day-rollover resets today_count to 1 (this fire); else increments.
+    """
+    if now is None:
+        now = datetime.now(timezone.utc)
+    today = _today_utc_iso(now)
+    today_count = state.today_count if state.today_utc_iso == today else 0
+    return PacerState(
+        schema_version=state.schema_version,
+        last_query_at_iso=now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        today_utc_iso=today,
+        today_count=today_count + 1,
+        all_time_count=state.all_time_count + 1,
+        wave_dirs=dict(state.wave_dirs),
+    )
+
+
+def _wigle_query_url(
+    latrange1: float, latrange2: float, longrange1: float, longrange2: float
+) -> str:
+    """Reconstruct the canonical query URL for source_url provenance.
+    Uses the same param shape as fetch_network_search.
+    """
+    params = urllib.parse.urlencode(
+        {
+            "latrange1": str(latrange1),
+            "latrange2": str(latrange2),
+            "longrange1": str(longrange1),
+            "longrange2": str(longrange2),
+            "resultsPerPage": str(PAGE_LIMIT),
+        }
+    )
+    return f"{SEARCH_ENDPOINT}?{params}"
+
+
+def derive_source_row_key(*, wap_id: int, netid: str) -> str:
+    """Per-result idempotency key.
+
+    Mirrors migration 0006 precedent (sha256("doc_url|candidate_type|
+    candidate_identifier")) but anchor-keyed since each WiGLE result is
+    uniquely a (wap_anchor, BSSID) pair. Re-running the wave produces
+    UNIQUE-violation skips for already-staged (anchor, BSSID) pairs.
+    """
+    payload = f"wigle|wap:{wap_id}|netid:{netid}".encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _load_t1_md_anchors(
+    conn: sqlite3.Connection,
+) -> list[tuple[int, int, int, float, float, str]]:
+    """Returns list of (wap_id, deployment_id, intra_tier_rank, lat, lon,
+    derivation_method) for T1 MD WiGLE-queryable anchors (lat/lon
+    populated). Ordered by intra_tier_rank ASC. Excludes the Atlas-row
+    rank-1 anchor (NULL lat/lon — known per Q3 ratification).
+    """
+    rows = conn.execute(
+        """
+        SELECT wap.id, wap.deployment_id, wap.intra_tier_rank,
+               do.lat, do.lon, wap.derivation_method
+          FROM wigle_anchor_priority wap
+          JOIN deployment_observations do ON do.id = wap.deployment_id
+         WHERE wap.priority_tier = 1
+           AND wap.state_or_country = 'MD'
+           AND do.lat IS NOT NULL
+           AND do.lon IS NOT NULL
+         ORDER BY wap.intra_tier_rank ASC
+        """
+    ).fetchall()
+    return [(int(r[0]), int(r[1]), int(r[2]), float(r[3]), float(r[4]), str(r[5]))
+            for r in rows]
+
+
+def _t1_md_anchors_already_fired(
+    conn: sqlite3.Connection, source_id: int
+) -> set[int]:
+    """Returns the set of wap_ids already fired in any prior live run.
+
+    Detection: we encode the wap_id in the source_url's `latrange1` /
+    `longrange1` derivation, but the durable signal is the raw artifact
+    file at raw/wigle/t1_md/<wave>/anchor-<wap_id>.json. We can't query
+    the filesystem cheaply per-anchor here, so we rely on the
+    raw_observations table's source_row_key prefix `wigle|wap:<wap_id>|`
+    being present for at least one row per anchor (any hit) OR the
+    sentinel zero-results record (we insert one with candidate_type
+    'wigle_zero_results' to mark "anchor was queried but returned
+    nothing").
+    """
+    cur = conn.execute(
+        """
+        SELECT DISTINCT
+               CAST(SUBSTR(notes, INSTR(notes, '"wap_id": ')+10) AS INTEGER) AS wap
+          FROM raw_observations
+         WHERE source_id = ?
+           AND notes LIKE '%"wave": "t1_md"%'
+           AND notes LIKE '%"wap_id":%'
+        """,
+        (source_id,),
+    )
+    out: set[int] = set()
+    for (wap,) in cur.fetchall():
+        if wap:
+            out.add(int(wap))
+    return out
+
+
+def _wave_dir_for(state: PacerState, wave: str, raw_root: Path) -> Path:
+    """Returns (and stores) a stable wave directory. New wave gets a fresh
+    UTC-compact-stamped subdir; existing wave reuses prior dir.
+    """
+    existing = state.wave_dirs.get(wave)
+    if existing:
+        p = Path(existing)
+        if not p.is_absolute():
+            p = REPO_ROOT / p
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+    wave_id = _utc_now_compact()
+    p = raw_root / wave_id
+    p.mkdir(parents=True, exist_ok=True)
+    try:
+        state.wave_dirs[wave] = str(p.relative_to(REPO_ROOT))
+    except ValueError:
+        state.wave_dirs[wave] = str(p)
+    return p
+
+
+def _persist_raw_response(
+    *,
+    wave_dir: Path,
+    wap_id: int,
+    deployment_id: int,
+    payload: bytes,
+    status: int,
+    headers: dict[str, str],
+    bbox: tuple[float, float, float, float],
+    fired_at_iso: str,
+    query_url: str,
+) -> Path:
+    """Provenance-first: write the raw HTTP response to disk before any
+    DB write. §11 #7 binds.
+    """
+    out = wave_dir / f"anchor-{wap_id}.json"
+    envelope = {
+        "argus_envelope": {
+            "wap_id": wap_id,
+            "deployment_id": deployment_id,
+            "fired_at_utc": fired_at_iso,
+            "http_status": status,
+            "query_url": query_url,
+            "bbox": {
+                "latrange1": bbox[0], "latrange2": bbox[1],
+                "longrange1": bbox[2], "longrange2": bbox[3],
+            },
+            "response_headers": headers,
+            "payload_sha256": hashlib.sha256(payload).hexdigest(),
+            "payload_byte_count": len(payload),
+        },
+        "wigle_response_text": payload.decode("utf-8", errors="replace"),
+    }
+    out.write_text(json.dumps(envelope, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return out
+
+
+def _stage_results(
+    conn: sqlite3.Connection,
+    *,
+    source_id: int,
+    extraction_run_id: int,
+    wap_id: int,
+    deployment_id: int,
+    intra_tier_rank: int,
+    derivation_method: str,
+    query_url: str,
+    raw_artifact_path: Path,
+    fired_at_iso: str,
+    parsed: Optional[dict],
+    http_status: int,
+) -> tuple[int, int, int]:
+    """Insert raw_observations rows for one anchor's response. Returns
+    (rows_inserted, rows_skipped_idempotent, results_observed).
+
+    Two record shapes:
+      * candidate_type='wigle_bssid' — one per result in `results[]`,
+        candidate_identifier = netid (BSSID), source_excerpt carries
+        ssid (PII-redacted) + lat/lon string.
+      * candidate_type='wigle_zero_results' — one sentinel row when the
+        response is success=true with zero results. Marks the anchor as
+        "fired but empty" so re-runs don't re-query.
+      * candidate_type='wigle_error' — one sentinel row when http_status
+        is non-2xx (4xx/5xx). Allows audit-trail without re-firing.
+    """
+    rows_inserted = 0
+    rows_skipped = 0
+    results = []
+    if parsed and parsed.get("success") and isinstance(parsed.get("results"), list):
+        results = parsed["results"]
+
+    if http_status >= 400:
+        notes = json.dumps(
+            {
+                "wave": "t1_md",
+                "wap_id": wap_id,
+                "deployment_id": deployment_id,
+                "intra_tier_rank": intra_tier_rank,
+                "derivation_method": derivation_method,
+                "fired_at_utc": fired_at_iso,
+                "raw_artifact": str(raw_artifact_path.relative_to(REPO_ROOT)),
+                "http_status": http_status,
+                "kind": "error",
+            },
+            sort_keys=True,
+        )
+        srk = derive_source_row_key(wap_id=wap_id, netid=f"_error_{http_status}_{fired_at_iso}")
+        try:
+            conn.execute(
+                "INSERT INTO raw_observations "
+                "(source_id, extraction_run_id, source_url, raw_payload, "
+                "candidate_identifier, candidate_type, source_excerpt, "
+                "captured_at, notes, source_row_key) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    source_id, extraction_run_id, query_url,
+                    parsed and json.dumps(parsed, sort_keys=True) or None,
+                    None, "wigle_error",
+                    f"WiGLE returned HTTP {http_status} for anchor {wap_id}",
+                    fired_at_iso, notes, srk,
+                ),
+            )
+            rows_inserted += 1
+        except sqlite3.IntegrityError:
+            rows_skipped += 1
+        return rows_inserted, rows_skipped, 0
+
+    if not results:
+        notes = json.dumps(
+            {
+                "wave": "t1_md",
+                "wap_id": wap_id,
+                "deployment_id": deployment_id,
+                "intra_tier_rank": intra_tier_rank,
+                "derivation_method": derivation_method,
+                "fired_at_utc": fired_at_iso,
+                "raw_artifact": str(raw_artifact_path.relative_to(REPO_ROOT)),
+                "http_status": http_status,
+                "kind": "zero_results",
+            },
+            sort_keys=True,
+        )
+        srk = derive_source_row_key(wap_id=wap_id, netid="_zero_results")
+        try:
+            conn.execute(
+                "INSERT INTO raw_observations "
+                "(source_id, extraction_run_id, source_url, raw_payload, "
+                "candidate_identifier, candidate_type, source_excerpt, "
+                "captured_at, notes, source_row_key) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    source_id, extraction_run_id, query_url,
+                    parsed and json.dumps(parsed, sort_keys=True) or None,
+                    None, "wigle_zero_results",
+                    f"WiGLE returned 0 results in 50m bbox around anchor {wap_id}",
+                    fired_at_iso, notes, srk,
+                ),
+            )
+            rows_inserted += 1
+        except sqlite3.IntegrityError:
+            rows_skipped += 1
+        return rows_inserted, rows_skipped, 0
+
+    for rec in results:
+        netid = str(rec.get("netid", "")).strip()
+        if not netid:
+            continue
+        ssid_raw = rec.get("ssid") or ""
+        ssid_redacted, pii_hits = redact_ssid_pii(str(ssid_raw))
+        excerpt = (
+            f"BSSID={netid} SSID={ssid_redacted!r} "
+            f"lat={rec.get('trilat')} lon={rec.get('trilong')} "
+            f"qos={rec.get('qos')}"
+        )[:200]
+        notes = json.dumps(
+            {
+                "wave": "t1_md",
+                "wap_id": wap_id,
+                "deployment_id": deployment_id,
+                "intra_tier_rank": intra_tier_rank,
+                "derivation_method": derivation_method,
+                "fired_at_utc": fired_at_iso,
+                "raw_artifact": str(raw_artifact_path.relative_to(REPO_ROOT)),
+                "http_status": http_status,
+                "kind": "result",
+                "wigle_record": rec,
+                "pii_redactions": pii_hits,
+            },
+            sort_keys=True,
+            default=str,
+        )
+        srk = derive_source_row_key(wap_id=wap_id, netid=netid)
+        try:
+            conn.execute(
+                "INSERT INTO raw_observations "
+                "(source_id, extraction_run_id, source_url, raw_payload, "
+                "candidate_identifier, candidate_type, candidate_manufacturer, "
+                "source_excerpt, captured_at, notes, source_row_key) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    source_id, extraction_run_id, query_url,
+                    json.dumps(rec, sort_keys=True, default=str),
+                    netid, "wigle_bssid", None,
+                    excerpt, fired_at_iso, notes, srk,
+                ),
+            )
+            rows_inserted += 1
+        except sqlite3.IntegrityError:
+            rows_skipped += 1
+    return rows_inserted, rows_skipped, len(results)
+
+
+def _upsert_source_live(conn: sqlite3.Connection, *, fetched_at: str, status: str) -> int:
+    """Update the WiGLE sources row for live-fire. Status transitions
+    'docs_only' → 'live_running' → 'live_partial'/'live_ok' as wave
+    progresses. Notes preserved from Step 2 build (we only update the
+    operational fields here).
+    """
+    cur = conn.execute("SELECT id FROM sources WHERE url = ?", (SOURCE_URL,))
+    row = cur.fetchone()
+    if row is None:
+        raise RuntimeError(
+            "WiGLE sources row missing; run --build-priority-list once first"
+        )
+    sid = int(row[0])
+    conn.execute(
+        "UPDATE sources SET last_fetched_at = ?, last_status = ? WHERE id = ?",
+        (fetched_at, status, sid),
+    )
+    return sid
+
+
+@dataclass
+class WaveStats:
+    queries_fired: int = 0
+    anchors_skipped_no_geo: int = 0
+    anchors_skipped_already_fired: int = 0
+    rows_inserted: int = 0
+    rows_skipped_idempotent: int = 0
+    results_observed: int = 0
+    quota_exhausted: bool = False
+    pacer_blocked_at_count: int = 0
+    fires: list[dict] = field(default_factory=list)
+
+
+def run_t1_md_wave(
+    *,
+    db_path: Path = DEFAULT_DB_PATH,
+    agent_id: str,
+    confirm_token: str,
+    max_queries: int = 1,
+    bbox_radius_m: float = DEFAULT_BBOX_RADIUS_M,
+    pacer_path: Path = DEFAULT_PACER_LEDGER,
+    raw_root: Path = DEFAULT_T1_MD_RAW_ROOT,
+    env_path: Path = DEFAULT_ENV_PATH,
+    sleep_to_meet_gap: bool = False,
+    dry_run: bool = True,
+) -> dict[str, object]:
+    """Drive the T1 MD live-fire wave. CEO-gated by `confirm_token`.
+
+    `dry_run=True` (default): exercises everything except the actual HTTP
+    call and the DB writes — useful for smoke-testing the driver without
+    burning quota. The DRY_RUN gate on `run_live_query` is bypassed by
+    this driver since the dispatch contract authorizes the flip; the
+    `dry_run` arg here is a separate, finer-grained driver-level gate.
+
+    `sleep_to_meet_gap=False`: if the pacer says wait, we exit cleanly
+    rather than sleeping inside the agent's heartbeat. Set True only for
+    long-running CLI invocations.
+
+    Returns a structured stats dict (also serialized to extraction_runs.notes).
+    """
+    if confirm_token != T1_MD_CONFIRM_TOKEN:
+        raise RuntimeError(
+            "T1 MD live-fire requires --confirm "
+            f"{T1_MD_CONFIRM_TOKEN!r}; refusing per dispatch contract."
+        )
+    if max_queries < 1:
+        raise ValueError("max_queries must be >= 1")
+
+    api_name, api_token = _load_wigle_creds(env_path)
+    LOG.info("WiGLE creds loaded (HTTP Basic) — values not logged")
+
+    pacer = PacerState.load(pacer_path)
+    LOG.info(
+        "pacer ledger loaded: today=%s today_count=%d all_time=%d "
+        "last_query_at=%s",
+        pacer.today_utc_iso, pacer.today_count, pacer.all_time_count,
+        pacer.last_query_at_iso,
+    )
+
+    fetched_at_iso = _utc_now()
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON")
+    stats = WaveStats()
+    try:
+        if dry_run:
+            # Read-only path: don't mutate sources / extraction_runs / pacer
+            # ledger / wave dir. We still resolve sid + simulate run_id so
+            # downstream code paths exercise correctly.
+            row = conn.execute(
+                "SELECT id FROM sources WHERE url = ?", (SOURCE_URL,)
+            ).fetchone()
+            if row is None:
+                raise RuntimeError(
+                    "WiGLE sources row missing; run --build-priority-list once first"
+                )
+            sid = int(row[0])
+            run_id = -1
+        else:
+            sid = _upsert_source_live(
+                conn, fetched_at=fetched_at_iso, status="live_running",
+            )
+            run_id = _start_run(conn, agent_id=agent_id, source_id=sid)
+
+        anchors = _load_t1_md_anchors(conn)
+        if not anchors:
+            raise RuntimeError("no T1 MD anchors with lat/lon found; aborting")
+        already_fired = _t1_md_anchors_already_fired(conn, sid)
+        LOG.info(
+            "T1 MD anchors total=%d already_fired=%d to_process=%d",
+            len(anchors), len(already_fired),
+            len(anchors) - len(already_fired),
+        )
+
+        if dry_run:
+            wave_dir = Path("/dev/null/dry_run_wave_dir")  # never written to
+            LOG.info("[DRY_RUN] wave_dir resolution skipped")
+        else:
+            wave_dir = _wave_dir_for(pacer, "t1_md", raw_root)
+            LOG.info("wave_dir=%s", wave_dir)
+
+        for (wap_id, dep_id, rank, lat, lon, deriv) in anchors:
+            if stats.queries_fired >= max_queries:
+                break
+            if wap_id in already_fired:
+                stats.anchors_skipped_already_fired += 1
+                continue
+
+            verdict = evaluate_pacer(pacer)
+            if not verdict.can_fire:
+                stats.pacer_blocked_at_count = stats.queries_fired
+                LOG.warning("pacer blocked: %s", verdict.reason)
+                if sleep_to_meet_gap and verdict.reason.startswith("min_gap_not_met"):
+                    LOG.info("sleeping %ds to meet pacer gap", verdict.seconds_until_ok)
+                    time.sleep(verdict.seconds_until_ok + 1)
+                else:
+                    break
+
+            try:
+                bbox = compute_bbox(lat, lon, radius_m=bbox_radius_m)
+            except ValueError as e:
+                LOG.warning("anchor wap_id=%d bbox refused: %s", wap_id, e)
+                stats.anchors_skipped_no_geo += 1
+                continue
+
+            query_url = _wigle_query_url(*bbox)
+            fired_at_iso = _utc_now()
+
+            if dry_run:
+                LOG.info(
+                    "[DRY_RUN] would fire wap_id=%d (deployment %d, rank %d) "
+                    "bbox=(%.6f,%.6f,%.6f,%.6f)",
+                    wap_id, dep_id, rank, *bbox,
+                )
+                payload = b'{"success": true, "totalResults": 0, "results": []}'
+                status = 200
+                headers = {"X-Argus-Dry-Run": "true"}
+            else:
+                LOG.info(
+                    "firing wap_id=%d (deployment %d, rank %d) "
+                    "bbox=(%.6f,%.6f,%.6f,%.6f)",
+                    wap_id, dep_id, rank, *bbox,
+                )
+                payload, status, headers = fetch_network_search(
+                    latrange1=bbox[0], latrange2=bbox[1],
+                    longrange1=bbox[2], longrange2=bbox[3],
+                    api_name=api_name, api_token=api_token,
+                )
+
+            pacer = record_pacer_fire(pacer)
+            if not dry_run:
+                pacer.save(pacer_path)
+            stats.queries_fired += 1
+
+            if dry_run:
+                artifact_path = Path("/dev/null/dry_run_artifact.json")
+            else:
+                artifact_path = _persist_raw_response(
+                    wave_dir=wave_dir,
+                    wap_id=wap_id,
+                    deployment_id=dep_id,
+                    payload=payload,
+                    status=status,
+                    headers=headers,
+                    bbox=bbox,
+                    fired_at_iso=fired_at_iso,
+                    query_url=query_url,
+                )
+
+            sig = parse_quota_signal(status, headers)
+            if sig.is_quota_exhausted:
+                LOG.error(
+                    "WiGLE 429 quota-exhausted; dispatch clause 3 binds: NO retries. "
+                    "Stopping wave. Retry-After=%s",
+                    sig.retry_after_seconds,
+                )
+                stats.quota_exhausted = True
+                stats.fires.append({
+                    "wap_id": wap_id, "http_status": status,
+                    "fired_at": fired_at_iso, "raw": str(artifact_path.relative_to(REPO_ROOT)),
+                    "results_observed": 0,
+                    "quota_exhausted": True,
+                    "retry_after_seconds": sig.retry_after_seconds,
+                })
+                conn.commit()
+                break
+
+            try:
+                parsed = json.loads(payload.decode("utf-8")) if payload else None
+            except (json.JSONDecodeError, UnicodeDecodeError) as e:
+                LOG.warning("anchor wap_id=%d non-JSON response: %s", wap_id, e)
+                parsed = None
+
+            if dry_run:
+                # Simulate: a 200 with empty results would insert 1
+                # zero-results sentinel; we don't actually write.
+                results = (parsed or {}).get("results") or [] if isinstance(parsed, dict) else []
+                inserted = 0
+                skipped = 0
+                observed = len(results)
+            else:
+                inserted, skipped, observed = _stage_results(
+                    conn,
+                    source_id=sid,
+                    extraction_run_id=run_id,
+                    wap_id=wap_id,
+                    deployment_id=dep_id,
+                    intra_tier_rank=rank,
+                    derivation_method=deriv,
+                    query_url=query_url,
+                    raw_artifact_path=artifact_path,
+                    fired_at_iso=fired_at_iso,
+                    parsed=parsed,
+                    http_status=status,
+                )
+            stats.rows_inserted += inserted
+            stats.rows_skipped_idempotent += skipped
+            stats.results_observed += observed
+            try:
+                raw_rel = str(artifact_path.relative_to(REPO_ROOT))
+            except ValueError:
+                raw_rel = str(artifact_path)
+            stats.fires.append({
+                "wap_id": wap_id, "deployment_id": dep_id, "rank": rank,
+                "http_status": status, "fired_at": fired_at_iso,
+                "raw": raw_rel,
+                "results_observed": observed,
+                "rows_inserted": inserted,
+                "rows_skipped_idempotent": skipped,
+            })
+            if not dry_run:
+                conn.commit()
+
+        run_notes = json.dumps(
+            {
+                "registry": REGISTRY_TAG,
+                "step": "MAC-9 Step 1 — T1 MD live-fire wave",
+                "dispatch_contract": "MAC-9 comment 251a65f3",
+                "dry_run": dry_run,
+                "max_queries": max_queries,
+                "bbox_radius_m": bbox_radius_m,
+                "queries_fired": stats.queries_fired,
+                "anchors_skipped_already_fired": stats.anchors_skipped_already_fired,
+                "anchors_skipped_no_geo": stats.anchors_skipped_no_geo,
+                "rows_inserted": stats.rows_inserted,
+                "rows_skipped_idempotent": stats.rows_skipped_idempotent,
+                "results_observed": stats.results_observed,
+                "quota_exhausted": stats.quota_exhausted,
+                "wave_dir": pacer.wave_dirs.get("t1_md"),
+                "ratification_envelope": (
+                    "100 q/day / 4 q/h / 15-min gap / T1 MD only / "
+                    "strict-set 549 anchors / HTTP Basic / no promotion / no SAR. "
+                    "(c) decision a4c8f80f: 51-row broadening NOT in this dispatch."
+                ),
+                "license": LICENSE_NOTE,
+                "license_attribution": LICENSE_ATTRIBUTION,
+                "fires": stats.fires,
+            },
+            sort_keys=True,
+            default=str,
+        )
+        if not dry_run:
+            final_status = (
+                "live_quota_exhausted" if stats.quota_exhausted else "live_ok"
+            )
+            _upsert_source_live(conn, fetched_at=_utc_now(), status=final_status)
+            _finish_run(
+                conn, run_id,
+                records_in=stats.queries_fired,
+                records_out=stats.rows_inserted,
+                errors=0 if not stats.quota_exhausted else 1,
+                status="ok" if not stats.quota_exhausted else "partial",
+                notes=run_notes,
+            )
+            conn.commit()
+        else:
+            conn.rollback()
+    finally:
+        conn.close()
+
+    return {
+        "queries_fired": stats.queries_fired,
+        "rows_inserted": stats.rows_inserted,
+        "rows_skipped_idempotent": stats.rows_skipped_idempotent,
+        "results_observed": stats.results_observed,
+        "anchors_skipped_already_fired": stats.anchors_skipped_already_fired,
+        "anchors_skipped_no_geo": stats.anchors_skipped_no_geo,
+        "quota_exhausted": stats.quota_exhausted,
+        "wave_dir": pacer.wave_dirs.get("t1_md"),
+        "fires": stats.fires,
+        "pacer": {
+            "today_utc_iso": pacer.today_utc_iso,
+            "today_count": pacer.today_count,
+            "all_time_count": pacer.all_time_count,
+            "last_query_at_iso": pacer.last_query_at_iso,
+        },
+    }
+
+
 # ─── CLI entry ────────────────────────────────────────────────────────────
 
 
@@ -1151,12 +1942,41 @@ def _main() -> int:
         help="Build the prioritized anchor list (default Step-2 deliverable).",
     )
     p.add_argument(
-        "--live-fire",
+        "--live-fire-t1-md",
         action="store_true",
         help=(
-            "Disable DRY_RUN gate (CEO-only flip after grant landing or "
-            "B-tier authorization). Step 2 deliverable does NOT use this."
+            "Run the T1 MD live-fire wave per dispatch contract MAC-9 "
+            "comment 251a65f3. Requires --confirm token. Pacer enforces "
+            "100 q/day + 4 q/h + 15-min gap; honors prior wave state."
         ),
+    )
+    p.add_argument(
+        "--confirm",
+        type=str,
+        default="",
+        help=f"Confirmation token; must equal {T1_MD_CONFIRM_TOKEN!r}",
+    )
+    p.add_argument(
+        "--max-queries",
+        type=int,
+        default=1,
+        help="Max queries this invocation will fire (default 1 — first-fire).",
+    )
+    p.add_argument(
+        "--bbox-radius-m",
+        type=float,
+        default=DEFAULT_BBOX_RADIUS_M,
+        help=f"Half-side of square bbox per anchor (default {DEFAULT_BBOX_RADIUS_M}m)",
+    )
+    p.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Driver-level dry-run (smoke-test the orchestration without HTTP/DB writes).",
+    )
+    p.add_argument(
+        "--sleep-to-meet-gap",
+        action="store_true",
+        help="If pacer says wait, sleep instead of exiting (long-running CLI use only).",
     )
     p.add_argument("--verbose", "-v", action="store_true")
     args = p.parse_args()
@@ -1166,18 +1986,23 @@ def _main() -> int:
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
 
-    if args.live_fire:
-        LOG.error(
-            "--live-fire is not authorized in Step 2. The DRY_RUN gate "
-            "is default ON; CEO flips OFF only after grant landing or "
-            "B-tier authorization. Refusing."
-        )
-        return 2
-
     if args.build_priority_list:
         result = build_prioritized_list(
             db_path=args.db_path,
             agent_id=args.agent_id,
+        )
+        print(json.dumps(result, indent=2, default=str))
+        return 0
+
+    if args.live_fire_t1_md:
+        result = run_t1_md_wave(
+            db_path=args.db_path,
+            agent_id=args.agent_id,
+            confirm_token=args.confirm,
+            max_queries=args.max_queries,
+            bbox_radius_m=args.bbox_radius_m,
+            sleep_to_meet_gap=args.sleep_to_meet_gap,
+            dry_run=args.dry_run,
         )
         print(json.dumps(result, indent=2, default=str))
         return 0
