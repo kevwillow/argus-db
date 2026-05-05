@@ -1,0 +1,16 @@
+R4: starting from 90/120 calls used
+  [+1] detail_UXX-S1A415A          200      11748B  https://fcc.report/FCC-ID/UXX-S1A415A/
+  [+2] company_YJJ                 200     151796B  https://fcc.report/company/Motorola-Solutions-Inc
+  [+3] company_2AGVG               200      11859B  https://fcc.report/company/Axon-Enterprise-Inc
+  [+4] company_TWV                 200      87493B  https://fcc.report/company/Sierra-Wireless-Inc
+  [+5] company_QYL                 200      82677B  https://fcc.report/company/Getac
+  detail page UXX: href_pdfs=9 doc_pdfs=0
+  [+6] pdf_UXX                     200     296233B  https://fcc.report/FCC-ID/UXX-S1A415A/7170313.pdf
+  detail page UXX: href_pdfs=0 doc_pdfs=0
+  company YJJ: parsed 0 FCC IDs; top: []
+  company 2AGVG: parsed 0 FCC IDs; top: []
+  company TWV: parsed 0 FCC IDs; top: []
+  company QYL: parsed 2 FCC IDs; top: ['QYL-5127MODMIN', 'QYL-WELLOG1']
+  [+7] detail_QYL-5127MODMIN       200      14657B  https://fcc.report/FCC-ID/QYL-5127MODMIN/
+
+R4 complete: 7 new calls (total 97/120)

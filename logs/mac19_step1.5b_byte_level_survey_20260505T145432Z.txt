@@ -1,0 +1,40 @@
+MAC-19 Wave-B2 Step 1.5b — byte-level survey (20260505T145432Z)
+==============================================================================
+Batch: raw/vendor_docs/20260505T143454Z
+Total HTTP calls used: 102/120
+
+Methodology mirrors MAC-16 (corpus survey) + MAC-18 (Step-0 sample):
+  * pdfminer.six text extraction for PDFs; HTML tag-strip for HTML.
+  * 4 anchored signals:
+      - ble_uuid_anchored: UUID-shape ±200 chars from BLE/Bluetooth/GATT keyword
+      - mac_anchored: MAC-shape ±200 chars from MAC/hardware-address/OUI keyword
+      - ssid_kw_total: SSID/wifi/wi-fi/WPA[12]/password keyword
+      - default_creds_kw: default-(pwd|user|cred|admin)/factory-default/admin[:=]/password[:=]
+
+cohort                              files  200 skip   raw_KB clean_KB  ble ssid  mac cred  uuid  mac#  u_anc  m_anc
+--------------------------------------------------------------------------------------------------------------
+cohort1_dam_pdfs                       21   21    1    92964      273   33   23    1    0     0     0      0      0
+cohort2_droneshield_wayback             6    6    6     2253      746    2    1    0    0     3     0      0      0
+cohort3_hak5_wayback                    9    9   11     1341      738    0  161    0   10    21     0      1      0
+cohort4_cradlepoint_wayback             1    1    1        0        0    0    0    0    0     0     0      0      0
+cohort5_fcc_pdfs                       29   29    5      986      172    0    0    0    0     0     0      0      0
+cohort6_dji_sdk                         4    4    1       81       10    0    0    0    0    24     0      0      0
+--------------------------------------------------------------------------------------------------------------
+WAVE TOTAL                             70   70   25    97627     1942   35  185    1   10    48     0      1      0
+
+Per-cohort yield projection (Step-2 candidate rows):
+------------------------------------------------------------------------------
+  cohort1_dam_pdfs                    anchored_total=  0   LOW-yield (no anchored UUID/MAC; absence-documented per §11 #1)
+  cohort2_droneshield_wayback         anchored_total=  0   LOW-yield (no anchored UUID/MAC; absence-documented per §11 #1)
+  cohort3_hak5_wayback                anchored_total=  1   MARGINAL (1 anchored)
+  cohort4_cradlepoint_wayback         anchored_total=  0   LOW-yield (no anchored UUID/MAC; absence-documented per §11 #1)
+  cohort5_fcc_pdfs                    anchored_total=  0   LOW-yield (no anchored UUID/MAC; absence-documented per §11 #1)
+  cohort6_dji_sdk                     anchored_total=  0   LOW-yield (no anchored UUID/MAC; absence-documented per §11 #1)
+
+Wave-aggregate projection vs Step-0 baseline:
+  Step-0 baseline (28 calls, 13 files): ble_kw=23, ssid_kw=19, ble_uuid_anchored=0, mac_anchored=0
+  Step-1 wave  (70 files): ble_kw=35, ssid_kw=185, ble_uuid_anchored=1, mac_anchored=0
+
+Stop-the-line evaluation (per CEO ratification at MAC-18):
+  Per-cohort SAR-6 #3 ~50% trip-line evaluated independently.
+  Two-consecutive-cohort wave-aggregate floor: NEEDS-CEO-EVAL
