@@ -96,10 +96,13 @@ HOURLY_QUOTA = {
     BUCKET_CODE_SEARCH: 28 * 60,  # 28/min ≈ 1680/h, but bucket binds at 28/min
 }
 # RL buffer: if remaining drops below this, halt-and-sleep until reset.
+# Search bucket binds at 30/min (NOT 1,800/h alone) — buffer must be
+# strictly below 30, else single-fire trips it. Min-gap (2.0s) already
+# enforces ~30/min naturally; buffer is defensive belt-and-suspenders.
 RL_REMAINING_BUFFER = {
     BUCKET_CORE: 200,
-    BUCKET_SEARCH: 50,
-    BUCKET_CODE_SEARCH: 5,
+    BUCKET_SEARCH: 3,
+    BUCKET_CODE_SEARCH: 2,
 }
 
 DRY_RUN_DEFAULT = True
@@ -757,10 +760,21 @@ def fetch_one_repo_files(
 
     Returns (per_file_records, queries_used_against_api). Raw CDN fetches
     are uncounted but still recorded.
+
+    Idempotent: if `<repo_dir>/_meta.json` exists with a non-empty body,
+    short-circuits to a noop record (already-fetched marker).
     """
     repo_dir = out_root / f"{_slugify(owner)}__{_slugify(repo)}"
     queries_used = 0
     files_recorded: list[dict] = []
+    meta_already = repo_dir / "_meta.json"
+    if not dry_run and meta_already.exists() and meta_already.stat().st_size > 0:
+        files_recorded.append({
+            "kind": "repo_skipped_already_on_disk",
+            "repo": f"{owner}/{repo}",
+            "saved_to": str(repo_dir.relative_to(REPO_ROOT)),
+        })
+        return files_recorded, queries_used
 
     # 1) Repo metadata (core)
     if queries_remaining - queries_used <= 0:
@@ -890,6 +904,47 @@ def fetch_one_repo_files(
     return files_recorded, queries_used
 
 
+def list_org_top_repos(
+    org_slug: str,
+    *,
+    pacer_path: Path,
+    pat: str,
+    dry_run: bool,
+    sleep_to_meet_gap: bool,
+    n_top: int = 3,
+) -> tuple[list[dict], int, Optional[str]]:
+    """List public repos for an org via /orgs/{slug}/repos?per_page=30 (core
+    bucket) and return the top-N by stargazers_count desc, excluding forks
+    and archived repos. Returns (top_n_items, queries_used, error_or_None).
+    """
+    url = (
+        f"https://api.github.com/orgs/{urllib.parse.quote(org_slug)}/repos"
+        "?type=public&per_page=30"
+    )
+    out = fetch_paced(
+        url, pacer_path=pacer_path, pat=pat,
+        dry_run=dry_run, sleep_to_meet_gap=sleep_to_meet_gap,
+    )
+    if not out.fired:
+        if out.reason == "dry_run":
+            return [], 0, None
+        return [], 0, f"pacer_veto: {out.reason}"
+    if out.response.status != 200:
+        return [], 1, f"http_{out.response.status}: {out.response.error}"
+    try:
+        items = json.loads(out.response.body)
+    except Exception as e:
+        return [], 1, f"json_parse_error: {e!r}"
+    filtered = [
+        it for it in items
+        if not it.get("fork") and not it.get("archived")
+    ]
+    filtered.sort(
+        key=lambda it: (it.get("stargazers_count") or 0), reverse=True
+    )
+    return filtered[:n_top], 1, None
+
+
 def cohort_a1(
     out_root: Path,
     *,
@@ -899,40 +954,63 @@ def cohort_a1(
     sleep_to_meet_gap: bool,
     queries_remaining: int,
     vendor_allowlist: Optional[set[str]],
+    vendor_skiplist: Optional[set[str]] = None,
     repos_per_vendor: int = A1_REPOS_PER_VENDOR,
     files_per_repo: int = A1_FILES_PER_REPO,
 ) -> tuple[dict, int]:
-    """A1 fetch: 19 confirmed first-party orgs × top-3 repos × ~5 files."""
+    """A1 fetch: 19 confirmed first-party orgs × top-N repos × ~5 files.
+
+    Methodology: per-org `/orgs/{slug}/repos?per_page=30` listing, then
+    client-side sort by stargazers_count (GitHub does not support sort=stars
+    on the org-repos route). 1 core call per org for listing + (~2 core
+    calls × top-N repos) for repo fetches + raw CDN file fetches (uncounted).
+
+    Cradlepoint sub-case: cradlepoint-org-listing is fetched; the existing
+    on-disk artifacts from the shadow probe (sdk-samples + container-samples)
+    are preserved by the idempotent skip-if-meta-exists check inside
+    `fetch_one_repo_files`. So vendor_skiplist need not include Cradlepoint;
+    listing call is 1 wasted call but disk-side dedup saves repo fetches.
+    """
     cohort_dir = out_root / "cohort_A1"
-    step0 = load_step0_repos()
     summary: dict = {"vendors": {}, "started_at": datetime.now(timezone.utc).isoformat()}
     queries_used = 0
     for vendor, org_slug in A1_ORGS:
         if vendor_allowlist and vendor not in vendor_allowlist:
             continue
+        if vendor_skiplist and vendor in vendor_skiplist:
+            summary["vendors"][vendor] = {
+                "org": org_slug,
+                "skipped": "vendor_skiplist",
+            }
+            continue
         if queries_remaining - queries_used <= 0:
             LOG.info("A1: queries budget exhausted; halting cohort")
             break
         vendor_summary: dict = {"org": org_slug, "repos_fetched": []}
-        # Pick top-N repos owned by org_slug from Step-0 cache.
-        items = (step0.get(vendor) or {}).get("items", [])
-        own_items = [
-            it for it in items
-            if (it.get("owner") or "").lower() == org_slug.lower()
-        ]
-        # If org owns 0 repos in top-10, fall back to top-N regardless of owner
-        # only when the org itself has public_repos==0 (Avigilon, Rekor case).
-        # Otherwise §11 #1 absence-document.
-        if not own_items:
+        top_items, used_listing, err = list_org_top_repos(
+            org_slug,
+            pacer_path=pacer_path, pat=pat,
+            dry_run=dry_run, sleep_to_meet_gap=sleep_to_meet_gap,
+            n_top=repos_per_vendor,
+        )
+        queries_used += used_listing
+        if err is not None:
+            vendor_summary["org_listing_error"] = err
+            summary["vendors"][vendor] = vendor_summary
+            continue
+        if not top_items and not dry_run:
             vendor_summary["note"] = (
-                f"no_top10_repos_owned_by_{org_slug}; absence per §11 #1"
+                f"org_listing_returned_zero_non_fork_non_archived; "
+                f"absence per §11 #1 (org={org_slug})"
             )
             summary["vendors"][vendor] = vendor_summary
             continue
-        for it in own_items[:repos_per_vendor]:
-            owner = (it.get("owner") or "")
-            repo = (it.get("full_name") or "").split("/", 1)[-1]
+        for it in top_items:
+            owner = (it.get("owner") or {}).get("login") or org_slug
+            repo = it.get("name") or ""
             default_branch = it.get("default_branch") or "main"
+            if not repo:
+                continue
             if queries_remaining - queries_used <= 0:
                 vendor_summary["repos_fetched"].append(
                     {"repo": f"{owner}/{repo}", "skipped": "queries_budget"}
@@ -949,7 +1027,7 @@ def cohort_a1(
             vendor_summary["repos_fetched"].append({
                 "repo": f"{owner}/{repo}",
                 "default_branch": default_branch,
-                "stars": it.get("stars"),
+                "stars": it.get("stargazers_count"),
                 "queries_used": used,
                 "files": files,
             })
@@ -957,7 +1035,27 @@ def cohort_a1(
     summary["closed_at"] = datetime.now(timezone.utc).isoformat()
     summary["queries_used"] = queries_used
     cohort_dir.mkdir(parents=True, exist_ok=True)
-    (cohort_dir / "_cohort_summary.json").write_text(
+    # Merge with prior summary if present (idempotent re-runs)
+    summary_path = cohort_dir / "_cohort_summary.json"
+    if summary_path.exists():
+        try:
+            prior = json.loads(summary_path.read_text())
+            # Merge per-vendor records: prior wins unless this run replaced
+            for v, rec in summary["vendors"].items():
+                pv = prior.get("vendors", {}).get(v) or {}
+                if pv and rec.get("skipped") and "skipped" not in pv:
+                    summary["vendors"][v] = pv
+            for v, rec in (prior.get("vendors") or {}).items():
+                if v not in summary["vendors"]:
+                    summary["vendors"][v] = rec
+            summary["queries_used_total_aggregated"] = (
+                int(prior.get("queries_used_total_aggregated", 0))
+                + int(prior.get("queries_used", 0))
+                + queries_used
+            )
+        except Exception:
+            pass
+    summary_path.write_text(
         json.dumps(summary, indent=2, sort_keys=True)
     )
     return summary, queries_used
@@ -1020,11 +1118,18 @@ def cohort_a4(
     """A4: top-N repos per vendor (broader sweep, deduped vs A1+A2+A3)."""
     cohort_dir = out_root / "cohort_A4"
     step0 = load_step0_repos()
-    # Build dedup set of (owner, repo) already covered in A1+A2+A3
+    # Build dedup set of (owner, repo) already covered in A1+A2+A3.
+    # A1 only fetches org-owned repos, so dedup against THAT subset, not
+    # the whole top-N from search (third-party repos in top-N are NOT in
+    # A1 — they remain candidates for A4).
     seen: set[tuple[str, str]] = set()
     for v, org in A1_ORGS:
         items = (step0.get(v) or {}).get("items", [])
-        for it in items[:A1_REPOS_PER_VENDOR]:
+        own_items = [
+            it for it in items
+            if (it.get("owner") or "").lower() == org.lower()
+        ]
+        for it in own_items[:A1_REPOS_PER_VENDOR]:
             owner = (it.get("owner") or "").lower()
             repo = (it.get("full_name") or "").split("/", 1)[-1].lower()
             seen.add((owner, repo))
@@ -1104,6 +1209,15 @@ def cohort_a5(
         for vendor in vendors[:A5_PER_KEYWORD_QUERIES]:
             if queries_remaining - queries_used <= 0:
                 break
+            # Idempotency: skip if already on disk (cross-heartbeat resume)
+            save_dir = cohort_dir / _slugify(vendor) / _slugify(kw)
+            if not dry_run and (save_dir / "issues_search.json").exists():
+                summary["queries"].append({
+                    "vendor": vendor, "keyword": kw,
+                    "skipped": "already_on_disk",
+                    "saved_to": str((save_dir / "issues_search.json").relative_to(REPO_ROOT)),
+                })
+                continue
             q = urllib.parse.quote_plus(
                 f'"{vendor}" "{kw}" is:issue is:closed reason:completed'
             )
@@ -1239,6 +1353,14 @@ def _main() -> int:
         help="Comma-separated vendor canonical names to restrict A1/A4 to.",
     )
     p.add_argument(
+        "--vendor-skip-list", type=str, default="",
+        help=(
+            "Comma-separated vendor canonical names to SKIP in A1/A4 "
+            "(e.g., already-covered Cradlepoint slice). "
+            "Skipped vendors recorded as 'skipped: vendor_skiplist' in summary."
+        ),
+    )
+    p.add_argument(
         "--max-queries", type=int, default=5,
         help="Upper bound on API-counted queries this invocation (default 5).",
     )
@@ -1309,6 +1431,10 @@ def _main() -> int:
         {v.strip() for v in args.vendor_allowlist.split(",") if v.strip()}
         if args.vendor_allowlist.strip() else None
     )
+    vendor_skip = (
+        {v.strip() for v in args.vendor_skip_list.split(",") if v.strip()}
+        if args.vendor_skip_list.strip() else None
+    )
 
     queries_budget = args.max_queries
     queries_used_total = 0
@@ -1326,6 +1452,7 @@ def _main() -> int:
                 dry_run=dry_run, sleep_to_meet_gap=args.sleep_to_meet_gap,
                 queries_remaining=queries_budget - queries_used_total,
                 vendor_allowlist=vendor_allow,
+                vendor_skiplist=vendor_skip,
             )
         elif cohort == "A2":
             summ, used = cohort_generic_repo_list(
@@ -1367,6 +1494,7 @@ def _main() -> int:
         "max_cohort": args.max_cohort,
         "cohorts": cohort_plan,
         "vendor_allowlist": sorted(vendor_allow) if vendor_allow else None,
+        "vendor_skip_list": sorted(vendor_skip) if vendor_skip else None,
         "max_queries": args.max_queries,
         "dry_run": dry_run,
         "run_ts": run_ts,
