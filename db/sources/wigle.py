@@ -24,7 +24,7 @@ Auth:         HTTP Basic, creds from `.env/.env`:
 License:      WiGLE EULA — https://wigle.net/eula.html
               "Interaction with the system is governed by our EULA."
               (verbatim from swagger.json `info.license`)
-Public docs:  swagger v3.1 cached at `raw/wigle_docs/20260504T181515Z/`
+Public docs:  swagger v3.1 cached at `wigle/docs/swagger/20260504T181515Z/`
               sha256 a66f00f9b81b63f5682f8862b9d1baec419e467c39f6c2597c7cf73d4c0388f4
               107,431 bytes, retrieved 2026-05-04T18:15:15Z
 
@@ -158,10 +158,12 @@ LOG = logging.getLogger("argus.ingest.wigle")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_DB_PATH = REPO_ROOT / "db" / "argus.db"
-DEFAULT_RAW_ROOT = REPO_ROOT / "raw" / "wigle"
+# WiGLE artifacts isolated to top-level wigle/ per architectural pivot
+# at MAC-1 [`4df426c7`] 2026-05-05; see wigle/README.md.
+DEFAULT_RAW_ROOT = REPO_ROOT / "wigle" / "raw"
 DEFAULT_ENV_PATH = REPO_ROOT / ".env" / ".env"
 DEFAULT_DOCS_SNAPSHOT = (
-    REPO_ROOT / "raw" / "wigle_docs" / "20260504T181515Z" / "swagger.json"
+    REPO_ROOT / "wigle" / "docs" / "swagger" / "20260504T181515Z" / "swagger.json"
 )
 DEFAULT_DOCS_SHA256 = (
     "a66f00f9b81b63f5682f8862b9d1baec419e467c39f6c2597c7cf73d4c0388f4"
@@ -1141,7 +1143,7 @@ def run_live_query(
 #
 # Pacer is on-disk so cross-heartbeat enforcement holds (a single agent
 # heartbeat does not see the prior heartbeat's in-memory state). Ledger
-# at logs/wigle_pacer.json. Quota days roll over at UTC midnight (matches
+# at wigle/pacer.json. Quota days roll over at UTC midnight (matches
 # the implicit WiGLE quota-day convention; we will tighten on first
 # observation if responses indicate otherwise).
 #
@@ -1156,7 +1158,7 @@ WIGLE_MIN_GAP_SECONDS = 900            # ~15 min — ratified at MAC-1 bd667afb 
 DEFAULT_BBOX_RADIUS_M = 50.0           # see comment above; CEO-overridable
 T1_MD_CONFIRM_TOKEN = "I-AUTHORIZE-T1-MD-LIVE-FIRE-2026-05-05"
 
-DEFAULT_PACER_LEDGER = REPO_ROOT / "logs" / "wigle_pacer.json"
+DEFAULT_PACER_LEDGER = REPO_ROOT / "wigle" / "pacer.json"
 DEFAULT_T1_MD_RAW_ROOT = DEFAULT_RAW_ROOT / "t1_md"
 
 
@@ -1365,7 +1367,7 @@ def _t1_md_anchors_already_fired(
 
     Detection: we encode the wap_id in the source_url's `latrange1` /
     `longrange1` derivation, but the durable signal is the raw artifact
-    file at raw/wigle/t1_md/<wave>/anchor-<wap_id>.json. We can't query
+    file at wigle/raw/t1_md/<wave>/anchor-<wap_id>.json. We can't query
     the filesystem cheaply per-anchor here, so we rely on the
     raw_observations table's source_row_key prefix `wigle|wap:<wap_id>|`
     being present for at least one row per anchor (any hit) OR the

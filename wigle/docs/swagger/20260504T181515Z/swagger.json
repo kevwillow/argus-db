@@ -1,0 +1,3737 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "Search, upload, and integrate statistics from WiGLE. Use API Name+Token from https://wigle.net/account",
+    "version" : "3.1",
+    "title" : "WiGLE API",
+    "contact" : {
+      "name" : "arkasha, bobzilla and uhtu",
+      "url" : "https://wigle.net/phpbb/",
+      "email" : "WiGLE-admin@wigle.net"
+    },
+    "license" : {
+      "name" : "Interaction with the system is governed by our EULA.",
+      "url" : "https://wigle.net/eula.html"
+    }
+  },
+  "tags" : [ {
+    "name" : "Bluetooth search and information tools"
+  }, {
+    "name" : "v3 ALPHA"
+  }, {
+    "name" : "Cell search and information tools"
+  }, {
+    "name" : "Network density ageing history tools"
+  }, {
+    "name" : "Stats group management"
+  }, {
+    "name" : "Network search and information tools"
+  }, {
+    "name" : "User profile operations"
+  }, {
+    "name" : "Statistics and information"
+  }, {
+    "name" : "Network observation file upload and status."
+  } ],
+  "schemes" : [ "https" ],
+  "paths" : {
+    "/api/v2/bluetooth/detail" : {
+      "get" : {
+        "tags" : [ "Bluetooth search and information tools" ],
+        "summary" : "Get details and observation records for a single network.",
+        "description" : "Provide unique information for a Bluetooth network. API and session authentication default to a page size of 100 results/page. Number of daily queries allowed per user are throttled based on history and participation. Detail endpoints are NOT included in COMMAPI subscriptions at this time.",
+        "operationId" : "detail",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "netid",
+          "in" : "query",
+          "description" : "The full Bluetooth Device ID to search",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "reverseAddress",
+          "in" : "query",
+          "description" : "Reverse geocode for an approximate address",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/NetSearchResponse"
+            }
+          },
+          "400" : {
+            "description" : "Request body error"
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Commercial request made for non-commercial resource"
+          },
+          "404" : {
+            "description" : "No network records matching search criteria found"
+          },
+          "429" : {
+            "description" : "too many queries today."
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/bluetooth/search" : {
+      "get" : {
+        "tags" : [ "Bluetooth search and information tools" ],
+        "summary" : "Search the WiGLE Bluetooth database.",
+        "description" : "Query the WiGLE database for paginated results based on multiple criteria. API and session authentication default to a page size of 100 results/page. COMMAPI defaults to a page size of 25 with a maximum of 1000 results per return. Number of daily queries allowed per user are throttled based on history and participation. Search endpoints are the only feature included in COMMAPI subscriptions at this time.<br><br>To get next page of results put the previous request's searchAfter value as a parameter in the new request's searchAfter.",
+        "operationId" : "search",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "onlymine",
+          "in" : "query",
+          "description" : "Search only for points first discovered by the current user. Use any string to set, leave unset for general search. Can't be used with COMMAPI auth, since these are points you have locally.",
+          "required" : false,
+          "type" : "string",
+          "default" : "false"
+        }, {
+          "name" : "notmine",
+          "in" : "query",
+          "description" : "Only search for networks first seen by other users",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "latrange1",
+          "in" : "query",
+          "description" : "Lesser of two latitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "latrange2",
+          "in" : "query",
+          "description" : "Greater of two latitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "longrange1",
+          "in" : "query",
+          "description" : "Lesser of two longitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "longrange2",
+          "in" : "query",
+          "description" : "Greater of two longitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "closestLat",
+          "in" : "query",
+          "description" : "Latitude to order by closest network (requires closestLong)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "closestLong",
+          "in" : "query",
+          "description" : "Longitude to order by closest network (requires closestLat)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "lastupdt",
+          "in" : "query",
+          "description" : "Filter points by how recently they've been updated (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "firsttime",
+          "in" : "query",
+          "description" : "Filter points by when they were first created (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "lasttime",
+          "in" : "query",
+          "description" : "Filter points by how recently they've had data submitted (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "startTransID",
+          "in" : "query",
+          "description" : "Earliest transid by which to bound (year-level precision only), format 'yyyyMMdd-00000'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "endTransID",
+          "in" : "query",
+          "description" : "Latest transid by which to bound (year-level precision only), format 'yyyyMMdd-00000'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "netid",
+          "in" : "query",
+          "description" : "Include only networks matching the string network BSSID, e.g. '0A:2C:EF:3D:25:1B' or '0A:2C:EF'. The first three octets are required.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "name",
+          "in" : "query",
+          "description" : "Include only networks exactly matching the string network name.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "namelike",
+          "in" : "query",
+          "description" : "Include only networks matching the string network name, allowing wildcards '%' (any string) and '_' (any character).",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "showBt",
+          "in" : "query",
+          "description" : "Include BT networks",
+          "required" : false,
+          "type" : "string",
+          "default" : "true"
+        }, {
+          "name" : "showBle",
+          "in" : "query",
+          "description" : "Include BLE networks",
+          "required" : false,
+          "type" : "string",
+          "default" : "true"
+        }, {
+          "name" : "minQoS",
+          "in" : "query",
+          "description" : "Minimum Quality of Signal (0-7).",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "variance",
+          "in" : "query",
+          "description" : "How tightly to bound queries against the provided latitude/longitude box. Value must be between 0.001 and 0.2. Intended for use with non-exact decimals and geocoded bounds.",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "mfgrIdMinimum",
+          "in" : "query",
+          "description" : "The minimum Manufacturer Identifier, inclusive",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "mfgrIdMaximum",
+          "in" : "query",
+          "description" : "The maximum Manufacturer Identifier, inclusive",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "houseNumber",
+          "in" : "query",
+          "description" : "Street address house number",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "road",
+          "in" : "query",
+          "description" : "Street address road",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "city",
+          "in" : "query",
+          "description" : "Street address city",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "region",
+          "in" : "query",
+          "description" : "Street address region",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "postalCode",
+          "in" : "query",
+          "description" : "Street address postal code",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "country",
+          "in" : "query",
+          "description" : "Street address country",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "resultsPerPage",
+          "in" : "query",
+          "description" : "How many results to return per request. Defaults to 25 for COMMAPI, 100 for site. Bounded at 1000 for COMMAPI, 100 for site.",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "searchAfter",
+          "in" : "query",
+          "description" : "Put in the previous page's searchAfter result to get the next page. Use this instead of 'first'",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/BluetoothSearchResponse"
+            }
+          },
+          "400" : {
+            "description" : "Request body error"
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "402" : {
+            "description" : "Insufficient balance for commercial query"
+          },
+          "429" : {
+            "description" : "Too many queries today."
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v3/cellChannel/{type}" : {
+      "get" : {
+        "tags" : [ "v3 ALPHA" ],
+        "summary" : "Request list of channels for GSM, LTE, WCDMA, or 5G NR transmitters in specified region",
+        "description" : "List of known channels and QoS values for any of the non-CDMA cell types in a bounding box. Note that the type parameter is sensitive to current type in the WiGLE database - this means that LTE and WCDMA networks may have been reported as GSM in some packages, a fallback query to GSM is recommended if the LTE/WCDMA network appears to be absent. Channel endpoints are NOT included in COMMAPI subscriptions at this time. Region cannot be large than 99 square miles (~256 sq km). Daily query limit subject to user DETAIL limit. Designed to support cell-site simulator detection.",
+        "operationId" : "cellChannel",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "type",
+          "in" : "path",
+          "description" : "Network Type: GSM/LTE/WCDMA/5G NR",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^(GSM|LTE|WCDMA|NR)$"
+        }, {
+          "name" : "latitude1",
+          "in" : "query",
+          "description" : "First bounding latitude",
+          "required" : true,
+          "type" : "number"
+        }, {
+          "name" : "latitude2",
+          "in" : "query",
+          "description" : "Second bounding latitude",
+          "required" : true,
+          "type" : "number"
+        }, {
+          "name" : "longitude1",
+          "in" : "query",
+          "description" : "First bounding longitude",
+          "required" : true,
+          "type" : "number"
+        }, {
+          "name" : "longitude2",
+          "in" : "query",
+          "description" : "Second bounding longitude",
+          "required" : true,
+          "type" : "number"
+        }, {
+          "name" : "closestLat",
+          "in" : "query",
+          "description" : "Latitude to order by closest network (requires closestLong)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "closestLong",
+          "in" : "query",
+          "description" : "Longitude to order by closest network (requires closestLat)",
+          "required" : false,
+          "type" : "number"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/ChannelDetailResponse"
+            }
+          },
+          "404" : {
+            "description" : "No matching cell sites found in region."
+          },
+          "429" : {
+            "description" : "too many DETAIL queries today."
+          },
+          "500" : {
+            "description" : "Failed to retrieve due to error."
+          },
+          "401" : {
+            "description" : "Error authenticating user"
+          }
+        },
+        "security" : [ {
+          "user" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/cell/mccMnc" : {
+      "get" : {
+        "tags" : [ "Cell search and information tools" ],
+        "summary" : "Get MCC and MNC codes for Cellular networks",
+        "description" : "Get metadata for cell networks - optionally filter by country and network codes",
+        "operationId" : "mccMnc",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "mcc",
+          "in" : "query",
+          "description" : "MCC to filter",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "mnc",
+          "in" : "query",
+          "description" : "MNC to filter",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/MccMncRecord"
+              }
+            }
+          },
+          "500" : {
+            "description" : "Failed to open mcc-mnc list"
+          }
+        }
+      }
+    },
+    "/api/v2/cell/search" : {
+      "get" : {
+        "tags" : [ "Cell search and information tools" ],
+        "summary" : "Search the WiGLE Cell database.",
+        "description" : "Query the WiGLE database for paginated results based on multiple criteria. API and session authentication default to a page size of 100 results/page. COMMAPI defaults to a page size of 25 with a maximum of 1000 results per return. Number of daily queries allowed per user are throttled based on history and participation.  Search endpoints are the only feature included in COMMAPI subscriptions at this time.<br><br>To get next page of results put the previous request's searchAfter value as a parameter in the new request's searchAfter.",
+        "operationId" : "search_1",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "onlymine",
+          "in" : "query",
+          "description" : "Search only for points first discovered by the current user. Use any string to set, leave unset for general search. Can't be used with COMMAPI auth, since these are points you have locally.",
+          "required" : false,
+          "type" : "string",
+          "default" : "false"
+        }, {
+          "name" : "notmine",
+          "in" : "query",
+          "description" : "Only search for networks first seen by other users",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "latrange1",
+          "in" : "query",
+          "description" : "Lesser of two latitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "latrange2",
+          "in" : "query",
+          "description" : "Greater of two latitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "longrange1",
+          "in" : "query",
+          "description" : "Lesser of two longitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "longrange2",
+          "in" : "query",
+          "description" : "Greater of two longitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "closestLat",
+          "in" : "query",
+          "description" : "Latitude to order by closest network (requires closestLong)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "closestLong",
+          "in" : "query",
+          "description" : "Longitude to order by closest network (requires closestLat)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "lastupdt",
+          "in" : "query",
+          "description" : "Filter points by how recently they've been updated (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "firsttime",
+          "in" : "query",
+          "description" : "Filter points by when they were first created (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "lasttime",
+          "in" : "query",
+          "description" : "Filter points by how recently they've had data submitted (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "startTransID",
+          "in" : "query",
+          "description" : "Earliest transid by which to bound (year-level precision only), format 'yyyyMMdd-00000'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "endTransID",
+          "in" : "query",
+          "description" : "Latest transid by which to bound (year-level precision only), format 'yyyyMMdd-00000'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "cell_op",
+          "in" : "query",
+          "description" : "Cell Operator (GSM/LTE/WCDMA/5G NR) or System (CDMA) ID parameter by which to filter",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "cell_net",
+          "in" : "query",
+          "description" : "Cell LAC (GSM/LTE/WCDMA/5G NR) or Network (CDMA) ID parameter by which to filter",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "cell_id",
+          "in" : "query",
+          "description" : "Cell ID(GSM/LTE/WCDMA/5G NR) or Basestation (CDMA) parameter by which to filter",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "ssid",
+          "in" : "query",
+          "description" : "Include only cell towers exactly matching the string network name.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "ssidlike",
+          "in" : "query",
+          "description" : "Include only cell towers matching the string network name, allowing wildcards '%' (any string) and '_' (any character).",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "minQoS",
+          "in" : "query",
+          "description" : "Minimum Quality of Signal (0-7).",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "showGsm",
+          "in" : "query",
+          "description" : "Include GSM cell networks",
+          "required" : false,
+          "type" : "string",
+          "default" : "true"
+        }, {
+          "name" : "showCdma",
+          "in" : "query",
+          "description" : "Include CDMA cell networks",
+          "required" : false,
+          "type" : "string",
+          "default" : "true"
+        }, {
+          "name" : "showLte",
+          "in" : "query",
+          "description" : "Include LTE cell networks",
+          "required" : false,
+          "type" : "string",
+          "default" : "true"
+        }, {
+          "name" : "showWcdma",
+          "in" : "query",
+          "description" : "Include WCDMA cell networks",
+          "required" : false,
+          "type" : "string",
+          "default" : "true"
+        }, {
+          "name" : "showNr",
+          "in" : "query",
+          "description" : "Include 5G NR cell networks",
+          "required" : false,
+          "type" : "string",
+          "default" : "true"
+        }, {
+          "name" : "variance",
+          "in" : "query",
+          "description" : "How tightly to bound queries against the provided latitude/longitude box. Value must be between 0.001 and 0.2. Intended for use with non-exact decimals and geocoded bounds.",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "houseNumber",
+          "in" : "query",
+          "description" : "Street address house number",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "road",
+          "in" : "query",
+          "description" : "Street address road",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "city",
+          "in" : "query",
+          "description" : "Street address city",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "region",
+          "in" : "query",
+          "description" : "Street address region",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "postalCode",
+          "in" : "query",
+          "description" : "Street address postal code",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "country",
+          "in" : "query",
+          "description" : "Street address country",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "resultsPerPage",
+          "in" : "query",
+          "description" : "How many results to return per request. Defaults to 25 for COMMAPI, 100 for site. Bounded at 1000 for COMMAPI, 100 for site.",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "searchAfter",
+          "in" : "query",
+          "description" : "Put in the previous page's searchAfter result to get the next page. Use this instead of 'first'",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/CellSearchResponse"
+            }
+          },
+          "400" : {
+            "description" : "Request body error"
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "402" : {
+            "description" : "Insufficient balance for commercial query"
+          },
+          "429" : {
+            "description" : "Too many queries today."
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v3/density/wifi" : {
+      "get" : {
+        "tags" : [ "Network density ageing history tools" ],
+        "summary" : "Get historical densities of WiFi networks first-seen and most-recently-seen for a geo-quad in one-year buckets.",
+        "description" : "Returns gridded density hisograms of both values. Neither latitude nor longitude quad extent may be greater than half a degree. The larger the search area, the slower this query will be. This can be a slow query in dense areas.",
+        "operationId" : "wifiDensity",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "topLat",
+          "in" : "query",
+          "description" : "Lesser of two latitudes by which to bound the search",
+          "required" : true,
+          "type" : "number"
+        }, {
+          "name" : "bottomLat",
+          "in" : "query",
+          "description" : "Greater of two latitudes by which to bound the search",
+          "required" : true,
+          "type" : "number"
+        }, {
+          "name" : "leftLon",
+          "in" : "query",
+          "description" : "Lesser of two longitudes by which to bound the search",
+          "required" : true,
+          "type" : "number"
+        }, {
+          "name" : "rightLon",
+          "in" : "query",
+          "description" : "Greater of two longitudes by which to bound the search",
+          "required" : true,
+          "type" : "number"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/DensityResponse"
+            }
+          },
+          "400" : {
+            "description" : "Request error"
+          },
+          "401" : {
+            "description" : "Not authenticated"
+          },
+          "429" : {
+            "description" : "Too many queries today"
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v3/detail/bt/{btNetworkId}" : {
+      "get" : {
+        "tags" : [ "v3 ALPHA" ],
+        "summary" : "Request detail for a bluetooth network",
+        "description" : "Location and detail properties for bluetooth networks. Detail endpoints are NOT included in COMMAPI subscriptions at this time.  Daily query limit subject to user DETAIL limit.",
+        "operationId" : "bt",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "btNetworkId",
+          "in" : "path",
+          "description" : "Network ID.",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/BtDetail"
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Commercial request made for non-commercial resource"
+          },
+          "404" : {
+            "description" : "No matching network ID found."
+          },
+          "429" : {
+            "description" : "too many DETAIL queries today."
+          },
+          "500" : {
+            "description" : "Failed to retrieve due to error."
+          }
+        },
+        "security" : [ {
+          "user" : [ ]
+        } ]
+      }
+    },
+    "/api/v3/detail/wifi/{wifiNetworkId}" : {
+      "get" : {
+        "tags" : [ "v3 ALPHA" ],
+        "summary" : "Request detail for a WiFi network",
+        "description" : "Location and detail properties for WiFi networks. Detail endpoints are NOT included in COMMAPI subscriptions at this time.  Daily query limit subject to user DETAIL limit.",
+        "operationId" : "wifi",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "wifiNetworkId",
+          "in" : "path",
+          "description" : "Network ID.",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/WiFiDetail"
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Commercial request made for non-commercial resource"
+          },
+          "404" : {
+            "description" : "No matching network ID found."
+          },
+          "429" : {
+            "description" : "too many DETAIL queries today."
+          },
+          "500" : {
+            "description" : "Failed to retrieve due to error."
+          }
+        },
+        "security" : [ {
+          "user" : [ ]
+        } ]
+      }
+    },
+    "/api/v3/detail/cell/{type}/{operator}/{lac}/{cid}" : {
+      "get" : {
+        "tags" : [ "v3 ALPHA" ],
+        "summary" : "Request detail for a GSM, LTE, WCDMA, or 5G NR network",
+        "description" : "Location and detail properties for non-CDMA cell types. Note that the type parameter is sensitive to current type in the WiGLE database - this means that LTE and WCDMA networks may have been reported as GSM in some packages, a fallback query to GSM is recommended if the LTE/WCDMA network appears to be absent. Detail endpoints are NOT included in COMMAPI subscriptions at this time.  Daily query limit subject to user DETAIL limit.",
+        "operationId" : "cell",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "operator",
+          "in" : "path",
+          "description" : "GSM/LTE/WCDMA/5G NR Operator ID",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^[0-9]{1,6}$"
+        }, {
+          "name" : "lac",
+          "in" : "path",
+          "description" : "GSM/LTE/WCDMA/5G NR Location Area Code",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^[0-9]{1,5}$"
+        }, {
+          "name" : "cid",
+          "in" : "path",
+          "description" : "GSM/LTE/WCDMA/5G NR Cell ID/NCI",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^[0-9]{1,11}$"
+        }, {
+          "name" : "type",
+          "in" : "path",
+          "description" : "Network Type: GSM/LTE/WCDMA/NR",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^(GSM|LTE|WCDMA|NR)$"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/BtDetail"
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Commercial request made for non-commercial resource"
+          },
+          "404" : {
+            "description" : "No matching network ID found."
+          },
+          "429" : {
+            "description" : "too many DETAIL queries today."
+          },
+          "500" : {
+            "description" : "Failed to retrieve due to error."
+          }
+        },
+        "security" : [ {
+          "user" : [ ]
+        } ]
+      }
+    },
+    "/api/v3/detail/cell/CDMA/{sid}/{nid}/{bsid}" : {
+      "get" : {
+        "tags" : [ "v3 ALPHA" ],
+        "summary" : "Request detail for a CDMA network",
+        "description" : "Location and detail properties for CDMA networks. Detail endpoints are NOT included in COMMAPI subscriptions at this time.  Daily query limit subject to user DETAIL limit.",
+        "operationId" : "cdmaCell",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "sid",
+          "in" : "path",
+          "description" : "CDMA System ID.",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^[0-9]{1,5}$"
+        }, {
+          "name" : "nid",
+          "in" : "path",
+          "description" : "CDMA Network ID.",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^[0-9]{1,5}$"
+        }, {
+          "name" : "bsid",
+          "in" : "path",
+          "description" : "CDMA Base Station ID.",
+          "required" : true,
+          "type" : "string",
+          "pattern" : "^[0-9]{1,9}$"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/CellDetail"
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Commercial request made for non-commercial resource"
+          },
+          "404" : {
+            "description" : "No matching network ID found."
+          },
+          "429" : {
+            "description" : "too many DETAIL queries today."
+          },
+          "500" : {
+            "description" : "Failed to retrieve due to error."
+          }
+        },
+        "security" : [ {
+          "user" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/group/admin" : {
+      "get" : {
+        "tags" : [ "Stats group management" ],
+        "summary" : "Get group info as a stats group administrator",
+        "description" : "",
+        "operationId" : "adminGroup",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "groupid",
+          "in" : "query",
+          "description" : "The unique string key of the group",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/GroupResponse"
+            }
+          },
+          "404" : {
+            "description" : "Group not found/not provided"
+          },
+          "400" : {
+            "description" : "Permission not valid for administration"
+          },
+          "401" : {
+            "description" : "User not authenticated"
+          }
+        }
+      }
+    },
+    "/api/v2/group/groupMembers" : {
+      "get" : {
+        "tags" : [ "Stats group management" ],
+        "summary" : "Get group members",
+        "description" : "",
+        "operationId" : "groupMembers",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "groupid",
+          "in" : "query",
+          "description" : "The unique numeric ID of the group",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/GroupMemberResponse"
+            }
+          },
+          "400" : {
+            "description" : "Unable to load group"
+          },
+          "404" : {
+            "description" : "Group not found"
+          }
+        }
+      }
+    },
+    "/api/v2/group/groupEventStats/{groupId}" : {
+      "get" : {
+        "tags" : [ "Stats group management" ],
+        "summary" : "Get group member stats for a time-bounded event",
+        "description" : "",
+        "operationId" : "groupEvent",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "groupId",
+          "in" : "path",
+          "description" : "The unique group ID",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "startDateTime",
+          "in" : "query",
+          "description" : "The starting date and time in ISO 8601 format: 2023-10-14T00:00:01Z (in UTC)",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "endDateTime",
+          "in" : "query",
+          "description" : "The ending date and time in ISO 8601 format: 2023-10-14T23:59:59Z (in UTC)",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "400" : {
+            "description" : "Invalid time range (must be 24 hours at minimum)"
+          },
+          "404" : {
+            "description" : "Group not found"
+          },
+          "200" : {
+            "description" : "Group sucessfully retrieved",
+            "schema" : {
+              "$ref" : "#/definitions/GroupStatsResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/group/groupForUser/{userName}" : {
+      "get" : {
+        "tags" : [ "Stats group management" ],
+        "summary" : "Get group (if present) for a user",
+        "description" : "",
+        "operationId" : "getGroupForUser",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "userName",
+          "in" : "path",
+          "description" : "The unique user ID",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "404" : {
+            "description" : "Group not found"
+          },
+          "200" : {
+            "description" : "Group membership updated",
+            "schema" : {
+              "$ref" : "#/definitions/Group"
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/network/detail" : {
+      "get" : {
+        "tags" : [ "Network search and information tools" ],
+        "summary" : "Get details and observation records for a single wifi or cell network",
+        "description" : "Provide unique information for a WiFi or cell network to request detailed information. Providing a netId value searches WiFi, operator searches GSM, and system searches CDMA. Detail endpoints are NOT included in COMMAPI subscriptions at this time.",
+        "operationId" : "detail_1",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "netid",
+          "in" : "query",
+          "description" : "The WiFi Network BSSID to search",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "operator",
+          "in" : "query",
+          "description" : "GSM/LTE/WCDMA/5G NR Operator ID",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "lac",
+          "in" : "query",
+          "description" : "GSM/LTE/WCDMA/5G NR Location Area Code",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "cid",
+          "in" : "query",
+          "description" : "GSM/LTE/WCDMA/5G NR Cell ID/NIR",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "description" : "Network Type: CDMA/GSM/LTE/WCDMA/NR/WIFI",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "system",
+          "in" : "query",
+          "description" : "CDMA System ID",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "network",
+          "in" : "query",
+          "description" : "CDMA Network ID",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "basestation",
+          "in" : "query",
+          "description" : "CDMA Base Station ID",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/WiFiNetworkDetailResponse"
+            }
+          },
+          "400" : {
+            "description" : "Request body error"
+          },
+          "401" : {
+            "description" : "Not authenticated"
+          },
+          "403" : {
+            "description" : "Commercial request made for non-commercial resource"
+          },
+          "404" : {
+            "description" : "No network records matching search criteria found"
+          },
+          "429" : {
+            "description" : "too many queries today."
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/network/geocode" : {
+      "get" : {
+        "tags" : [ "Network search and information tools" ],
+        "summary" : "Get coordinates for an address for use in searching",
+        "description" : "Relies on OpenStreetMap nominatim",
+        "operationId" : "geocode",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "addresscode",
+          "in" : "query",
+          "description" : "An address string, Street, City, State/Region, Country",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/NetworkGeocodingResponse"
+            }
+          },
+          "400" : {
+            "description" : "Request error"
+          },
+          "401" : {
+            "description" : "Not authenticated"
+          },
+          "429" : {
+            "description" : "too many queries today."
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/network/comment" : {
+      "post" : {
+        "tags" : [ "Network search and information tools" ],
+        "summary" : "Add a comment to a network",
+        "description" : "Append a comment to the existing comments on a network.",
+        "operationId" : "comment",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "netid",
+          "in" : "formData",
+          "description" : "The BSSID of the network for the comment, e.g. '0A:2C:EF:3D:25:1B'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "comment",
+          "in" : "formData",
+          "description" : "The comment to attach",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/NetCommentResponse"
+            }
+          }
+        },
+        "security" : [ {
+          "Basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/network/search" : {
+      "get" : {
+        "tags" : [ "Network search and information tools" ],
+        "summary" : "Search the WiGLE Wifi database.",
+        "description" : "Query the WiGLE database for paginated results based on multiple criteria. API and session authentication default to a page size of 100 results/page. COMMAPI defaults to a page size of 25 with a maximum of 1000 results per return. Number of daily queries allowed per user are throttled based on history and participation.  Search endpoints are the only feature included in COMMAPI subscriptions at this time.<br><br>To get next page of results put the previous request's searchAfter value as a parameter in the new request's searchAfter.",
+        "operationId" : "search_2",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "onlymine",
+          "in" : "query",
+          "description" : "Search only for points first discovered by the current user. Use any string to set, leave unset for general search. Can't be used with COMMAPI auth, since these are points you have locally.",
+          "required" : false,
+          "type" : "string",
+          "default" : "false"
+        }, {
+          "name" : "notmine",
+          "in" : "query",
+          "description" : "Only search for networks first seen by other users",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "latrange1",
+          "in" : "query",
+          "description" : "Lesser of two latitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "latrange2",
+          "in" : "query",
+          "description" : "Greater of two latitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "longrange1",
+          "in" : "query",
+          "description" : "Lesser of two longitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "longrange2",
+          "in" : "query",
+          "description" : "Greater of two longitudes by which to bound the search (specify both)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "closestLat",
+          "in" : "query",
+          "description" : "Latitude to order by closest network (requires closestLong)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "closestLong",
+          "in" : "query",
+          "description" : "Longitude to order by closest network (requires closestLat)",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "lastupdt",
+          "in" : "query",
+          "description" : "Filter points by how recently they've been updated (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "firsttime",
+          "in" : "query",
+          "description" : "Filter points by when they were first created (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "lasttime",
+          "in" : "query",
+          "description" : "Filter points by how recently they've had data submitted (more recent than this value), condensed date/time numeric string format 'yyyyMMdd[hhmm[ss]]'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "startTransID",
+          "in" : "query",
+          "description" : "Earliest transid by which to bound (year-level precision only), format 'yyyyMMdd-00000'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "endTransID",
+          "in" : "query",
+          "description" : "Latest transid by which to bound (year-level precision only), format 'yyyyMMdd-00000'",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "encryption",
+          "in" : "query",
+          "description" : "Encryption detected: 'None', 'WEP', 'WPA', 'WPA2', 'WPA3', 'Unknown'. Case insensitive.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "freenet",
+          "in" : "query",
+          "description" : "Include only networks that have been marked as free access.",
+          "required" : false,
+          "type" : "boolean",
+          "default" : false
+        }, {
+          "name" : "paynet",
+          "in" : "query",
+          "description" : "Include only networks that have been marked as for-pay access.",
+          "required" : false,
+          "type" : "boolean",
+          "default" : false
+        }, {
+          "name" : "netid",
+          "in" : "query",
+          "description" : "Include only networks matching the string network BSSID, e.g. '0A:2C:EF:3D:25:1B' or '0A:2C:EF'. The first three octets are required.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "ssid",
+          "in" : "query",
+          "description" : "Include only networks exactly matching the string network name.",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "ssidlike",
+          "in" : "query",
+          "description" : "Include only networks matching the string network name, allowing wildcards '%' (any string) and '_' (any character).",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "minQoS",
+          "in" : "query",
+          "description" : "Minimum Quality of Signal (0-7).",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "variance",
+          "in" : "query",
+          "description" : "How tightly to bound queries against the provided latitude/longitude box. Value must be between 0.001 and 0.2. Intended for use with non-exact decimals and geocoded bounds.",
+          "required" : false,
+          "type" : "number"
+        }, {
+          "name" : "rcoisMinimum",
+          "in" : "query",
+          "description" : "The minimum Roaming Consortium Organizational Identifier, inclusive",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "rcoisMaximum",
+          "in" : "query",
+          "description" : "The maximum Roaming Consortium Organizational Identifier, inclusive",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "channel",
+          "in" : "query",
+          "description" : "Include only networks with this channel",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "frequency",
+          "in" : "query",
+          "description" : "Include only networks with this frequency, in integer MHz",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "houseNumber",
+          "in" : "query",
+          "description" : "Street address house number",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "road",
+          "in" : "query",
+          "description" : "Street address road",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "city",
+          "in" : "query",
+          "description" : "Street address city",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "region",
+          "in" : "query",
+          "description" : "Street address region",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "postalCode",
+          "in" : "query",
+          "description" : "Street address postal code",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "country",
+          "in" : "query",
+          "description" : "Street address country",
+          "required" : false,
+          "type" : "string"
+        }, {
+          "name" : "resultsPerPage",
+          "in" : "query",
+          "description" : "How many results to return per request. Defaults to 25 for COMMAPI, 100 for site. Bounded at 1000 for COMMAPI, 100 for site.",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "searchAfter",
+          "in" : "query",
+          "description" : "Put in the previous page's searchAfter result to get the next page. Use this instead of 'first'",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/NetSearchResponse"
+            }
+          },
+          "400" : {
+            "description" : "Request body error"
+          },
+          "402" : {
+            "description" : "Insufficient balance for commercial query"
+          },
+          "410" : {
+            "description" : "Query Failed"
+          },
+          "429" : {
+            "description" : "too many queries today."
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/profile/user" : {
+      "get" : {
+        "tags" : [ "User profile operations" ],
+        "summary" : "Get the user object for the current logged-in user",
+        "description" : "See basic user information.",
+        "operationId" : "user",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Request successful"
+          },
+          "500" : {
+            "description" : "Request failed"
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/profile/apiToken" : {
+      "get" : {
+        "tags" : [ "User profile operations" ],
+        "summary" : "Get all authorization tokens for the logged-in user",
+        "description" : "",
+        "operationId" : "apiToken",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "type",
+          "in" : "query",
+          "description" : "Token types - 'API', 'COMMAPI', or 'ANDROID'",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/ResettableAuthTokenResponse"
+            }
+          },
+          "204" : {
+            "description" : "Request successful, but no tokens present for user"
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/stats/standings" : {
+      "get" : {
+        "tags" : [ "Statistics and information" ],
+        "summary" : "Get user standings",
+        "description" : "",
+        "operationId" : "stats",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "The criteria by which to sort the results. Values are ['discovered', 'total', 'monthcount', 'prevmonthcount', 'gendisc', 'gentotal', 'firsttransid', 'lasttransid']",
+          "required" : false,
+          "type" : "string",
+          "default" : "discovered"
+        }, {
+          "name" : "pagestart",
+          "in" : "query",
+          "description" : "The first record to request according to the 'sort' parameter",
+          "required" : false,
+          "type" : "integer",
+          "default" : 0,
+          "format" : "int64"
+        }, {
+          "name" : "pageend",
+          "in" : "query",
+          "description" : "The last record to request according to the 'sort' parameter",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "default" : {
+            "description" : "successful operation"
+          }
+        }
+      }
+    },
+    "/api/v2/stats/group" : {
+      "get" : {
+        "tags" : [ "Statistics and information" ],
+        "summary" : "Get group standings",
+        "description" : "Fetches a list of all teams. Authenticated users receive additional group info for the group they administer.",
+        "operationId" : "groupStats",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/GroupStatResponse"
+            }
+          },
+          "500" : {
+            "description" : "Error fetching groups list"
+          }
+        }
+      }
+    },
+    "/api/v2/stats/countries" : {
+      "get" : {
+        "tags" : [ "Statistics and information" ],
+        "summary" : "Get statistics organized by country",
+        "description" : "Fetches all countries and basic stats",
+        "operationId" : "countries",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/CountriesResponse"
+            }
+          },
+          "500" : {
+            "description" : "Unable to complete request"
+          }
+        }
+      }
+    },
+    "/api/v2/stats/regions" : {
+      "get" : {
+        "tags" : [ "Statistics and information" ],
+        "summary" : "Get statistics for a specified country, organized by region, postal code, and encryption",
+        "description" : "",
+        "operationId" : "countryRegion",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "country",
+          "in" : "query",
+          "description" : "the two-letter code of the country for which you'd like a regional breakdown. Defaults to 'US'",
+          "required" : false,
+          "type" : "string",
+          "default" : "US"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request succeeded",
+            "schema" : {
+              "$ref" : "#/definitions/RegionResponse"
+            }
+          },
+          "500" : {
+            "description" : "Unable to complete request"
+          }
+        }
+      }
+    },
+    "/api/v2/stats/user" : {
+      "get" : {
+        "tags" : [ "Statistics and information" ],
+        "summary" : "Get user statistics",
+        "description" : "Get statistics and badge image for the authenticated user",
+        "operationId" : "userStatistics",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "user",
+          "in" : "query",
+          "description" : "the name of the user for whom to get stats",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Corresponding UserStatsResponse for user"
+          },
+          "404" : {
+            "description" : "No matching user found"
+          },
+          "401" : {
+            "description" : "User not authenticated"
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/stats/general" : {
+      "get" : {
+        "tags" : [ "Statistics and information" ],
+        "summary" : "Get a named map of general upload statistics",
+        "description" : "Information condensed from site uploads about most popular OUIs, Manufacturers, and ",
+        "operationId" : "generalStats",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "default" : {
+            "description" : "successful operation"
+          }
+        }
+      }
+    },
+    "/api/v2/stats/site" : {
+      "get" : {
+        "tags" : [ "Statistics and information" ],
+        "summary" : "Get a named map of site-level statistics",
+        "description" : "A big hash of short-named statistics used in providing site-wide information.",
+        "operationId" : "siteStats",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "object",
+              "additionalProperties" : {
+                "type" : "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/file/kml/{transid}" : {
+      "get" : {
+        "tags" : [ "Network observation file upload and status." ],
+        "summary" : "Download a KML summary of a file",
+        "description" : "Get a KML summary approximation for a successfully processed file uploaded by the current user",
+        "operationId" : "getKmlForTransId",
+        "produces" : [ "application/vnd.google-earth.kml+xml" ],
+        "parameters" : [ {
+          "name" : "transid",
+          "in" : "path",
+          "description" : "The unique transaction ID for the file",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request successful"
+          },
+          "401" : {
+            "description" : "User not authenticated"
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/file/transactions" : {
+      "get" : {
+        "tags" : [ "Network observation file upload and status." ],
+        "summary" : "Get the status of files uploaded by the current user",
+        "description" : "Results in response model paginated at 100 results per page",
+        "operationId" : "getTransLogsForUser",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "pagestart",
+          "in" : "query",
+          "description" : "Most recent record to fetch descending chronologically. Defaults to 0",
+          "required" : false,
+          "type" : "integer",
+          "default" : 0,
+          "format" : "int64"
+        }, {
+          "name" : "pageend",
+          "in" : "query",
+          "description" : "Number of results to fetch from offset. Defaults to 100",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Request successful",
+            "schema" : {
+              "$ref" : "#/definitions/TranslogResponse"
+            }
+          },
+          "401" : {
+            "description" : "User not authenticated"
+          }
+        },
+        "security" : [ {
+          "basic" : [ ]
+        } ]
+      }
+    },
+    "/api/v2/file/upload" : {
+      "post" : {
+        "tags" : [ "Network observation file upload and status." ],
+        "summary" : "Upload a file",
+        "description" : "Transmit a file for processing and incorporation into the database. Supports DStumbler, G-Mon, inSSIDer, Kismac, Kismet, MacStumbler, NetStumbler, Pocket Warrior, Wardrive-Android, WiFiFoFum, WiFi-Where, WiGLE WiFi Wardriving, and Apple consolidated DB formats. One or more files may be enclosed within a zip, tar, or tar.gz archive. Files may not exceed 180MiB, and archives WILL IGNORE more than 200 member files. For documentation on WiGLE Wireless CSV files, see https://api.wigle.net/csvFormat.html",
+        "operationId" : "upload",
+        "consumes" : [ "multipart/form-data" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "file",
+          "in" : "formData",
+          "description" : "multipart/form-data file; proper formulation requires both filename and payload.",
+          "required" : true,
+          "type" : "file"
+        }, {
+          "name" : "donate",
+          "in" : "formData",
+          "description" : "Allow commercial use of the file contents - 'on' to allow.",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Upload successful",
+            "schema" : {
+              "$ref" : "#/definitions/UploadResponse"
+            }
+          },
+          "500" : {
+            "description" : "Unable to process posted file",
+            "schema" : {
+              "$ref" : "#/definitions/ErrorMessageResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "basic" : {
+      "description" : "",
+      "type" : "basic"
+    },
+    "user" : {
+      "description" : "",
+      "type" : "apiKey",
+      "name" : "Authorization",
+      "in" : "header"
+    }
+  },
+  "definitions" : {
+    "NetSearchResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "totalResults" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "first" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "last" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "resultCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "results" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/WiFiNetwork"
+          }
+        },
+        "searchAfter" : {
+          "type" : "string",
+          "description" : "Use this in future searches to get the next page of data"
+        },
+        "search_after" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "deprecated"
+        }
+      }
+    },
+    "WiFiNetwork" : {
+      "type" : "object",
+      "properties" : {
+        "trilat" : {
+          "type" : "number"
+        },
+        "trilong" : {
+          "type" : "number"
+        },
+        "ssid" : {
+          "type" : "string"
+        },
+        "qos" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "transid" : {
+          "type" : "string"
+        },
+        "firsttime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lasttime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lastupdt" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "netid" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        },
+        "comment" : {
+          "type" : "string"
+        },
+        "wep" : {
+          "type" : "string"
+        },
+        "bcninterval" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "freenet" : {
+          "type" : "string"
+        },
+        "dhcp" : {
+          "type" : "string"
+        },
+        "paynet" : {
+          "type" : "string"
+        },
+        "userfound" : {
+          "type" : "boolean"
+        },
+        "channel" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "frequency" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "rcois" : {
+          "type" : "string"
+        },
+        "encryption" : {
+          "type" : "string"
+        },
+        "country" : {
+          "type" : "string"
+        },
+        "region" : {
+          "type" : "string"
+        },
+        "road" : {
+          "type" : "string"
+        },
+        "city" : {
+          "type" : "string"
+        },
+        "housenumber" : {
+          "type" : "string"
+        },
+        "postalcode" : {
+          "type" : "string"
+        }
+      }
+    },
+    "BluetoothNetwork" : {
+      "type" : "object",
+      "properties" : {
+        "trilat" : {
+          "type" : "number"
+        },
+        "trilong" : {
+          "type" : "number"
+        },
+        "ssid" : {
+          "type" : "string"
+        },
+        "qos" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "transid" : {
+          "type" : "string"
+        },
+        "firsttime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lasttime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lastupdt" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "netid" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        },
+        "capabilities" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "userfound" : {
+          "type" : "boolean"
+        },
+        "device" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "mfgrId" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "country" : {
+          "type" : "string"
+        },
+        "region" : {
+          "type" : "string"
+        },
+        "road" : {
+          "type" : "string"
+        },
+        "city" : {
+          "type" : "string"
+        },
+        "housenumber" : {
+          "type" : "string"
+        },
+        "postalcode" : {
+          "type" : "string"
+        }
+      }
+    },
+    "BluetoothSearchResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "totalResults" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "first" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "last" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "resultCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "results" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/BluetoothNetwork"
+          }
+        },
+        "searchAfter" : {
+          "type" : "string",
+          "description" : "Use this in future searches to get the next page of data"
+        },
+        "search_after" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "deprecated"
+        }
+      }
+    },
+    "CellSiteChannel" : {
+      "type" : "object",
+      "properties" : {
+        "channel" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "latitude" : {
+          "type" : "number"
+        },
+        "longitude" : {
+          "type" : "number"
+        },
+        "qos" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      }
+    },
+    "ChannelDetailResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "resultsExceedLimit" : {
+          "type" : "boolean"
+        },
+        "results" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/CellSiteChannel"
+          }
+        },
+        "resultType" : {
+          "type" : "string"
+        }
+      }
+    },
+    "MccMncRecord" : {
+      "type" : "object",
+      "properties" : {
+        "type" : {
+          "type" : "string"
+        },
+        "countryName" : {
+          "type" : "string"
+        },
+        "countryCode" : {
+          "type" : "string"
+        },
+        "mcc" : {
+          "type" : "string"
+        },
+        "mnc" : {
+          "type" : "string"
+        },
+        "brand" : {
+          "type" : "string"
+        },
+        "operator" : {
+          "type" : "string"
+        },
+        "status" : {
+          "type" : "string"
+        },
+        "bands" : {
+          "type" : "string"
+        },
+        "notes" : {
+          "type" : "string"
+        }
+      }
+    },
+    "CellSearchResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "totalResults" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "first" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "last" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "resultCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "results" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GenericNetwork"
+          }
+        },
+        "searchAfter" : {
+          "type" : "string",
+          "description" : "Use this in future searches to get the next page of data"
+        },
+        "search_after" : {
+          "type" : "integer",
+          "format" : "int64",
+          "description" : "deprecated"
+        }
+      }
+    },
+    "GenericNetwork" : {
+      "type" : "object",
+      "properties" : {
+        "trilat" : {
+          "type" : "number"
+        },
+        "trilong" : {
+          "type" : "number"
+        },
+        "ssid" : {
+          "type" : "string"
+        },
+        "qos" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "transid" : {
+          "type" : "string"
+        },
+        "firsttime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lasttime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lastupdt" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "id" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "string"
+        },
+        "channel" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "gentype" : {
+          "type" : "string"
+        },
+        "country" : {
+          "type" : "string"
+        },
+        "region" : {
+          "type" : "string"
+        },
+        "road" : {
+          "type" : "string"
+        },
+        "city" : {
+          "type" : "string"
+        },
+        "housenumber" : {
+          "type" : "string"
+        },
+        "postalcode" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DensityAsOfDate" : {
+      "type" : "object",
+      "properties" : {
+        "date" : {
+          "type" : "string"
+        },
+        "firstTimeSeenDensity" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "lastTimeSeenDensity" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "DensityResponse" : {
+      "type" : "object",
+      "properties" : {
+        "histogramByCell" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GeoHistogram"
+          }
+        },
+        "cells" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "millisecondsToCalculate" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "requestTopLat" : {
+          "type" : "number"
+        },
+        "requestBottomLat" : {
+          "type" : "number"
+        },
+        "requestLeftLon" : {
+          "type" : "number"
+        },
+        "requestRightLon" : {
+          "type" : "number"
+        }
+      }
+    },
+    "GeoHistogram" : {
+      "type" : "object",
+      "properties" : {
+        "topLat" : {
+          "type" : "number"
+        },
+        "bottomLat" : {
+          "type" : "number"
+        },
+        "leftLon" : {
+          "type" : "number"
+        },
+        "rightLon" : {
+          "type" : "number"
+        },
+        "densities" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/DensityAsOfDate"
+          }
+        }
+      }
+    },
+    "BluetoothLocation" : {
+      "type" : "object",
+      "properties" : {
+        "alt" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "accuracy" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "lastupdt" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "latitude" : {
+          "type" : "number"
+        },
+        "longitude" : {
+          "type" : "number"
+        },
+        "month" : {
+          "type" : "string"
+        },
+        "ssid" : {
+          "type" : "string"
+        },
+        "time" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "signal" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "netId" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "string"
+        }
+      }
+    },
+    "BtDetail" : {
+      "type" : "object",
+      "required" : [ "networkId" ],
+      "properties" : {
+        "trilateratedLatitude" : {
+          "type" : "number",
+          "readOnly" : true
+        },
+        "trilateratedLongitude" : {
+          "type" : "number",
+          "readOnly" : true
+        },
+        "bestClusterWiGLEQoS" : {
+          "type" : "integer",
+          "format" : "int32",
+          "readOnly" : true
+        },
+        "firstSeen" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "lastSeen" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "lastUpdate" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "streetAddress" : {
+          "readOnly" : true,
+          "$ref" : "#/definitions/StreetAddress"
+        },
+        "networkId" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "name" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "type" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "capabilities" : {
+          "type" : "array",
+          "readOnly" : true,
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "deviceType" : {
+          "type" : "integer",
+          "format" : "int32",
+          "readOnly" : true
+        },
+        "locationClusters" : {
+          "type" : "array",
+          "readOnly" : true,
+          "items" : {
+            "$ref" : "#/definitions/BtLocationCluster"
+          }
+        }
+      }
+    },
+    "BtLocationCluster" : {
+      "type" : "object",
+      "properties" : {
+        "centroidLatitude" : {
+          "type" : "number",
+          "format" : "double"
+        },
+        "centroidLongitude" : {
+          "type" : "number",
+          "format" : "double"
+        },
+        "minLastUpdate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "maxLastUpdate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "clusterSsid" : {
+          "type" : "string"
+        },
+        "locations" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/BluetoothLocation"
+          }
+        },
+        "score" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "daysObservedCount" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      }
+    },
+    "StreetAddress" : {
+      "type" : "object",
+      "properties" : {
+        "housenumber" : {
+          "type" : "string"
+        },
+        "road" : {
+          "type" : "string"
+        },
+        "city" : {
+          "type" : "string"
+        },
+        "region" : {
+          "type" : "string"
+        },
+        "country" : {
+          "type" : "string"
+        },
+        "postalcode" : {
+          "type" : "string"
+        }
+      }
+    },
+    "WiFiDetail" : {
+      "type" : "object",
+      "required" : [ "networkId" ],
+      "properties" : {
+        "trilateratedLatitude" : {
+          "type" : "number",
+          "readOnly" : true
+        },
+        "trilateratedLongitude" : {
+          "type" : "number",
+          "readOnly" : true
+        },
+        "bestClusterWiGLEQoS" : {
+          "type" : "integer",
+          "format" : "int32",
+          "readOnly" : true
+        },
+        "firstSeen" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "lastSeen" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "lastUpdate" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "streetAddress" : {
+          "readOnly" : true,
+          "$ref" : "#/definitions/StreetAddress"
+        },
+        "networkId" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "name" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "type" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "comment" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "bcninterval" : {
+          "type" : "integer",
+          "format" : "int32",
+          "readOnly" : true
+        },
+        "freenet" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "dhcp" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "paynet" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "encryption" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "channel" : {
+          "type" : "integer",
+          "format" : "int32",
+          "readOnly" : true
+        },
+        "locationClusters" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/WiFiLocationCluster"
+          }
+        }
+      }
+    },
+    "WiFiLocation" : {
+      "type" : "object",
+      "properties" : {
+        "alt" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "accuracy" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "lastupdt" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "latitude" : {
+          "type" : "number"
+        },
+        "longitude" : {
+          "type" : "number"
+        },
+        "month" : {
+          "type" : "string"
+        },
+        "ssid" : {
+          "type" : "string"
+        },
+        "time" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "signal" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "netId" : {
+          "type" : "string"
+        },
+        "noise" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "snr" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "wep" : {
+          "type" : "string"
+        },
+        "channel" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "frequency" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "encryptionValue" : {
+          "type" : "string"
+        }
+      }
+    },
+    "WiFiLocationCluster" : {
+      "type" : "object",
+      "properties" : {
+        "centroidLatitude" : {
+          "type" : "number",
+          "format" : "double"
+        },
+        "centroidLongitude" : {
+          "type" : "number",
+          "format" : "double"
+        },
+        "minLastUpdate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "maxLastUpdate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "clusterSsid" : {
+          "type" : "string"
+        },
+        "locations" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/WiFiLocation"
+          }
+        },
+        "score" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "daysObservedCount" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      }
+    },
+    "CellDetail" : {
+      "type" : "object",
+      "required" : [ "networkId" ],
+      "properties" : {
+        "trilateratedLatitude" : {
+          "type" : "number",
+          "readOnly" : true
+        },
+        "trilateratedLongitude" : {
+          "type" : "number",
+          "readOnly" : true
+        },
+        "bestClusterWiGLEQoS" : {
+          "type" : "integer",
+          "format" : "int32",
+          "readOnly" : true
+        },
+        "firstSeen" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "lastSeen" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "lastUpdate" : {
+          "type" : "string",
+          "format" : "date-time",
+          "readOnly" : true
+        },
+        "streetAddress" : {
+          "readOnly" : true,
+          "$ref" : "#/definitions/StreetAddress"
+        },
+        "networkId" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "type" : {
+          "type" : "string",
+          "readOnly" : true
+        },
+        "attributes" : {
+          "type" : "array",
+          "readOnly" : true,
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "channel" : {
+          "type" : "integer",
+          "format" : "int32",
+          "readOnly" : true
+        },
+        "locationClusters" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/CellLocationCluster"
+          }
+        },
+        "xarfcn" : {
+          "type" : "integer",
+          "format" : "int32",
+          "readOnly" : true
+        }
+      }
+    },
+    "CellLocationCluster" : {
+      "type" : "object",
+      "properties" : {
+        "centroidLatitude" : {
+          "type" : "number",
+          "format" : "double"
+        },
+        "centroidLongitude" : {
+          "type" : "number",
+          "format" : "double"
+        },
+        "minLastUpdate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "maxLastUpdate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "clusterSsid" : {
+          "type" : "string"
+        },
+        "locations" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GenericLocation"
+          }
+        },
+        "score" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "daysObservedCount" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      }
+    },
+    "GenericLocation" : {
+      "type" : "object",
+      "properties" : {
+        "alt" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "accuracy" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "lastupdt" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "latitude" : {
+          "type" : "number"
+        },
+        "longitude" : {
+          "type" : "number"
+        },
+        "month" : {
+          "type" : "string"
+        },
+        "ssid" : {
+          "type" : "string"
+        },
+        "time" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "signal" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "netId" : {
+          "type" : "string"
+        },
+        "genType" : {
+          "type" : "string"
+        },
+        "attributes" : {
+          "type" : "string"
+        },
+        "channel" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      }
+    },
+    "Group" : {
+      "type" : "object",
+      "properties" : {
+        "groupId" : {
+          "type" : "string"
+        },
+        "groupName" : {
+          "type" : "string"
+        },
+        "owner" : {
+          "type" : "string"
+        },
+        "discovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "total" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "genDisc" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "authType" : {
+          "type" : "string"
+        },
+        "groupOwner" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "GroupMember" : {
+      "type" : "object",
+      "properties" : {
+        "groupId" : {
+          "type" : "string"
+        },
+        "username" : {
+          "type" : "string"
+        },
+        "status" : {
+          "type" : "string"
+        },
+        "discovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "total" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "genDisc" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "firstTransid" : {
+          "type" : "string"
+        },
+        "lastTransid" : {
+          "type" : "string"
+        },
+        "monthCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "prevMonthCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "GroupResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "groupid" : {
+          "type" : "string"
+        },
+        "group" : {
+          "$ref" : "#/definitions/Group"
+        },
+        "users" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GroupMember"
+          }
+        }
+      }
+    },
+    "GroupMemberResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "users" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GroupMember"
+          }
+        },
+        "group" : {
+          "$ref" : "#/definitions/Group"
+        }
+      }
+    },
+    "GroupMemberEventStats" : {
+      "type" : "object",
+      "properties" : {
+        "userName" : {
+          "type" : "string"
+        },
+        "wifiDiscoveredWithLocation" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "wifiDiscovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "cellDiscoveredWithLocation" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "cellDiscovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btDiscoveredWithLocation" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btDiscovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "GroupStatsResponse" : {
+      "type" : "object",
+      "properties" : {
+        "overAllGroupStats" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GroupMember"
+          }
+        },
+        "startDateTime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "endDateTime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "eventMemberStats" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GroupMemberEventStats"
+          }
+        }
+      }
+    },
+    "GeocodingResponse" : {
+      "type" : "object",
+      "properties" : {
+        "address" : {
+          "type" : "object",
+          "additionalProperties" : {
+            "type" : "string"
+          }
+        },
+        "lat" : {
+          "type" : "number"
+        },
+        "lon" : {
+          "type" : "number"
+        },
+        "importance" : {
+          "type" : "number"
+        },
+        "place_id" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "licence" : {
+          "type" : "string"
+        },
+        "osm_type" : {
+          "type" : "string"
+        },
+        "display_name" : {
+          "type" : "string"
+        },
+        "boundingbox" : {
+          "type" : "array",
+          "items" : {
+            "type" : "number"
+          }
+        }
+      }
+    },
+    "WiFiNetworkDetailResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "cdma" : {
+          "type" : "boolean"
+        },
+        "gsm" : {
+          "type" : "boolean"
+        },
+        "lte" : {
+          "type" : "boolean"
+        },
+        "nr" : {
+          "type" : "boolean"
+        },
+        "wcdma" : {
+          "type" : "boolean"
+        },
+        "wifi" : {
+          "type" : "boolean"
+        },
+        "addresses" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GeocodingResponse"
+          }
+        },
+        "results" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/WiFiNetworkWithLocation"
+          }
+        }
+      }
+    },
+    "WiFiNetworkWithLocation" : {
+      "type" : "object",
+      "properties" : {
+        "trilat" : {
+          "type" : "number"
+        },
+        "trilong" : {
+          "type" : "number"
+        },
+        "ssid" : {
+          "type" : "string"
+        },
+        "qos" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "transid" : {
+          "type" : "string"
+        },
+        "firsttime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lasttime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lastupdt" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "netid" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "type" : {
+          "type" : "string"
+        },
+        "comment" : {
+          "type" : "string"
+        },
+        "wep" : {
+          "type" : "string"
+        },
+        "bcninterval" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "freenet" : {
+          "type" : "string"
+        },
+        "dhcp" : {
+          "type" : "string"
+        },
+        "paynet" : {
+          "type" : "string"
+        },
+        "userfound" : {
+          "type" : "boolean"
+        },
+        "channel" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "frequency" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "rcois" : {
+          "type" : "string"
+        },
+        "locationData" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/WiFiLocation"
+          }
+        },
+        "encryption" : {
+          "type" : "string"
+        },
+        "country" : {
+          "type" : "string"
+        },
+        "region" : {
+          "type" : "string"
+        },
+        "road" : {
+          "type" : "string"
+        },
+        "city" : {
+          "type" : "string"
+        },
+        "housenumber" : {
+          "type" : "string"
+        },
+        "postalcode" : {
+          "type" : "string"
+        }
+      }
+    },
+    "NetworkGeocodingResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "results" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GeocodingResponse"
+          }
+        }
+      }
+    },
+    "NetCommentResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "comment" : {
+          "type" : "string"
+        },
+        "netid" : {
+          "type" : "string"
+        }
+      }
+    },
+    "Person" : {
+      "type" : "object",
+      "properties" : {
+        "userid" : {
+          "type" : "string"
+        },
+        "email" : {
+          "type" : "string"
+        },
+        "donate" : {
+          "type" : "string"
+        },
+        "joindate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lastlogin" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "flags" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "emailVerified" : {
+          "type" : "boolean"
+        },
+        "nextlogin" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "session" : {
+          "type" : "string"
+        },
+        "admin" : {
+          "type" : "boolean"
+        },
+        "success" : {
+          "type" : "string"
+        }
+      }
+    },
+    "AuthToken" : {
+      "type" : "object",
+      "properties" : {
+        "authName" : {
+          "type" : "string"
+        },
+        "token" : {
+          "type" : "string"
+        },
+        "status" : {
+          "type" : "string",
+          "enum" : [ "STATUS_ACTIVE", "STATUS_DISABLED" ]
+        },
+        "type" : {
+          "type" : "string",
+          "enum" : [ "API", "COMMAPI", "ANDROID", "COOKIE", "SERVICE" ]
+        },
+        "personId" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "ResettableAuthTokenResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "result" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/AuthToken"
+          }
+        },
+        "digest" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      }
+    },
+    "GroupStat" : {
+      "type" : "object",
+      "properties" : {
+        "groupId" : {
+          "type" : "string"
+        },
+        "groupName" : {
+          "type" : "string"
+        },
+        "owner" : {
+          "type" : "string"
+        },
+        "discovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "total" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "genDisc" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "members" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "joined" : {
+          "type" : "boolean"
+        },
+        "groupOwner" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "GroupStatResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "groups" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/GroupStat"
+          }
+        }
+      }
+    },
+    "CountriesResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "countries" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/CountryStat"
+          }
+        }
+      }
+    },
+    "CountryStat" : {
+      "type" : "object",
+      "properties" : {
+        "country" : {
+          "type" : "string"
+        },
+        "wifiCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "cellCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "EncryptionStat" : {
+      "type" : "object",
+      "properties" : {
+        "wep" : {
+          "type" : "string"
+        },
+        "count" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "PostalStat" : {
+      "type" : "object",
+      "properties" : {
+        "postalCode" : {
+          "type" : "string"
+        },
+        "wifiCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "cellCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "RegionResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "regions" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/RegionStat"
+          }
+        },
+        "postalCode" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/PostalStat"
+          }
+        },
+        "encryption" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/EncryptionStat"
+          }
+        }
+      }
+    },
+    "RegionStat" : {
+      "type" : "object",
+      "properties" : {
+        "region" : {
+          "type" : "string"
+        },
+        "wifiCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "cellCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "UserStandings" : {
+      "type" : "object",
+      "properties" : {
+        "rank" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "monthRank" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "userName" : {
+          "type" : "string"
+        },
+        "discoveredWiFiGPS" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "discoveredWiFiGPSPercent" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "discoveredWiFi" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "discoveredCellGPS" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "discoveredCell" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "discoveredBtGPS" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "discoveredBt" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "eventMonthCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "eventPrevMonthCount" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "prevRank" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "prevMonthRank" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "totalWiFiLocations" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "first" : {
+          "type" : "string"
+        },
+        "last" : {
+          "type" : "string"
+        },
+        "self" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "UserStatsResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "imageBadgeUrl" : {
+          "type" : "string"
+        },
+        "statistics" : {
+          "$ref" : "#/definitions/UserStandings"
+        },
+        "rank" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "monthRank" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "user" : {
+          "type" : "string"
+        }
+      }
+    },
+    "TransLog" : {
+      "type" : "object",
+      "properties" : {
+        "transid" : {
+          "type" : "string"
+        },
+        "username" : {
+          "type" : "string"
+        },
+        "firstTime" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "lastupdt" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "fileName" : {
+          "type" : "string"
+        },
+        "fileSize" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "fileLines" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "status" : {
+          "type" : "string"
+        },
+        "discoveredGps" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "discovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "total" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "totalGps" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "totalLocations" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "percentDone" : {
+          "type" : "number",
+          "format" : "float"
+        },
+        "timeParsing" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "genDiscovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "genDiscoveredGps" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "genTotal" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "genTotalGps" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "genTotalLocations" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btDiscovered" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btDiscoveredGps" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btTotal" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btTotalGps" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "btTotalLocations" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "wwwdStatus" : {
+          "type" : "string"
+        },
+        "wait" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "brand" : {
+          "type" : "string"
+        },
+        "model" : {
+          "type" : "string"
+        },
+        "osRelease" : {
+          "type" : "string"
+        }
+      }
+    },
+    "TranslogResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "results" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/TransLog"
+          }
+        },
+        "processingQueueDepth" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "geoQueueDepth" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "trilaterationQueueDepth" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "TransidResponse" : {
+      "type" : "object",
+      "properties" : {
+        "file" : {
+          "type" : "string"
+        },
+        "size" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "transId" : {
+          "type" : "string"
+        }
+      }
+    },
+    "UploadResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "warning" : {
+          "type" : "string"
+        },
+        "results" : {
+          "$ref" : "#/definitions/UploadResultsResponse"
+        },
+        "observer" : {
+          "type" : "string"
+        }
+      }
+    },
+    "UploadResultsResponse" : {
+      "type" : "object",
+      "properties" : {
+        "timeTaken" : {
+          "type" : "string"
+        },
+        "filesize" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "filename" : {
+          "type" : "string"
+        },
+        "transids" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/TransidResponse"
+          }
+        }
+      }
+    },
+    "ErrorMessageResponse" : {
+      "type" : "object",
+      "properties" : {
+        "success" : {
+          "type" : "boolean"
+        },
+        "message" : {
+          "type" : "string"
+        }
+      }
+    }
+  }
+}

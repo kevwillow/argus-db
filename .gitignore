@@ -31,3 +31,8 @@ __pycache__/
 .idea/
 .vscode/
 *.swp
+
+# WiGLE per-runtime artifacts (extracted to top-level wigle/ per MAC-1 4df426c7).
+# Pattern parity with raw/ + logs/ exclusions above; canonical DB rows live in db/argus.db.
+wigle/raw/
+wigle/pacer.json
