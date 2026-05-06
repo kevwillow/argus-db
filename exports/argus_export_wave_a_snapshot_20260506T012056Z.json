@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "argus_run_id": "679efd99-9466-45ce-96c8-3cfa2f7a68b2",
+    "bible_head_commit": "269c656",
+    "bible_amendments_through": "6699cdf",
+    "schema_version": 6,
+    "phase_marker": "phase_4_wave_a_snapshot",
+    "confidence_threshold": 0,
+    "wave_a_yield_summary": {
+      "rows_staged": 1,
+      "rows_exported": 1,
+      "cohorts_with_extractions": [
+        "cohort_A2"
+      ],
+      "confidence_bands": {
+        "75_89": 1,
+        "90_99": 0,
+        "below_75": 0
+      },
+      "wave_a_close_at": "2026-05-06T00:44:56Z",
+      "wave_a_dispatch_at": "2026-05-05T16:16:10Z"
+    },
+    "dropped_in_export": {
+      "no_identifier": 0,
+      "excerpt_overflow_after_truncate": 0,
+      "schema_invalid": 0
+    },
+    "exported_at": "2026-05-06T01:20:56.774418Z",
+    "reconciliation": {
+      "source_record_count": 1,
+      "entries_count": 1,
+      "dropped_total": 0,
+      "check": "source_record_count \u2212 sum(dropped_in_export) = entries_count"
+    },
+    "audit_trail": {
+      "mac22_issue": "MAC-22",
+      "mac21_step0": "MAC-21",
+      "mac23_step1": "MAC-23",
+      "mac25_step2": "MAC-25",
+      "mac26_step25": "MAC-26",
+      "feedback_memories": [
+        "feedback_vendor_public_materials_marketing_not_technical.md",
+        "feedback_per_cohort_trip_line_multi_cohort_waves.md",
+        "feedback_calibration_window_inverse_yield_certainty.md",
+        "feedback_fp_rate_cross_field_disambig.md"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "argus_record_id": "d4bfc29b7d63f7b1",
+      "identifier_type": "mac",
+      "identifier": "e4:aa:ea:80:a1:9b",
+      "manufacturer": "Flock Safety",
+      "device_category": "alpr",
+      "model": null,
+      "confidence": 75,
+      "source_url": "https://raw.githubusercontent.com/0xXyc/flock-you-wifi-recon/main/README.md",
+      "source_excerpt": "_flagged:64 ch:10     \u2190 baseline: 0 matches\n[+00:07:23.948] MATCH(oui_flock) PROBE_REQ src:e4:aa:ea:80:a1:9b ssid:\"<hidden>\" rssi:-82 ch:5 hits:1\n[+00:07:24.461] MATCH(oui_flock) PROBE_REQ src:e4:aa:e",
+      "source_name": "GitHub: 0xXyc/flock-you-wifi-recon (Wave-A A2 cohort)",
+      "source_type": "manufacturer_doc",
+      "captured_at": "2026-05-06 00:30:28",
+      "extraction_module": "db.sources.vendor_docs",
+      "extraction_run_id": 27
+    }
+  ]
+}
