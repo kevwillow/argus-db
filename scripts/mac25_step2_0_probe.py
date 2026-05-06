@@ -303,25 +303,29 @@ def evaluate_code_search_pacer(
             rl_remaining_last=st.rl_remaining_last,
             rl_reset_last_iso=st.rl_reset_last_iso,
         )
-    # RL-buffer check
+    # RL-buffer check. Only enforce when the reset boundary is still in the
+    # future — once reset has elapsed, the cached rl_remaining_last is
+    # stale and the next fire will refresh it from response headers.
     if (
         st.rl_remaining_last is not None
         and st.rl_remaining_last <= RL_REMAINING_BUFFER_CODE_SEARCH
+        and st.rl_reset_last_iso
     ):
-        if st.rl_reset_last_iso:
-            try:
-                reset = datetime.strptime(
-                    st.rl_reset_last_iso, "%Y-%m-%dT%H:%M:%SZ"
-                ).replace(tzinfo=timezone.utc)
-                wait = max(0, int((reset - now).total_seconds()) + 5)
-                if wait > 0:
-                    return False, (
-                        f"rl_remaining_below_buffer "
-                        f"({st.rl_remaining_last} ≤ {RL_REMAINING_BUFFER_CODE_SEARCH}, "
-                        f"reset_in={wait}s)"
-                    ), wait
-            except ValueError:
-                pass
+        try:
+            reset = datetime.strptime(
+                st.rl_reset_last_iso, "%Y-%m-%dT%H:%M:%SZ"
+            ).replace(tzinfo=timezone.utc)
+            wait = int((reset - now).total_seconds()) + 5
+            if wait > 0:
+                return False, (
+                    f"rl_remaining_below_buffer "
+                    f"({st.rl_remaining_last} ≤ {RL_REMAINING_BUFFER_CODE_SEARCH}, "
+                    f"reset_in={wait}s)"
+                ), wait
+            # else: reset has elapsed; cached rl_remaining is stale — fall
+            # through to min-gap check.
+        except ValueError:
+            pass
     # Min-gap
     if st.last_query_at_iso:
         try:
@@ -483,6 +487,7 @@ def run_probe(
     dry_run: bool,
     max_queries: int,
     log_path: Path,
+    skip_vendors: list[str] | None = None,
 ) -> dict:
     """Execute the /search/code probe within hard caps + per-vendor caps.
 
@@ -508,8 +513,17 @@ def run_probe(
     queries_fired = 0
     queries_attempted = 0
     cap = min(max_queries, PROBE_HARD_CAP)
+    skip_set = {v.lower() for v in (skip_vendors or [])}
 
     for plan in VENDOR_PLAN:
+        if plan["vendor"].lower() in skip_set:
+            LOG.info("SKIP vendor=%s (per --skip-vendors)", plan["vendor"])
+            manifest["vendor_yield_summary"][plan["vendor"]] = {
+                "vendor": plan["vendor"], "skipped": True,
+                "queries_fired": 0, "queries_attempted": 0,
+                "total_count_returned": 0, "queries": [],
+            }
+            continue
         if queries_fired >= cap:
             manifest["halted_reason"] = "probe_hard_cap_reached"
             break
@@ -545,20 +559,28 @@ def run_probe(
                         "url": url, "vendor": vendor, "dry_run": True,
                     })
                     continue
-                # PACER: load + evaluate
+                # PACER: load + evaluate. Loop the sleep-then-reevaluate
+                # cycle up to MAX_PACER_LOOPS times (each loop sleeps the
+                # current wait_s value, capped at 300s) before halting. This
+                # handles the case where reset boundary keeps shifting by a
+                # few seconds across consecutive evaluations.
                 state = PacerState.load(pacer_path)
                 can, reason, wait_s = evaluate_code_search_pacer(state)
                 slept_s = 0.0
-                if not can and wait_s > 0:
+                MAX_PACER_LOOPS = 4
+                loops = 0
+                while not can and wait_s > 0 and loops < MAX_PACER_LOOPS:
                     capped = min(wait_s, 300)
-                    LOG.info("pacer veto: %s — sleeping %ds", reason, capped)
+                    LOG.info("pacer veto: %s — sleeping %ds (loop %d/%d)",
+                             reason, capped, loops + 1, MAX_PACER_LOOPS)
                     time.sleep(capped)
-                    slept_s = float(capped)
+                    slept_s += float(capped)
                     state = PacerState.load(pacer_path)
                     can, reason, wait_s = evaluate_code_search_pacer(state)
+                    loops += 1
                 if not can:
-                    LOG.warning("pacer still vetoing after sleep: %s — halt",
-                                reason)
+                    LOG.warning("pacer still vetoing after %d loops: %s — halt",
+                                loops, reason)
                     manifest["halted_reason"] = f"pacer_veto:{reason}"
                     break
                 LOG.info("FETCH %s", url)
@@ -650,6 +672,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--confirm", default="",
                    help="Live-fire confirm token")
     p.add_argument("--max-queries", type=int, default=PROBE_HARD_CAP)
+    p.add_argument("--skip-vendors", default="",
+                   help="Comma-separated vendor names to skip (e.g. 'Cradlepoint,Sierra Wireless')")
     p.add_argument("--pacer", type=Path, default=DEFAULT_PACER_LEDGER)
     p.add_argument("--raw-root", type=Path, default=DEFAULT_RAW_ROOT)
     p.add_argument("--env-path", type=Path, default=DEFAULT_ENV_PATH)
@@ -694,6 +718,7 @@ def main(argv: list[str] | None = None) -> int:
         pat = load_github_pat(args.env_path)
         LOG.info("PAT loaded (length=%d)", len(pat))
 
+    skip_vendors = [s.strip() for s in args.skip_vendors.split(",") if s.strip()]
     manifest = run_probe(
         pacer_path=args.pacer,
         raw_root=args.raw_root,
@@ -701,6 +726,7 @@ def main(argv: list[str] | None = None) -> int:
         dry_run=dry_run,
         max_queries=args.max_queries,
         log_path=log_path,
+        skip_vendors=skip_vendors,
     )
     LOG.info(
         "Probe complete — fired=%d attempted=%d halted=%s",
