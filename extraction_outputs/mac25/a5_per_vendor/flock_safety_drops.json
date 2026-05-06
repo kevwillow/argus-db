@@ -1,0 +1,100 @@
+[
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/MM0x02__RSS-Push/issue_64/_thread.json#issue_body",
+    "offset": 476,
+    "ident_preview": "CVE-2025"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/MM0x02__RSS-Push/issue_64/_thread.json#issue_body",
+    "offset": 554,
+    "ident_preview": "CVE-2025"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/MM0x02__RSS-Push/issue_64/_thread.json#issue_body",
+    "offset": 4101,
+    "ident_preview": "CVE-2025"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/MM0x02__RSS-Push/issue_64/_thread.json#issue_body",
+    "offset": 6516,
+    "ident_preview": "CVE-2021"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/MM0x02__RSS-Push/issue_64/_thread.json#issue_body",
+    "offset": 7664,
+    "ident_preview": "CVE-2025"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/MM0x02__RSS-Push/issue_64/_thread.json#issue_body",
+    "offset": 40844,
+    "ident_preview": "UAC-0173"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/MM0x02__RSS-Push/issue_64/_thread.json#issue_body",
+    "offset": 42927,
+    "ident_preview": "CVE-2024"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/chainreactors__picker/issue_816/_thread.json#issue_body",
+    "offset": 5540,
+    "ident_preview": "CVE-2025"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/chainreactors__picker/issue_816/_thread.json#issue_body",
+    "offset": 7955,
+    "ident_preview": "CVE-2021"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/chainreactors__picker/issue_816/_thread.json#issue_body",
+    "offset": 9103,
+    "ident_preview": "CVE-2025"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/chainreactors__picker/issue_816/_thread.json#issue_body",
+    "offset": 19164,
+    "ident_preview": "CVE-2025"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/chainreactors__picker/issue_816/_thread.json#issue_body",
+    "offset": 19242,
+    "ident_preview": "CVE-2025"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/chainreactors__picker/issue_816/_thread.json#issue_body",
+    "offset": 51697,
+    "ident_preview": "CVE-2024"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/flock_safety/chainreactors__picker/issue_816/_thread.json#issue_body",
+    "offset": 56097,
+    "ident_preview": "UAC-0173"
+  }
+]

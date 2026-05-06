@@ -1,0 +1,757 @@
+[
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/MONROE-PROJECT__Maintenance/issue_29/_thread.json#comment#267898115",
+    "offset": 1037,
+    "ident_preview": "c6:14:42:ee:72:03"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/OpenEmu__OpenEmu/issue_2853/_thread.json#issue_body",
+    "offset": 462,
+    "ident_preview": "f0c1e65c-9ed3-11e6-9540-e9442346186c"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/OpenEmu__OpenEmu/issue_2853/_thread.json#comment#257366299",
+    "offset": 177,
+    "ident_preview": "CUH-ZCT2U"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/OpenEmu__OpenEmu/issue_2853/_thread.json#comment#257388536",
+    "offset": 14,
+    "ident_preview": "CUH-ZCT2U"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/OpenEmu__OpenEmu/issue_2853/_thread.json#comment#257713269",
+    "offset": 191,
+    "ident_preview": "1c-66-6d-d4-60-9e"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#issue_body",
+    "offset": 2201,
+    "ident_preview": "05bb36a8-aae9-4012-9591-ee0c34a29230"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#issue_body",
+    "offset": 2317,
+    "ident_preview": "10bccf6d-80a6-4faa-a46b-830c15f1d8b7"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#issue_body",
+    "offset": 2440,
+    "ident_preview": "4e3d02c8-a750-42b8-9736-f098a2767be2"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#issue_body",
+    "offset": 2563,
+    "ident_preview": "d289a0f2-0b66-45a6-9d53-8e7883082874"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#issue_body",
+    "offset": 2680,
+    "ident_preview": "0dbc6ef2-30e7-483c-b693-0463491037ab"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231001427",
+    "offset": 108,
+    "ident_preview": "d39c84c7-b978-46ca-9987-5d3da3e82d6f"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231001427",
+    "offset": 229,
+    "ident_preview": "3ffd0803-a131-45fc-a845-3dee501bf3df"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231001427",
+    "offset": 346,
+    "ident_preview": "e9e43c5d-cef7-4141-8b3e-60374a06fb31"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231001427",
+    "offset": 473,
+    "ident_preview": "b536b450-fae3-4f86-82e6-47899508da32"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231001427",
+    "offset": 601,
+    "ident_preview": "6b6f6ae3-b3b6-46cd-916c-7381d7d6edd9"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 103,
+    "ident_preview": "ad76437c-ffcb-4b47-a0f1-8ceca19670eb"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 222,
+    "ident_preview": "22391d3d-507a-463e-98ad-60a0fcd7ba05"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 348,
+    "ident_preview": "ac35007e-b628-46c8-b093-c92a9932fd1e"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 464,
+    "ident_preview": "f06223a3-e956-4a0a-b17a-627cbcc69bd4"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 583,
+    "ident_preview": "99e96bb2-8fc3-4828-844c-647bba145bfe"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 706,
+    "ident_preview": "53e78d83-ac95-48ee-8e49-1a30b24d01c6"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 820,
+    "ident_preview": "2138a658-d46d-428d-89ee-babec9ba3812"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 949,
+    "ident_preview": "56db32c7-86f0-4ee8-a9ce-8959ed11a941"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 1072,
+    "ident_preview": "deb5815c-06ce-4ef2-a72a-9623af5b168e"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 1199,
+    "ident_preview": "20b1317e-b94b-47e6-b2f3-7b0b326d6175"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 1317,
+    "ident_preview": "6ad6b288-cd3d-400c-a8a1-7a4956d90352"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 1432,
+    "ident_preview": "268b218e-d8cd-4fbe-80e0-3175d01f2a5f"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 1547,
+    "ident_preview": "a393c7a7-101a-43c2-9059-3134479c5f5c"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 1662,
+    "ident_preview": "d5525869-b590-4537-a57b-d743ab064ae6"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 1778,
+    "ident_preview": "b524f763-d126-4766-bb95-7af8e96011d7"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 1894,
+    "ident_preview": "0709dc80-a011-4a63-af94-1cb0b8982510"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 2006,
+    "ident_preview": "65ceaa5b-e386-408b-9958-fbbdfa87fcca"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 2121,
+    "ident_preview": "da238525-6bcc-4e40-87cd-34514a923bb8"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 2237,
+    "ident_preview": "85085c77-724a-4d09-9121-83bd7eca9fb3"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 2353,
+    "ident_preview": "a66d18a1-a7ac-400d-b633-6187baf40e61"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 2468,
+    "ident_preview": "5c1ffdfc-e30c-477d-a2b6-f713e647b693"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 2583,
+    "ident_preview": "b9800613-e33b-4a4e-a8e4-21042fc222e9"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1231002511",
+    "offset": 2708,
+    "ident_preview": "461ee695-e7a4-499f-bd1b-d23aa7052d9c"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1232197845",
+    "offset": 199,
+    "ident_preview": "ef06223f-7d4c-4e4e-bac4-7aeb9e9aac76"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1232197845",
+    "offset": 323,
+    "ident_preview": "609aff56-694b-4d29-ada1-55d2b9af3741"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1232197845",
+    "offset": 450,
+    "ident_preview": "e0de93fc-341c-4dd4-ade1-b527cbd66e17"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/Ysurac__openmptcprouter/issue_2497/_thread.json#comment#1232202193",
+    "offset": 74,
+    "ident_preview": "5d06d6db-ca59-45da-97d8-3361b24da304"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/canonical__cloud-init/issue_2586/_thread.json#comment#1541685034",
+    "offset": 512,
+    "ident_preview": "CVE-2015"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/canonical__cloud-init/issue_2586/_thread.json#comment#1541685034",
+    "offset": 727,
+    "ident_preview": "CVE-2015"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/canonical__cloud-init/issue_2586/_thread.json#comment#1541685034",
+    "offset": 8685,
+    "ident_preview": "DAC-X20U"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#181458286",
+    "offset": 780,
+    "ident_preview": "a74c5a98-ce59-11e5-8775-ed60dba78866"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 2718,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 3092,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 4912,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 5286,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 5660,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 6034,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 6551,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 6925,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 7299,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 7673,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#283980090",
+    "offset": 8047,
+    "ident_preview": "GCM-SHA384"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/deskflow__deskflow/issue_4132/_thread.json#comment#307343143",
+    "offset": 240,
+    "ident_preview": "73e0db60-4d39-11e7-8110-b3e4a97b385c"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#issue_body",
+    "offset": 718,
+    "ident_preview": "691a255a-5f3c-11e7-8fa4-09b4df10bb25"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#issue_body",
+    "offset": 864,
+    "ident_preview": "6574d3a0-5f3c-11e7-8d87-43a744c3e803"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#issue_body",
+    "offset": 1008,
+    "ident_preview": "94d9d38e-5f3c-11e7-9111-189687fb693c"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#321279102",
+    "offset": 389,
+    "ident_preview": "312c374c-7cf0-11e7-87b0-0f25c570d29f"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326615735",
+    "offset": 383,
+    "ident_preview": "cba4f8a6-8f13-11e7-96f8-b28da4e44694"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326633637",
+    "offset": 163,
+    "ident_preview": "fb747b9c-8f1d-11e7-82e6-f55c3217a2d7"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326633637",
+    "offset": 405,
+    "ident_preview": "550d799c-8f1e-11e7-8ca7-91af83ac280c"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326633637",
+    "offset": 582,
+    "ident_preview": "5b2f9d8c-8f1e-11e7-9a4d-6c4bd46c3275"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326714578",
+    "offset": 197,
+    "ident_preview": "19bcdc44-8f68-11e7-9453-c1159e35cdc3"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326750288",
+    "offset": 185,
+    "ident_preview": "e41fc41e-8fd7-11e7-97ea-02dd33a6e3c4"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326750288",
+    "offset": 367,
+    "ident_preview": "9e7de440-8fd7-11e7-8beb-c56e4e11f8a9"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326750288",
+    "offset": 571,
+    "ident_preview": "6f658018-8fd8-11e7-85ea-4bb75a421abf"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#326961266",
+    "offset": 342,
+    "ident_preview": "5868b9d0-9158-11e7-8735-1f63d1638689"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#327010498",
+    "offset": 195,
+    "ident_preview": "51b80afc-9183-11e7-8bea-d1adbf7f1900"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#327585042",
+    "offset": 222,
+    "ident_preview": "4077a0b2-931e-11e7-98e0-009b232887bf"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#327585042",
+    "offset": 367,
+    "ident_preview": "43a305f6-931e-11e7-9adb-2cf9008f9445"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#328292827",
+    "offset": 123,
+    "ident_preview": "4924579a-956d-11e7-9971-2aa8e2a81622"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#335118639",
+    "offset": 157,
+    "ident_preview": "409a193a-ad27-11e7-9cc7-97f41f07bdfe"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#335118639",
+    "offset": 386,
+    "ident_preview": "6a480ecc-ad27-11e7-9331-78308b343ec2"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#346120188",
+    "offset": 851,
+    "ident_preview": "ac-bc-32-eb-c7-ee"
+  },
+  {
+    "kind": "cred_value",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#346150128",
+    "offset": 156,
+    "ident_preview": "sudo"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#472097428",
+    "offset": 151,
+    "ident_preview": "b8560200-452d-11e9-807a-52ee747a443d"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/dokterdok__Continuity-Activation-Tool/issue_397/_thread.json#comment#522252401",
+    "offset": 1228,
+    "ident_preview": "6178d800-c11e-11e9-916c-3339ddcad038"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/matteocrippa__dsl-n55u-bender/issue_3/_thread.json#issue_body",
+    "offset": 3449,
+    "ident_preview": "JMR-TX3927"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/matteocrippa__dsl-n55u-bender/issue_3/_thread.json#issue_body",
+    "offset": 31663,
+    "ident_preview": "ATA-RAID"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/matteocrippa__dsl-n55u-bender/issue_3/_thread.json#issue_body",
+    "offset": 32202,
+    "ident_preview": "PCI-EXPRESS"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/matteocrippa__dsl-n55u-bender/issue_3/_thread.json#issue_body",
+    "offset": 32598,
+    "ident_preview": "AHA-2920A"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/matteocrippa__dsl-n55u-bender/issue_3/_thread.json#issue_body",
+    "offset": 32748,
+    "ident_preview": "INI-A100U2W"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/matteocrippa__dsl-n55u-bender/issue_3/_thread.json#issue_body",
+    "offset": 68090,
+    "ident_preview": "ISO-8859"
+  },
+  {
+    "kind": "fcc_id_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/matteocrippa__dsl-n55u-bender/issue_3/_thread.json#issue_body",
+    "offset": 72274,
+    "ident_preview": "CRC-CCITT"
+  },
+  {
+    "kind": "root_at",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/matteocrippa__dsl-n55u-bender/issue_3/_thread.json#issue_body",
+    "offset": 83273,
+    "ident_preview": "root@kali"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#issue_body",
+    "offset": 358,
+    "ident_preview": "00-00-00-00-00-00"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#issue_body",
+    "offset": 376,
+    "ident_preview": "00-00-00-00-00-00"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#issue_body",
+    "offset": 941,
+    "ident_preview": "00-00-00-00-00-00"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#issue_body",
+    "offset": 959,
+    "ident_preview": "00-00-00-00-00-00"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1505406847",
+    "offset": 3652,
+    "ident_preview": "00:00:00:00:00:00"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1505560223",
+    "offset": 199,
+    "ident_preview": "00-00-00-00-00-00"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1505560223",
+    "offset": 217,
+    "ident_preview": "00-00-00-00-00-00"
+  },
+  {
+    "kind": "root_at",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1909295316",
+    "offset": 200,
+    "ident_preview": "root@vyos"
+  },
+  {
+    "kind": "root_at",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1909295316",
+    "offset": 577,
+    "ident_preview": "root@vyos"
+  },
+  {
+    "kind": "root_at",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1911167292",
+    "offset": 476,
+    "ident_preview": "root@vyos"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1911898135",
+    "offset": 3028,
+    "ident_preview": "00:00:00:00:00:00"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1911898135",
+    "offset": 4704,
+    "ident_preview": "00:00:00:00:00:00"
+  },
+  {
+    "kind": "root_at",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1913016904",
+    "offset": 288,
+    "ident_preview": "root@vyos"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1913561815",
+    "offset": 267,
+    "ident_preview": "32cc1e13-3ab0-4e14-bf4c-f27611f13b8c"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1913561815",
+    "offset": 473,
+    "ident_preview": "10becfbd-d8c1-4dd6-b22c-60593ff58464"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1913561815",
+    "offset": 626,
+    "ident_preview": "9830c7ab-0328-4025-9028-db660cab44ba"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#1913561815",
+    "offset": 832,
+    "ident_preview": "cccb6eee-00e6-4210-8086-7c50a6d08b6b"
+  },
+  {
+    "kind": "mac_anchored",
+    "reason": "no_vendor_proximity",
+    "file": "raw/github_step2_a5/sierra_wireless/systemd__systemd/issue_27219/_thread.json#comment#2367152422",
+    "offset": 1702,
+    "ident_preview": "00:00:00:00:00:00"
+  },
+  {
+    "kind": "uuid_anchored",
+    "reason": "disambig_drop:url_context_excluder:/assets/",
+    "ident_preview": "faa8549e-86ed-11e4-825f-0250275dcdb7",
+    "candidate_id": "3bc70918813c78df"
+  }
+]
