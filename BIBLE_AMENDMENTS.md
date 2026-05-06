@@ -428,3 +428,62 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
 **Application timing.** SAR-6 binds at **Wave B Step 0 dispatch** (this heartbeat, post-CP3 sign-off) and applies to every subsequent Phase 4 wave (A, C, D, E) until CP4 closes Phase 4. It does **not** retroactively bind Phase 3 (closed at MAC-11 ratification per board steer [`31445dcf`](/MAC/issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) 21:40Z). It does **not** alter the WiGLE deferred-enrichment posture (independent decision frame, 2026-05-18 timeout, see [`feedback_wigle_deferred_enrichment.md`](feedback_wigle_deferred_enrichment.md)).
 
 **Why this is a SAR, not a Correction Pass.** No bible text is edited. The bible's existing §6 Phase 4 wave list (A/B/C/D/E definition), §7.3 Extraction Worker spec, §8.2 confidence bands, §10 ship-narrow-then-widen / yield-per-effort posture, and §11 #1/#7/#8 hard rules already define the structural surface; SAR-6 captures the per-wave operational discipline the board added at Phase 4 dispatch authorization. Mirrors SAR-5's relationship to §6 Phase 3 / §7.2 / §11 (single-phase-class operational guidance bundle, board-stated, no in-place edit). The CP convention remains reserved for in-place bible edits driven by per-wave schema-fit decisions during Phase 4 (e.g., a future CP7 if Wave B chooses a new `vendor_doc_observations` staging table).
+
+### SAR-7 — Step-2.0 disambig bundle (CVE-FP allowlist + DJI/Djibouti FP class + news/forum-prose-FP class)
+
+**Date:** 2026-05-06
+**Source:** [MAC-35](/MAC/issues/MAC-35) CP4 brief authoring under CEO autonomy per HB27 sign-off [`0c252e39`](/MAC/issues/MAC-1#comment-0c252e39-f552-4996-8492-4148bf8284a4); board ratification via approval [`bf95a897`](/MAC/approvals/bf95a897-834c-473e-99f1-63d6cefd4b06) at 2026-05-06T11:43:05Z.
+**Bible commit:** SAR-7 entry committed paired with this amendment-log landing; no bible-text edit.
+**Binds:** Extraction Worker (§7.3), Validator (§7.4), `db/extraction/fcc_grantees_allowlist.py` and equivalent vendor-mention disambig surfaces.
+
+**The rule (3 sub-items, single bundled amendment).** SAR-7 is operational guidance for the existing §7.3/§7.4 disambig surface — no §4 / §11 enumeration extension. Mirrors SAR-1 (interpretive guidance for §7.3 LAA-bit examples).
+
+#### SAR-7 #1 — CVE-FP allowlist (codification, already partially live)
+
+The CVE/CWE/NIST shape was implemented in `STOP_LIST_PATTERNS` of `db/extraction/fcc_grantees_allowlist.py` (Wave-A close, MAC-25 commit `aed1e96`) but never amendment-logged. SAR-7 #1 codifies the implementation under §11 #11 amendment-log discipline:
+
+- Any `fcc_id_anchored` match that also matches `^CVE-\d{4}(-\d{4,7})?$`, `^CWE-\d{1,4}$`, or NIST NVD shape is rejected as `reason='cve_security_advisory_fp'`.
+- Wave-C ([MAC-28](/MAC/issues/MAC-28)) is the test case: 40-paper academic corpus with constant CVE references; the stop-list caught all of them. Wave-A Step-1.5b survey originally surfaced `CVE-2025` as one of 2 FP hits.
+
+**Reasoning.** Academic and security-research literature uses CVE/CWE shape constantly; without the stop-list, every paper citing a CVE would surface as an `fcc_id_anchored` hit and pollute Phase-5 promotion candidates.
+
+#### SAR-7 #2 — DJI/Djibouti FP class (vendor-name vs country-code disambig)
+
+When a `vendor_mention` regex pass counts string occurrences of `DJI` (the §2.1 #6 drone-vendor short name), reject occurrences where the surrounding ±50-char context matches a country/jurisdiction shape:
+
+- ISO 3166-1 alpha-3 country code position (e.g., `Republic of Djibouti`, `country: DJI`, `jurisdiction code DJI`)
+- Court-filing jurisdictional context (`District of DJI`, `case venue DJI`)
+- FOIA-released document jurisdictional metadata block
+
+**Reasoning.** `DJI` is both the drone vendor and the ISO 3166-1 alpha-3 code for Djibouti. Wave-D ([MAC-31](/MAC/issues/MAC-31)) court/FOIA prose and Wave-E ([MAC-33](/MAC/issues/MAC-33)) news prose carry both contexts. Wave-D survey (`raw/court_foia/20260506T030500Z/_step1_5b_survey.json`) produced 0 `fcc_id_anchored` hits for DJI — but vendor-mention density count (which feeds Phase-5 cross-reference scoring) is FP-prone without this gate. `DJI` is also a real FCC grantee code (`Seragen Diagnostics`, unrelated to drones) — the grantee allowlist gate alone never disambiguates the drone-vs-country-vs-grantee cases.
+
+**False-negative leaning.** A real DJI drone FCC filing (post-2013 applicant) would have a 5-char grantee prefix (e.g., `2AGUI-…`), not the 3-char `DJI` shape — so this rule does not interfere with real DJI drone identifier promotion. Phase-5 Validator + standing-advisory cross-reference catches anything missed.
+
+**Implementation.** New `is_country_jurisdiction_context_fp(vendor, context_text)` predicate in `db/extraction/fcc_grantees_allowlist.py`, applied at vendor-mention scoring time (Step-1.5b survey + Phase-5 cross-reference scoring).
+
+#### SAR-7 #3 — News/forum-prose commercial-model-name FP class
+
+If a `fcc_id_anchored` regex match has surrounding ±50-char context matching `<vendor-name>\s+<prefix>-<digits>`, where:
+
+1. `<vendor-name>` is from the §2.1 / 24-vendor canonical lexicon (carries from MAC-7/MAC-8/MAC-11 + MAC-21 anchors), AND
+2. `<digits>` is 3–4 digits (matching commercial-model-name shape, not the 4–14-char FCC product-code range), AND
+3. The matched grantee prefix's `fcc_grantees.grantee_name` does **not** match the vendor name in the surrounding context (i.e., `MBR` resolves to `Esselte Dymo`, not `Cradlepoint`),
+
+Then reject as `reason='commercial_model_name_fp'` and route to a count-only disambig drop log (analogous to `fcc_id_grantee_allowlist_drops`).
+
+**Source.** Surfaced by [MAC-33](/MAC/issues/MAC-33) Wave-E Step-1.5b survey (`raw/news_forums/20260506T052423Z/_step1_5b_survey.json`, run log `logs/mac33_step1_5b_run_20260506T054543Z.log`). 2 strict-gate hits in `e5_stackexchange/queries/Cradlepoint_serverfault/search.json`: `MBR-1200` and `MBR-1000`. `MBR` is a real FCC grantee code (`Esselte Dymo N V`, label printers) but surrounding prose says `Cradlepoint MBR-1200` — the Cradlepoint Mobile Broadband Router product line, not an FCC ID.
+
+**Sibling cases to specify defensively.** Cradlepoint IBR-N family, Sierra Wireless GX-/RV-/MG-series, Motorola APX-series (`APX-6000`/`APX-7000`/`APX-8000`), Cisco/Juniper router model nomenclature. Rule shape catches the class, not just the seed.
+
+**False-negative leaning.** A real Cradlepoint FCC filing under a 5-char post-2013 grantee prefix (e.g., `2AABC-XYZ12345`) would not match the FP shape (5-char prefix, 8-char product code). Edge case: a real 3-char Cradlepoint grantee filing (legacy applicants) would pass the gate via item 3 (grantee-name-vs-vendor-context check).
+
+**Implementation.** New `is_commercial_model_name_fp(match, context_text)` predicate in `db/extraction/fcc_grantees_allowlist.py`, called from `validate_fcc_id_match()` after the existing CVE/CWE/NIST stop-list gate. Drop count surfaces in Step-1.5b survey output as a new `fcc_id_commercial_model_name_fp_drops` field, parallel to `fcc_id_grantee_allowlist_drops`.
+
+#### SAR-7 catch-all — application timing and binding scope
+
+- **Binds at Phase-5 Validator dispatch.** SAR-7 is codified now (CP4 sign-off) but the implementation lands as Phase-5 Validator scope (separate issue, dispatched on this same CP4 ratification).
+- **Does not retroactively rewrite Phase-4 wave dispositions.** Wave-B/B2/C/D/E early-cuts stand as ratified; SAR-7 explains and codifies the FP classes that were observed but does not reopen the path-decisions. Wave-E `MBR-1200`/`MBR-1000` reclassify retroactively as `fcc_id_commercial_model_name_fp_drops` (count-only); the path-(a) early-cut already-ratified by approval [`4444343b`](/MAC/approvals/4444343b-d02d-4e8c-a6a3-06b3f8935b51) stands.
+- **§7.3 / §7.4 contractual surface unchanged.** SAR-7 is operational guidance for `db/extraction/fcc_grantees_allowlist.py` and the equivalent vendor-mention disambig surface.
+- **Why a SAR, not a Correction Pass.** No bible text is being edited. Mirrors SAR-1's relationship to §7.3 (interpretive guidance binding implementation, not contract) and SAR-3/SAR-4/SAR-5/SAR-6's pattern of single-decision interpretive bundles.
+
+**CP4 brief reference.** Full Phase-4 close + Phase-5 dispatch readiness context lives in `/home/kev/argus/CP4_BRIEF.md` (commit `dff9e6e`, board-ratified via approval [`bf95a897`](/MAC/approvals/bf95a897-834c-473e-99f1-63d6cefd4b06)).
