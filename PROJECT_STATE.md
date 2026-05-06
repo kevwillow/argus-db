@@ -17,6 +17,64 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 - **MAC-20 Wave-B2 Step 2 ExtractionWorker dispatch** spawned 2026-05-05T~15:0xZ from MAC-19 Step-1.5b ratification — **Cohort 3 (Hak5 Wayback) ONLY**, ~9 files / 738 KB clean; hybrid regex-first / LLM-second per MAC-18 architecture; per-row confidence; low-confidence → Phase-5 Validator (NOT higher-tier); `source_excerpt` ≤200 chars + overflow drop-with-skip-log; `raw_observations` writes only — NO `identifiers` promotion (§11 #8). Cohorts 1/2/4/5/6 absence-documented per §11 #1, scoped out by CEO ratification. ✅ **Step-2.1 deliverable RATIFIED by CEO `in_review`-on-board 2026-05-05T~15:25Z** at CEO comment [`37f1a20b`](/MAC/issues/MAC-20#comment-37f1a20b-9595-477a-b909-fcdff8b337e0): commit `564f0d2` (`db/sources/vendor_docs.py` 735 LOC + `tests/test_vendor_docs_extractor.py` 328 LOC, 15/15 pytests green re-run); `extraction_runs` rows 23+24 staged on `source_id=11`, `raw_observations=0`, `identifiers=0` (§11 #8 ✓); all hard-rule attestations verified disk-side (§11 #1/3/7/8/14, §7.3, MAC-18 #5, SAR-5, SAR-6 #1/2/3); structural finding = corpus-ceiling = 0 rows (GitBook landing pages, deep technical sub-pages not in scope of Step-1 fetch). **SAR-6 #3 stop-line TRIPPED** (0 rows / 30 mid-band projection = 0% ≪ ~50% trip band); CEO surfaced to board on MAC-1 [`0371793c`](/MAC/issues/MAC-1#comment-0371793c-bcf5-4a22-a136-73d0ab4934e4) for path (a)/(b)/(c) authorization with CEO recommendation = **(a) early-cut Wave-B2 + advance to Wave-A**. MAC-20 reassigned to board user `in_review`; awaiting board path-decision per SAR-6 item 5 board-class.
 
 ## Last action
+CEO heartbeat 2026-05-06T~04:43Z (HB27 chained execution + autonomous-mode framework activated) — **Wave-D closed `done` (path-(a) early-cut ratified by board), Wave-E dispatched as MAC-32 [FINAL Phase-4 wave], autonomous-mode framework codified.** Board signed off both asks at MAC-1 [`0c252e39`](/MAC/issues/MAC-1#comment-0c252e39-f552-4996-8492-4148bf8284a4) 04:40:20Z. 5-item chain executed cleanly post-sign-off:
+
+(1) **MAC-31 closed `done`** at 04:41:37Z with path-(a) disposition + framework-active note. Wave-D corpus-ceiling = 0 vendor-gated rows (court/FOIA); same architectural disposition as Wave-B2 + Wave-C precedents. Standing-advisory archive `raw/court_foia/20260506T030500Z/` preserved (D2 MuckRock + D4 Intercept + D6 DOJ FOIA toolkit corpus). DJI→Djibouti FP class flagged as 7th SAR-7 batch candidate. Phase-4 corpus-ceiling pattern empirically validated across **B + B2 + C + D = 4 of 5 executed waves**; Wave-A's 1 row is outlier.
+
+(2) **Wave-E Step 0 dispatched as [MAC-32](/MAC/issues/MAC-32)** `todo` at 04:43:34Z, parent=MAC-1, assignee=SourceWorker. **FINAL Phase-4 wave** (news / forums cohort). 8 discovery surfaces (Krebs / Ars / Register / Hacker News API / Reddit per-subreddit / StackExchange API / industry forums / Twitter absence-doc); honest Phase-4 corpus-shape pre-warning embedded ("trending toward also-zero" hypothesis testing); Mitigation A (Reddit OAuth) vs Mitigation B (unauth) auth posture proposal at Step-0; Step-2 architecture 7-numbered-points reproduced verbatim; reuse of MAC-25 disambig modules + CVE-FP (MAC-28) + DJI/Djibouti (MAC-31) candidates inherited. Autonomous-mode framework summary embedded in dispatch description.
+
+(3) **`feedback_patterned_decision_autonomous_mode.md` codified** in CEO memory: 3rd-occurrence rule for autonomous-mode delegation proposals. 5-section framework template (what becomes CEO-autonomous / what stays board-class / revert conditions / carry-forwards binding / wall-clock impact estimate). The request to delegate is itself board-class. MEMORY.md index entry added.
+
+(4) **Autonomous-mode framework section added to PROJECT_STATE** (this section serves as the operating-mode reference). See "**Autonomous-mode framework (active for Phase-4 remainder)**" section below.
+
+(5) **`feedback_vendor_public_materials_marketing_not_technical.md` already extended** at HB25 to cover B/B2/A/C; daily note HB27 records the Wave-D corpus-ceiling validation strengthens the pattern (now 4-of-5 waves at zero vendor-gated rows).
+
+**Discipline reinforcement:** chain-don't-exit + autonomous-mode framework now combined. CEO-class steps chain within single heartbeat per `feedback_chain_dont_exit_at_wave_close.md`; board-class decisions delegated to CEO autonomy where pattern stable per `feedback_patterned_decision_autonomous_mode.md`. Both rules' counterpoints preserve board authority for genuinely judgment-class moments.
+
+**DB state HB27:** raw_observations 109,837 (unchanged from HB21 — Wave-A is sole identifier-bearing row); identifiers 0; sources 12; extraction_runs 27 last from Wave-A; schema_version 6.
+
+---
+
+## Autonomous-mode framework (ACTIVE for Phase-4 remainder per board sign-off [`0c252e39`](/MAC/issues/MAC-1#comment-0c252e39-f552-4996-8492-4148bf8284a4) 2026-05-06T04:40Z)
+
+### CEO-autonomous (no board ping needed)
+
+- **Step-N ratifications** within waves (already CEO-class per SAR-6 #1)
+- **Wave dispatches** Step 0 → Step 1 → Step 2 (already CEO-class per SAR-6 #1)
+- **Memory codification** with explicit board direction or per established pattern (already CEO-class)
+- **Routine status comments** + chain-don't-exit pattern through CEO-class
+- **NEW: Auto-default to path-(a) on zero-yield wave-ends** when corpus-shape matches B/B2/C/D pattern (pipeline structurally clean + 0 vendor-gated rows + stop-lines all tripped + standing-advisory archive preservable + worker rec=(a))
+- **NEW: CP4 brief authoring** (frame around epistemic-clarification finding per HB25 board direction); surface as complete artifact for board sign-off
+
+### Board-class (always surface for sign-off)
+
+- **Yield > 0 on a wave-end** — path-decision becomes non-obvious; board judgment needed
+- **Stop-line trip on a yielding wave (mid-wave)** — not zero-yield-pattern-match; board judgment
+- **§11 hard-rule trip** (any wave) — always board
+- **Unexpected response shape** that requires architectural judgment (analogous to WiGLE cron-shape pivot)
+- **Novel architectural decisions** (not following established pattern)
+- **Approval-class secrets / billing / infra** per `feedback_approval_request_deviation_justification.md`
+- **Host-level concerns** per `feedback_host_level_board_class.md`
+- **CP4 brief sign-off** (final Phase-4 deliverable)
+- **Phase 5 dispatch** (CP-class architectural moment)
+
+### Carry-forwards (binding regardless of framework)
+
+- Pitch-behavior binding (WiGLE-admin) holds verbatim through 2026-05-18
+- 7 SAR-7 candidates (5 MAC-25 + 1 CVE-FP MAC-28 + 1 DJI/Djibouti MAC-31) batch evaluation at slack moment with feedback-vs-SAR-class pre-evaluation per board direction at HB25
+- All existing memory rules + hard-rule attestations + SAR-1 through SAR-6 bind
+
+### Framework expiry
+
+Bounded by Phase-4 close (CP4 brief sign-off + Phase 5 dispatch). After CP4 sign-off, board-class authority returns to default for Phase-5 work. Phase-5 in-flight work may earn similar autonomous-mode framework if pattern stabilizes (revisit at N=3 occurrence rule).
+
+**Wake-board criteria forward:** Wave-E Step-0 deliverable from SourceWorker on MAC-32 (CEO-class ratify per SAR-6 #1; chain-don't-exit fires) / Wave-E Step-1 + Step-1.5b + wave-end (auto-default path-(a) under framework if zero-yield pattern match; board surfaced if any revert condition fires) / **CP4 brief authored under CEO autonomy + surfaced for board sign-off** (board-class) / **Phase 5 dispatch** (board-class; CP-class architectural moment).
+
+**Pitch-behavior binding (WiGLE-admin) holds verbatim through 2026-05-18.** Bible HEAD `fdeeec1` (HB25) + amendments through SAR-6.
+
+---
+
+## Prior action (CEO heartbeat 2026-05-06T~02:35Z — HB25 Wave-C close + Wave-D dispatched + corpus-shape memory extended)
 CEO heartbeat 2026-05-06T~02:35Z (HB25 chained execution post-board-sign-off) — **Wave-C closed `done` (path-(a) early-cut ratified by board), Wave-D dispatched as MAC-30, corpus-shape memory extended.** Board path-(a) sign-off at MAC-1 [`598f17ff`](/MAC/issues/MAC-1#comment-598f17ff-ecac-45d5-81fb-b58807f53c31) 02:31:58Z authorized 4-item CEO-class chain. All 4 executed cleanly:
 
 (1) **MAC-28 closed `done`** at 02:33:01Z with path-(a) disposition comment. Wave-C corpus-ceiling = 0 vendor-gated rows after CVE-FP disambig (academic literature); same architectural disposition as Wave-B2 MAC-20. Audit trail preserved verbatim across 11 cohorts × 40 papers Step-1 deliverable [`5ee71db2`](/MAC/issues/MAC-28#comment-5ee71db2-991a-407b-82e5-d6fa2a8c657e), CEO Step-1 quality ratify [`51b3a912`](/MAC/issues/MAC-28#comment-51b3a912-7663-4cf5-941a-0403b4fb59e0), board path-(a) sign-off [`598f17ff`](/MAC/issues/MAC-1#comment-598f17ff-ecac-45d5-81fb-b58807f53c31). Standing-advisory archive (260 DJI / 18 Axon / 11 APX vendor mentions in 40-paper corpus at `raw/academic/20260506T015939Z/`) preserved for Wave-D/E cross-reference at zero cost. CVE-FP disambig codification candidate held for SAR-7-batch evaluation when Wave-D/E in flight (now 6 candidates: 5 from MAC-25 + 1 CVE-FP from MAC-28).
