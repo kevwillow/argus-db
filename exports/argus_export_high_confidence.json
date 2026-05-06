@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "argus_version": "7",
+    "exported_at": "2026-05-06T19:54:00Z",
+    "record_count": 0,
+    "confidence_threshold": 70,
+    "argus_run_id": "25ded783-2dd0-537a-9067-5c0d7ceb05ce",
+    "source_record_count": 63,
+    "dropped_in_export": {
+      "unknown_category": 62,
+      "ssid_pattern": 0,
+      "device_fingerprint": 0,
+      "oversized_mac_range": 0,
+      "procurement_only": 0,
+      "self_exclude_oui": 0,
+      "below_confidence_threshold": 1
+    }
+  },
+  "entries": []
+}
