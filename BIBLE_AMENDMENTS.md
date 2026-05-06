@@ -585,3 +585,53 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 **Validator-quality acknowledgment.** This is the second consecutive halt-flag surface from Validator (SAR-8 at [MAC-39](/MAC/issues/MAC-39), SAR-9 here at [MAC-41](/MAC/issues/MAC-41)). Pattern is the §11 #11 + propose-don't-promote contract working as specified, not a Validator-process problem. Surface-and-ratify discipline is exactly what bounded-but-not-fully-enumerated SAR-N-class disambig classes require.
 
 **MAC-41 reference.** Full halt-flag context + per-class FP/TP/ambiguous counts + rollback ledger lives in `extraction_outputs/mac41/sar8_bulk_stage_halt_flag.json`; Validator deliverable comment at MAC-41 [`a9404b0c`](/MAC/issues/MAC-41#comment-a9404b0c-33bc-490f-9b8a-4402d2ae8630); board approval at [`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23).
+
+---
+
+## Checkpoint 5 sign-off — Phase-5 close + §12 disposition slate
+
+**Date:** 2026-05-06
+**Source:** [MAC-47](/MAC/issues/MAC-47) CP5 brief authoring under CEO autonomy per board comprehensive forward-runway authorization at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z. Brief at `/home/kev/argus/CP5_BRIEF.md` (commit `28bab20`). Board ratification via approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) approved 2026-05-06T20:17:10Z.
+**Bible commit:** §12 dispositions land paired with this amendment-log entry (no §-text edits beyond §12 reorganization).
+
+**The disposition slate.** Board ratified CP5 brief as the Phase-5 close artifact. Per CP5_BRIEF §4 + §7, the §12 Open-Questions slate is reorganized as follows:
+
+### §12 dispositions ratified at CP5
+
+| § / question | Disposition at CP5 | Notes |
+|---|---|---|
+| Project name "Argus" | **RESOLVED — final v1 name.** | Argus owns identifier-canonical-state + Talos-bound exports; Talos owns scanner-side scanning + correlation; "MAC" is the Paperclip issue-prefix only. |
+| `device_cluster_id` schema column | **RESOLVED — SAR-3 lean confirmed final.** | Argus identifies, Talos correlates. No Argus-side schema change; correlation logic owned by Talos team. |
+| MuckRock API vs search | **RESOLVED — moot.** | Phase-4 Wave-D path-(a) early-cut ([MAC-31](/MAC/issues/MAC-31)) used search; corpus-ceiling held at 0. |
+| Inference 70-cap binding | **RESOLVED — 70-cap binding for inferred rows confirmed final.** | No current row pressure on the cap (all Phase-5 inferred rows landed at 50–55 per SAR-1 LAA-bit penalty + strict §8.4 conf=50 starting band). |
+| Single-product §2.1 vendor OUI categorization (narrow §11 #10 vs strict §8.4) | **DEFERRED — to Wave-F / Phase-6.** | CP5_BRIEF §3.1 surfaced row-count visibility per disposition: ~18 of 62 inferred rows would flip under narrow read; all 17 stay below conf=70 high-conf band. Board ratified CEO path-(a): accept v0.1 with strict §8.4. Narrow-read carve-out queued for Wave-F / Phase-6 once model-level evidence raises a vendor cluster's per-row band into 70-cap territory. |
+| §4.4 256-entry `mac_range` expansion ceiling | **DEFERRED — to Talos integration handoff.** | All 8 active `mac_range` rows are OUI-28/OUI-36 sub-allocations vastly exceeding §4.4's expansion ceiling. Board ratified CEO path-(c): defer routing semantics to Talos integration handoff (jointly bound between Argus export shape and Talos seeder protocol). |
+| `argus_record_id` upsert semantics | **BOUND TO TALOS HANDOFF.** | Argus-side stable-id is in place (`argus_run_id` deterministic UUID5; `argus_record_id` = `identifiers.id`). Talos-side upsert vs destructive drop-and-reload is the open piece. SAR-2 lean (upsert) holds as intended direction; binding decision is bilateral. |
+| `geographic_scope` filter for high-confidence Talos export | **OPEN — held for explicit board direction.** | CEO-recommended path: configurable string column on `identifiers`, default US, filter at export-time — would land as Correction Pass 7. Wave-A row currently at NULL placeholder; deferrable to Talos integration handoff. |
+| WiGLE API credentials | **OPEN — pitch-binding carries forward.** | Pitch-behavior binding holds verbatim through 2026-05-18 (12 days remaining at HB36). |
+
+### Phase-5 close attestations
+
+- **§11 #1 (no fabrication):** held end-to-end across Phase-5. Wave-A row promotion source-attested; inferred rows explicit FP/TP/flag-for-review classification (SAR-8 + SAR-9); zero synthetic-value insertions.
+- **§11 #6 (no live fetches at validation/export):** held. MAC-39/MAC-41/MAC-42/MAC-44/MAC-45/MAC-46 ran with `PRAGMA query_only = ON` or under controlled-write contracts. Zero outbound HTTP at Phase-5.
+- **§11 #7 (provenance carry-through):** held. Every staged row carries `source_url` + `source_excerpt` + `extraction_run_id` lineage; `argus_record_id` = `identifiers.id` exposed at export time.
+- **§11 #8 (no identifier promotion without ratification):** held. Wave-A row promoted only after MAC-38 §11 #8 ratification gate; inferred rows held at staged-`inferred` band; 4 inferred singletons held at conf=50 rather than uplifted absent cross-source corroboration.
+- **§11 #11 (halt-the-line propose-don't-promote):** fired twice (MAC-39 SAR-8, MAC-41 SAR-9), both surfaced via Validator post-staging spot-check, both ratified live without additional rollback. The contract working as specified.
+- **§11 #12, #13, #14:** all preserved end-to-end across MAC-45 + MAC-46 cross-checks; reconciliation halts at 0.
+
+### Phase-5 close invariants (HB36)
+
+- `identifiers` rowcount **121 total / 63 active** (1 Wave-A `alpr/mac` Flock Safety at conf=60 + 54 `unknown/oui` inferred at conf=55 + 8 `unknown/mac_range` inferred at conf=50–55).
+- Talos export survivors: **1 standard / 0 high-conf** (Wave-A Flock at standard).
+- `argus_run_id`: `25ded783-2dd0-537a-9067-5c0d7ceb05ce` (deterministic UUID5; idempotent across re-runs of unchanged DB state).
+- Schema version `7`. Pre-state backup at `db/argus.db.pre_mac42_step5_backup` retained.
+
+### Forward path
+
+- **Default disposition (α — ongoing-maintenance).** Board ratified CP5 without selecting a downstream path; per CP5_BRIEF §7, default to (α). v0.1 ships; Wave-F + Talos handoff queued for explicit board direction at the next heartbeat.
+- **(β) Wave-F dispatch** (model-level evidence sweep) and **(γ) Talos integration handoff** remain available as explicit board calls.
+- **Autonomy-mode framework expires at CP5 sign-off** per HB35 boundary; board-class authority returns to default for any post-CP5 work.
+
+**Why this is a checkpoint sign-off, not a Correction Pass / SAR.** No bible §-text edited; the §12 reorganization is the Open-Questions section being maintained per its own discipline. CP5 sign-off mirrors CP4 sign-off precedent (board-ratified close + bible-amendment-log entry recording the close + §12 disposition slate without bible §-text edit).
+
+**MAC-47 reference.** CP5 brief at `/home/kev/argus/CP5_BRIEF.md` (commit `28bab20`); approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d).
