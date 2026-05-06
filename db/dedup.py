@@ -126,12 +126,22 @@ def _append_source_to_notes(
     return "\n".join(lines) if lines else None
 
 
-def merge_cluster(records: Sequence[IdentifierRow]) -> DedupResult:
+def merge_cluster(
+    records: Sequence[IdentifierRow],
+    *,
+    independent_corroboration: bool = True,
+) -> DedupResult:
     """Merge a cluster of records that have already been determined duplicates.
 
     Pure: no DB writes, no global state. Returns the updated canonical row
     (new confidence, appended notes) and the superseded rows with their
     `superseded_by` field set to canonical.id.
+
+    `independent_corroboration` enforces §11 #8: confidence only rises when
+    a *second independent source* confirms. Default True preserves bible
+    §8.3 verbatim semantics. Pass False when all cluster members trace to
+    the same `raw_observations.source_id` — provenance is still combined
+    and `superseded_by` set, but confidence is held at `max(originals)`.
     """
     if not records:
         raise ValueError("merge_cluster() requires at least one record")
@@ -147,9 +157,11 @@ def merge_cluster(records: Sequence[IdentifierRow]) -> DedupResult:
 
     losers = tuple(r for r in records if r is not canonical)
 
-    # Confidence: min(99, max(originals) + 5) per §8.3.
     max_conf = max((r.confidence or 0) for r in records)
-    new_confidence = min(99, max_conf + 5)
+    if independent_corroboration:
+        new_confidence = min(99, max_conf + 5)  # §8.3 corroboration bonus
+    else:
+        new_confidence = max_conf  # §11 #8: same-source = no uplift
 
     canonical_updated = replace(
         canonical,
