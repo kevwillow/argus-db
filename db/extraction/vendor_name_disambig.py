@@ -367,14 +367,18 @@ def vendor_match_disposition(candidate: str, vendor_canonical: str) -> str:
     if bare_token and candidate_norm == bare_token.lower():
         return _DISPOSITION_FLAG_REVIEW
 
-    # Step 4 — SAR-9 #1 positive-evidence accept. Substring match against the
-    # raw lowercased candidate so dash-delimited shapes (``Motorola - BSG``)
-    # remain reachable. Codified for ``Motorola Solutions`` to accept the
-    # business-radio shape (BSG / Broadband Solutions Group / Business Light
-    # Radios) under the §2.1 Solutions canonical.
-    for evidence in VENDOR_POSITIVE_EVIDENCE.get(vendor_canonical, ()):
-        if evidence and evidence in candidate_lower:
-            return _DISPOSITION_ACCEPT
+    # Step 4 — SAR-9 #1 positive-evidence accept. Gated on bare-token presence:
+    # the candidate's normalized form must start with the per-canonical bare
+    # token (``motorola ...``) AND the raw lowercased candidate must contain a
+    # positive-evidence substring. This codifies the SAR-9 #1 semantics ("bare
+    # `Motorola` token + model-name / business-radio evidence ⇒ Solutions
+    # accept"). Standalone ``Broadband Solutions Group`` (no Motorola prefix)
+    # does NOT accept under Solutions — it could be ARRIS/CommScope post-split
+    # broadband lineage rather than the §2.1 vendor.
+    if bare_token and candidate_norm.startswith(bare_token.lower() + " "):
+        for evidence in VENDOR_POSITIVE_EVIDENCE.get(vendor_canonical, ()):
+            if evidence and evidence in candidate_lower:
+                return _DISPOSITION_ACCEPT
 
     # Step 5 — alias allowlist (after geographic-prefix-strip + normalization).
     for alias in VENDOR_ALIAS_ALLOWLIST.get(vendor_canonical, []):

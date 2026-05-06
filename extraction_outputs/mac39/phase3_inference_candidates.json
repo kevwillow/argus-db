@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "produced_at_utc": "2026-05-06T18:36:26.021094+00:00",
+    "produced_at_utc": "2026-05-06T18:45:42.072855+00:00",
     "validator_agent_id": "da137694-2efe-4589-8150-828dcab881fb",
     "phase_5_step": "Step-4 follow-on (Phase-3 inference candidate sweep, Tier 4) \u2014 SAR-8 wired",
     "issue_chain": "MAC-36 \u2192 MAC-39 \u2192 MAC-41",
@@ -53,10 +53,10 @@
     "WatchGuard"
   ],
   "phase2_oui_inference": {
-    "sar8_accept_total": 124,
+    "sar8_accept_total": 120,
     "sar8_accept_pre_filter_drops": 0,
     "sar8_accept_laa_bit_count": 0,
-    "sar8_accept_post_filter_stageable": 124,
+    "sar8_accept_post_filter_stageable": 120,
     "sar8_flag_for_review_total": 6,
     "sar8_flag_for_review_samples": [
       {
@@ -187,7 +187,7 @@
       {
         "canonical_name": "Motorola Solutions",
         "primary_category": null,
-        "accept_count": 24,
+        "accept_count": 20,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -804,7 +804,7 @@
     }
   },
   "fcc_grantees_inference": {
-    "total_match_count": 72,
+    "total_match_count": 71,
     "talos_exportable": false,
     "talos_export_reason": "FCC grantee_code is a regulatory entity prefix (per \u00a74.2 fcc_grantees note), NOT a \u00a74.1 per-device identifier. These rows are vendor-attestation metadata only \u2014 they enrich any future FCC-ID-bearing identifier but do not produce identifiers rows themselves. Phase-4 fcc_equipment_filings (if/when created) would consume these as anchors.",
     "by_vendor": [
@@ -854,7 +854,7 @@
       {
         "canonical_name": "Motorola Solutions",
         "primary_category": null,
-        "match_count": 10,
+        "match_count": 9,
         "samples": [
           {
             "fcc_grantee_id": 71927,

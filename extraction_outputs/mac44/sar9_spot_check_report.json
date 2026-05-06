@@ -1,0 +1,360 @@
+{
+  "_meta": {
+    "produced_at_utc": "2026-05-06T18:48:29.162708+00:00",
+    "validator_agent_id": "da137694-2efe-4589-8150-828dcab881fb",
+    "phase_5_step": "Step-4 follow-on\u00b2 (MAC-44) \u2014 Step E spot-check",
+    "issue_chain": "MAC-36 \u2192 MAC-39 \u2192 MAC-41 \u2192 MAC-44",
+    "amendments_applied": [
+      "SAR-1 (LAA-bit penalty)",
+      "SAR-7 #1/#2/#3 (codified upstream)",
+      "SAR-8 (vendor-name-disambig)",
+      "SAR-9 #1/#2/#3 (Motorola corporate-split FP + caller restructure + WatchGuard Technologies hard-reject)"
+    ],
+    "random_seed": 20260506,
+    "sample_size": 15,
+    "staged_total": 120,
+    "sample_pct": 12.5
+  },
+  "halt_class_triggered": false,
+  "halt_class_triggers": [],
+  "per_vendor_distribution": {
+    "Motorola Solutions": 20,
+    "Axis Communications": 10,
+    "Parrot": 10,
+    "SoundThinking": 2,
+    "Harris": 9,
+    "Kenwood": 2,
+    "DJI": 26,
+    "Sierra Wireless": 12,
+    "Genetec": 5,
+    "WatchGuard": 2,
+    "Avigilon": 2,
+    "Cellebrite": 2,
+    "Skydio": 2,
+    "Flock Safety": 2,
+    "Axon": 2,
+    "Cradlepoint": 4,
+    "Jacobs": 4,
+    "KeyW": 2,
+    "Septier": 1,
+    "Digital Receiver Technology": 1
+  },
+  "motorola_solutions_count_within_dispatch_band": true,
+  "checks": [
+    {
+      "identifier_id": 433,
+      "raw_observation_id": 67362,
+      "identifier": "00:40:8c",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Axis Communications",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Axis Communications AB",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 416,
+      "raw_observation_id": 55414,
+      "identifier": "90:3a:e6",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Parrot",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "PARROT SA",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 490,
+      "raw_observation_id": 176035,
+      "identifier": "00:50:c2:a3:2",
+      "identifier_type": "mac_range",
+      "device_category": "unknown",
+      "manufacturer": "Harris",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Harris Designs of NRV, Inc.",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 475,
+      "raw_observation_id": 165843,
+      "identifier": "00:0d:4f",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Kenwood",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Kenwood Corporation",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 442,
+      "raw_observation_id": 73429,
+      "identifier": "00:18:85",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Motorola Solutions",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Motorola Solutions Inc.",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 492,
+      "raw_observation_id": 178768,
+      "identifier": "00:a0:d5",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Sierra Wireless",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Sierra Wireless, ULC",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 476,
+      "raw_observation_id": 167072,
+      "identifier": "00:12:1c",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Parrot",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Parrot Sa",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 495,
+      "raw_observation_id": 180169,
+      "identifier": "04:a8:5a",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "DJI",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 471,
+      "raw_observation_id": 162659,
+      "identifier": "00:00:c3",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Harris",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Harris Corporation",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 427,
+      "raw_observation_id": 62961,
+      "identifier": "00:1f:92",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Motorola Solutions",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Motorola Solutions Inc.",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 417,
+      "raw_observation_id": 57141,
+      "identifier": "d4:11:d6",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "SoundThinking",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "ShotSpotter, Inc.",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 431,
+      "raw_observation_id": 67308,
+      "identifier": "60:60:1f",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "DJI",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 461,
+      "raw_observation_id": 88509,
+      "identifier": "48:2c:ea",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Motorola Solutions",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Motorola Inc Business Light Radios",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 435,
+      "raw_observation_id": 67842,
+      "identifier": "9c:5a:8a",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "DJI",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "DJI BAIWANG TECHNOLOGY CO LTD",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    },
+    {
+      "identifier_id": 419,
+      "raw_observation_id": 57708,
+      "identifier": "00:17:f3",
+      "identifier_type": "oui",
+      "device_category": "unknown",
+      "manufacturer": "Harris",
+      "confidence": 50,
+      "source_type": "inferred",
+      "candidate_manufacturer_raw": "Harris Corporation",
+      "checks": {
+        "bare_motorola_not_promoted": "ok",
+        "motorola_mobility_not_under_solutions": "ok",
+        "watchguard_technologies_not_under_video": "ok",
+        "harris_adacom_not_under_harris": "ok",
+        "confidence_in_inferred_band": "ok",
+        "device_category_unknown": "ok",
+        "superseded_by_null": "ok",
+        "provenance_carried": "ok"
+      }
+    }
+  ]
+}

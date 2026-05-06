@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "produced_at_utc": "2026-05-06T18:50:06.616969+00:00",
+    "validator_agent_id": "da137694-2efe-4589-8150-828dcab881fb",
+    "phase_5_step": "Step-4 follow-on\u00b2 (MAC-44) \u2014 SAR-9 bulk-stage retry",
+    "issue_chain": "MAC-36 \u2192 MAC-39 \u2192 MAC-41 \u2192 MAC-44",
+    "amendments_applied": [
+      "SAR-1 (LAA-bit penalty)",
+      "SAR-7 #1/#2/#3 (codified upstream; not invoked here)",
+      "SAR-8 (vendor-name-disambig + alias allowlist + geo-prefix)",
+      "SAR-9 #1 (Motorola Mobility/Solutions corporate-split FP + bare-Motorola flag_for_review + positive-evidence accept)",
+      "SAR-9 #2 (alias-iteration caller restructure: one-canonical-per-loop + alias-equality predicate)",
+      "SAR-9 #3 (WatchGuard Technologies firewall hard-reject)"
+    ],
+    "board_ratification_comment": "MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d)",
+    "board_ratification_at_utc": "2026-05-06T17:08:16Z",
+    "sar9_board_ratification_comment": "[`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23)",
+    "sar9_board_ratification_at_utc": "2026-05-06T18:05:53Z",
+    "dry_run": false,
+    "ledger_run_id": 33,
+    "promotion_class": "Validator-execution under board ratification"
+  },
+  "summary": {
+    "raw_observations_evaluated": 109736,
+    "sar9_accept_total": 120,
+    "sar9_disposition_distribution": {
+      "accept": 120,
+      "reject_fp": 481,
+      "flag_for_review": 6,
+      "no_match": 109129
+    },
+    "sar9_reject_fp_per_canonical": {
+      "Motorola Solutions": 467,
+      "Axon": 6,
+      "WatchGuard": 4,
+      "Harris": 2,
+      "Flock Safety": 2
+    },
+    "sar9_flag_for_review_per_canonical": {
+      "Motorola Solutions": 4,
+      "Genetec": 2
+    },
+    "inserted": 0,
+    "dry_run_would_insert": 0,
+    "skipped_already_promoted": 120,
+    "skipped_pi_self_exclude": 0,
+    "skipped_known_fake": 0,
+    "wave_a_oui_collisions_halted": 0,
+    "identifiers_table_post_count": 121,
+    "per_vendor_distribution": {}
+  },
+  "section_11_attestations": {
+    "#1_no_fabrication": "Every staged row anchored to a real raw_observations.id; no synthetic identifiers.",
+    "#6_no_live_fetches": "Operates on already-staged Phase-2 raw_observations only.",
+    "#7_provenance": "source_url + source_excerpt carried verbatim per row (or computed-excerpt if raw row had none).",
+    "#8_no_confidence_drift": "Single-source 'inferred' band per \u00a78.2 (baseline 50, \u221210 LAA-bit penalty per SAR-1). No uplift at this step.",
+    "#12_pi_self_exclude": "Pi OUIs (['28:cd:c1', 'b8:27:eb', 'dc:a6:32', 'e4:5f:01']) skipped at staging-time guard.",
+    "#13_unknown_category_talos_ban": "device_category='unknown' for ALL staged rows \u2014 pre-flagged Talos-export-banned at staging time. Reconciled at Step-6 export design via dropped_in_export.unknown_category tally.",
+    "#14_procurement_only_talos_ban": "N/A \u2014 this script stages source_type='inferred' from Phase-2 OUI/MAC-range raw_observations only, not procurement records.",
+    "#11_amendment_log_discipline": "SAR-9 codified at fa89dfc; this pass implements the amendment via Validator-execution. Halt-the-line clause (SAR-10 candidate) remains live: any new disambig class beyond SAR-7+SAR-8+SAR-9 surfaces via halt-flag artifact + CEO reassign, not silent bundling.",
+    "wave_a_collision_halt_line": "0 candidates at OUI e4:aa:ea halted-not-staged (Wave-A canonical row stays identifiers.id=1 at MAC-level e4:aa:ea:80:a1:9b)."
+  }
+}
