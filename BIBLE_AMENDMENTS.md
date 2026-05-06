@@ -536,3 +536,52 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 - **Why a SAR, not a Correction Pass.** No bible text is being edited. Mirrors SAR-7's relationship to §7.3/§7.4 (operational guidance binding implementation, not contract).
 
 **MAC-39 reference.** Full halt-flag context + per-source candidate counts lives in MAC-39 Validator deliverable [`dd521ad3`](/MAC/issues/MAC-39#comment-dd521ad3-11f5-4c3c-855b-b84429ebbcb3); CEO halt-flag surface to board at MAC-1 [`4bd6644c`](/MAC/issues/MAC-1#comment-4bd6644c-e2be-42f9-9acf-7856b828e1dd); board ratification at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d).
+
+### SAR-9 — Motorola Mobility/Solutions corporate-split FP class (+ SAR-8 alias-iteration bug-fix + WatchGuard Technologies/Video disambig)
+
+**Date:** 2026-05-06
+**Source:** [MAC-41](/MAC/issues/MAC-41) Phase-5 Step-4 follow-on bulk-stage halt-flag surfaced by Validator post-staging spot-check (3 commits 1d684ce/65860f4/d317550, 411 inferred rows staged then rolled back); halt-flag artifact at `extraction_outputs/mac41/sar8_bulk_stage_halt_flag.json`. Board ratification via approval [`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23) approved 2026-05-06T18:05:53Z, bundling SAR-9 codification + SAR-8 alias-iteration bug-fix + WatchGuard Technologies hard-reject.
+**Bible commit:** SAR-9 entry committed paired with this amendment-log landing; no bible-text edit. §2.1 lexicon `Motorola Solutions` aliases column re-scoped per item (1) below.
+**Binds:** Extraction Worker (§7.3), Validator (§7.4), `db/extraction/vendor_name_disambig.py` module (extends SAR-8 list contents + restructures caller surface).
+
+**The rule.** SAR-9 augments SAR-8 with three additional disambig classes surfaced by Step-4 follow-on bulk-stage. The Validator MUST apply these alongside the SAR-8 predicate before promoting candidates to staged-`inferred` band:
+
+1. **Motorola Mobility/Solutions corporate-split FP class.** When matching candidate vendor strings against the §2.1 `Motorola Solutions` canonical entry, the predicate MUST reject candidate strings carrying any of the substrings `mobility`, `(wuhan)`, `lenovo` (case-insensitive). These attribute to **Motorola Mobility / Lenovo** (consumer smartphones, post-2011 corporate-split entity), a corporate entity distinct from **Motorola Solutions** (police radios, the §2.1 vendor). Concrete corpus impact at MAC-41: 240 `Motorola Mobility LLC, a Lenovo Company` rows + 32 `Motorola (Wuhan) Mobility Technologies Communication Co., Ltd.` rows = 272 FP rows (66% of the 411-row Step-4 follow-on bulk-stage).
+
+   - **Bare `Motorola` token routes to `flag_for_review`** pending model-name evidence: `APX` / `V300` / `V500` / `Vigilant` / business-light-radio shape ⇒ Solutions; consumer-smartphone shape ⇒ Mobility/Lenovo; ambiguous shape ⇒ human triage.
+   - **§2.1 `Motorola Solutions` aliases column re-scoped:** drop bare `Motorola` (ambiguous post-2011); keep model-line aliases only (`Motorola APX`, `Motorola V300`, `Motorola V500`, `Motorola Vigilant`).
+
+2. **SAR-8 alias-iteration bug-fix (caller-restructure).** The SAR-8 module's `VENDOR_FP_LIST` is keyed by canonical_name only (`Harris`, `Axon`, `Flock Safety`, `Genetec`), but the prior caller (`db.validation.phase3_inference_candidates.sar8_match` + `db.validation.sar8_bulk_stage._classify`) iterated over alias-strings, so `VENDOR_FP_LIST.get('Harris Corporation')` returned `[]` and the FP-substring check (`'harris adacom' in candidate_lower`) never fired — `HARRIS ADACOM CORPORATION` × 2 slipped through to the staged set despite being SAR-8-enumerated FPs.
+
+   - **Fix shape (board-approved):** restructure the caller to invoke `vendor_match_disposition(candidate, canonical_name)` **once per canonical** (not once per alias-string), with an alias-equality predicate handling alias-string lookups. Bundle implementation with SAR-9 (one commit, not two) — the alias-bug fix is a caller-restructure that touches the same SAR-8 surface as the Motorola/WatchGuard FP-list extensions.
+
+3. **WatchGuard Technologies (firewall) vs §2.1 WatchGuard Video (body-cam) disambig.** Add `watchguard technologies` as a `VENDOR_FP_LIST` hard-reject entry under canonical `WatchGuard`. The IEEE OUI vendor `WatchGuard Technologies, Inc.` is a network firewall vendor distinct from `WatchGuard Video` (the §2.1 police body-cam vendor). Concrete corpus impact at MAC-41: 4 FP rows (firewall) vs 2 TP rows (`WatchGuard Video` body-cam).
+
+   - **No flag-for-review path.** The corporate-entity distinction is clear (firewall vendor vs body-cam vendor) and 4 rows is enough signal to commit to a hard-reject codification rather than kicking the can to flagged-for-review triage.
+   - **Future-Wave caveat (recorded):** if a future Wave surfaces WatchGuard Technologies firewalls in surveillance/police adjacency (i.e., the firewall vendor legitimately ships into the §2.1 device-category space), this codification needs amendment. Current corpus has no such evidence.
+
+**Reasoning.** MAC-41 Step-4 follow-on bulk-stage (411 rows inserted at strict §8.4 / `device_category='unknown'`) tripped a post-staging spot-check halt under the dispatch's stop-the-line clause ("New disambig class beyond SAR-8 → halt + comment; do NOT bundle silently"). Validator rolled back all 411 rows under §11 #11 discipline (audit ledger row inserted, `raw_observations.promoted_identifier_id` pointers cleared, Wave-A canonical `identifiers.id=1` preserved) and surfaced 3 halt-flags rather than silently bundling them into the staged set. The 66% FP rate on Motorola alone is non-trivial corpus-density signal — propose-don't-promote was the right discipline. Post-fix expected staged count drops from 411 to ~135 TPs (still a thin Phase-5 outcome — acceptable per §11 #8 propose-don't-promote-without-second-source).
+
+**Implementation directive (per board approval [`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23)).**
+- Update `db/extraction/vendor_name_disambig.py`:
+    - Extend `VENDOR_FP_LIST['Motorola Solutions']` with substring-reject entries for `mobility`, `(wuhan)`, `lenovo`.
+    - Add bare-`Motorola` flag-for-review semantics (third return state, mirrors GENETEC Corporation handling at SAR-8).
+    - Extend `VENDOR_FP_LIST['WatchGuard']` with hard-reject entry for `watchguard technologies`.
+- Update `db/extraction/vendor_name_disambig.py` callers (`db.validation.phase3_inference_candidates.sar8_match` + `db.validation.sar8_bulk_stage._classify`):
+    - Restructure to invoke `vendor_match_disposition(candidate, canonical_name)` once per canonical entry (not once per alias-string).
+    - Add dedicated alias-equality predicate for alias-string lookups.
+- Re-scope §2.1 `Motorola Solutions` aliases column: drop bare `Motorola`; keep `Motorola APX`, `Motorola V300`, `Motorola V500`, `Motorola Vigilant`.
+- Tests required: positive (`Motorola Solutions Inc.`, `MOTOROLA SOLUTIONS MALAYSIA SDN. BHD.`, model-line aliases) + negative (`Motorola Mobility LLC, a Lenovo Company`, `Motorola (Wuhan) Mobility Technologies`, `WatchGuard Technologies, Inc.`) + flag-for-review (bare `Motorola` token) + alias-iteration regression (`HARRIS ADACOM CORPORATION` rejects under restructured caller).
+- Re-run bulk-stage post-fix: expected ~135 staged inferred rows (down from 411). Idempotent re-run produces byte-identical artifacts (modulo timestamp).
+
+**Application timing and binding scope.**
+- **Binds at Phase-5 Step-4 follow-on² dispatch (MAC-43).** SAR-9 codified now; implementation lands as Validator-execution against the MAC-41 SAR-8-applied candidate set, with the alias-iteration bug-fix bundled.
+- **Does not retroactively rewrite Phase-4 wave dispositions** (Wave-A row promotion stands; identifiers.id=1 Flock Safety MAC preserved through MAC-41 rollback).
+- **§7.3 / §7.4 contractual surface unchanged.** SAR-9 extends SAR-8 operational guidance; no bible-text edit beyond the §2.1 `Motorola Solutions` aliases column re-scope.
+- **Why a SAR, not a Correction Pass.** Mirrors SAR-7 / SAR-8 relationship to §7.3/§7.4 (operational guidance binding implementation, not contract). The §2.1 alias re-scope is a lexicon-content change, not a §-text change.
+
+**Bundling rationale.** Bundling SAR-8 alias-iteration bug-fix with SAR-9 codification (single ratification gate, single commit) was board-approved despite covering one amendment-log change (SAR-9) and one implementation-class change (alias-bug). Reasoning: the alias-bug fix is a caller-restructure that touches the same SAR-8 surface as the Motorola/WatchGuard FP-list extensions; bundling keeps blast radius contained at one validator-execution dispatch.
+
+**Validator-quality acknowledgment.** This is the second consecutive halt-flag surface from Validator (SAR-8 at [MAC-39](/MAC/issues/MAC-39), SAR-9 here at [MAC-41](/MAC/issues/MAC-41)). Pattern is the §11 #11 + propose-don't-promote contract working as specified, not a Validator-process problem. Surface-and-ratify discipline is exactly what bounded-but-not-fully-enumerated SAR-N-class disambig classes require.
+
+**MAC-41 reference.** Full halt-flag context + per-class FP/TP/ambiguous counts + rollback ledger lives in `extraction_outputs/mac41/sar8_bulk_stage_halt_flag.json`; Validator deliverable comment at MAC-41 [`a9404b0c`](/MAC/issues/MAC-41#comment-a9404b0c-33bc-490f-9b8a-4402d2ae8630); board approval at [`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23).
