@@ -17,6 +17,50 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 - **MAC-20 Wave-B2 Step 2 ExtractionWorker dispatch** spawned 2026-05-05T~15:0xZ from MAC-19 Step-1.5b ratification — **Cohort 3 (Hak5 Wayback) ONLY**, ~9 files / 738 KB clean; hybrid regex-first / LLM-second per MAC-18 architecture; per-row confidence; low-confidence → Phase-5 Validator (NOT higher-tier); `source_excerpt` ≤200 chars + overflow drop-with-skip-log; `raw_observations` writes only — NO `identifiers` promotion (§11 #8). Cohorts 1/2/4/5/6 absence-documented per §11 #1, scoped out by CEO ratification. ✅ **Step-2.1 deliverable RATIFIED by CEO `in_review`-on-board 2026-05-05T~15:25Z** at CEO comment [`37f1a20b`](/MAC/issues/MAC-20#comment-37f1a20b-9595-477a-b909-fcdff8b337e0): commit `564f0d2` (`db/sources/vendor_docs.py` 735 LOC + `tests/test_vendor_docs_extractor.py` 328 LOC, 15/15 pytests green re-run); `extraction_runs` rows 23+24 staged on `source_id=11`, `raw_observations=0`, `identifiers=0` (§11 #8 ✓); all hard-rule attestations verified disk-side (§11 #1/3/7/8/14, §7.3, MAC-18 #5, SAR-5, SAR-6 #1/2/3); structural finding = corpus-ceiling = 0 rows (GitBook landing pages, deep technical sub-pages not in scope of Step-1 fetch). **SAR-6 #3 stop-line TRIPPED** (0 rows / 30 mid-band projection = 0% ≪ ~50% trip band); CEO surfaced to board on MAC-1 [`0371793c`](/MAC/issues/MAC-1#comment-0371793c-bcf5-4a22-a136-73d0ab4934e4) for path (a)/(b)/(c) authorization with CEO recommendation = **(a) early-cut Wave-B2 + advance to Wave-A**. MAC-20 reassigned to board user `in_review`; awaiting board path-decision per SAR-6 item 5 board-class.
 
 ## Last action
+CEO heartbeat 2026-05-06T~18:58Z (HB34 — **MAC-44 SAR-9 bulk-stage retry RATIFIED + Step-5 unblocked + chain-don't-exit fired**). Validator hand-back at MAC-44 closed; 120 inferred rows staged at strict §8.4 / `device_category='unknown'` / conf=50 with SAR-1 LAA-bit penalty per row. CEO ratify under board comprehensive forward-runway authorization at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 17:08:16Z ("All intermediate steps CEO-class with chain-don't-exit firing as appropriate. Wake me at CP5 brief surface or §11 hard-rule trip."). 5-item chain executed under chain-don't-exit:
+
+(1) **Independent verification** of Validator deliverable: commit `2b1a7fe` (SAR-9 module + caller restructure + migration 0007 + 54 new tests) + commit `9a3afa7` (Step D bulk-stage + Step E spot-check + positive-evidence gate tightening). Migration slot 0007 verified per `feedback_migration_slot_check_disk.md`. Pytest re-run independently: 276 passed / 2 WiGLE skipped (matches Validator claim exactly). Spot-check report 15/15 all 8 checks green; `halt_class_triggered: false`; per-vendor `motorola_solutions_count_within_dispatch_band: true`. Reconciliation arithmetic 411→120 walked: closes to 120 (411 − 274 − 2 − 4 − 4 − 4 − 4 + 1).
+
+(2) **MAC-44 ratified `done`** at 18:58:47Z via PATCH with comprehensive ratify comment. Three CEO decisions surfaced + ratified: (i) **120-staged outcome ratified** (-11% vs ~135 dispatch principled per SAR-9 #1/#2/#3 + tightened positive-evidence gate); (ii) **Conservative no_match ratified for standalone `Broadband Solutions Group` ×4** (§11 #1 over-promotion-is-violation dominates; ambiguous IEEE OUI registrations 00:24:c8/c9 between pre-split Motorola BSG and post-2010 ARRIS/CommScope broadband); (iii) **Conservative no_match ratified for `Motorola Korea` ×2 + `Motorola Communication Israel` ×2** (SAR-9 #1 verbatim only flags exact-bare-`Motorola`; broader regional-qualifier flag would be SAR-10 amendment with empirical CP5 visibility, not Step-4 follow-on² scope). One carry-forward CP5-cleanup blemish logged: flag_for_review JSON landed at `extraction_outputs/mac43/sar9_flagged_for_review.json` instead of dispatch-required `mac44/` per `feedback_identifier_vs_content.md` (file contents correct + committed; deviation purely cosmetic — joins HB33 sequential-allocator-residue cleanup ask).
+
+(3) **MAC-42 envelope refresh comment posted** at 19:00Z (id `c81196ea-…`). Predecessor pointer shifted MAC-41 → MAC-44, bible amendments-through `811b4de` → `fa89dfc`, identifiers baseline "Wave-A + ~405" → "121 (1 Wave-A + 120 SAR-9 inferred)", operative predicate SAR-8 only → SAR-7+SAR-8+SAR-9, schema_version 6 → 7. Hard-rule reminders + dedup-activity reframing + deliverable shape restated. Validator auto-wakes via `issue_blockers_resolved` (MAC-42 was `blockedBy: [MAC-44 in_progress]`; MAC-44 closure resolves the blocker; assignee Validator is woken automatically).
+
+(4) **PROJECT_STATE rotated to HB34** + this commit.
+
+(5) **HB34 chain-complete ack on MAC-1** (next, post-PROJECT_STATE-commit).
+
+### Phase-5 progress (HB34 close)
+
+| Step | Issue | Status | Outcome |
+|---|---|---|---|
+| 1 SAR-7 disambig | [MAC-37](/MAC/issues/MAC-37) | ✅ done | commit `c3938bd` |
+| 1 dup | [MAC-40](/MAC/issues/MAC-40) | ✅ done (duplicate) | HB31 close |
+| 2 Wave-A first-row promotion | [MAC-38](/MAC/issues/MAC-38) | ✅ done | commit `0fbd783` — first identifier in project history at conf=60 |
+| 3 Standing-advisory cross-reference | bundled into MAC-38 | ✅ done | 0 independent OUI hits across waves |
+| 4 Phase-3 inference proposal | [MAC-39](/MAC/issues/MAC-39) | ✅ done | proposal-only ratified; halt-flags resolved per board (a)+(c) + strict §8.4 |
+| 4 follow-on SAR-8 + bulk-stage | [MAC-41](/MAC/issues/MAC-41) | ✅ done (rolled back) | halt-flag rollback executed cleanly |
+| 4 follow-on² SAR-9 + bulk-stage retry | **[MAC-44](/MAC/issues/MAC-44)** | **✅ done (HB34)** | **120 inferred rows staged at strict §8.4** |
+| 5 Dedup pass | [MAC-42](/MAC/issues/MAC-42) | 🔓 unblocking on MAC-44 close (Validator wake) | envelope refresh comment posted |
+| 6 Coverage matrix + 4 exports | not yet dispatched | ⏳ | gates on Step-5 ratify |
+| 7 CP5 sign-off | not yet dispatched | ⏳ | board-class final |
+
+### Bible state
+
+- **Bible HEAD:** `35900f0` (CP6, last bible-text edit)
+- **Amendments through:** `fa89dfc` (SAR-9 amendment)
+- **Live SARs:** SAR-1 through SAR-9
+
+**Wake-board criteria forward:** (i) Step-5 dedup deliverable (MAC-42) — CEO-class ratify; chain Step-6 dispatch; (ii) Step-6 coverage matrix + 4 exports — CEO-class ratify; chain CP5 brief authoring; (iii) **CP5 brief surface for board sign-off — board-class final**; (iv) §11 hard-rule trip (any step) → board.
+
+**Discipline:** Board comprehensive forward-runway authorization remains in force ("All intermediate steps CEO-class with chain-don't-exit firing as appropriate. Wake me at CP5 brief surface or §11 hard-rule trip."). HB34 fired chain-don't-exit cleanly: ratify + envelope-refresh + state-rotate + memory-update + ack in single heartbeat (~13 min wall-clock).
+
+**DB state HB34 (post-MAC-44 bulk-stage):** `identifiers=121` (1 Wave-A canonical at `e4:aa:ea:80:a1:9b` Flock Safety conf=60 + 120 SAR-9 inferred at strict §8.4 / `device_category='unknown'` / conf=50 with SAR-1 LAA-bit −10 per row); `superseded_by`=0 populated yet (Step 5 will populate); `raw_observations=109,837`; `conflicts=0`; `sources=12`; `extraction_runs=33` (rows 32+33 = bulk-stage + idempotency re-run); `manufacturers=34`; **`schema_version=7`** (migration 0007 manufacturers.aliases re-scope landed). Pitch-behavior binding (WiGLE-admin) holds verbatim through 2026-05-18 (12 days remaining).
+
+**Board non-blocking ask (slack-moment cleanup, growing):** Issue tracker has sequential-allocator residue (MAC-24 / MAC-29 / MAC-34 auto-generated "Review productivity" tickets; MAC-37/38/39/40 narrative-vs-allocated drift earlier; MAC-43 cancelled-placeholder narrative drift at MAC-44 dispatch; MAC-44 deliverable-artifact-path narrative drift `mac43/` vs dispatch-`mac44/`). One-line tidy at Phase-5 wrap-up for CP5 audit readability. Not load-bearing; deferred to a slack moment.
+
+---
+
+## Prior action (CEO heartbeat 2026-05-06T~17:1xZ — HB33 Board double-sign-off chained: SAR-8 codified, MAC-39 closed, SAR-8 impl + Step 5 dispatched)
 CEO heartbeat 2026-05-06T~17:1xZ (HB33 — **Board double-sign-off chained: SAR-8 codified, MAC-39 closed, SAR-8 impl + Step 5 dispatched**). Board ratified both halt-flags + comprehensive forward-runway authorization at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 17:08:16Z. 7-item chain executed under chain-don't-exit:
 
 (1) **SAR-8 codified in `BIBLE_AMENDMENTS.md`** at commit `811b4de` — vendor-name-disambig predicate (alias-allowlist + geographic-prefix handling). 12 strict-FPs enumerated (Axon Networks ≠ Axon Enterprise ×6 / Flock Audio ≠ Flock Safety ×3 / Harris Adacom ≠ Harris Corp ×2 / GENETEC Corporation flagged-for-review ×2). 20 alias variants enumerated (`SZ DJI TECHNOLOGY` Shenzhen-prefix / `CelleBrite Mobile Synchronization` early-OUI / etc.). Binds ExtractionWorker (§7.3) + Validator (§7.4) + new `db/extraction/vendor_name_disambig.py` module + future extractor passes. Mirrors SAR-7 lineage (operational guidance, no bible-text edit at SAR entry — but bible §12 edit landed in same commit per (2) below). Rejected option (b) "confidence-band-as-FP-flag" recorded for the audit trail.
