@@ -1,525 +1,96 @@
 {
   "_meta": {
-    "produced_at_utc": "2026-05-06T15:17:53.229509+00:00",
+    "produced_at_utc": "2026-05-06T17:38:05.012647+00:00",
     "validator_agent_id": "da137694-2efe-4589-8150-828dcab881fb",
-    "phase_5_step": "Step-4 (Phase-3 inference candidate sweep, Tier 4)",
-    "issue_chain": "MAC-36 \u2192 MAC-39",
+    "phase_5_step": "Step-4 follow-on (Phase-3 inference candidate sweep, Tier 4) \u2014 SAR-8 wired",
+    "issue_chain": "MAC-36 \u2192 MAC-39 \u2192 MAC-41",
     "bible_sections": "\u00a75 Tier 4, \u00a76 Phase 5 #3, \u00a77.4, \u00a78.2, \u00a78.4, \u00a711 #1/#7/#8/#10/#12/#13/#14",
     "amendments_applied": [
       "SAR-1 (LAA bit penalty)",
       "SAR-5 (PII discipline \u2014 N/A this pass; no PII surfaces)",
-      "SAR-7 #1/#2/#3 (codified for Step-1; not invoked in Step-4)"
+      "SAR-7 #1/#2/#3 (codified for Step-1; not invoked in Step-4)",
+      "SAR-8 (vendor-name-disambig + alias allowlist + geo-prefix)"
     ],
-    "promotion_status": "PROPOSAL ONLY \u2014 no rows written to identifiers. CEO + board ratify the disambig predicate + \u00a78.4-vs-\u00a711-#10 tension before bulk staging. JSON-artifact-only schema fit per MAC-39 dispatch (Validator picks cleanest).",
+    "promotion_status": "PROPOSAL ONLY \u2014 no rows written to identifiers from this script. Bulk-staging into identifiers happens via the MAC-41 bulk-stage executor (db/validation/sar8_bulk_stage.py).",
     "db_writes_this_pass": 0,
     "identifiers_table_row_count": 1
   },
-  "canonical_manufacturer_lookup_size": 57,
-  "canonical_manufacturer_lookup_keys_sample": [
-    "avigilon",
-    "axis",
-    "axis communications",
-    "axon",
-    "berla",
-    "briefcam",
-    "brinc",
-    "brinc drones",
-    "cellebrite",
-    "clearview",
-    "clearview ai",
-    "cradlepoint",
-    "da-jiang innovations",
-    "dedrone",
-    "digital receiver",
-    "dji",
-    "droneshield",
-    "drt",
-    "drtbox",
-    "engility",
-    "ericsson cradlepoint",
-    "flock",
-    "flock safety",
-    "genetec",
-    "getac",
-    "graykey (product)",
-    "hak5",
-    "harris",
-    "jacobs",
-    "jacobs engineering"
+  "canonical_lexicon_size": 34,
+  "canonical_lexicon_canonical_names": [
+    "Avigilon",
+    "Axis Communications",
+    "Axon",
+    "BRINC",
+    "Berla",
+    "BriefCam",
+    "Cellebrite",
+    "Clearview AI",
+    "Cradlepoint",
+    "DJI",
+    "Dedrone",
+    "Digital Receiver Technology",
+    "DroneShield",
+    "Engility",
+    "Flock Safety",
+    "Genetec",
+    "Getac",
+    "Hak5",
+    "Harris",
+    "Jacobs",
+    "Kenwood",
+    "KeyW",
+    "L3Harris",
+    "Magnet Forensics",
+    "Motorola Solutions",
+    "Parrot",
+    "Rekor",
+    "Reveal",
+    "Septier",
+    "Sierra Wireless",
+    "Skydio",
+    "SoundThinking",
+    "Vigilant Solutions",
+    "WatchGuard"
   ],
   "phase2_oui_inference": {
-    "strict_match_total": 397,
-    "strict_match_pre_filter_drops": 0,
-    "strict_match_laa_bit_count": 0,
-    "strict_match_post_filter_stageable": 397,
-    "permissive_only_total": 128,
-    "permissive_only_samples": [
+    "sar8_accept_total": 411,
+    "sar8_accept_pre_filter_drops": 0,
+    "sar8_accept_laa_bit_count": 0,
+    "sar8_accept_post_filter_stageable": 411,
+    "sar8_flag_for_review_total": 2,
+    "sar8_flag_for_review_samples": [
       {
-        "raw_observation_id": 53683,
+        "raw_observation_id": 74000,
         "source_id": 1,
         "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "f4:63:e7",
+        "candidate_identifier": "00:0a:b1",
         "candidate_type": "oui",
-        "candidate_manufacturer_raw": "Nanjing Maxon O.E. Tech. Co., LTD",
-        "matched_canonical_name": "Axon",
-        "matched_via_alias": "Axon",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "body_cam",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 54255,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "cc:6a:10",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "The Chamberlain Group, Inc",
-        "matched_canonical_name": "Berla",
-        "matched_via_alias": "Berla",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 56367,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "4c:d9:c4",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "Magneti Marelli Automotive Electronics (Guangzhou) Co. Ltd",
-        "matched_canonical_name": "Magnet Forensics",
-        "matched_via_alias": "Magnet",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 56658,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "0c:c0:c0",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "MAGNETI MARELLI SISTEMAS ELECTRONICOS MEXICO",
-        "matched_canonical_name": "Magnet Forensics",
-        "matched_via_alias": "Magnet",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 56942,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "d4:4c:24",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "Vuppalamritha Magnetic Components LTD",
-        "matched_canonical_name": "Magnet Forensics",
-        "matched_via_alias": "Magnet",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 57936,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "00:12:60",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "Stanton Magnetics,inc.",
-        "matched_canonical_name": "Magnet Forensics",
-        "matched_via_alias": "Magnet",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 58498,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "00:04:eb",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "Paxonet Communications, Inc.",
-        "matched_canonical_name": "Axon",
-        "matched_via_alias": "Axon",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "body_cam",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 58911,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "00:10:cf",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "FIBERLANE COMMUNICATIONS",
-        "matched_canonical_name": "Berla",
-        "matched_via_alias": "Berla",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 59398,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "48:1c:b9",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-        "matched_canonical_name": "DJI",
-        "matched_via_alias": "DJI",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "drone",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 59939,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "44:11:46",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "The Chamberlain Group, Inc",
-        "matched_canonical_name": "Berla",
-        "matched_via_alias": "Berla",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 60185,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "8c:58:23",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-        "matched_canonical_name": "DJI",
-        "matched_via_alias": "DJI",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "drone",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 60305,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "0c:9a:e6",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-        "matched_canonical_name": "DJI",
-        "matched_via_alias": "DJI",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "drone",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 64772,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "d8:c0:68",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "Netgenetech.co.,ltd.",
+        "candidate_manufacturer_raw": "GENETEC Corporation",
         "matched_canonical_name": "Genetec",
         "matched_via_alias": "Genetec",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
         "vendor_primary_category": "alpr",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
+        "disposition": "flag_for_review",
+        "reason": "GENETEC Corporation (early-2000s OUI registration, address Tokyo) may be a separate Japanese entity from Genetec Inc. (Montreal, the \u00a72.1 alpr vendor). Routes to extraction_outputs/mac41/sar8_flagged_for_review.json for CEO/board triage; NOT bulk-staged."
       },
       {
-        "raw_observation_id": 67308,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "60:60:1f",
+        "raw_observation_id": 165173,
+        "source_id": 4,
+        "source_url": "https://www.wireshark.org/download/automated/data/manuf",
+        "candidate_identifier": "00:0a:b1",
         "candidate_type": "oui",
-        "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-        "matched_canonical_name": "DJI",
-        "matched_via_alias": "DJI",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "drone",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 67309,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "e4:7a:2c",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-        "matched_canonical_name": "DJI",
-        "matched_via_alias": "DJI",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "drone",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 67654,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "24:3c:b0",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "Dongguan Mentech Optical & Magnetic Co., Ltd.",
-        "matched_canonical_name": "Magnet Forensics",
-        "matched_via_alias": "Magnet",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 67936,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "f4:46:2a",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "maxon zub",
-        "matched_canonical_name": "Axon",
-        "matched_via_alias": "Axon",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "body_cam",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 68246,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "88:29:85",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-        "matched_canonical_name": "DJI",
-        "matched_via_alias": "DJI",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "drone",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 68589,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "60:56:99",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "MAGNETI MARELLI   S.E. S.p.A.",
-        "matched_canonical_name": "Magnet Forensics",
-        "matched_via_alias": "Magnet",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
-      },
-      {
-        "raw_observation_id": 68920,
-        "source_id": 1,
-        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
-        "candidate_identifier": "94:d8:6b",
-        "candidate_type": "oui",
-        "candidate_manufacturer_raw": "nass magnet Hung\u00e1ria Kft.",
-        "matched_canonical_name": "Magnet Forensics",
-        "matched_via_alias": "Magnet",
-        "match_kind": "permissive_substring",
-        "match_path": "permissive",
-        "vendor_primary_category": "hacking_tool",
-        "device_category_per_8_4": "unknown",
-        "device_category_explanation": "\u00a78.4 + \u00a711 #10 \u2014 OUI-level inference never categorizes (category requires model-level evidence). Vendor primary_category carried as metadata only.",
-        "confidence_proposed": 30,
-        "confidence_reasoning": "\u00a78.2 inferred 30\u201370 band; baseline 50, adjustments=['permissive_substring_match_only'].",
-        "flags": [
-          "permissive_substring_match_only"
-        ],
-        "pre_filter_drop": false,
-        "talos_export_eligible": false,
-        "talos_export_reason": "\u00a711 #13 \u2014 device_category='unknown' is never exported to Talos."
+        "candidate_manufacturer_raw": "GENETEC Corporation",
+        "matched_canonical_name": "Genetec",
+        "matched_via_alias": "Genetec",
+        "vendor_primary_category": "alpr",
+        "disposition": "flag_for_review",
+        "reason": "GENETEC Corporation (early-2000s OUI registration, address Tokyo) may be a separate Japanese entity from Genetec Inc. (Montreal, the \u00a72.1 alpr vendor). Routes to extraction_outputs/mac41/sar8_flagged_for_review.json for CEO/board triage; NOT bulk-staged."
       }
     ],
     "by_vendor": [
       {
         "canonical_name": "Motorola Solutions",
         "primary_category": null,
-        "strict_count": 300,
+        "accept_count": 300,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -528,7 +99,8 @@
             "source_id": 1,
             "candidate_identifier": "50:16:f4",
             "candidate_manufacturer_raw": "Motorola Mobility LLC, a Lenovo Company",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Motorola",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -537,7 +109,8 @@
             "source_id": 1,
             "candidate_identifier": "c4:a0:52",
             "candidate_manufacturer_raw": "Motorola Mobility LLC, a Lenovo Company",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Motorola",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -546,259 +119,8 @@
             "source_id": 1,
             "candidate_identifier": "c8:58:95",
             "candidate_manufacturer_raw": "Motorola Mobility LLC, a Lenovo Company",
-            "match_kind": "prefix_token",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
-      {
-        "canonical_name": "Axis Communications",
-        "primary_category": "alpr",
-        "strict_count": 13,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 54374,
-            "source_id": 1,
-            "candidate_identifier": "b8:a4:4f",
-            "candidate_manufacturer_raw": "Axis Communications AB",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 67362,
-            "source_id": 1,
-            "candidate_identifier": "00:40:8c",
-            "candidate_manufacturer_raw": "Axis Communications AB",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 83018,
-            "source_id": 1,
-            "candidate_identifier": "e8:27:25",
-            "candidate_manufacturer_raw": "Axis Communications AB",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
-      {
-        "canonical_name": "Sierra Wireless",
-        "primary_category": null,
-        "strict_count": 12,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 59964,
-            "source_id": 1,
-            "candidate_identifier": "50:13:9d",
-            "candidate_manufacturer_raw": "Sierra Wireless, ULC",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 60750,
-            "source_id": 1,
-            "candidate_identifier": "84:db:2f",
-            "candidate_manufacturer_raw": "Sierra Wireless, ULC",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 60755,
-            "source_id": 1,
-            "candidate_identifier": "64:ce:6e",
-            "candidate_manufacturer_raw": "Sierra Wireless, ULC",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
-      {
-        "canonical_name": "Harris",
-        "primary_category": "imsi_catcher",
-        "strict_count": 11,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 57708,
-            "source_id": 1,
-            "candidate_identifier": "00:17:f3",
-            "candidate_manufacturer_raw": "Harris Corporation",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 66554,
-            "source_id": 1,
-            "candidate_identifier": "00:02:68",
-            "candidate_manufacturer_raw": "Harris Government Communications",
-            "match_kind": "prefix_token",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 70418,
-            "source_id": 1,
-            "candidate_identifier": "00:06:ec",
-            "candidate_manufacturer_raw": "Harris Corporation",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
-      {
-        "canonical_name": "Parrot",
-        "primary_category": "drone",
-        "strict_count": 10,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 55414,
-            "source_id": 1,
-            "candidate_identifier": "90:3a:e6",
-            "candidate_manufacturer_raw": "PARROT SA",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 71195,
-            "source_id": 1,
-            "candidate_identifier": "00:12:1c",
-            "candidate_manufacturer_raw": "PARROT SA",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 71196,
-            "source_id": 1,
-            "candidate_identifier": "90:03:b7",
-            "candidate_manufacturer_raw": "PARROT SA",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
-      {
-        "canonical_name": "Axon",
-        "primary_category": "body_cam",
-        "strict_count": 8,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 60977,
-            "source_id": 1,
-            "candidate_identifier": "00:58:28",
-            "candidate_manufacturer_raw": "Axon Networks Inc.",
-            "match_kind": "prefix_token",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 68168,
-            "source_id": 1,
-            "candidate_identifier": "84:70:03",
-            "candidate_manufacturer_raw": "Axon Networks Inc.",
-            "match_kind": "prefix_token",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 82658,
-            "source_id": 1,
-            "candidate_identifier": "00:c0:d4",
-            "candidate_manufacturer_raw": "AXON NETWORKS, INC.",
-            "match_kind": "prefix_token",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
-      {
-        "canonical_name": "Genetec",
-        "primary_category": "alpr",
-        "strict_count": 7,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 63504,
-            "source_id": 1,
-            "candidate_identifier": "0c:bf:15",
-            "candidate_manufacturer_raw": "Genetec Inc.",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 74000,
-            "source_id": 1,
-            "candidate_identifier": "00:0a:b1",
-            "candidate_manufacturer_raw": "GENETEC Corporation",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 88181,
-            "source_id": 1,
-            "candidate_identifier": "00:bf:15",
-            "candidate_manufacturer_raw": "Genetec Inc.",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
-      {
-        "canonical_name": "WatchGuard",
-        "primary_category": "body_cam",
-        "strict_count": 6,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 58676,
-            "source_id": 1,
-            "candidate_identifier": "00:01:21",
-            "candidate_manufacturer_raw": "WatchGuard Technologies, Inc.",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 65374,
-            "source_id": 1,
-            "candidate_identifier": "00:1d:96",
-            "candidate_manufacturer_raw": "WatchGuard Video",
-            "match_kind": "exact_normalized",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 78311,
-            "source_id": 1,
-            "candidate_identifier": "00:90:7f",
-            "candidate_manufacturer_raw": "WatchGuard Technologies, Inc.",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Motorola",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -807,34 +129,271 @@
       {
         "canonical_name": "DJI",
         "primary_category": "drone",
-        "strict_count": 4,
+        "accept_count": 26,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
           {
-            "raw_observation_id": 67842,
+            "raw_observation_id": 59398,
             "source_id": 1,
-            "candidate_identifier": "9c:5a:8a",
-            "candidate_manufacturer_raw": "DJI BAIWANG TECHNOLOGY CO LTD",
-            "match_kind": "prefix_token",
+            "candidate_identifier": "48:1c:b9",
+            "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "DJI",
             "confidence_proposed": 50,
             "flags": []
           },
           {
-            "raw_observation_id": 84161,
+            "raw_observation_id": 60185,
             "source_id": 1,
-            "candidate_identifier": "ec:72:f7",
-            "candidate_manufacturer_raw": "DJI BAIWANG TECHNOLOGY CO LTD",
-            "match_kind": "prefix_token",
+            "candidate_identifier": "8c:58:23",
+            "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "DJI",
             "confidence_proposed": 50,
             "flags": []
           },
           {
-            "raw_observation_id": 207118,
+            "raw_observation_id": 60305,
+            "source_id": 1,
+            "candidate_identifier": "0c:9a:e6",
+            "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "DJI",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "Axis Communications",
+        "primary_category": "alpr",
+        "accept_count": 13,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 54374,
+            "source_id": 1,
+            "candidate_identifier": "b8:a4:4f",
+            "candidate_manufacturer_raw": "Axis Communications AB",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Axis Communications",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 67362,
+            "source_id": 1,
+            "candidate_identifier": "00:40:8c",
+            "candidate_manufacturer_raw": "Axis Communications AB",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Axis Communications",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 83018,
+            "source_id": 1,
+            "candidate_identifier": "e8:27:25",
+            "candidate_manufacturer_raw": "Axis Communications AB",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Axis Communications",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "Sierra Wireless",
+        "primary_category": null,
+        "accept_count": 12,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 59964,
+            "source_id": 1,
+            "candidate_identifier": "50:13:9d",
+            "candidate_manufacturer_raw": "Sierra Wireless, ULC",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Sierra Wireless",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 60750,
+            "source_id": 1,
+            "candidate_identifier": "84:db:2f",
+            "candidate_manufacturer_raw": "Sierra Wireless, ULC",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Sierra Wireless",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 60755,
+            "source_id": 1,
+            "candidate_identifier": "64:ce:6e",
+            "candidate_manufacturer_raw": "Sierra Wireless, ULC",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Sierra Wireless",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "Harris",
+        "primary_category": "imsi_catcher",
+        "accept_count": 11,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 57708,
+            "source_id": 1,
+            "candidate_identifier": "00:17:f3",
+            "candidate_manufacturer_raw": "Harris Corporation",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Harris",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 66554,
+            "source_id": 1,
+            "candidate_identifier": "00:02:68",
+            "candidate_manufacturer_raw": "Harris Government Communications",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Harris",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 70418,
+            "source_id": 1,
+            "candidate_identifier": "00:06:ec",
+            "candidate_manufacturer_raw": "Harris Corporation",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Harris",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "Parrot",
+        "primary_category": "drone",
+        "accept_count": 10,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 55414,
+            "source_id": 1,
+            "candidate_identifier": "90:3a:e6",
+            "candidate_manufacturer_raw": "PARROT SA",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Parrot",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 71195,
+            "source_id": 1,
+            "candidate_identifier": "00:12:1c",
+            "candidate_manufacturer_raw": "PARROT SA",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Parrot",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 71196,
+            "source_id": 1,
+            "candidate_identifier": "90:03:b7",
+            "candidate_manufacturer_raw": "PARROT SA",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Parrot",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "WatchGuard",
+        "primary_category": "body_cam",
+        "accept_count": 6,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 58676,
+            "source_id": 1,
+            "candidate_identifier": "00:01:21",
+            "candidate_manufacturer_raw": "WatchGuard Technologies, Inc.",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "WatchGuard",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 65374,
+            "source_id": 1,
+            "candidate_identifier": "00:1d:96",
+            "candidate_manufacturer_raw": "WatchGuard Video",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "WatchGuard",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 78311,
+            "source_id": 1,
+            "candidate_identifier": "00:90:7f",
+            "candidate_manufacturer_raw": "WatchGuard Technologies, Inc.",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "WatchGuard",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "Genetec",
+        "primary_category": "alpr",
+        "accept_count": 5,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 63504,
+            "source_id": 1,
+            "candidate_identifier": "0c:bf:15",
+            "candidate_manufacturer_raw": "Genetec Inc.",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Genetec",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 88181,
+            "source_id": 1,
+            "candidate_identifier": "00:bf:15",
+            "candidate_manufacturer_raw": "Genetec Inc.",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Genetec",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 176471,
             "source_id": 4,
-            "candidate_identifier": "9c:5a:8a",
-            "candidate_manufacturer_raw": "Dji Baiwang Technology Co Ltd",
-            "match_kind": "prefix_token",
+            "candidate_identifier": "00:50:c2:be:7",
+            "candidate_manufacturer_raw": "Genetec Inc.",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Genetec",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -843,7 +402,7 @@
       {
         "canonical_name": "Flock Safety",
         "primary_category": "alpr",
-        "strict_count": 4,
+        "accept_count": 4,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -852,7 +411,8 @@
             "source_id": 1,
             "candidate_identifier": "b4:1e:52",
             "candidate_manufacturer_raw": "Flock Safety",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Flock Safety",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -861,7 +421,8 @@
             "source_id": 3,
             "candidate_identifier": "8c:1f:64:57:4",
             "candidate_manufacturer_raw": "Flock Audio Inc.",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Flock",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -870,7 +431,8 @@
             "source_id": 4,
             "candidate_identifier": "8c:1f:64:57:4",
             "candidate_manufacturer_raw": "Flock Audio Inc.",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Flock",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -879,7 +441,7 @@
       {
         "canonical_name": "Cradlepoint",
         "primary_category": null,
-        "strict_count": 4,
+        "accept_count": 4,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -888,7 +450,8 @@
             "source_id": 1,
             "candidate_identifier": "00:30:44",
             "candidate_manufacturer_raw": "CradlePoint, Inc",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Cradlepoint",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -897,7 +460,8 @@
             "source_id": 1,
             "candidate_identifier": "00:e0:1c",
             "candidate_manufacturer_raw": "CradlePoint, Inc",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Cradlepoint",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -906,7 +470,8 @@
             "source_id": 4,
             "candidate_identifier": "00:30:44",
             "candidate_manufacturer_raw": "CradlePoint, Inc",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Cradlepoint",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -915,7 +480,7 @@
       {
         "canonical_name": "Jacobs",
         "primary_category": "imsi_catcher",
-        "strict_count": 4,
+        "accept_count": 4,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -924,7 +489,8 @@
             "source_id": 2,
             "candidate_identifier": "10:63:a3:1",
             "candidate_manufacturer_raw": "Jacobs Technology, Inc.",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Jacobs",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -933,7 +499,8 @@
             "source_id": 3,
             "candidate_identifier": "8c:1f:64:a9:8",
             "candidate_manufacturer_raw": "Jacobs Technology, Inc.",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Jacobs",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -942,7 +509,8 @@
             "source_id": 4,
             "candidate_identifier": "10:63:a3:1",
             "candidate_manufacturer_raw": "Jacobs Technology, Inc.",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Jacobs",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -951,7 +519,7 @@
       {
         "canonical_name": "SoundThinking",
         "primary_category": "gunshot_detect",
-        "strict_count": 2,
+        "accept_count": 2,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -960,7 +528,8 @@
             "source_id": 1,
             "candidate_identifier": "d4:11:d6",
             "candidate_manufacturer_raw": "ShotSpotter, Inc.",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "ShotSpotter",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -969,7 +538,8 @@
             "source_id": 4,
             "candidate_identifier": "d4:11:d6",
             "candidate_manufacturer_raw": "ShotSpotter, Inc.",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "ShotSpotter",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -978,7 +548,7 @@
       {
         "canonical_name": "Kenwood",
         "primary_category": "police_radio",
-        "strict_count": 2,
+        "accept_count": 2,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -987,7 +557,8 @@
             "source_id": 1,
             "candidate_identifier": "00:0d:4f",
             "candidate_manufacturer_raw": "Kenwood Corporation",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Kenwood",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -996,7 +567,8 @@
             "source_id": 4,
             "candidate_identifier": "00:0d:4f",
             "candidate_manufacturer_raw": "Kenwood Corporation",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Kenwood",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -1005,7 +577,7 @@
       {
         "canonical_name": "Avigilon",
         "primary_category": "alpr",
-        "strict_count": 2,
+        "accept_count": 2,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -1014,7 +586,8 @@
             "source_id": 1,
             "candidate_identifier": "70:1a:d5",
             "candidate_manufacturer_raw": "Avigilon Alta",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Avigilon",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -1023,7 +596,8 @@
             "source_id": 4,
             "candidate_identifier": "70:1a:d5",
             "candidate_manufacturer_raw": "Avigilon Alta",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Avigilon",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -1032,7 +606,7 @@
       {
         "canonical_name": "Cellebrite",
         "primary_category": "hacking_tool",
-        "strict_count": 2,
+        "accept_count": 2,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -1041,7 +615,8 @@
             "source_id": 1,
             "candidate_identifier": "00:16:00",
             "candidate_manufacturer_raw": "CelleBrite Mobile Synchronization",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Cellebrite",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -1050,7 +625,8 @@
             "source_id": 4,
             "candidate_identifier": "00:16:00",
             "candidate_manufacturer_raw": "CelleBrite Mobile Synchronization",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Cellebrite",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -1059,7 +635,7 @@
       {
         "canonical_name": "Skydio",
         "primary_category": "drone",
-        "strict_count": 2,
+        "accept_count": 2,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -1068,7 +644,8 @@
             "source_id": 1,
             "candidate_identifier": "38:1d:14",
             "candidate_manufacturer_raw": "Skydio Inc.",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Skydio",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -1077,7 +654,37 @@
             "source_id": 4,
             "candidate_identifier": "38:1d:14",
             "candidate_manufacturer_raw": "Skydio Inc.",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Skydio",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "Axon",
+        "primary_category": "body_cam",
+        "accept_count": 2,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 83602,
+            "source_id": 1,
+            "candidate_identifier": "00:25:df",
+            "candidate_manufacturer_raw": "Axon Enterprise, Inc.",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Axon",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 172326,
+            "source_id": 4,
+            "candidate_identifier": "00:25:df",
+            "candidate_manufacturer_raw": "Axon Enterprise, Inc.",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Axon",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -1086,7 +693,7 @@
       {
         "canonical_name": "KeyW",
         "primary_category": "imsi_catcher",
-        "strict_count": 2,
+        "accept_count": 2,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -1095,7 +702,8 @@
             "source_id": 3,
             "candidate_identifier": "70:b3:d5:7c:b",
             "candidate_manufacturer_raw": "KeyW Corporation",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "KeyW",
             "confidence_proposed": 50,
             "flags": []
           },
@@ -1104,7 +712,8 @@
             "source_id": 4,
             "candidate_identifier": "70:b3:d5:7c:b",
             "candidate_manufacturer_raw": "KeyW Corporation",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "KeyW",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -1113,7 +722,7 @@
       {
         "canonical_name": "Septier",
         "primary_category": "imsi_catcher",
-        "strict_count": 1,
+        "accept_count": 1,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -1122,7 +731,8 @@
             "source_id": 4,
             "candidate_identifier": "00:50:c2:2a:5",
             "candidate_manufacturer_raw": "Septier Communication Ltd",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Septier",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -1131,7 +741,7 @@
       {
         "canonical_name": "Digital Receiver Technology",
         "primary_category": "imsi_catcher",
-        "strict_count": 1,
+        "accept_count": 1,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
@@ -1140,302 +750,23 @@
             "source_id": 4,
             "candidate_identifier": "00:50:c2:36:0",
             "candidate_manufacturer_raw": "Digital Receiver Technology",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
+            "matched_via_alias": "Digital Receiver Technology",
             "confidence_proposed": 50,
             "flags": []
           }
         ]
       }
     ],
-    "strict_path_fp_probes": {
-      "count": 12,
-      "samples": [
-        {
-          "raw_observation_id": 60977,
-          "source_id": 1,
-          "candidate_identifier": "00:58:28",
-          "candidate_manufacturer_raw": "Axon Networks Inc.",
-          "matched_canonical_name": "Axon",
-          "fp_reason": "Axon Networks Inc. is a network-gear vendor distinct from Axon Enterprise (TASER International legacy / body-cam vendor in \u00a72.1).",
-          "suspect_other_vendor": "Axon Networks Inc. (unaffiliated network gear)"
-        },
-        {
-          "raw_observation_id": 68168,
-          "source_id": 1,
-          "candidate_identifier": "84:70:03",
-          "candidate_manufacturer_raw": "Axon Networks Inc.",
-          "matched_canonical_name": "Axon",
-          "fp_reason": "Axon Networks Inc. is a network-gear vendor distinct from Axon Enterprise (TASER International legacy / body-cam vendor in \u00a72.1).",
-          "suspect_other_vendor": "Axon Networks Inc. (unaffiliated network gear)"
-        },
-        {
-          "raw_observation_id": 74000,
-          "source_id": 1,
-          "candidate_identifier": "00:0a:b1",
-          "candidate_manufacturer_raw": "GENETEC Corporation",
-          "matched_canonical_name": "Genetec",
-          "fp_reason": "GENETEC Corporation (early-2000s OUI registration, address Tokyo) may be a separate Japanese entity from Genetec Inc. (Montreal, the \u00a72.1 alpr vendor). Verify before staging \u2014 the OUIs `00:0a:b1` predate Genetec Inc.'s typical FCC/IEEE-registration era.",
-          "suspect_other_vendor": "GENETEC Corporation (possibly distinct entity)"
-        },
-        {
-          "raw_observation_id": 82658,
-          "source_id": 1,
-          "candidate_identifier": "00:c0:d4",
-          "candidate_manufacturer_raw": "AXON NETWORKS, INC.",
-          "matched_canonical_name": "Axon",
-          "fp_reason": "Axon Networks Inc. is a network-gear vendor distinct from Axon Enterprise (TASER International legacy / body-cam vendor in \u00a72.1).",
-          "suspect_other_vendor": "Axon Networks Inc. (unaffiliated network gear)"
-        },
-        {
-          "raw_observation_id": 90646,
-          "source_id": 1,
-          "candidate_identifier": "00:40:2d",
-          "candidate_manufacturer_raw": "HARRIS ADACOM CORPORATION",
-          "matched_canonical_name": "Harris",
-          "fp_reason": "HARRIS ADACOM CORPORATION is a 1990s networking-products vendor distinct from Harris Corporation (the \u00a72.1 imsi_catcher vendor).",
-          "suspect_other_vendor": "Harris Adacom Corporation"
-        },
-        {
-          "raw_observation_id": 99722,
-          "source_id": 3,
-          "candidate_identifier": "8c:1f:64:57:4",
-          "candidate_manufacturer_raw": "Flock Audio Inc.",
-          "matched_canonical_name": "Flock Safety",
-          "fp_reason": "Flock Audio Inc. is a Canadian audio-equipment company unrelated to Flock Safety (the \u00a72.1 alpr vendor). The bare alias `Flock` in manufacturers.aliases captures both.",
-          "suspect_other_vendor": "Flock Audio Inc. (audio equipment)"
-        },
-        {
-          "raw_observation_id": 165173,
-          "source_id": 4,
-          "candidate_identifier": "00:0a:b1",
-          "candidate_manufacturer_raw": "GENETEC Corporation",
-          "matched_canonical_name": "Genetec",
-          "fp_reason": "GENETEC Corporation (early-2000s OUI registration, address Tokyo) may be a separate Japanese entity from Genetec Inc. (Montreal, the \u00a72.1 alpr vendor). Verify before staging \u2014 the OUIs `00:0a:b1` predate Genetec Inc.'s typical FCC/IEEE-registration era.",
-          "suspect_other_vendor": "GENETEC Corporation (possibly distinct entity)"
-        },
-        {
-          "raw_observation_id": 173011,
-          "source_id": 4,
-          "candidate_identifier": "00:40:2d",
-          "candidate_manufacturer_raw": "Harris Adacom Corporation",
-          "matched_canonical_name": "Harris",
-          "fp_reason": "HARRIS ADACOM CORPORATION is a 1990s networking-products vendor distinct from Harris Corporation (the \u00a72.1 imsi_catcher vendor).",
-          "suspect_other_vendor": "Harris Adacom Corporation"
-        },
-        {
-          "raw_observation_id": 177601,
-          "source_id": 4,
-          "candidate_identifier": "00:58:28",
-          "candidate_manufacturer_raw": "Axon Networks Inc.",
-          "matched_canonical_name": "Axon",
-          "fp_reason": "Axon Networks Inc. is a network-gear vendor distinct from Axon Enterprise (TASER International legacy / body-cam vendor in \u00a72.1).",
-          "suspect_other_vendor": "Axon Networks Inc. (unaffiliated network gear)"
-        },
-        {
-          "raw_observation_id": 179146,
-          "source_id": 4,
-          "candidate_identifier": "00:c0:d4",
-          "candidate_manufacturer_raw": "Axon Networks, Inc.",
-          "matched_canonical_name": "Axon",
-          "fp_reason": "Axon Networks Inc. is a network-gear vendor distinct from Axon Enterprise (TASER International legacy / body-cam vendor in \u00a72.1).",
-          "suspect_other_vendor": "Axon Networks Inc. (unaffiliated network gear)"
-        },
-        {
-          "raw_observation_id": 201290,
-          "source_id": 4,
-          "candidate_identifier": "84:70:03",
-          "candidate_manufacturer_raw": "Axon Networks Inc.",
-          "matched_canonical_name": "Axon",
-          "fp_reason": "Axon Networks Inc. is a network-gear vendor distinct from Axon Enterprise (TASER International legacy / body-cam vendor in \u00a72.1).",
-          "suspect_other_vendor": "Axon Networks Inc. (unaffiliated network gear)"
-        },
-        {
-          "raw_observation_id": 203127,
-          "source_id": 4,
-          "candidate_identifier": "8c:1f:64:57:4",
-          "candidate_manufacturer_raw": "Flock Audio Inc.",
-          "matched_canonical_name": "Flock Safety",
-          "fp_reason": "Flock Audio Inc. is a Canadian audio-equipment company unrelated to Flock Safety (the \u00a72.1 alpr vendor). The bare alias `Flock` in manufacturers.aliases captures both.",
-          "suspect_other_vendor": "Flock Audio Inc. (audio equipment)"
-        }
-      ],
-      "interpretation": "These rows match the strict-path predicate but are likely false positives \u2014 distinct corporate entities sharing a vendor-token prefix. CEO should ratify whether to (a) tighten the predicate (e.g., per-vendor allowlist of alias variants), (b) add the FP entities to a vendor-name blocklist, or (c) accept the FP rate at the staged device_category='unknown' confidence floor."
-    },
-    "permissive_path_likely_tps": {
-      "count": 20,
-      "samples": [
-        {
-          "raw_observation_id": 59398,
-          "source_id": 1,
-          "candidate_identifier": "48:1c:b9",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 60185,
-          "source_id": 1,
-          "candidate_identifier": "8c:58:23",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 60305,
-          "source_id": 1,
-          "candidate_identifier": "0c:9a:e6",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 67308,
-          "source_id": 1,
-          "candidate_identifier": "60:60:1f",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 67309,
-          "source_id": 1,
-          "candidate_identifier": "e4:7a:2c",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 68246,
-          "source_id": 1,
-          "candidate_identifier": "88:29:85",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 75447,
-          "source_id": 1,
-          "candidate_identifier": "58:b8:58",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 82947,
-          "source_id": 1,
-          "candidate_identifier": "34:d2:62",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 91444,
-          "source_id": 1,
-          "candidate_identifier": "04:a8:5a",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 91889,
-          "source_id": 1,
-          "candidate_identifier": "4c:43:f6",
-          "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 180169,
-          "source_id": 4,
-          "candidate_identifier": "04:a8:5a",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 181344,
-          "source_id": 4,
-          "candidate_identifier": "0c:9a:e6",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 186633,
-          "source_id": 4,
-          "candidate_identifier": "34:d2:62",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 189344,
-          "source_id": 4,
-          "candidate_identifier": "48:1c:b9",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 189897,
-          "source_id": 4,
-          "candidate_identifier": "4c:43:f6",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 191692,
-          "source_id": 4,
-          "candidate_identifier": "58:b8:58",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 192547,
-          "source_id": 4,
-          "candidate_identifier": "60:60:1f",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 201660,
-          "source_id": 4,
-          "candidate_identifier": "88:29:85",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 205021,
-          "source_id": 4,
-          "candidate_identifier": "8c:58:23",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        },
-        {
-          "raw_observation_id": 216177,
-          "source_id": 4,
-          "candidate_identifier": "e4:7a:2c",
-          "candidate_manufacturer_raw": "Sz Dji Technology Co.,Ltd",
-          "matched_canonical_name": "DJI",
-          "missed_tp_reason": "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name for DJI (\u00a72.1 drone vendor). Strict-path missed it because the company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization yields `sz dji` \u2260 `dji`. CEO should ratify whether this is added to manufacturers.aliases or whether the predicate handles geographic prefixes natively."
-        }
-      ],
-      "interpretation": "These rows are in the permissive-only bucket but are likely true positives the strict-path missed. The most important miss is `SZ DJI TECHNOLOGY CO.,LTD` \u2014 DJI's canonical IEEE registration name. CEO should ratify whether to add `SZ DJI` (and similar geographic-prefix variants) to manufacturers.aliases, or whether the predicate should handle geographic prefixes natively."
-    },
     "wave_a_oui_collision": {
       "wave_a_oui": "e4:aa:ea",
       "wave_a_mac": "e4:aa:ea:80:a1:9b",
-      "strict_inference_rows_at_oui": 0,
+      "accept_inference_rows_at_oui": 0,
       "halt_flag": "no_collision \u2014 IEEE OUI e4:aa:ea registers to Liteon Technology Corporation (not in \u00a72.1 manufacturers); no \u00a72.1-vendor inference candidate emits at this OUI. The Wave-A row stays canonical at MAC-level e4:aa:ea:80:a1:9b (manufacturer=Flock Safety per community-inferred OEM narrative). Liteon attribution remains in raw_observations (IEEE id=85781, Wireshark id=216273) only."
     }
   },
   "fcc_grantees_inference": {
-    "total_match_count": 90,
+    "total_match_count": 96,
     "talos_exportable": false,
     "talos_export_reason": "FCC grantee_code is a regulatory entity prefix (per \u00a74.2 fcc_grantees note), NOT a \u00a74.1 per-device identifier. These rows are vendor-attestation metadata only \u2014 they enrich any future FCC-ID-bearing identifier but do not produce identifiers rows themselves. Phase-4 fcc_equipment_filings (if/when created) would consume these as anchors.",
     "by_vendor": [
@@ -1453,7 +784,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Motorola Solutions",
             "matched_via_alias": "Motorola Solutions",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": null
           },
           {
@@ -1465,7 +796,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Motorola Solutions",
             "matched_via_alias": "Motorola Solutions",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": null
           },
           {
@@ -1477,7 +808,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Motorola Solutions",
             "matched_via_alias": "Motorola Solutions",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": null
           }
         ]
@@ -1496,7 +827,7 @@
             "date_received": "2016-09-01",
             "matched_canonical_name": "Harris",
             "matched_via_alias": "Harris",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "imsi_catcher"
           },
           {
@@ -1508,7 +839,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Harris",
             "matched_via_alias": "Harris",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "imsi_catcher"
           },
           {
@@ -1520,8 +851,51 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Harris",
             "matched_via_alias": "Harris",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "imsi_catcher"
+          }
+        ]
+      },
+      {
+        "canonical_name": "DJI",
+        "primary_category": "drone",
+        "match_count": 8,
+        "samples": [
+          {
+            "fcc_grantee_id": 56379,
+            "grantee_code": "2AHAN",
+            "grantee_name": "SZ DJI Software Technology Co., Ltd.",
+            "country": "China",
+            "state": null,
+            "date_received": "2016-01-18",
+            "matched_canonical_name": "DJI",
+            "matched_via_alias": "DJI",
+            "match_kind": "sar8_accept",
+            "vendor_primary_category": "drone"
+          },
+          {
+            "fcc_grantee_id": 56389,
+            "grantee_code": "2AHAY",
+            "grantee_name": "SZ DJI BaiWang Technology Co.,Ltd",
+            "country": "China",
+            "state": null,
+            "date_received": "2016-01-18",
+            "matched_canonical_name": "DJI",
+            "matched_via_alias": "DJI",
+            "match_kind": "sar8_accept",
+            "vendor_primary_category": "drone"
+          },
+          {
+            "fcc_grantee_id": 61139,
+            "grantee_code": "2ANDR",
+            "grantee_name": "SZ DJI Osmo Technology Co.,Ltd.",
+            "country": "China",
+            "state": null,
+            "date_received": "2017-08-15",
+            "matched_canonical_name": "DJI",
+            "matched_via_alias": "DJI",
+            "match_kind": "sar8_accept",
+            "vendor_primary_category": "drone"
           }
         ]
       },
@@ -1539,7 +913,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Sierra Wireless",
             "matched_via_alias": "Sierra Wireless",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": null
           },
           {
@@ -1551,7 +925,7 @@
             "date_received": "1998-09-30",
             "matched_canonical_name": "Sierra Wireless",
             "matched_via_alias": "Sierra Wireless",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": null
           },
           {
@@ -1563,7 +937,7 @@
             "date_received": "2000-08-10",
             "matched_canonical_name": "Sierra Wireless",
             "matched_via_alias": "Sierra Wireless",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": null
           }
         ]
@@ -1582,7 +956,7 @@
             "date_received": "2016-01-05",
             "matched_canonical_name": "Parrot",
             "matched_via_alias": "Parrot",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "drone"
           },
           {
@@ -1594,7 +968,7 @@
             "date_received": "2015-11-13",
             "matched_canonical_name": "Parrot",
             "matched_via_alias": "Parrot",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "drone"
           },
           {
@@ -1606,51 +980,8 @@
             "date_received": "2019-08-09",
             "matched_canonical_name": "Parrot",
             "matched_via_alias": "Parrot",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "drone"
-          }
-        ]
-      },
-      {
-        "canonical_name": "Axon",
-        "primary_category": "body_cam",
-        "match_count": 5,
-        "samples": [
-          {
-            "fcc_grantee_id": 56162,
-            "grantee_code": "2AGVG",
-            "grantee_name": "Axon Product Partners, LLC",
-            "country": "United States",
-            "state": "California",
-            "date_received": "2015-12-11",
-            "matched_canonical_name": "Axon",
-            "matched_via_alias": "Axon",
-            "match_kind": "prefix_token",
-            "vendor_primary_category": "body_cam"
-          },
-          {
-            "fcc_grantee_id": 84785,
-            "grantee_code": "LG2",
-            "grantee_name": "Axon Networks",
-            "country": "United States",
-            "state": "Massachusetts",
-            "date_received": "1998-04-14",
-            "matched_canonical_name": "Axon",
-            "matched_via_alias": "Axon",
-            "match_kind": "prefix_token",
-            "vendor_primary_category": "body_cam"
-          },
-          {
-            "fcc_grantee_id": 88571,
-            "grantee_code": "OPC",
-            "grantee_name": "AXON Systems, Ltd.",
-            "country": "Germany",
-            "state": null,
-            "date_received": "2012-07-11",
-            "matched_canonical_name": "Axon",
-            "matched_via_alias": "Axon",
-            "match_kind": "prefix_token",
-            "vendor_primary_category": "body_cam"
           }
         ]
       },
@@ -1668,7 +999,7 @@
             "date_received": "2017-01-05",
             "matched_canonical_name": "Kenwood",
             "matched_via_alias": "Kenwood",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "police_radio"
           },
           {
@@ -1680,7 +1011,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Kenwood",
             "matched_via_alias": "Kenwood",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "police_radio"
           },
           {
@@ -1692,7 +1023,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Kenwood",
             "matched_via_alias": "Kenwood",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "police_radio"
           }
         ]
@@ -1711,7 +1042,7 @@
             "date_received": "2019-02-23",
             "matched_canonical_name": "Axis Communications",
             "matched_via_alias": "Axis",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "alpr"
           },
           {
@@ -1723,7 +1054,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Axis Communications",
             "matched_via_alias": "Axis",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "alpr"
           },
           {
@@ -1735,8 +1066,51 @@
             "date_received": "1998-04-15",
             "matched_canonical_name": "Axis Communications",
             "matched_via_alias": "Axis",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "alpr"
+          }
+        ]
+      },
+      {
+        "canonical_name": "Axon",
+        "primary_category": "body_cam",
+        "match_count": 4,
+        "samples": [
+          {
+            "fcc_grantee_id": 56162,
+            "grantee_code": "2AGVG",
+            "grantee_name": "Axon Product Partners, LLC",
+            "country": "United States",
+            "state": "California",
+            "date_received": "2015-12-11",
+            "matched_canonical_name": "Axon",
+            "matched_via_alias": "Axon",
+            "match_kind": "sar8_accept",
+            "vendor_primary_category": "body_cam"
+          },
+          {
+            "fcc_grantee_id": 88571,
+            "grantee_code": "OPC",
+            "grantee_name": "AXON Systems, Ltd.",
+            "country": "Germany",
+            "state": null,
+            "date_received": "2012-07-11",
+            "matched_canonical_name": "Axon",
+            "matched_via_alias": "Axon",
+            "match_kind": "sar8_accept",
+            "vendor_primary_category": "body_cam"
+          },
+          {
+            "fcc_grantee_id": 96899,
+            "grantee_code": "WH4",
+            "grantee_name": "Axon Labs",
+            "country": "United States",
+            "state": "Massachusetts",
+            "date_received": "2008-07-09",
+            "matched_canonical_name": "Axon",
+            "matched_via_alias": "Axon",
+            "match_kind": "sar8_accept",
+            "vendor_primary_category": "body_cam"
           }
         ]
       },
@@ -1754,7 +1128,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Jacobs",
             "matched_via_alias": "Jacobs",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "imsi_catcher"
           },
           {
@@ -1766,7 +1140,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Jacobs",
             "matched_via_alias": "Jacobs",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "imsi_catcher"
           },
           {
@@ -1778,7 +1152,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Jacobs",
             "matched_via_alias": "Jacobs",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "imsi_catcher"
           }
         ]
@@ -1796,8 +1170,8 @@
             "state": null,
             "date_received": "2017-05-07",
             "matched_canonical_name": "Reveal",
-            "matched_via_alias": "Reveal Media",
-            "match_kind": "exact_normalized",
+            "matched_via_alias": "Reveal",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "body_cam"
           },
           {
@@ -1809,7 +1183,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Reveal",
             "matched_via_alias": "Reveal",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "body_cam"
           }
         ]
@@ -1828,7 +1202,7 @@
             "date_received": "1998-04-15",
             "matched_canonical_name": "Getac",
             "matched_via_alias": "Getac",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "body_cam"
           },
           {
@@ -1840,7 +1214,7 @@
             "date_received": "2003-03-07",
             "matched_canonical_name": "Getac",
             "matched_via_alias": "Getac",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "body_cam"
           }
         ]
@@ -1859,7 +1233,7 @@
             "date_received": "2017-08-14",
             "matched_canonical_name": "Avigilon",
             "matched_via_alias": "Avigilon",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "alpr"
           }
         ]
@@ -1878,7 +1252,7 @@
             "date_received": "2017-10-02",
             "matched_canonical_name": "Magnet Forensics",
             "matched_via_alias": "Magnet",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "hacking_tool"
           }
         ]
@@ -1897,7 +1271,7 @@
             "date_received": "2018-02-12",
             "matched_canonical_name": "Dedrone",
             "matched_via_alias": "Dedrone",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "drone_detect"
           }
         ]
@@ -1916,7 +1290,7 @@
             "date_received": "2019-06-19",
             "matched_canonical_name": "Skydio",
             "matched_via_alias": "Skydio",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "drone"
           }
         ]
@@ -1935,7 +1309,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Vigilant Solutions",
             "matched_via_alias": "Vigilant",
-            "match_kind": "prefix_token",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "alpr"
           }
         ]
@@ -1954,27 +1328,8 @@
             "date_received": "2003-05-15",
             "matched_canonical_name": "WatchGuard",
             "matched_via_alias": "WatchGuard",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "body_cam"
-          }
-        ]
-      },
-      {
-        "canonical_name": "DJI",
-        "primary_category": "drone",
-        "match_count": 1,
-        "samples": [
-          {
-            "fcc_grantee_id": 91016,
-            "grantee_code": "QT9",
-            "grantee_name": "DJI Innovations Technology Co., Ltd.",
-            "country": "China",
-            "state": null,
-            "date_received": "2012-10-25",
-            "matched_canonical_name": "DJI",
-            "matched_via_alias": "DJI",
-            "match_kind": "prefix_token",
-            "vendor_primary_category": "drone"
           }
         ]
       },
@@ -1992,7 +1347,7 @@
             "date_received": "2007-01-17",
             "matched_canonical_name": "Cradlepoint",
             "matched_via_alias": "Cradlepoint",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": null
           }
         ]
@@ -2011,7 +1366,7 @@
             "date_received": "2008-08-08",
             "matched_canonical_name": "SoundThinking",
             "matched_via_alias": "ShotSpotter",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "gunshot_detect"
           }
         ]
@@ -2030,7 +1385,7 @@
             "date_received": "2009-07-15",
             "matched_canonical_name": "Digital Receiver Technology",
             "matched_via_alias": "Digital Receiver Technology",
-            "match_kind": "exact_normalized",
+            "match_kind": "sar8_accept",
             "vendor_primary_category": "imsi_catcher"
           }
         ]
@@ -3015,7 +2370,7 @@
             "contract_amount_usd": 42998.0,
             "contract_date": "2025-02-20",
             "matched_canonical_name": "BRINC",
-            "matched_via_alias": "BRINC Drones",
+            "matched_via_alias": "BRINC",
             "vendor_primary_category": "drone"
           },
           {
@@ -3026,7 +2381,7 @@
             "contract_amount_usd": 29998.0,
             "contract_date": "2025-02-19",
             "matched_canonical_name": "BRINC",
-            "matched_via_alias": "BRINC Drones",
+            "matched_via_alias": "BRINC",
             "vendor_primary_category": "drone"
           },
           {
@@ -3037,7 +2392,7 @@
             "contract_amount_usd": 20094.0,
             "contract_date": "2024-09-06",
             "matched_canonical_name": "BRINC",
-            "matched_via_alias": "BRINC Drones",
+            "matched_via_alias": "BRINC",
             "vendor_primary_category": "drone"
           }
         ]
@@ -4660,22 +4015,19 @@
   "halt_flags": [
     {
       "class": "new_disambig_class",
-      "description": "_normalize_vendor + strict-vs-permissive split is a vendor-name-disambig predicate beyond the SAR-7 trio. Concrete failures surfaced this pass: 12 strict-path FPs (Axon Networks Inc. \u2260 Axon Enterprise; Flock Audio Inc. \u2260 Flock Safety; Harris Adacom Corp \u2260 Harris Corp; GENETEC Corporation may be distinct from Genetec Inc.) and 20 permissive-path likely-TPs (SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE DJI registration but strict-path drops it because the `SZ ` geographic prefix doesn't suffix-strip). Both classes need CEO ratification before bulk staging.",
-      "stop_the_line_clause": "MAC-39 dispatch \u2014 'Any new disambig class beyond SAR-7 trio \u2192 halt + surface; do NOT bundle silently.'",
-      "ceo_ratification_ask": "(a) Is the vendor-name-disambig predicate in this script the right shape to codify as a SAR-amendment (e.g., SAR-8) before bulk staging?  (b) Should the strict-path be the only one that emits candidates, or should permissive-only matches be staged at confidence \u226430 and treated as FP-pending?  (c) Should `_normalize_vendor` live in a shared module (e.g., db/extraction/vendor_normalize.py) so future extractor passes use the same predicate?"
+      "status": "RESOLVED \u2014 SAR-8 codified (commit 811b4de)",
+      "description": "Vendor-name-disambig predicate now lives in db/extraction/vendor_name_disambig.py and is consumed via vendor_match_disposition. SAR-8 enumerates the FP list (Axon Networks \u00d76 / Flock Audio \u00d72 / Harris Adacom \u00d72 hard-reject; GENETEC Corporation \u00d72 flag_for_review) and the alias allowlist (DJI / Cellebrite). Geographic-prefix list stripped before normalization."
     },
     {
       "class": "section_tension_8_4_vs_11_10",
-      "description": "\u00a78.4 says 'An OUI alone never gets a device_category other than unknown' (broad rule); \u00a711 #10 says 'Do not categorize at the OUI level for multi-purpose vendors' (narrower). Bible \u00a75 Tier 4 example #1 ('Manufacturer Y's only product is body cameras \u2192 flag as body_cam category') is in tension with \u00a78.4. Single-product vendors in \u00a72.1 include Flock (alpr), DJI (drone), Skydio (drone), Cellebrite (hacking_tool), Hak5 (hacking_tool), ShotSpotter/SoundThinking (gunshot_detect), etc.",
-      "stop_the_line_clause": "Phase-5 Step-4 conservative posture: device_category='unknown' for ALL OUI-level inference candidates (strict-\u00a78.4 read). Any deviation requires a SAR-amendment.",
-      "ceo_ratification_ask": "Is the strict-\u00a78.4 read (device_category='unknown' for ALL OUI-level inference, regardless of vendor primary_category) correct? If so, all 525-ish strict candidates land device_category='unknown' and are \u00a711 #13-banned from Talos export \u2014 the inference pass produces analytical-only records, with \u00a711 #13 reconciling against \u00a76 Phase 5 #4 coverage matrix. If a SAR-amendment carves out single-product vendors, those candidates would Talos-export at the vendor primary_category. Recommendation: hold strict-\u00a78.4 in Step-4; revisit at CP5 alongside the export design."
+      "status": "RESOLVED \u2014 strict-\u00a78.4 ratified by board at MAC-1 613ec532 2026-05-06T17:08:16Z",
+      "description": "All OUI-level inference candidates land device_category='unknown'. \u00a711 #13-banned from Talos export. Analytical-only."
     },
     {
       "class": "wave_a_oui_conflict_probe",
-      "description": "no_collision \u2014 IEEE OUI e4:aa:ea registers to Liteon Technology Corporation (not in \u00a72.1 manufacturers); no \u00a72.1-vendor inference candidate emits at this OUI. The Wave-A row stays canonical at MAC-level e4:aa:ea:80:a1:9b (manufacturer=Flock Safety per community-inferred OEM narrative). Liteon attribution remains in raw_observations (IEEE id=85781, Wireshark id=216273) only.",
-      "result": "no_halt_needed",
-      "ceo_ratification_ask": "Confirm the Wave-A canonical row stays at MAC-level granularity; IEEE OUI e4:aa:ea Liteon attribution remains in raw_observations only and is NOT promoted to identifiers as an inference row. (Phase-5 Step-5 dedup pass will not see a conflict here either.)"
+      "status": "RESOLVED \u2014 no_halt_needed (re-confirmed under SAR-8)",
+      "description": "no_collision \u2014 IEEE OUI e4:aa:ea registers to Liteon Technology Corporation (not in \u00a72.1 manufacturers); no \u00a72.1-vendor inference candidate emits at this OUI. The Wave-A row stays canonical at MAC-level e4:aa:ea:80:a1:9b (manufacturer=Flock Safety per community-inferred OEM narrative). Liteon attribution remains in raw_observations (IEEE id=85781, Wireshark id=216273) only."
     }
   ],
-  "validator_summary_recommendation": "Hold bulk staging until CEO ratifies (a) the vendor-name-disambig predicate as a new SAR class (SAR-8 candidate), (b) the \u00a78.4-vs-\u00a711-#10 tension resolution (recommend strict \u00a78.4: device_category='unknown' for all OUI-level inference), (c) Wave-A OUI-conflict-probe result (no conflict; Liteon stays in raw_observations). Per-source candidate counts surfaced; halt-flags surfaced; no \u00a711 hard-rule trips beyond the new-disambig class. Recommend chaining to Step-5 dedup once CEO ratifies the disambig posture; the strict-path can then bulk-stage to identifiers (or a new staging table) for dedup."
+  "validator_summary_recommendation": "SAR-8 wired; bulk-stage executor (sar8_bulk_stage.py) reads this artifact + the SAR-8 predicate and writes ~405 strict-clean inferred rows to identifiers at device_category='unknown' (strict-\u00a78.4) with full \u00a711 attestations. GENETEC Corporation flagged-for-review entries route to extraction_outputs/mac41/sar8_flagged_for_review.json for CEO/board triage."
 }

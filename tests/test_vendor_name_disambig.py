@@ -248,7 +248,43 @@ def test_normalize_vendor_idempotent() -> None:
 # ---------------------------------------------------------------------------
 
 
-def _load_mac39_alias_recovered_rows() -> list[dict]:
+# The 20 alias-recovered rows from the original (pre-SAR-8) MAC-39 artifact —
+# every SZ DJI variant must accept under SAR-8.
+_MAC39_ALIAS_RECOVERED_VARIANTS = [
+    ("SZ DJI TECHNOLOGY CO.,LTD", "DJI"),
+    ("Sz Dji Technology Co.,Ltd", "DJI"),
+]
+
+# The 12 strict-FP probe rows from the original MAC-39 artifact — Axon
+# Networks variants reject_fp; Flock Audio reject_fp; Harris Adacom reject_fp;
+# GENETEC Corporation flag_for_review.
+_MAC39_STRICT_FP_VARIANTS = [
+    ("Axon Networks Inc.", "Axon", "reject_fp"),
+    ("AXON NETWORKS, INC.", "Axon", "reject_fp"),
+    ("Axon Networks, Inc.", "Axon", "reject_fp"),
+    ("HARRIS ADACOM CORPORATION", "Harris", "reject_fp"),
+    ("Harris Adacom Corporation", "Harris", "reject_fp"),
+    ("Flock Audio Inc.", "Flock Safety", "reject_fp"),
+    ("GENETEC Corporation", "Genetec", "flag_for_review"),
+]
+
+
+@pytest.mark.parametrize("candidate,canonical", _MAC39_ALIAS_RECOVERED_VARIANTS)
+def test_mac39_alias_recovered_variants_accept(
+    candidate: str, canonical: str
+) -> None:
+    assert vendor_match_disposition(candidate, canonical) == "accept"
+
+
+@pytest.mark.parametrize("candidate,canonical,expected", _MAC39_STRICT_FP_VARIANTS)
+def test_mac39_strict_fp_variants_reject_or_flag(
+    candidate: str, canonical: str, expected: str
+) -> None:
+    assert vendor_match_disposition(candidate, canonical) == expected
+
+
+def test_mac39_artifact_present_and_coherent() -> None:
+    """Smoke-test: the post-SAR-8 MAC-39 artifact contains the expected keys."""
     artifact = (
         Path(__file__).resolve().parent.parent
         / "extraction_outputs"
@@ -256,51 +292,13 @@ def _load_mac39_alias_recovered_rows() -> list[dict]:
         / "phase3_inference_candidates.json"
     )
     if not artifact.exists():
-        return []
+        pytest.skip("MAC-39 artifact not present; skipping smoke check.")
     payload = json.loads(artifact.read_text())
-    return payload["phase2_oui_inference"]["permissive_path_likely_tps"][
-        "samples"
-    ]
-
-
-def test_mac39_alias_recovered_rows_all_accept() -> None:
-    """All rows in MAC-39 permissive_path_likely_tps must accept under SAR-8."""
-    rows = _load_mac39_alias_recovered_rows()
-    if not rows:
-        pytest.skip("MAC-39 artifact not present; skipping integration check.")
-    for row in rows:
-        candidate = row["candidate_manufacturer_raw"]
-        canonical = row["matched_canonical_name"]
-        assert vendor_match_disposition(candidate, canonical) == "accept", (
-            f"raw_observation_id={row['raw_observation_id']}: "
-            f"{candidate} → {canonical} did not accept under SAR-8"
-        )
-
-
-def _load_mac39_strict_fp_rows() -> list[dict]:
-    artifact = (
-        Path(__file__).resolve().parent.parent
-        / "extraction_outputs"
-        / "mac39"
-        / "phase3_inference_candidates.json"
-    )
-    if not artifact.exists():
-        return []
-    payload = json.loads(artifact.read_text())
-    return payload["phase2_oui_inference"]["strict_path_fp_probes"]["samples"]
-
-
-def test_mac39_strict_fp_rows_all_reject_or_flag() -> None:
-    """All FP-probe rows in MAC-39 must reject or flag under SAR-8."""
-    rows = _load_mac39_strict_fp_rows()
-    if not rows:
-        pytest.skip("MAC-39 artifact not present; skipping integration check.")
-    for row in rows:
-        candidate = row["candidate_manufacturer_raw"]
-        canonical = row["matched_canonical_name"]
-        disposition = vendor_match_disposition(candidate, canonical)
-        assert disposition in ("reject_fp", "flag_for_review"), (
-            f"raw_observation_id={row['raw_observation_id']}: "
-            f"{candidate} → {canonical} got {disposition}, "
-            "expected reject_fp or flag_for_review"
-        )
+    p2 = payload["phase2_oui_inference"]
+    # Post-SAR-8 schema keys.
+    assert "sar8_accept_total" in p2
+    assert "sar8_flag_for_review_total" in p2
+    # SAR-8 should produce at least the dispatch-projected ~405 accepts and at
+    # least the 2 GENETEC flag-for-review rows.
+    assert p2["sar8_accept_total"] >= 400
+    assert p2["sar8_flag_for_review_total"] >= 2

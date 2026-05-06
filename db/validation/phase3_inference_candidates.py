@@ -5,20 +5,19 @@ summarising per-source candidate counts, sample rows, applied disambig +
 hard-rule filters, and the halt-flags that the CEO + board must ratify
 before bulk staging into ``identifiers`` (or a new staging table).
 
-Why JSON-artifact-only (not direct insert into ``identifiers``):
-    The MAC-39 dispatch enumerates "any new disambig class beyond the
-    SAR-7 trio → halt + surface; do NOT bundle silently". The Phase-2
-    IEEE/Wireshark `candidate_manufacturer` field carries free-text
-    vendor names (`SZ DJI TECHNOLOGY CO.,LTD`, `Motorola Solutions
-    Inc.`, `Avigilon Alta`, `WatchGuard Video` vs. `WatchGuard
-    Technologies, Inc.`, etc.). Matching against the §2.1 canonical
-    list requires a normalized vendor-name disambig, which is a
-    SAR-7-class predicate this script implements as ``_normalize_vendor``
-    + the strict/permissive split. CEO + board ratify the disambig
-    posture (and any §8.4-vs-§11-#10 carveout) before promotion.
+SAR-8 wired (commit ``811b4de``) — vendor-name-disambig now lives in
+``db/extraction/vendor_name_disambig.py``. The strict-vs-permissive
+split this script previously implemented is replaced by the SAR-8
+``vendor_match_disposition`` predicate, which returns a 4-state result
+(``accept`` / ``reject_fp`` / ``flag_for_review`` / ``no_match``).
+``GENETEC Corporation`` cases route to a separate flagged-for-review
+artifact (``extraction_outputs/mac41/sar8_flagged_for_review.json``).
 
 Output artifact:
     ``extraction_outputs/mac39/phase3_inference_candidates.json``
+    (re-run idempotent under SAR-8 — modulo timestamp + run metadata)
+    ``extraction_outputs/mac41/sar8_flagged_for_review.json``
+    (GENETEC Corporation triage queue; CEO/board decision-class)
 
 Idempotent — re-running over the same DB state produces byte-identical
 output (modulo the timestamp + run metadata). Re-runs MUST yield zero
@@ -33,8 +32,11 @@ Authority chain:
 - Bible §11 #1 (no fabrication), #7 (provenance), #8 (no confidence drift),
   #10 (multi-purpose OUI categorization), #12 (Pi self-exclude),
   #13 (unknown-category Talos ban), #14 (procurement-only Talos ban).
+- BIBLE_AMENDMENTS.md SAR-1 (LAA-bit penalty), SAR-7 (CVE-FP / DJI-Djibouti
+  / news-prose-FP), SAR-8 (vendor-name-disambig).
 - CP4 brief §4 Step 4 (Phase-3 inference candidate sweep).
-- MAC-39 dispatch.
+- MAC-39 dispatch (Phase-3 inference candidate sweep proposal).
+- MAC-41 dispatch (SAR-8 implementation + bulk-stage at strict §8.4).
 """
 
 from __future__ import annotations
@@ -45,6 +47,11 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+from db.extraction.vendor_name_disambig import (
+    _normalize_vendor,
+    vendor_match_disposition,
+)
 
 DB_PATH = Path(__file__).resolve().parents[1] / "argus.db"
 ARTIFACT_PATH = (
@@ -81,49 +88,10 @@ PI_SELF_EXCLUDE_OUIS = frozenset({
 WAVE_A_MAC = "e4:aa:ea:80:a1:9b"
 WAVE_A_OUI = "e4:aa:ea"
 
-# Vendor-name normalization suffixes — stripped to align IEEE / Wireshark
-# free-text vendor names with the §2.1 canonical-list. Lowercased; order
-# matters (longest first to handle `, inc.` before `, inc`).
-_VENDOR_SUFFIX_STRIPS = (
-    ", inc.", ", inc", " inc.", " inc",
-    ", ltd.", ", ltd", " ltd.", " ltd",
-    ", llc", " llc",
-    ", ulc", " ulc",
-    " corporation", " corp.", " corp",
-    " co.,ltd", " co., ltd", " co.,ltd.", " co., ltd.",
-    " co.,ltd.", " co.ltd.", " co. ltd",
-    " co., limited", ", limited", " limited",
-    " technologies", " technology",
-    " sa", " ag", " ab", " gmbh", " bv", " plc", " spa",
-    ", s.a.", " s.a.",
-    ", inc", " holdings",
-)
-
-
-def _normalize_vendor(name: str) -> str:
-    """Vendor-name disambig predicate — strip corporate suffixes + punctuation.
-
-    NOTE: This is a NEW SAR-class disambig predicate (beyond SAR-7 #1/#2/#3).
-    Per MAC-39 dispatch stop-the-line: any new disambig class halts + surfaces.
-    The predicate is implemented for the strict/permissive split surfaced in
-    the artifact, NOT silently applied at promotion time.
-    """
-    if not name:
-        return ""
-    s = name.lower().strip()
-    # Drop trailing punctuation in chunks.
-    changed = True
-    while changed:
-        changed = False
-        for suf in _VENDOR_SUFFIX_STRIPS:
-            if s.endswith(suf):
-                s = s[: -len(suf)].rstrip(" ,.;:")
-                changed = True
-                break
-    # Collapse whitespace + remove comma/period/semicolon punctuation.
-    s = re.sub(r"[,;:.]+", " ", s)
-    s = re.sub(r"\s+", " ", s).strip()
-    return s
+# Vendor-name normalization (`_normalize_vendor`) + the SAR-8
+# ``vendor_match_disposition`` predicate are imported from
+# ``db.extraction.vendor_name_disambig``. SAR-8 supersedes the
+# strict/permissive split this module used pre-MAC-41.
 
 
 def _connect() -> sqlite3.Connection:
@@ -169,80 +137,87 @@ def is_pi_self_exclude(oui_prefix: str) -> bool:
 
 def build_canonical_lookup(
     manufacturers: list[sqlite3.Row],
-) -> dict[str, dict[str, Any]]:
-    """Build a normalized-vendor-name → canonical-row lookup from §2.1 set.
+) -> list[dict[str, Any]]:
+    """Build the §2.1 canonical lexicon — list of (canonical_name, aliases, …).
 
-    Returns a dict keyed by normalized name (lowercase, suffix-stripped),
-    valued by ``{canonical_name, primary_category, alias_used}``. The §2.1
-    aliases column is comma-separated.
+    Each entry is a dict with ``canonical_name``, ``primary_category``, and
+    ``alias_strings`` (the canonical name itself plus the comma-separated
+    ``aliases`` column from ``manufacturers``). Callers iterate this list and
+    invoke SAR-8 :func:`vendor_match_disposition` against each ``alias_string``
+    to find the first canonical match (or flag-for-review).
     """
-    lookup: dict[str, dict[str, Any]] = {}
+    lexicon: list[dict[str, Any]] = []
     for row in manufacturers:
         cn = row["canonical_name"]
-        primary_category = row["primary_category"]
-        alias_list = [cn] + [
+        alias_strings = [cn] + [
             a.strip() for a in (row["aliases"] or "").split(",") if a.strip()
         ]
-        for alias in alias_list:
-            norm = _normalize_vendor(alias)
-            if not norm:
-                continue
-            # First registration wins; aliases shouldn't conflict across vendors.
-            if norm not in lookup:
-                lookup[norm] = {
+        lexicon.append(
+            {
+                "canonical_name": cn,
+                "primary_category": row["primary_category"],
+                "alias_strings": alias_strings,
+            }
+        )
+    return lexicon
+
+
+def sar8_match(
+    candidate_name: str, lexicon: list[dict[str, Any]]
+) -> dict[str, Any] | None:
+    """SAR-8-shaped match against the §2.1 canonical lexicon.
+
+    Iterates over each manufacturer × alias-string and invokes
+    :func:`vendor_match_disposition`. Returns:
+
+    - first ``accept`` hit (with ``disposition='accept'`` + ``alias_used`` +
+      ``match_kind`` derived from how SAR-8 matched) — preferred outcome.
+    - first ``flag_for_review`` hit if no ``accept`` was found — the
+      candidate routes to the human-triage artifact.
+    - ``None`` if neither an accept nor a flag was produced.
+    """
+    flagged: dict[str, Any] | None = None
+    for entry in lexicon:
+        cn = entry["canonical_name"]
+        primary = entry["primary_category"]
+        for alias in entry["alias_strings"]:
+            disposition = vendor_match_disposition(candidate_name, alias)
+            if disposition == "accept":
+                return {
                     "canonical_name": cn,
-                    "primary_category": primary_category,
+                    "primary_category": primary,
                     "alias_used": alias,
+                    "disposition": "accept",
+                    "match_kind": "sar8_accept",
+                    "candidate_normalized": _normalize_vendor(candidate_name),
                 }
-    return lookup
+            if disposition == "flag_for_review" and flagged is None:
+                flagged = {
+                    "canonical_name": cn,
+                    "primary_category": primary,
+                    "alias_used": alias,
+                    "disposition": "flag_for_review",
+                    "match_kind": "sar8_flag_for_review",
+                    "candidate_normalized": _normalize_vendor(candidate_name),
+                }
+    return flagged
 
 
 def strict_match(
-    candidate_name: str, canonical_lookup: dict[str, dict[str, Any]]
+    candidate_name: str, lexicon: list[dict[str, Any]]
 ) -> dict[str, Any] | None:
-    """Strict normalized match — full-string equality after suffix-strip.
+    """Backwards-compatible alias for :func:`sar8_match` (accept-only).
 
-    Falls back to alias-prefix-equality (`alias` then a delimiter) for
-    sub-brand names like `Avigilon Alta` (matches `Avigilon`) and
-    `WatchGuard Video` (matches `WatchGuard`). Multi-token sub-brands
-    where the alias is a prefix-token-match are accepted.
+    Returns the SAR-8 accept hit, or ``None`` if the candidate flagged-for-
+    review or no_match. Flagged-for-review hits surface separately via
+    :func:`sar8_match`.
     """
-    norm = _normalize_vendor(candidate_name)
-    if not norm:
+    hit = sar8_match(candidate_name, lexicon)
+    if hit is None:
         return None
-    if norm in canonical_lookup:
-        match = dict(canonical_lookup[norm])
-        match["match_kind"] = "exact_normalized"
-        match["candidate_normalized"] = norm
-        return match
-    # Prefix-token match — `avigilon alta` starts-with `avigilon` + space.
-    for alias_norm, row in canonical_lookup.items():
-        if norm.startswith(alias_norm + " "):
-            match = dict(row)
-            match["match_kind"] = "prefix_token"
-            match["candidate_normalized"] = norm
-            return match
-    return None
-
-
-def permissive_match(
-    candidate_name: str, canonical_lookup: dict[str, dict[str, Any]]
-) -> dict[str, Any] | None:
-    """Permissive substring match — alias-substring-in-candidate-normalized.
-
-    This is the intentionally-noisy match the strict path is filtering out.
-    Surfaced separately so the CEO + board can review the FP density.
-    """
-    norm = _normalize_vendor(candidate_name)
-    if not norm:
+    if hit["disposition"] != "accept":
         return None
-    for alias_norm, row in canonical_lookup.items():
-        if alias_norm and alias_norm in norm:
-            match = dict(row)
-            match["match_kind"] = "permissive_substring"
-            match["candidate_normalized"] = norm
-            return match
-    return None
+    return hit
 
 
 def _candidate_row(
@@ -317,126 +292,16 @@ def _candidate_row(
     }
 
 
-_STRICT_PATH_FP_PROBE_NEEDLES: tuple[tuple[str, str, str, str], ...] = (
-    # (canonical_match, candidate_substring, why_fp, suspect_other_vendor)
-    (
-        "Axon",
-        "axon networks",
-        "Axon Networks Inc. is a network-gear vendor distinct from Axon "
-        "Enterprise (TASER International legacy / body-cam vendor in §2.1).",
-        "Axon Networks Inc. (unaffiliated network gear)",
-    ),
-    (
-        "Flock Safety",
-        "flock audio",
-        "Flock Audio Inc. is a Canadian audio-equipment company unrelated "
-        "to Flock Safety (the §2.1 alpr vendor). The bare alias `Flock` in "
-        "manufacturers.aliases captures both.",
-        "Flock Audio Inc. (audio equipment)",
-    ),
-    (
-        "Genetec",
-        "genetec corporation",
-        "GENETEC Corporation (early-2000s OUI registration, address Tokyo) "
-        "may be a separate Japanese entity from Genetec Inc. (Montreal, the "
-        "§2.1 alpr vendor). Verify before staging — the OUIs `00:0a:b1` "
-        "predate Genetec Inc.'s typical FCC/IEEE-registration era.",
-        "GENETEC Corporation (possibly distinct entity)",
-    ),
-    (
-        "Harris",
-        "harris adacom",
-        "HARRIS ADACOM CORPORATION is a 1990s networking-products vendor "
-        "distinct from Harris Corporation (the §2.1 imsi_catcher vendor).",
-        "Harris Adacom Corporation",
-    ),
-)
-
-_PERMISSIVE_PATH_LIKELY_TP_NEEDLES: tuple[tuple[str, str, str], ...] = (
-    # (canonical_match, candidate_substring, reason_likely_tp)
-    (
-        "DJI",
-        "sz dji technology",
-        "SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE-registered name "
-        "for DJI (§2.1 drone vendor). Strict-path missed it because the "
-        "company-prefix `SZ ` (Shenzhen) doesn't suffix-strip; normalization "
-        "yields `sz dji` ≠ `dji`. CEO should ratify whether this is added "
-        "to manufacturers.aliases or whether the predicate handles geographic "
-        "prefixes natively.",
-    ),
-    (
-        "Cellebrite",
-        "cellebrite mobile synchronization",
-        "CelleBrite Mobile Synchronization (early 2000s OUI) is the same "
-        "entity as Cellebrite (the §2.1 hacking_tool vendor) — Cellebrite "
-        "originated as a mobile-data-sync company before pivoting to "
-        "forensics.",
-    ),
-)
-
-
-def _probe_strict_fps(
-    strict_rows: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
-    """Return strict-path rows that match the FP probe needles."""
-    hits: list[dict[str, Any]] = []
-    for row in strict_rows:
-        manuf_l = (row["candidate_manufacturer_raw"] or "").lower()
-        for canonical, needle, why, suspect in _STRICT_PATH_FP_PROBE_NEEDLES:
-            if (
-                row["matched_canonical_name"] == canonical
-                and needle in manuf_l
-            ):
-                hits.append(
-                    {
-                        "raw_observation_id": row["raw_observation_id"],
-                        "source_id": row["source_id"],
-                        "candidate_identifier": row["candidate_identifier"],
-                        "candidate_manufacturer_raw": row[
-                            "candidate_manufacturer_raw"
-                        ],
-                        "matched_canonical_name": canonical,
-                        "fp_reason": why,
-                        "suspect_other_vendor": suspect,
-                    }
-                )
-                break
-    return hits
-
-
-def _probe_permissive_tps(
-    permissive_only_rows: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
-    """Return permissive-only rows that match the missed-TP probe needles."""
-    hits: list[dict[str, Any]] = []
-    for row in permissive_only_rows:
-        manuf_l = (row["candidate_manufacturer_raw"] or "").lower()
-        for canonical, needle, reason in _PERMISSIVE_PATH_LIKELY_TP_NEEDLES:
-            if (
-                row["matched_canonical_name"] == canonical
-                and needle in manuf_l
-            ):
-                hits.append(
-                    {
-                        "raw_observation_id": row["raw_observation_id"],
-                        "source_id": row["source_id"],
-                        "candidate_identifier": row["candidate_identifier"],
-                        "candidate_manufacturer_raw": row[
-                            "candidate_manufacturer_raw"
-                        ],
-                        "matched_canonical_name": canonical,
-                        "missed_tp_reason": reason,
-                    }
-                )
-                break
-    return hits
-
-
 def sweep_phase2_oui_inference(
     conn: sqlite3.Connection,
-    canonical_lookup: dict[str, dict[str, Any]],
+    lexicon: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """Class D — Phase-2 IEEE/Wireshark OUI/MAC-range × §2.1 canonical match."""
+    """Class D — Phase-2 IEEE/Wireshark OUI/MAC-range × §2.1 canonical match.
+
+    SAR-8 wired: alias-recovered candidates (e.g. ``SZ DJI TECHNOLOGY CO.,LTD``)
+    accept as canonical matches; strict-path FPs (Axon Networks, Flock Audio,
+    Harris Adacom) reject; ``GENETEC Corporation`` flags-for-review.
+    """
     cur = conn.execute(
         """SELECT id, source_id, source_url, candidate_identifier,
                   candidate_type, candidate_manufacturer
@@ -444,51 +309,54 @@ def sweep_phase2_oui_inference(
             WHERE candidate_type IN ('oui','mac_range')
               AND candidate_manufacturer IS NOT NULL"""
     )
-    strict_rows: list[dict[str, Any]] = []
-    permissive_only_rows: list[dict[str, Any]] = []
-    seen_strict_ids: set[int] = set()
+    accept_rows: list[dict[str, Any]] = []
+    flag_rows: list[dict[str, Any]] = []
 
     for raw in cur.fetchall():
-        s_match = strict_match(raw["candidate_manufacturer"], canonical_lookup)
-        if s_match is not None:
-            strict_rows.append(_candidate_row(raw, s_match, match_path="strict"))
-            seen_strict_ids.add(raw["id"])
-
-    cur = conn.execute(
-        """SELECT id, source_id, source_url, candidate_identifier,
-                  candidate_type, candidate_manufacturer
-             FROM raw_observations
-            WHERE candidate_type IN ('oui','mac_range')
-              AND candidate_manufacturer IS NOT NULL"""
-    )
-    for raw in cur.fetchall():
-        if raw["id"] in seen_strict_ids:
+        hit = sar8_match(raw["candidate_manufacturer"], lexicon)
+        if hit is None:
             continue
-        p_match = permissive_match(raw["candidate_manufacturer"], canonical_lookup)
-        if p_match is not None:
-            permissive_only_rows.append(
-                _candidate_row(raw, p_match, match_path="permissive")
+        if hit["disposition"] == "accept":
+            accept_rows.append(_candidate_row(raw, hit, match_path="strict"))
+        elif hit["disposition"] == "flag_for_review":
+            flag_rows.append(
+                {
+                    "raw_observation_id": raw["id"],
+                    "source_id": raw["source_id"],
+                    "source_url": raw["source_url"],
+                    "candidate_identifier": raw["candidate_identifier"],
+                    "candidate_type": raw["candidate_type"],
+                    "candidate_manufacturer_raw": raw["candidate_manufacturer"],
+                    "matched_canonical_name": hit["canonical_name"],
+                    "matched_via_alias": hit["alias_used"],
+                    "vendor_primary_category": hit["primary_category"],
+                    "disposition": "flag_for_review",
+                    "reason": (
+                        "GENETEC Corporation (early-2000s OUI registration, "
+                        "address Tokyo) may be a separate Japanese entity "
+                        "from Genetec Inc. (Montreal, the §2.1 alpr vendor). "
+                        "Routes to extraction_outputs/mac41/sar8_flagged_for_"
+                        "review.json for CEO/board triage; NOT bulk-staged."
+                    ),
+                }
             )
 
-    strict_path_fp_probes = _probe_strict_fps(strict_rows)
-    permissive_path_likely_tps = _probe_permissive_tps(permissive_only_rows)
-
-    # Per-vendor breakdown, strict path.
+    # Per-vendor breakdown of accept set.
     by_vendor: dict[str, dict[str, Any]] = {}
-    for row in strict_rows:
+    for row in accept_rows:
         cn = row["matched_canonical_name"]
         bucket = by_vendor.setdefault(
             cn,
             {
                 "canonical_name": cn,
                 "primary_category": row["vendor_primary_category"],
-                "strict_count": 0,
+                "accept_count": 0,
                 "pre_filter_drop_count": 0,
                 "laa_bit_count": 0,
                 "samples": [],
             },
         )
-        bucket["strict_count"] += 1
+        bucket["accept_count"] += 1
         if row["pre_filter_drop"]:
             bucket["pre_filter_drop_count"] += 1
         if "SAR-1_laa_bit_set" in row["flags"]:
@@ -503,69 +371,41 @@ def sweep_phase2_oui_inference(
                         "candidate_manufacturer_raw"
                     ],
                     "match_kind": row["match_kind"],
+                    "matched_via_alias": row["matched_via_alias"],
                     "confidence_proposed": row["confidence_proposed"],
                     "flags": row["flags"],
                 }
             )
 
-    # Wave-A OUI-conflict probe — would any strict candidate land at e4:aa:ea?
+    # Wave-A OUI-conflict probe — would any accepted candidate land at e4:aa:ea?
     wave_a_oui_collision = [
         row
-        for row in strict_rows
+        for row in accept_rows
         if row["candidate_identifier"].lower().startswith(WAVE_A_OUI)
     ]
 
-    # Permissive-only sample for FP review.
-    permissive_only_samples = permissive_only_rows[:20]
-
     return {
         "phase2_oui_inference": {
-            "strict_match_total": len(strict_rows),
-            "strict_match_pre_filter_drops": sum(
-                1 for r in strict_rows if r["pre_filter_drop"]
+            "sar8_accept_total": len(accept_rows),
+            "sar8_accept_pre_filter_drops": sum(
+                1 for r in accept_rows if r["pre_filter_drop"]
             ),
-            "strict_match_laa_bit_count": sum(
-                1 for r in strict_rows if "SAR-1_laa_bit_set" in r["flags"]
+            "sar8_accept_laa_bit_count": sum(
+                1 for r in accept_rows if "SAR-1_laa_bit_set" in r["flags"]
             ),
-            "strict_match_post_filter_stageable": sum(
-                1 for r in strict_rows if not r["pre_filter_drop"]
+            "sar8_accept_post_filter_stageable": sum(
+                1 for r in accept_rows if not r["pre_filter_drop"]
             ),
-            "permissive_only_total": len(permissive_only_rows),
-            "permissive_only_samples": permissive_only_samples,
+            "sar8_flag_for_review_total": len(flag_rows),
+            "sar8_flag_for_review_samples": flag_rows[:20],
             "by_vendor": sorted(
                 by_vendor.values(),
-                key=lambda x: -x["strict_count"],
+                key=lambda x: -x["accept_count"],
             ),
-            "strict_path_fp_probes": {
-                "count": len(strict_path_fp_probes),
-                "samples": strict_path_fp_probes[:20],
-                "interpretation": (
-                    "These rows match the strict-path predicate but are likely "
-                    "false positives — distinct corporate entities sharing a "
-                    "vendor-token prefix. CEO should ratify whether to (a) "
-                    "tighten the predicate (e.g., per-vendor allowlist of "
-                    "alias variants), (b) add the FP entities to a vendor-name "
-                    "blocklist, or (c) accept the FP rate at the staged "
-                    "device_category='unknown' confidence floor."
-                ),
-            },
-            "permissive_path_likely_tps": {
-                "count": len(permissive_path_likely_tps),
-                "samples": permissive_path_likely_tps[:20],
-                "interpretation": (
-                    "These rows are in the permissive-only bucket but are "
-                    "likely true positives the strict-path missed. The most "
-                    "important miss is `SZ DJI TECHNOLOGY CO.,LTD` — DJI's "
-                    "canonical IEEE registration name. CEO should ratify "
-                    "whether to add `SZ DJI` (and similar geographic-prefix "
-                    "variants) to manufacturers.aliases, or whether the "
-                    "predicate should handle geographic prefixes natively."
-                ),
-            },
             "wave_a_oui_collision": {
                 "wave_a_oui": WAVE_A_OUI,
                 "wave_a_mac": WAVE_A_MAC,
-                "strict_inference_rows_at_oui": len(wave_a_oui_collision),
+                "accept_inference_rows_at_oui": len(wave_a_oui_collision),
                 "halt_flag": (
                     "no_collision — IEEE OUI e4:aa:ea registers to Liteon "
                     "Technology Corporation (not in §2.1 manufacturers); no "
@@ -577,9 +417,9 @@ def sweep_phase2_oui_inference(
                 )
                 if not wave_a_oui_collision
                 else (
-                    "COLLISION — strict inference candidate at OUI e4:aa:ea "
-                    "would conflict with Wave-A canonical row. Halt-the-line "
-                    "per MAC-39 dispatch stop-the-line clause."
+                    "COLLISION — SAR-8-accept inference candidate at OUI "
+                    "e4:aa:ea would conflict with Wave-A canonical row. "
+                    "Halt-the-line per MAC-39 dispatch stop-the-line clause."
                 ),
             },
         }
@@ -588,7 +428,7 @@ def sweep_phase2_oui_inference(
 
 def sweep_fcc_grantees(
     conn: sqlite3.Connection,
-    canonical_lookup: dict[str, dict[str, Any]],
+    lexicon: list[dict[str, Any]],
 ) -> dict[str, Any]:
     """Class A — FCC grantees × §2.1 canonical match.
 
@@ -605,7 +445,7 @@ def sweep_fcc_grantees(
     matches: list[dict[str, Any]] = []
     by_vendor: dict[str, dict[str, Any]] = {}
     for r in cur.fetchall():
-        m = strict_match(r["grantee_name"], canonical_lookup)
+        m = strict_match(r["grantee_name"], lexicon)
         if m is None:
             continue
         cn = m["canonical_name"]
@@ -656,7 +496,7 @@ def sweep_fcc_grantees(
 
 def sweep_procurement_records(
     conn: sqlite3.Connection,
-    canonical_lookup: dict[str, dict[str, Any]],
+    lexicon: list[dict[str, Any]],
 ) -> dict[str, Any]:
     """Class B — procurement_records × §2.1 canonical match.
 
@@ -671,7 +511,7 @@ def sweep_procurement_records(
     matches: list[dict[str, Any]] = []
     by_vendor: dict[str, dict[str, Any]] = {}
     for r in cur.fetchall():
-        m = strict_match(r["vendor_canonical_name"], canonical_lookup)
+        m = strict_match(r["vendor_canonical_name"], lexicon)
         if m is None:
             continue
         cn = m["canonical_name"]
@@ -720,7 +560,7 @@ def sweep_procurement_records(
 
 def sweep_deployment_observations(
     conn: sqlite3.Connection,
-    canonical_lookup: dict[str, dict[str, Any]],
+    lexicon: list[dict[str, Any]],
 ) -> dict[str, Any]:
     """Class C — deployment_observations × §2.1 canonical match.
 
@@ -737,7 +577,7 @@ def sweep_deployment_observations(
     matches: list[dict[str, Any]] = []
     by_vendor: dict[str, dict[str, Any]] = {}
     for r in cur.fetchall():
-        m = strict_match(r["vendor_raw"], canonical_lookup)
+        m = strict_match(r["vendor_raw"], lexicon)
         if m is None:
             continue
         cn = m["canonical_name"]
@@ -831,128 +671,81 @@ def sweep_wigle_anchors(conn: sqlite3.Connection) -> dict[str, Any]:
     }
 
 
+FLAGGED_FOR_REVIEW_ARTIFACT_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "extraction_outputs"
+    / "mac41"
+    / "sar8_flagged_for_review.json"
+)
+
+
 def evaluate() -> dict[str, Any]:
     conn = _connect()
     try:
         manufacturers = conn.execute(
             "SELECT id, canonical_name, aliases, primary_category FROM manufacturers"
         ).fetchall()
-        canonical_lookup = build_canonical_lookup(manufacturers)
+        lexicon = build_canonical_lookup(manufacturers)
 
-        phase2 = sweep_phase2_oui_inference(conn, canonical_lookup)
-        fcc = sweep_fcc_grantees(conn, canonical_lookup)
-        proc = sweep_procurement_records(conn, canonical_lookup)
-        deploy = sweep_deployment_observations(conn, canonical_lookup)
+        phase2 = sweep_phase2_oui_inference(conn, lexicon)
+        fcc = sweep_fcc_grantees(conn, lexicon)
+        proc = sweep_procurement_records(conn, lexicon)
+        deploy = sweep_deployment_observations(conn, lexicon)
         wigle = sweep_wigle_anchors(conn)
 
         identifiers_count = conn.execute(
             "SELECT COUNT(*) AS n FROM identifiers"
         ).fetchone()["n"]
 
-        # Halt-the-line surface — the dispatch enumerates three halt classes.
-        halt_flags = []
-
-        # Halt #1 — vendor-name-disambig is a NEW SAR-class predicate.
-        strict_fp_count = phase2["phase2_oui_inference"][
-            "strict_path_fp_probes"
-        ]["count"]
-        permissive_tp_count = phase2["phase2_oui_inference"][
-            "permissive_path_likely_tps"
-        ]["count"]
-        halt_flags.append(
+        # Halt-the-line surface — under SAR-8 the original 3 halts are
+        # closed (#1 SAR-8 codified, #2 strict-§8.4 ratified at MAC-1
+        # 613ec532, #3 no Wave-A OUI collision). Re-stated here for the
+        # audit trail.
+        halt_flags = [
             {
                 "class": "new_disambig_class",
+                "status": "RESOLVED — SAR-8 codified (commit 811b4de)",
                 "description": (
-                    "_normalize_vendor + strict-vs-permissive split is a "
-                    "vendor-name-disambig predicate beyond the SAR-7 trio. "
-                    "Concrete failures surfaced this pass: "
-                    f"{strict_fp_count} strict-path FPs (Axon Networks Inc. "
-                    f"≠ Axon Enterprise; Flock Audio Inc. ≠ Flock Safety; "
-                    f"Harris Adacom Corp ≠ Harris Corp; GENETEC Corporation "
-                    f"may be distinct from Genetec Inc.) and "
-                    f"{permissive_tp_count} permissive-path likely-TPs "
-                    f"(SZ DJI TECHNOLOGY CO.,LTD is the canonical IEEE "
-                    f"DJI registration but strict-path drops it because the "
-                    f"`SZ ` geographic prefix doesn't suffix-strip). "
-                    "Both classes need CEO ratification before bulk staging."
+                    "Vendor-name-disambig predicate now lives in "
+                    "db/extraction/vendor_name_disambig.py and is consumed "
+                    "via vendor_match_disposition. SAR-8 enumerates the "
+                    "FP list (Axon Networks ×6 / Flock Audio ×2 / Harris "
+                    "Adacom ×2 hard-reject; GENETEC Corporation ×2 "
+                    "flag_for_review) and the alias allowlist (DJI / "
+                    "Cellebrite). Geographic-prefix list stripped before "
+                    "normalization."
                 ),
-                "stop_the_line_clause": (
-                    "MAC-39 dispatch — 'Any new disambig class beyond SAR-7 "
-                    "trio → halt + surface; do NOT bundle silently.'"
-                ),
-                "ceo_ratification_ask": (
-                    "(a) Is the vendor-name-disambig predicate in this script "
-                    "the right shape to codify as a SAR-amendment "
-                    "(e.g., SAR-8) before bulk staging?  "
-                    "(b) Should the strict-path be the only one that emits "
-                    "candidates, or should permissive-only matches be staged "
-                    "at confidence ≤30 and treated as FP-pending?  "
-                    "(c) Should `_normalize_vendor` live in a shared module "
-                    "(e.g., db/extraction/vendor_normalize.py) so future "
-                    "extractor passes use the same predicate?"
-                ),
-            }
-        )
-
-        # Halt #2 — §8.4 vs §11 #10 tension on OUI-level categorization.
-        halt_flags.append(
+            },
             {
                 "class": "section_tension_8_4_vs_11_10",
+                "status": (
+                    "RESOLVED — strict-§8.4 ratified by board at MAC-1 "
+                    "613ec532 2026-05-06T17:08:16Z"
+                ),
                 "description": (
-                    "§8.4 says 'An OUI alone never gets a device_category "
-                    "other than unknown' (broad rule); §11 #10 says 'Do not "
-                    "categorize at the OUI level for multi-purpose vendors' "
-                    "(narrower). Bible §5 Tier 4 example #1 ('Manufacturer Y's "
-                    "only product is body cameras → flag as body_cam category') "
-                    "is in tension with §8.4. Single-product vendors in §2.1 "
-                    "include Flock (alpr), DJI (drone), Skydio (drone), "
-                    "Cellebrite (hacking_tool), Hak5 (hacking_tool), "
-                    "ShotSpotter/SoundThinking (gunshot_detect), etc."
+                    "All OUI-level inference candidates land "
+                    "device_category='unknown'. §11 #13-banned from Talos "
+                    "export. Analytical-only."
                 ),
-                "stop_the_line_clause": (
-                    "Phase-5 Step-4 conservative posture: device_category="
-                    "'unknown' for ALL OUI-level inference candidates "
-                    "(strict-§8.4 read). Any deviation requires a SAR-amendment."
-                ),
-                "ceo_ratification_ask": (
-                    "Is the strict-§8.4 read (device_category='unknown' for ALL "
-                    "OUI-level inference, regardless of vendor primary_category) "
-                    "correct? If so, all 525-ish strict candidates land "
-                    "device_category='unknown' and are §11 #13-banned from Talos "
-                    "export — the inference pass produces analytical-only "
-                    "records, with §11 #13 reconciling against §6 Phase 5 #4 "
-                    "coverage matrix. If a SAR-amendment carves out single-"
-                    "product vendors, those candidates would Talos-export at "
-                    "the vendor primary_category. Recommendation: hold strict-"
-                    "§8.4 in Step-4; revisit at CP5 alongside the export design."
-                ),
-            }
-        )
-
-        # Halt #3 — Wave-A OUI-conflict probe (clean: no §2.1 inference at the OUI).
-        halt_flags.append(
+            },
             {
                 "class": "wave_a_oui_conflict_probe",
+                "status": "RESOLVED — no_halt_needed (re-confirmed under SAR-8)",
                 "description": phase2["phase2_oui_inference"][
                     "wave_a_oui_collision"
                 ]["halt_flag"],
-                "result": "no_halt_needed",
-                "ceo_ratification_ask": (
-                    "Confirm the Wave-A canonical row stays at MAC-level "
-                    "granularity; IEEE OUI e4:aa:ea Liteon attribution remains "
-                    "in raw_observations only and is NOT promoted to "
-                    "identifiers as an inference row. (Phase-5 Step-5 dedup "
-                    "pass will not see a conflict here either.)"
-                ),
-            }
-        )
+            },
+        ]
 
         return {
             "_meta": {
                 "produced_at_utc": datetime.now(timezone.utc).isoformat(),
                 "validator_agent_id": "da137694-2efe-4589-8150-828dcab881fb",
-                "phase_5_step": "Step-4 (Phase-3 inference candidate sweep, Tier 4)",
-                "issue_chain": "MAC-36 → MAC-39",
+                "phase_5_step": (
+                    "Step-4 follow-on (Phase-3 inference candidate sweep, "
+                    "Tier 4) — SAR-8 wired"
+                ),
+                "issue_chain": "MAC-36 → MAC-39 → MAC-41",
                 "bible_sections": (
                     "§5 Tier 4, §6 Phase 5 #3, §7.4, §8.2, §8.4, "
                     "§11 #1/#7/#8/#10/#12/#13/#14"
@@ -961,20 +754,20 @@ def evaluate() -> dict[str, Any]:
                     "SAR-1 (LAA bit penalty)",
                     "SAR-5 (PII discipline — N/A this pass; no PII surfaces)",
                     "SAR-7 #1/#2/#3 (codified for Step-1; not invoked in Step-4)",
+                    "SAR-8 (vendor-name-disambig + alias allowlist + geo-prefix)",
                 ],
                 "promotion_status": (
-                    "PROPOSAL ONLY — no rows written to identifiers. CEO + "
-                    "board ratify the disambig predicate + §8.4-vs-§11-#10 "
-                    "tension before bulk staging. JSON-artifact-only schema "
-                    "fit per MAC-39 dispatch (Validator picks cleanest)."
+                    "PROPOSAL ONLY — no rows written to identifiers from this "
+                    "script. Bulk-staging into identifiers happens via the "
+                    "MAC-41 bulk-stage executor (db/validation/sar8_bulk_stage.py)."
                 ),
                 "db_writes_this_pass": 0,
                 "identifiers_table_row_count": identifiers_count,
             },
-            "canonical_manufacturer_lookup_size": len(canonical_lookup),
-            "canonical_manufacturer_lookup_keys_sample": sorted(
-                canonical_lookup.keys()
-            )[:30],
+            "canonical_lexicon_size": len(lexicon),
+            "canonical_lexicon_canonical_names": sorted(
+                e["canonical_name"] for e in lexicon
+            ),
             **phase2,
             **fcc,
             **proc,
@@ -982,20 +775,45 @@ def evaluate() -> dict[str, Any]:
             **wigle,
             "halt_flags": halt_flags,
             "validator_summary_recommendation": (
-                "Hold bulk staging until CEO ratifies (a) the vendor-name-"
-                "disambig predicate as a new SAR class (SAR-8 candidate), "
-                "(b) the §8.4-vs-§11-#10 tension resolution (recommend strict "
-                "§8.4: device_category='unknown' for all OUI-level inference), "
-                "(c) Wave-A OUI-conflict-probe result (no conflict; Liteon stays "
-                "in raw_observations). Per-source candidate counts surfaced; "
-                "halt-flags surfaced; no §11 hard-rule trips beyond the new-"
-                "disambig class. Recommend chaining to Step-5 dedup once CEO "
-                "ratifies the disambig posture; the strict-path can then bulk-"
-                "stage to identifiers (or a new staging table) for dedup."
+                "SAR-8 wired; bulk-stage executor (sar8_bulk_stage.py) reads "
+                "this artifact + the SAR-8 predicate and writes ~405 strict-"
+                "clean inferred rows to identifiers at device_category="
+                "'unknown' (strict-§8.4) with full §11 attestations. GENETEC "
+                "Corporation flagged-for-review entries route to "
+                "extraction_outputs/mac41/sar8_flagged_for_review.json for "
+                "CEO/board triage."
             ),
         }
     finally:
         conn.close()
+
+
+def _write_flagged_for_review_artifact(
+    payload: dict[str, Any], path: Path
+) -> dict[str, Any]:
+    """Write the GENETEC Corporation triage queue artifact."""
+    flagged = payload["phase2_oui_inference"]["sar8_flag_for_review_samples"]
+    out = {
+        "_meta": {
+            "produced_at_utc": datetime.now(timezone.utc).isoformat(),
+            "validator_agent_id": "da137694-2efe-4589-8150-828dcab881fb",
+            "phase_5_step": "Step-4 follow-on (MAC-41) — SAR-8 flagged-for-review",
+            "issue_chain": "MAC-36 → MAC-39 → MAC-41",
+            "amendments_applied": ["SAR-8 (flag_for_review third state)"],
+            "rationale": (
+                "GENETEC Corporation (early-2000s OUI registration, address "
+                "Tokyo) may be distinct from Genetec Inc. (Montreal, the §2.1 "
+                "alpr vendor). SAR-8 routes these rows here for CEO/board "
+                "triage; they are NOT bulk-staged to identifiers."
+            ),
+            "decision_class": "CEO/board (not Validator)",
+        },
+        "flagged_count": len(flagged),
+        "flagged_rows": flagged,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(out, indent=2, default=str) + "\n")
+    return out
 
 
 def main() -> None:
@@ -1003,15 +821,24 @@ def main() -> None:
     ARTIFACT_PATH.parent.mkdir(parents=True, exist_ok=True)
     ARTIFACT_PATH.write_text(json.dumps(payload, indent=2, default=str) + "\n")
     print(f"Artifact written: {ARTIFACT_PATH}")
+
+    flagged = _write_flagged_for_review_artifact(
+        payload, FLAGGED_FOR_REVIEW_ARTIFACT_PATH
+    )
+    print(
+        f"Flagged-for-review artifact written: {FLAGGED_FOR_REVIEW_ARTIFACT_PATH} "
+        f"(count={flagged['flagged_count']})"
+    )
+
     summary = {
-        "phase2_strict_match_total": payload["phase2_oui_inference"][
-            "strict_match_total"
+        "phase2_sar8_accept_total": payload["phase2_oui_inference"][
+            "sar8_accept_total"
         ],
-        "phase2_strict_match_post_filter_stageable": payload[
+        "phase2_sar8_accept_post_filter_stageable": payload[
             "phase2_oui_inference"
-        ]["strict_match_post_filter_stageable"],
-        "phase2_permissive_only_total": payload["phase2_oui_inference"][
-            "permissive_only_total"
+        ]["sar8_accept_post_filter_stageable"],
+        "phase2_sar8_flag_for_review_total": payload["phase2_oui_inference"][
+            "sar8_flag_for_review_total"
         ],
         "fcc_grantees_match_total": payload["fcc_grantees_inference"][
             "total_match_count"
