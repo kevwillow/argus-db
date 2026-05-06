@@ -50,6 +50,7 @@ from typing import Any
 
 from db.extraction.vendor_name_disambig import (
     _normalize_vendor,
+    alias_equality,
     vendor_match_disposition,
 )
 
@@ -165,39 +166,57 @@ def build_canonical_lookup(
 def sar8_match(
     candidate_name: str, lexicon: list[dict[str, Any]]
 ) -> dict[str, Any] | None:
-    """SAR-8-shaped match against the §2.1 canonical lexicon.
+    """SAR-8/SAR-9-shaped match against the §2.1 canonical lexicon.
 
-    Iterates over each manufacturer × alias-string and invokes
-    :func:`vendor_match_disposition`. Returns:
+    SAR-9 #2 alias-iteration bug-fix: invokes
+    :func:`vendor_match_disposition` once per canonical entry (not once per
+    alias-string) so per-canonical FP-list lookups fire correctly. Alias-
+    string lookups happen via :func:`alias_equality` only when the canonical
+    disposition is ``no_match``.
 
-    - first ``accept`` hit (with ``disposition='accept'`` + ``alias_used`` +
-      ``match_kind`` derived from how SAR-8 matched) — preferred outcome.
-    - first ``flag_for_review`` hit if no ``accept`` was found — the
-      candidate routes to the human-triage artifact.
+    Returns:
+    - first ``accept`` hit — preferred outcome.
+    - first ``flag_for_review`` hit if no ``accept`` was found — routes to
+      the human-triage artifact.
     - ``None`` if neither an accept nor a flag was produced.
     """
     flagged: dict[str, Any] | None = None
     for entry in lexicon:
         cn = entry["canonical_name"]
         primary = entry["primary_category"]
+        disposition = vendor_match_disposition(candidate_name, cn)
+        if disposition == "accept":
+            return {
+                "canonical_name": cn,
+                "primary_category": primary,
+                "alias_used": cn,
+                "disposition": "accept",
+                "match_kind": "sar9_accept_canonical",
+                "candidate_normalized": _normalize_vendor(candidate_name),
+            }
+        if disposition == "flag_for_review" and flagged is None:
+            flagged = {
+                "canonical_name": cn,
+                "primary_category": primary,
+                "alias_used": cn,
+                "disposition": "flag_for_review",
+                "match_kind": "sar9_flag_for_review",
+                "candidate_normalized": _normalize_vendor(candidate_name),
+            }
+        if disposition in ("reject_fp", "flag_for_review"):
+            # Don't try aliases — FP/flag is canonical-scoped.
+            continue
+        # disposition == "no_match" → try alias-string equality lookups.
         for alias in entry["alias_strings"]:
-            disposition = vendor_match_disposition(candidate_name, alias)
-            if disposition == "accept":
+            if alias == cn:
+                continue  # already tested via canonical disposition
+            if alias_equality(candidate_name, alias):
                 return {
                     "canonical_name": cn,
                     "primary_category": primary,
                     "alias_used": alias,
                     "disposition": "accept",
-                    "match_kind": "sar8_accept",
-                    "candidate_normalized": _normalize_vendor(candidate_name),
-                }
-            if disposition == "flag_for_review" and flagged is None:
-                flagged = {
-                    "canonical_name": cn,
-                    "primary_category": primary,
-                    "alias_used": alias,
-                    "disposition": "flag_for_review",
-                    "match_kind": "sar8_flag_for_review",
+                    "match_kind": "sar9_accept_alias_equality",
                     "candidate_normalized": _normalize_vendor(candidate_name),
                 }
     return flagged
@@ -319,6 +338,36 @@ def sweep_phase2_oui_inference(
         if hit["disposition"] == "accept":
             accept_rows.append(_candidate_row(raw, hit, match_path="strict"))
         elif hit["disposition"] == "flag_for_review":
+            cn = hit["canonical_name"]
+            cm_lower = (raw["candidate_manufacturer"] or "").lower().strip()
+            if cn == "Genetec":
+                reason = (
+                    "GENETEC Corporation (early-2000s OUI registration, "
+                    "address Tokyo) may be a separate Japanese entity from "
+                    "Genetec Inc. (Montreal, the §2.1 alpr vendor). SAR-8 "
+                    "flag_for_review carried forward; routes to extraction_"
+                    "outputs/mac43/sar9_flagged_for_review.json for CEO/board "
+                    "triage; NOT bulk-staged."
+                )
+                flag_class = "sar8_genetec_corporation"
+            elif cn == "Motorola Solutions" and cm_lower == "motorola":
+                reason = (
+                    "SAR-9 #1 — bare `Motorola` token without further "
+                    "qualifier is post-2011 corporate-split-ambiguous "
+                    "(Motorola Solutions / police radios vs Motorola "
+                    "Mobility / Lenovo / consumer smartphones). Routes to "
+                    "extraction_outputs/mac43/sar9_flagged_for_review.json "
+                    "for CEO/board model-name evidence triage; NOT bulk-"
+                    "staged."
+                )
+                flag_class = "sar9_motorola_bare_token"
+            else:
+                reason = (
+                    f"flag_for_review under canonical={cn!r} (predicate "
+                    f"returned flag_for_review for an unforeseen candidate "
+                    f"shape; CEO/board triage required)."
+                )
+                flag_class = "unknown_flag_for_review"
             flag_rows.append(
                 {
                     "raw_observation_id": raw["id"],
@@ -327,17 +376,12 @@ def sweep_phase2_oui_inference(
                     "candidate_identifier": raw["candidate_identifier"],
                     "candidate_type": raw["candidate_type"],
                     "candidate_manufacturer_raw": raw["candidate_manufacturer"],
-                    "matched_canonical_name": hit["canonical_name"],
+                    "matched_canonical_name": cn,
                     "matched_via_alias": hit["alias_used"],
                     "vendor_primary_category": hit["primary_category"],
                     "disposition": "flag_for_review",
-                    "reason": (
-                        "GENETEC Corporation (early-2000s OUI registration, "
-                        "address Tokyo) may be a separate Japanese entity "
-                        "from Genetec Inc. (Montreal, the §2.1 alpr vendor). "
-                        "Routes to extraction_outputs/mac41/sar8_flagged_for_"
-                        "review.json for CEO/board triage; NOT bulk-staged."
-                    ),
+                    "flag_class": flag_class,
+                    "reason": reason,
                 }
             )
 
@@ -674,8 +718,8 @@ def sweep_wigle_anchors(conn: sqlite3.Connection) -> dict[str, Any]:
 FLAGGED_FOR_REVIEW_ARTIFACT_PATH = (
     Path(__file__).resolve().parents[2]
     / "extraction_outputs"
-    / "mac41"
-    / "sar8_flagged_for_review.json"
+    / "mac43"
+    / "sar9_flagged_for_review.json"
 )
 
 
@@ -791,22 +835,35 @@ def evaluate() -> dict[str, Any]:
 def _write_flagged_for_review_artifact(
     payload: dict[str, Any], path: Path
 ) -> dict[str, Any]:
-    """Write the GENETEC Corporation triage queue artifact."""
+    """Write the SAR-8 + SAR-9 flag_for_review triage queue artifact."""
     flagged = payload["phase2_oui_inference"]["sar8_flag_for_review_samples"]
+    by_flag_class: dict[str, int] = {}
+    for f in flagged:
+        cls = f.get("flag_class", "unknown_flag_for_review")
+        by_flag_class[cls] = by_flag_class.get(cls, 0) + 1
     out = {
         "_meta": {
             "produced_at_utc": datetime.now(timezone.utc).isoformat(),
             "validator_agent_id": "da137694-2efe-4589-8150-828dcab881fb",
-            "phase_5_step": "Step-4 follow-on (MAC-41) — SAR-8 flagged-for-review",
-            "issue_chain": "MAC-36 → MAC-39 → MAC-41",
-            "amendments_applied": ["SAR-8 (flag_for_review third state)"],
+            "phase_5_step": (
+                "Step-4 follow-on² (MAC-44) — SAR-8 + SAR-9 flagged-for-review"
+            ),
+            "issue_chain": "MAC-36 → MAC-39 → MAC-41 → MAC-44",
+            "amendments_applied": [
+                "SAR-8 (flag_for_review third state — GENETEC Corporation)",
+                "SAR-9 #1 (bare `Motorola` token flag_for_review)",
+            ],
             "rationale": (
-                "GENETEC Corporation (early-2000s OUI registration, address "
-                "Tokyo) may be distinct from Genetec Inc. (Montreal, the §2.1 "
-                "alpr vendor). SAR-8 routes these rows here for CEO/board "
-                "triage; they are NOT bulk-staged to identifiers."
+                "Two flag-for-review classes share this artifact: "
+                "(a) SAR-8 GENETEC Corporation (Tokyo OUI; possibly distinct "
+                "from Genetec Inc. Montreal, the §2.1 alpr vendor); "
+                "(b) SAR-9 #1 bare `Motorola` token (post-2011 corporate-"
+                "split ambiguity between Motorola Solutions and Motorola "
+                "Mobility / Lenovo). Both classes require CEO/board model-"
+                "name triage before any promotion; rows are NOT bulk-staged."
             ),
             "decision_class": "CEO/board (not Validator)",
+            "by_flag_class": by_flag_class,
         },
         "flagged_count": len(flagged),
         "flagged_rows": flagged,

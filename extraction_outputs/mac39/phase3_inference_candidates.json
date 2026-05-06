@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "produced_at_utc": "2026-05-06T17:38:05.012647+00:00",
+    "produced_at_utc": "2026-05-06T18:36:26.021094+00:00",
     "validator_agent_id": "da137694-2efe-4589-8150-828dcab881fb",
     "phase_5_step": "Step-4 follow-on (Phase-3 inference candidate sweep, Tier 4) \u2014 SAR-8 wired",
     "issue_chain": "MAC-36 \u2192 MAC-39 \u2192 MAC-41",
@@ -53,12 +53,26 @@
     "WatchGuard"
   ],
   "phase2_oui_inference": {
-    "sar8_accept_total": 411,
+    "sar8_accept_total": 124,
     "sar8_accept_pre_filter_drops": 0,
     "sar8_accept_laa_bit_count": 0,
-    "sar8_accept_post_filter_stageable": 411,
-    "sar8_flag_for_review_total": 2,
+    "sar8_accept_post_filter_stageable": 124,
+    "sar8_flag_for_review_total": 6,
     "sar8_flag_for_review_samples": [
+      {
+        "raw_observation_id": 66857,
+        "source_id": 1,
+        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+        "candidate_identifier": "00:e0:0c",
+        "candidate_type": "oui",
+        "candidate_manufacturer_raw": "MOTOROLA",
+        "matched_canonical_name": "Motorola Solutions",
+        "matched_via_alias": "Motorola Solutions",
+        "vendor_primary_category": null,
+        "disposition": "flag_for_review",
+        "flag_class": "sar9_motorola_bare_token",
+        "reason": "SAR-9 #1 \u2014 bare `Motorola` token without further qualifier is post-2011 corporate-split-ambiguous (Motorola Solutions / police radios vs Motorola Mobility / Lenovo / consumer smartphones). Routes to extraction_outputs/mac43/sar9_flagged_for_review.json for CEO/board model-name evidence triage; NOT bulk-staged."
+      },
       {
         "raw_observation_id": 74000,
         "source_id": 1,
@@ -70,7 +84,36 @@
         "matched_via_alias": "Genetec",
         "vendor_primary_category": "alpr",
         "disposition": "flag_for_review",
-        "reason": "GENETEC Corporation (early-2000s OUI registration, address Tokyo) may be a separate Japanese entity from Genetec Inc. (Montreal, the \u00a72.1 alpr vendor). Routes to extraction_outputs/mac41/sar8_flagged_for_review.json for CEO/board triage; NOT bulk-staged."
+        "flag_class": "sar8_genetec_corporation",
+        "reason": "GENETEC Corporation (early-2000s OUI registration, address Tokyo) may be a separate Japanese entity from Genetec Inc. (Montreal, the \u00a72.1 alpr vendor). SAR-8 flag_for_review carried forward; routes to extraction_outputs/mac43/sar9_flagged_for_review.json for CEO/board triage; NOT bulk-staged."
+      },
+      {
+        "raw_observation_id": 81848,
+        "source_id": 1,
+        "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+        "candidate_identifier": "00:0a:28",
+        "candidate_type": "oui",
+        "candidate_manufacturer_raw": "Motorola",
+        "matched_canonical_name": "Motorola Solutions",
+        "matched_via_alias": "Motorola Solutions",
+        "vendor_primary_category": null,
+        "disposition": "flag_for_review",
+        "flag_class": "sar9_motorola_bare_token",
+        "reason": "SAR-9 #1 \u2014 bare `Motorola` token without further qualifier is post-2011 corporate-split-ambiguous (Motorola Solutions / police radios vs Motorola Mobility / Lenovo / consumer smartphones). Routes to extraction_outputs/mac43/sar9_flagged_for_review.json for CEO/board model-name evidence triage; NOT bulk-staged."
+      },
+      {
+        "raw_observation_id": 165036,
+        "source_id": 4,
+        "source_url": "https://www.wireshark.org/download/automated/data/manuf",
+        "candidate_identifier": "00:0a:28",
+        "candidate_type": "oui",
+        "candidate_manufacturer_raw": "Motorola",
+        "matched_canonical_name": "Motorola Solutions",
+        "matched_via_alias": "Motorola Solutions",
+        "vendor_primary_category": null,
+        "disposition": "flag_for_review",
+        "flag_class": "sar9_motorola_bare_token",
+        "reason": "SAR-9 #1 \u2014 bare `Motorola` token without further qualifier is post-2011 corporate-split-ambiguous (Motorola Solutions / police radios vs Motorola Mobility / Lenovo / consumer smartphones). Routes to extraction_outputs/mac43/sar9_flagged_for_review.json for CEO/board model-name evidence triage; NOT bulk-staged."
       },
       {
         "raw_observation_id": 165173,
@@ -83,49 +126,25 @@
         "matched_via_alias": "Genetec",
         "vendor_primary_category": "alpr",
         "disposition": "flag_for_review",
-        "reason": "GENETEC Corporation (early-2000s OUI registration, address Tokyo) may be a separate Japanese entity from Genetec Inc. (Montreal, the \u00a72.1 alpr vendor). Routes to extraction_outputs/mac41/sar8_flagged_for_review.json for CEO/board triage; NOT bulk-staged."
+        "flag_class": "sar8_genetec_corporation",
+        "reason": "GENETEC Corporation (early-2000s OUI registration, address Tokyo) may be a separate Japanese entity from Genetec Inc. (Montreal, the \u00a72.1 alpr vendor). SAR-8 flag_for_review carried forward; routes to extraction_outputs/mac43/sar9_flagged_for_review.json for CEO/board triage; NOT bulk-staged."
+      },
+      {
+        "raw_observation_id": 179533,
+        "source_id": 4,
+        "source_url": "https://www.wireshark.org/download/automated/data/manuf",
+        "candidate_identifier": "00:e0:0c",
+        "candidate_type": "oui",
+        "candidate_manufacturer_raw": "Motorola",
+        "matched_canonical_name": "Motorola Solutions",
+        "matched_via_alias": "Motorola Solutions",
+        "vendor_primary_category": null,
+        "disposition": "flag_for_review",
+        "flag_class": "sar9_motorola_bare_token",
+        "reason": "SAR-9 #1 \u2014 bare `Motorola` token without further qualifier is post-2011 corporate-split-ambiguous (Motorola Solutions / police radios vs Motorola Mobility / Lenovo / consumer smartphones). Routes to extraction_outputs/mac43/sar9_flagged_for_review.json for CEO/board model-name evidence triage; NOT bulk-staged."
       }
     ],
     "by_vendor": [
-      {
-        "canonical_name": "Motorola Solutions",
-        "primary_category": null,
-        "accept_count": 300,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 52860,
-            "source_id": 1,
-            "candidate_identifier": "50:16:f4",
-            "candidate_manufacturer_raw": "Motorola Mobility LLC, a Lenovo Company",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Motorola",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 53126,
-            "source_id": 1,
-            "candidate_identifier": "c4:a0:52",
-            "candidate_manufacturer_raw": "Motorola Mobility LLC, a Lenovo Company",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Motorola",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 53410,
-            "source_id": 1,
-            "candidate_identifier": "c8:58:95",
-            "candidate_manufacturer_raw": "Motorola Mobility LLC, a Lenovo Company",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Motorola",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
       {
         "canonical_name": "DJI",
         "primary_category": "drone",
@@ -138,7 +157,7 @@
             "source_id": 1,
             "candidate_identifier": "48:1c:b9",
             "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "DJI",
             "confidence_proposed": 50,
             "flags": []
@@ -148,7 +167,7 @@
             "source_id": 1,
             "candidate_identifier": "8c:58:23",
             "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "DJI",
             "confidence_proposed": 50,
             "flags": []
@@ -158,7 +177,7 @@
             "source_id": 1,
             "candidate_identifier": "0c:9a:e6",
             "candidate_manufacturer_raw": "SZ DJI TECHNOLOGY CO.,LTD",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "DJI",
             "confidence_proposed": 50,
             "flags": []
@@ -166,39 +185,39 @@
         ]
       },
       {
-        "canonical_name": "Axis Communications",
-        "primary_category": "alpr",
-        "accept_count": 13,
+        "canonical_name": "Motorola Solutions",
+        "primary_category": null,
+        "accept_count": 24,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
           {
-            "raw_observation_id": 54374,
+            "raw_observation_id": 53738,
             "source_id": 1,
-            "candidate_identifier": "b8:a4:4f",
-            "candidate_manufacturer_raw": "Axis Communications AB",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Axis Communications",
+            "candidate_identifier": "00:04:7d",
+            "candidate_manufacturer_raw": "Motorola Solutions Inc.",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Motorola Solutions",
             "confidence_proposed": 50,
             "flags": []
           },
           {
-            "raw_observation_id": 67362,
+            "raw_observation_id": 54039,
             "source_id": 1,
-            "candidate_identifier": "00:40:8c",
-            "candidate_manufacturer_raw": "Axis Communications AB",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Axis Communications",
+            "candidate_identifier": "10:74:6f",
+            "candidate_manufacturer_raw": "MOTOROLA SOLUTIONS MALAYSIA SDN. BHD.",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Motorola Solutions",
             "confidence_proposed": 50,
             "flags": []
           },
           {
-            "raw_observation_id": 83018,
+            "raw_observation_id": 57272,
             "source_id": 1,
-            "candidate_identifier": "e8:27:25",
-            "candidate_manufacturer_raw": "Axis Communications AB",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Axis Communications",
+            "candidate_identifier": "00:24:37",
+            "candidate_manufacturer_raw": "Motorola - BSG",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Motorola Solutions",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -216,7 +235,7 @@
             "source_id": 1,
             "candidate_identifier": "50:13:9d",
             "candidate_manufacturer_raw": "Sierra Wireless, ULC",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Sierra Wireless",
             "confidence_proposed": 50,
             "flags": []
@@ -226,7 +245,7 @@
             "source_id": 1,
             "candidate_identifier": "84:db:2f",
             "candidate_manufacturer_raw": "Sierra Wireless, ULC",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Sierra Wireless",
             "confidence_proposed": 50,
             "flags": []
@@ -236,7 +255,7 @@
             "source_id": 1,
             "candidate_identifier": "64:ce:6e",
             "candidate_manufacturer_raw": "Sierra Wireless, ULC",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Sierra Wireless",
             "confidence_proposed": 50,
             "flags": []
@@ -244,39 +263,39 @@
         ]
       },
       {
-        "canonical_name": "Harris",
-        "primary_category": "imsi_catcher",
-        "accept_count": 11,
+        "canonical_name": "Axis Communications",
+        "primary_category": "alpr",
+        "accept_count": 10,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
           {
-            "raw_observation_id": 57708,
+            "raw_observation_id": 54374,
             "source_id": 1,
-            "candidate_identifier": "00:17:f3",
-            "candidate_manufacturer_raw": "Harris Corporation",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Harris",
+            "candidate_identifier": "b8:a4:4f",
+            "candidate_manufacturer_raw": "Axis Communications AB",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Axis Communications",
             "confidence_proposed": 50,
             "flags": []
           },
           {
-            "raw_observation_id": 66554,
+            "raw_observation_id": 67362,
             "source_id": 1,
-            "candidate_identifier": "00:02:68",
-            "candidate_manufacturer_raw": "Harris Government Communications",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Harris",
+            "candidate_identifier": "00:40:8c",
+            "candidate_manufacturer_raw": "Axis Communications AB",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Axis Communications",
             "confidence_proposed": 50,
             "flags": []
           },
           {
-            "raw_observation_id": 70418,
+            "raw_observation_id": 83018,
             "source_id": 1,
-            "candidate_identifier": "00:06:ec",
-            "candidate_manufacturer_raw": "Harris Corporation",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Harris",
+            "candidate_identifier": "e8:27:25",
+            "candidate_manufacturer_raw": "Axis Communications AB",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Axis Communications",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -294,7 +313,7 @@
             "source_id": 1,
             "candidate_identifier": "90:3a:e6",
             "candidate_manufacturer_raw": "PARROT SA",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Parrot",
             "confidence_proposed": 50,
             "flags": []
@@ -304,7 +323,7 @@
             "source_id": 1,
             "candidate_identifier": "00:12:1c",
             "candidate_manufacturer_raw": "PARROT SA",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Parrot",
             "confidence_proposed": 50,
             "flags": []
@@ -314,7 +333,7 @@
             "source_id": 1,
             "candidate_identifier": "90:03:b7",
             "candidate_manufacturer_raw": "PARROT SA",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Parrot",
             "confidence_proposed": 50,
             "flags": []
@@ -322,39 +341,39 @@
         ]
       },
       {
-        "canonical_name": "WatchGuard",
-        "primary_category": "body_cam",
-        "accept_count": 6,
+        "canonical_name": "Harris",
+        "primary_category": "imsi_catcher",
+        "accept_count": 9,
         "pre_filter_drop_count": 0,
         "laa_bit_count": 0,
         "samples": [
           {
-            "raw_observation_id": 58676,
+            "raw_observation_id": 57708,
             "source_id": 1,
-            "candidate_identifier": "00:01:21",
-            "candidate_manufacturer_raw": "WatchGuard Technologies, Inc.",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "WatchGuard",
+            "candidate_identifier": "00:17:f3",
+            "candidate_manufacturer_raw": "Harris Corporation",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Harris",
             "confidence_proposed": 50,
             "flags": []
           },
           {
-            "raw_observation_id": 65374,
+            "raw_observation_id": 66554,
             "source_id": 1,
-            "candidate_identifier": "00:1d:96",
-            "candidate_manufacturer_raw": "WatchGuard Video",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "WatchGuard",
+            "candidate_identifier": "00:02:68",
+            "candidate_manufacturer_raw": "Harris Government Communications",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Harris",
             "confidence_proposed": 50,
             "flags": []
           },
           {
-            "raw_observation_id": 78311,
+            "raw_observation_id": 70418,
             "source_id": 1,
-            "candidate_identifier": "00:90:7f",
-            "candidate_manufacturer_raw": "WatchGuard Technologies, Inc.",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "WatchGuard",
+            "candidate_identifier": "00:06:ec",
+            "candidate_manufacturer_raw": "Harris Corporation",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Harris",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -372,7 +391,7 @@
             "source_id": 1,
             "candidate_identifier": "0c:bf:15",
             "candidate_manufacturer_raw": "Genetec Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Genetec",
             "confidence_proposed": 50,
             "flags": []
@@ -382,7 +401,7 @@
             "source_id": 1,
             "candidate_identifier": "00:bf:15",
             "candidate_manufacturer_raw": "Genetec Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Genetec",
             "confidence_proposed": 50,
             "flags": []
@@ -392,47 +411,8 @@
             "source_id": 4,
             "candidate_identifier": "00:50:c2:be:7",
             "candidate_manufacturer_raw": "Genetec Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Genetec",
-            "confidence_proposed": 50,
-            "flags": []
-          }
-        ]
-      },
-      {
-        "canonical_name": "Flock Safety",
-        "primary_category": "alpr",
-        "accept_count": 4,
-        "pre_filter_drop_count": 0,
-        "laa_bit_count": 0,
-        "samples": [
-          {
-            "raw_observation_id": 83198,
-            "source_id": 1,
-            "candidate_identifier": "b4:1e:52",
-            "candidate_manufacturer_raw": "Flock Safety",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Flock Safety",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 99722,
-            "source_id": 3,
-            "candidate_identifier": "8c:1f:64:57:4",
-            "candidate_manufacturer_raw": "Flock Audio Inc.",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Flock",
-            "confidence_proposed": 50,
-            "flags": []
-          },
-          {
-            "raw_observation_id": 203127,
-            "source_id": 4,
-            "candidate_identifier": "8c:1f:64:57:4",
-            "candidate_manufacturer_raw": "Flock Audio Inc.",
-            "match_kind": "sar8_accept",
-            "matched_via_alias": "Flock",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -450,7 +430,7 @@
             "source_id": 1,
             "candidate_identifier": "00:30:44",
             "candidate_manufacturer_raw": "CradlePoint, Inc",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Cradlepoint",
             "confidence_proposed": 50,
             "flags": []
@@ -460,7 +440,7 @@
             "source_id": 1,
             "candidate_identifier": "00:e0:1c",
             "candidate_manufacturer_raw": "CradlePoint, Inc",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Cradlepoint",
             "confidence_proposed": 50,
             "flags": []
@@ -470,7 +450,7 @@
             "source_id": 4,
             "candidate_identifier": "00:30:44",
             "candidate_manufacturer_raw": "CradlePoint, Inc",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Cradlepoint",
             "confidence_proposed": 50,
             "flags": []
@@ -489,7 +469,7 @@
             "source_id": 2,
             "candidate_identifier": "10:63:a3:1",
             "candidate_manufacturer_raw": "Jacobs Technology, Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Jacobs",
             "confidence_proposed": 50,
             "flags": []
@@ -499,7 +479,7 @@
             "source_id": 3,
             "candidate_identifier": "8c:1f:64:a9:8",
             "candidate_manufacturer_raw": "Jacobs Technology, Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Jacobs",
             "confidence_proposed": 50,
             "flags": []
@@ -509,7 +489,7 @@
             "source_id": 4,
             "candidate_identifier": "10:63:a3:1",
             "candidate_manufacturer_raw": "Jacobs Technology, Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Jacobs",
             "confidence_proposed": 50,
             "flags": []
@@ -528,7 +508,7 @@
             "source_id": 1,
             "candidate_identifier": "d4:11:d6",
             "candidate_manufacturer_raw": "ShotSpotter, Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_alias_equality",
             "matched_via_alias": "ShotSpotter",
             "confidence_proposed": 50,
             "flags": []
@@ -538,7 +518,7 @@
             "source_id": 4,
             "candidate_identifier": "d4:11:d6",
             "candidate_manufacturer_raw": "ShotSpotter, Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_alias_equality",
             "matched_via_alias": "ShotSpotter",
             "confidence_proposed": 50,
             "flags": []
@@ -557,7 +537,7 @@
             "source_id": 1,
             "candidate_identifier": "00:0d:4f",
             "candidate_manufacturer_raw": "Kenwood Corporation",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Kenwood",
             "confidence_proposed": 50,
             "flags": []
@@ -567,8 +547,37 @@
             "source_id": 4,
             "candidate_identifier": "00:0d:4f",
             "candidate_manufacturer_raw": "Kenwood Corporation",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Kenwood",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "WatchGuard",
+        "primary_category": "body_cam",
+        "accept_count": 2,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 65374,
+            "source_id": 1,
+            "candidate_identifier": "00:1d:96",
+            "candidate_manufacturer_raw": "WatchGuard Video",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "WatchGuard",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 170210,
+            "source_id": 4,
+            "candidate_identifier": "00:1d:96",
+            "candidate_manufacturer_raw": "WatchGuard Video",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "WatchGuard",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -586,7 +595,7 @@
             "source_id": 1,
             "candidate_identifier": "70:1a:d5",
             "candidate_manufacturer_raw": "Avigilon Alta",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Avigilon",
             "confidence_proposed": 50,
             "flags": []
@@ -596,7 +605,7 @@
             "source_id": 4,
             "candidate_identifier": "70:1a:d5",
             "candidate_manufacturer_raw": "Avigilon Alta",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Avigilon",
             "confidence_proposed": 50,
             "flags": []
@@ -615,7 +624,7 @@
             "source_id": 1,
             "candidate_identifier": "00:16:00",
             "candidate_manufacturer_raw": "CelleBrite Mobile Synchronization",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Cellebrite",
             "confidence_proposed": 50,
             "flags": []
@@ -625,7 +634,7 @@
             "source_id": 4,
             "candidate_identifier": "00:16:00",
             "candidate_manufacturer_raw": "CelleBrite Mobile Synchronization",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Cellebrite",
             "confidence_proposed": 50,
             "flags": []
@@ -644,7 +653,7 @@
             "source_id": 1,
             "candidate_identifier": "38:1d:14",
             "candidate_manufacturer_raw": "Skydio Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Skydio",
             "confidence_proposed": 50,
             "flags": []
@@ -654,8 +663,37 @@
             "source_id": 4,
             "candidate_identifier": "38:1d:14",
             "candidate_manufacturer_raw": "Skydio Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Skydio",
+            "confidence_proposed": 50,
+            "flags": []
+          }
+        ]
+      },
+      {
+        "canonical_name": "Flock Safety",
+        "primary_category": "alpr",
+        "accept_count": 2,
+        "pre_filter_drop_count": 0,
+        "laa_bit_count": 0,
+        "samples": [
+          {
+            "raw_observation_id": 83198,
+            "source_id": 1,
+            "candidate_identifier": "b4:1e:52",
+            "candidate_manufacturer_raw": "Flock Safety",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Flock Safety",
+            "confidence_proposed": 50,
+            "flags": []
+          },
+          {
+            "raw_observation_id": 209986,
+            "source_id": 4,
+            "candidate_identifier": "b4:1e:52",
+            "candidate_manufacturer_raw": "Flock Safety",
+            "match_kind": "sar9_accept_canonical",
+            "matched_via_alias": "Flock Safety",
             "confidence_proposed": 50,
             "flags": []
           }
@@ -673,7 +711,7 @@
             "source_id": 1,
             "candidate_identifier": "00:25:df",
             "candidate_manufacturer_raw": "Axon Enterprise, Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Axon",
             "confidence_proposed": 50,
             "flags": []
@@ -683,7 +721,7 @@
             "source_id": 4,
             "candidate_identifier": "00:25:df",
             "candidate_manufacturer_raw": "Axon Enterprise, Inc.",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Axon",
             "confidence_proposed": 50,
             "flags": []
@@ -702,7 +740,7 @@
             "source_id": 3,
             "candidate_identifier": "70:b3:d5:7c:b",
             "candidate_manufacturer_raw": "KeyW Corporation",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "KeyW",
             "confidence_proposed": 50,
             "flags": []
@@ -712,7 +750,7 @@
             "source_id": 4,
             "candidate_identifier": "70:b3:d5:7c:b",
             "candidate_manufacturer_raw": "KeyW Corporation",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "KeyW",
             "confidence_proposed": 50,
             "flags": []
@@ -731,7 +769,7 @@
             "source_id": 4,
             "candidate_identifier": "00:50:c2:2a:5",
             "candidate_manufacturer_raw": "Septier Communication Ltd",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Septier",
             "confidence_proposed": 50,
             "flags": []
@@ -750,7 +788,7 @@
             "source_id": 4,
             "candidate_identifier": "00:50:c2:36:0",
             "candidate_manufacturer_raw": "Digital Receiver Technology",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "matched_via_alias": "Digital Receiver Technology",
             "confidence_proposed": 50,
             "flags": []
@@ -766,53 +804,10 @@
     }
   },
   "fcc_grantees_inference": {
-    "total_match_count": 96,
+    "total_match_count": 72,
     "talos_exportable": false,
     "talos_export_reason": "FCC grantee_code is a regulatory entity prefix (per \u00a74.2 fcc_grantees note), NOT a \u00a74.1 per-device identifier. These rows are vendor-attestation metadata only \u2014 they enrich any future FCC-ID-bearing identifier but do not produce identifiers rows themselves. Phase-4 fcc_equipment_filings (if/when created) would consume these as anchors.",
     "by_vendor": [
-      {
-        "canonical_name": "Motorola Solutions",
-        "primary_category": null,
-        "match_count": 28,
-        "samples": [
-          {
-            "fcc_grantee_id": 71927,
-            "grantee_code": "ABY",
-            "grantee_name": "Motorola Solutions, Inc.",
-            "country": "United States",
-            "state": "Dist of Columbia",
-            "date_received": "1998-04-14",
-            "matched_canonical_name": "Motorola Solutions",
-            "matched_via_alias": "Motorola Solutions",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": null
-          },
-          {
-            "fcc_grantee_id": 71928,
-            "grantee_code": "ABZ",
-            "grantee_name": "Motorola Solutions, Inc.",
-            "country": "United States",
-            "state": "Illinois",
-            "date_received": "1998-04-14",
-            "matched_canonical_name": "Motorola Solutions",
-            "matched_via_alias": "Motorola Solutions",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": null
-          },
-          {
-            "fcc_grantee_id": 72202,
-            "grantee_code": "AK3",
-            "grantee_name": "Motorola Solutions, Inc.",
-            "country": "United States",
-            "state": "Dist of Columbia",
-            "date_received": "1998-04-14",
-            "matched_canonical_name": "Motorola Solutions",
-            "matched_via_alias": "Motorola Solutions",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": null
-          }
-        ]
-      },
       {
         "canonical_name": "Harris",
         "primary_category": "imsi_catcher",
@@ -827,7 +822,7 @@
             "date_received": "2016-09-01",
             "matched_canonical_name": "Harris",
             "matched_via_alias": "Harris",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "imsi_catcher"
           },
           {
@@ -839,7 +834,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Harris",
             "matched_via_alias": "Harris",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "imsi_catcher"
           },
           {
@@ -851,8 +846,51 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Harris",
             "matched_via_alias": "Harris",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "imsi_catcher"
+          }
+        ]
+      },
+      {
+        "canonical_name": "Motorola Solutions",
+        "primary_category": null,
+        "match_count": 10,
+        "samples": [
+          {
+            "fcc_grantee_id": 71927,
+            "grantee_code": "ABY",
+            "grantee_name": "Motorola Solutions, Inc.",
+            "country": "United States",
+            "state": "Dist of Columbia",
+            "date_received": "1998-04-14",
+            "matched_canonical_name": "Motorola Solutions",
+            "matched_via_alias": "Motorola Solutions",
+            "match_kind": "sar9_accept_canonical",
+            "vendor_primary_category": null
+          },
+          {
+            "fcc_grantee_id": 71928,
+            "grantee_code": "ABZ",
+            "grantee_name": "Motorola Solutions, Inc.",
+            "country": "United States",
+            "state": "Illinois",
+            "date_received": "1998-04-14",
+            "matched_canonical_name": "Motorola Solutions",
+            "matched_via_alias": "Motorola Solutions",
+            "match_kind": "sar9_accept_canonical",
+            "vendor_primary_category": null
+          },
+          {
+            "fcc_grantee_id": 72202,
+            "grantee_code": "AK3",
+            "grantee_name": "Motorola Solutions, Inc.",
+            "country": "United States",
+            "state": "Dist of Columbia",
+            "date_received": "1998-04-14",
+            "matched_canonical_name": "Motorola Solutions",
+            "matched_via_alias": "Motorola Solutions",
+            "match_kind": "sar9_accept_canonical",
+            "vendor_primary_category": null
           }
         ]
       },
@@ -870,7 +908,7 @@
             "date_received": "2016-01-18",
             "matched_canonical_name": "DJI",
             "matched_via_alias": "DJI",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "drone"
           },
           {
@@ -882,7 +920,7 @@
             "date_received": "2016-01-18",
             "matched_canonical_name": "DJI",
             "matched_via_alias": "DJI",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "drone"
           },
           {
@@ -894,7 +932,7 @@
             "date_received": "2017-08-15",
             "matched_canonical_name": "DJI",
             "matched_via_alias": "DJI",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "drone"
           }
         ]
@@ -913,7 +951,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Sierra Wireless",
             "matched_via_alias": "Sierra Wireless",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": null
           },
           {
@@ -925,7 +963,7 @@
             "date_received": "1998-09-30",
             "matched_canonical_name": "Sierra Wireless",
             "matched_via_alias": "Sierra Wireless",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": null
           },
           {
@@ -937,7 +975,7 @@
             "date_received": "2000-08-10",
             "matched_canonical_name": "Sierra Wireless",
             "matched_via_alias": "Sierra Wireless",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": null
           }
         ]
@@ -956,7 +994,7 @@
             "date_received": "2016-01-05",
             "matched_canonical_name": "Parrot",
             "matched_via_alias": "Parrot",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "drone"
           },
           {
@@ -968,7 +1006,7 @@
             "date_received": "2015-11-13",
             "matched_canonical_name": "Parrot",
             "matched_via_alias": "Parrot",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "drone"
           },
           {
@@ -980,7 +1018,7 @@
             "date_received": "2019-08-09",
             "matched_canonical_name": "Parrot",
             "matched_via_alias": "Parrot",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "drone"
           }
         ]
@@ -999,7 +1037,7 @@
             "date_received": "2017-01-05",
             "matched_canonical_name": "Kenwood",
             "matched_via_alias": "Kenwood",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "police_radio"
           },
           {
@@ -1011,7 +1049,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Kenwood",
             "matched_via_alias": "Kenwood",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "police_radio"
           },
           {
@@ -1023,51 +1061,8 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Kenwood",
             "matched_via_alias": "Kenwood",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "police_radio"
-          }
-        ]
-      },
-      {
-        "canonical_name": "Axis Communications",
-        "primary_category": "alpr",
-        "match_count": 5,
-        "samples": [
-          {
-            "fcc_grantee_id": 65510,
-            "grantee_code": "2ASJS",
-            "grantee_name": "AXIS TECHNOLOGY",
-            "country": "United States",
-            "state": "Wyoming",
-            "date_received": "2019-02-23",
-            "matched_canonical_name": "Axis Communications",
-            "matched_via_alias": "Axis",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": "alpr"
-          },
-          {
-            "fcc_grantee_id": 79039,
-            "grantee_code": "GGZ",
-            "grantee_name": "Axis Integrated Systems Inc",
-            "country": "United States",
-            "state": "Texas",
-            "date_received": "1998-04-14",
-            "matched_canonical_name": "Axis Communications",
-            "matched_via_alias": "Axis",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": "alpr"
-          },
-          {
-            "fcc_grantee_id": 83955,
-            "grantee_code": "KPM",
-            "grantee_name": "Axis Micro Device Corp",
-            "country": "Taiwan",
-            "state": null,
-            "date_received": "1998-04-15",
-            "matched_canonical_name": "Axis Communications",
-            "matched_via_alias": "Axis",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": "alpr"
           }
         ]
       },
@@ -1085,7 +1080,7 @@
             "date_received": "2015-12-11",
             "matched_canonical_name": "Axon",
             "matched_via_alias": "Axon",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "body_cam"
           },
           {
@@ -1097,7 +1092,7 @@
             "date_received": "2012-07-11",
             "matched_canonical_name": "Axon",
             "matched_via_alias": "Axon",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "body_cam"
           },
           {
@@ -1109,7 +1104,7 @@
             "date_received": "2008-07-09",
             "matched_canonical_name": "Axon",
             "matched_via_alias": "Axon",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "body_cam"
           }
         ]
@@ -1128,7 +1123,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Jacobs",
             "matched_via_alias": "Jacobs",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "imsi_catcher"
           },
           {
@@ -1140,7 +1135,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Jacobs",
             "matched_via_alias": "Jacobs",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "imsi_catcher"
           },
           {
@@ -1152,7 +1147,7 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Jacobs",
             "matched_via_alias": "Jacobs",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "imsi_catcher"
           }
         ]
@@ -1171,7 +1166,7 @@
             "date_received": "2017-05-07",
             "matched_canonical_name": "Reveal",
             "matched_via_alias": "Reveal",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "body_cam"
           },
           {
@@ -1183,8 +1178,39 @@
             "date_received": "1998-04-14",
             "matched_canonical_name": "Reveal",
             "matched_via_alias": "Reveal",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "body_cam"
+          }
+        ]
+      },
+      {
+        "canonical_name": "Axis Communications",
+        "primary_category": "alpr",
+        "match_count": 2,
+        "samples": [
+          {
+            "fcc_grantee_id": 65510,
+            "grantee_code": "2ASJS",
+            "grantee_name": "AXIS TECHNOLOGY",
+            "country": "United States",
+            "state": "Wyoming",
+            "date_received": "2019-02-23",
+            "matched_canonical_name": "Axis Communications",
+            "matched_via_alias": "Axis",
+            "match_kind": "sar9_accept_alias_equality",
+            "vendor_primary_category": "alpr"
+          },
+          {
+            "fcc_grantee_id": 89658,
+            "grantee_code": "PNB",
+            "grantee_name": "Axis Communications AB",
+            "country": "Sweden",
+            "state": null,
+            "date_received": "2001-05-13",
+            "matched_canonical_name": "Axis Communications",
+            "matched_via_alias": "Axis Communications",
+            "match_kind": "sar9_accept_canonical",
+            "vendor_primary_category": "alpr"
           }
         ]
       },
@@ -1202,7 +1228,7 @@
             "date_received": "1998-04-15",
             "matched_canonical_name": "Getac",
             "matched_via_alias": "Getac",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "body_cam"
           },
           {
@@ -1214,7 +1240,7 @@
             "date_received": "2003-03-07",
             "matched_canonical_name": "Getac",
             "matched_via_alias": "Getac",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "body_cam"
           }
         ]
@@ -1233,27 +1259,8 @@
             "date_received": "2017-08-14",
             "matched_canonical_name": "Avigilon",
             "matched_via_alias": "Avigilon",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "alpr"
-          }
-        ]
-      },
-      {
-        "canonical_name": "Magnet Forensics",
-        "primary_category": "hacking_tool",
-        "match_count": 1,
-        "samples": [
-          {
-            "fcc_grantee_id": 61569,
-            "grantee_code": "2ANWJ",
-            "grantee_name": "MAGNET SYSTEMS IKE",
-            "country": "Greece",
-            "state": null,
-            "date_received": "2017-10-02",
-            "matched_canonical_name": "Magnet Forensics",
-            "matched_via_alias": "Magnet",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": "hacking_tool"
           }
         ]
       },
@@ -1271,7 +1278,7 @@
             "date_received": "2018-02-12",
             "matched_canonical_name": "Dedrone",
             "matched_via_alias": "Dedrone",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "drone_detect"
           }
         ]
@@ -1290,46 +1297,8 @@
             "date_received": "2019-06-19",
             "matched_canonical_name": "Skydio",
             "matched_via_alias": "Skydio",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "drone"
-          }
-        ]
-      },
-      {
-        "canonical_name": "Vigilant Solutions",
-        "primary_category": "alpr",
-        "match_count": 1,
-        "samples": [
-          {
-            "fcc_grantee_id": 86992,
-            "grantee_code": "NCV",
-            "grantee_name": "Vigilant Systems Inc",
-            "country": "United States",
-            "state": "Oregon",
-            "date_received": "1998-04-14",
-            "matched_canonical_name": "Vigilant Solutions",
-            "matched_via_alias": "Vigilant",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": "alpr"
-          }
-        ]
-      },
-      {
-        "canonical_name": "WatchGuard",
-        "primary_category": "body_cam",
-        "match_count": 1,
-        "samples": [
-          {
-            "fcc_grantee_id": 90241,
-            "grantee_code": "Q6G",
-            "grantee_name": "WatchGuard Technologies, Inc.",
-            "country": "United States",
-            "state": "Washington",
-            "date_received": "2003-05-15",
-            "matched_canonical_name": "WatchGuard",
-            "matched_via_alias": "WatchGuard",
-            "match_kind": "sar8_accept",
-            "vendor_primary_category": "body_cam"
           }
         ]
       },
@@ -1347,7 +1316,7 @@
             "date_received": "2007-01-17",
             "matched_canonical_name": "Cradlepoint",
             "matched_via_alias": "Cradlepoint",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": null
           }
         ]
@@ -1366,7 +1335,7 @@
             "date_received": "2008-08-08",
             "matched_canonical_name": "SoundThinking",
             "matched_via_alias": "ShotSpotter",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_alias_equality",
             "vendor_primary_category": "gunshot_detect"
           }
         ]
@@ -1385,7 +1354,7 @@
             "date_received": "2009-07-15",
             "matched_canonical_name": "Digital Receiver Technology",
             "matched_via_alias": "Digital Receiver Technology",
-            "match_kind": "sar8_accept",
+            "match_kind": "sar9_accept_canonical",
             "vendor_primary_category": "imsi_catcher"
           }
         ]
@@ -1393,7 +1362,7 @@
     ]
   },
   "procurement_records_inference": {
-    "total_match_count": 34661,
+    "total_match_count": 34658,
     "talos_exportable": false,
     "talos_export_reason": "\u00a711 #14 + \u00a74.5 procurement-only carveout \u2014 procurement records establish vendor-agency relationships, not device presence. Analytical-only. Future Talos-bound identifiers may upgrade via procurement_records.linked_identifier_id when a concrete MAC/OUI/UUID is later linked.",
     "by_vendor": [
@@ -1880,7 +1849,7 @@
       {
         "canonical_name": "WatchGuard",
         "primary_category": "body_cam",
-        "match_count": 69,
+        "match_count": 68,
         "samples": [
           {
             "procurement_record_id": 86814,
@@ -2398,35 +2367,6 @@
         ]
       },
       {
-        "canonical_name": "Flock Safety",
-        "primary_category": "alpr",
-        "match_count": 2,
-        "samples": [
-          {
-            "procurement_record_id": 58421,
-            "agency_name": "Department of the Interior / Departmental Offices",
-            "vendor_canonical_name": "FLOCK GROUP INC",
-            "product_family": null,
-            "contract_amount_usd": 231600.0,
-            "contract_date": "2025-09-25",
-            "matched_canonical_name": "Flock Safety",
-            "matched_via_alias": "Flock",
-            "vendor_primary_category": "alpr"
-          },
-          {
-            "procurement_record_id": 58422,
-            "agency_name": "Department of Veterans Affairs / Department of Veterans Affairs",
-            "vendor_canonical_name": "FLOCK GROUP INC",
-            "product_family": null,
-            "contract_amount_usd": 21000.0,
-            "contract_date": "2025-09-17",
-            "matched_canonical_name": "Flock Safety",
-            "matched_via_alias": "Flock",
-            "vendor_primary_category": "alpr"
-          }
-        ]
-      },
-      {
         "canonical_name": "Axis Communications",
         "primary_category": "alpr",
         "match_count": 1,
@@ -2483,14 +2423,14 @@
     ]
   },
   "deployment_observations_inference": {
-    "total_match_count": 91572,
+    "total_match_count": 90974,
     "talos_exportable": false,
     "talos_export_reason": "\u00a74.2 + \u00a711 #1 \u2014 deployment_observations carry no identifier. Inference linking a deployment to a concrete identifier is a Phase 3+ activity (e.g., WiGLE BSSID surveys around a deployment lat/lon). Without that link, no identifiers row emits.",
     "by_vendor": [
       {
         "canonical_name": "Flock Safety",
         "primary_category": "alpr",
-        "match_count": 80733,
+        "match_count": 80236,
         "samples": [
           {
             "deployment_observation_id": 15124,
@@ -2541,7 +2481,7 @@
           "OH": 225,
           "AZ": 30,
           "TX": 229,
-          "CA": 202,
+          "CA": 201,
           "OK": 38,
           "NC": 120,
           "MI": 123,
@@ -2587,7 +2527,7 @@
       {
         "canonical_name": "Motorola Solutions",
         "primary_category": null,
-        "match_count": 4649,
+        "match_count": 4549,
         "samples": [
           {
             "deployment_observation_id": 15263,
@@ -2635,41 +2575,36 @@
         "by_state": {
           "GA": 9,
           "OR": 10,
-          "PA": 13,
+          "PA": 3,
           "NM": 8,
-          "CA": 79,
+          "CA": 76,
           "MO": 5,
-          "MD": 14,
+          "MD": 9,
           "IN": 5,
           "NJ": 6,
-          "IL": 30,
+          "IL": 6,
           "AL": 3,
           "UT": 5,
-          "FL": 14,
+          "FL": 12,
           "OH": 3,
-          "MA": 5,
-          "TX": 15,
-          "SD": 1,
-          "NY": 4,
-          "WA": 9,
+          "MA": 4,
+          "TX": 14,
+          "NY": 3,
+          "WA": 7,
           "VA": 5,
           "MN": 4,
-          "TN": 4,
+          "TN": 3,
           "SC": 1,
           "AZ": 1,
           "LA": 1,
           "NC": 5,
-          "WV": 8,
+          "WV": 4,
           "ID": 2,
           "NV": 3,
           "OK": 1,
-          "AK": 2,
-          "KY": 1,
-          "MT": 1,
+          "AK": 1,
           "WI": 3,
-          "VT": 1,
-          "NE": 6,
-          "HI": 1
+          "VT": 1
         }
       },
       {
@@ -2832,7 +2767,7 @@
       {
         "canonical_name": "SoundThinking",
         "primary_category": "gunshot_detect",
-        "match_count": 935,
+        "match_count": 934,
         "samples": [
           {
             "deployment_observation_id": 15073,
@@ -2883,7 +2818,7 @@
           "NC": 10,
           "NY": 12,
           "IN": 6,
-          "FL": 19,
+          "FL": 18,
           "NJ": 16,
           "MI": 2,
           "CA": 57,

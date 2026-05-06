@@ -1,4 +1,4 @@
-"""Tests for SAR-8 vendor-name-disambig predicate (db/extraction/vendor_name_disambig.py).
+"""Tests for SAR-8 + SAR-9 vendor-name-disambig (db/extraction/vendor_name_disambig.py).
 
 Coverage:
 - Positive (alias accepts) — every entry in VENDOR_ALIAS_ALLOWLIST.
@@ -9,6 +9,12 @@ Coverage:
 - Re-run determinism — predicate output is identical on identical input.
 - 20-row alias-recovered cases from MAC-39 — every raw_observation alias
   string from extraction_outputs/mac39 accepts as DJI canonical.
+- SAR-9 #1 Motorola Mobility/Solutions corporate-split FPs reject under
+  Motorola Solutions canonical; bare-Motorola flag_for_review; positive-
+  evidence accept (BSG / Broadband Solutions / Business Light).
+- SAR-9 #2 alias-iteration regression — HARRIS ADACOM CORPORATION rejects
+  under restructured caller via the per-canonical FP-list lookup.
+- SAR-9 #3 WatchGuard Technologies firewall reject under WatchGuard.
 """
 
 from __future__ import annotations
@@ -21,9 +27,12 @@ import pytest
 from db.extraction.vendor_name_disambig import (
     GEOGRAPHIC_PREFIX_LIST,
     VENDOR_ALIAS_ALLOWLIST,
+    VENDOR_BARE_TOKEN_FLAG,
     VENDOR_FP_LIST,
+    VENDOR_POSITIVE_EVIDENCE,
     _normalize_vendor,
     _strip_geographic_prefix,
+    alias_equality,
     is_canonical_vendor_match,
     is_flagged_for_review,
     is_fp_rejected,
@@ -284,7 +293,7 @@ def test_mac39_strict_fp_variants_reject_or_flag(
 
 
 def test_mac39_artifact_present_and_coherent() -> None:
-    """Smoke-test: the post-SAR-8 MAC-39 artifact contains the expected keys."""
+    """Smoke-test: the SAR-8/SAR-9 MAC-39 artifact contains the expected keys."""
     artifact = (
         Path(__file__).resolve().parent.parent
         / "extraction_outputs"
@@ -295,10 +304,313 @@ def test_mac39_artifact_present_and_coherent() -> None:
         pytest.skip("MAC-39 artifact not present; skipping smoke check.")
     payload = json.loads(artifact.read_text())
     p2 = payload["phase2_oui_inference"]
-    # Post-SAR-8 schema keys.
+    # SAR-8/SAR-9 schema keys (key names retained for backwards-compat across
+    # amendments; the contents reflect SAR-9 disposition).
     assert "sar8_accept_total" in p2
     assert "sar8_flag_for_review_total" in p2
-    # SAR-8 should produce at least the dispatch-projected ~405 accepts and at
-    # least the 2 GENETEC flag-for-review rows.
-    assert p2["sar8_accept_total"] >= 400
-    assert p2["sar8_flag_for_review_total"] >= 2
+    # Post-SAR-9, the accept count is well below the SAR-8 baseline of 411 due
+    # to Motorola Mobility (×274) + WatchGuard Technologies (×4) + Harris
+    # Adacom (×2) FP rejections. Expect ~120-140 staged accepts and ≥6 flagged
+    # (GENETEC ×2 + bare Motorola ×4).
+    assert p2["sar8_accept_total"] >= 100
+    assert p2["sar8_accept_total"] <= 200
+    assert p2["sar8_flag_for_review_total"] >= 6
+
+
+# ---------------------------------------------------------------------------
+# SAR-9 #1 — Motorola Mobility/Solutions corporate-split FP class.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    [
+        "Motorola Solutions Inc.",
+        "Motorola Solutions, Inc.",
+        "MOTOROLA SOLUTIONS, INC.",
+        "Motorola Solutions Malaysia Sdn. Bhd.",
+        "MOTOROLA SOLUTIONS MALAYSIA SDN. BHD.",
+        "Motorola Solutions",
+    ],
+)
+def test_sar9_motorola_solutions_canonical_accepts(candidate: str) -> None:
+    """SAR-9 TPs — Motorola Solutions canonical / Malaysia subsidiary accept."""
+    assert vendor_match_disposition(candidate, "Motorola Solutions") == "accept"
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    [
+        "Motorola - BSG",
+        "Motorola Inc Business Light Radios",
+        "Motorola, Broadband Solutions Group",
+    ],
+)
+def test_sar9_motorola_solutions_positive_evidence_accepts(candidate: str) -> None:
+    """SAR-9 #1 — business-radio shape qualifiers accept under Solutions."""
+    assert vendor_match_disposition(candidate, "Motorola Solutions") == "accept"
+
+
+@pytest.mark.parametrize(
+    "alias",
+    [
+        "Motorola APX",
+        "Motorola V300",
+        "Motorola V500",
+        "Motorola Vigilant",
+    ],
+)
+def test_sar9_motorola_solutions_model_line_aliases_accept(alias: str) -> None:
+    """SAR-9 #2 §2.1 alias re-scope — model-line aliases accept under Solutions."""
+    assert vendor_match_disposition(alias, "Motorola Solutions") == "accept"
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    [
+        "Motorola Mobility LLC, a Lenovo Company",
+        "Motorola Mobility LLC",
+        "MOTOROLA MOBILITY LLC, A LENOVO COMPANY",
+        "Motorola (Wuhan) Mobility Technologies Communication Co., Ltd.",
+        "Motorola(Wuhan) Mobility Technologies Communication Co.,Ltd",
+        "Motorola Wuhan Mobility",  # `(wuhan)` substring would miss; `mobility` catches.
+        "Lenovo Group Limited",  # `lenovo` substring catches.
+    ],
+)
+def test_sar9_motorola_mobility_lenovo_rejects(candidate: str) -> None:
+    """SAR-9 #1 — Motorola Mobility / (Wuhan) / Lenovo descendants reject_fp."""
+    disposition = vendor_match_disposition(candidate, "Motorola Solutions")
+    assert disposition == "reject_fp", (candidate, disposition)
+    assert is_fp_rejected(candidate, "Motorola Solutions") is True
+    assert is_canonical_vendor_match(candidate, "Motorola Solutions") is False
+
+
+@pytest.mark.parametrize("candidate", ["Motorola", "MOTOROLA", "motorola"])
+def test_sar9_bare_motorola_flags_for_review(candidate: str) -> None:
+    """SAR-9 #1 — bare `Motorola` token routes to flag_for_review."""
+    assert vendor_match_disposition(candidate, "Motorola Solutions") == "flag_for_review"
+    assert is_flagged_for_review(candidate, "Motorola Solutions") is True
+    assert is_canonical_vendor_match(candidate, "Motorola Solutions") is False
+    assert is_fp_rejected(candidate, "Motorola Solutions") is False
+
+
+def test_sar9_motorola_solutions_in_fp_list() -> None:
+    """SAR-9 #1 codifies mobility / (wuhan) / lenovo FP entries."""
+    assert "Motorola Solutions" in VENDOR_FP_LIST
+    substrings = {
+        str(e["substring"]).lower()
+        for e in VENDOR_FP_LIST["Motorola Solutions"]
+    }
+    assert "mobility" in substrings
+    assert "(wuhan)" in substrings
+    assert "lenovo" in substrings
+
+
+def test_sar9_motorola_solutions_alias_allowlist_rescoped() -> None:
+    """SAR-9 #2 — bare `Motorola` dropped; model-line aliases retained."""
+    aliases = VENDOR_ALIAS_ALLOWLIST["Motorola Solutions"]
+    assert "Motorola" not in aliases  # bare Motorola dropped
+    assert "Motorola APX" in aliases
+    assert "Motorola V300" in aliases
+    assert "Motorola V500" in aliases
+    assert "Motorola Vigilant" in aliases
+
+
+def test_sar9_motorola_bare_token_flag_registered() -> None:
+    """SAR-9 #1 — Motorola Solutions registered for bare-token flag_for_review."""
+    assert VENDOR_BARE_TOKEN_FLAG.get("Motorola Solutions") == "motorola"
+
+
+def test_sar9_motorola_positive_evidence_registered() -> None:
+    """SAR-9 #1 — Motorola Solutions positive-evidence list contains BSG/BLR/Broadband."""
+    evidence = VENDOR_POSITIVE_EVIDENCE.get("Motorola Solutions", ())
+    assert "broadband solutions" in evidence
+    assert "business light" in evidence
+    # Both space-bsg and dash-bsg variants needed for `Motorola - BSG` / `Motorola-BSG`.
+    assert " bsg" in evidence
+    assert "-bsg" in evidence
+
+
+# ---------------------------------------------------------------------------
+# SAR-9 #3 — WatchGuard Technologies (firewall) vs WatchGuard Video.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    [
+        "WatchGuard Technologies, Inc.",
+        "WatchGuard Technologies",
+        "WATCHGUARD TECHNOLOGIES, INC.",
+        "watchguard technologies",
+    ],
+)
+def test_sar9_watchguard_technologies_rejects(candidate: str) -> None:
+    """SAR-9 #3 — WatchGuard Technologies (firewall) reject_fp under WatchGuard."""
+    assert vendor_match_disposition(candidate, "WatchGuard") == "reject_fp"
+    assert is_fp_rejected(candidate, "WatchGuard") is True
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    ["WatchGuard Video", "WATCHGUARD VIDEO", "WatchGuard"],
+)
+def test_sar9_watchguard_video_still_accepts(candidate: str) -> None:
+    """WatchGuard Video / bare WatchGuard accept under §2.1 WatchGuard canonical."""
+    assert vendor_match_disposition(candidate, "WatchGuard") == "accept"
+
+
+def test_sar9_watchguard_in_fp_list() -> None:
+    assert "WatchGuard" in VENDOR_FP_LIST
+    substrings = {
+        str(e["substring"]).lower() for e in VENDOR_FP_LIST["WatchGuard"]
+    }
+    assert "watchguard technologies" in substrings
+
+
+# ---------------------------------------------------------------------------
+# SAR-9 #2 — caller restructure / alias-iteration bug regression.
+# ---------------------------------------------------------------------------
+
+
+def test_sar9_alias_equality_predicate_basic() -> None:
+    """alias_equality is exact-normalized equality (no prefix-token, no FP-list)."""
+    assert alias_equality("Motorola APX", "Motorola APX") is True
+    assert alias_equality("MOTOROLA APX", "Motorola APX") is True
+    assert alias_equality("Motorola APX, Inc.", "Motorola APX") is True
+    # No prefix-token — distinct from vendor_match_disposition's default match.
+    assert alias_equality("Motorola APX 6000", "Motorola APX") is False
+    assert alias_equality("", "Motorola APX") is False
+    assert alias_equality("Motorola APX", "") is False
+
+
+def test_sar9_alias_iteration_regression_harris_adacom() -> None:
+    """SAR-9 #2 — HARRIS ADACOM CORPORATION rejects under the restructured caller.
+
+    Pre-SAR-9 caller iterated alias-strings as the canonical_name argument;
+    `VENDOR_FP_LIST.get('Harris Corporation')` returned `[]` so the
+    `harris adacom` substring check never fired and the candidate was
+    accepted via prefix-token. Restructured caller invokes
+    ``vendor_match_disposition(candidate, 'Harris')`` ONCE per canonical
+    so the FP-list lookup fires correctly.
+    """
+    # Direct predicate at canonical = 'Harris' — should reject.
+    assert vendor_match_disposition("HARRIS ADACOM CORPORATION", "Harris") == "reject_fp"
+    assert vendor_match_disposition("Harris Adacom Corporation", "Harris") == "reject_fp"
+    # Via the restructured _classify caller — should NOT match (rejected at canonical).
+    from db.validation.sar8_bulk_stage import _classify
+
+    lexicon = [
+        {
+            "canonical_name": "Harris",
+            "primary_category": "imsi_catcher",
+            "alias_strings": ["Harris", "Harris Corporation"],
+        },
+    ]
+    assert _classify("HARRIS ADACOM CORPORATION", lexicon) is None
+    assert _classify("Harris Adacom Corporation", lexicon) is None
+    # Sibling sanity — `Harris Corporation` itself accepts via canonical.
+    hit = _classify("Harris Corporation", lexicon)
+    assert hit is not None
+    assert hit["canonical_name"] == "Harris"
+
+
+def test_sar9_caller_restructure_motorola_mobility() -> None:
+    """Restructured caller correctly rejects Motorola Mobility under Solutions."""
+    from db.validation.sar8_bulk_stage import _classify
+
+    lexicon = [
+        {
+            "canonical_name": "Motorola Solutions",
+            "primary_category": None,
+            "alias_strings": [
+                "Motorola Solutions",
+                "Motorola Vigilant",
+                "Motorola APX",
+                "Motorola V300",
+                "Motorola V500",
+            ],
+        },
+    ]
+    # Mobility variants reject under restructured caller.
+    assert _classify("Motorola Mobility LLC, a Lenovo Company", lexicon) is None
+    assert _classify(
+        "Motorola (Wuhan) Mobility Technologies Communication Co., Ltd.",
+        lexicon,
+    ) is None
+    # Solutions canonical accepts.
+    hit = _classify("Motorola Solutions Inc.", lexicon)
+    assert hit is not None
+    assert hit["canonical_name"] == "Motorola Solutions"
+    # Bare Motorola flags (caller treats flag_for_review as None — not staged).
+    assert _classify("Motorola", lexicon) is None
+    # Positive-evidence shapes accept.
+    hit = _classify("Motorola - BSG", lexicon)
+    assert hit is not None
+    assert hit["canonical_name"] == "Motorola Solutions"
+    hit = _classify("Motorola Inc Business Light Radios", lexicon)
+    assert hit is not None
+    assert hit["canonical_name"] == "Motorola Solutions"
+
+
+def test_sar9_caller_restructure_watchguard() -> None:
+    """Restructured caller rejects WatchGuard Technologies, accepts Video."""
+    from db.validation.sar8_bulk_stage import _classify
+
+    lexicon = [
+        {
+            "canonical_name": "WatchGuard",
+            "primary_category": "body_cam",
+            "alias_strings": ["WatchGuard", "WatchGuard Video"],
+        },
+    ]
+    assert _classify("WatchGuard Technologies, Inc.", lexicon) is None
+    hit = _classify("WatchGuard Video", lexicon)
+    assert hit is not None
+    assert hit["canonical_name"] == "WatchGuard"
+
+
+# ---------------------------------------------------------------------------
+# SAR-9 sibling-vendor / caller cross-vendor checks.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "candidate,canonical,expected",
+    [
+        # Motorola Mobility under non-Solutions canonical → no_match (FP list
+        # is per-canonical; Motorola Mobility is not in the §2.1 lexicon).
+        ("Motorola Mobility LLC, a Lenovo Company", "Axon", "no_match"),
+        ("Motorola Mobility LLC, a Lenovo Company", "Flock Safety", "no_match"),
+        # Solutions canonical — sibling candidate doesn't match.
+        ("Motorola Solutions Inc.", "Axon", "no_match"),
+        ("Motorola Solutions Inc.", "Flock Safety", "no_match"),
+    ],
+)
+def test_sar9_cross_vendor_motorola_no_match(
+    candidate: str, canonical: str, expected: str
+) -> None:
+    assert vendor_match_disposition(candidate, canonical) == expected
+
+
+# ---------------------------------------------------------------------------
+# SAR-9 re-run determinism (predicate + caller).
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "candidate,canonical",
+    [
+        ("Motorola Mobility LLC, a Lenovo Company", "Motorola Solutions"),
+        ("Motorola Solutions Inc.", "Motorola Solutions"),
+        ("Motorola - BSG", "Motorola Solutions"),
+        ("Motorola", "Motorola Solutions"),
+        ("WatchGuard Technologies, Inc.", "WatchGuard"),
+        ("HARRIS ADACOM CORPORATION", "Harris"),
+    ],
+)
+def test_sar9_predicate_determinism(candidate: str, canonical: str) -> None:
+    """Predicate output is deterministic on identical input."""
+    a = vendor_match_disposition(candidate, canonical)
+    b = vendor_match_disposition(candidate, canonical)
+    assert a == b
