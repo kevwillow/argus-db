@@ -17,6 +17,53 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 - **MAC-20 Wave-B2 Step 2 ExtractionWorker dispatch** spawned 2026-05-05T~15:0xZ from MAC-19 Step-1.5b ratification — **Cohort 3 (Hak5 Wayback) ONLY**, ~9 files / 738 KB clean; hybrid regex-first / LLM-second per MAC-18 architecture; per-row confidence; low-confidence → Phase-5 Validator (NOT higher-tier); `source_excerpt` ≤200 chars + overflow drop-with-skip-log; `raw_observations` writes only — NO `identifiers` promotion (§11 #8). Cohorts 1/2/4/5/6 absence-documented per §11 #1, scoped out by CEO ratification. ✅ **Step-2.1 deliverable RATIFIED by CEO `in_review`-on-board 2026-05-05T~15:25Z** at CEO comment [`37f1a20b`](/MAC/issues/MAC-20#comment-37f1a20b-9595-477a-b909-fcdff8b337e0): commit `564f0d2` (`db/sources/vendor_docs.py` 735 LOC + `tests/test_vendor_docs_extractor.py` 328 LOC, 15/15 pytests green re-run); `extraction_runs` rows 23+24 staged on `source_id=11`, `raw_observations=0`, `identifiers=0` (§11 #8 ✓); all hard-rule attestations verified disk-side (§11 #1/3/7/8/14, §7.3, MAC-18 #5, SAR-5, SAR-6 #1/2/3); structural finding = corpus-ceiling = 0 rows (GitBook landing pages, deep technical sub-pages not in scope of Step-1 fetch). **SAR-6 #3 stop-line TRIPPED** (0 rows / 30 mid-band projection = 0% ≪ ~50% trip band); CEO surfaced to board on MAC-1 [`0371793c`](/MAC/issues/MAC-1#comment-0371793c-bcf5-4a22-a136-73d0ab4934e4) for path (a)/(b)/(c) authorization with CEO recommendation = **(a) early-cut Wave-B2 + advance to Wave-A**. MAC-20 reassigned to board user `in_review`; awaiting board path-decision per SAR-6 item 5 board-class.
 
 ## Last action
+CEO heartbeat 2026-05-06T~17:1xZ (HB33 — **Board double-sign-off chained: SAR-8 codified, MAC-39 closed, SAR-8 impl + Step 5 dispatched**). Board ratified both halt-flags + comprehensive forward-runway authorization at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 17:08:16Z. 7-item chain executed under chain-don't-exit:
+
+(1) **SAR-8 codified in `BIBLE_AMENDMENTS.md`** at commit `811b4de` — vendor-name-disambig predicate (alias-allowlist + geographic-prefix handling). 12 strict-FPs enumerated (Axon Networks ≠ Axon Enterprise ×6 / Flock Audio ≠ Flock Safety ×3 / Harris Adacom ≠ Harris Corp ×2 / GENETEC Corporation flagged-for-review ×2). 20 alias variants enumerated (`SZ DJI TECHNOLOGY` Shenzhen-prefix / `CelleBrite Mobile Synchronization` early-OUI / etc.). Binds ExtractionWorker (§7.3) + Validator (§7.4) + new `db/extraction/vendor_name_disambig.py` module + future extractor passes. Mirrors SAR-7 lineage (operational guidance, no bible-text edit at SAR entry — but bible §12 edit landed in same commit per (2) below). Rejected option (b) "confidence-band-as-FP-flag" recorded for the audit trail.
+
+(2) **§12 Open Question added to `PROJECT_BIBLE.md`** at commit `811b4de` — "Single-product §2.1 vendor OUI categorization at export time — narrow §11 #10 / §5 Tier 4 reading vs strict §8.4. Decide at CP5 with empirical row-count visibility per disposition." Strict §8.4 conservative posture binds for v1 Phase-5 Step-4; narrow-read decision deferred to CP5. Single-product §2.1 vendors enumerated (Flock=alpr / DJI=drone / Skydio=drone / Hak5=hacking_tool / Cellebrite=hacking_tool / ShotSpotter=gunshot_detect).
+
+(3) **MAC-39 closed `done`** at 17:1xZ via PATCH with full ratification comment — halt-flag dispositions table (board-approved per (1) and (2)), Validator quality acknowledgment (read-only sweep / zero DB writes / idempotent / all 3 halt-flags surfaced rather than silently bundled / §11 hard-rule attestations clean / per-source candidate counts verifiable from artifact), Phase-5 Step-4 close state (proposal-only deliverable ratified; bulk-staging dispatched as separate child issue under (4)).
+
+(4) **SAR-8 implementation + bulk-staging dispatched as [MAC-41](/MAC/issues/MAC-41)** `todo` to Validator. 4-step internal scope: (A) implement `db/extraction/vendor_name_disambig.py` module + `_normalize_vendor` shared move + `VENDOR_FP_LIST` + `VENDOR_ALIAS_ALLOWLIST` + `GEOGRAPHIC_PREFIX_LIST`, with full positive/negative/edge-case test coverage; (B) re-run MAC-39 candidate sweep with new predicate (12 FPs removed + 20 alias-recovered + `GENETEC` flagged-for-review JSON artifact); (C) bulk-stage at strict §8.4 (`device_category='unknown'`, `source_type='inferred'`, conf ≤ 70 with SAR-1 LAA-bit penalty, full §11 #1/#7/#8/#12/#13/#14 attestations); (D) deliverable comment with row-count delta + per-vendor distribution + reassign CEO `in_review`. Stop-the-line clauses preserved (any new disambig class beyond SAR-7+SAR-8 = halt + comment + CEO).
+
+(5) **Step 5 dedup pass dispatched as [MAC-42](/MAC/issues/MAC-42)** `blocked` to Validator (via `blockedByIssueIds=[MAC-41]`). Per bible §6 Phase 5 #2 + §8.3 dedup contract; cross-source confidence uplift `min(99, max(originals) + 5)`; `superseded_by` audit trail; expected light dedup activity at Phase-5 baseline (Wave-A MAC + ~405 OUI-level inferred rows; Liteon `e4:aa:ea` not in §2.1 = no expected MAC×OUI collision; confirm empirically).
+
+(6) **PROJECT_STATE rotated to HB33** + this commit.
+
+(7) **HB33 chain-complete ack on MAC-1** (next, post-PROJECT_STATE-commit).
+
+### Phase-5 progress (HB33 close)
+
+| Step | Issue | Status | Outcome |
+|---|---|---|---|
+| 1 SAR-7 disambig | [MAC-37](/MAC/issues/MAC-37) | ✅ done | commit `c3938bd` |
+| 1 dup | [MAC-40](/MAC/issues/MAC-40) | ✅ done (duplicate) | HB31 close |
+| 2 Wave-A first-row promotion | [MAC-38](/MAC/issues/MAC-38) | ✅ done | commit `0fbd783` — first identifier in project history at conf=60 |
+| 3 Standing-advisory cross-reference | bundled into MAC-38 | ✅ done | 0 independent OUI hits across waves |
+| 4 Phase-3 inference proposal | [MAC-39](/MAC/issues/MAC-39) | ✅ done (HB33) | proposal-only ratified; halt-flags resolved per board (a)+(c) + strict §8.4 |
+| 4 follow-on SAR-8 + bulk-stage | [MAC-41](/MAC/issues/MAC-41) | 🟡 todo (Validator) | dispatched HB33 |
+| 5 Dedup pass | [MAC-42](/MAC/issues/MAC-42) | ⏳ blocked-by MAC-41 (Validator) | dispatched HB33 |
+| 6 Coverage matrix + 4 exports | not yet dispatched | ⏳ | TBD next CEO heartbeat after Step 5 close |
+| 7 CP5 sign-off | not yet dispatched | ⏳ | board-class final |
+
+### Bible state
+
+- **Bible HEAD:** `35900f0` (CP6, last bible-text edit)
+- **Amendments through:** `811b4de` (SAR-8 amendment + §12 Open Question added)
+- **Live SARs:** SAR-1 through SAR-8
+
+**Wake-board criteria forward:** (i) SAR-8 implementation deliverable (MAC-41) — CEO-class ratify per SAR-6 #1; chain Step-5 unblock; (ii) Step-5 dedup deliverable (MAC-42) — CEO-class ratify; chain Step-6 dispatch; (iii) Step-6 coverage matrix + 4 exports — CEO-class ratify; chain CP5 brief authoring; (iv) **CP5 brief surface for board sign-off — board-class final**; (v) §11 hard-rule trip (any step) → board.
+
+**Discipline:** Board explicitly authorized "All intermediate steps CEO-class with chain-don't-exit firing as appropriate. Wake me at CP5 brief surface or §11 hard-rule trip." This is a comprehensive forward-runway authorization comparable to HB17 ("standing autonomous run continues") — but bounded to Phase-5 Steps 4-follow-on through 6 + CP5 brief authoring (CP5 sign-off remains board-class).
+
+**DB state HB33 (unchanged this heartbeat — bulk-staging happens at MAC-41 close):** `identifiers=1` (Wave-A row, conf=60); `raw_observations=109,837`; `conflicts=0`; `sources=12`; `extraction_runs=27`; `manufacturers=34`; `schema_version=6`. Pitch-behavior binding (WiGLE-admin) holds verbatim through 2026-05-18 (12 days remaining).
+
+**Board non-blocking ask (slack-moment cleanup):** Issue tracker has sequential-allocator residue (MAC-24 / MAC-29 / MAC-34 auto-generated "Review productivity" tickets; MAC-37/38/39/40 narrative-vs-allocated drift earlier). One-line tidy at Phase-5 wrap-up for CP5 audit readability. Not load-bearing; deferred to a slack moment.
+
+---
+
+## Prior action (CEO heartbeat 2026-05-06T~16:40Z — HB32 Status-update + MAC-39 board-class halt-flags surfaced)
 CEO heartbeat 2026-05-06T~16:40Z (HB32 — **Status-update + MAC-39 board-class halt-flags surfaced**). Board ping "Status update?" at MAC-1 [`ee84381d`](/MAC/issues/MAC-1#comment-ee84381d-10db-4ce7-b0b4-c1b62141f0c5) 16:36:04Z prompted full-state re-verification per `feedback_verify_before_recap.md` (extended this heartbeat with parent-coordination-issue-children-check rule). HB32 status update posted on MAC-1 at [`4bd6644c`](/MAC/issues/MAC-1#comment-4bd6644c-e2be-42f9-9acf-7856b828e1dd) — 9 sections: slip-acknowledgment + true Phase-5 state table + DB state + Validator quality assessment + 3 halt-flags surfaced from MAC-39 with CEO recommendations + forward path table + pitch-behavior binding status.
 
 **True Phase-5 progress (verified against git log + DB + issue tree this heartbeat):**
