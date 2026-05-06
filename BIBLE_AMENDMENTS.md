@@ -487,3 +487,52 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 - **Why a SAR, not a Correction Pass.** No bible text is being edited. Mirrors SAR-1's relationship to §7.3 (interpretive guidance binding implementation, not contract) and SAR-3/SAR-4/SAR-5/SAR-6's pattern of single-decision interpretive bundles.
 
 **CP4 brief reference.** Full Phase-4 close + Phase-5 dispatch readiness context lives in `/home/kev/argus/CP4_BRIEF.md` (commit `dff9e6e`, board-ratified via approval [`bf95a897`](/MAC/approvals/bf95a897-834c-473e-99f1-63d6cefd4b06)).
+
+---
+
+### SAR-8 — Vendor-name-disambig predicate (alias allowlist + geographic-prefix handling)
+
+**Date:** 2026-05-06
+**Source:** [MAC-39](/MAC/issues/MAC-39) Phase-5 Step-4 halt-flag #1 surfaced by Validator at [`dd521ad3`](/MAC/issues/MAC-39#comment-dd521ad3-11f5-4c3c-855b-b84429ebbcb3) 2026-05-06T15:20:07Z; CEO surfaced to board at MAC-1 [`4bd6644c`](/MAC/issues/MAC-1#comment-4bd6644c-e2be-42f9-9acf-7856b828e1dd) 16:40:29Z; board ratification via MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z, approving option (a)+(c) combined and rejecting (b) ("mixing confidence-band signals with FP-flagging signals at the wrong layer").
+**Bible commit:** SAR-8 entry committed paired with this amendment-log landing; no bible-text edit.
+**Binds:** Extraction Worker (§7.3), Validator (§7.4), new `db/extraction/vendor_name_disambig.py` module + future extractor passes.
+
+**The rule.** When matching candidate vendor strings against the §2.1 / 24-vendor canonical lexicon (Phase-3 inference, Phase-4 retroactive sweeps, future extractor passes), the predicate must:
+
+1. **Reject prefix-token false-positives** where the candidate string carries a tokenizable prefix that collides with a §2.1 canonical name but the full normalized string is a distinct entity. Concrete cases observed at MAC-39:
+    - `Axon Networks Inc.` ≠ Axon Enterprise (×6 hits)
+    - `Flock Audio Inc.` ≠ Flock Safety (×3 hits)
+    - `Harris Adacom Corp` ≠ Harris Corp (×2 hits)
+    - `GENETEC Corporation` may be distinct from Genetec Inc. (×2 hits — flag for human review)
+
+2. **Recover canonical-name matches** under geographic-prefix variations. Concrete cases observed at MAC-39:
+    - `SZ DJI TECHNOLOGY CO.,LTD` (Shenzhen-prefix; canonical IEEE registration name for DJI) → matches `dji`
+    - `CelleBrite Mobile Synchronization` (early-2000s OUI; same entity as today's Cellebrite) → matches `cellebrite`
+
+3. **Maintain a per-vendor alias allowlist** keyed by canonical §2.1 name. Allowlist entries are explicit string variants that the predicate accepts as canonical-vendor matches. Entries in the FP list (item 1) are explicit string variants the predicate rejects.
+
+4. **Geographic-prefix handling:** `SZ` (Shenzhen), `Shenzhen`, `SZ.`, `Shenzhen Co.,` and similar 2–10-char geographic prefixes are stripped before normalization comparison. Do not strip US state/city prefixes when they carry separate legal-entity meaning (e.g., `New York Axon` is not Axon Enterprise).
+
+**Reasoning.** MAC-39 Phase-3 inference candidate sweep surfaced 12 strict-path FPs and 20 permissive-path missed-TPs at OUI×§2.1 vendor matching. The strict-path FPs are real false matches (Axon Networks ≠ Axon Enterprise); the permissive-path missed-TPs are real entity matches obscured by IEEE registration name conventions (DJI registers as `SZ DJI TECHNOLOGY CO.,LTD`). Rule shape captures both classes via a single allowlist-driven module rather than ad-hoc regex.
+
+**Implementation directive (per board (a)+(c) approval).**
+- New module `db/extraction/vendor_name_disambig.py` carrying:
+    - `_normalize_vendor(name: str) -> str` (moved from MAC-39 sweep code; canonical normalization predicate shared across extractor passes)
+    - `is_canonical_vendor_match(candidate: str, vendor_canonical: str) -> bool` (allowlist-driven match predicate; consumes FP list + alias allowlist)
+    - `VENDOR_FP_LIST` (constant, 12+ FP cases enumerated above)
+    - `VENDOR_ALIAS_ALLOWLIST` (constant, 20+ alias variants enumerated above; per-canonical-vendor keyed)
+    - `GEOGRAPHIC_PREFIX_LIST` (constant; `SZ`, `Shenzhen`, etc.)
+- Tests required: positive (each alias accepts) + negative (each FP rejects) + edge (`GENETEC Corporation` flagged for human review, not silently accepted/rejected).
+- Wired into Phase-5 Step-4 follow-on (SAR-8 application against MAC-39 candidate set + bulk-stage); Phase-4 retroactive sweeps re-run post-implementation; future extractor passes inherit.
+
+**False-negative leaning.** The allowlist is an explicit-add predicate. Vendors with ambiguous corporate naming (e.g., overseas subsidiaries with significant rebranding) require explicit alias entries. Phase-5 inference sweep surfaces unknown-alias counts in the bulk-staging deliverable comment.
+
+**Rejected option (b) — for the record.** Emit permissive-only matches at confidence ≤ 30 as FP-pending was rejected by board reasoning: "mixing confidence-band signals with FP-flagging signals at the wrong layer. Confidence reflects source/methodology certainty; FP review is a separate discipline. Keep them clean." (MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d)).
+
+**Application timing and binding scope.**
+- **Binds at Phase-5 Step-4 follow-on dispatch.** SAR-8 codified now; implementation lands as Validator-execution against MAC-39 candidate set.
+- **Does not retroactively rewrite Phase-4 wave dispositions** (Wave-B/B2/A/C/D/E early-cuts and Wave-A row promotion stand). SAR-8 governs Phase-5 inference + future extractor passes.
+- **§7.3 / §7.4 contractual surface unchanged.** SAR-8 is operational guidance for the new disambig module + future extractor pass surfaces.
+- **Why a SAR, not a Correction Pass.** No bible text is being edited. Mirrors SAR-7's relationship to §7.3/§7.4 (operational guidance binding implementation, not contract).
+
+**MAC-39 reference.** Full halt-flag context + per-source candidate counts lives in MAC-39 Validator deliverable [`dd521ad3`](/MAC/issues/MAC-39#comment-dd521ad3-11f5-4c3c-855b-b84429ebbcb3); CEO halt-flag surface to board at MAC-1 [`4bd6644c`](/MAC/issues/MAC-1#comment-4bd6644c-e2be-42f9-9acf-7856b828e1dd); board ratification at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d).
