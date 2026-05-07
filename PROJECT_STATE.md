@@ -18,6 +18,47 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-07T~22:30Z (HB49 — **Lynceus engineer re-delivery package surfaced to board on MAC-1 [`f5a7812e`](/MAC/issues/MAC-1#comment-f5a7812e-0577-4e07-822e-826a805eb6e1) · HB48 chain (d)+(e) closed**).
+
+**HB49 — board wake on MAC-1 [`5513620e`](/MAC/issues/MAC-1#comment-5513620e-18c6-4c9a-b286-457641dea161) 22:27:38Z** ("Can you proceed with or surface HB49 please?"). HB48 had landed cleanly at state commit `a1be64c` with chain items (d)+(e) marked ⏳ — this heartbeat is the natural cadence to fold them in alongside the HB48-forward plan's queued board notification.
+
+**HB49 — re-delivery package independently spot-verified before surfacing.** All 4 artifacts on disk in `argus/exports/`:
+1. `argus_export.json` — 18 entries, `argus_run_id=6bf7d50f-0917-5687-bbc5-a156363d8853`, entry keys `[argus_record_id, description, pattern, pattern_type]` (4-field minimal shape per §7.5), sha256 `52e2ab418c749169ae94986d78d85fa9ee3f23f1aec57be5ccb61fd6fbebe131`. **Byte-stable vs prior delivery** = no functional change for the operational feed.
+2. `argus_export_high_confidence.json` — 0 entries, sha256 `4418aec60fa8692f1a9095d827cf0fddade5a947a8b0e7f7bc4598d14f82d097`.
+3. `argus_export.csv` — 63 active rows + `# meta:` line + 16-col header (15 CP11 cols + `notes` tail) + Wave-A SAR-10 hash `eea6f74486eea9c0` at row 1 (Flock Safety `e4:aa:ea:80:a1:9b`), `schema_version=8`, sha256 `fe5c8e1c6feccb141f2e94567cb3e49ce2e844f939970cdede95df5c46347076`.
+4. `coverage_report.md` — `## Lynceus integration: dual-artifact contract (CP11)` section at line 7, sha256 `48a7abf0975eab11399dd08d0188f9c2e4008abac53a57321df1a5e750ee717a`.
+
+**HB49 — board notification posted on MAC-1.** Comment [`f5a7812e`](/MAC/issues/MAC-1#comment-f5a7812e-0577-4e07-822e-826a805eb6e1) at 22:30:48Z. Contents: HB48 closure recap one-liner + 4-artifact bundle table with sha256 fingerprints + engineer-facing change summary (JSON byte-stable / CSV 12→16 cols / Wave-A `argus_record_id=eea6f74486eea9c0` SAR-10 / `fcc_id` deferred to v1.1) + 2 procedural carry-forwards (no urgency: `last_verified` semantics + §11 #7 attestation log discipline) + wake-board criteria. Pitch-binding reaffirmed verbatim (11 days remaining to 2026-05-18).
+
+**HB49 — MAC-1 reassigned `in_review` to user `ve8D79nSrERcuRYUzld9JyB4lXghkKhx`** as standing kickoff thread. PATCH 22:30:5xZ; `assigneeAgentId=null`, `assigneeUserId=ve8D79n…`, status `in_review`. HB48 chain items (d) MAC-1 closure recap + (e) MAC-1 reset to in_review now ✅.
+
+**HB49 — chain-don't-exit fired:**
+- (a) Independent artifact verification + sha256 capture ✅
+- (b) HB49 board notification posted ✅ ([`f5a7812e`](/MAC/issues/MAC-1#comment-f5a7812e-0577-4e07-822e-826a805eb6e1))
+- (c) MAC-1 reassigned to user `in_review` ✅
+- (d) PROJECT_STATE rotated to HB49 (this commit) ⏳
+- (e) Daily memory 2026-05-07 carries forward HB49 alongside HB47/HB48 entries ⏳
+
+**HB49-forward sequence:**
+- HB50 (next CEO heartbeat — wake-driven only): board acknowledgement of re-delivery OR Lynceus engineer integration test results (board-routed) OR [MAC-50](/MAC/issues/MAC-50) axis ratification surface OR §11 hard-rule trip
+- No autonomous dispatch teed up; Argus v1 + Lynceus integration handoff is at a natural rest-state pending external feedback
+- Parallel: [MAC-50](/MAC/issues/MAC-50) public-release planning track continues on its own thread (HB45 dispatch)
+
+**Wake-board criteria (HB49-forward — unchanged from HB48 except Lynceus delivery now done):**
+- Lynceus engineer integration test results (board-routed; HB49 made the bundle deliverable)
+- [MAC-50](/MAC/issues/MAC-50) axis ratifications (parallel public-release planning track)
+- §11 hard-rule trip
+- Refresh-cadence cron specs surface (Track 2 from original Lynceus prompt)
+- WiGLE-admin response (post-§2-ratification + email send; or 2026-05-18 timeout)
+
+**Phase-5+post-CP5 invariants preserved (HB49 — frozen since HB42 unchanged):** `identifiers=121 total / 63 active`. Lynceus survivors: 18 standard / 0 high-conf. Schema version 8 (CSV `meta:` line cites 8; this is the export-time `schema_version`, not the DB schema_version which remains 7 per HB42 baseline — CP11 export-shape change does not bump DB schema). Live SARs 1–10. Live CPs 1–11. Test suite: 391 passed / 2 skipped / 0 failed.
+
+**Bible HEAD:** `c2ef963` (unchanged from HB47/HB48 — no further bible churn this heartbeat). **State HEAD pre-HB49:** `a1be64c`.
+
+WiGLE pitch-binding holds verbatim through 2026-05-18 (11 days remaining at HB49). Public release timing respects this.
+
+---
+
 CEO heartbeat 2026-05-07T~20:23Z (HB48 — **MAC-51 Step-0 RATIFIED · CP11 implementation CLOSED at commit `221bc82` · dual-artifact contract live**).
 
 **HB48 — Validator deliverable wake on MAC-51.** Validator (`da137694-…`) delivered single-pass commit `221bc82` (`feat(export): CP11 MAC-51 — argus_export.csv 15-column expansion + coverage_report dual-artifact section`) on top of HB47 state `c4abe4e` and bible HEAD `c2ef963`. Wake comment [`01a20c05`](/MAC/issues/MAC-51#comment-01a20c05-20c7-4146-b0d5-862e83a93130) reported all 6 dispatch clauses pass + 4 procedural notes (none halts). Patterned per MAC-49 single-pass cycle.
