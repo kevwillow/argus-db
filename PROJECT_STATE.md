@@ -18,6 +18,45 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-07T19:41Z (HB46 — **board JSON-vs-CSV reconciliation question; CP11 ratification proposal surfaced — JSON-as-operational-feed + CSV-as-rich-import canonical contract**).
+
+**HB46 — board wake at MAC-1 [`3e612a85`](/MAC/issues/MAC-1#comment-3e612a85-e2b4-4922-89ed-3552062cc25e) 19:35:34Z.** Board (acting as Lynceus integration recipient) flagged JSON shape divergence from Lynceus Section 2 spec — JSON has 4 fields per entry (`pattern, pattern_type, description, argus_record_id`); spec asked for 5 required + 11 optional preserved. Two questions: (Q1) is this the latest export?; (Q2) deliberate departure or propagation gap? Board offered two unblock paths: (a) update JSON to match spec; (b) lowest-friction — add `argus_record_id` to CSV header so Lynceus consumes CSV as canonical input.
+
+**HB46 — verification (Q1).** Independently verified `exports/argus_export.json` on disk: file mtime 2026-05-07 13:50:54 EDT (= 17:50:54Z), `argus_run_id=6bf7d50f-0917-5687-bbc5-a156363d8853`, schema_version 8, record_count 18, entries[0] keys = `['pattern', 'pattern_type', 'description', 'argus_record_id']`. **Confirmed: latest export, no fresher run since 17:50:54Z.** CSV independently verified: 63 rows, 12 columns matching board's claim; spec-equivalent provenance fields present except `argus_record_id` and CP8-flat `description` (computed only in JSON path).
+
+**HB46 — diagnosis (Q2): propagation gap, not deliberate departure.** Trace:
+1. HB39 Lynceus integration handoff dispatch flagged 2 halt-flags + 6 picks; **Pick #3 (Item 5 sequencing): "Wait for Lynceus Section 2 field-shape spec before locking entry shape. No urgency."** Lynceus integration handoff doc §5.4 explicitly proposed "ADD all 5 fields per-entry" expansion.
+2. HB40 bundle ratification at `0aa89a0` ratified CP7+CP8(sub-A description+sub-B severity)+CP9+CP10+SAR-10. Pick #3 acknowledged as deferred. **CP8 covers description + severity only — does NOT include per-entry-provenance expansion.**
+3. MAC-48 implementation built JSON exporter against MINIMAL v1 §7.5 entry shape per CP8-narrowed scope, with per-entry-provenance expansion gated on deferred Pick #3.
+4. Section 2 spec ratified on board side after HB40; **CEO never explicitly notified** that the gating spec landed; Pick #3 became orphaned.
+
+Net: CP8 sub-A (description-flatten) + CP8 sub-B (severity-out) are deliberate and stay; per-entry-provenance stripping is the pre-existing v1 §7.5 minimal shape that was never expanded.
+
+**HB46 — CP11 ratification proposal surfaced.** MAC-1 [`447781e0`](/MAC/issues/MAC-1#comment-447781e0-d17d-4da3-a4dd-39f8552ed9b7). Three sub-pieces:
+- **CP11 sub-A** — Add `argus_record_id` (SAR-10 16-char hex) + `description` (CP8 flat) columns to `argus_export.csv` via `_write_csv()` field_order at `db/validation/export_lynceus.py:486`. ~10-LOC change in one function.
+- **CP11 sub-B** — Bible amendment formalizing dual-artifact contract: `argus_export.json` (operational alert feed, minimal entry, CP7-filtered, CP8-flattened) + `argus_export.csv` (rich-import feed, full 14-col, unfiltered). Verbatim §-text drafted. Supersedes HB39 §5.4 "ADD all 5 fields per-entry" position.
+- **CP11 sub-C** — `coverage_report.md` documents the dual-artifact split (auto-regen on next export run via wording add to `_build_coverage_report_md()`).
+
+5 open picks for board: bundle vs sub-by-sub ratify; CSV unfiltered vs CP7-applied (CEO recs unfiltered); shared `_format_description()` call vs CSV-side re-derive (CEO recs shared); `first_seen`/`last_verified`/`fcc_id` defer to v1.1 (CEO recs defer); Lynceus engineer notification post-CP11 close.
+
+**HB46 sequence (proposed):** HB46 surface → HB47 (post-board-ratify) MAC-51 dispatch to Validator → HB48 (post-MAC-51-close) re-export sample artifacts + board re-delivers to Lynceus engineer. ~3 CEO heartbeats wall-clock.
+
+**Carry-forward note:** MAC-51 dispatch will explicitly require text-replace operations to preserve historical narrative around v1 §7.5 minimal-entry-shape (HB42 baseline canonical) per just-codified `feedback_text_replace_narrative_historical_safety`. HB44 lesson sticks.
+
+**Wake-board criteria (HB46-forward):**
+- Board ratification of CP11 (this proposal)
+- MAC-50 axis ratifications (parallel track; board, on MAC-50)
+- Lynceus engineer integration test results (board-routed; will likely re-fire post-CP11 land)
+- §11 hard-rule trip
+- Refresh-cadence cron specs surface (Track 2)
+- WiGLE-admin response (post-§2-ratification + email send)
+
+**Phase-5+post-CP5 invariants preserved (HB46 — frozen since HB42 unchanged):** `identifiers=121 total / 63 active`. Lynceus exports: 18 standard / 0 high-conf survivors. Schema version 7. Live SARs 1–10. Live CPs 1–10 (CP9 implementation CLOSED; CP11 in-flight as proposal).
+
+WiGLE pitch-binding holds verbatim through 2026-05-18 (11 days remaining at HB46). Public release timing respects this.
+
+---
+
 CEO heartbeat 2026-05-07T19:24Z (HB45 — **board ack landed; three asks executed: text-replace narrative-safety memory durable + Lynceus engineer addendum landed + [MAC-50](/MAC/issues/MAC-50) public-release planning track DISPATCHED with comprehensive plan doc**).
 
 **HB45 — board wake at MAC-1 [`63b1f81c`](/MAC/issues/MAC-1#comment-63b1f81c-fe03-4ff6-8868-9366c9908544) 19:14:24Z.** Three asks: (a) codify HB44 text-replace forward-rule as feedback memory; (b) fold two docs-tightenings (default `("US",)` filter + geographic_scope-dormant-on-current-dataset) into Lynceus engineer integration handoff; (c) dispatch public-release planning track as fresh ratification proposal.
