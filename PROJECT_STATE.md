@@ -18,6 +18,48 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-07T19:24Z (HB45 — **board ack landed; three asks executed: text-replace narrative-safety memory durable + Lynceus engineer addendum landed + [MAC-50](/MAC/issues/MAC-50) public-release planning track DISPATCHED with comprehensive plan doc**).
+
+**HB45 — board wake at MAC-1 [`63b1f81c`](/MAC/issues/MAC-1#comment-63b1f81c-fe03-4ff6-8868-9366c9908544) 19:14:24Z.** Three asks: (a) codify HB44 text-replace forward-rule as feedback memory; (b) fold two docs-tightenings (default `("US",)` filter + geographic_scope-dormant-on-current-dataset) into Lynceus engineer integration handoff; (c) dispatch public-release planning track as fresh ratification proposal.
+
+**HB45 — Memory durable filed.** `feedback_text_replace_narrative_historical_safety` codifies the rule verbatim plus dispatch-contract clause + acceptance gate + post-close repair pattern + generalization to non-rename text-substitutions. Lineage: `verify_before_recap` + `check_git_index_before_state_commit`. MEMORY.md index updated.
+
+**HB45 — Lynceus integration handoff doc updated.** Document `lynceus_v03_integration` revision `d6d74f9c-…` (was `2c071159-…` at HB39 land). HB45 ADDENDUM section appended with Clarification A (default filter `("US",)` + `global` unconditional pass + `unknown`/NULL handling + comma-separated codes) + Clarification B (geographic_scope filter exercises 0 records on current dataset; predictions for engineer's sense-making + spike-test instructions) + bonus reconciliation explainer (63 source − 45 unknown_category − 0 geographic_scope_mismatch = 18 entries). Doc is engineer-facing only; not a CP-class amendment per board direction.
+
+**HB45 — [MAC-50](/MAC/issues/MAC-50) public-release planning track dispatched.** Created `in_review` to board user `ve8D79nSrERcuRYUzld9JyB4lXghkKhx`, parent=MAC-1. Plan document landed at MAC-50 `#document-plan` revision `4a7efc52-…` (32.5KB / ~4,500 words). 8 axes covered with CEO recommendations:
+- §1 License: AGPL-3.0 code + ODbL-1.0 data + CC-BY-SA-4.0 docs; Atlas NC clause path (b) quarantine 15,071 rows
+- §2 WiGLE binding: path (b) proactive update with email draft included verbatim for board send
+- §3 Sensitive-content scrubbing: 11 surfaces enumerated (A–K) + remediation table + estimated effort/risk per surface
+- §4 Documentation: 15-doc set including dedicated THREAT_MODEL.md
+- §5 Public-vs-private matrix: top-level inventory tabulated; PROJECT_STATE.md only excluded; CEO recs (b) gitignore + history rewrite bundled with §3 author-rewrite
+- §6 Bible amendments: §1 mission update + §11 #2 license posture + §12 contribution-policy + vendor-takedown new entries; coordinated commit per `0aa89a0` precedent
+- §7 Hosting: new GitHub org + branch protection + CI deferred-or-now (board call)
+- §8 Sequence: Lynceus integration → integration test passes → release prep → WiGLE handling → public push; ~3-4 weeks wall-clock; WiGLE binding floor 2026-05-19 OR post-(b)-ack
+- 10 cross-cutting open questions surfaced for board judgment
+Ratification posture: CEO surfaces fresh-ratification proposals per axis; board ratifies in chunks.
+
+**HB45 — chain-don't-exit fired:**
+- (a) Memory durable filed ✅
+- (b) Lynceus addendum landed ✅
+- (c) MAC-50 created + plan doc landed + reassigned to board ✅
+- (d) MAC-1 chain comment [`3c2ba207`](/MAC/issues/MAC-1#comment-3c2ba207-5edf-40c0-a424-9a539ddb4c52) ✅
+- (e) PROJECT_STATE rotated to HB45 (this commit) ⏳
+- (f) Memory daily 2026-05-07 updated + MEMORY.md index updated ⏳
+- (g) MAC-1 reset to `in_review` ✅
+
+**Wake-board criteria (HB45-forward):**
+- MAC-50 axis ratifications (board, on MAC-50; CEO surfaces drafts per cadence)
+- Lynceus engineer integration test results (board-routed)
+- §11 hard-rule trip
+- Refresh-cadence cron specs surface (Track 2; sequence after Lynceus integration confirms)
+- WiGLE-admin response (post-§2-ratification + email send)
+
+**Phase-5+post-CP5 invariants preserved (HB45 — frozen since HB44 unchanged):** `identifiers=121 total / 63 active`. Lynceus exports: 18 standard / 0 high-conf survivors. Schema version 7. Live SARs 1–10. Live CPs 1–10 (CP9 implementation CLOSED).
+
+WiGLE pitch-binding holds verbatim through 2026-05-18 (11 days remaining at HB45). Public release timing respects this.
+
+---
+
 CEO heartbeat 2026-05-07T~18:5xZ (HB44 — **MAC-49 Step-0 ratified + CP9 implementation CLOSED · post-close historical-text repair · chain to MAC-1 fired**).
 
 **HB44 — MAC-49 Step-0 ratify (CEO).** Validator delivered Sub-A `ebc5404` + Sub-B `34da059`. Independent CEO verification at MAC-49 [`0875d1a2`](/MAC/issues/MAC-49#comment-0875d1a2) reproduced all 5 acceptance-gate clauses (clause #4 substituted side-effect-free `python -c "import db.export.wave_a_snapshot_export"` per Validator's Note 2 — original `--help` was authored against a hypothetical argparse contract, MAC-22 script is stdlib-only). Combined diff `9bb4e55..HEAD` = 4 files / 27 insertions / 9 deletions, zero out-of-scope edits. Byte-stable re-export confirmed: `_meta.argus_run_id=6bf7d50f-0917-5687-bbc5-a156363d8853`, `record_count=18`, `dropped.unknown_category=45`, `dropped.geographic_scope_mismatch=0`, SAR-10 Wave-A hash `eea6f74486eea9c0` byte-matches in `entries[]`. `DEFAULT_GEOGRAPHIC_SCOPE_FILTER=("US",)` unchanged; `db/export/argus_record_id.py` SAR-10 module untouched; `db/exports/` removed; canonical tree `db/export/` only.
