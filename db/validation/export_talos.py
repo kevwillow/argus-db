@@ -1,32 +1,44 @@
-"""Phase-5 Step-6 Talos export writer (MAC-46).
+"""Phase-5 Step-6 Lynceus export writer (MAC-46 + MAC-48 §B2).
 
 Generates the four §6 Phase 5 #5 / §9 item 2 deliverables in ``argus/exports/``:
 
-1. ``argus_export.json`` — Talos-consumable, confidence floor 30, applies
-   §4.4 type mapping + §4.5 severity + §7.5 description-format constraints.
-2. ``argus_export_high_confidence.json`` — Talos-consumable, confidence floor
-   70, applies the §8.4 / §11 #12 Pi self-exclude OUI ban.
-3. ``argus_export.csv`` — human-readable, all 63 active canonical rows (no
-   Talos filtering).
+1. ``argus_export.json`` — Lynceus-consumable, confidence floor 30, applies
+   §4.4 type mapping + §7.5 description-format constraints + CP7
+   geographic_scope filter (default ``["US"]``).
+2. ``argus_export_high_confidence.json`` — Lynceus-consumable, confidence
+   floor 70, applies §8.4 / §11 #12 Pi self-exclude OUI ban + CP7 filter
+   (and rejects ``geographic_scope IN ('unknown', NULL)`` per CP7).
+3. ``argus_export.csv`` — human-readable, all 63 active canonical rows
+   (no Lynceus filtering).
 4. ``coverage_report.md`` — coverage matrix + gap analysis + §9 item 9
-   "Dropped from Talos export" tally reconciliation against the
-   ``_meta.dropped_in_export`` blocks of the two Talos files.
+   "Dropped from Lynceus export" tally reconciliation against the
+   ``_meta.dropped_in_export`` blocks of the two Lynceus files.
 
 Authority chain
 ---------------
 - Bible §4.4 — identifier_type → pattern_type mapping (verbatim).
-- Bible §4.5 — device_category → severity mapping (verbatim).
-- Bible §7.5 — Talos export shape, ``_meta.dropped_in_export`` block,
-  description-format constraints, idempotency contract.
+- Bible §4.5 — device_category → severity mapping (SUPERSEDED at CP8;
+  severity owned operator-side via Lynceus's ``severity_overrides.yaml``;
+  no severity emitted in export shape).
+- Bible §7.5 — Lynceus export shape, ``_meta.dropped_in_export`` block,
+  description-format constraints (CP8 flat form), idempotency contract.
 - Bible §8.4 + §11 #12 — Pi self-exclude OUI list.
 - Bible §11 #6 — read-only DB access during export pass
   (``PRAGMA query_only = ON``).
-- Bible §11 #13 — ``device_category='unknown'`` Talos-export ban.
-- Bible §11 #14 — ``source_type='procurement'`` Talos-export ban.
+- Bible §11 #13 — ``device_category='unknown'`` Lynceus-export ban.
+- Bible §11 #14 — ``source_type='procurement'`` Lynceus-export ban.
+- BIBLE_AMENDMENTS.md CP7 — ``geographic_scope`` export-time filter.
+- BIBLE_AMENDMENTS.md CP8 — flat ``{vendor} {device_category}`` description
+  ≤80 char, severity reframed-as-historical (dropped from output shape).
+- BIBLE_AMENDMENTS.md SAR-10 — ``argus_record_id =
+  sha256(type|identifier)[:16]`` (the §8.3 dedup-key hash, stable under
+  re-runs / confidence drift / source edits / vendor reattribution).
 - MAC-45 ``coverage_matrix_report.json`` — drives drop_assignments map +
-  pre-tallied bin counts; the writer reconciles against this map and halts
-  on any mismatch (no silent re-tally).
-- MAC-46 dispatch (HB36).
+  pre-tallied bin counts; the writer reconciles static-bin classifications
+  against this map and halts on any mismatch (no silent re-tally). The
+  CP7 geographic_scope filter is applied AFTER static reconciliation as
+  a runtime parameter, so its tally is not in MAC-45's pre-tally.
+- MAC-46 dispatch (HB36); MAC-48 §B2 dispatch (HB41).
 
 Read-only contract
 ------------------
@@ -63,6 +75,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from db.export.argus_record_id import argus_record_id as _sar10_hash
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DB_PATH = REPO_ROOT / "db" / "argus.db"
 EXPORTS_DIR = REPO_ROOT / "exports"
@@ -86,9 +100,13 @@ IDENTIFIER_TYPE_TO_PATTERN_TYPE: dict[str, str | None] = {
     "device_fingerprint": None,  # DROPPED per §4.4
 }
 
-# §4.5 severity mapping (verbatim, including the in_vehicle_router row even
-# though no migration-0001 enum value matches — kept for documentation).
-DEVICE_CATEGORY_TO_SEVERITY: dict[str, str] = {
+# §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
+# Severity is now owned operator-side via Lynceus's ``severity_overrides.yaml``;
+# the export shape no longer emits ``severity``. The mapping below is retained
+# only for audit-trail / historical-reasoning continuity per CP8 sub-correction
+# B; future export shape changes MUST NOT consult this table for severity
+# values.
+_DEVICE_CATEGORY_TO_SEVERITY_HISTORICAL: dict[str, str] = {
     "imsi_catcher": "high",
     "alpr": "high",
     "covert_cam": "high",
@@ -99,9 +117,8 @@ DEVICE_CATEGORY_TO_SEVERITY: dict[str, str] = {
     "body_cam": "med",
     "drone": "med",
     "police_radio": "low",
-    "in_vehicle_router": "low",  # §4.5 row; not in migration-0001 enum.
+    "in_vehicle_router": "low",
     "gunshot_detect": "low",
-    # `unknown` is intentionally absent — §11 #13 bans it from Talos export.
 }
 
 # §8.4 / §11 #12 Pi self-exclude OUIs (the running-scanner hardware family).
@@ -112,24 +129,19 @@ PI_SELF_EXCLUDE_OUIS: frozenset[str] = frozenset(
 # §4.4 mac_range expansion ceiling.
 MAC_RANGE_EXPANSION_CEILING = 256
 
-# §7.5 description-format constraint.
+# §7.5 description-format constraint (CP8 flat form ≤80 chars).
 DESCRIPTION_MAX_CHARS = 80
+
+# CP8 description-format fallbacks (verbatim).
+DESCRIPTION_VENDOR_UNATTRIBUTED = "Unattributed identifier"
+
+# CP7 default geographic_scope filter (US-deployed Lynceus instances).
+DEFAULT_GEOGRAPHIC_SCOPE_FILTER: tuple[str, ...] = ("US",)
 
 # Deterministic UUID5 namespace anchor — locks ``argus_run_id`` to the data.
 # This namespace UUID itself is a UUID5(NAMESPACE_DNS, "argus.export.v1") so
 # the choice is reproducible from this codebase alone (no opaque magic value).
 ARGUS_RUN_ID_NAMESPACE: uuid.UUID = uuid.uuid5(uuid.NAMESPACE_DNS, "argus.export.v1")
-
-# Per-record description seeds (vendor + generic-name + short-context).
-# We only carry seeds for vendors that survive the standard export at HB36
-# (the Wave-A Flock row). The runtime will fall back to a generic
-# "{category} device" form for any survivor whose vendor lacks a seed; this
-# keeps the writer non-fragile if Step-4-follow-on rows ever lift off
-# `unknown` in a future Phase 5 reopening.
-DESCRIPTION_SEEDS: dict[str, str] = {
-    # vendor::category → ≤80-char description per §7.5.
-    "Flock Safety::alpr": "Flock Safety ALPR camera",
-}
 
 
 class Halt(Exception):
@@ -156,13 +168,18 @@ class ActiveRow:
 
 @dataclass(frozen=True)
 class TalosEntry:
-    """A single entry written to ``argus_export*.json``."""
+    """A single entry written to ``argus_export*.json``.
+
+    ``argus_record_id`` is the SAR-10 hash (16-hex-char SHA-256 prefix of
+    ``f"{identifier_type}|{normalized_identifier}"``); not the integer PK.
+    Severity is no longer emitted (CP8 sub-correction B: severity owned
+    operator-side via Lynceus's ``severity_overrides.yaml``).
+    """
 
     pattern: str
     pattern_type: str
-    severity: str
     description: str
-    argus_record_id: int
+    argus_record_id: str
 
 
 def _open_readonly(db_path: Path) -> sqlite3.Connection:
@@ -243,19 +260,30 @@ def _utc_now_iso() -> str:
 
 
 def _format_description(row: ActiveRow) -> str:
-    """Build a §7.5-compliant description ≤80 chars."""
+    """Build a §7.5-compliant description ≤80 chars per CP8 flat form.
 
-    if row.manufacturer:
-        seed_key = f"{row.manufacturer}::{row.device_category}"
-        if seed_key in DESCRIPTION_SEEDS:
-            return DESCRIPTION_SEEDS[seed_key]
-        # Fallback: "{vendor} {category} device" — keeps shape per §7.5
-        # template, drops the optional short-context parenthetical.
-        candidate = f"{row.manufacturer} {row.device_category} device"
-        if len(candidate) <= DESCRIPTION_MAX_CHARS:
-            return candidate
-    # Last-resort fallback per §7.5: generic "{category} device".
-    return f"{row.device_category} device"
+    CP8 ladder (verbatim):
+    - Vendor unknown → ``"Unattributed identifier"``.
+    - Vendor known, category unknown → ``"{vendor} unknown"``.
+    - Both known → ``"{vendor} {device_category}"``.
+
+    Defensive: if the constructed string exceeds the §7.5 80-char ceiling
+    (only reachable if a §2.1 vendor name + device_category > 80 chars; in
+    practice all current §2.1 combinations fit comfortably), fall back to
+    ``"Unattributed identifier"``. The classifier still halts on overflow
+    via ``_classify_row`` as defense-in-depth against generator drift.
+    """
+
+    vendor = (row.manufacturer or "").strip()
+    if not vendor:
+        return DESCRIPTION_VENDOR_UNATTRIBUTED
+    if row.device_category == "unknown":
+        candidate = f"{vendor} unknown"
+    else:
+        candidate = f"{vendor} {row.device_category}"
+    if len(candidate) <= DESCRIPTION_MAX_CHARS:
+        return candidate
+    return DESCRIPTION_VENDOR_UNATTRIBUTED
 
 
 def _classify_row(
@@ -264,7 +292,7 @@ def _classify_row(
     confidence_threshold: int,
     apply_pi_self_exclude: bool,
 ) -> tuple[str | None, list[TalosEntry]]:
-    """Classify a row for a Talos export file.
+    """Classify a row for a Lynceus export file (static gates only).
 
     Returns ``(drop_bin, entries)``. If ``drop_bin`` is None the row is a
     survivor and ``entries`` is non-empty. Bin priority is the dispatch's
@@ -278,6 +306,10 @@ def _classify_row(
     procurement-only rows have no concrete identifier at all and are never
     in the main `identifiers` table by design (§4.5); the gate is here as
     defense-in-depth.
+
+    The CP7 ``geographic_scope_mismatch`` bin is NOT applied here — it is a
+    runtime parameter applied in ``_apply_geographic_scope_filter()`` after
+    static reconciliation against MAC-45.
     """
 
     # §11 #14 — procurement-only ban (defense-in-depth: should not appear
@@ -290,7 +322,7 @@ def _classify_row(
     # §4.4 — device_fingerprint dropped.
     if row.identifier_type == "device_fingerprint":
         return "device_fingerprint", []
-    # §4.4 — ssid_pattern dropped (no regex in Talos v0.2).
+    # §4.4 — ssid_pattern dropped (no regex in Lynceus v0.2).
     if row.identifier_type == "ssid_pattern":
         return "ssid_pattern", []
     # §4.4 — mac_range expand or drop.
@@ -318,12 +350,6 @@ def _classify_row(
             f"row id={row.id} identifier_type={row.identifier_type} has no "
             "§4.4 mapping but reached the survivor branch — §4.4 schema drift?"
         )
-    severity = DEVICE_CATEGORY_TO_SEVERITY.get(row.device_category)
-    if severity is None:
-        raise Halt(
-            f"row id={row.id} device_category={row.device_category} has no "
-            "§4.5 mapping but reached the survivor branch — §4.5 schema drift?"
-        )
     description = _format_description(row)
     if len(description) > DESCRIPTION_MAX_CHARS:
         raise Halt(
@@ -334,11 +360,37 @@ def _classify_row(
         TalosEntry(
             pattern=row.identifier,
             pattern_type=pattern_type,
-            severity=severity,
             description=description,
-            argus_record_id=row.id,
+            argus_record_id=_sar10_hash(row.identifier_type, row.identifier),
         )
     ]
+
+
+def _passes_geographic_scope(
+    row: ActiveRow,
+    *,
+    geographic_scope_filter: tuple[str, ...],
+    is_high_confidence: bool,
+) -> bool:
+    """CP7 export-time filter: True if row passes the geographic_scope gate.
+
+    Rules (verbatim from BIBLE_AMENDMENTS.md CP7):
+    - ``global`` passes unconditionally.
+    - Match against any element of ``geographic_scope_filter`` (case-sensitive
+      on ISO codes; comma-sep handled per §4.1) → pass.
+    - ``unknown`` (or NULL): passes the standard export, fails the
+      high-confidence export.
+    - Else: fail.
+    """
+
+    raw = (row.geographic_scope or "").strip()
+    if not raw or raw == "unknown":
+        return not is_high_confidence
+    if raw == "global":
+        return True
+    # §4.1 allows comma-separated lists of ISO codes — split and match any.
+    row_codes = {part.strip() for part in raw.split(",") if part.strip()}
+    return any(code in row_codes for code in geographic_scope_filter)
 
 
 def _reconcile(
@@ -398,18 +450,20 @@ def _build_meta(
     *,
     schema_version: int,
     confidence_threshold: int,
+    geographic_scope_filter: tuple[str, ...],
     argus_run_id: str,
     exported_at: str,
     source_record_count: int,
     bins: dict[str, int],
 ) -> dict[str, Any]:
-    """Build the §7.5 ``_meta`` block."""
+    """Build the §7.5 ``_meta`` block (CP7 augments with scope filter)."""
 
     return {
         "argus_version": str(schema_version),
         "exported_at": exported_at,
         "record_count": source_record_count - sum(bins.values()),
         "confidence_threshold": confidence_threshold,
+        "geographic_scope_filter": list(geographic_scope_filter),
         "argus_run_id": argus_run_id,
         "source_record_count": source_record_count,
         "dropped_in_export": bins,
@@ -477,8 +531,15 @@ def _build_export(
     argus_run_id: str,
     exported_at: str,
     expected_drop_assignments: dict[str, str],
+    geographic_scope_filter: tuple[str, ...] = DEFAULT_GEOGRAPHIC_SCOPE_FILTER,
 ) -> tuple[dict[str, Any], dict[int, str | None]]:
-    """Classify every row, reconcile vs MAC-45, return the §7.5 payload."""
+    """Classify every row, reconcile vs MAC-45 (static gates), apply CP7
+    geographic_scope filter post-reconciliation, return the §7.5 payload.
+
+    Bin order in ``bins`` dict follows priority order; ``geographic_scope_mismatch``
+    sits at the tail because it is a runtime parameter applied after MAC-45
+    reconciliation and is independent of the static classification surface.
+    """
 
     bins: dict[str, int] = {
         "unknown_category": 0,
@@ -488,9 +549,10 @@ def _build_export(
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,
+        "geographic_scope_mismatch": 0,
     }
     bin_assignments: dict[int, str | None] = {}
-    entries: list[TalosEntry] = []
+    survivor_rows: list[tuple[ActiveRow, TalosEntry]] = []
     for row in rows:
         drop_bin, row_entries = _classify_row(
             row,
@@ -501,16 +563,33 @@ def _build_export(
         if drop_bin is not None:
             bins[drop_bin] += 1
         else:
-            entries.extend(row_entries)
+            for entry in row_entries:
+                survivor_rows.append((row, entry))
+    # Static-gate reconciliation against MAC-45 happens BEFORE the CP7
+    # geographic filter — MAC-45 captures the static priors only.
     _reconcile(
         file_label=file_label,
         rows=rows,
         bin_assignments=bin_assignments,
         expected=expected_drop_assignments,
     )
+    # CP7 geographic_scope filter (runtime parameter, post-reconciliation).
+    is_high_confidence = confidence_threshold >= 70
+    entries: list[TalosEntry] = []
+    for row, entry in survivor_rows:
+        if _passes_geographic_scope(
+            row,
+            geographic_scope_filter=geographic_scope_filter,
+            is_high_confidence=is_high_confidence,
+        ):
+            entries.append(entry)
+        else:
+            bin_assignments[row.id] = "geographic_scope_mismatch"
+            bins["geographic_scope_mismatch"] += 1
     meta = _build_meta(
         schema_version=schema_version,
         confidence_threshold=confidence_threshold,
+        geographic_scope_filter=geographic_scope_filter,
         argus_run_id=argus_run_id,
         exported_at=exported_at,
         source_record_count=len(rows),
@@ -522,7 +601,6 @@ def _build_export(
             {
                 "pattern": e.pattern,
                 "pattern_type": e.pattern_type,
-                "severity": e.severity,
                 "description": e.description,
                 "argus_record_id": e.argus_record_id,
             }
@@ -564,6 +642,7 @@ def _build_coverage_report_md(
             ("oversized_mac_range (§4.4)", bins["oversized_mac_range"]),
             ("self_exclude_oui (§8.4 / §11 #12)", bins["self_exclude_oui"]),
             ("below_confidence_threshold (§7.5)", bins["below_confidence_threshold"]),
+            ("geographic_scope_mismatch (CP7)", bins["geographic_scope_mismatch"]),
         ]
         lines = [
             f"#### `{label}` (confidence ≥ {threshold})",
@@ -652,15 +731,36 @@ def _build_coverage_report_md(
         "appears in either Talos JSON file."
     )
     md_parts.append(
-        "- **§11 #14 (procurement-only Talos-banned)** — defense-in-depth gate; the "
+        "- **§11 #14 (procurement-only Lynceus-banned)** — defense-in-depth gate; the "
         "`identifiers` table cannot hold a `source_type='procurement'` row that lacks "
         "an identifier per §4.1, but the gate is wired regardless."
+    )
+    md_parts.append(
+        "- **CP7 (geographic_scope export-time filter)** — applied AFTER static "
+        "MAC-45 reconciliation as a runtime parameter. `global` passes "
+        "unconditionally; ISO-code matches against the filter pass; `unknown` / "
+        "NULL passes the standard export but fails the high-confidence export. "
+        "Default filter = `[\"US\"]`."
+    )
+    md_parts.append(
+        "- **CP8 (description format + severity reframe)** — flat `{vendor} "
+        "{device_category}` ≤80 chars (CP8 sub-correction A); fallbacks "
+        "`\"{vendor} unknown\"` and `\"Unattributed identifier\"`. "
+        "`severity` field dropped from export shape (CP8 sub-correction B); "
+        "owned operator-side via Lynceus's `severity_overrides.yaml`."
+    )
+    md_parts.append(
+        "- **SAR-10 (`argus_record_id`)** — 16-hex-char SHA-256 prefix of "
+        "`{identifier_type}|{normalized_identifier}` per `db/export/argus_record_id.py`. "
+        "Hashes the §8.3 dedup key; stable under re-runs / confidence drift / "
+        "source edits / vendor reattribution."
     )
     md_parts.append("")
     md_parts.append(
         "Idempotency: re-running the writer on unchanged DB state produces "
         "byte-identical files modulo `_meta.exported_at`. `argus_run_id` is a "
-        "deterministic UUID5 over the active-set fingerprint."
+        "deterministic UUID5 over the active-set fingerprint; `argus_record_id` "
+        "values are deterministic SAR-10 hashes."
     )
     md_parts.append("")
     md_parts.append("## §6 Phase 5 #4 coverage matrix (MAC-45 verbatim)")
@@ -736,9 +836,24 @@ def _build_coverage_report_md(
         "that flow to `argus_export.csv`."
     )
     md_parts.append("")
+    by_geographic_scope: dict[str, int] = {}
+    for row in rows:
+        key = (row.geographic_scope or "unknown").strip() or "unknown"
+        by_geographic_scope[key] = by_geographic_scope.get(key, 0) + 1
     md_parts.append(f"- **By `device_category`:** {fmt_dist(by_category)}")
     md_parts.append(f"- **By `identifier_type`:** {fmt_dist(by_identifier_type)}")
     md_parts.append(f"- **By `source_type`:** {fmt_dist(by_source_type)}")
+    md_parts.append(
+        f"- **By `geographic_scope` (CP7):** {fmt_dist(by_geographic_scope)}"
+    )
+    standard_filter = standard_meta.get("geographic_scope_filter", [])
+    high_filter = high_meta.get("geographic_scope_filter", [])
+    md_parts.append(
+        f"- **CP7 filter applied:** standard={standard_filter}, "
+        f"high-confidence={high_filter} (records with `geographic_scope` "
+        f"matching ANY filter element pass; `global` passes unconditionally; "
+        f"`unknown`/NULL passes standard but fails high-confidence)."
+    )
     md_parts.append("")
     md_parts.append(
         "## §7.5 description-format compliance (Talos exports only)"
@@ -846,8 +961,20 @@ def run(
     exports_dir: Path = EXPORTS_DIR,
     coverage_matrix_report_path: Path = COVERAGE_MATRIX_REPORT_PATH,
     coverage_matrix_md_path: Path = COVERAGE_MATRIX_MD_PATH,
+    geographic_scope_filter: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
-    """Generate all four Step-6 deliverables and return a summary dict."""
+    """Generate all four Step-6 deliverables and return a summary dict.
+
+    ``geographic_scope_filter`` is the CP7 export-time filter; defaults to
+    ``("US",)``. Operators in non-US jurisdictions configure via this param
+    (e.g. ``("NL",)``, ``("AU",)``, ``("EU", "GB")``).
+    """
+
+    geographic_scope_filter = (
+        DEFAULT_GEOGRAPHIC_SCOPE_FILTER
+        if geographic_scope_filter is None
+        else tuple(geographic_scope_filter)
+    )
 
     if not coverage_matrix_report_path.exists():
         raise Halt(
@@ -884,6 +1011,7 @@ def run(
         argus_run_id=argus_run_id,
         exported_at=exported_at,
         expected_drop_assignments=drop_assignments["argus_export.json"],
+        geographic_scope_filter=geographic_scope_filter,
     )
     standard_path = exports_dir / "argus_export.json"
     standard_size = _write_json(standard_path, standard_payload)
@@ -898,6 +1026,7 @@ def run(
         argus_run_id=argus_run_id,
         exported_at=exported_at,
         expected_drop_assignments=drop_assignments["argus_export_high_confidence.json"],
+        geographic_scope_filter=geographic_scope_filter,
     )
     high_path = exports_dir / "argus_export_high_confidence.json"
     high_size = _write_json(high_path, high_payload)
@@ -965,12 +1094,29 @@ def main() -> None:
         type=Path,
         default=COVERAGE_MATRIX_MD_PATH,
     )
+    parser.add_argument(
+        "--geographic-scope-filter",
+        type=str,
+        default=",".join(DEFAULT_GEOGRAPHIC_SCOPE_FILTER),
+        help=(
+            "CP7 export-time filter on identifiers.geographic_scope. "
+            "Comma-separated ISO codes (e.g. 'US' or 'NL,AU'). Default: 'US'."
+        ),
+    )
     args = parser.parse_args()
+    geographic_scope_filter = tuple(
+        part.strip() for part in args.geographic_scope_filter.split(",") if part.strip()
+    )
+    if not geographic_scope_filter:
+        raise SystemExit(
+            "--geographic-scope-filter must contain at least one ISO code."
+        )
     summary = run(
         db_path=args.db,
         exports_dir=args.exports_dir,
         coverage_matrix_report_path=args.coverage_matrix_report,
         coverage_matrix_md_path=args.coverage_matrix_md,
+        geographic_scope_filter=geographic_scope_filter,
     )
     print(json.dumps(summary, indent=2, ensure_ascii=False))
 

@@ -20,31 +20,35 @@ Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `iden
 
 | device_category \ identifier_type | oui | mac | mac_range | bssid | ssid_exact | ssid_pattern | ble_uuid | ble_service | device_fingerprint | **row total** |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `alpr` | . | 1 | . | . | . | . | . | . | . | **1** |
+| `alpr` | 1 | 1 | . | . | . | . | . | . | . | **2** |
 | `imsi_catcher` | . | . | . | . | . | . | . | . | . | **0** |
 | `body_cam` | . | . | . | . | . | . | . | . | . | **0** |
 | `police_radio` | . | . | . | . | . | . | . | . | . | **0** |
-| `drone` | . | . | . | . | . | . | . | . | . | **0** |
-| `gunshot_detect` | . | . | . | . | . | . | . | . | . | **0** |
-| `hacking_tool` | . | . | . | . | . | . | . | . | . | **0** |
+| `drone` | 14 | . | . | . | . | . | . | . | . | **14** |
+| `gunshot_detect` | 1 | . | . | . | . | . | . | . | . | **1** |
+| `hacking_tool` | 1 | . | . | . | . | . | . | . | . | **1** |
 | `covert_cam` | . | . | . | . | . | . | . | . | . | **0** |
 | `gps_tracker` | . | . | . | . | . | . | . | . | . | **0** |
 | `face_recog` | . | . | . | . | . | . | . | . | . | **0** |
 | `drone_detect` | . | . | . | . | . | . | . | . | . | **0** |
-| `unknown` | 54 | . | 8 | . | . | . | . | . | . | **62** |
+| `unknown` | 37 | . | 8 | . | . | . | . | . | . | **45** |
 | **col total** | **54** | **1** | **8** | . | . | . | . | . | . | **63** |
 
 ### Non-empty cell detail
 
 | device_category | identifier_type | n | n_by_source_type | min_conf | max_conf | median_conf | row_ids |
 |---|---|---|---|---|---|---|---|
+| `alpr` | `oui` | 1 | inferred=1 | 55 | 55 | 55 | 449 |
 | `alpr` | `mac` | 1 | crowdsourced=1 | 60 | 60 | 60 | 1 |
-| `unknown` | `oui` | 54 | inferred=54 | 55 | 55 | 55.0 | 413, 414, 415, 416, 417, 418, 419, 420 … +46 |
+| `drone` | `oui` | 14 | inferred=14 | 55 | 55 | 55.0 | 421, 423, 424, 431, 432, 435, 436, 444 … +6 |
+| `gunshot_detect` | `oui` | 1 | inferred=1 | 55 | 55 | 55 | 417 |
+| `hacking_tool` | `oui` | 1 | inferred=1 | 55 | 55 | 55 | 443 |
+| `unknown` | `oui` | 37 | inferred=37 | 55 | 55 | 55 | 413, 414, 415, 416, 418, 419, 420, 422 … +29 |
 | `unknown` | `mac_range` | 8 | inferred=8 | 50 | 55 | 52.5 | 467, 468, 469, 470, 488, 489, 490, 491 |
 
 ### Shape-gap surface (CP5 board-class, NOT halt per dispatch)
 
-- **Empty device_category rows:** 10 of 12 (`imsi_catcher, body_cam, police_radio, drone, gunshot_detect, hacking_tool, covert_cam, gps_tracker, face_recog, drone_detect`). Drives directly from §8.4 ("Multi-purpose vendors are not categorized at the OUI level") — every Phase-3-inferred OUI sits in `unknown` until model-level evidence lands.
+- **Empty device_category rows:** 7 of 12 (`imsi_catcher, body_cam, police_radio, covert_cam, gps_tracker, face_recog, drone_detect`). Drives directly from §8.4 ("Multi-purpose vendors are not categorized at the OUI level") — every Phase-3-inferred OUI sits in `unknown` until model-level evidence lands.
 - **Empty identifier_type cols:** 6 of 9 (`bssid, ssid_exact, ssid_pattern, ble_uuid, ble_service, device_fingerprint`). The `bssid` / `ssid_exact` / `ssid_pattern` / `ble_uuid` / `ble_service` / `device_fingerprint` enums are declared in §4.1 but no Tier-1/2/3/4 source has yet promoted into them.
 - **Dispatch §6.1 column-list typo:** the dispatch lists `ssid` and `fcc_id` which are NOT `identifiers.identifier_type` enum values (they are `ssid_exact` and Phase-4 `fcc_equipment_filings.fcc_id` respectively per §4.2). The matrix uses the migration-0001 enum verbatim.
 - **Dispatch §6.1 device_category count typo:** the dispatch says "13 device_category enum values" — migration 0001 declares 12 and migration 0007 does not extend the CHECK. The matrix uses the 12 enum values from migration 0001 verbatim.
@@ -92,28 +96,28 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 
 | Bin | Count |
 |---|---|
-| `unknown_category` (§11 #13) | 62 |
+| `unknown_category` (§11 #13) | 45 |
 | `procurement_only` (§11 #14) | 0 |
 | `device_fingerprint` (§4.4) | 0 |
 | `ssid_pattern` (§4.4) | 0 |
 | `oversized_mac_range` (§4.4) | 0 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
 | `below_confidence_threshold` (§7.5) | 0 |
-| **sum(bins)** | **62** |
-| **survivors → eligible entries** | **1** |
-| **reconciliation** | **63 − 62 = 1** ✅ |
+| **sum(bins)** | **45** |
+| **survivors → eligible entries** | **18** |
+| **reconciliation** | **63 − 45 = 18** ✅ |
 
 ### `argus_export_high_confidence.json` (confidence ≥ 70; Pi self-exclude drop = True)
 
 | Bin | Count |
 |---|---|
-| `unknown_category` (§11 #13) | 62 |
+| `unknown_category` (§11 #13) | 45 |
 | `procurement_only` (§11 #14) | 0 |
 | `device_fingerprint` (§4.4) | 0 |
 | `ssid_pattern` (§4.4) | 0 |
 | `oversized_mac_range` (§4.4) | 0 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
-| `below_confidence_threshold` (§7.5) | 1 |
+| `below_confidence_threshold` (§7.5) | 18 |
 | **sum(bins)** | **63** |
 | **survivors → eligible entries** | **0** |
 | **reconciliation** | **63 − 63 = 0** ✅ |

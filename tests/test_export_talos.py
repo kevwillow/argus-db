@@ -24,9 +24,11 @@ from pathlib import Path
 
 import pytest
 
+from db.export.argus_record_id import argus_record_id as _sar10_hash
 from db.validation.export_talos import (
+    DEFAULT_GEOGRAPHIC_SCOPE_FILTER,
     DESCRIPTION_MAX_CHARS,
-    DEVICE_CATEGORY_TO_SEVERITY,
+    DESCRIPTION_VENDOR_UNATTRIBUTED,
     IDENTIFIER_TYPE_TO_PATTERN_TYPE,
     PI_SELF_EXCLUDE_OUIS,
     ActiveRow,
@@ -36,6 +38,7 @@ from db.validation.export_talos import (
     _derive_argus_run_id,
     _format_description,
     _open_readonly,
+    _passes_geographic_scope,
     run,
 )
 
@@ -114,19 +117,16 @@ def test_type_mapping_drops_match_44_verbatim() -> None:
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_service"] == "ble_uuid"
 
 
-def test_severity_mapping_excludes_unknown_per_section_11_13() -> None:
-    """`unknown` device_category MUST NOT have a severity mapping.
+def test_severity_field_dropped_from_export_shape_per_cp8() -> None:
+    """CP8 sub-correction B: severity is owned operator-side via Lynceus's
+    ``severity_overrides.yaml``. The export shape MUST NOT emit `severity`."""
+    from db.validation import export_talos as mod
 
-    Bible §11 #13 bans unknown-category Talos export; the writer halts before
-    severity derivation. Including a severity row would invite accidental
-    promotion through a code-path bug.
-    """
-    assert "unknown" not in DEVICE_CATEGORY_TO_SEVERITY
-
-
-def test_severity_high_categories_per_section_45() -> None:
-    for cat in ("imsi_catcher", "alpr", "covert_cam", "hacking_tool", "gps_tracker", "face_recog"):
-        assert DEVICE_CATEGORY_TO_SEVERITY[cat] == "high"
+    # The historical mapping is retained for audit-trail reasoning but is
+    # explicitly underscored as a private symbol; future code MUST NOT
+    # consult it for output shape decisions.
+    assert hasattr(mod, "_DEVICE_CATEGORY_TO_SEVERITY_HISTORICAL")
+    assert not hasattr(mod, "DEVICE_CATEGORY_TO_SEVERITY")
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -234,7 +234,7 @@ def test_classify_mac_range_drops_to_oversized_section_44() -> None:
     assert bin_label == "oversized_mac_range"
 
 
-def test_classify_survivor_alpr_mac() -> None:
+def test_classify_survivor_alpr_mac_emits_cp8_flat_and_sar10_hash() -> None:
     bin_label, entries = _classify_row(
         _row(identifier="e4:aa:ea:80:a1:9b", identifier_type="mac", device_category="alpr",
              manufacturer="Flock Safety", confidence=60),
@@ -246,9 +246,12 @@ def test_classify_survivor_alpr_mac() -> None:
     e = entries[0]
     assert e.pattern == "e4:aa:ea:80:a1:9b"
     assert e.pattern_type == "mac"
-    assert e.severity == "high"
-    assert e.description == "Flock Safety ALPR camera"
-    assert e.argus_record_id == 1
+    # CP8: flat description form, no severity field.
+    assert e.description == "Flock Safety alpr"
+    assert not hasattr(e, "severity")
+    # SAR-10: argus_record_id is the 16-hex-char hash, not the integer PK.
+    assert e.argus_record_id == _sar10_hash("mac", "e4:aa:ea:80:a1:9b")
+    assert e.argus_record_id == "eea6f74486eea9c0"
     assert len(e.description) <= DESCRIPTION_MAX_CHARS
 
 
@@ -257,30 +260,41 @@ def test_classify_survivor_alpr_mac() -> None:
 # ────────────────────────────────────────────────────────────────────────────
 
 
-def test_description_seed_used_when_present() -> None:
+def test_description_cp8_flat_form_for_known_vendor_and_category() -> None:
     desc = _format_description(_row(manufacturer="Flock Safety", device_category="alpr"))
-    assert desc == "Flock Safety ALPR camera"
-
-
-def test_description_fallback_within_ceiling() -> None:
-    desc = _format_description(_row(manufacturer="Acme", device_category="alpr"))
-    assert desc == "Acme alpr device"
+    assert desc == "Flock Safety alpr"
     assert len(desc) <= DESCRIPTION_MAX_CHARS
 
 
-def test_description_generic_when_no_manufacturer() -> None:
+def test_description_cp8_flat_form_handles_arbitrary_known_pair() -> None:
+    desc = _format_description(_row(manufacturer="Acme", device_category="alpr"))
+    assert desc == "Acme alpr"
+    assert len(desc) <= DESCRIPTION_MAX_CHARS
+
+
+def test_description_cp8_unattributed_when_vendor_missing() -> None:
     desc = _format_description(_row(manufacturer=None, device_category="alpr"))
-    assert desc == "alpr device"
+    assert desc == DESCRIPTION_VENDOR_UNATTRIBUTED
 
 
-def test_description_long_vendor_falls_back_to_generic_per_section_75() -> None:
-    """§7.5: 'If a record cannot be described in 80 chars without losing
-    meaning, the canonical record stays but the Talos export uses a generic
-    description like `{category} device`.' The writer must NOT halt on a
-    long manufacturer; it must fall back to the generic form."""
+def test_description_cp8_vendor_unknown_form_when_category_unknown() -> None:
+    """CP8 fallback: vendor known + category unknown → ``"{vendor} unknown"``.
+    In practice §11 #13 drops device_category='unknown' before reaching
+    `_format_description`, but the function ladder must implement the form."""
+    desc = _format_description(_row(manufacturer="Acme", device_category="unknown"))
+    assert desc == "Acme unknown"
+
+
+def test_description_long_vendor_falls_back_to_unattributed_per_cp8() -> None:
+    """Defense-in-depth: a synthetic 100-char vendor name overflows the 80-char
+    ceiling for `{vendor} {category}`. The CP8 ladder falls back to
+    `Unattributed identifier` rather than halting (the classifier still
+    halts via `_classify_row` length check as a backstop). In real §2.1
+    data this path is unreachable — all current vendor names + categories
+    fit within 80 chars."""
     long_vendor = "X" * 100
     desc = _format_description(_row(manufacturer=long_vendor, device_category="alpr"))
-    assert desc == "alpr device"
+    assert desc == DESCRIPTION_VENDOR_UNATTRIBUTED
     assert len(desc) <= DESCRIPTION_MAX_CHARS
 
 
@@ -344,7 +358,8 @@ def test_build_export_passes_when_assignments_align() -> None:
     rows = [
         _row(id=20, device_category="unknown"),
         _row(id=21, identifier="e4:aa:ea:80:a1:9b", identifier_type="mac",
-             device_category="alpr", manufacturer="Flock Safety", confidence=60),
+             device_category="alpr", manufacturer="Flock Safety", confidence=60,
+             geographic_scope="US"),
     ]
     payload, assignments = _build_export(
         rows=rows,
@@ -359,8 +374,13 @@ def test_build_export_passes_when_assignments_align() -> None:
     assert payload["_meta"]["record_count"] == 1
     assert payload["_meta"]["source_record_count"] == 2
     assert payload["_meta"]["dropped_in_export"]["unknown_category"] == 1
+    assert payload["_meta"]["dropped_in_export"]["geographic_scope_mismatch"] == 0
+    assert payload["_meta"]["geographic_scope_filter"] == ["US"]
     assert len(payload["entries"]) == 1
-    assert payload["entries"][0]["argus_record_id"] == 21
+    assert payload["entries"][0]["argus_record_id"] == _sar10_hash(
+        "mac", "e4:aa:ea:80:a1:9b"
+    )
+    assert "severity" not in payload["entries"][0]
     assert assignments == {20: "unknown_category", 21: None}
 
 
@@ -382,6 +402,128 @@ def test_meta_reconciliation_invariant() -> None:
         meta["source_record_count"] - sum(meta["dropped_in_export"].values())
         == len(payload["entries"])
     )
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# CP7 — geographic_scope export-time filter
+# ────────────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "scope,is_high,filter_codes,expected",
+    [
+        # `global` passes both files unconditionally.
+        ("global", False, ("US",), True),
+        ("global", True, ("US",), True),
+        ("global", True, ("NL",), True),
+        # ISO match passes; mismatch fails.
+        ("US", False, ("US",), True),
+        ("US", True, ("US",), True),
+        ("US", False, ("NL",), False),
+        ("US", True, ("NL",), False),
+        # `unknown` / NULL: passes standard, fails high-confidence.
+        ("unknown", False, ("US",), True),
+        ("unknown", True, ("US",), False),
+        (None, False, ("US",), True),
+        (None, True, ("US",), False),
+        # Comma-sep ISO list in row + filter.
+        ("EU,GB", False, ("GB",), True),
+        ("EU,GB", True, ("FR",), False),
+    ],
+)
+def test_passes_geographic_scope_cp7(
+    scope: str | None,
+    is_high: bool,
+    filter_codes: tuple[str, ...],
+    expected: bool,
+) -> None:
+    row = _row(geographic_scope=scope)
+    assert (
+        _passes_geographic_scope(
+            row, geographic_scope_filter=filter_codes, is_high_confidence=is_high
+        )
+        == expected
+    )
+
+
+def test_default_geographic_scope_filter_is_us() -> None:
+    assert DEFAULT_GEOGRAPHIC_SCOPE_FILTER == ("US",)
+
+
+def test_build_export_drops_to_geographic_scope_mismatch_for_non_us() -> None:
+    """A NL-scoped row under default `["US"]` filter drops to mismatch bin."""
+    rows = [
+        _row(id=30, identifier="e4:aa:ea:80:a1:9b", identifier_type="mac",
+             device_category="alpr", manufacturer="Flock Safety",
+             confidence=80, geographic_scope="NL"),
+    ]
+    payload, assignments = _build_export(
+        rows=rows,
+        file_label="argus_export.json",
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+        schema_version=8,
+        argus_run_id="abc",
+        exported_at="2026-01-01T00:00:00Z",
+        expected_drop_assignments={},  # static gates pass; CP7 is post-recon.
+        geographic_scope_filter=("US",),
+    )
+    assert payload["_meta"]["dropped_in_export"]["geographic_scope_mismatch"] == 1
+    assert payload["_meta"]["record_count"] == 0
+    assert payload["entries"] == []
+    assert assignments[30] == "geographic_scope_mismatch"
+
+
+def test_build_export_global_scope_passes_all_files() -> None:
+    """A `global`-scoped row under default `["US"]` filter survives both files."""
+    rows = [
+        _row(id=40, identifier="e4:aa:ea:80:a1:9b", identifier_type="mac",
+             device_category="alpr", manufacturer="Flock Safety",
+             confidence=80, geographic_scope="global"),
+    ]
+    standard_payload, _ = _build_export(
+        rows=rows, file_label="argus_export.json", confidence_threshold=30,
+        apply_pi_self_exclude=False, schema_version=8, argus_run_id="abc",
+        exported_at="2026-01-01T00:00:00Z",
+        expected_drop_assignments={}, geographic_scope_filter=("US",),
+    )
+    high_payload, _ = _build_export(
+        rows=rows, file_label="argus_export_high_confidence.json",
+        confidence_threshold=70, apply_pi_self_exclude=True,
+        schema_version=8, argus_run_id="abc",
+        exported_at="2026-01-01T00:00:00Z",
+        expected_drop_assignments={}, geographic_scope_filter=("US",),
+    )
+    assert standard_payload["_meta"]["record_count"] == 1
+    assert high_payload["_meta"]["record_count"] == 1
+    assert standard_payload["_meta"]["dropped_in_export"]["geographic_scope_mismatch"] == 0
+    assert high_payload["_meta"]["dropped_in_export"]["geographic_scope_mismatch"] == 0
+
+
+def test_build_export_unknown_scope_high_conf_drops_per_cp7() -> None:
+    """A NULL-scoped row passes standard but drops in high-confidence."""
+    rows = [
+        _row(id=50, identifier="e4:aa:ea:80:a1:9b", identifier_type="mac",
+             device_category="alpr", manufacturer="Flock Safety",
+             confidence=80, geographic_scope=None),
+    ]
+    standard_payload, _ = _build_export(
+        rows=rows, file_label="argus_export.json", confidence_threshold=30,
+        apply_pi_self_exclude=False, schema_version=8, argus_run_id="abc",
+        exported_at="2026-01-01T00:00:00Z",
+        expected_drop_assignments={}, geographic_scope_filter=("US",),
+    )
+    high_payload, _ = _build_export(
+        rows=rows, file_label="argus_export_high_confidence.json",
+        confidence_threshold=70, apply_pi_self_exclude=True,
+        schema_version=8, argus_run_id="abc",
+        exported_at="2026-01-01T00:00:00Z",
+        expected_drop_assignments={}, geographic_scope_filter=("US",),
+    )
+    assert standard_payload["_meta"]["record_count"] == 1
+    assert standard_payload["_meta"]["dropped_in_export"]["geographic_scope_mismatch"] == 0
+    assert high_payload["_meta"]["record_count"] == 0
+    assert high_payload["_meta"]["dropped_in_export"]["geographic_scope_mismatch"] == 1
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -432,15 +574,17 @@ def _make_synthetic_db(tmp_path: Path) -> Path:
     con.executescript(SCHEMA_DDL)
     con.execute(
         "INSERT INTO identifiers (id, identifier, identifier_type, "
-        "device_category, manufacturer, confidence, source_url, source_type) "
+        "device_category, manufacturer, confidence, source_url, source_type, "
+        "geographic_scope) "
         "VALUES (1, 'e4:aa:ea:80:a1:9b', 'mac', 'alpr', 'Flock Safety', "
-        "60, 'http://e', 'crowdsourced')"
+        "60, 'http://e', 'crowdsourced', 'US')"
     )
     con.execute(
         "INSERT INTO identifiers (id, identifier, identifier_type, "
-        "device_category, manufacturer, confidence, source_url, source_type) "
+        "device_category, manufacturer, confidence, source_url, source_type, "
+        "geographic_scope) "
         "VALUES (2, '00:04:7d', 'oui', 'unknown', 'Motorola Solutions', "
-        "55, 'http://e', 'inferred')"
+        "55, 'http://e', 'inferred', 'global')"
     )
     con.commit()
     con.close()
@@ -464,6 +608,7 @@ def _make_synthetic_mac45(tmp_path: Path) -> tuple[Path, Path]:
                         "oversized_mac_range": 0,
                         "ssid_pattern": 0,
                         "device_fingerprint": 0,
+                        "geographic_scope_mismatch": 0,
                     },
                     "survivors": 1,
                     "reconciles": 2,
@@ -478,6 +623,7 @@ def _make_synthetic_mac45(tmp_path: Path) -> tuple[Path, Path]:
                         "oversized_mac_range": 0,
                         "ssid_pattern": 0,
                         "device_fingerprint": 0,
+                        "geographic_scope_mismatch": 0,
                     },
                     "survivors": 0,
                     "reconciles": 2,
@@ -506,14 +652,23 @@ def test_run_writes_all_four_files(tmp_path: Path) -> None:
     assert standard["_meta"]["record_count"] == 1
     assert standard["_meta"]["source_record_count"] == 2
     assert standard["_meta"]["confidence_threshold"] == 30
+    assert standard["_meta"]["geographic_scope_filter"] == ["US"]
+    assert "geographic_scope_mismatch" in standard["_meta"]["dropped_in_export"]
     assert len(standard["entries"]) == 1
-    assert standard["entries"][0]["argus_record_id"] == 1
+    # SAR-10 hash, not integer PK.
+    assert standard["entries"][0]["argus_record_id"] == _sar10_hash(
+        "mac", "e4:aa:ea:80:a1:9b"
+    )
     assert standard["entries"][0]["pattern_type"] == "mac"
-    assert standard["entries"][0]["severity"] == "high"
+    # CP8: severity dropped from output shape.
+    assert "severity" not in standard["entries"][0]
+    # CP8: flat description form.
+    assert standard["entries"][0]["description"] == "Flock Safety alpr"
 
     high = json.loads((exports_dir / "argus_export_high_confidence.json").read_text())
     assert high["_meta"]["record_count"] == 0
     assert high["_meta"]["confidence_threshold"] == 70
+    assert high["_meta"]["geographic_scope_filter"] == ["US"]
     assert high["_meta"]["dropped_in_export"]["below_confidence_threshold"] == 1
     assert high["entries"] == []
 

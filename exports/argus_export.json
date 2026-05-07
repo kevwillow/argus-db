@@ -1,28 +1,133 @@
 {
   "_meta": {
-    "argus_version": "7",
-    "exported_at": "2026-05-06T19:54:00Z",
-    "record_count": 1,
+    "argus_version": "8",
+    "exported_at": "2026-05-07T17:50:54Z",
+    "record_count": 18,
     "confidence_threshold": 30,
-    "argus_run_id": "25ded783-2dd0-537a-9067-5c0d7ceb05ce",
+    "geographic_scope_filter": [
+      "US"
+    ],
+    "argus_run_id": "6bf7d50f-0917-5687-bbc5-a156363d8853",
     "source_record_count": 63,
     "dropped_in_export": {
-      "unknown_category": 62,
+      "unknown_category": 45,
       "ssid_pattern": 0,
       "device_fingerprint": 0,
       "oversized_mac_range": 0,
       "procurement_only": 0,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 0
+      "below_confidence_threshold": 0,
+      "geographic_scope_mismatch": 0
     }
   },
   "entries": [
     {
+      "pattern": "88:29:85",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "108e8f0bd4b6da48"
+    },
+    {
+      "pattern": "9c:5a:8a",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "26c3eded4bd7bdc1"
+    },
+    {
+      "pattern": "48:1c:b9",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "2fde1a991a0cd103"
+    },
+    {
+      "pattern": "58:b8:58",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "448af7459a52e1cc"
+    },
+    {
+      "pattern": "4c:43:f6",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "47f7062efe51278d"
+    },
+    {
+      "pattern": "38:1d:14",
+      "pattern_type": "oui",
+      "description": "Skydio drone",
+      "argus_record_id": "50894ea2e4d6f1e4"
+    },
+    {
+      "pattern": "b4:1e:52",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "5a15545c78f88aed"
+    },
+    {
+      "pattern": "ec:72:f7",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "690ec880c2e8716f"
+    },
+    {
+      "pattern": "8c:58:23",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "759d22ae8c310a68"
+    },
+    {
+      "pattern": "e4:7a:2c",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "76619ed0f14e349c"
+    },
+    {
+      "pattern": "60:60:1f",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "8f6d7a48b568c851"
+    },
+    {
+      "pattern": "34:d2:62",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "99696ff1930ae2c6"
+    },
+    {
+      "pattern": "f8:40:68",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "ccbe7f8e094c1ed2"
+    },
+    {
+      "pattern": "d4:11:d6",
+      "pattern_type": "oui",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "d30df38a13b98013"
+    },
+    {
+      "pattern": "00:16:00",
+      "pattern_type": "oui",
+      "description": "Cellebrite hacking_tool",
+      "argus_record_id": "dcaccb6a6f5318ae"
+    },
+    {
+      "pattern": "04:a8:5a",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "edbac6b416864b33"
+    },
+    {
       "pattern": "e4:aa:ea:80:a1:9b",
       "pattern_type": "mac",
-      "severity": "high",
-      "description": "Flock Safety ALPR camera",
-      "argus_record_id": 1
+      "description": "Flock Safety alpr",
+      "argus_record_id": "eea6f74486eea9c0"
+    },
+    {
+      "pattern": "0c:9a:e6",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "f328f535d79393e4"
     }
   ]
 }
