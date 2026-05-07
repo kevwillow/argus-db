@@ -46,7 +46,7 @@ CEO heartbeat 2026-05-07T~18:0xZ (HB42 — **MAC-48 Sub-deliverable B Step-0 RAT
 - §11 #13 leakage scan: 0 unknown_category leaks (per-row category lookup against canonical DB for all 18 entries).
 - §11 #8 no confidence drift: all 18 standard survivors at conf 55–60, 0 high-conf survivors.
 - Active-set distribution verified: 45 unknown / 14 drone / 2 alpr / 1 hacking_tool / 1 gunshot_detect = 63 ✓; 62 global + 1 US = 63 ✓ (Wave-A only US-scoped row, all others vendor-OUI = global per CP7).
-- Test surface: 73 pass on B-deliverable test files (`test_argus_record_id.py` 27 + `test_export_talos.py` 46); 385 pass / 2 skip / 0 fail full suite.
+- Test surface: 73 pass on B-deliverable test files (`test_argus_record_id.py` 27 + `test_export_lynceus.py` 46); 385 pass / 2 skip / 0 fail full suite.
 - Idempotency: re-ran exporter to scratch directory; both JSONs byte-identical modulo `_meta.exported_at`; `argus_run_id=6bf7d50f-0917-5687-bbc5-a156363d8853` deterministic.
 
 **Decisions on surfaced surfaces (Validator-flagged for board judgment):**

@@ -25,7 +25,7 @@ from pathlib import Path
 import pytest
 
 from db.export.argus_record_id import argus_record_id as _sar10_hash
-from db.validation.export_talos import (
+from db.validation.export_lynceus import (
     DEFAULT_GEOGRAPHIC_SCOPE_FILTER,
     DESCRIPTION_MAX_CHARS,
     DESCRIPTION_VENDOR_UNATTRIBUTED,
@@ -120,7 +120,7 @@ def test_type_mapping_drops_match_44_verbatim() -> None:
 def test_severity_field_dropped_from_export_shape_per_cp8() -> None:
     """CP8 sub-correction B: severity is owned operator-side via Lynceus's
     ``severity_overrides.yaml``. The export shape MUST NOT emit `severity`."""
-    from db.validation import export_talos as mod
+    from db.validation import export_lynceus as mod
 
     # The historical mapping is retained for audit-trail reasoning but is
     # explicitly underscored as a private symbol; future code MUST NOT
@@ -304,7 +304,7 @@ def test_classify_halts_when_description_exceeds_80_chars(monkeypatch: pytest.Mo
     survivor-branch length-check halts the line per §7.5. The fallback chain
     in real code is unreachable with valid §4.1 enum values, but this gate
     is wired regardless."""
-    import db.validation.export_talos as mod
+    import db.validation.export_lynceus as mod
 
     monkeypatch.setattr(mod, "_format_description", lambda row: "Z" * 100)
     with pytest.raises(Halt, match="exceeds 80-char"):
