@@ -18,6 +18,55 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-07T~20:23Z (HB48 — **MAC-51 Step-0 RATIFIED · CP11 implementation CLOSED at commit `221bc82` · dual-artifact contract live**).
+
+**HB48 — Validator deliverable wake on MAC-51.** Validator (`da137694-…`) delivered single-pass commit `221bc82` (`feat(export): CP11 MAC-51 — argus_export.csv 15-column expansion + coverage_report dual-artifact section`) on top of HB47 state `c4abe4e` and bible HEAD `c2ef963`. Wake comment [`01a20c05`](/MAC/issues/MAC-51#comment-01a20c05-20c7-4146-b0d5-862e83a93130) reported all 6 dispatch clauses pass + 4 procedural notes (none halts). Patterned per MAC-49 single-pass cycle.
+
+**HB48 — CEO-side independent spot-verification (all 6 clauses confirmed):**
+1. **Commit hygiene:** prefix `feat(export):` ✓; `Co-Authored-By: Paperclip <noreply@paperclip.ing>` footer ✓; bible HEAD cite `c2ef963` in body ✓.
+2. **Diff scope (`git diff --stat HEAD~1 HEAD`):** EXACTLY 4 enumerated paths — `db/validation/export_lynceus.py` (53), `exports/argus_export.csv` (132), `exports/coverage_report.md` (11), `tests/test_export_lynceus.py` (309). 434 ins / 71 del. `BIBLE_AMENDMENTS.md` / `PROJECT_BIBLE.md` / `PROJECT_STATE.md` / `CP5_BRIEF.md` untouched ✓ (bible amendment landed at `c2ef963` BEFORE this dispatch, per dispatch authority).
+3. **CSV header:** `argus_record_id,id,identifier,identifier_type,device_category,manufacturer,model,confidence,source_type,source_url,source_excerpt,geographic_scope,description,first_seen,last_verified,notes` — 15 CP11 cols in canonical order + `notes` tail ✓.
+4. **Wave-A row sample (CSV line 3):** `eea6f74486eea9c0,1,e4:aa:ea:80:a1:9b,mac,alpr,Flock Safety,…` — SAR-10 hash byte-matches HB44 baseline ✓.
+5. **JSON byte-stable re-export:** `_meta.argus_run_id == 6bf7d50f-0917-5687-bbc5-a156363d8853` ✓; `entries[0].keys() == ['argus_record_id','description','pattern','pattern_type']` (4-field minimal entry shape preserved per §7.5) ✓; SAR-10 hashes byte-stable.
+6. **Coverage report:** `## Lynceus integration: dual-artifact contract (CP11)` section present at line 7 ✓.
+
+**HB48 — single-source-of-truth structural guarantee landed.** Validator's test `test_csv_description_matches_json_description_single_source_of_truth` cements that the CSV `description` column and the JSON `entries[].description` are byte-identical via shared `_format_description(row)`. This is the structural guarantee CP11 was *for*.
+
+**HB48 — 4 procedural notes adjudicated (all accepted, none halts):**
+1. **`last_verified` discrepancy — Validator correct, dispatch wrong.** Direct DB query confirms `last_verified IS NULL` for ALL 63 active rows incl. Wave-A id=1. CSV honors `or ""` pattern. Test asserts actual state (`first_seen='2026-05-06 00:30:28'`, `last_verified=''`); Validator made the right call (test reality, not dispatch fiction). Carry-forward: future MAC issue to either backfill `last_verified` from MAC-22-era research notes, or clarify `last_verified` semantics in the bible. Not urgent.
+2. **Auto-regen drift on `coverage_report.md` (talos→lynceus rename).** Captured naturally per dispatch's "do NOT hand-edit" directive. The post-MAC-49 module name converging into the auto-generated artifact is exactly the right behaviour. Accepted clean.
+3. **`Lynceus_integration_spec_for_Argus.txt` reference.** Consumer-side spec, not in-tree. Wording preserved verbatim per dispatch — correct call. Refine if/when spec moves in-tree; durable as-is.
+4. **`§11 #7` attestation pre-existing staleness** (`coverage_report.md` lines 730–734 describe `argus_record_id` as `identifiers.id` — stale post-SAR-10 hash). Out of scope for MAC-51 per dispatch enumeration. Carry-forward: future amendment-log discipline (§11 #11) pass.
+
+**HB48 — MAC-51 closed `done`** via PATCH at 2026-05-07T20:23:46Z. Step-0 ratification comment [`bf7c4ffd`](/MAC/issues/MAC-51#comment-bf7c4ffd-cc73-46a8-bb3b-d4e7a084394a). MAC-51 deliverable closed; CP11 cycle complete.
+
+**HB48 — chain-don't-exit fired:**
+- (a) MAC-51 Step-0 ratification comment + close ✅ (`bf7c4ffd`)
+- (b) PROJECT_STATE rotated to HB48 (this commit) ⏳
+- (c) Memory daily 2026-05-07 + tacit lessons updated ✅
+- (d) MAC-1 chain comment with HB48 closure recap ⏳
+- (e) MAC-1 reset to `in_review` (standing kickoff thread) ⏳
+
+**HB48-forward sequence:**
+- HB49 (board notification): ping board so they can re-deliver new artifacts (JSON unchanged + CSV expanded) to Lynceus engineer for the integration test cycle
+- Future MAC issue (no urgency): `last_verified` semantics + backfill OR bible clarification; `§11 #7` attestation log discipline pass
+- Pivot opportunity: MAC-50 public-release planning track (parallel since HB45 dispatch — currently in-progress on its own thread)
+
+**Wake-board criteria (HB48-forward):**
+- MAC-50 axis ratifications (parallel public-release planning track)
+- Lynceus engineer integration test results (board-routed; will fire post-redelivery announcement)
+- §11 hard-rule trip
+- Refresh-cadence cron specs surface (Track 2)
+- WiGLE-admin response (post-§2-ratification + email send)
+
+**Phase-5+post-CP5 invariants preserved (HB48 — frozen since HB42 unchanged):** `identifiers=121 total / 63 active`. Lynceus survivors: 18 standard / 0 high-conf (unchanged; JSON minimal entry shape preserved). Schema version 7 (CSV column expansion does NOT bump schema_version — it's an export-shape change, not a DB-schema change). Live SARs 1–10. Live CPs 1–11 (CP9 CLOSED at HB44; CP11 CLOSED at HB48). Test suite: 391 passed / 2 skipped / 0 failed (HB42 baseline 385 + 6 CP11 = 391 ✓).
+
+**Bible HEAD:** `c2ef963` (CP11 amendment, unchanged from HB47 — implementation landed without further bible churn).
+
+WiGLE pitch-binding holds verbatim through 2026-05-18 (11 days remaining at HB48). Public release timing respects this.
+
+---
+
 CEO heartbeat 2026-05-07T~20:1xZ (HB47 — **CP11 RATIFIED · bible amendment commit `c2ef963` · MAC-51 dispatched to Validator**).
 
 **HB47 — board CP11 bundle ratification at MAC-1 [`cf5eeb79`](/MAC/issues/MAC-1#comment-cf5eeb79-d5dd-4ee2-b9ed-d148d224c533) 20:08:08Z.** Sub-A + Sub-B + Sub-C bundle approved; sub-A expanded board-side to include `first_seen` + `last_verified` columns alongside `argus_record_id` + `description` (final 15 CSV columns); `fcc_id` deferred to v1.1 per JOIN-cost rationale. CSV stays unfiltered per `Lynceus_integration_spec_for_Argus.txt` Section 7 framing. Shared `_format_description()` ratified as single source of truth.
