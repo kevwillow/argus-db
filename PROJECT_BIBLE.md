@@ -343,7 +343,7 @@ Inferred records always have `source_type='inferred'`, capped confidence (≤70)
    - `argus.db` (canonical SQLite)
    - `argus_export.json` (Lynceus-consumable, all confidences ≥30; applies §4.4 type mapping and §4.5 severity)
    - `argus_export_high_confidence.json` (Lynceus-consumable, confidence ≥70; recommended default for the scanner)
-   - `argus_export.csv` (human-readable, all canonical records)
+   - `argus_export.csv` (rich-import feed per CP11; 15 columns; all active records, unfiltered)
    - `coverage_report.md` (the matrix, gap analysis, and the §9 item 9 "Dropped from Lynceus export" tallies)
 
 
@@ -495,6 +495,21 @@ If a record cannot be described in 80 chars without losing meaning (rare under f
 - **`severity` field intentionally absent** (CP8). Severity is owned operator-side via Lynceus's `severity_overrides.yaml` file. §4.5 retained as superseded historical reasoning only.
 - The `dropped_in_export` tallies must reconcile with the coverage report (§9 item 9) such that `source_record_count − sum(dropped_in_export) = entries.length`.
 
+**Lynceus integration shape: dual-artifact contract — CP11 (2026-05-07) directive.**
+
+The v0.1 export ships two consumer-grade artifacts targeting distinct Lynceus consumer-side use cases:
+
+1. **`argus_export.json`** — operational alert feed. Minimal entry shape `{pattern, pattern_type, description, argus_record_id}` per row (per the §-text above). Designed for low-bandwidth / streaming / alert-oriented ingest. CP7 `geographic_scope_filter` applied (default `("US",)` plus `global` unconditional pass). CP8 ≤80-char flat description applied. Severity owned operator-side per CP8 sub-B. Companion file `argus_export_high_confidence.json` follows the same shape with `confidence_threshold=70`.
+
+2. **`argus_export.csv`** — rich-import feed. Full canonical row shape with 15 columns: `argus_record_id, id, identifier, identifier_type, device_category, manufacturer, model, confidence, source_type, source_url, source_excerpt, geographic_scope, description, first_seen, last_verified, notes`. **Unfiltered** — all active rows regardless of CP7 filter. Operators apply geographic / category / confidence filters at Lynceus-side import time.
+
+The split exists because: (a) JSON is sized for runtime alert-feed consumption where small payloads matter; (b) CSV carries full provenance for the import-once / store-in-watchlist_metadata workflow per Lynceus v0.3 schema migration 004. Together the two artifacts satisfy `Lynceus_integration_spec_for_Argus.txt` Section 2's "no lossy conversion" principle without bloating the alert-feed JSON. Symbol-table fields not present in either artifact (`fcc_id` requires JOIN against `fcc_grantees`): deferred to v1.1+ as identified-need surfaces.
+
+**CSV population logic (CP11 sub-A).**
+- `argus_record_id` — call `db.export.argus_record_id.argus_record_id(row.identifier_type, row.identifier)` per SAR-10. 16-char hex.
+- `description` — call shared `_format_description(row)` (CP8 ≤80-char flat) — same function powers JSON and CSV; single source of truth.
+- `first_seen` / `last_verified` — direct from `identifiers` table columns.
+
 **Don'ts:**
 - Do not include the `raw_observations` table in exports
 - Do not include `superseded_by` pointers in exports (resolve them first)
@@ -567,7 +582,7 @@ This run is "done" when all of the following are true:
    - `argus.db` (canonical SQLite)
    - `argus_export.json` (Lynceus-consumable, all confidences ≥30)
    - `argus_export_high_confidence.json` (Lynceus-consumable, confidence ≥70)
-   - `argus_export.csv` (human-readable, all canonical records)
+   - `argus_export.csv` (rich-import feed per CP11; 15 columns; all active records, unfiltered)
    - `coverage_report.md`
 
    Each Lynceus-consumable JSON file conforms to the schema in §7.5 (including the §4.4 type mapping, §4.5 severity derivation, and the description-format constraints). Each is independently parseable and includes a complete `_meta` block.

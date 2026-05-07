@@ -800,6 +800,72 @@ vendor_overrides:
 
 ---
 
+## Correction Pass 11 — Lynceus integration: dual-artifact contract (JSON-as-operational-feed + CSV-as-rich-import)
+
+**Date:** 2026-05-07
+**Source:** HB46 board JSON-vs-CSV reconciliation question at MAC-1 [`3e612a85`](/MAC/issues/MAC-1#comment-3e612a85-e2b4-4922-89ed-3552062cc25e) 19:35:34Z + CEO HB46 CP11 ratification proposal at [`447781e0`](/MAC/issues/MAC-1#comment-447781e0-d17d-4da3-a4dd-39f8552ed9b7) 19:41:23Z. Board ratification via comment [`cf5eeb79`](/MAC/issues/MAC-1#comment-cf5eeb79-d5dd-4ee2-b9ed-d148d224c533) 2026-05-07T20:08:08Z (sub-A + sub-B + sub-C bundle approved, with sub-A expanded to include `first_seen` + `last_verified`; `fcc_id` deferred to v1.1).
+**Bible commit:** §7.5 dual-artifact contract sub-section + §6 Phase 5 #4 CSV description update land paired with this amendment-log entry.
+**Binds:** Export Worker (§7.5), Lynceus integration test cycle, `lynceus-import-argus` v0.3 import CLI consumer.
+
+### The reconciliation
+
+`Lynceus_integration_spec_for_Argus.txt` Section 2 ratified board-side post-HB40 with a 5-required-+-11-optional-preserved per-entry field set ("no lossy conversion" principle). HB40 Pick #3 (Item 5 sequencing) had deferred per-entry-provenance expansion of the JSON `entries[]` shape pending exactly that Section 2 spec landing. The spec landed without an explicit CP-class notification routed back to Argus; Pick #3 became orphaned; the JSON exporter shipped the v1 §7.5 minimal entry shape (`pattern, pattern_type, description, argus_record_id`) per CP8-narrowed scope.
+
+CP11 reconciles the divergence via a **dual-artifact contract** rather than a single-artifact bloat: `argus_export.json` stays minimal (operational alert feed shape), `argus_export.csv` becomes the rich-import feed carrying full provenance for Lynceus's `watchlist_metadata` side-table import. This satisfies Lynceus's "no lossy conversion" principle (provenance carried in the canonical-import path) AND preserves the JSON's small-payload framing for future streaming/runtime alert-feed use cases per `Lynceus_integration_spec_for_Argus.txt` section 7's "Argus global export, Lynceus operator-side filtering" framing.
+
+### Sub-correction A — `argus_export.csv` shape extension (§7.5 + §6 Phase 5 #4)
+
+The change. `argus_export.csv` field_order extends from 12 columns to 15:
+
+```
+argus_record_id, id, identifier, identifier_type, device_category, manufacturer,
+model, confidence, source_type, source_url, source_excerpt, geographic_scope,
+description, first_seen, last_verified, notes
+```
+
+**Population logic:**
+- `argus_record_id` — call `db.export.argus_record_id.argus_record_id(row.identifier_type, row.identifier)` per SAR-10. 16-char hex.
+- `description` — call existing `_format_description(row)` from JSON-write path (CP8 ≤80-char flat); fallback chain (`{vendor} {device_category}` → `{vendor} unknown` → `Unattributed identifier`) preserved verbatim. **Single source of truth — the same function powers both JSON and CSV.**
+- `first_seen` — direct from `identifiers.first_seen` column (DATETIME).
+- `last_verified` — direct from `identifiers.last_verified` column (DATETIME).
+- `fcc_id` — **deferred to v1.1** (board ratification clause). Requires JOIN against `fcc_grantees`; defer until identified-need surfaces; revisit if Lynceus integration test surfaces a hard need.
+
+**Filter posture.** CSV remains **unfiltered** (all active rows; currently 63). Operators apply geographic / category / confidence filters at Lynceus-side import per `Lynceus_integration_spec_for_Argus.txt` section 7 "Argus global export, Lynceus operator-side filtering" framing. CP7 `geographic_scope_filter` continues to apply to JSON only; does NOT apply to CSV.
+
+### Sub-correction B — §7.5 dual-artifact contract sub-section
+
+The change. §7.5 grows a new sub-section codifying the dual-artifact split:
+
+> **Lynceus integration shape: dual-artifact contract — CP11 (2026-05-07) directive.**
+>
+> The v0.1 export ships two consumer-grade artifacts targeting distinct Lynceus consumer-side use cases:
+>
+> 1. **`argus_export.json`** — operational alert feed. Minimal entry shape `{pattern, pattern_type, description, argus_record_id}` per row. Designed for low-bandwidth / streaming / alert-oriented ingest. CP7 `geographic_scope_filter` applied (default `("US",)` plus `global` unconditional pass). CP8 ≤80-char flat description applied. Severity owned operator-side per CP8 sub-B. Companion file `argus_export_high_confidence.json` follows the same shape with `confidence_threshold=70`.
+>
+> 2. **`argus_export.csv`** — rich-import feed. Full canonical row shape with 15 columns per CP11 sub-A: `argus_record_id, id, identifier, identifier_type, device_category, manufacturer, model, confidence, source_type, source_url, source_excerpt, geographic_scope, description, first_seen, last_verified, notes`. **Unfiltered** — all active rows regardless of CP7 filter. Operators apply geographic / category / confidence filters at Lynceus-side import time.
+>
+> The split exists because: (a) JSON is sized for runtime alert-feed consumption where small payloads matter; (b) CSV carries full provenance for the import-once / store-in-watchlist_metadata workflow per Lynceus v0.3 schema migration 004. Together the two artifacts satisfy `Lynceus_integration_spec_for_Argus.txt` Section 2's "no lossy conversion" principle without bloating the alert-feed JSON.
+>
+> Symbol-table fields not present in either artifact (`fcc_id` requires JOIN against `fcc_grantees`): not exported in v1.0; deferred to v1.1+ as identified-need surfaces.
+>
+> Supersedes the HB39 Lynceus integration handoff doc §5.4 proposal ("ADD all 5 fields per-entry"). Spec compliance achieved via dual-artifact split rather than single-artifact bloat.
+
+### Sub-correction C — `coverage_report.md` documents the artifact split
+
+The change. `_build_coverage_report_md()` in `db/validation/export_lynceus.py` adds a new top-level section describing the dual-artifact contract + which artifact serves which Lynceus consumer-side use case (runtime alerts vs import-once provenance). Auto-regenerates on next export run.
+
+### Sub-correction D — §6 Phase 5 #4 CSV description update
+
+The change. §6 Phase 5 #4 line currently reading `argus_export.csv (human-readable, all canonical records)` updates to `argus_export.csv (rich-import feed; 15 columns per CP11; all active records, unfiltered)`.
+
+**Why a Correction Pass, not a SAR.** §7.5 dual-artifact contract sub-section + §6 Phase 5 #4 line update + DB-export shape contract amendment all touch bible §-text. Mirrors CP7/CP8 precedent for export-shape contract amendments.
+
+**Lynceus-side migration cost.** Zero for the v0.3 import CLI (`lynceus-import-argus`) — it consumes CSV and `watchlist_metadata` already has destination columns for the four new fields per Lynceus migration 004. No re-import beyond the standard CP11 sample-export redelivery cycle. JSON consumers (none in v0.3; future streaming alert ingest will benefit from the small-payload framing).
+
+**Carry-forward rule.** Per [`feedback_text_replace_narrative_historical_safety`](memory) (codified at HB45): MAC-51 implementation dispatch MUST require explicit historical-narrative preservation for any text-replace operations across PROJECT_STATE.md / BIBLE_AMENDMENTS.md / coverage_report.md narrative; the v1 §7.5 minimal-entry-shape is the canonical contract for HB42 baseline and prior, and historical references to it stay intact.
+
+---
+
 ## SAR-10 — `argus_record_id` algorithm: `sha256(type|identifier)[:16]`
 
 **Date:** 2026-05-07
