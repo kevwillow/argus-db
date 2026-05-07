@@ -127,7 +127,7 @@ The schema is the contract. All sub-agents output rows conforming to this.
 - **`sources`** — registry of every source crawled, with last-fetch timestamp and status
 - **`raw_observations`** — staging table; raw extracted records before normalization (preserve forever for audit). Holds rows that carry an actual or candidate identifier (MAC/OUI/BSSID/SSID/UUID) in `candidate_identifier` keyed by §4.1 `identifier_type`.
 - **`deployment_observations`** — staging table for Tier 1 sources that yield agency × technology × location × vendor metadata but **no** MAC/OUI/SSID/UUID identifier (EFF Atlas of Surveillance, DeFlock). Identifier columns intentionally absent — promotion to `identifiers` requires a Phase 3+ inference linking a deployment to a concrete identifier candidate (§11 #1). Idempotency keyed by `(source_id, source_row_key)` where `source_row_key` is the source's stable per-row natural key (e.g. Atlas's `AOSNUMBER`). Added in Correction Pass 4 (BIBLE_AMENDMENTS).
-- **`procurement_records`** — staging table for Tier 2/3 procurement-only rows (SAM.gov, city council minutes, FOIA-released procurement docs) that name an agency × vendor purchase but carry **no** MAC/OUI/SSID/UUID identifier. Schema includes a nullable `linked_identifier_id` FK back to `identifiers` for the upgrade path when a later source attaches a concrete identifier to the same purchase. Per §4.5 procurement-only carveout / §11 #14, these rows are NEVER exported to Talos — they are analytical only. Created in MAC-2 / Phase 1 (signed off at Checkpoint 1); documented in §4.2 in Correction Pass 5 (BIBLE_AMENDMENTS).
+- **`procurement_records`** — staging table for Tier 2/3 procurement-only rows (SAM.gov, city council minutes, FOIA-released procurement docs) that name an agency × vendor purchase but carry **no** MAC/OUI/SSID/UUID identifier. Schema includes a nullable `linked_identifier_id` FK back to `identifiers` for the upgrade path when a later source attaches a concrete identifier to the same purchase. Per §4.5 procurement-only carveout / §11 #14, these rows are NEVER exported to Lynceus — they are analytical only. Created in MAC-2 / Phase 1 (signed off at Checkpoint 1); documented in §4.2 in Correction Pass 5 (BIBLE_AMENDMENTS).
 - **`fcc_grantees`** — staging table for FCC EAS grantee registrations (Phase 3 / MAC-7; first source = opendata.fcc.gov dataset `3b3k-34jp`, USGOV_WORKS public domain). Holds grantee_code → entity-name + mailing/contact metadata + date_received. Identifier columns intentionally absent — `grantee_code` is a regulatory entity prefix, not a per-device identifier (per-device FCC IDs are formed `grantee_code + product_code`, owned by Phase 4 `fcc_equipment_filings` if/when created). Idempotency keyed by `(source_id, source_row_key=grantee_code)`. Stale-mirror sources: `sources.notes` MUST carry `dataset_freeze_date` + `staleness_warning` when the upstream mirror is documented stale (3b3k-34jp is frozen at 2021-03-22; Flock Safety + post-2020 grantees absent — Phase 4 owns the gap). Added in Correction Pass 6 (BIBLE_AMENDMENTS).
 - **`extraction_runs`** — log of every extraction job: agent id, source, started_at, finished_at, records_in, records_out, errors
 - **`conflicts`** — when two sources disagree on the same identifier; reviewed and resolved by CEO
@@ -140,33 +140,37 @@ The schema is the contract. All sub-agents output rows conforming to this.
 - SSIDs: stored exactly as broadcast; pattern fields use POSIX regex
 - Manufacturer names: matched against a canonical list maintained in `manufacturers` table; new vendors added explicitly
 
-### 4.4 Talos export mapping
+### 4.4 Lynceus export mapping
 
-The downstream consumer (Talos, the Raspberry Pi RF security monitor) has a fixed, minimal watchlist schema with `pattern_type ∈ {mac, oui, ssid, ble_uuid}`. Argus's richer `identifier_type` enum must be collapsed at export time. Talos cannot be modified to accept Argus's richer enum; Argus does the collapsing. The export worker (§7.5) applies exactly this mapping:
+The downstream consumer (Lynceus, the Raspberry Pi RF security monitor) has a fixed, minimal watchlist schema with `pattern_type ∈ {mac, oui, ssid, ble_uuid}`. Argus's richer `identifier_type` enum must be collapsed at export time. Lynceus cannot be modified to accept Argus's richer enum; Argus does the collapsing. The export worker (§7.5) applies exactly this mapping:
 
-| Argus `identifier_type` | Talos `pattern_type` | Notes |
+| Argus `identifier_type` | Lynceus `pattern_type` | Notes |
 |---|---|---|
 | `oui` | `oui` | direct pass |
 | `mac` | `mac` | direct pass |
-| `bssid` | `mac` | a BSSID *is* a MAC for Talos's purposes |
+| `bssid` | `mac` | a BSSID *is* a MAC for Lynceus's purposes |
 | `ssid_exact` | `ssid` | direct pass |
-| `ssid_pattern` | (DROPPED) | Talos has no regex support in v0.2; record in coverage report |
+| `ssid_pattern` | (DROPPED) | Lynceus has no regex support in v0.2; record in coverage report |
 | `ble_uuid` | `ble_uuid` | direct pass |
-| `ble_service` | `ble_uuid` | collapsed; BLE service UUIDs *are* UUIDs for Talos |
+| `ble_service` | `ble_uuid` | collapsed; BLE service UUIDs *are* UUIDs for Lynceus |
 | `mac_range` | (expand or DROP) | expand into individual MACs at export ONLY if range ≤256 entries; otherwise drop and note in coverage report |
-| `device_fingerprint` | (DROPPED) | Talos has no fingerprint matching; analytical-only |
+| `device_fingerprint` | (DROPPED) | Lynceus has no fingerprint matching; analytical-only |
 
-Records that drop out of the Talos export remain in the canonical Argus database for analytical purposes. The coverage report MUST tally Argus-only records by category so the human knows what's not flowing downstream.
+Records that drop out of the Lynceus export remain in the canonical Argus database for analytical purposes. The coverage report MUST tally Argus-only records by category so the human knows what's not flowing downstream.
 
-See §4.5 for severity derivation, §7.5 for the export-file shape and per-record description format, and §8.4 for additional drop rules (unknown category, Pi self-exclude, procurement-only).
+**Geographic-scope filter (CP7).** The Lynceus export applies an export-time `geographic_scope_filter` against `identifiers.geographic_scope` (§4.1). Default = `["US"]` for both standard and high-confidence exports (US-deployed Lynceus instances). Records with `geographic_scope` matching ANY filter element pass; records with `global` pass unconditionally; records with `unknown` pass into the standard export but NOT the high-confidence export. Records filtered out are tallied in `_meta.dropped_in_export` under `geographic_scope_mismatch`. Operators in non-US jurisdictions configure via export CLI flag; Argus does NOT bake the filter into the canonical DB. (See §7.5 for the export-shape contract and §12 #1 disposition.)
 
-### 4.5 Severity for Talos export
+See §7.5 for the export-file shape and per-record description format, and §8.4 for additional drop rules (unknown category, Pi self-exclude, procurement-only). Severity is no longer Argus-emitted — see §4.5 superseded banner + CP8.
 
-Talos requires a `severity ∈ {low, med, high}` per record. Argus has `confidence` (0–100) but not severity. **Severity is NOT confidence.** Severity expresses "how alarming is it that this device is near me," which is a function of `device_category`, not how sure we are about the identifier.
+### 4.5 Severity for Lynceus export *(superseded — see CP8)*
 
-The export worker (§7.5) derives Talos severity from Argus `device_category` using exactly this mapping:
+> **⚠️ Superseded as of CP8 (2026-05-07): severity is owned operator-side via Lynceus's `severity_overrides.yaml` file. Argus does NOT emit `severity` in the export shape. Section retained below verbatim for audit-trail / historical-reasoning continuity. Future export modules MUST NOT consult §4.5 for severity values.**
 
-| `device_category` | Talos `severity` | Reasoning |
+Lynceus requires a `severity ∈ {low, med, high}` per record. Argus has `confidence` (0–100) but not severity. **Severity is NOT confidence.** Severity expresses "how alarming is it that this device is near me," which is a function of `device_category`, not how sure we are about the identifier.
+
+The export worker (§7.5) derives Lynceus severity from Argus `device_category` using exactly this mapping:
+
+| `device_category` | Lynceus `severity` | Reasoning |
 |---|---|---|
 | `imsi_catcher` | `high` | highest threat to personal privacy |
 | `alpr` | `high` | always-on tracking infrastructure |
@@ -183,7 +187,7 @@ The export worker (§7.5) derives Talos severity from Argus `device_category` us
 
 **Confidence vs. severity rule.** Confidence affects whether a record is exported (threshold 70 for the high-confidence file — see §6 Phase 5 and §7.5), not severity. A high-severity record at confidence 50 is dropped from the high-confidence export entirely; it is NOT downgraded to low severity.
 
-**Procurement-only carveout.** Procurement-only records (`source_type='procurement'` with no MAC/OUI/UUID, only an agency-bought-vendor mapping) are NEVER exported to Talos. They are analytical only. The Talos export contains only records with concrete identifiers. (See also §8.4 and §11 #14.)
+**Procurement-only carveout.** Procurement-only records (`source_type='procurement'` with no MAC/OUI/UUID, only an agency-bought-vendor mapping) are NEVER exported to Lynceus. They are analytical only. The Lynceus export contains only records with concrete identifiers. (See also §8.4 and §11 #14.)
 
 ---
 
@@ -337,10 +341,10 @@ Inferred records always have `source_type='inferred'`, capped confidence (≤70)
 
 
    - `argus.db` (canonical SQLite)
-   - `argus_export.json` (Talos-consumable, all confidences ≥30; applies §4.4 type mapping and §4.5 severity)
-   - `argus_export_high_confidence.json` (Talos-consumable, confidence ≥70; recommended default for the scanner)
+   - `argus_export.json` (Lynceus-consumable, all confidences ≥30; applies §4.4 type mapping and §4.5 severity)
+   - `argus_export_high_confidence.json` (Lynceus-consumable, confidence ≥70; recommended default for the scanner)
    - `argus_export.csv` (human-readable, all canonical records)
-   - `coverage_report.md` (the matrix, gap analysis, and the §9 item 9 "Dropped from Talos export" tallies)
+   - `coverage_report.md` (the matrix, gap analysis, and the §9 item 9 "Dropped from Lynceus export" tallies)
 
 
 
@@ -425,26 +429,32 @@ Inferred records always have `source_type='inferred'`, capped confidence (≤70)
 
 ### 7.5 Export Worker
 
-**Goal:** Produce final exports per §6 Phase 5. The Talos-bound files (`argus_export.json`, `argus_export_high_confidence.json`) must apply the §4.4 type mapping and §4.5 severity derivation before writing entries.
+**Goal:** Produce final exports per §6 Phase 5. The Lynceus-bound files (`argus_export.json`, `argus_export_high_confidence.json`) must apply the §4.4 type mapping and §4.5 severity derivation before writing entries.
 **Outputs:** Files in `exports/` directory, each with a header comment (in JSON: `_meta` field; in CSV: top-line `# meta`) including: export timestamp, record count, schema version, confidence threshold applied.
 
-**Per-record description format (Talos exports only).** For `argus_export.json` and `argus_export_high_confidence.json`, descriptions must be self-contained and readable as a phone notification. Constraints:
+**Per-record description format (Lynceus exports only) — CP8 (2026-05-07) directive.** For `argus_export.json` and `argus_export_high_confidence.json`, descriptions must be self-contained and readable as a phone notification. Constraints:
 
 - Maximum 80 characters
 - No "see source" references
 - No URLs
 - No `source_excerpt` fragments — those stay in the canonical DB only
-- Format: `{vendor} {product family or generic name} ({short context})`
+- **Format (flat per CP8):** `{vendor} {device_category}` — flat, no parentheticals, no rich product-family seed.
+- **Fallback patterns:**
+    - Vendor known, category unknown: `"{vendor} unknown"`.
+    - Vendor unknown (e.g. inferred from OUI without canonical-name match): `"Unattributed identifier"`.
 - Examples:
-    - GOOD: `Hak5 WiFi Pineapple (pentest gear)`
-    - GOOD: `Axon Body 3 body camera`
-    - GOOD: `Apple Find My / AirTag service`
+    - GOOD: `Flock Safety alpr`
+    - GOOD: `Hak5 hacking_tool`
+    - GOOD: `Axon body_cam`
+    - GOOD: `Apple ble_service`
+    - GOOD: `DJI drone`
     - BAD: `Hak5 - see source for details`
+    - BAD: `Hak5 WiFi Pineapple (pentest gear)`  *(rich-seed superseded by CP8)*
     - BAD: `Device manufactured by Hak5 LLC, used for wireless penetration testing as documented in https://...`
 
-If a record cannot be described in 80 chars without losing meaning, the canonical record stays but the Talos export uses a generic description like `{category} device` and notes the truncation in the coverage report.
+If a record cannot be described in 80 chars without losing meaning (rare under flat template), the canonical record stays but the Lynceus export uses `"{category} device"` and notes the truncation in the coverage report.
 
-**Talos export file shape (`argus_export.json` and `argus_export_high_confidence.json`).** Both files conform to:
+**Lynceus export file shape (`argus_export.json` and `argus_export_high_confidence.json`) — CP7 + CP8 + SAR-10 (2026-05-07) directive.** Both files conform to:
 
 ```json
 {
@@ -454,6 +464,7 @@ If a record cannot be described in 80 chars without losing meaning, the canonica
     "record_count": 0,
     "confidence_threshold": 0,
     "argus_run_id": "<UUID for this export run>",
+    "geographic_scope_filter": ["US"],
     "source_record_count": 0,
     "dropped_in_export": {
       "unknown_category": 0,
@@ -462,29 +473,34 @@ If a record cannot be described in 80 chars without losing meaning, the canonica
       "oversized_mac_range": 0,
       "procurement_only": 0,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 0
+      "below_confidence_threshold": 0,
+      "geographic_scope_mismatch": 0
     }
   },
   "entries": [
     {
       "pattern": "<normalized identifier>",
       "pattern_type": "<mac|oui|ssid|ble_uuid>",
-      "severity": "<low|med|high>",
-      "description": "<≤80 char self-contained description>",
-      "argus_record_id": 0
+      "description": "<≤80 char flat {vendor} {device_category} per CP8>",
+      "argus_record_id": "<16 hex chars: sha256(type|identifier)[:16] per SAR-10>"
     }
   ]
 }
 ```
 
-`confidence_threshold` is `0` for `argus_export.json` (full export, all confidences ≥30 per §6 Phase 5 / §9) and `70` for `argus_export_high_confidence.json`. The `argus_record_id` field is required and stable across re-runs of the same canonical record; the downstream Talos seeder uses it for upsert semantics (update-existing vs. insert-new) when re-importing later Argus versions. The `dropped_in_export` tallies must reconcile with the coverage report (§9 item 9) such that `source_record_count − sum(dropped_in_export) = entries.length`.
+**Field notes:**
+- `confidence_threshold` is `0` for `argus_export.json` (full export, all confidences ≥30 per §6 Phase 5 / §9) and `70` for `argus_export_high_confidence.json`.
+- `geographic_scope_filter` is the export-time CLI parameter (CP7); default `["US"]`. `"global"` records pass unconditionally; `"unknown"` records pass into standard but not high-confidence (§4.4).
+- `argus_record_id` is computed per **SAR-10** as `sha256(f"{identifier_type}|{normalized_identifier}").hexdigest()[:16]`. Stable under §8.3 dedup events: re-runs / confidence drift / source edits / vendor reattribution all yield identical hash. The Lynceus seeder uses it as the upsert key (update-existing vs. insert-new) when re-importing later Argus versions.
+- **`severity` field intentionally absent** (CP8). Severity is owned operator-side via Lynceus's `severity_overrides.yaml` file. §4.5 retained as superseded historical reasoning only.
+- The `dropped_in_export` tallies must reconcile with the coverage report (§9 item 9) such that `source_record_count − sum(dropped_in_export) = entries.length`.
 
 **Don'ts:**
 - Do not include the `raw_observations` table in exports
 - Do not include `superseded_by` pointers in exports (resolve them first)
-- Do not export records with `confidence < 30` to any Talos export file. The floor for `argus_export.json` is `confidence ≥ 30`; the threshold for `argus_export_high_confidence.json` is `confidence ≥ 70`. Records below 30 are tallied as `below_confidence_threshold` in the coverage report.
-- Do not export records with `device_category='unknown'` to Talos under any confidence threshold (see §8.4 and §11 #13)
-- Do not export procurement-only records (no concrete identifier) to Talos (see §4.5 and §11 #14)
+- Do not export records with `confidence < 30` to any Lynceus export file. The floor for `argus_export.json` is `confidence ≥ 30`; the threshold for `argus_export_high_confidence.json` is `confidence ≥ 70`. Records below 30 are tallied as `below_confidence_threshold` in the coverage report.
+- Do not export records with `device_category='unknown'` to Lynceus under any confidence threshold (see §8.4 and §11 #13)
+- Do not export procurement-only records (no concrete identifier) to Lynceus (see §4.5 and §11 #14)
 - Do not include OUIs from the Pi self-exclude list (§8.4) in `argus_export_high_confidence.json`
 
 ---
@@ -528,17 +544,17 @@ On dedup:
 The single biggest risk to this database is over-claiming. Specific guardrails:
 
 - **Multi-purpose vendors are not categorized at the OUI level.** Motorola Solutions makes police radios *and* hospital pagers *and* warehouse scanners. An OUI alone never gets a `device_category` other than `unknown`. Category requires model-level evidence.
-  - **Unknown-category Talos carveout.** Records with `device_category='unknown'` (the multi-purpose vendor case) are NEVER exported to Talos under any confidence level. Talos cannot do anything useful with "unknown category" records — they would either be dropped (silently losing data) or fire as low-severity noise (training the user to ignore alerts). They remain in the canonical Argus database for analytical purposes only. The coverage report must tally these as "analytical-only records" separately from "exported records." (See also §11 #13.)
+  - **Unknown-category Lynceus carveout.** Records with `device_category='unknown'` (the multi-purpose vendor case) are NEVER exported to Lynceus under any confidence level. Lynceus cannot do anything useful with "unknown category" records — they would either be dropped (silently losing data) or fire as low-severity noise (training the user to ignore alerts). They remain in the canonical Argus database for analytical purposes only. The coverage report must tally these as "analytical-only records" separately from "exported records." (See also §11 #13.)
 - **Procurement ≠ deployment.** An agency buying a Stingray doesn't put one on every patrol car. Procurement records add geographic context but never raise an identifier above 85 confidence by themselves.
 - **MAC randomization warning.** Modern phones and some modern surveillance gear randomize MACs. Note this in the export readme so the scanner doesn't generate false alerts on randomized devices.
 - **Test data filter.** Reject identifiers matching known documentation/example ranges (RFC 7042, locally administered ranges with obvious patterns, vendor demo addresses). The full reject list is enumerated in §7.3 and applied by the validator (§7.4).
-- **Pi self-exclude list (running scanner's own hardware).** Talos runs on a Raspberry Pi, which has well-known OUIs:
+- **Pi self-exclude list (running scanner's own hardware).** Lynceus runs on a Raspberry Pi, which has well-known OUIs:
   - `b8:27:eb` (older Pi boards)
   - `dc:a6:32` (Pi 4 era)
   - `e4:5f:01` (recent boards)
   - `28:cd:c1` (more recent)
 
-  These OUIs MUST NOT appear in the Talos high-confidence export, regardless of source confidence. They appear in the standard export (`argus_export.json`) with `severity='low'` and a description noting "informational — common in DIY hardware." This exclusion list is hard-coded in the export worker (§7.5) and tallied in the coverage report under `self_exclude_oui`. (See also §11 #12.)
+  These OUIs MUST NOT appear in the Lynceus high-confidence export, regardless of source confidence. They appear in the standard export (`argus_export.json`) with `severity='low'` and a description noting "informational — common in DIY hardware." This exclusion list is hard-coded in the export worker (§7.5) and tallied in the coverage report under `self_exclude_oui`. (See also §11 #12.)
 
 ---
 
@@ -549,19 +565,19 @@ This run is "done" when all of the following are true:
 1. `db/argus.db` exists, schema matches §4, all phases complete
 2. `exports/` contains:
    - `argus.db` (canonical SQLite)
-   - `argus_export.json` (Talos-consumable, all confidences ≥30)
-   - `argus_export_high_confidence.json` (Talos-consumable, confidence ≥70)
+   - `argus_export.json` (Lynceus-consumable, all confidences ≥30)
+   - `argus_export_high_confidence.json` (Lynceus-consumable, confidence ≥70)
    - `argus_export.csv` (human-readable, all canonical records)
    - `coverage_report.md`
 
-   Each Talos-consumable JSON file conforms to the schema in §7.5 (including the §4.4 type mapping, §4.5 severity derivation, and the description-format constraints). Each is independently parseable and includes a complete `_meta` block.
+   Each Lynceus-consumable JSON file conforms to the schema in §7.5 (including the §4.4 type mapping, §4.5 severity derivation, and the description-format constraints). Each is independently parseable and includes a complete `_meta` block.
 3. `coverage_report.md` exists and shows category coverage with honest gap analysis
 4. Every record in the main table has a working source_url
 5. The validator has run a final pass and `conflicts` table is empty (or every entry is human-resolved)
 6. The `argus_cli.py` utility works for `status`, `query`, `export`, `validate`
 7. README.md at the project root describes: what the database is, how to consume the export, the schema, the confidence scoring, the limitations, and the legal/ethical scope (§2.2 + §11)
 
-9. Coverage report includes a "Dropped from Talos export" section tallying records held back by category: `unknown_category`, `ssid_pattern`, `device_fingerprint`, `oversized_mac_range`, `procurement_only`, `self_exclude_oui`, `below_confidence_threshold`. Tallies must sum correctly: `source_record_count − sum(dropped) = exported entries count` for each Talos-bound JSON file (matching the `_meta.dropped_in_export` block defined in §7.5).
+9. Coverage report includes a "Dropped from Lynceus export" section tallying records held back by category: `unknown_category`, `ssid_pattern`, `device_fingerprint`, `oversized_mac_range`, `procurement_only`, `self_exclude_oui`, `below_confidence_threshold`. Tallies must sum correctly: `source_record_count − sum(dropped) = exported entries count` for each Lynceus-bound JSON file (matching the `_meta.dropped_in_export` block defined in §7.5).
 
 ---
 
@@ -588,11 +604,11 @@ These are hard rules. Violating any of these is a stop-the-line event.
 7. **Do not promote a record to the main table without provenance.** Provenance is the database. Without it, we have a rumor.
 8. **Do not let confidence drift upward without corroboration.** Confidence only rises when a second independent source confirms.
 9. **Do not skip checkpoints.** Even if a phase looks easy, stop and report.
-10. **Do not categorize at the OUI level for multi-purpose vendors** (see §8.4).
+10. **Do not categorize at the OUI level for multi-purpose vendors** (see §8.4). *(Reframed by CP10 (2026-05-07): narrow-read carve-out — Argus-side categorization of single-product-line §2.1 vendors whose entire product line falls within the canonical surveillance category is permitted, regardless of whether the vendor also makes consumer/commercial variants of that category. FP-suppression for multi-purpose vendors is delegated to the Lynceus operator-override layer (`severity_overrides.yaml`), not Argus-side gatekeeping. Argus ships factual vendor-attribution; Lynceus operators tune alert behavior per their threat model. See CP10 in BIBLE_AMENDMENTS.md for the 17-row v0.1 cutover slate and the operator-override-as-FP-layer architecture.)*
 11. **Do not skip the `BIBLE_AMENDMENTS.md` log entry when making in-place bible edits or adding sub-agent-level rules.** The git diff is the source of truth, but the amendment log is the human-readable trail. An undocumented amendment is a process violation regardless of whether the edit itself is correct.
-12. **Do not export OUIs that match the running scanner's hardware family** (Raspberry Pi OUIs as enumerated in §8.4) in the high-confidence Talos export. They go in the standard export at `severity='low'` only.
-13. **Do not export records with `device_category='unknown'` to Talos** under any confidence level. They remain canonical-only (see §8.4).
-14. **Do not export procurement-only records (no concrete identifier) to Talos.** Procurement records establish vendor-agency relationships, not device presence. They are analytical only (see §4.5).
+12. **Do not export OUIs that match the running scanner's hardware family** (Raspberry Pi OUIs as enumerated in §8.4) in the high-confidence Lynceus export. They go in the standard export at `severity='low'` only.
+13. **Do not export records with `device_category='unknown'` to Lynceus** under any confidence level. They remain canonical-only (see §8.4).
+14. **Do not export procurement-only records (no concrete identifier) to Lynceus.** Procurement records establish vendor-agency relationships, not device presence. They are analytical only (see §4.5).
 
 ---
 
@@ -603,30 +619,34 @@ These are hard rules. Violating any of these is a stop-the-line event.
 **Open**
 
 - **WiGLE API credentials.** Human needs to provide an API key. Argus is useless without it for Phase 3. Required before the Phase 3 Step-0 budget estimate fires (§6 Phase 3 / Checkpoint 3a). (Status at CP5: pitch-behavior binding holds verbatim through 2026-05-18; carries forward unchanged.)
-- **Configurable `geographic_scope` filter for the high-confidence Talos export.** Should the high-confidence export filter records by configurable geographic scope (e.g., default = `US`)? Two adjacent realities surfaced this question at Checkpoint 2: (a) DeFlock ingest holds ~849 international ALPR nodes (Netherlands, Australia, Italy, Denmark, plus Polizia/Politie blocks) — Talos is currently a US-deployed scanner, so non-US deployment records are dead weight in the watchlist; (b) DeFlock also holds private-sector retail ALPR records (HOA / shopping-mall installations) which the Phase-2 board call placed out-of-scope for V1 but kept in-staging for potential V2 reconsideration. A single export-time categorical filter (geographic + sector) handles both axes without separate ingestion paths. Records stay in `deployment_observations` regardless; export shape is the only thing that changes. Decide at Phase 5 alongside the Talos export design. (Added by Correction Pass 5. Status at CP5: CEO-recommended path is configurable string column on `identifiers`, default US, filter at export-time — would land as Correction Pass 7. Held for explicit board direction; Wave-A row currently at NULL placeholder. Deferrable to Talos integration handoff.)
 
 **Deferred at CP5 sign-off (2026-05-06) — revisit at Wave-F / Phase-6**
 
-- **Single-product §2.1 vendor OUI categorization at export time — narrow §11 #10 / §5 Tier 4 reading vs strict §8.4.** CP5 row-count visibility per disposition surfaced (CP5_BRIEF §3.1): under narrow-read carve-out, ~18 of 62 inferred rows would flip out of `unknown` — `DJI=13`, `Flock Safety=1` inferred, `Skydio=1`, `Cellebrite=1`, `SoundThinking=1`, with all 17 inferred rows still below the conf=70 high-confidence band so they stay standard-export-only. Board ratified CEO path-(a): accept v0.1 with strict §8.4. The narrow-read carve-out is queued for Wave-F / Phase-6 once model-level evidence sweeps raise a vendor cluster's per-row band into 70-cap territory. (CP5 sign-off via approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) 2026-05-06T20:17:10Z.)
-- **§4.4 256-entry `mac_range` expansion ceiling — OUI-prefix routing without expansion.** All 8 active `mac_range` rows are OUI-28 / OUI-36 sub-allocations vastly exceeding §4.4's expansion ceiling, so even if §3.1 narrow-read flipped their `device_category`, they'd re-fall to `oversized_mac_range`. Board ratified CEO path-(c): defer routing semantics to Talos integration handoff (jointly bound between Argus export shape and Talos seeder protocol). (CP5_BRIEF §3.2; CP5 sign-off 2026-05-06.)
+- **§4.4 256-entry `mac_range` expansion ceiling — OUI-prefix routing without expansion.** All 8 active `mac_range` rows are OUI-28 / OUI-36 sub-allocations vastly exceeding §4.4's expansion ceiling, so even if §3.1 narrow-read flipped their `device_category`, they'd re-fall to `oversized_mac_range`. Board ratified CEO path-(c): defer routing semantics to Lynceus integration handoff (jointly bound between Argus export shape and Lynceus seeder protocol). (CP5_BRIEF §3.2; CP5 sign-off 2026-05-06.)
 
-**Bound to Talos integration handoff (post-CP5)**
+**Resolved at CP7 / CP8 / CP10 / SAR-10 (2026-05-07)**
 
-- **`argus_record_id` upsert semantics in Talos seeder.** Argus-side stable-id is in place (`argus_run_id` deterministic UUID5 over the active-set fingerprint; `argus_record_id` = `identifiers.id`, stable across re-runs). Talos-side upsert vs destructive drop-and-reload protocol is the open piece. SAR-2 lean (upsert) holds as intended direction; binding decision is bilateral with Talos team. (CP5 carries this forward to integration handoff per CP5_BRIEF §4 #2.)
+Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (six-pick + two-halt-flag bundle approved as recommended; bundled handoff [`f6c6e206`](/MAC/issues/MAC-1#comment-f6c6e206-51f5-4bee-a7db-b062d96cdf41) + doc [`lynceus_v03_integration`](/MAC/issues/MAC-1#document-lynceus_v03_integration)).
+
+- ~~**Configurable `geographic_scope` filter for the high-confidence Lynceus export.**~~ Resolved at **CP7**: export-time categorical filter on `identifiers.geographic_scope`, default `["US"]` for both standard and high-confidence exports, configurable via export CLI flag. Records remain in canonical DB regardless; only the export shape filters. Schema unchanged (`identifiers.geographic_scope TEXT` exists in 0001 since CP-0). `_meta.dropped_in_export.geographic_scope_mismatch` tally added. Wave-A row backfilled to `US` (Flock Safety US-headquartered, US-deployed). See §4.4 + §7.5 + BIBLE_AMENDMENTS.md CP7.
+- ~~**Single-product §2.1 vendor OUI categorization at export time — narrow §11 #10 / §5 Tier 4 reading vs strict §8.4.**~~ Resolved at **CP10**: narrow-read v0.1 cutover via Lynceus's `severity_overrides.yaml` operator-side architecture making FP-suppression revisable space. **17 rows flip** `device_category` from `unknown` to specific category at v0.1 cutover (DJI=13 drone, Flock Safety=1 alpr, Skydio=1 drone, Cellebrite=1 hacking_tool, SoundThinking=1 gunshot_detect; Hak5 prospective). All 17 stay below conf=70 (standard export only). Operator-override-as-FP-layer principle codified: Argus ships factual vendor-attribution; Lynceus owns alerting policy. DJI explicit FP-risk callout for Lynceus integration documentation. See §11 #10 carry-forward + BIBLE_AMENDMENTS.md CP10.
+- ~~**`argus_record_id` upsert semantics in Lynceus seeder.**~~ Resolved at **SAR-10**: `argus_record_id = sha256(f"{identifier_type}|{normalized_identifier}").hexdigest()[:16]`. Hashes the §8.3 dedup key; stable under re-runs / confidence drift / source edits / vendor reattribution. Replaces prior integer-PK plan (which fails Lynceus's "stable across vendor reattribution" expected event under §8.3). One Wave-A test artifact (`d4bfc29b7d63f7b1`) re-imports under the new hash; notify Lynceus engineer in integration test cycle. See §7.5 + BIBLE_AMENDMENTS.md SAR-10.
+- ~~**Severity for Lynceus export.**~~ Resolved at **CP8**: severity is owned operator-side via Lynceus's `severity_overrides.yaml` file. Argus does NOT emit `severity` in the export shape. §4.5 retained as superseded historical reasoning only (audit-trail discipline). Description format also tightened: ≤80 char flat `{vendor} {device_category}` (drops rich product-family seed); fallbacks `"{vendor} unknown"` / `"Unattributed identifier"`. See §4.5 superseded banner + §7.5 + BIBLE_AMENDMENTS.md CP8.
+- ~~**Working-name "Talos" → final-name "Lynceus".**~~ Resolved at **CP9**: bible §-text rename throughout (Talos → Lynceus). File names UNCHANGED (`argus_export.json` / `argus_export_high_confidence.json` / `argus_export.csv` retain existing convention). Historical record (BIBLE_AMENDMENTS.md prior entries, CP4_BRIEF.md, CP5_BRIEF.md, PROJECT_STATE.md prior heartbeats) NOT retroactively renamed. See BIBLE_AMENDMENTS.md CP9.
 
 **Resolved at CP5 sign-off (2026-05-06)**
 
 Board ratification via approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) 2026-05-06T20:17:10Z (CP5_BRIEF, commit `28bab20`, [MAC-47](/MAC/issues/MAC-47)).
 
-- ~~**Project name.** "Argus" working name; final confirm at Checkpoint 5 alongside the coverage matrix.~~ Resolved: **"Argus" is the final v1 name.** Boundary: Argus owns identifier-canonical-state + Talos-bound exports; Talos owns scanner-side scanning + correlation. "MAC" is the Paperclip issue-prefix only.
-- ~~**`device_cluster_id` for vehicle / operator correlation.**~~ Resolved: **SAR-3 lean confirmed final** — Argus identifies, Talos correlates. No Argus-side schema change; correlation logic owned by Talos team.
+- ~~**Project name.** "Argus" working name; final confirm at Checkpoint 5 alongside the coverage matrix.~~ Resolved: **"Argus" is the final v1 name.** Boundary: Argus owns identifier-canonical-state + Lynceus-bound exports; Lynceus owns scanner-side scanning + correlation. "MAC" is the Paperclip issue-prefix only.
+- ~~**`device_cluster_id` for vehicle / operator correlation.**~~ Resolved: **SAR-3 lean confirmed final** — Argus identifies, Lynceus correlates. No Argus-side schema change; correlation logic owned by Lynceus team.
 - ~~**Whether to query MuckRock's API or just their search.**~~ Resolved at Phase-4 Wave-D path-(a) early-cut ([MAC-31](/MAC/issues/MAC-31)): search was used; corpus-ceiling held at 0; question moot.
 - ~~**How aggressive on inference?** Bible says inferences are capped at 70 confidence.~~ Resolved: **70-cap binding for inferred rows confirmed final.** No current row pressure on the cap (all Phase-5 inferred rows landed at 50–55 per SAR-1 LAA-bit penalty + strict §8.4 conf=50 starting band).
 
 **Resolved during 2026-05-04 correction pass**
 
 - ~~**Confidence threshold for the default scanner export.**~~ Resolved at Checkpoint 0 (default = 70). Reconfirmed by Correction 2 (§4.5) and Correction 8 (§7.5): `argus_export_high_confidence.json` uses `confidence ≥ 70`; `argus_export.json` uses `confidence ≥ 30`.
-- ~~**Output file naming convention.**~~ Resolved by Correction 8 / §7.5 / §9 item 2: `argus_export.json` and `argus_export_high_confidence.json` are the canonical Talos-bound names; `argus.db` and `argus_export.csv` round out the export set.
+- ~~**Output file naming convention.**~~ Resolved by Correction 8 / §7.5 / §9 item 2: `argus_export.json` and `argus_export_high_confidence.json` are the canonical Lynceus-bound names; `argus.db` and `argus_export.csv` round out the export set.
 
 Add new questions to this section as they arise. Do not invent answers.
 

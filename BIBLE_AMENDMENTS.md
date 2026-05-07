@@ -635,3 +635,221 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 **Why this is a checkpoint sign-off, not a Correction Pass / SAR.** No bible §-text edited; the §12 reorganization is the Open-Questions section being maintained per its own discipline. CP5 sign-off mirrors CP4 sign-off precedent (board-ratified close + bible-amendment-log entry recording the close + §12 disposition slate without bible §-text edit).
 
 **MAC-47 reference.** CP5 brief at `/home/kev/argus/CP5_BRIEF.md` (commit `28bab20`); approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d).
+
+---
+
+## Correction Pass 7 — `geographic_scope` §12 #1 resolution + export-time filter
+
+**Date:** 2026-05-07
+**Source:** Lynceus v0.3 integration handoff bundle (path-γ); HB39 10-item bundled ratification proposal at MAC-1 [`f6c6e206`](/MAC/issues/MAC-1#comment-f6c6e206-51f5-4bee-a7db-b062d96cdf41); doc [`lynceus_v03_integration`](/MAC/issues/MAC-1#document-lynceus_v03_integration). Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (six-pick + two-halt-flag bundle approved as recommended).
+**Bible commit:** §12 #1 (Open) resolution + §7.5 export-time filter directive land paired with this amendment-log entry. Schema unchanged — `identifiers.geographic_scope TEXT` exists in 0001 schema since CP-0 (line 77 of `db/migrations/0001_initial.sql`).
+
+**The resolution.** CP7 closes the §12 question "Configurable `geographic_scope` filter for the high-confidence Lynceus export." Resolution: **export-time categorical filter on `identifiers.geographic_scope`, default-on for high-confidence export, configurable.** Records remain in canonical DB regardless; only the export shape filters.
+
+**Implementation directive (export-time logic, no schema change).**
+- **Per-record population at extraction time.** Every `identifiers` row populates `geographic_scope` per §4.1 spec (ISO country/region codes, comma-sep, or `global`). Source-class defaults: structured-source rows inherit the source's country-of-origin (Atlas/DeFlock = `US` for US ALPRs, `NL`/`AU`/`IT` etc. for non-US deployments; FCC = `US`; SAM.gov = `US`; IEEE = `global`). Inferred rows inherit from the corroborating evidence's geographic-scope; `unknown` if no evidence; `global` for vendor-OUI-only rows where deployment geography is unknowable.
+- **Wave-A row backfill.** The Wave-A Flock Safety MAC (`identifiers.id=1`) is currently NULL placeholder per CP5 carry-forward; backfill to `US` (Flock Safety is US-headquartered, US-deployed; source = DeFlock US-jurisdiction record).
+- **Export-time filter.** Lynceus-bound exports (`argus_export.json`, `argus_export_high_confidence.json`) accept a `geographic_scope_filter` parameter. Default = `["US"]` for both exports (US-deployed Lynceus instances). Records with `geographic_scope` matching ANY filter element pass; records with `global` pass unconditionally; records with `unknown` pass into the standard export but NOT the high-confidence export. Records filtered out are tallied in `_meta.dropped_in_export` under a new key `geographic_scope_mismatch`.
+- **Operator override.** Lynceus operators in non-US jurisdictions (e.g. `["NL"]`, `["AU"]`, `["EU"]`) configure via export CLI flag; Argus does NOT bake the filter into the canonical DB.
+
+**§4.4 / §7.5 update directive.** §7.5 export shape adds `geographic_scope_mismatch` to `_meta.dropped_in_export`. Coverage report (§9 item 9) updates to include geographic-scope tally. §4.4 references `geographic_scope` as an export-time consideration alongside the type-mapping table.
+
+**§12 disposition.** §12 #1 (Open) → **RESOLVED at CP7**. Strikethrough form preserves audit trail. The "Two adjacent realities" reasoning (DeFlock international ALPR + private-sector retail ALPR) holds: (a) is handled by the geographic_scope filter; (b) (private-sector / sector filter) remains at strict §8.4 unknown-category gate per CP5 disposition — sector is not currently a column.
+
+**Why a Correction Pass, not a SAR.** §12 question resolution + §7.5 export-shape contract update + §4.4 cross-reference touch the bible's main §-text contract surface. Mirrors CP1/CP2 precedent for export-shape contract amendments.
+
+**Lynceus-side migration cost.** Zero — Lynceus consumes filtered output; the filter is fully Argus-side.
+
+---
+
+## Correction Pass 8 — Description ceiling + §4.5 severity reframe-as-historical + §12 SAR-2 carry-forward amendment
+
+**Date:** 2026-05-07
+**Source:** Lynceus v0.3 integration handoff bundle (path-γ) — Lynceus engineer's Section 3 (description shape) + Section 4 (severity ownership) verbatim asks. Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Halt-flag #2 ✅ + Pick #2 ✅ + Pick #4 ✅).
+**Bible commit:** §7.5 description-format directive update + §4.5 superseded-historical banner land paired with this amendment-log entry.
+**Binds:** Export Worker (§7.5), all future export modules; Lynceus integration test cycle.
+
+### Sub-correction A — Description format (§7.5)
+
+**The change.** §7.5's description-format directive narrows from "≤80 char `{vendor} {product family or generic name} ({short context})`" to **"≤80 char flat `{vendor} {device_category}`"** per Lynceus's verbatim Section 3 ask. Drop the rich-seed pattern (e.g. `"Flock Safety ALPR camera"`); use flat form (`"Flock Safety alpr"`).
+
+**Fallback patterns (Lynceus's ask):**
+- Vendor known, category unknown: `"Unknown vendor {vendor}"` → reshaped to `"{vendor} unknown"` to keep `{vendor}` head-of-string convention.
+- Vendor unknown (e.g. inferred from OUI without canonical-name match): `"Unattributed identifier"`.
+- Both known: `"{vendor} {device_category}"` (flat). Examples: `"Flock Safety alpr"`, `"Hak5 hacking_tool"`, `"Axon body_cam"`.
+
+**Why ≤80 not Lynceus's max.** Lynceus accepts longer descriptions but the alert-UI surface benefits from the tighter ceiling; the flat template fits comfortably within 80 chars for all current §2.1 vendor × device_category combinations.
+
+**§7.5 examples updated.** Old examples (`"Hak5 WiFi Pineapple (pentest gear)"`, `"Axon Body 3 body camera"`, `"Apple Find My / AirTag service"`) struck; replaced with flat form (`"Hak5 hacking_tool"`, `"Axon body_cam"`, `"Apple ble_service"`).
+
+### Sub-correction B — §4.5 severity reframe-as-historical
+
+**The change.** §4.5 ("Severity for Lynceus export") gets a banner at section head: **"⚠️ Superseded as of CP8 (2026-05-07): severity is owned operator-side via Lynceus's `severity_overrides.yaml` file. Argus does NOT emit `severity` in the export shape. Section retained for audit-trail / historical-reasoning continuity."** §4.5's text body is preserved verbatim below the banner; future export modules MUST NOT consult §4.5 for severity values.
+
+**Why reframe-as-historical, not full strike.** §4.5 contains the original severity-mapping reasoning (which Lynceus operators may consult when building their override file). Striking the section breaks the reasoning chain. The banner makes the supersession unambiguous while preserving the audit trail.
+
+**§7.5 export shape update.** The `entries[]` schema drops the `severity` field. `_meta.dropped_in_export` retains all current keys; no new key needed (severity is no longer a category).
+
+**Operator-override architecture (codified in CP10 below).** Lynceus operators configure severity per-vendor / per-device_category / per-record via `severity_overrides.yaml` operator-side. Argus ships vendor-attribution facts; Lynceus owns alerting policy.
+
+### Sub-correction C — §12 SAR-2 carry-forward amendment
+
+**The change.** §12 "Bound to Talos integration handoff" entry on `argus_record_id` upsert semantics gets text amendment from "lean is upsert" to **"v1 algorithm: `sha256(type|identifier)[:16]` hashes the §8.3 dedup key, stable across re-runs / confidence drift / source edits / vendor reattribution"** per SAR-10 ratification (below). The §12 entry itself migrates to "Resolved at CP8 (2026-05-07)" via SAR-10 binding.
+
+**Why a Correction Pass, not a SAR.** §7.5 description-format contract + §4.5 superseded-historical banner + §12 disposition reorg all touch bible §-text. Mirrors CP1/CP2/CP5 precedent.
+
+**Lynceus-side migration cost.** Zero for description (Lynceus accepts the flat form). Zero for severity (Lynceus's override file design absorbs the responsibility). One record (the Wave-A snapshot test artifact `d4bfc29b7d63f7b1`) needs re-import under the SAR-10 hash — see SAR-10 entry below.
+
+---
+
+## Correction Pass 9 — Talos → Lynceus rename slate (forward-looking contract surface)
+
+**Date:** 2026-05-07
+**Source:** Lynceus v0.3 integration handoff (path-γ) — Lynceus is the canonical name for the downstream consumer (Raspberry Pi RF security monitor; formerly working-name "Talos"). Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Pick #5 ✅ — α: keep `argus_export*.json` filenames + bible `Talos`→`Lynceus` rename throughout).
+**Bible commit:** §-by-§ rename of `Talos`→`Lynceus` in PROJECT_BIBLE.md forward-looking contract surface lands paired with this amendment-log entry.
+**Binds:** All future Argus documentation, exports, comments, integration artifacts.
+
+### Rename scope
+
+**File names UNCHANGED.** `argus_export.json` + `argus_export_high_confidence.json` + `argus_export.csv` retain existing naming convention per board's preserve-existing-convention directive. Export module function names + variable names + DB column names remain unchanged (e.g. `argus_record_id`, `argus_run_id`, `_meta` keys). Only natural-language references in PROJECT_BIBLE.md prose surface flip.
+
+**§-by-§ rename slate (PROJECT_BIBLE.md §-text only).**
+- **§4.4** "Talos export mapping" → **"Lynceus export mapping"** (header + body prose).
+- **§4.5** "Severity for Talos export" → **"Severity for Lynceus export (superseded — see CP8)"** (paired with CP8's superseded-historical banner).
+- **§6 Phase 5** prose references (Talos-consumable, Talos-bound) → Lynceus-consumable / Lynceus-bound.
+- **§7.5** "Talos exports only" / "Talos-bound files" / "Talos seeder" → Lynceus equivalents.
+- **§8.4** "Pi self-exclude list (running scanner's own hardware)" — "Talos runs on a Raspberry Pi" → "Lynceus runs on a Raspberry Pi".
+- **§9** "Dropped from Talos export" → "Dropped from Lynceus export"; per-file Talos-consumable annotations → Lynceus-consumable.
+- **§11 #12, #13, #14** — "Talos export" / "to Talos" → Lynceus equivalents.
+- **§12 (Open + Resolved)** entries referencing Talos → Lynceus, with one exception (see Historical-record carve-out below).
+
+### Historical-record carve-out (NOT renamed)
+
+**BIBLE_AMENDMENTS.md historical entries (CP1 through CP6 + SAR-1 through SAR-9 + CP5 sign-off block).** These are the historical record. The board's "Talos was working-name through CP5" reasoning IS the historical truth. Retroactive rename would falsify the audit trail. Future amendment-log entries (CP7+ / SAR-10+) use Lynceus from inception.
+
+**PROJECT_STATE.md historical heartbeat blocks.** Heartbeat-by-heartbeat record; not renamed. Future heartbeat blocks use Lynceus.
+
+**CP4_BRIEF.md, CP5_BRIEF.md.** Frozen artifacts of their respective checkpoint sign-offs; not renamed.
+
+**§12 "Resolved at CP5 sign-off" subsection in PROJECT_BIBLE.md.** Item 1 ("Project name") references "Talos owns scanner-side scanning + correlation" as part of the resolved boundary statement. This subsection IS in PROJECT_BIBLE.md (forward-looking contract) but it ALSO documents a CP5-sign-off boundary call. The board's resolution at CP5 used "Talos" as the working name; CP9 amends the boundary statement to read "Lynceus owns scanner-side scanning + correlation" per CP9 board ratification. Audit trail preserved via CP9 amendment-log entry.
+
+**Why a Correction Pass, not a SAR.** Touches bible §-text contract surface across §4.4 / §4.5 / §6 / §7.5 / §8.4 / §9 / §11 / §12. CP1/CP2/CP5 precedent.
+
+**Lynceus-side migration cost.** Zero — rename is internal to Argus's bible documentation surface.
+
+---
+
+## Correction Pass 10 — §11 #10 narrow-read v0.1 cutover + operator-override-as-FP-layer principle
+
+**Date:** 2026-05-07
+**Source:** Lynceus v0.3 integration handoff (path-γ) — board override of CP5 path-(a) deferral via Lynceus's `severity_overrides.yaml` operator-side architecture making FP-suppression revisable space. Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Pick #6 ✅ — full 17-row flip approved).
+**Bible commit:** §11 #10 narrow-read carve-out codification + §-text update lands paired with this amendment-log entry. Argus DB row mutation: 17 rows flip `device_category` from `unknown` to specific category at v0.1 cutover.
+
+### The codification (CP10 verbatim per board)
+
+> *"Narrow §11 #10 read includes any §2.1 vendor whose product line includes the canonical surveillance category, regardless of whether the vendor also makes consumer/commercial variants of that category. Argus ships vendor-attribution facts; FP-suppression for multi-purpose vendors is handled by Lynceus operator-override file (`severity_overrides.yaml`), not by Argus-side gatekeeping. This preserves the most informative data export while delegating filtering to operator policy where context is known."*
+
+### The 17-row flip (v0.1 cutover)
+
+| Vendor | Current category | Flipped category | Rows | Source-class |
+|---|---|---|---|---|
+| DJI | `unknown` | `drone` | 13 | OUI inference (IEEE) |
+| Flock Safety | `unknown` | `alpr` | 1 | inferred (non-Wave-A) |
+| Skydio | `unknown` | `drone` | 1 | OUI inference (IEEE) |
+| Cellebrite | `unknown` | `hacking_tool` | 1 | OUI inference |
+| SoundThinking | `unknown` | `gunshot_detect` | 1 | OUI inference |
+
+Total: **17 rows** flip. Hak5 listed prospectively (rule applies if Hak5 OUIs surface in future Wave; current set has 0 Hak5 OUIs).
+
+**All 17 rows stay below conf=70.** Per CP5_BRIEF §3.1 row-count visibility, all 17 inferred rows currently sit at conf=50–55 per SAR-1 LAA-bit penalty + strict §8.4 starting band; they remain in `argus_export.json` (standard) but NOT `argus_export_high_confidence.json` until corroboration uplifts confidence.
+
+### Operator-override-as-FP-layer architecture (codified)
+
+**Argus side (data layer).** Argus ships factual vendor-attribution. Multi-purpose vendor records flow into the export with their factually-correct category attribution. No FP-suppression at the data layer.
+
+**Lynceus side (alerting layer).** Lynceus operators configure `severity_overrides.yaml` per their threat model and operational context. Examples:
+```yaml
+vendor_overrides:
+  - vendor: DJI
+    severity: low   # or 'suppress' to drop entirely from alert UI
+  - vendor: Skydio
+    severity: low
+```
+
+**Why the architecture works.** Vendor attribution is factually correct and stable. Severity / suppression policy depends on operator context (urban vs rural, recreational drone density, threat model) which Argus cannot know. Operators see all DJI broadcasts (visibility); operators tune alert behavior (signal-to-noise).
+
+### Explicit FP-risk callout (DJI primary, Skydio prospective)
+
+**DJI integration handoff documentation (verbatim per board).**
+
+> *"DJI is the highest-FP-risk vendor in the narrow-read set due to consumer market dominance (Mavic / Mini / Air series significantly outnumber LE-deployed Matrice 300/350 hardware in field broadcasts). Lynceus operators in dense urban or recreational drone-flying areas should expect frequent DJI matches; if FP volume is operationally noisy, suppress via `vendor_overrides: - vendor: DJI` entry in `severity_overrides.yaml`. Argus does not gatekeep this at the data layer because vendor-attribution is factually correct and operators benefit from visibility into all DJI broadcasts even when adjusting alert behavior."*
+
+**Same callout pattern applies prospectively to Skydio** (if FP volume becomes operational concern) **and any future multi-purpose vendor added to §2.1.**
+
+### §11 #10 §-text update directive
+
+§11 #10 ("Do not categorize at the OUI level for multi-purpose vendors") gets a CP10 carry-forward amendment: the rule's enforcement is REFRAMED — Argus-side categorization of single-product-line §2.1 vendors (per CP10's narrow read) is permitted; FP-suppression for multi-purpose vendors is delegated to Lynceus operator-override layer. §8.4 references CP10 for the narrow-read carve-out.
+
+### §12 disposition
+
+§12 "Deferred at CP5 sign-off → Wave-F / Phase-6" entry on "Single-product §2.1 vendor OUI categorization at export time" → **RESOLVED at CP10 (2026-05-07)** with narrow-read v0.1 cutover. The deferral preserved in strikethrough.
+
+**Why a Correction Pass, not a SAR.** §11 #10 contract amendment + §8.4 cross-reference + §12 disposition reorg + DB row mutation (17 rows flip). Mirrors CP3/CP5 precedent for §11 / §12 contract changes.
+
+**Lynceus-side migration cost.** Lynceus engineer SHOULD include `severity_overrides.yaml` template + DJI/Skydio default-suppress example in the Lynceus integration test cycle delivery.
+
+---
+
+## SAR-10 — `argus_record_id` algorithm: `sha256(type|identifier)[:16]`
+
+**Date:** 2026-05-07
+**Source:** Lynceus v0.3 integration handoff (path-γ) — Halt-flag #1 surfaced at HB39 (`argus_record_id` divergence between Wave-A snapshot hex `d4bfc29b7d63f7b1` and v1 Talos integer-id export; integer NOT stable under §8.3 dedup-driven supersede + reattribution per Lynceus's expected events). Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Halt-flag #1 ✅ — strong endorsement; codify as SAR-10 + CP8 §12 carry-forward text amendment).
+**Bible commit:** SAR-10 amendment-log entry lands paired with CP8 §12 carry-forward text amendment (above). No further bible §-text edit.
+**Binds:** Export Worker (§7.5), all future export modules, Lynceus seeder integration handoff.
+
+**The algorithm.** `argus_record_id = sha256(f"{identifier_type}|{normalized_identifier}").hexdigest()[:16]`.
+
+**Inputs:**
+- `identifier_type`: §4.1 enum value (e.g. `mac`, `oui`, `bssid`, `ssid_exact`, `ble_uuid`, `mac_range`, etc.). Lowercase, no whitespace.
+- `normalized_identifier`: per §4.3 normalization rules (MAC `aa:bb:cc:dd:ee:ff` lowercase colon-separated; OUI `aa:bb:cc` lowercase; UUID lowercase 8-4-4-4-12; SSIDs exact-as-broadcast).
+
+**Output:** First 16 hex chars of the SHA-256 digest. Treated as opaque string; not human-meaningful, not human-derivable.
+
+**Stability under §8.3 dedup events.**
+| Event | argus_record_id behavior |
+|---|---|
+| Re-run of unchanged DB | identical hash (bit-for-bit) |
+| Confidence drift (e.g. 50 → 65 → 70) | identical hash (confidence not in input) |
+| Source edit (source_url changes, source_excerpt changes) | identical hash (source not in input) |
+| Vendor reattribution under §8.3 (e.g. SAR-9 Motorola Mobility/Solutions split) | identical hash (manufacturer not in input) |
+| Identifier merge under §8.3 (two records collapsing to one canonical) | dropped record's hash gone; surviving record's hash unchanged |
+| Identifier supersede under §8.3 (`superseded_by` pointer set) | superseding record's hash unchanged; superseded record dropped from export |
+
+**Stability under §11 #11 rollback.** Rollback drops the staged row; argus_record_id never persisted to export, so no Lynceus-side cleanup needed.
+
+**Why this algorithm vs prior alternatives.**
+- **`identifiers.id` (integer PK).** Drops on `superseded_by` reattribution (the dropped row's `id` never reappears; the surviving row's `id` is from a different lineage). Fails Lynceus's "stable across vendor reattribution" expected event.
+- **`f"{run_id}|{id}"`.** `run_id` changes per export run; fails Lynceus's "stable across re-runs" expected event.
+- **Hash of full record (vendor / confidence / source).** Mutates on confidence drift / source edits / vendor reattribution. Fails 3 of Lynceus's 4 expected events.
+- **Hash of (type | identifier) only.** ✅ All 4 expected events stable. Hashes the immutable §8.3 dedup key.
+
+**Implementation directive.**
+- **Module:** Add `db/export/argus_record_id.py` with single function `argus_record_id(identifier_type: str, normalized_identifier: str) -> str` returning the 16-hex-char digest.
+- **Export Worker (§7.5) integration.** Replace existing `entries[].argus_record_id` population with the SAR-10 algorithm. The `_meta.dropped_in_export` tally is unaffected.
+- **Lynceus seeder integration.** Use `argus_record_id` as the upsert key (replaces the prior integer-id-as-upsert-key plan). Re-import on each Argus export = idempotent under unchanged DB state.
+- **Tests required.**
+    - Determinism: same input → same output (10× repetition, byte-identical).
+    - Stability under confidence drift: row at conf=50 vs conf=70 → same hash.
+    - Stability under source edit: row at source_url=A vs source_url=B → same hash.
+    - Stability under vendor reattribution: row reattributed Motorola Mobility → Motorola Solutions → same hash (provided identifier unchanged).
+    - Differentiation: different `identifier_type` for same identifier string → different hash; different identifier for same type → different hash.
+    - Collision space: 16 hex chars = 64 bits = 1.8e19 distinct values; collision probability negligible at v1 row-count scale (<10k).
+
+**Lynceus-side migration cost.**
+- **One record** in the Wave-A snapshot test artifact (hex `d4bfc29b7d63f7b1`) needs re-import under the SAR-10 hash. The Wave-A canonical row is `identifiers.id=1`, `identifier_type='mac'`, `identifier='e4:aa:ea:80:a1:9b'` (Flock Safety alpr). New `argus_record_id` = `sha256("mac|e4:aa:ea:80:a1:9b").hexdigest()[:16]` (computed at export time). Notify Lynceus engineer in the integration test cycle delivery.
+
+**§12 carry-forward (CP8 sub-correction C).** §12 "Bound to Talos integration handoff → `argus_record_id` upsert semantics" entry → **RESOLVED at SAR-10 (2026-05-07)**. Text amendment from "lean is upsert" to "v1 algorithm: `sha256(type|identifier)[:16]` hashes the §8.3 dedup key, stable across re-runs / confidence drift / source edits / vendor reattribution."
+
+**Why a SAR, not a Correction Pass.** Operational rule binding export module implementation; no bible §-text contract change beyond §12 disposition reorg (handled by CP8 sub-correction C). Mirrors SAR-1/SAR-7/SAR-8/SAR-9 precedent for module-binding operational rules.
+
+**Bundling rationale (CP7 + CP8 + CP9 + CP10 + SAR-10).** Five amendments bundled at one ratification gate per board's six-pick + two-halt-flag bundled approval at [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012). Reasoning: all five derive from the same Lynceus v0.3 integration handoff document; landing them as a coordinated commit preserves the audit trail's single-source attribution; Lynceus integration test cycle (downstream item) gates on all five being landed before a Lynceus-shaped sample export can be produced.
