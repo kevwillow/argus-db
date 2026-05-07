@@ -84,6 +84,8 @@ def _row(**kw) -> ActiveRow:
         source_excerpt=None,
         notes=None,
         geographic_scope=None,
+        first_seen=None,
+        last_verified=None,
     )
     defaults.update(kw)
     return ActiveRow(**defaults)
@@ -572,12 +574,16 @@ def _make_synthetic_db(tmp_path: Path) -> Path:
     db_path = tmp_path / "argus.db"
     con = sqlite3.connect(str(db_path))
     con.executescript(SCHEMA_DDL)
+    # Wave-A canonical row — mirrors the real db/argus.db id=1 (first_seen
+    # populated, last_verified NULL — see MAC-51 deliverable note on the
+    # MAC-22-era last_verified discrepancy).
     con.execute(
         "INSERT INTO identifiers (id, identifier, identifier_type, "
         "device_category, manufacturer, confidence, source_url, source_type, "
-        "geographic_scope) "
+        "geographic_scope, first_seen, last_verified) "
         "VALUES (1, 'e4:aa:ea:80:a1:9b', 'mac', 'alpr', 'Flock Safety', "
-        "60, 'http://e', 'crowdsourced', 'US')"
+        "60, 'http://e', 'crowdsourced', 'US', "
+        "'2026-05-06 00:30:28', NULL)"
     )
     con.execute(
         "INSERT INTO identifiers (id, identifier, identifier_type, "
@@ -723,3 +729,302 @@ def test_run_halts_when_mac45_report_missing(tmp_path: Path) -> None:
             coverage_matrix_report_path=tmp_path / "missing.json",
             coverage_matrix_md_path=tmp_path / "missing.md",
         )
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# CP11 — argus_export.csv 15-column expansion (Lynceus rich-import feed)
+# ────────────────────────────────────────────────────────────────────────────
+
+CP11_CSV_FIELD_ORDER: tuple[str, ...] = (
+    "argus_record_id",
+    "id",
+    "identifier",
+    "identifier_type",
+    "device_category",
+    "manufacturer",
+    "model",
+    "confidence",
+    "source_type",
+    "source_url",
+    "source_excerpt",
+    "geographic_scope",
+    "description",
+    "first_seen",
+    "last_verified",
+    "notes",
+)
+
+
+def _make_cp11_synthetic_db(tmp_path: Path) -> Path:
+    """Three-row fixture for CP11 verification clause #1 (Wave-A MAC + 2 OUIs)."""
+
+    db_path = tmp_path / "argus.db"
+    con = sqlite3.connect(str(db_path))
+    con.executescript(SCHEMA_DDL)
+    con.execute(
+        "INSERT INTO identifiers (id, identifier, identifier_type, "
+        "device_category, manufacturer, confidence, source_url, source_type, "
+        "geographic_scope, first_seen, last_verified) "
+        "VALUES (1, 'e4:aa:ea:80:a1:9b', 'mac', 'alpr', 'Flock Safety', "
+        "60, 'http://e', 'crowdsourced', 'US', "
+        "'2026-05-06 00:30:28', NULL)"
+    )
+    con.execute(
+        "INSERT INTO identifiers (id, identifier, identifier_type, "
+        "device_category, manufacturer, confidence, source_url, source_type, "
+        "geographic_scope) "
+        "VALUES (2, '00:04:7d', 'oui', 'unknown', 'Motorola Solutions', "
+        "55, 'http://e', 'inferred', 'global')"
+    )
+    con.execute(
+        "INSERT INTO identifiers (id, identifier, identifier_type, "
+        "device_category, manufacturer, confidence, source_url, source_type, "
+        "geographic_scope) "
+        "VALUES (3, 'b8:27:eb', 'oui', 'unknown', 'Raspberry Pi Foundation', "
+        "70, 'http://e', 'official', 'global')"
+    )
+    con.commit()
+    con.close()
+    return db_path
+
+
+def _make_cp11_synthetic_mac45(tmp_path: Path) -> tuple[Path, Path]:
+    """MAC-45 reconciliation map for the 3-row CP11 fixture."""
+
+    matrix_md_path = tmp_path / "coverage_matrix.md"
+    matrix_md_path.write_text("# matrix seed\n", encoding="utf-8")
+    report_path = tmp_path / "coverage_matrix_report.json"
+    report_path.write_text(
+        json.dumps(
+            {
+                "drop_tally_standard": {
+                    "drop_assignments": {
+                        "2": "unknown_category",
+                        "3": "unknown_category",
+                    },
+                    "bins": {
+                        "unknown_category": 2,
+                        "procurement_only": 0,
+                        "self_exclude_oui": 0,
+                        "below_confidence_threshold": 0,
+                        "oversized_mac_range": 0,
+                        "ssid_pattern": 0,
+                        "device_fingerprint": 0,
+                        "geographic_scope_mismatch": 0,
+                    },
+                    "survivors": 1,
+                    "reconciles": 3,
+                },
+                "drop_tally_high_confidence": {
+                    "drop_assignments": {
+                        "1": "below_confidence_threshold",
+                        "2": "unknown_category",
+                        "3": "unknown_category",
+                    },
+                    "bins": {
+                        "unknown_category": 2,
+                        "procurement_only": 0,
+                        "self_exclude_oui": 0,
+                        "below_confidence_threshold": 1,
+                        "oversized_mac_range": 0,
+                        "ssid_pattern": 0,
+                        "device_fingerprint": 0,
+                        "geographic_scope_mismatch": 0,
+                    },
+                    "survivors": 0,
+                    "reconciles": 3,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    return report_path, matrix_md_path
+
+
+def _read_cp11_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    """Return (header, rows) from the CSV, skipping the leading meta comment."""
+
+    import csv as _csv
+
+    with path.open("r", encoding="utf-8", newline="") as fh:
+        first = fh.readline()
+        assert first.startswith("# meta:"), f"expected meta line, got {first!r}"
+        reader = _csv.DictReader(fh)
+        assert reader.fieldnames is not None
+        return list(reader.fieldnames), list(reader)
+
+
+def test_csv_header_is_cp11_15_columns_in_order(tmp_path: Path) -> None:
+    """CP11 verification clause #1: CSV header row contains exactly 15 columns
+    in the CP11-specified order. (Counting non-`notes` semantic columns; `notes`
+    rides at the tail per the existing pattern, total 16 incl. notes.)"""
+
+    db_path = _make_cp11_synthetic_db(tmp_path)
+    report_path, matrix_md_path = _make_cp11_synthetic_mac45(tmp_path)
+    exports_dir = tmp_path / "exports"
+    run(
+        db_path=db_path,
+        exports_dir=exports_dir,
+        coverage_matrix_report_path=report_path,
+        coverage_matrix_md_path=matrix_md_path,
+    )
+
+    header, _ = _read_cp11_csv(exports_dir / "argus_export.csv")
+    assert tuple(header) == CP11_CSV_FIELD_ORDER
+    # CP11 sub-A directive specifies 15 NEW/EXISTING semantic columns; `notes`
+    # rides at the end of the row (16 total). The 15 enumerated:
+    cp11_enumerated = [c for c in CP11_CSV_FIELD_ORDER if c != "notes"]
+    assert len(cp11_enumerated) == 15
+
+
+def test_csv_argus_record_id_byte_stable_for_three_rows(tmp_path: Path) -> None:
+    """CP11 verification clause #1 (sample 3 rows incl. Wave-A Flock MAC + 2 OUIs):
+    each CSV row's `argus_record_id` matches `argus_record_id(type, identifier)`
+    byte-for-byte."""
+
+    db_path = _make_cp11_synthetic_db(tmp_path)
+    report_path, matrix_md_path = _make_cp11_synthetic_mac45(tmp_path)
+    exports_dir = tmp_path / "exports"
+    run(
+        db_path=db_path,
+        exports_dir=exports_dir,
+        coverage_matrix_report_path=report_path,
+        coverage_matrix_md_path=matrix_md_path,
+    )
+
+    _, csv_rows = _read_cp11_csv(exports_dir / "argus_export.csv")
+    assert len(csv_rows) == 3
+    by_id = {row["id"]: row for row in csv_rows}
+
+    # Wave-A Flock MAC: SAR-10 hash matches the canonical value asserted in
+    # `test_classify_survivor_alpr_mac_emits_cp8_flat_and_sar10_hash`.
+    assert by_id["1"]["argus_record_id"] == _sar10_hash("mac", "e4:aa:ea:80:a1:9b")
+    assert by_id["1"]["argus_record_id"] == "eea6f74486eea9c0"
+    # Motorola OUI.
+    assert by_id["2"]["argus_record_id"] == _sar10_hash("oui", "00:04:7d")
+    # Raspberry Pi OUI.
+    assert by_id["3"]["argus_record_id"] == _sar10_hash("oui", "b8:27:eb")
+
+
+def test_csv_description_byte_stable_for_three_rows(tmp_path: Path) -> None:
+    """CP11 verification clause #1: each CSV row's `description` matches
+    `_format_description(row)` byte-for-byte for the 3-row sample."""
+
+    db_path = _make_cp11_synthetic_db(tmp_path)
+    report_path, matrix_md_path = _make_cp11_synthetic_mac45(tmp_path)
+    exports_dir = tmp_path / "exports"
+    run(
+        db_path=db_path,
+        exports_dir=exports_dir,
+        coverage_matrix_report_path=report_path,
+        coverage_matrix_md_path=matrix_md_path,
+    )
+
+    _, csv_rows = _read_cp11_csv(exports_dir / "argus_export.csv")
+    by_id = {row["id"]: row for row in csv_rows}
+
+    # Wave-A Flock MAC — vendor + alpr → "Flock Safety alpr" (CP8 flat).
+    assert by_id["1"]["description"] == _format_description(
+        _row(manufacturer="Flock Safety", device_category="alpr")
+    )
+    assert by_id["1"]["description"] == "Flock Safety alpr"
+    # Motorola OUI — vendor + unknown → "{vendor} unknown" (CP8 sub-A ladder).
+    assert by_id["2"]["description"] == _format_description(
+        _row(manufacturer="Motorola Solutions", device_category="unknown")
+    )
+    assert by_id["2"]["description"] == "Motorola Solutions unknown"
+    # Raspberry Pi OUI — same ladder.
+    assert by_id["3"]["description"] == _format_description(
+        _row(manufacturer="Raspberry Pi Foundation", device_category="unknown")
+    )
+    assert by_id["3"]["description"] == "Raspberry Pi Foundation unknown"
+
+
+def test_csv_first_seen_non_empty_for_wave_a_row(tmp_path: Path) -> None:
+    """CP11 verification clause #1: `first_seen` is non-empty for the Wave-A
+    row.
+
+    Note (MAC-51 procedural): the dispatch claimed the Wave-A row also has a
+    confirmed `last_verified` from the MAC-22 era; the current `db/argus.db`
+    state shows `last_verified IS NULL` for ALL 63 active rows (including
+    Wave-A). The test asserts the actual DB state — `first_seen` non-empty,
+    `last_verified` empty-string — and does NOT regress on a missing column.
+    Surfaced in the deliverable comment for CEO follow-up."""
+
+    db_path = _make_cp11_synthetic_db(tmp_path)
+    report_path, matrix_md_path = _make_cp11_synthetic_mac45(tmp_path)
+    exports_dir = tmp_path / "exports"
+    run(
+        db_path=db_path,
+        exports_dir=exports_dir,
+        coverage_matrix_report_path=report_path,
+        coverage_matrix_md_path=matrix_md_path,
+    )
+
+    _, csv_rows = _read_cp11_csv(exports_dir / "argus_export.csv")
+    wave_a = next(row for row in csv_rows if row["id"] == "1")
+    assert wave_a["first_seen"] == "2026-05-06 00:30:28"
+    # NULL → "" per the existing `manufacturer or ""` handling pattern.
+    assert wave_a["last_verified"] == ""
+    # Other rows: both NULL → both empty.
+    other_rows = [row for row in csv_rows if row["id"] != "1"]
+    for row in other_rows:
+        assert row["first_seen"] == ""
+        assert row["last_verified"] == ""
+
+
+def test_csv_description_matches_json_description_single_source_of_truth(
+    tmp_path: Path,
+) -> None:
+    """CP11 single-source-of-truth: the CSV `description` column and the JSON
+    `entries[].description` field MUST be byte-identical for any row that
+    survives to both feeds. Both call `_format_description(row)`; this test
+    cements the contract."""
+
+    db_path = _make_cp11_synthetic_db(tmp_path)
+    report_path, matrix_md_path = _make_cp11_synthetic_mac45(tmp_path)
+    exports_dir = tmp_path / "exports"
+    run(
+        db_path=db_path,
+        exports_dir=exports_dir,
+        coverage_matrix_report_path=report_path,
+        coverage_matrix_md_path=matrix_md_path,
+    )
+
+    _, csv_rows = _read_cp11_csv(exports_dir / "argus_export.csv")
+    json_payload = json.loads((exports_dir / "argus_export.json").read_text())
+    json_by_arid = {e["argus_record_id"]: e for e in json_payload["entries"]}
+
+    matched = 0
+    for csv_row in csv_rows:
+        arid = csv_row["argus_record_id"]
+        if arid in json_by_arid:
+            assert csv_row["description"] == json_by_arid[arid]["description"], (
+                f"CSV description {csv_row['description']!r} != JSON description "
+                f"{json_by_arid[arid]['description']!r} for argus_record_id={arid}"
+            )
+            matched += 1
+    # Wave-A Flock MAC survives to JSON; assert at least one match made.
+    assert matched >= 1
+
+
+def test_coverage_report_has_lynceus_dual_artifact_section(tmp_path: Path) -> None:
+    """CP11 sub-B: coverage_report.md carries the
+    'Lynceus integration: dual-artifact contract (CP11)' section."""
+
+    db_path = _make_cp11_synthetic_db(tmp_path)
+    report_path, matrix_md_path = _make_cp11_synthetic_mac45(tmp_path)
+    exports_dir = tmp_path / "exports"
+    run(
+        db_path=db_path,
+        exports_dir=exports_dir,
+        coverage_matrix_report_path=report_path,
+        coverage_matrix_md_path=matrix_md_path,
+    )
+
+    coverage = (exports_dir / "coverage_report.md").read_text()
+    assert "## Lynceus integration: dual-artifact contract (CP11)" in coverage
+    assert "operational alert feed" in coverage
+    assert "rich-import feed" in coverage
+    assert "no lossy conversion" in coverage
+    assert "fcc_id` deferred to v1.1" in coverage

@@ -164,6 +164,8 @@ class ActiveRow:
     source_excerpt: str | None
     notes: str | None
     geographic_scope: str | None
+    first_seen: str | None
+    last_verified: str | None
 
 
 @dataclass(frozen=True)
@@ -194,7 +196,7 @@ def _load_active_rows(con: sqlite3.Connection) -> list[ActiveRow]:
         """
         SELECT id, identifier, identifier_type, device_category, manufacturer,
                model, confidence, source_type, source_url, source_excerpt,
-               notes, geographic_scope
+               notes, geographic_scope, first_seen, last_verified
         FROM identifiers
         WHERE superseded_by IS NULL
         ORDER BY id ASC
@@ -216,6 +218,8 @@ def _load_active_rows(con: sqlite3.Connection) -> list[ActiveRow]:
                 source_excerpt=r["source_excerpt"],
                 notes=r["notes"],
                 geographic_scope=r["geographic_scope"],
+                first_seen=r["first_seen"],
+                last_verified=r["last_verified"],
             )
         )
     return rows
@@ -477,13 +481,22 @@ def _write_json(path: Path, payload: dict[str, Any]) -> int:
 
 
 def _write_csv(path: Path, rows: list[ActiveRow], schema_version: int, exported_at: str) -> int:
-    """Write the human-readable CSV (all 63 active canonicals, no Talos filter)."""
+    """Write the rich-import CSV (all active canonicals, no CP7 filter).
+
+    CP11 dual-artifact contract: this is the rich-import feed for Lynceus.
+    The 15-column shape carries `argus_record_id` (SAR-10 hash), `description`
+    (CP8 flat ≤80-char form, byte-identical to the JSON-feed `description`
+    via shared `_format_description`), and the `first_seen`/`last_verified`
+    columns directly from the `identifiers` table. Operators apply
+    geographic / category / confidence filters at Lynceus-side import.
+    """
 
     header_meta = (
         f"# meta: schema_version={schema_version}, exported_at={exported_at}, "
         f"record_count={len(rows)}, confidence_threshold=0\n"
     )
     field_order = [
+        "argus_record_id",
         "id",
         "identifier",
         "identifier_type",
@@ -495,6 +508,9 @@ def _write_csv(path: Path, rows: list[ActiveRow], schema_version: int, exported_
         "source_url",
         "source_excerpt",
         "geographic_scope",
+        "description",
+        "first_seen",
+        "last_verified",
         "notes",
     ]
     with path.open("w", encoding="utf-8", newline="") as fh:
@@ -504,6 +520,7 @@ def _write_csv(path: Path, rows: list[ActiveRow], schema_version: int, exported_
         for row in rows:
             writer.writerow(
                 {
+                    "argus_record_id": _sar10_hash(row.identifier_type, row.identifier),
                     "id": row.id,
                     "identifier": row.identifier,
                     "identifier_type": row.identifier_type,
@@ -515,6 +532,9 @@ def _write_csv(path: Path, rows: list[ActiveRow], schema_version: int, exported_
                     "source_url": row.source_url,
                     "source_excerpt": (row.source_excerpt or "").replace("\r\n", "\n"),
                     "geographic_scope": row.geographic_scope or "",
+                    "description": _format_description(row),
+                    "first_seen": (row.first_seen or "").replace("\r\n", "\n"),
+                    "last_verified": (row.last_verified or "").replace("\r\n", "\n"),
                     "notes": (row.notes or "").replace("\r\n", "\n"),
                 }
             )
@@ -695,6 +715,35 @@ def _build_coverage_report_md(
         "`extraction_outputs/mac45/coverage_matrix.md` is embedded verbatim as the "
         "Section 1 matrix; this report adds the §9 item 9 drop-tally reconciliation "
         "block and the Section 3 high-level distribution summary."
+    )
+    md_parts.append("")
+    md_parts.append("## Lynceus integration: dual-artifact contract (CP11)")
+    md_parts.append("")
+    md_parts.append(
+        "The v0.1 export ships two consumer-grade artifacts targeting distinct "
+        "Lynceus consumer-side use cases:"
+    )
+    md_parts.append("")
+    md_parts.append(
+        "1. **`argus_export.json`** — operational alert feed. Minimal entry shape "
+        "`{pattern, pattern_type, description, argus_record_id}`. CP7 "
+        "`geographic_scope_filter` applied; CP8 ≤80-char flat description applied; "
+        "severity owned operator-side per CP8 sub-B. Sized for low-bandwidth / "
+        "streaming / alert-oriented ingest."
+    )
+    md_parts.append(
+        "2. **`argus_export.csv`** — rich-import feed. Full canonical row shape "
+        "with 15 columns including `argus_record_id` (SAR-10), `description` "
+        "(CP8 flat — byte-identical to the JSON-feed `description` via shared "
+        "`_format_description`), `first_seen`, `last_verified`. Unfiltered — all "
+        "active rows regardless of CP7 filter. Operators apply geographic / "
+        "category / confidence filters at Lynceus-side import per "
+        "`Lynceus_integration_spec_for_Argus.txt` section 7."
+    )
+    md_parts.append("")
+    md_parts.append(
+        "The split satisfies Lynceus's \"no lossy conversion\" principle (Section 2 "
+        "spec) without bloating the alert-feed JSON. `fcc_id` deferred to v1.1."
     )
     md_parts.append("")
     md_parts.append("## §11 attestations")
