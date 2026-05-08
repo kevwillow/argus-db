@@ -537,10 +537,23 @@ Every record in the main table has a working `source_url`. Records without prove
 | `academic` (peer-reviewed or conference) | 70–90 |
 | `foia` (released documents) | 65–85 |
 | `crowdsourced` (WiGLE, DeFlock) | 50–75 |
+| `manufacturer_app` (vendor companion APK/IPA static-analysis extract) | 60–95 (sub-banded by identifier class — see below) |
 | `inferred` (derived) | 30–70, capped |
 | News, forums, unverified | 20–50 |
 
 Adjust within range based on specificity, recency, and corroboration. Two independent sources at 70 each can corroborate to a single record at 85.
+
+**`manufacturer_app` sub-banding** (added Correction Pass 12 for Wave G — Phase 6 vendor companion app static analysis). The 60–95 outer band breaks down per identifier class, because vendor apps yield different attestation strength per class:
+
+| Identifier class extracted from vendor app | Sub-band | Rationale |
+|---|---|---|
+| Hardcoded BLE service UUID (128-bit or 16-bit-in-context) | 80–95 | BLE specs require service UUID for discovery; vendor app must contain the canonical value. Highest tier. |
+| Default SSID pattern (vendor-prefix WiFi name) | 70–85 | Clear vendor attestation in code; hardware match TBV at scan time. |
+| Default credential string (plaintext) | 60–80 | Vendor-attested at app version, but firmware may have rotated. Encoded/hashed values dropped (require runtime analysis). |
+| MAC OUI from validation code path | 75–90 | Confirms OUI assignment; cross-checks against IEEE Tier-1 registry. Disagreement → manual flag. |
+| Product-family taxonomy (model names, internal hardware IDs) | 90–95 | Vendor's own product naming inside their own app is near-canonical; primarily feeds aliases / inference candidates. |
+
+Default per-row confidence at extraction time = midpoint of the relevant sub-band. SAR-7 / SAR-8 / SAR-9 corroboration adjusts up; framework-string proximity, single-app-only surfacing, or cross-vendor-default appearance adjusts down. SAR-11 (proposed; gated on Step-2 calibration of first 2 vendor apps) handles framework-UUID and third-party-BLE-library FP classes if calibration shows >5% FP rate from those sources. §8.4 strict-promotion rule (≥80) applies as written.
 
 ### 8.3 Dedup logic
 
@@ -624,6 +637,7 @@ These are hard rules. Violating any of these is a stop-the-line event.
 12. **Do not export OUIs that match the running scanner's hardware family** (Raspberry Pi OUIs as enumerated in §8.4) in the high-confidence Lynceus export. They go in the standard export at `severity='low'` only.
 13. **Do not export records with `device_category='unknown'` to Lynceus** under any confidence level. They remain canonical-only (see §8.4).
 14. **Do not export procurement-only records (no concrete identifier) to Lynceus.** Procurement records establish vendor-agency relationships, not device presence. They are analytical only (see §4.5).
+15. **Do not commit decompiled vendor app source code, raw APK/IPA contents, or extracted decompile artifacts to the git index.** (Added Correction Pass 12, Wave G — Phase 6 license-posture confirmation per board direction 2026-05-08.) Raw APK/IPA binaries land at `raw/vendor_apps/<vendor>/<app_package_id>/<version>/<sha256>.{apk,ipa}` for provenance only and are gitignored. Decompiled `.java` / smali / dumped Mach-O headers live in workspace-only scratch directories during ExtractionWorker runs and are cleaned at end of run. Only extracted identifier *candidates* (value + relative file path within the decompile output) land in `raw_observations`. The git index never contains vendor-proprietary source. (See §11 #2 — this rule operationalizes the access/license posture for the vendor companion app corpus, mirroring the §1201 + §201.40(b) reverse-engineering exemption boundary: research is permitted, redistribution of decompiled source is not.)
 
 ---
 
@@ -634,6 +648,12 @@ These are hard rules. Violating any of these is a stop-the-line event.
 **Open**
 
 - **WiGLE API credentials.** Human needs to provide an API key. Argus is useless without it for Phase 3. Required before the Phase 3 Step-0 budget estimate fires (§6 Phase 3 / Checkpoint 3a). (Status at CP5: pitch-behavior binding holds verbatim through 2026-05-18; carries forward unchanged.)
+
+**Wave G (Phase 6) — board-ratified 2026-05-08, queued for execution post-v1.0.0 ship** (added Correction Pass 12)
+
+- **DMCA-takedown counter-notice template.** If a vendor issues a DMCA takedown for a Wave G finding in Argus's published exports, posture is: identifiers are facts (Feist), not copyrightable expression; Argus does not republish vendor source. Reliance: 17 USC §1201 security-research exemption + 37 CFR §201.40(b) implementing regulation. Pre-draft a counter-notice template under §512(g) for the file `wave_g/LEGAL_POSTURE.md`. Cross-reference from `THREAT_MODEL.md` at public-release prep so external readers understand the legal grounding. Surface for board review at Wave G Step 0 close.
+- **EULA-conflict-policy.** Per-vendor judgment criteria for app-EULA conflicts with reverse-engineering: (a) hostile EULA + low yield-value → exclude; (b) hostile EULA + high yield-value → surface to board for explicit risk-acceptance; (c) standard reverse-engineering clause + standard yield-value → include (boilerplate prohibition is preempted by §1201 in US); (d) anti-circumvention clause specifically targeting security research → exclude (rare). Borderline cases come back to board. Surface specific vendor EULA concerns as Step-0 ground-truth deliverable.
+- **Wave-G-vs-Wave-G.5 iOS deferral rationale.** Wave G is Android-first because Apple FairPlay encrypts most app binaries (decryption requires jailbroken iOS device) and most surveillance vendors with iOS apps also publish Android — Android-first captures the same vendor coverage at lower legal/operational cost. Wave G.5 / Phase 7 surfaces as a separate board-class proposal *after* Wave G Steps 1+2 complete and Android yield is empirically known. Specific Wave G.5 trigger: Step 0 surfaces a vendor that has *only* iOS app and significant yield-value (e.g., body-cam vendor exclusive to iOS) — flag for targeted Wave G.5 dispatch with vendor-specific scope.
 
 **Deferred at CP5 sign-off (2026-05-06) — revisit at Wave-F / Phase-6**
 

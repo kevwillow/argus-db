@@ -919,3 +919,77 @@ The change. §6 Phase 5 #4 line currently reading `argus_export.csv (human-reada
 **Why a SAR, not a Correction Pass.** Operational rule binding export module implementation; no bible §-text contract change beyond §12 disposition reorg (handled by CP8 sub-correction C). Mirrors SAR-1/SAR-7/SAR-8/SAR-9 precedent for module-binding operational rules.
 
 **Bundling rationale (CP7 + CP8 + CP9 + CP10 + SAR-10).** Five amendments bundled at one ratification gate per board's six-pick + two-halt-flag bundled approval at [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012). Reasoning: all five derive from the same Lynceus v0.3 integration handoff document; landing them as a coordinated commit preserves the audit trail's single-source attribution; Lynceus integration test cycle (downstream item) gates on all five being landed before a Lynceus-shaped sample export can be produced.
+
+---
+
+## Correction Pass 12 — Wave G (Phase 6) vendor companion app static analysis: §8.2 `manufacturer_app` confidence bands + §11 #15 license-posture rule + §12 three open questions
+
+**Date:** 2026-05-08
+**Source:** [MAC-52](/MAC/issues/MAC-52) — Wave G ratification proposal at plan document rev 1 (`c4c12502`); board ratification via comment [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b) 2026-05-08T05:24:21Z (request_confirmation `df6ce24d` auto-superseded by ratifying board comment per `supersedeOnUserComment: true`; comment text is the authoritative ratification with detailed direction across all 10 §11 decision points).
+**Bible commit:** §8.2 `manufacturer_app` row + sub-banding table + §11 #15 new hard-rule + §12 three new open questions land paired with this amendment-log entry.
+**Binds:** SourceWorker (Wave G Step 0/1), ExtractionWorker (Wave G Step 2), Validator (Wave G post-Step-2 promotion), CEO orchestrator, future quarterly refresh routine.
+
+**Naming note.** The board comment authorized these amendments as "Correction Pass 11"; CP11 is already taken by the Lynceus dual-artifact contract (commit `c2ef963`). Landed here as **CP12** to preserve audit-trail uniqueness; surfaced for board acknowledgement at MAC-52 close. Substance unchanged from board direction.
+
+### Corrections applied
+
+1. **§8.2 — add `manufacturer_app` source_type with five-class sub-banding.** Outer band `60–95`. Sub-bands per identifier class:
+   - Hardcoded BLE service UUIDs (128-bit or 16-bit-in-context) → `80–95` (BLE specs require service UUID for discovery; vendor app must contain canonical value).
+   - Default SSID patterns (vendor-prefix WiFi names) → `70–85` (clear vendor attestation; hardware match TBV at scan time).
+   - Default credential strings (plaintext only; encoded/hashed dropped) → `60–80` (vendor-attested at app version; firmware may have rotated).
+   - MAC OUI from validation code path → `75–90` (cross-checks against IEEE Tier-1 registry; disagreement → manual flag).
+   - Product-family taxonomy (model names, internal hardware IDs) → `90–95` (vendor's own product naming inside their own app).
+
+   Default per-row confidence at extraction time = midpoint of relevant sub-band. SAR-7/SAR-8/SAR-9 corroboration adjusts up; framework-string proximity, single-app-only surfacing, or cross-vendor-default appearance adjusts down. SAR-11 (proposed; gated on Step-2 calibration of first 2 vendor apps) handles framework-UUID and third-party-BLE-library FP classes if calibration shows >5% FP rate from those sources. §8.4 strict-promotion rule (≥80) applies as written.
+
+2. **§11 #15 — new hard-rule: do not commit decompiled vendor app source code, raw APK/IPA contents, or extracted decompile artifacts to the git index.** Operational details: raw APK/IPA binaries land at `raw/vendor_apps/<vendor>/<app_package_id>/<version>/<sha256>.{apk,ipa}` for provenance only and are gitignored; decompiled `.java` / smali / dumped Mach-O headers live in workspace-only scratch directories during ExtractionWorker runs and are cleaned at end of run; only extracted identifier *candidates* (value + relative file path within the decompile output) land in `raw_observations`. The git index never contains vendor-proprietary source. This codifies the §11 #2 license-posture confirmation the board called out under "Bible amendments authorized" — operationalizing the §1201 + 37 CFR §201.40(b) reverse-engineering exemption boundary (research permitted; redistribution of decompiled source not).
+
+3. **§12 — three new open questions under a new "Wave G (Phase 6)" subhead.**
+   - **DMCA-takedown counter-notice template.** Pre-draft a counter-notice template under §512(g) at `wave_g/LEGAL_POSTURE.md` for cases where a vendor issues a DMCA takedown for a Wave G finding in published exports. Reliance: §1201 + §201.40(b); identifiers are facts (Feist), not copyrightable expression; Argus does not republish vendor source. Cross-reference from `THREAT_MODEL.md` at public-release prep so external readers understand the legal grounding. Surface for board review at Wave G Step 0 close.
+   - **EULA-conflict-policy.** Per-vendor judgment criteria for app-EULA conflicts with reverse-engineering: (a) hostile EULA + low yield-value → exclude; (b) hostile EULA + high yield-value → surface to board; (c) standard reverse-engineering clause + standard yield-value → include (boilerplate prohibition is preempted by §1201 in US); (d) anti-circumvention clause specifically targeting security research → exclude (rare). Borderline cases come back to board. Surface specific vendor EULA concerns as Step-0 ground-truth deliverable.
+   - **Wave-G-vs-Wave-G.5 iOS deferral rationale.** Wave G is Android-first because Apple FairPlay encrypts most app binaries (decryption requires jailbroken iOS device) and most surveillance vendors with iOS apps also publish Android — Android-first captures the same vendor coverage at lower legal/operational cost. Wave G.5 / Phase 7 surfaces as a separate board-class proposal *after* Wave G Steps 1+2 complete and Android yield is empirically known. Specific Wave G.5 trigger: Step 0 surfaces a vendor that has *only* iOS app and significant yield-value — flag for targeted Wave G.5 dispatch.
+
+### §11 #11 self-binding satisfied
+
+This entry is itself the §11 #11 amendment-log entry pairing for the §8.2 + §11 #15 + §12 in-place edits. Bible HEAD bumps from `c2ef963` (CP11) to the CP12 commit landed alongside this entry.
+
+### Wave G dispatch sequencing (board-ratified, executed across heartbeats post-CP12)
+
+Per board ratification comment [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b):
+
+1. CP12 lands (this commit) — coordinated bible amendment.
+2. CEO creates Wave G Step 0 child issue under MAC-1 (`status=backlog`, assignee=SourceWorker `9cf8ff12-…`). **No execution.** Wave G holds in backlog until: (i) Lynceus integration test confirms (engineer-side; board-routed); (ii) [MAC-50](/MAC/issues/MAC-50) public-release planning deliverables document lands; (iii) public release v1.0.0 ships.
+3. Post-v1.0.0 ship: Wave G Step 0 dispatch fires as fresh board-class proposal (autonomous mode expired at CP5; CEO honors that).
+4. Steps 1+2 follow standard wave pattern under sustained-execution + chain-don't-exit; calibration window = first 2 vendor apps fully processed; SAR-11 codified if Step-2 calibration shows >5% framework-UUID FP rate.
+5. Validator promotes Wave G findings to Layer 1 per §11 #8 gate.
+6. v1.1.0 release with Wave G yield baked in.
+7. Quarterly refresh cron deploys post-v1.1.0 ship: cron `0 9 1 */3 *` (1st of Jan/Apr/Jul/Oct, 09:00 UTC), skip-on-overlap, no-catch-up, ≤4h wall-clock per fire.
+
+### Decision points ratified at this gate (board direction recorded for audit trail)
+
+Quoting board direction at [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b) verbatim per decision point:
+
+1. **Download channel** — APKMirror primary; APKPure secondary; `gplay-api` / `gplaycli` tertiary (only if APK unavailable on archives; document Google ToS gray-area exposure per-vendor); vendor direct download quaternary (preferred when available — vendor-attested distribution). Per-vendor channel selection ratified at Step 0 close.
+2. **Vendor list** — 20 Android-first + 5 indirect (per plan §2). Step 0's first deliverable is per-vendor availability ground-truth; flag vendors with no public Android app for Wave G.5 (iOS-only) deferred scope. Board edge-case direction recorded: Cellebrite (predominantly enterprise; surface availability + recommended scope), Hak5 (consumer/maker; ground-truth at Step 0), Harris (almost zero consumer footprint; defer to Wave G.5 with FOIA-firmware path), DJI (multi-app footprint — DJI Fly, GO 4, RC, Matrice — analyze all in scope; cohort by app rather than collapsing).
+3. **SAR-11 gate** — gated on Step-2 calibration; calibration window = first 2 vendor apps fully processed. Critical FP-class enumeration board-supplied: OS framework UUIDs (Apple Find My, Apple Continuity, Android system, Bluetooth GATT standards `0x180F` / `0x1800` etc.); third-party BLE library UUIDs (Nordic Semi UART `6e400001-b5a3-f393-e0a9-e50e24dcca9e`, TI BLE stack defaults, Espressif chipset); cross-vendor SDK UUIDs (RxBluetooth, Polidea RxAndroidBle, BluetoothKit); generic Bluetooth standard service UUIDs (battery, device info, generic access/attribute); third-party analytics SDK UUIDs (Firebase, Crashlytics, Amplitude). Validator must explicitly sweep these classes during 2-app calibration and surface findings as SAR-11 candidate scope. **No promotion to Layer 1 until calibration completes and SAR-11 (if needed) lands.** If calibration surfaces no novel FP classes, surface that determination explicitly rather than codifying a no-op SAR.
+4. **Retention threshold** — 5 GB LFS escalation gate approved (20–40 apps × ~100 MB ≈ 2–4 GB raw + ~1–2 GB multi-version + ~1 GB iOS headroom). If Step 1 download volume approaches 5 GB, worker stops + reassigns CEO; CEO surfaces LFS-vs-prune decision to board.
+5. **Cadence** — quarterly cron `0 9 1 */3 *` approved, skip-on-overlap + no-catch-up; runtime budget per cron ≤4h wall-clock; halt + alert on overrun.
+6. **Kill-switch** — approved. Trip criteria: 0 BLE UUIDs across first 2 apps after FP filtering = trip; 0 SSIDs after FP filtering = trip; 0 credentials after FP filtering = trip. Any single class tripping = surface to board (don't auto-continue). All three tripping = strong signal hypothesis is wrong; board reassesses sequencing.
+7. **Sequencing — Path A (sequential, not interleaved).** Wave G executes AFTER public release v1.0.0 ships. Wave G yield ships as v1.1.0. Strict order: Lynceus integration test confirms → [MAC-50](/MAC/issues/MAC-50) deliverables document lands → public-release prep work executes → v1.0.0 ships → Wave G Step 0 fires as fresh board-class proposal → Steps 1+2 + calibration + ratification → SAR-11 codified if needed → Validator promotion → v1.1.0 release with Wave G yield. Wave G remains in `backlog` until v1.0.0 ships.
+8. **EULA conflict policy** — DMCA §1201 security-research exemption + §201.40(b) cover static analysis of legally-acquired binaries. Per-vendor judgment criteria recorded under §12 EULA-conflict-policy entry. Document §1201 reliance in `wave_g/LEGAL_POSTURE.md`; cross-reference from `THREAT_MODEL.md` at public-release prep.
+9. **iOS scope** — deferred to Wave G.5 / Phase 7 (Apple FairPlay encryption + Android-first vendor coverage justification). Specific exception: Step 0 surfaces a vendor with iOS-only significant-yield → flag for targeted Wave G.5 dispatch.
+10. **Budget envelope** — Step 0 ≤5 heartbeats; Step 1 ≤10 heartbeats (sustained-execution covers ~5–10 vendor downloads per heartbeat); Step 2 ≤30 heartbeats; total ≤50 heartbeats wall-clock for Steps 0–2 combined. Budget overrun trip: any stage exceeds its cap by >50% → worker halts + surfaces to CEO. Estimated wall-clock with sustained-execution + chain-don't-exit active: 2–4 days.
+
+### Worker assignments (no new hires required)
+
+- Step 0 + Step 1: **SourceWorker** (`9cf8ff12-53c3-4f83-837f-3142d8d1d151`).
+- Step 2: **ExtractionWorker** (`1347736c-…`).
+- Post-Step-2 Layer-1 promotion: **Validator** (per existing Phase-5 §11 #8 promotion gate).
+
+### §12 Open Questions impact
+
+Three new open questions added under a new "Wave G (Phase 6)" subhead per #3 above. No existing §12 entries resolved by this pass. WiGLE pitch-binding and pre-CP5 deferred items unchanged.
+
+### Why a Correction Pass, not a SAR
+
+§8.2 outer-table addition + §11 hard-rule addition + §12 question additions all touch bible §-text. Mirrors CP1 / CP3 / CP5 / CP6 / CP7 / CP8 / CP9 / CP10 / CP11 precedent for bible §-text contract amendments.

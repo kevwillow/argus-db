@@ -18,6 +18,52 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-08T~05:30Z (HB50 — **Wave G (Phase 6) ratified · CP12 landed · Wave G Step 0 child issue created in `backlog` gated on v1.0.0 ship**).
+
+**HB50 — board wake on MAC-52 [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b) 2026-05-08T05:24:21Z** ("Wave G plan ratification — accepted with detailed direction"). Board ratified the Wave G — Vendor Companion App Static Analysis (Phase 6) proposal at MAC-52 plan rev 1 (`c4c12502`). request_confirmation `df6ce24d` auto-superseded by the ratifying comment per `supersedeOnUserComment: true`; comment text is the authoritative ratification with detailed direction across all 10 §11 decision points + execution-discipline reaffirmation + SAR-11 calibration scope + sequence/budget specifics + bible-amendment authorization.
+
+**HB50 — CP12 landed as coordinated commit.** Bible §-text amendments per board direction (board called "Correction Pass 11"; CP11 already at commit `c2ef963`, so landed as **CP12** to preserve audit-trail uniqueness — naming clarification surfaced for board acknowledgement at MAC-52 close):
+- **§8.2** — added `manufacturer_app` source_type row (outer band 60–95) + sub-banding table for five identifier classes (BLE service UUIDs 80–95, default SSIDs 70–85, default credentials 60–80, MAC OUI from validation 75–90, product-family taxonomy 90–95). SAR-11 (gated on Step-2 calibration) handles framework-UUID and third-party-BLE-library FP classes.
+- **§11 #15 (new hard-rule)** — do not commit decompiled vendor app source code, raw APK/IPA contents, or extracted decompile artifacts to the git index. Raw APK/IPA at `raw/vendor_apps/<vendor>/<app_package_id>/<version>/<sha256>.{apk,ipa}` (gitignored, provenance-only); decompiled source workspace-only and cleaned at end of run; only extracted candidate values + relative file paths land in `raw_observations`. Operationalizes §11 #2 license-posture confirmation per §1201 + §201.40(b) reverse-engineering exemption boundary (research permitted; redistribution not).
+- **§12** — three new open questions under a new "Wave G (Phase 6)" subhead: DMCA-takedown counter-notice template (`wave_g/LEGAL_POSTURE.md` pre-draft); EULA-conflict-policy (per-vendor judgment criteria a/b/c/d); Wave-G-vs-Wave-G.5 iOS deferral rationale (Apple FairPlay + Android-first coverage justification).
+
+CP12 entry appended to `BIBLE_AMENDMENTS.md` (920+ → ~1010 lines) capturing all 10 ratified decision points verbatim from board direction, worker assignments (SourceWorker `9cf8ff12-…` Steps 0+1, ExtractionWorker `1347736c-…` Step 2, Validator post-Step-2 promotion per §11 #8), and execution sequencing (Wave G holds in `backlog` until v1.0.0 ships).
+
+**HB50 — Wave G Step 0 child issue created in `backlog`.** New child of MAC-1 (per board direction "parent=MAC-1") assigned to SourceWorker `9cf8ff12-53c3-4f83-837f-3142d8d1d151`. **No execution.** Status `backlog` — Wave G is gated on three pre-conditions (Lynceus integration test confirms engineer-side / [MAC-50](/MAC/issues/MAC-50) deliverables document lands / public release v1.0.0 ships). Post-v1.0.0, Step 0 fires as a fresh board-class proposal (autonomous mode expired at CP5; CEO honors that).
+
+**HB50 — MAC-52 plan rev bumped to rev 2** capturing board's detailed direction per decision point. MAC-52 closed (status `done`) — its purpose was Wave G ratification + child dispatch + CP12 landing; all three landed this heartbeat.
+
+**HB50 — auto-memory MEMORY.md hook updated** with the Wave G ratification + CP12 + child-issue-creation entry per board direction.
+
+**HB50 — chain-don't-exit fired:**
+- (a) Bible §8.2 / §11 #15 / §12 edits + CP12 amendment-log entry ✅
+- (b) PROJECT_STATE.md HB50 rotation (this commit) ⏳ pending git commit
+- (c) MAC-52 plan rev 2 surfaced ✅
+- (d) Wave G Step 0 child issue created in `backlog` ✅
+- (e) MAC-52 board notification + close ✅
+- (f) Auto-memory MEMORY.md hook updated ✅
+
+**HB50-forward sequence:**
+- HB51 (next CEO heartbeat — wake-driven only): board acknowledgement of CP12 naming OR Lynceus integration test results (board-routed) OR [MAC-50](/MAC/issues/MAC-50) axis ratification surface OR §11 hard-rule trip
+- No autonomous dispatch teed up. Wave G Step 0 stays in `backlog` until v1.0.0 ships; standing autonomous run continues for routine items.
+- WiGLE pitch-binding holds verbatim through 2026-05-18 (10 days remaining at HB50).
+
+**Wake-board criteria (HB50-forward — unchanged from HB49 except Wave G now ratified + queued):**
+- Lynceus engineer integration test results (board-routed)
+- [MAC-50](/MAC/issues/MAC-50) axis ratifications (parallel public-release planning track)
+- §11 hard-rule trip
+- Refresh-cadence cron specs surface (Track 2 from original Lynceus prompt)
+- WiGLE-admin response (post-§2-ratification + email send; or 2026-05-18 timeout)
+- v1.0.0 ship event → triggers Wave G Step 0 fresh dispatch as board-class proposal
+
+**Phase-5+post-CP5 invariants preserved (HB50 — frozen since HB42):** `identifiers=121 total / 63 active`. Lynceus survivors: 18 standard / 0 high-conf. Schema version 8 (CSV `meta:` line cites 8; CP11 export-shape change does not bump DB schema_version=7). Live SARs 1–10. **Live CPs 1–12** (CP12 added this heartbeat). Test suite: 391 passed / 2 skipped / 0 failed (no test changes this heartbeat — bible-only amendment + child-issue dispatch).
+
+**Bible HEAD (post-HB50):** the CP12 commit landed alongside this state rotation. **State HEAD pre-HB50:** `a0245e4`.
+
+WiGLE pitch-binding holds verbatim through 2026-05-18 (10 days remaining at HB50). Public release timing respects this.
+
+---
+
 CEO heartbeat 2026-05-07T~22:30Z (HB49 — **Lynceus engineer re-delivery package surfaced to board on MAC-1 [`f5a7812e`](/MAC/issues/MAC-1#comment-f5a7812e-0577-4e07-822e-826a805eb6e1) · HB48 chain (d)+(e) closed**).
 
 **HB49 — board wake on MAC-1 [`5513620e`](/MAC/issues/MAC-1#comment-5513620e-18c6-4c9a-b286-457641dea161) 22:27:38Z** ("Can you proceed with or surface HB49 please?"). HB48 had landed cleanly at state commit `a1be64c` with chain items (d)+(e) marked ⏳ — this heartbeat is the natural cadence to fold them in alongside the HB48-forward plan's queued board notification.
