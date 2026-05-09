@@ -18,6 +18,50 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-09T~04:30Z (HB51 — **MAC-50 rev 2 ratification captured · plan rev 3 landed · §4 license-files chunk surfaced for board · Lynceus engineer dict-key inquiry teed up**).
+
+**HB51 — board wake on MAC-1 [`ed2340ee`](/MAC/issues/MAC-1#comment-ed2340ee-bcab-4629-8c36-13517b38df1c) 2026-05-09T04:17:06Z** ("Rev 2 plan reviewed. Comprehensive work — ratifying with two pushbacks and several refinements"). MAC-50 plan rev 2 (`a2103d56`) ratified across all 15 ratification points with **3 explicit overrides** (PROJECT_STATE.md (b)→(c) replace contents / author-rewrite generic placeholder→Github noreply pattern `<id>+<username>@users.noreply.github.com` / Talos→Lynceus dict-keys preserve-just-in-case→verify-with-Lynceus-engineer-first) + several refinements (WiGLE email "[N weeks]"→"3-4 weeks" / WiGLE subsystem disposition gated on §2 outcome / scrub execution as single coordinated commit / THREAT_MODEL.md disclaimer paragraph / CP13 single coordinated commit immediately pre-flip / LEGAL_POSTURE.md top-level / CI/CD v1.0 with basic checks ratified / GitHub org pending trademark check (preliminary `argus-watch`) / 4-step §8 ladder + 4-6 week wall-clock acknowledged).
+
+**HB51 — MAC-50 plan rev 3 landed** (revision `effad13e`, document [#document-plan](/MAC/issues/MAC-50#document-plan)). Rev 3 captures the ratification verbatim with explicit override markers + a 15-row ratification ledger + the post-acceptance sequence (CEO surfaces §4 chunks per ladder; Lynceus engineer dict-key check; CP13 verbatim text; Lynceus integration test; WiGLE-admin response; final scrub execution + author-rewrite + force-push + repo creation + push v1.0.0; Wave G Step 0 fresh proposal post-v1.0.0). Per [`feedback_fresh_ratification_supersedes_mutation`](memory) — rev 3 is the *ratification capture*, not a fresh ratification proposal; no new request_confirmation needed.
+
+**HB51 — `request_confirmation e21dbe4b` posture.** Pending in Paperclip-state against rev 2; substantive ratification at MAC-1 [`ed2340ee`](/MAC/issues/MAC-1#comment-ed2340ee-bcab-4629-8c36-13517b38df1c) is the audit-trail authority. CEO can't accept directly (board access required); board-side cleanup welcome but not a gate. Board's "Standing autonomous run continues for routine items + the chunked ratification ladder per §8" closer authorizes CEO to proceed on the ladder.
+
+**HB51 — MAC-1 acknowledgement comment [`4a60a470`](/MAC/issues/MAC-1#comment-4a60a470-098d-4b72-aea2-c6ec211284a8)** captures the 3 overrides verbatim + refinements ledger + post-acceptance sequence + Lynceus engineer dict-key inquiry text drafted for board-side relay. The Lynceus engineer inquiry text scopes the question to internal-audit `extraction_outputs/mac39|41/*.json` dict keys (`talos_export_eligible` / `talos_exportable` / `talos_export_reason` / `#13_unknown_category_talos_ban` / `#14_procurement_only_talos_ban`), notes that `extraction_outputs/` is separate from the export contract Lynceus actually consumes (`exports/argus_export.json` + `exports/argus_export.csv` post-CP11 has no `talos_*` keys), and offers two paths (preserve+document-as-historical-name OR rename `talos_*` → `lynceus_*` in live producer modules + leave frozen historical JSONs verbatim per §11 #1).
+
+**HB51 — MAC-50 §4 chunk 1 ratification proposal surfaced** at [`02644b3b`](/MAC/issues/MAC-50#comment-02644b3b-1e92-4029-9021-9f8bcf4a278f). Scope: license files (LICENSE / LICENSE-DATA / LICENSE-DOCS / CREDITS.md). Verbatim SPDX sources cited. CREDITS.md draft included inline (8 upstream sources tabulated: DeFlock ODbL / EFF Atlas CC-BY-NC-SA / IEEE OUI / Wireshark manuf / WiGLE / FCC EAS / USAspending / council municipal records). 4 open questions surfaced for board: (1) SPDX-License-Identifier comment style (CEO recommends (b) single-line SPDX comments); (2) CREDITS.md placement (CEO recommends top-level); (3) Atlas quarantine column implementation (CEO recommends (a) `LICENSE` column on `deployment_observations` via migration `0007_license_column.sql`); (4) acknowledgements sub-section naming board user via Github noreply pattern + Paperclip agents. SPDX-header sweep + Atlas quarantine migration scoped as separate ratification micro-chunks.
+
+**HB51 — chain-don't-exit fired:**
+- (a) MAC-50 plan rev 2→rev 3 ✅ (`effad13e`)
+- (b) MAC-1 acknowledgement comment ✅ ([`4a60a470`](/MAC/issues/MAC-1#comment-4a60a470-098d-4b72-aea2-c6ec211284a8))
+- (c) MAC-50 §4 chunk 1 ratification proposal surfaced ✅ ([`02644b3b`](/MAC/issues/MAC-50#comment-02644b3b-1e92-4029-9021-9f8bcf4a278f))
+- (d) Lynceus engineer dict-key inquiry drafted (folded into MAC-1 ack at (b); board-side relay)
+- (e) PROJECT_STATE rotated to HB51 (this commit) ⏳
+- (f) Daily memory 2026-05-09 + MEMORY.md index updated ⏳
+- (g) MAC-1 reassigned `in_review` to user (standing kickoff thread) ⏳
+
+**HB51-forward sequence:**
+- HB52 (next CEO heartbeat — wake-driven only): board ratification of §4 chunk 1 (license files at MAC-50 [`02644b3b`](/MAC/issues/MAC-50#comment-02644b3b-1e92-4029-9021-9f8bcf4a278f)) OR Lynceus engineer dict-key response (board-routed) OR WiGLE email send confirmation OR Lynceus integration test results OR §11 hard-rule trip
+- §4 chunk 1 board ratification → CEO surfaces chunk 2 (README + METHODOLOGY + DATA_DICTIONARY) per §8 ladder
+- Standing autonomous run continues for routine items + the chunked ratification ladder per §8 (board endorsement at [`ed2340ee`](/MAC/issues/MAC-1#comment-ed2340ee-bcab-4629-8c36-13517b38df1c))
+
+**Wake-board criteria (HB51-forward):**
+- §4 chunk 1 board ratification (license files + 4 open questions) on [MAC-50](/MAC/issues/MAC-50) [`02644b3b`](/MAC/issues/MAC-50#comment-02644b3b-1e92-4029-9021-9f8bcf4a278f)
+- Lynceus engineer dict-key response (board-routed; gates §3 scrub-execution chunk)
+- WiGLE email send confirmation (board-side outbound; gates §2 outcome path)
+- Lynceus integration test results (external; gates the public-flip sequence)
+- WiGLE-admin response (post-§2-email-send; or 7-day non-response default: hold WiGLE subsystem out of v1.0.0)
+- §11 hard-rule trip
+- Refresh-cadence cron specs surface (Track 2 from original Lynceus prompt)
+- v1.0.0 ship event → triggers Wave G Step 0 fresh dispatch as board-class proposal ([MAC-53](/MAC/issues/MAC-53) backlog)
+
+**Phase-5+post-CP5 invariants preserved (HB51 — frozen since HB42):** `identifiers=121 total / 63 active`. Lynceus survivors: 18 standard / 0 high-conf. Schema version 8 (CSV `meta:` line cites 8; CP11 export-shape change does not bump DB schema_version=7). Live SARs 1–10. **Live CPs 1–12** (CP13 will land at the public-flip commit per §6 sequencing). Test suite: 391 passed / 2 skipped / 0 failed (no test changes this heartbeat — pure planning + ratification capture).
+
+**Bible HEAD:** `90132fa` (CP12, unchanged from HB50). **State HEAD pre-HB51:** `90132fa` (HB50 PROJECT_STATE.md rotation landed in `90132fa` per CP12 commit which folded both bible amendments + state rotation; per [`feedback_check_git_index_before_state_commit`](memory): `git status` clean before this commit modulo untracked db backup files + `research_leads/`).
+
+WiGLE pitch-binding holds verbatim through 2026-05-18 — **9 days remaining at HB51**. Public release timing respects this.
+
+---
+
 CEO heartbeat 2026-05-08T~05:30Z (HB50 — **Wave G (Phase 6) ratified · CP12 landed · Wave G Step 0 child issue created in `backlog` gated on v1.0.0 ship**).
 
 **HB50 — board wake on MAC-52 [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b) 2026-05-08T05:24:21Z** ("Wave G plan ratification — accepted with detailed direction"). Board ratified the Wave G — Vendor Companion App Static Analysis (Phase 6) proposal at MAC-52 plan rev 1 (`c4c12502`). request_confirmation `df6ce24d` auto-superseded by the ratifying comment per `supersedeOnUserComment: true`; comment text is the authoritative ratification with detailed direction across all 10 §11 decision points + execution-discipline reaffirmation + SAR-11 calibration scope + sequence/budget specifics + bible-amendment authorization.
