@@ -108,13 +108,13 @@ The schema is the contract. All sub-agents output rows conforming to this.
 |---|---|---|
 | `id` | INTEGER PK | autoincrement |
 | `identifier` | TEXT NOT NULL | the actual MAC/OUI/UUID/SSID/BSSID, normalized |
-| `identifier_type` | TEXT NOT NULL | enum: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint` |
+| `identifier_type` | TEXT NOT NULL | enum: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`, `ble_local_name`, `ble_characteristic`, `product_family_codename` (last three added Correction Pass 13 — Wave G structural fidelity) |
 | `device_category` | TEXT NOT NULL | enum from §2.1 (alpr, imsi_catcher, body_cam, police_radio, in_vehicle_router, drone, gunshot_detect, hacking_tool, covert_cam, gps_tracker, face_recog, drone_detect) |
 | `manufacturer` | TEXT | normalized vendor name |
 | `model` | TEXT | when known |
 | `confidence` | INTEGER | 0–100, see §8.2 |
 | `source_url` | TEXT NOT NULL | direct URL to the evidence |
-| `source_type` | TEXT NOT NULL | enum: `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc` |
+| `source_type` | TEXT NOT NULL | enum: `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc`, `manufacturer_app` (last added Correction Pass 13 — CP12 §8.2 schema sibling) |
 | `source_excerpt` | TEXT | short quoted/paraphrased justification (≤200 chars) |
 | `geographic_scope` | TEXT | ISO country/region codes, comma-sep, or `global` |
 | `first_seen` | DATETIME | when we first ingested this record |
@@ -155,6 +155,9 @@ The downstream consumer (Lynceus, the Raspberry Pi RF security monitor) has a fi
 | `ble_service` | `ble_uuid` | collapsed; BLE service UUIDs *are* UUIDs for Lynceus |
 | `mac_range` | (expand or DROP) | expand into individual MACs at export ONLY if range ≤256 entries; otherwise drop and note in coverage report |
 | `device_fingerprint` | (DROPPED) | Lynceus has no fingerprint matching; analytical-only |
+| `ble_local_name` | (DROPPED) | added Correction Pass 13; Lynceus has no GAP local-name match in v0.3; analytical-only |
+| `ble_characteristic` | (DROPPED) | added Correction Pass 13; Lynceus discovers by service UUID (`ble_service` / `ble_uuid`), not characteristic; analytical-only |
+| `product_family_codename` | (DROPPED) | added Correction Pass 13; vendor-internal taxonomy / cohort strings (e.g. Flock `DeviceType` enum values); analytical-only |
 
 Records that drop out of the Lynceus export remain in the canonical Argus database for analytical purposes. The coverage report MUST tally Argus-only records by category so the human knows what's not flowing downstream.
 

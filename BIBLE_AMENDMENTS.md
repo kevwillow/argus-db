@@ -993,3 +993,76 @@ Three new open questions added under a new "Wave G (Phase 6)" subhead per #3 abo
 ### Why a Correction Pass, not a SAR
 
 §8.2 outer-table addition + §11 hard-rule addition + §12 question additions all touch bible §-text. Mirrors CP1 / CP3 / CP5 / CP6 / CP7 / CP8 / CP9 / CP10 / CP11 precedent for bible §-text contract amendments.
+
+---
+
+## Correction Pass 13 — CP12 schema sibling: §4.1 `identifier_type` + `source_type` enum extensions (Wave G structural fidelity)
+
+**Date:** 2026-05-10
+**Source:** [MAC-54](/MAC/issues/MAC-54) — Validator dispatch authored to close the §11 #11 amendment-log gap surfaced at HB62 (pre-flight Step-0 schema-enum BLOCKER: CP12 added `manufacturer_app` to §8.2 source_type sub-banding without a sibling schema migration). Board ratification of Path X (single coordinated migration) at MAC-1 [`9d568fa7`](/MAC/issues/MAC-1#comment-9d568fa7-edc0-4d68-a7dd-fb40d4cd919e) 2026-05-10 HB63. CEO Step-0 ratification of the dispatch at MAC-54 [`34c908b8`](/MAC/issues/MAC-54#comment-34c908b8-0a66-4a6f-a3a5-4aa6d2bc5470) 2026-05-10.
+**Bible commit:** §4.1 `identifier_type` enum row + §4.1 `source_type` enum row + §4.4 Lynceus-mapping new-row entries land paired with this amendment-log entry; migration `db/migrations/0009_manufacturer_app_and_identifier_type_extensions.sql` + wrapper `db/validation/migration_0009_verify.py` land in the same coordinated commit.
+**Binds:** Validator (§11 #7 promotion gate, §7.4 record validation), ExtractionWorker (raw_observations staging shape for Wave G outputs), Export Worker (§7.5 / §4.4 Lynceus mapping for the three new identifier types — all DROPPED-class per analytical-only fidelity), SourceWorker (registers vendor companion app sources with `source_type='manufacturer_app'`).
+
+### Why this Correction Pass exists
+
+CP12 (commit `90132fa`, 2026-05-08) added `manufacturer_app` to §8.2 source_type sub-banding to define the confidence band for Wave G (Phase 6) vendor companion app static-analysis output, but did not land the sibling schema migration. The `identifiers.source_type` and `sources.source_type` CHECK constraints from `0001_initial.sql` (lines 71–75 and 120–124) still reject the value, structurally blocking Wave G narrow-scope promotion (21 candidates: 6 BLE UUIDs + 1 BLE local name + 14 Flock DeviceType taxonomy values).
+
+In parallel, the Wave G pre-v1 deliverables (2026-05-10 HB56, MAC-1 [`5b000045`](/MAC/issues/MAC-1#comment-5b000045-1265-4be4-88b2-dfeaac46c6df)) surfaced three new identifier classes that do not fit the existing §4.1 `identifier_type` enum without semantic-loss collapse:
+
+- **BLE local name** (the literal string `Penguin` broadcast over GAP scan response) — distinct from a service or characteristic UUID; collapsing to `ble_uuid` or `ssid_pattern` would falsify the structural surface.
+- **BLE characteristic UUID** (paired with the `ble_service` UUID in GATT, surfaced as distinct in the Wave G handoff) — distinct from a service-level UUID; preserving the distinction matches §4.4's DROPPED-class analytical-only fidelity convention.
+- **Product-family codename** (vendor's internal taxonomy strings — Flock's `DeviceType` enum values surfaced from operator-app static analysis) — vendor's own product naming inside their own app per §8.2 sub-banding (90–95 band).
+
+Board HB63 ratified **Path X — single coordinated migration** to close both the schema-sibling gap and the structural-fidelity gap in one commit.
+
+### Corrections applied
+
+1. **§4.1 `identifiers.identifier_type` enum row** — extended from 9 values to 12. New values appended:
+   - `ble_local_name`
+   - `ble_characteristic`
+   - `product_family_codename`
+
+2. **§4.1 `identifiers.source_type` enum row** — extended from 8 values to 9. New value appended:
+   - `manufacturer_app` (CP12 schema sibling)
+
+3. **§4.4 Lynceus export mapping** — three new rows added to the `identifier_type → pattern_type` collapse table. All three new types map to **DROPPED-class** (analytical-only, no Lynceus surface):
+   - `ble_local_name` → (DROPPED) — Lynceus has no GAP local-name match in v0.3; carried in canonical DB for analytical reuse.
+   - `ble_characteristic` → (DROPPED) — Lynceus discovers by service UUID, not characteristic; carried analytically. (Distinct from `ble_service`, which collapses to `ble_uuid`.)
+   - `product_family_codename` → (DROPPED) — taxonomy / cohort strings; analytical-only.
+
+4. **Schema migration `0009_manufacturer_app_and_identifier_type_extensions.sql`** — table-rebuild pattern (SQLite CHECK constraints are table-level; per https://sqlite.org/lang_altertable.html section 7). Three CHECK constraints extended in a single coordinated commit:
+   - `identifiers.identifier_type` ← + 3 values (above)
+   - `identifiers.source_type` ← + 1 value (above)
+   - `sources.source_type` ← + 1 value (above; mirrors §4.1 enum-parity convention)
+
+   Self-referencing FK `identifiers.superseded_by → identifiers(id)` preserved across the rebuild via the standard `PRAGMA foreign_keys = OFF` envelope + `PRAGMA foreign_key_check` integrity assertion before commit. Schema version bumps 8 → 9.
+
+5. **Wrapper `db/validation/migration_0009_verify.py`** — operationalizes the §11 #11 spot-check around the rebuild: pre/post row-count parity (121 identifiers + 12 sources), index-set preservation (5 identifiers indexes + 1 sources index), self-FK map preservation, post-state `PRAGMA foreign_key_check` returns 0 rows, CHECK enum extensions present in post-state DDL, canary INSERT smoke-test for each new enum value inside a SAVEPOINT (rolled back to leave zero residue), audit row written to `extraction_runs`. Idempotency boundary — re-runs short-circuit on `MAX(version) FROM schema_version >= 9`. Mirrors MAC-48 `cp7_cp10_v01_cutover.py` precedent.
+
+### §11 hard-rule discipline (cite verbatim from bible HEAD `90132fa`, pre-CP13 lines)
+
+- **§11 #1 (no fabrication)** — every new CHECK enum value cites canon: `manufacturer_app` from CP12 §8.2 + BIBLE_AMENDMENTS.md CP12 entry; the three new identifier-types from `android_test/extraction_outputs/wave_g_pre_v1/HANDOFF_TO_VALIDATOR.md` §"Headline findings" + board HB63 Path X ratification.
+- **§11 #7 (no promotion to main table without provenance)** — migration is schema-only; zero `identifiers` row writes. Wave G narrow-scope promotion is the subsequent MAC-55 dispatch under the §11 #7 promotion gate; CP13 unblocks the schema surface without bypassing the gate.
+- **§11 #8 (no confidence drift)** — no `confidence` column writes; no row mutations beyond the column-preserving `INSERT INTO X_new SELECT * FROM X` rebuild copy.
+- **§11 #11 (amendment-log discipline)** — this entry IS the §11 #11 closure for the CP12 schema-sibling gap. The discipline rule binds CP-class edits to amendment-log entries; CP12 paired §8.2 and §11 #15 with the amendment log but missed the §4.1 schema-row sibling. CP13 closes the gap and operationalizes the rule per `feedback_enum_amendment_needs_schema_migration_sibling` codified at HB63.
+- **§11 #15 (no decompiled vendor source in git index)** — N/A; schema migration carries no decompile artifacts.
+
+### Sequencing post-acceptance (per board HB63 ratification)
+
+1. **MAC-54 ratified** (this commit) — coordinated commit lands: migration 0009 SQL + wrapper + CP13 amendment-log entry + §4.1 / §4.4 PROJECT_BIBLE.md edits. CEO performs §11 #11 amendment-text review + line-by-line SQL review at the ratification gate.
+2. Migration applies on local DB (CEO-class action via the wrapper); schema CHECK constraints extended; schema_version → 9.
+3. CEO dispatches MAC-55 — narrow-scope promotion contract (21 entries: 6 BLE UUIDs at conf 80–95, 1 BLE local name "Penguin" at conf 70–85, 14 Flock DeviceType taxonomy at conf 90–95) to Validator.
+4. Board ratifies MAC-55 promotion contract.
+5. Validator runs §11 #7 / §11 #8 promotion gate on 21 entries; entries land in `identifiers` with appropriate `(identifier_type, source_type)` per the now-extended schema. Per §4.4 mapping (above), the 14 product_family_codename + 1 ble_local_name + (paired) ble_characteristic rows go DROPPED-class at export; the 6 ble_service / ble_uuid pairs flow through to Lynceus `pattern_type='ble_uuid'`.
+
+### §12 Open Questions impact
+
+No existing §12 entries resolved by this pass. CP12 Wave G (Phase 6) §12 entries (DMCA counter-notice template, EULA-conflict-policy, Wave-G-vs-Wave-G.5 iOS deferral rationale) unchanged. WiGLE pitch-binding and pre-CP5 deferred items unchanged.
+
+### Why a Correction Pass, not a SAR
+
+§4.1 enum-row extensions + §4.4 Lynceus-mapping additions are in-place bible §-text edits. CP-class is the right framing per CP11 / CP12 precedent for bible §-text contract amendments. SAR is reserved for operational-rule binding without bible §-text change.
+
+### §11 #11 self-binding satisfied
+
+This entry is itself the §11 #11 amendment-log pairing for the §4.1 / §4.4 in-place edits in this coordinated commit. Bible HEAD bumps from `90132fa` (CP12) to the CP13 commit landed alongside this entry.
