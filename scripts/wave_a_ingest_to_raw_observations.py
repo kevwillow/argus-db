@@ -202,6 +202,24 @@ def extract_observations(json_data, slug):
         'repo_url': sm.get('repo_url') or sm.get('repo'),
         'commit_sha': sm.get('commit_sha') or sm.get('source_commit_sha'),
     }
+    # Per board direction d3d1bbda 2026-05-11 + log-scan recovery 2026-05-11:
+    # when source_metadata is empty but the run log captured `git rev-parse HEAD`,
+    # apply the recovered SHA + repo URL as overrides.
+    SHA_OVERRIDES = {
+        'opendroneid_receiver-android': {
+            'repo_url': 'https://github.com/opendroneid/receiver-android',
+            'commit_sha': 'ed44ea3f16ce63be655454021ccda53413d13419',
+        },
+        'eylonK14_IMSICatcherDetector': {
+            'repo_url': 'https://github.com/eylonK14/IMSICatcherDetector',
+            'commit_sha': '634551457a1497a8e1dcd51128ccb673acdbdb5c',
+        },
+    }
+    if slug in SHA_OVERRIDES:
+        if not repo_meta.get('repo_url'):
+            repo_meta['repo_url'] = SHA_OVERRIDES[slug]['repo_url']
+        if not repo_meta.get('commit_sha'):
+            repo_meta['commit_sha'] = SHA_OVERRIDES[slug]['commit_sha']
     for key in ('observations', 'candidates', 'candidate_identifiers'):
         if key in json_data and isinstance(json_data[key], list):
             for obs in json_data[key]:
