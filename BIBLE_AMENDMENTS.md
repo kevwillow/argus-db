@@ -1157,3 +1157,83 @@ No existing §12 entries closed by this pass. The Wave-A surfacings extended Arg
 ### §11 #11 self-binding satisfied
 
 This entry is itself the §11 #11 amendment-log pairing for the §8.4 four-amendment batch + §11 #12 expansion + five schema migrations landed in this coordinated commit + the schema dump audit + the separately-committed feedback memos. Bible HEAD bumps from `1c67bea` (MAC-57 CP13 export fix) to the CP14 coordinated commit landed alongside this entry. Schema_version bumps from 9 (post-CP13) to 14 (post-0014).
+
+---
+
+## Correction Pass 15 — §8.2 `primary_registry` source-type band (resolves FAA RID + SIG-registry structural-equivalence finding)
+
+**Date:** 2026-05-11
+**Source:** [MAC-63](/MAC/issues/MAC-63) reopened-via-comment dispatch [`c0e91b23`](/MAC/issues/MAC-63#comment-c0e91b23-ba74-4ebe-8d3e-e6fe94c67f0e) 2026-05-11 with fresh §11 #11 delegation scoped to: CP15 ratification (with 3 board-flagged refinements to the Phase-5 draft) + migration 0015 + promotion-cycle-2 (483 rows) + final handoff. Original surfacing: Wave-A Phase 3a 481 FAA RID `drone_id_prefix` rows (alphafox02/DragonSync) + Wave-A 1a/2+ Apple `0x004C` + XUNTONG `0x09C8` `ble_manufacturer_id` rows. Board's reframe at MAC-63 [`fe2beeee`](/MAC/issues/MAC-63#comment-fe2beeee-2571-475e-86f6-edc99f99ecad) 2026-05-11. Phase-1 ratification at MAC-63 [`f00e9120`](/MAC/issues/MAC-63#comment-f00e9120-e92d-4226-af25-60bd075951b7).
+**Bible commit:** PROJECT_BIBLE.md §8.2 source-band table edit (insert `primary_registry` row + narrow `official` description) + new §8.2 `primary_registry` sub-rule + PROJECT_BIBLE.md §12 FAA RID question `RESOLVED by CP15 2026-05-11` append + BIBLE_AMENDMENTS.md CP15 entry (this entry) + draft moved from `raw/wave_a/_bible_amendment_cp15_primary_registry_draft_2026-05-11.md` to `bible/history/cp15/`. Single coordinated commit titled "CP15: §8.2 primary_registry source-type band (resolves FAA RID + SIG-registry structural-equivalence finding)".
+**Binds:** Validator (§11 #7 promotion gate — promotion-cycle-2 will sweep the 483-row HOLD batch at conf=85 single-source under the new band), Export Worker (§7.5 — `primary_registry` rows flow to Lynceus high-confidence export when `device_category ≠ 'unknown'` per §11 #13; FAA RID `drone_id_prefix` rows with category=`drone` qualify, SIG company-IDs at category=`unknown` excluded by §11 #13 carveout), SourceWorker (post-CP15 ingest of registry-direct citations classifies under `primary_registry`).
+
+### Why this Correction Pass exists
+
+Three Wave-A surfacings (FAA RID via alphafox02/DragonSync Phase 3a; Apple `0x004C` + XUNTONG `0x09C8` `ble_manufacturer_id` Phase 1a/2+) share a structural shape that the pre-CP15 §8.2 source-band table did not accommodate cleanly:
+
+- Authoritative numerical-allocation registries (IEEE OUI, Bluetooth SIG company IDs, FAA RID, IANA) where the issuing authority IS the source-of-truth for what the identifier means.
+- MAC-63 promotion-cycle-1 dispatch §4.1 ≥3-independent-sources cut-off was structurally ill-defined for these — "what does `1581Fxxx` mean at FAA?" has one source-of-truth, not three.
+- Existing `official` band conflated registry-issuance with regulatory-filing; existing `crowdsourced` band capped at 75 (too low for registry-direct citations).
+
+The board reframe at `fe2beeee` and CP15 ratification dispatch at `c0e91b23` direct: split the gap. Move IEEE OUI registry from `official` (which keeps FCC filings + court-verifiable government filings) into a new `primary_registry` band, alongside FAA RID + SIG company IDs + IANA assignments + similar issuer-of-record registries.
+
+### Corrections applied
+
+1. **§8.2 source-band table** — inserted new row `primary_registry` (70–85 single-source; up to 95 cross-band corroboration) between existing `official` and `regulatory` bands.
+
+2. **§8.2 `official` band description** — narrowed to court-verifiable government filings only (FCC EAS, FAA enforcement orders, court-ordered disclosures). IEEE OUI registry migrates to `primary_registry`.
+
+3. **§8.2 `primary_registry` sub-rule** — added immediately after the source-band table (and before the existing `manufacturer_app` sub-banding section). Defines:
+   - Canonical examples (IEEE OUI, Bluetooth SIG, FAA RID, IANA)
+   - Distinguishing-issuer test (source-of-truth-for-meaning vs third-party-assertion vs court-verifiable-filing)
+   - Confidence ceiling rationale (70–85 single-source; up to 95 cross-band corroboration per §8.3 formula)
+   - Waiver of ≥3-independent-sources cut-off (primary_registry-only; other bands keep their cut-off rules)
+   - **Reclassification discipline (§11 #8 boundary)** — reclassification from `crowdsourced`/`inferred` to `primary_registry` requires direct registry source_url, NOT ancestry chain (Phase-1 refinement 1.2 closes the "ancestry chain establishes the registry-issuer citation" loophole that the draft had pre-refinement)
+   - **Multi-registry edge case** — most-direct citation wins; registry-internal reassignment routes to `conflicts` table with `reason='registry_reassignment'` (Phase-1 refinement 1.3 narrows the draft's original speculative authority-ranking framing)
+   - Composition with CP14 §8.4 lenses (G-1, G-3, G-7, G-9)
+
+4. **PROJECT_BIBLE.md §12 FAA RID question** — appended `RESOLVED by CP15 2026-05-11` marker to the "Wave-A (CP14)" subhead's "§8.2 source_type band for FAA RID-class primary-source registries" bullet. Per the fresh-ratification-supersedes-mutation discipline, did NOT remove the question — appended the resolution marker.
+
+5. **Draft archival** — moved `raw/wave_a/_bible_amendment_cp15_primary_registry_draft_2026-05-11.md` to `bible/history/cp15/` for audit trail (CP14 precedent).
+
+### Phase-1 refinements to the draft (per board direction `c0e91b23`)
+
+Three refinements applied before this coordinated commit:
+
+1. **§5 source-ancestry-scope acknowledgment** — added paragraph noting the future-CP reclassification sweep is bounded by source ancestry (sources.id=1 IEEE bulk-load covers ~91,727 raw_observations rows), not identifier count. "No data loss" framing preserved; sweep scoping is a future-CP planning task.
+2. **§11 #8 reclassification tightening (closed the "ancestry chain" loophole)** — replaced the draft's permissive "WHEN the row's ancestry chain establishes the registry-issuer citation" phrasing with a strict-direct-source_url requirement. A third-party citation chain reaching a registry no longer qualifies; a new raw_observations row citing the registry directly is required.
+3. **§3.1 multi-registry narrow** — dropped the draft's speculative "higher-authority registry" framing (which would have required CP15 to legislate registry-authority-ranking without precedent) in favor of "most-direct citation wins"; registry-internal reassignment routes to conflicts table.
+
+Phase-1 verification report at MAC-63 [`7642f54a`](/MAC/issues/MAC-63#comment-7642f54a-cc85-4740-9436-e376a7f56815). Board's pre-Phase-2 grep check at `f00e9120` caught a `§2.2 / §2.3 drift` (the tightened reclassification rule was in §2.3 audit-stub but missing from §2.2 bible-text); fixed before this coordinated commit so the bible-binding portion carries the same tightened rule as the audit-trail entry.
+
+### §11 hard-rule discipline
+
+- **§11 #1 (no fabrication)** — every `primary_registry` citation must name the registry-issuer AND include `source_url` pointing at the issuer's own publication (FAA's database URL, SIG's registry URL, IEEE's MA-L assignment record URL, etc.). Third-party-repo citations of the same identifier remain `crowdsourced`.
+- **§11 #7 (provenance)** — `primary_registry` rows carry the same `raw_observations` ancestry discipline as other promotion paths (Bible §7.3 worker-role separation; `raw_observations.source_url` + `source_excerpt` populated from the registry-issuer publication).
+- **§11 #8 (no confidence drift)** — single-source `primary_registry` promotes to 70–85; corroboration follows §8.2 formula. Reclassification from `crowdsourced`/`inferred` to `primary_registry` is permissible ONLY when the row's existing `source_url` already points DIRECTLY at the registry issuer's own publication. Reclassification is band-correction within preserved provenance, NOT a provenance shortcut. (Phase-1 refinement 1.2 closes the "ancestry chain" loophole.)
+- **§11 #11 (amendment-log discipline)** — this CP15 entry is the amendment-log closure for the §8.2 amendment in this coordinated commit. The bible-text amendment (§8.2 sub-rule) carries the same tightened reclassification language as this audit-trail entry, per the §11 #11 coordinated-commit discipline (pre-Phase-2 grep check at `f00e9120` caught and fixed an earlier drift between the two).
+- **§11 #13** — N/A directly; CP15 doesn't touch `device_category` rules. Composes with §11 #13 at promotion-cycle-2: SIG company-IDs (`0x004C` Apple, `0x09C8` XUNTONG) classify as `device_category='unknown'` per §8.4 multi-purpose-vendor discipline + §11 #13 excludes them from Lynceus high-confidence export. FAA RID `drone_id_prefix` rows classify as `device_category='drone'` (FAA RID scope is drones) and qualify for high-conf export.
+
+### Sequencing post-acceptance (per dispatch `c0e91b23` Phase-3 onward)
+
+1. **CP15 ratifies at this commit.** Bible HEAD bumps from `9c31603` (post-MAC-63-Wave-A state) to the CP15 commit.
+2. **Schema-sibling migration `0015_primary_registry_source_type_extension.sql`** (Phase-3 dispatch) adds `primary_registry` to `identifiers.source_type` + `sources.source_type` CHECK enums via the SQLite table-rebuild pattern (per 0009 precedent). Cumulative-CHECK-enum discipline per `feedback_migration_sequence_cumulative_enum_carryforward.md` — each table's CHECK must include every prior CP's contribution + `primary_registry`.
+3. **Promotion-cycle-2** (Phase-5/6 dispatch) sweeps the three CP15-unblocked HOLD batches:
+   - FAA RID 481 `drone_id_prefix` rows (alphafox02/DragonSync 3a; sources.id=23)
+   - Apple `0x004C` `ble_manufacturer_id`
+   - XUNTONG `0x09C8` `ble_manufacturer_id`
+   483 rows total, all single-source `primary_registry`, ceiling 85.
+4. **Sources reclassification (Wave-B+ batch task)** — IEEE OUI bulk-load source row migrates from `source_type='regulatory'` (current) to `source_type='primary_registry'`. Backfill of existing identifiers rows whose ancestry traces back to IEEE OUI is bounded by source ancestry (~91,727 raw_observations rows; substantial subset of identifiers rows) — sweep scoping is a future-CP planning task. CP15 ratifies the band, not the migration plan. (Phase-1 refinement 1.1 acknowledges the scope.)
+
+### §12 Open Questions impact
+
+- **RESOLVED:** "§8.2 source_type band for FAA RID-class primary-source registries" (Wave-A (CP14) subhead; original surfacing from MAC-63 Wave-A `72c0323` §12 finalization commit). Marked `RESOLVED by CP15 2026-05-11` in PROJECT_BIBLE.md §12; bullet preserved per fresh-ratification-supersedes-mutation discipline (append, don't remove).
+- **No new §12 questions added by CP15.** The two other Wave-A (CP14) §12 questions (static-MAC tracker sub-class, operator_profile architecture) remain open per their original framing.
+
+### Why a Correction Pass, not a SAR
+
+§8.2 source-band table edit + new §8.2 sub-rule + §12 question resolution all touch bible §-text. CP-class is the right framing per CP11/CP12/CP13/CP14 precedent for in-place bible §-text amendments. SAR is reserved for interpretive sub-agent rules without bible §-text change.
+
+### §11 #11 self-binding satisfied
+
+This entry is itself the §11 #11 amendment-log pairing for the §8.2 edits in this coordinated commit. Bible HEAD bumps from `9c31603` (post-MAC-63-Wave-A state) to the CP15 coordinated commit landed alongside this entry. Schema-sibling migration 0015 is the next deliverable (Phase-3 dispatch), tracking the CP15 amendment's contract with the database schema.

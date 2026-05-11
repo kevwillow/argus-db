@@ -533,8 +533,9 @@ Every record in the main table has a working `source_url`. Records without prove
 
 | Source type | Default confidence range |
 |---|---|
-| `official` (IEEE registry, FCC filing) | 90–100 |
-| `regulatory` (gov't filing, court order text) | 80–95 |
+| `official` (court-verifiable government filings — FCC EAS, FAA enforcement orders, court-ordered disclosures) | 90–100 |
+| `primary_registry` (authoritative numerical-allocation registries — see §8.2 sub-rule below) | 70–85 single-source; up to 95 with cross-band corroboration |
+| `regulatory` (gov't filing, court order text — non-`official`-tier regulatory provenance) | 80–95 |
 | `manufacturer_doc` (vendor spec sheet) | 75–90 |
 | `procurement` (SAM.gov, state portals) | 70–85 (proves *purchase*, not *deployment*) |
 | `academic` (peer-reviewed or conference) | 70–90 |
@@ -545,6 +546,41 @@ Every record in the main table has a working `source_url`. Records without prove
 | News, forums, unverified | 20–50 |
 
 Adjust within range based on specificity, recency, and corroboration. Two independent sources at 70 each can corroborate to a single record at 85.
+
+**`primary_registry` sub-banding** (added Correction Pass 15 for the FAA RID + Bluetooth SIG + IEEE OUI registry cluster).
+
+`primary_registry` covers authoritative numerical-allocation registries maintained by standards bodies, standards-development organizations (SDOs), or regulatory authorities where the registry IS the source-of-truth for what the identifier means. Canonical examples:
+
+- **IEEE OUI registry** (MA-L 24-bit, MA-M 28-bit, MA-S 36-bit). IEEE assigns OUI blocks; the registry record IS the canonical attribution of OUI → manufacturer. (Migrates FROM `official` band into `primary_registry`.)
+- **Bluetooth SIG company-identifier registry.** SIG assigns 16-bit BLE company IDs; the registry IS the canonical attribution of `0x004C` → Apple, etc.
+- **FAA ANSI/CTA-2063-A RID registry.** FAA assigns drone serial-number prefixes; the registry IS the canonical attribution of `1581Fxxx` → DJI, `1748xxxx` → Autel, etc.
+- **IANA assignments.** When Argus eventually ingests IANA-managed namespaces (port numbers, protocol numbers, etc.), they land here.
+
+**Distinguishing test (apply at ingest time):** ask "is this source the source-of-truth for what the identifier *means*, or is it a third-party assertion about meaning?"
+
+- Registry-as-issuer → `primary_registry`.
+- Third-party citing the registry → `crowdsourced` (50–75 band) or `manufacturer_doc` (75–90 band) per existing rules.
+- Court-verifiable government filing about a deployed instance → `regulatory` (80–95 band) or `official` (90–100 band).
+
+**Confidence ceiling rationale:**
+
+- **70–85 single-source** for `primary_registry`. The floor of 70 sits above `crowdsourced`'s ceiling of 75 (registry issuance carries more authority than community curation). The ceiling of 85 sits below `regulatory`'s 95 (registries are issuer-of-record but not court-verifiable in the regulatory-filing sense) and below `manufacturer_doc`'s 90 (the registry can name a manufacturer, but the manufacturer's own spec sheet may carry additional model-level detail the registry doesn't capture).
+- **Up to 95 with cross-band corroboration.** When a `primary_registry` row is additionally corroborated by `regulatory` or `manufacturer_doc` sources, §8.3 corroboration formula (`min(99, max(originals) + 5)`) applies. Example: IEEE OUI registry (primary_registry, 85) + FCC EAS test report citing the same OUI (regulatory, 90) corroborates to a single record at confidence min(99, max(85,90)+5) = 95.
+
+**Waiver of ≥3-independent-sources cut-off for `primary_registry`.** The Phase-4 promotion-cycle cut-off requiring `independent_source_count ≥ 3` does NOT apply to `primary_registry` rows. The waiver is `primary_registry`-only — other source-band cut-off rules remain in force. Justification: asking for "three independent sources" of what `1581Fxxx` means at FAA is structurally ill-defined — FAA's registry IS the source of truth, and there is no parallel source-of-truth to corroborate against. A single primary_registry citation IS sufficient evidence under §11 #1 (no fabrication) because the registry's own publication is verifiable.
+
+**Reclassification discipline (§11 #8 boundary).** Reclassification of an existing `identifiers` row from `crowdsourced` / `inferred` to `primary_registry` is permissible ONLY when the row's existing `source_url` already points DIRECTLY at the registry issuer's own publication (FAA's database URL, SIG's company-identifier registry URL, IEEE's MA-L assignment record URL, etc.). If the `source_url` points at a third-party citation — community repo, blog post, aggregator, even an academic paper that cites the registry — the row stays in its current band. To establish `primary_registry` classification, a new `raw_observations` row citing the registry directly is required, per §11 #1 provenance discipline. Reclassification is a band-correction within preserved provenance, NOT a provenance shortcut. The §11 #8 "no confidence drift" rule composes: band-correction with the new ceiling re-applies to a row whose direct provenance qualifies; rows whose direct provenance is third-party stay capped at their current band's ceiling regardless of upstream-registry ancestry.
+
+**Multi-registry edge case.** Rare case: an identifier appears in two primary registries (e.g., an IEEE-issued OUI also referenced in an FAA filing as part of a drone-prefix assignment). Validator-side disposition: take the most-direct registry citation (the registry that ISSUES the identifier value) as `primary_registry`; secondary citations classify per their own source nature.
+
+**Edge sub-case NOT covered by CP15:** registry-internal reassignment (e.g., IEEE reassigns a defunct company's OUI to a successor). Route such cases to the `conflicts` table with `reason='registry_reassignment'` for human-CEO disposition. A future CP may codify reassignment-discipline if frequency warrants. CP15 explicitly does NOT legislate this case.
+
+**Composition with §8.4 lenses (CP14 cross-references):**
+
+- **G-1 protocol-container OUI lens.** SDO-assigned OUIs (`FA:0B:BC` ASD-STAN, `50:6F:9A` Wi-Fi Alliance) classify as `primary_registry` when sourced from the SDO's own registry, and as `crowdsourced` when sourced from a community repo citing the SDO. CP15 + G-1 compose: protocol-container lens governs `device_category` semantics; `primary_registry` band governs confidence.
+- **G-3 `ble_manufacturer_id`.** SIG-assigned values like `0x004C` Apple + `0x09C8` XUNTONG are `primary_registry` when sourced from the SIG company-identifier registry. Wave-A community-repo citations remain `crowdsourced` 50–75; SIG-registry direct citation lifts to `primary_registry` 70–85.
+- **G-7 `paired_identifier_id` + `pair_kind`.** Independent. Pairing discipline operates on identifier structure (LA-bit flip, vendor-as-container, firmware-generation); source-band classification is orthogonal.
+- **G-9 `drone_id_prefix`.** FAA RID is the canonical `primary_registry` case driving CP15. The 481-row FAA RID batch HELD from Phase-4 promotion-cycle-1 promotes at confidence 85 per `primary_registry` single-source rule once CP15 ratifies.
 
 **`manufacturer_app` sub-banding** (added Correction Pass 12 for Wave G — Phase 6 vendor companion app static analysis). The 60–95 outer band breaks down per identifier class, because vendor apps yield different attestation strength per class:
 
@@ -702,7 +738,7 @@ These are hard rules. Violating any of these is a stop-the-line event.
 
 - **Static-MAC tracker sub-class architecture.** Phase 3b (`seemoo-lab/AirGuard`) surfaced a distinct opposite-pattern sub-class to G-4 LA-bit pairing: Tile, Chipolo (own-network mode), and Pebblebee emit STATIC MACs by design. AirGuard's risk-evaluation algorithm (`RiskLevelEvaluator.kt:36-37`) treats them as a first-class architecture distinction ("dynamic-MAC tracker" vs "static-MAC tracker"). CP14 migration 0012's `pair_kind` enum INTENTIONALLY EXCLUDES `static_mac_tracker` per dispatch §2.5 disposition ("different security architecture; handle via notes-JSON until a third sub-class is needed"). At what `n` of static-MAC observations does Argus introduce a structural `pair_kind` value or a separate identifier shape? Currently `n=3` (Tile + Chipolo + Pebblebee). Forward expectation: Wave-D / Wave-E may surface additional static-MAC ecosystems (LoRa-side trackers, industrial asset trackers) that push the question.
 - **`operator_profile` architecture (G-17).** Three corporate operators surfaced in Wave-A Phase 3c (Lowe's Q1373493, Home Depot Q864407, Simon Property Group Q2287759) deploy surveillance hardware but don't manufacture it. CP14 migration 0014 HELD `operator_profile` from `identifier_type` extension; deferred to validator-side review. Options: (A) new `identifier_type` value (rejected — shape mismatch; operators are entities not products); (B) new `operators` table parallel to `manufacturers` + `procurement_records` (CEO recommendation); (C) fold into `procurement_records` (rejected — conflates buys with deploys). Trigger for resolution: Wave-D or Wave-E surfaces ≥10 `operator_profile` candidates OR Lynceus integration team requests operators-table support.
-- **`§8.2 source_type` band for FAA RID-class primary-source registries.** Wave-A Phase 3a staged 481 `drone_id_prefix` instances from the FAA RID lookup (4783-record SQLite at FAA publicDOCRev 2025-11-28 build). The dispatch §4.1 cut-off rules require `independent_source_count ≥ 3` for Phase-4 promotion. FAA RID is structurally an authoritative numerical-allocation registry — closer to IEEE OUI assignments than to FCC filings or vendor spec sheets. Asking for "three independent sources" of what `1581Fxxx` means is structurally ill-defined because FAA's registry IS the source of truth. The cleaner structural question (board reframe at MAC-63 [`fe2beeee`](/MAC/issues/MAC-63#comment-fe2beeee-2571-475e-86f6-edc99f99ecad) 2026-05-11): should §8.2 grow a new `source_type='primary_registry'` band (parallel to but distinct from `regulatory` and `manufacturer_doc`; ceiling ~85–90, below `regulatory`'s court-verifiable ceiling but above `manufacturer_doc`)? If yes, FAA RID promotes single-source under that band and the ≥3-source cut-off rule remains untouched for the cases it's actually right for. 481 rows currently HELD pending Phase-5 human-CEO disposition.
+- **`§8.2 source_type` band for FAA RID-class primary-source registries.** Wave-A Phase 3a staged 481 `drone_id_prefix` instances from the FAA RID lookup (4783-record SQLite at FAA publicDOCRev 2025-11-28 build). The dispatch §4.1 cut-off rules require `independent_source_count ≥ 3` for Phase-4 promotion. FAA RID is structurally an authoritative numerical-allocation registry — closer to IEEE OUI assignments than to FCC filings or vendor spec sheets. Asking for "three independent sources" of what `1581Fxxx` means is structurally ill-defined because FAA's registry IS the source of truth. The cleaner structural question (board reframe at MAC-63 [`fe2beeee`](/MAC/issues/MAC-63#comment-fe2beeee-2571-475e-86f6-edc99f99ecad) 2026-05-11): should §8.2 grow a new `source_type='primary_registry'` band (parallel to but distinct from `regulatory` and `manufacturer_doc`; ceiling ~85–90, below `regulatory`'s court-verifiable ceiling but above `manufacturer_doc`)? If yes, FAA RID promotes single-source under that band and the ≥3-source cut-off rule remains untouched for the cases it's actually right for. 481 rows currently HELD pending Phase-5 human-CEO disposition. **RESOLVED by CP15 2026-05-11** — §8.2 grew the `primary_registry` band (70–85 single-source; up to 95 cross-band corroboration); ≥3-source cut-off waived for `primary_registry` only; FAA RID 481 rows + Apple `0x004C` + XUNTONG `0x09C8` (483 rows total) promote in promotion-cycle-2 at conf=85 single-source. Bible HEAD bumps to the CP15 commit; see `BIBLE_AMENDMENTS.md` CP15 entry.
 
 **Wave G (Phase 6) — board-ratified 2026-05-08, queued for execution post-v1.0.0 ship** (added Correction Pass 12)
 
