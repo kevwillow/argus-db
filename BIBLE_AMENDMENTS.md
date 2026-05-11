@@ -1066,3 +1066,94 @@ No existing §12 entries resolved by this pass. CP12 Wave G (Phase 6) §12 entri
 ### §11 #11 self-binding satisfied
 
 This entry is itself the §11 #11 amendment-log pairing for the §4.1 / §4.4 in-place edits in this coordinated commit. Bible HEAD bumps from `90132fa` (CP12) to the CP13 commit landed alongside this entry.
+
+---
+
+## Correction Pass 14 — Wave-A close: §8.4 four-amendment batch (G-1/G-4/G-13.3/G-15) + §11 #12 expansion + 5 schema migrations
+
+**Date:** 2026-05-11
+**Source:** [MAC-63](/MAC/issues/MAC-63) — Wave-A CEO Ratification Run. Human-CEO (Kev) delegated Bible §11 #11 amendment authority to CEO Claude for this run because they wanted to review the *output* rather than the *inputs* one-by-one. Phase 1 (drafting) ratified by board comment [`02ad16b0`](/MAC/issues/MAC-63#comment-02ad16b0-c8a2-47cd-831d-26e067c8a822); Phase 2 (CEO-skeptic self-review with §8.2 vs §8.3 catch + 4 revisions) ratified by board [`bbb71be5`](/MAC/issues/MAC-63#comment-bbb71be5-67fa-48ea-8c4c-8a1fc3797c0a); Phase 3 DDL fold-in ratified by board [`6516a9af`](/MAC/issues/MAC-63#comment-6516a9af-9d73-4134-b8f4-cc44085e63ef); Phase 3 application + this coordinated commit at heartbeat 2026-05-11.
+**Bible commit:** PROJECT_BIBLE.md §8.4 four-amendment batch + §11 #12 expansion + BIBLE_AMENDMENTS.md CP14 entry (this entry) + 4 draft files moved from `raw/wave_a/_bible_amendment_*` to `bible/history/cp14/` for audit trail. Single coordinated commit titled "CP14: §8.4 four-amendment batch (G-1/G-4/G-13.3/G-15)".
+**Schema-sibling commits (5 separate migration commits per dispatch §3.1):**
+  - `db/migrations/0010_behavioral_signatures.sql` (new TABLE per MAC-58 §5 Option B)
+  - `db/migrations/0011_ble_manufacturer_id_identifier_type_extension.sql` (G-3)
+  - `db/migrations/0012_paired_identifier_id.sql` (G-7 — paired_identifier_id + pair_kind columns)
+  - `db/migrations/0013_drone_rid_and_proprietary_protocol_identifier_types_extension.sql` (G-9 + Phase-4 fold-in; 13 new types)
+  - `db/migrations/0014_surveillance_metadata_identifier_types_extension.sql` (G-10 alpr_model only; operator_profile HELD as G-17)
+  - `db/schema_post_cp14.sql` (audit dump; schema_version=14)
+**Binds:** Validator (§11 #7 promotion gate — Phase-4 promotion-cycle-1 next heartbeat under the §8.4 amendments + new schema), ExtractionWorker (raw_observations staging shape for the 13 new identifier_types from 0013), Export Worker (§7.5 — new `self_exclude_defensive_tool` bucket per G-15; `pair_kind` interactions in the export shape), SourceWorker (Wave-B+ continues staging into the now-extended schema).
+
+### Why this Correction Pass exists
+
+Wave-A (autonomous-run dispatch 2026-05-11 covering Phases 1-2-3-4-6) extracted ~1,162 candidate observations across 14 returned agents + 1 Opus sub-agent (G-4 LA-bit amendment draft). Wave-A produced 16 CEO gates (G-1 through G-16 with sub-items) representing Bible amendment candidates, schema-migration drafts, and validator-side discipline questions. The CEO Ratification Run consolidates the four §8.4 amendment-class gates into a single coordinated CP14 batch:
+
+- **G-1** standards-body protocol-container OUI lens (FA:0B:BC ASD-STAN n=5, 50:6F:9A Wi-Fi Alliance NAN n=3, 90:3A:E6 Parrot dual-lens n=4)
+- **G-4** Locally-administered (U/L=1) OUI pairing discipline (sub-agent draft 2026-05-11; bit-math verified Phase 2; DB sibling-presence verified for 60:60:1f id=431/509 DJI)
+- **G-13.3** Hardware-anchor model-level evidence (Phase-2 self-review aligned with §8.2 source-bands; dropped initial parallel H1/H2/H3 tier framing; Falcon-gen1 ↔ Snapdragon 625 single-source ceiling 75 under `crowdsourced` band)
+- **G-15** Defensive-tool operator-side hardware self-exclude (Pi self-exclude mechanic extended to USB VID:PID + diag-interface + Rayhunter-supported modem family; §11 #12 update in parallel)
+
+In parallel, five schema migrations sibling these amendments per "coordinated commit" discipline:
+
+- **0010** new `behavioral_signatures` TABLE per MAC-58 §5 Option B (board decision 2026-05-09). 42 staged behavioral signatures HELD from promotion (single-source per §8.3; Wave-B targets NDSS 2025 Marlin + Rayhunter PCAPs).
+- **0011** adds `ble_manufacturer_id` to identifier_type CHECK enum (G-3). 22+ staged from Wave-A.
+- **0012** adds `paired_identifier_id` + `pair_kind` columns to identifiers (G-7 multi-gate enabler for G-4/G-2/G-1/G-13.3). pair_kind enum: 4 values + NULL (la_bit_flip / frdid_sibling / vendor_as_container / firmware_generation). Static-MAC tracker INTENTIONALLY EXCLUDED — handle via notes-JSON per dispatch §2.5.
+- **0013** adds 13 new identifier_types covering Drone-RID + proprietary RF-protocol cluster (G-9 + Phase-4 fold-in per dispatch §3.1.4). Renamed from `0013_drone_rid_identifier_types_extension.sql` to current name per board direction 6516a9af.
+- **0014** adds `alpr_model` (G-10 partial). `operator_profile` HELD as new gate G-17 (operators-table vs identifier-type architectural call — deferred to validator-side review).
+
+Phase-2 self-review surfaced a load-bearing §8.2-vs-§8.3 catch: the original Wave-A dispatch §2.2 stated "Bible §8.3 caps single-source hypotheses at confidence 60" but §8.3 is actually dedup logic — the operative cap is §8.2 source-type bands. The G-13.3 amendment now aligns with §8.2 directly (no parallel tier system). Board ratified at bbb71be5. This is the kind of self-review the dispatch was designed to catch.
+
+### Corrections applied
+
+1. **§8.4 first bullet edit (multi-purpose vendors)** — added explicit reference to the new "Model-level evidence — what counts" sub-rule below.
+
+2. **§8.4 NEW BULLET: "Model-level evidence — what counts (hardware-anchor sub-rule)"** (G-13.3) — formalizes three evidence shapes (direct firmware-binary inspection / paper-report inference / community attribution); explicitly composes with §8.2 source-type bands; explicitly does NOT introduce a parallel tier system; specifies `pair_kind='firmware_generation'` for generation-pairing rows; specifies `device_fingerprint` identifier_type for chipset/PMIC anchor rows with `manufacturer='Qualcomm'` / `model=<vendor>-<gen>`.
+
+3. **§8.4 NEW BULLET: "Protocol-container OUI lens (third-lens discipline)"** (G-1) — formalizes the three OUI lenses (chip-vendor, product-vendor, protocol-container); specifies dual-lens vendor-as-container handling via `pair_kind='vendor_as_container'`; within-lens corroboration discipline (FRDID single-source held; FA:0B:BC promotion-ready).
+
+4. **§8.4 NEW BULLET: "Locally-administered (U/L=1) OUI pairing discipline"** (G-4) — sub-agent draft 2026-05-11 ratifies as-is per bit-math verification (Phase 2 §2.6). Three dispositions (sibling-present-same-vendor / sibling-absent / sibling-present-different-vendor). Precedence rule with protocol-container lens (check protocol-container FIRST).
+
+5. **§8.4 NEW BULLET: "Defensive-tool operator-side hardware self-exclude"** (G-15) — Pi self-exclude mechanic extended. Three-layer exclusion list: USB VID:PID values (5 concrete from 6α surfacing — Orbic 3 modes + UZ801 + PinePhone Quectel), firmware/hardware-rev-anchored modems (4 entries: Wingtech CT2MHS01, T-Mobile TMOHS1, TP-Link M7350/M7310), and forward-proofing language mirroring Rayhunter upstream curation. Standard export at `severity='low'`; coverage_report bucket `self_exclude_defensive_tool` (separate from `self_exclude_oui`).
+
+6. **§11 #12 expansion** — original Pi-only rule expanded to "Operator-stack self-exclude" covering (a) Lynceus host (Pi) and (b) defensive-tool hardware (Rayhunter-supported modems). Mandatory regardless of source confidence.
+
+7. **Schema migrations applied (5)** — see Schema-sibling commits header above. Each applied with `PRAGMA foreign_keys = OFF / BEGIN / apply / PRAGMA foreign_key_check / PRAGMA integrity_check / COMMIT / PRAGMA foreign_keys = ON` envelope per dispatch §3.1. End-state schema_version=14; 154 identifiers rows preserved across 4 table rebuilds; 27-value cumulative `identifier_type` enum; 0 behavioral_signatures rows (gated on Wave-B second-source).
+
+### §11 hard-rule discipline (cite verbatim from bible HEAD pre-CP14 / post-CP13)
+
+- **§11 #1 (no fabrication)** — every §8.4 amendment cites concrete Wave-A surfacing provenance:
+  - G-1: 1d + 2c + 4a + 4b + 4c surfacings (FA:0B:BC at n=5)
+  - G-4: 1a + 1c + 2a surfacings (n=3 device-MAC LA); sub-agent draft math + DB sibling verification (Phase 2 §2.6)
+  - G-13.3: 6ε direct firmware-binary inspection (ALPR-DDR-FIREHOSE.mbn) + 6δ paper inference
+  - G-15: 6α (EFForg/rayhunter `installer/src/*` surfacing for USB VID:PIDs)
+- **§11 #2 (no non-public data)** — feedback memo `feedback_supply_chain_pki_lineage.md` re-classed G-13.1 Xiaomi-PKI finding OUT of §11 amendment status; intelligence-style supply-chain discipline, not hard rule. Cert fingerprints recorded as public-CA material only (no key material).
+- **§11 #7 (no promotion without provenance)** — schema-only this CP; promotion is Phase 4 next heartbeat (the §8.4 amendments inform Phase-4 disposition).
+- **§11 #8 (no confidence drift)** — no confidence-column writes; the four amendments codify promotion-time disposition rules (paired-identifier, lens-classification, hardware-anchor source-band, defensive-tool self-exclude).
+- **§11 #11 (amendment-log discipline)** — this entry IS the §11 #11 closure for the CP14 coordinated commit. The discipline rule binds CP-class edits to amendment-log entries; CP14 pairs four §8.4 amendments + §11 #12 expansion + five schema migrations with this single amendment-log entry.
+- **§11 #12 (operator-stack self-exclude)** — expanded in this CP from Pi-only to operator-stack-wide (Pi + Rayhunter-supported defensive-tool hardware).
+- **§11 #15 (no decompiled vendor source in git index)** — N/A; no decompile artifacts in this CP.
+
+### Resolved §12 questions
+
+No existing §12 entries closed by this pass. The Wave-A surfacings extended Argus's coverage at the schema + bible levels rather than resolving prior open questions.
+
+### New open §12 questions
+
+1. **Static-MAC tracker sub-class architecture.** Phase 3b (`seemoo-lab/AirGuard`) surfaced a distinct opposite-pattern sub-class to G-4 LA-bit: Tile, Chipolo, Pebblebee emit STATIC MACs by design. AirGuard's risk-evaluation algorithm treats them as a first-class architecture distinction ("dynamic-MAC tracker" vs "static-MAC tracker"). CP14 0012's `pair_kind` enum INTENTIONALLY EXCLUDES `static_mac_tracker` per dispatch §2.5 ("different security architecture; handle via notes-JSON until a third sub-class is needed"). Open question: at what n of static-MAC observations does Argus introduce a structural pair_kind value or a separate identifier shape? Currently n=3 (Tile + Chipolo + Pebblebee). Forward expectation: Wave-D/E may surface additional static-MAC ecosystems (LoRa-side trackers, industrial asset trackers) that push the question.
+
+2. **operator_profile architecture (G-17).** Three corporate operators surfaced in Wave-A Phase 3c (Lowe's Q1373493, Home Depot Q864407, Simon Property Group Q2287759). These deploy surveillance hardware but don't manufacture it. CP14 0014 HELD operator_profile from identifier_type extension; deferred to validator-side review. Options: (A) new identifier_type value (rejected — shape mismatch; operators are entities not products), (B) new `operators` table parallel to `manufacturers` + `procurement_records`, or (C) fold into procurement_records (rejected — conflates buys with deploys). CEO recommendation Option B. Trigger for resolution: Wave-D or Wave-E surfaces ≥10 operator_profile candidates OR Lynceus integration team requests operators-table support.
+
+3. **FAA RID single-authoritative-federal-source vs ≥3-source rule.** Wave-A Phase 3a staged 481 drone_id_prefix instances from the FAA RID lookup (4783-record SQLite at FAA publicDOCRev 2025-11-28 build). The dispatch §4.1 cut-off rules require `independent_source_count ≥ 3` for Phase-4 promotion. FAA RID is a single authoritative federal source. Open question for human-CEO Phase-4 disposition: does single-authoritative-federal-source waive the ≥3 rule for this 481-row batch? Currently HELD from promotion-cycle-1 per dispatch §6 ("surfacing this is your job; deciding it is human-CEO's"). Will be flagged in the Phase 4 candidates document and Phase 5 handoff doc.
+
+### Sequencing post-acceptance (per board ratification 6516a9af)
+
+1. **Phase 3 application** (this commit batch — 2026-05-11): 5 migrations applied as 5 separate commits + schema dump commit + CP14 coordinated commit (this entry's home) + feedback memos commit.
+2. **Phase 4 promotion-cycle-1** (next heartbeat): generate `raw/wave_a/_promotion_cycle_1_candidates_2026-05-11.md` per dispatch §4.1; self-review the candidates with skeptical eyes; promote survivors atomically; route 3 known conflict cases (G-6 Pelco/Motorola Solutions on 00:04:7D, 4c Parrot 90:3A:E6 parser/test contradiction, 6γ AIMSICD DF_id=4 ambiguity) to `conflicts` table per §4.2. Regenerate `coverage_report.md`.
+3. **Phase 5 handoff** (subsequent heartbeat): `raw/wave_a/_ratification_run_2026-05-11.md` containing migrations applied + bible amendments applied + feedback memo filed + promotion-cycle-1 results + promotion-cycle-2 queue + updated gates queue snapshot + FAA RID §6 disposition flag + PROJECT_STATE.md HB update.
+
+### Why a Correction Pass, not separate SARs
+
+§8.4 four-amendment batch + §11 #12 expansion + 5 schema migrations all touch bible §-text and identifier-table schema. CP-class is the right framing per CP11 / CP12 / CP13 precedent for coordinated bible §-text + schema amendments. SAR is reserved for operational-rule binding without bible §-text change.
+
+### §11 #11 self-binding satisfied
+
+This entry is itself the §11 #11 amendment-log pairing for the §8.4 four-amendment batch + §11 #12 expansion + five schema migrations landed in this coordinated commit + the schema dump audit + the separately-committed feedback memos. Bible HEAD bumps from `1c67bea` (MAC-57 CP13 export fix) to the CP14 coordinated commit landed alongside this entry. Schema_version bumps from 9 (post-CP13) to 14 (post-0014).
