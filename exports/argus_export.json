@@ -1,18 +1,21 @@
 {
   "_meta": {
-    "argus_version": "8",
-    "exported_at": "2026-05-07T17:50:54Z",
-    "record_count": 18,
+    "argus_version": "9",
+    "exported_at": "2026-05-11T03:49:02Z",
+    "record_count": 26,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "6bf7d50f-0917-5687-bbc5-a156363d8853",
-    "source_record_count": 63,
+    "argus_run_id": "2f1129a5-2f02-542a-bb67-bb6f3913a8b7",
+    "source_record_count": 96,
     "dropped_in_export": {
       "unknown_category": 45,
-      "ssid_pattern": 0,
+      "ssid_pattern": 5,
       "device_fingerprint": 0,
+      "ble_local_name": 3,
+      "ble_characteristic": 3,
+      "product_family_codename": 14,
       "oversized_mac_range": 0,
       "procurement_only": 0,
       "self_exclude_oui": 0,
@@ -28,6 +31,12 @@
       "argus_record_id": "108e8f0bd4b6da48"
     },
     {
+      "pattern": "e8ccbb38-9532-46a8-9fe5-1814df172e6f",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "24493d61823561a3"
+    },
+    {
       "pattern": "9c:5a:8a",
       "pattern_type": "oui",
       "description": "DJI drone",
@@ -38,6 +47,12 @@
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "2fde1a991a0cd103"
+    },
+    {
+      "pattern": "20c944c1-add2-42d7-a638-967ee9a26ff6",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "3e8522eb51ef9578"
     },
     {
       "pattern": "58:b8:58",
@@ -58,10 +73,22 @@
       "argus_record_id": "50894ea2e4d6f1e4"
     },
     {
+      "pattern": "00003300-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "52f6bf7990060f7a"
+    },
+    {
       "pattern": "b4:1e:52",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "5a15545c78f88aed"
+    },
+    {
+      "pattern": "00003200-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "5ef22302a7634fb4"
     },
     {
       "pattern": "ec:72:f7",
@@ -88,6 +115,12 @@
       "argus_record_id": "8f6d7a48b568c851"
     },
     {
+      "pattern": "00000000-0000-1000-1b7f-430ea194e6cf",
+      "pattern_type": "ble_uuid",
+      "description": "Getac body_cam",
+      "argus_record_id": "993ee07ebcd64fc4"
+    },
+    {
       "pattern": "34:d2:62",
       "pattern_type": "oui",
       "description": "DJI drone",
@@ -106,10 +139,28 @@
       "argus_record_id": "d30df38a13b98013"
     },
     {
+      "pattern": "00003100-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "d3548b94fac0f910"
+    },
+    {
       "pattern": "00:16:00",
       "pattern_type": "oui",
       "description": "Cellebrite hacking_tool",
       "argus_record_id": "dcaccb6a6f5318ae"
+    },
+    {
+      "pattern": "00003400-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "e427dbb1d2e2029a"
+    },
+    {
+      "pattern": "00003500-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "e42c67030014e18e"
     },
     {
       "pattern": "04:a8:5a",

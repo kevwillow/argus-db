@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 63,
+  "pre_active_count": 96,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -23,7 +23,10 @@
     "ssid_pattern",
     "ble_uuid",
     "ble_service",
-    "device_fingerprint"
+    "device_fingerprint",
+    "ble_local_name",
+    "ble_characteristic",
+    "product_family_codename"
   ],
   "cells": [
     {
@@ -47,9 +50,9 @@
       "n_by_source_type": {
         "crowdsourced": 1
       },
-      "min_conf": 60,
-      "max_conf": 60,
-      "median_conf": 60,
+      "min_conf": 65,
+      "max_conf": 65,
+      "median_conf": 65,
       "row_ids": [
         1
       ]
@@ -87,12 +90,20 @@
     {
       "device_category": "alpr",
       "identifier_type": "ssid_pattern",
-      "n": 0,
-      "n_by_source_type": {},
-      "min_conf": null,
-      "max_conf": null,
-      "median_conf": null,
-      "row_ids": []
+      "n": 5,
+      "n_by_source_type": {
+        "crowdsourced": 5
+      },
+      "min_conf": 60,
+      "max_conf": 70,
+      "median_conf": 60,
+      "row_ids": [
+        559,
+        560,
+        561,
+        562,
+        563
+      ]
     },
     {
       "device_category": "alpr",
@@ -107,12 +118,23 @@
     {
       "device_category": "alpr",
       "identifier_type": "ble_service",
-      "n": 0,
-      "n_by_source_type": {},
-      "min_conf": null,
-      "max_conf": null,
-      "median_conf": null,
-      "row_ids": []
+      "n": 7,
+      "n_by_source_type": {
+        "crowdsourced": 5,
+        "manufacturer_app": 2
+      },
+      "min_conf": 70,
+      "max_conf": 87,
+      "median_conf": 70,
+      "row_ids": [
+        533,
+        535,
+        554,
+        555,
+        556,
+        557,
+        558
+      ]
     },
     {
       "device_category": "alpr",
@@ -123,6 +145,63 @@
       "max_conf": null,
       "median_conf": null,
       "row_ids": []
+    },
+    {
+      "device_category": "alpr",
+      "identifier_type": "ble_local_name",
+      "n": 3,
+      "n_by_source_type": {
+        "crowdsourced": 2,
+        "manufacturer_app": 1
+      },
+      "min_conf": 60,
+      "max_conf": 82,
+      "median_conf": 70,
+      "row_ids": [
+        539,
+        564,
+        565
+      ]
+    },
+    {
+      "device_category": "alpr",
+      "identifier_type": "ble_characteristic",
+      "n": 2,
+      "n_by_source_type": {
+        "manufacturer_app": 2
+      },
+      "min_conf": 87,
+      "max_conf": 87,
+      "median_conf": 87.0,
+      "row_ids": [
+        534,
+        536
+      ]
+    },
+    {
+      "device_category": "alpr",
+      "identifier_type": "product_family_codename",
+      "n": 12,
+      "n_by_source_type": {
+        "manufacturer_app": 12
+      },
+      "min_conf": 92,
+      "max_conf": 92,
+      "median_conf": 92.0,
+      "row_ids": [
+        540,
+        541,
+        544,
+        545,
+        546,
+        547,
+        548,
+        549,
+        550,
+        551,
+        552,
+        553
+      ]
     },
     {
       "device_category": "imsi_catcher",
@@ -215,6 +294,36 @@
       "row_ids": []
     },
     {
+      "device_category": "imsi_catcher",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "imsi_catcher",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "imsi_catcher",
+      "identifier_type": "product_family_codename",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
       "device_category": "body_cam",
       "identifier_type": "oui",
       "n": 0,
@@ -287,6 +396,20 @@
     {
       "device_category": "body_cam",
       "identifier_type": "ble_service",
+      "n": 1,
+      "n_by_source_type": {
+        "manufacturer_app": 1
+      },
+      "min_conf": 87,
+      "max_conf": 87,
+      "median_conf": 87,
+      "row_ids": [
+        537
+      ]
+    },
+    {
+      "device_category": "body_cam",
+      "identifier_type": "device_fingerprint",
       "n": 0,
       "n_by_source_type": {},
       "min_conf": null,
@@ -296,7 +419,31 @@
     },
     {
       "device_category": "body_cam",
-      "identifier_type": "device_fingerprint",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "body_cam",
+      "identifier_type": "ble_characteristic",
+      "n": 1,
+      "n_by_source_type": {
+        "manufacturer_app": 1
+      },
+      "min_conf": 87,
+      "max_conf": 87,
+      "median_conf": 87,
+      "row_ids": [
+        538
+      ]
+    },
+    {
+      "device_category": "body_cam",
+      "identifier_type": "product_family_codename",
       "n": 0,
       "n_by_source_type": {},
       "min_conf": null,
@@ -387,6 +534,36 @@
     {
       "device_category": "police_radio",
       "identifier_type": "device_fingerprint",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "police_radio",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "police_radio",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "police_radio",
+      "identifier_type": "product_family_codename",
       "n": 0,
       "n_by_source_type": {},
       "min_conf": null,
@@ -502,6 +679,36 @@
       "row_ids": []
     },
     {
+      "device_category": "drone",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "drone",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "drone",
+      "identifier_type": "product_family_codename",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
       "device_category": "gunshot_detect",
       "identifier_type": "oui",
       "n": 1,
@@ -588,6 +795,36 @@
     {
       "device_category": "gunshot_detect",
       "identifier_type": "device_fingerprint",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "gunshot_detect",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "gunshot_detect",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "gunshot_detect",
+      "identifier_type": "product_family_codename",
       "n": 0,
       "n_by_source_type": {},
       "min_conf": null,
@@ -690,6 +927,36 @@
       "row_ids": []
     },
     {
+      "device_category": "hacking_tool",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "hacking_tool",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "hacking_tool",
+      "identifier_type": "product_family_codename",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
       "device_category": "covert_cam",
       "identifier_type": "oui",
       "n": 0,
@@ -780,6 +1047,36 @@
       "row_ids": []
     },
     {
+      "device_category": "covert_cam",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "covert_cam",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "covert_cam",
+      "identifier_type": "product_family_codename",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
       "device_category": "gps_tracker",
       "identifier_type": "oui",
       "n": 0,
@@ -870,6 +1167,36 @@
       "row_ids": []
     },
     {
+      "device_category": "gps_tracker",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "gps_tracker",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "gps_tracker",
+      "identifier_type": "product_family_codename",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
       "device_category": "face_recog",
       "identifier_type": "oui",
       "n": 0,
@@ -960,6 +1287,36 @@
       "row_ids": []
     },
     {
+      "device_category": "face_recog",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "face_recog",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "face_recog",
+      "identifier_type": "product_family_codename",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
       "device_category": "drone_detect",
       "identifier_type": "oui",
       "n": 0,
@@ -1048,6 +1405,41 @@
       "max_conf": null,
       "median_conf": null,
       "row_ids": []
+    },
+    {
+      "device_category": "drone_detect",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "drone_detect",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "drone_detect",
+      "identifier_type": "product_family_codename",
+      "n": 2,
+      "n_by_source_type": {
+        "manufacturer_app": 2
+      },
+      "min_conf": 92,
+      "max_conf": 92,
+      "median_conf": 92.0,
+      "row_ids": [
+        542,
+        543
+      ]
     },
     {
       "device_category": "unknown",
@@ -1189,6 +1581,36 @@
       "max_conf": null,
       "median_conf": null,
       "row_ids": []
+    },
+    {
+      "device_category": "unknown",
+      "identifier_type": "ble_local_name",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "unknown",
+      "identifier_type": "ble_characteristic",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
+    },
+    {
+      "device_category": "unknown",
+      "identifier_type": "product_family_codename",
+      "n": 0,
+      "n_by_source_type": {},
+      "min_conf": null,
+      "max_conf": null,
+      "median_conf": null,
+      "row_ids": []
     }
   ],
   "vendor_corroboration": [
@@ -1295,7 +1717,7 @@
       "deployment_observations_count": 80753,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 2
+      "active_identifier_count": 33
     },
     {
       "canonical_name": "Genetec",
@@ -1308,6 +1730,18 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Getac",
+      "aliases_used": [
+        "Getac"
+      ],
+      "fcc_grantees_count": 2,
+      "procurement_records_count": 21,
+      "deployment_observations_count": 17,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
     },
     {
       "canonical_name": "Harris",
@@ -1463,11 +1897,14 @@
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
       "oversized_mac_range": 0,
-      "ssid_pattern": 0,
-      "device_fingerprint": 0
+      "ssid_pattern": 5,
+      "device_fingerprint": 0,
+      "ble_local_name": 3,
+      "ble_characteristic": 3,
+      "product_family_codename": 14
     },
-    "survivors": 18,
-    "reconciles": 63,
+    "survivors": 26,
+    "reconciles": 96,
     "drop_assignments": {
       "413": "unknown_category",
       "414": "unknown_category",
@@ -1513,7 +1950,32 @@
       "488": "unknown_category",
       "489": "unknown_category",
       "490": "unknown_category",
-      "491": "unknown_category"
+      "491": "unknown_category",
+      "534": "ble_characteristic",
+      "536": "ble_characteristic",
+      "538": "ble_characteristic",
+      "539": "ble_local_name",
+      "540": "product_family_codename",
+      "541": "product_family_codename",
+      "542": "product_family_codename",
+      "543": "product_family_codename",
+      "544": "product_family_codename",
+      "545": "product_family_codename",
+      "546": "product_family_codename",
+      "547": "product_family_codename",
+      "548": "product_family_codename",
+      "549": "product_family_codename",
+      "550": "product_family_codename",
+      "551": "product_family_codename",
+      "552": "product_family_codename",
+      "553": "product_family_codename",
+      "559": "ssid_pattern",
+      "560": "ssid_pattern",
+      "561": "ssid_pattern",
+      "562": "ssid_pattern",
+      "563": "ssid_pattern",
+      "564": "ble_local_name",
+      "565": "ble_local_name"
     }
   },
   "drop_tally_high_confidence": {
@@ -1526,11 +1988,14 @@
       "self_exclude_oui": 0,
       "below_confidence_threshold": 18,
       "oversized_mac_range": 0,
-      "ssid_pattern": 0,
-      "device_fingerprint": 0
+      "ssid_pattern": 5,
+      "device_fingerprint": 0,
+      "ble_local_name": 3,
+      "ble_characteristic": 3,
+      "product_family_codename": 14
     },
-    "survivors": 0,
-    "reconciles": 63,
+    "survivors": 8,
+    "reconciles": 96,
     "drop_assignments": {
       "1": "below_confidence_threshold",
       "413": "unknown_category",
@@ -1594,7 +2059,32 @@
       "488": "unknown_category",
       "489": "unknown_category",
       "490": "unknown_category",
-      "491": "unknown_category"
+      "491": "unknown_category",
+      "534": "ble_characteristic",
+      "536": "ble_characteristic",
+      "538": "ble_characteristic",
+      "539": "ble_local_name",
+      "540": "product_family_codename",
+      "541": "product_family_codename",
+      "542": "product_family_codename",
+      "543": "product_family_codename",
+      "544": "product_family_codename",
+      "545": "product_family_codename",
+      "546": "product_family_codename",
+      "547": "product_family_codename",
+      "548": "product_family_codename",
+      "549": "product_family_codename",
+      "550": "product_family_codename",
+      "551": "product_family_codename",
+      "552": "product_family_codename",
+      "553": "product_family_codename",
+      "559": "ssid_pattern",
+      "560": "ssid_pattern",
+      "561": "ssid_pattern",
+      "562": "ssid_pattern",
+      "563": "ssid_pattern",
+      "564": "ble_local_name",
+      "565": "ble_local_name"
     }
   },
   "halts": []

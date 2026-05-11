@@ -93,6 +93,12 @@ IDENTIFIER_TYPES: tuple[str, ...] = (
     "ble_uuid",
     "ble_service",
     "device_fingerprint",
+    # CP13 (migration 0009) — Wave G structural fidelity. All three are
+    # analytical-only (DROPPED-class per §4.4); they never reach the Lynceus
+    # pattern table but are carried in the canonical DB.
+    "ble_local_name",
+    "ble_characteristic",
+    "product_family_codename",
 )
 
 # §8.2 confidence-band ceilings — annotation reference only (no mutations).
@@ -105,6 +111,9 @@ SOURCE_TYPE_CEILINGS: dict[str, int] = {
     "foia": 85,
     "crowdsourced": 75,
     "inferred": 70,
+    # CP12 (bible §8.2) — vendor companion app static-analysis extract.
+    # Outer band 60–95; sub-banded per identifier class (§8.2 table).
+    "manufacturer_app": 95,
 }
 
 # §8.4 / §11 #12 Pi self-exclude OUIs.
@@ -175,12 +184,13 @@ class VendorCorroboration:
 
 @dataclass(frozen=True)
 class DropBinTally:
-    """§9 item 9 drop bins for one Talos export file.
+    """§9 item 9 drop bins for one Lynceus export file.
 
     Each row is assigned to AT MOST one bin (priority order: procurement_only
-    > unknown_category > device_fingerprint > ssid_pattern >
-    oversized_mac_range > self_exclude_oui > below_confidence_threshold).
-    Survivors → eligible for export.
+    > unknown_category > device_fingerprint > ssid_pattern > ble_local_name
+    > ble_characteristic > product_family_codename > oversized_mac_range >
+    self_exclude_oui > below_confidence_threshold). Survivors → eligible for
+    export.
     """
 
     file_label: str
@@ -193,6 +203,10 @@ class DropBinTally:
     oversized_mac_range: int
     ssid_pattern: int
     device_fingerprint: int
+    # CP13 (§4.4) — Wave G analytical-only types.
+    ble_local_name: int
+    ble_characteristic: int
+    product_family_codename: int
     survivors: int
     drop_assignments: dict[int, str]  # row_id → bin name (only dropped rows)
 
@@ -389,13 +403,16 @@ def _assign_drop_bin(
     """Return the drop-bin name a row falls into, or None if it survives.
 
     Priority order (a row can only drop for one reason):
-      1. procurement_only      (§11 #14)
-      2. unknown_category      (§11 #13)
-      3. device_fingerprint    (§4.4)
-      4. ssid_pattern          (§4.4)
-      5. oversized_mac_range   (§4.4)
-      6. self_exclude_oui      (§8.4 / §11 #12 — high-conf file only)
-      7. below_confidence_threshold  (§7.5)
+      1. procurement_only            (§11 #14)
+      2. unknown_category            (§11 #13)
+      3. device_fingerprint          (§4.4)
+      4. ssid_pattern                (§4.4)
+      5. ble_local_name              (§4.4 CP13)
+      6. ble_characteristic          (§4.4 CP13)
+      7. product_family_codename     (§4.4 CP13)
+      8. oversized_mac_range         (§4.4)
+      9. self_exclude_oui            (§8.4 / §11 #12 — high-conf file only)
+     10. below_confidence_threshold  (§7.5)
     """
     if row.source_type == "procurement":
         return "procurement_only"
@@ -405,6 +422,16 @@ def _assign_drop_bin(
         return "device_fingerprint"
     if row.identifier_type == "ssid_pattern":
         return "ssid_pattern"
+    # CP13 (§4.4) — Wave G analytical-only types. Each drops to its own bin
+    # so the tally cleanly shows what's carried in the canonical DB but
+    # withheld from Lynceus (no GAP local-name matching, no characteristic
+    # discovery, no codename ingestion in v0.3).
+    if row.identifier_type == "ble_local_name":
+        return "ble_local_name"
+    if row.identifier_type == "ble_characteristic":
+        return "ble_characteristic"
+    if row.identifier_type == "product_family_codename":
+        return "product_family_codename"
     if (
         row.identifier_type == "mac_range"
         and mac_range_size(row.identifier) > MAC_RANGE_EXPANSION_CEILING
@@ -434,6 +461,10 @@ def _compute_drop_tally(
         "oversized_mac_range": 0,
         "ssid_pattern": 0,
         "device_fingerprint": 0,
+        # CP13 (§4.4) — Wave G analytical-only types.
+        "ble_local_name": 0,
+        "ble_characteristic": 0,
+        "product_family_codename": 0,
     }
     drop_assignments: dict[int, str] = {}
     survivors = 0
@@ -457,6 +488,9 @@ def _compute_drop_tally(
         oversized_mac_range=bins["oversized_mac_range"],
         ssid_pattern=bins["ssid_pattern"],
         device_fingerprint=bins["device_fingerprint"],
+        ble_local_name=bins["ble_local_name"],
+        ble_characteristic=bins["ble_characteristic"],
+        product_family_codename=bins["product_family_codename"],
         survivors=survivors,
         drop_assignments=drop_assignments,
     )
@@ -479,6 +513,9 @@ def _check_halts(
         + standard.oversized_mac_range
         + standard.ssid_pattern
         + standard.device_fingerprint
+        + standard.ble_local_name
+        + standard.ble_characteristic
+        + standard.product_family_codename
     )
     if standard_sum + standard.survivors != n:
         halts.append(
@@ -499,6 +536,9 @@ def _check_halts(
         + high_conf.oversized_mac_range
         + high_conf.ssid_pattern
         + high_conf.device_fingerprint
+        + high_conf.ble_local_name
+        + high_conf.ble_characteristic
+        + high_conf.product_family_codename
     )
     if high_conf_sum + high_conf.survivors != n:
         halts.append(
@@ -650,6 +690,10 @@ def _drop_tally_to_dict(t: DropBinTally) -> dict:
             "oversized_mac_range": t.oversized_mac_range,
             "ssid_pattern": t.ssid_pattern,
             "device_fingerprint": t.device_fingerprint,
+            # CP13 (§4.4) — Wave G analytical-only types.
+            "ble_local_name": t.ble_local_name,
+            "ble_characteristic": t.ble_characteristic,
+            "product_family_codename": t.product_family_codename,
         },
         "survivors": t.survivors,
         "reconciles": (
@@ -660,6 +704,9 @@ def _drop_tally_to_dict(t: DropBinTally) -> dict:
             + t.oversized_mac_range
             + t.ssid_pattern
             + t.device_fingerprint
+            + t.ble_local_name
+            + t.ble_characteristic
+            + t.product_family_codename
             + t.survivors
         ),
         "drop_assignments": {str(k): v for k, v in sorted(t.drop_assignments.items())},
@@ -726,7 +773,10 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
     lines.append("")
     lines.append(
         "Rows = `device_category` enum (12 values, migration 0001 verbatim). "
-        "Cols = `identifier_type` enum (9 values, migration 0001 verbatim). "
+        "Cols = `identifier_type` enum (12 values: 9 from migration 0001 + "
+        "3 from migration 0009 / CP13 — `ble_local_name`, `ble_characteristic`, "
+        "`product_family_codename` — Wave G structural fidelity, all "
+        "DROPPED-class for Lynceus). "
         "Cells show `n` only; per-source-type breakdown + confidence "
         "distribution in the cell-detail table below."
     )
@@ -791,10 +841,9 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
     ]
     lines.append(
         f"- **Empty identifier_type cols:** {len(empty_types)} of "
-        f"{len(IDENTIFIER_TYPES)} (`{', '.join(empty_types)}`). The "
-        f"`bssid` / `ssid_exact` / `ssid_pattern` / `ble_uuid` / "
-        f"`ble_service` / `device_fingerprint` enums are declared in §4.1 "
-        f"but no Tier-1/2/3/4 source has yet promoted into them."
+        f"{len(IDENTIFIER_TYPES)} (`{', '.join(empty_types)}`). Enums declared "
+        f"in §4.1 (migration 0001) and CP13 (migration 0009) without any "
+        f"Tier-1/2/3/4 source promotion yet."
     )
     lines.append(
         "- **Dispatch §6.1 column-list typo:** the dispatch lists `ssid` and "
@@ -872,9 +921,10 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
     lines.append(
         "Each row is assigned to AT MOST one drop bin (priority order: "
         "`procurement_only` > `unknown_category` > `device_fingerprint` > "
-        "`ssid_pattern` > `oversized_mac_range` > `self_exclude_oui` > "
-        "`below_confidence_threshold`). Survivors are eligible for the "
-        "corresponding Talos export file. Reconciliation: "
+        "`ssid_pattern` > `ble_local_name` > `ble_characteristic` > "
+        "`product_family_codename` > `oversized_mac_range` > "
+        "`self_exclude_oui` > `below_confidence_threshold`). Survivors are "
+        "eligible for the corresponding Lynceus export file. Reconciliation: "
         "`pre_active_count − sum(bins) = survivors`."
     )
     lines.append("")
@@ -887,6 +937,9 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
             ("`procurement_only` (§11 #14)", tally.procurement_only),
             ("`device_fingerprint` (§4.4)", tally.device_fingerprint),
             ("`ssid_pattern` (§4.4)", tally.ssid_pattern),
+            ("`ble_local_name` (§4.4 CP13)", tally.ble_local_name),
+            ("`ble_characteristic` (§4.4 CP13)", tally.ble_characteristic),
+            ("`product_family_codename` (§4.4 CP13)", tally.product_family_codename),
             ("`oversized_mac_range` (§4.4)", tally.oversized_mac_range),
             ("`self_exclude_oui` (§8.4 / §11 #12)", tally.self_exclude_oui),
             ("`below_confidence_threshold` (§7.5)", tally.below_confidence_threshold),
@@ -972,7 +1025,10 @@ def main(argv: Optional[list[str]] = None) -> int:
         print(json.dumps(payload, indent=2, default=str))
     else:
         print(f"Pre-active identifiers:                       {report.pre_active_count}")
-        print(f"Cells (12 dc × 9 it = 108):                   {len(report.cells)}")
+        print(f"Cells ({len(DEVICE_CATEGORIES)} dc × "
+              f"{len(IDENTIFIER_TYPES)} it = "
+              f"{len(DEVICE_CATEGORIES) * len(IDENTIFIER_TYPES)}):"
+              f"           {len(report.cells)}")
         print(f"Non-empty cells:                              "
               f"{sum(1 for c in report.cells if c.n > 0)}")
         print(f"Vendor corroboration entries:                 "

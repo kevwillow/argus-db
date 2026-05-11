@@ -1,18 +1,21 @@
 {
   "_meta": {
-    "argus_version": "8",
-    "exported_at": "2026-05-07T17:50:54Z",
-    "record_count": 0,
+    "argus_version": "9",
+    "exported_at": "2026-05-11T03:49:02Z",
+    "record_count": 8,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "6bf7d50f-0917-5687-bbc5-a156363d8853",
-    "source_record_count": 63,
+    "argus_run_id": "2f1129a5-2f02-542a-bb67-bb6f3913a8b7",
+    "source_record_count": 96,
     "dropped_in_export": {
       "unknown_category": 45,
-      "ssid_pattern": 0,
+      "ssid_pattern": 5,
       "device_fingerprint": 0,
+      "ble_local_name": 3,
+      "ble_characteristic": 3,
+      "product_family_codename": 14,
       "oversized_mac_range": 0,
       "procurement_only": 0,
       "self_exclude_oui": 0,
@@ -20,5 +23,54 @@
       "geographic_scope_mismatch": 0
     }
   },
-  "entries": []
+  "entries": [
+    {
+      "pattern": "e8ccbb38-9532-46a8-9fe5-1814df172e6f",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "24493d61823561a3"
+    },
+    {
+      "pattern": "20c944c1-add2-42d7-a638-967ee9a26ff6",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "3e8522eb51ef9578"
+    },
+    {
+      "pattern": "00003300-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "52f6bf7990060f7a"
+    },
+    {
+      "pattern": "00003200-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "5ef22302a7634fb4"
+    },
+    {
+      "pattern": "00000000-0000-1000-1b7f-430ea194e6cf",
+      "pattern_type": "ble_uuid",
+      "description": "Getac body_cam",
+      "argus_record_id": "993ee07ebcd64fc4"
+    },
+    {
+      "pattern": "00003100-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "d3548b94fac0f910"
+    },
+    {
+      "pattern": "00003400-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "e427dbb1d2e2029a"
+    },
+    {
+      "pattern": "00003500-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "e42c67030014e18e"
+    }
+  ]
 }

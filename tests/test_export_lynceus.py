@@ -107,6 +107,10 @@ def test_type_mapping_covers_every_identifier_type() -> None:
         "ble_uuid",
         "ble_service",
         "device_fingerprint",
+        # CP13 (§4.4) — Wave G analytical-only types.
+        "ble_local_name",
+        "ble_characteristic",
+        "product_family_codename",
     }
     assert set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()) == expected
 
@@ -117,6 +121,10 @@ def test_type_mapping_drops_match_44_verbatim() -> None:
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["mac_range"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["bssid"] == "mac"
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_service"] == "ble_uuid"
+    # CP13 (§4.4) — all three Wave G analytical-only types are DROPPED.
+    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_local_name"] is None
+    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_characteristic"] is None
+    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["product_family_codename"] is None
 
 
 def test_severity_field_dropped_from_export_shape_per_cp8() -> None:
@@ -223,6 +231,103 @@ def test_classify_device_fingerprint_drops_section_44() -> None:
         apply_pi_self_exclude=False,
     )
     assert bin_label == "device_fingerprint"
+
+
+def test_classify_ble_local_name_drops_section_44_cp13() -> None:
+    """CP13: ble_local_name is DROPPED-class (no GAP local-name match in Lynceus v0.3)."""
+    bin_label, entries = _classify_row(
+        _row(identifier="FlockLPR-A2", identifier_type="ble_local_name",
+             device_category="alpr", manufacturer="Flock Safety", confidence=82),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label == "ble_local_name"
+    assert entries == []
+
+
+def test_classify_ble_local_name_drops_in_high_conf_too() -> None:
+    """CP13 type-drop fires above the confidence-floor gate per priority order:
+    a high-conf ble_local_name still drops to its type bin, never to
+    `below_confidence_threshold` and never as a survivor."""
+    bin_label, entries = _classify_row(
+        _row(identifier="FlockLPR-A2", identifier_type="ble_local_name",
+             device_category="alpr", manufacturer="Flock Safety", confidence=85),
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+    )
+    assert bin_label == "ble_local_name"
+    assert entries == []
+
+
+def test_classify_ble_characteristic_drops_section_44_cp13() -> None:
+    """CP13: ble_characteristic is DROPPED-class (Lynceus discovers by service
+    UUID, not characteristic)."""
+    bin_label, entries = _classify_row(
+        _row(identifier="0000aaaa-0000-1000-8000-00805f9b34fb",
+             identifier_type="ble_characteristic",
+             device_category="alpr", manufacturer="Flock Safety", confidence=87),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label == "ble_characteristic"
+    assert entries == []
+
+
+def test_classify_ble_characteristic_drops_in_high_conf_too() -> None:
+    bin_label, _ = _classify_row(
+        _row(identifier="0000aaaa-0000-1000-8000-00805f9b34fb",
+             identifier_type="ble_characteristic",
+             device_category="alpr", manufacturer="Flock Safety", confidence=87),
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+    )
+    assert bin_label == "ble_characteristic"
+
+
+def test_classify_product_family_codename_drops_section_44_cp13() -> None:
+    """CP13: product_family_codename is DROPPED-class (vendor-internal taxonomy
+    / cohort strings, e.g. Flock `DeviceType` enum values)."""
+    bin_label, entries = _classify_row(
+        _row(identifier="WingmanCondor", identifier_type="product_family_codename",
+             device_category="alpr", manufacturer="Flock Safety", confidence=92),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label == "product_family_codename"
+    assert entries == []
+
+
+def test_classify_product_family_codename_drops_in_high_conf_too() -> None:
+    bin_label, _ = _classify_row(
+        _row(identifier="WingmanCondor", identifier_type="product_family_codename",
+             device_category="alpr", manufacturer="Flock Safety", confidence=92),
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+    )
+    assert bin_label == "product_family_codename"
+
+
+def test_classify_cp13_type_drops_above_unknown_category_below_procurement() -> None:
+    """Priority order regression: CP13 type-drop bins sit BELOW procurement_only
+    and unknown_category but ABOVE confidence-floor / self-exclude. A row that's
+    BOTH ble_characteristic AND unknown_category drops to unknown_category;
+    a row that's BOTH ble_characteristic AND procurement drops to procurement_only."""
+    # ble_characteristic + unknown_category → unknown_category (priority 2 wins).
+    bin_label, _ = _classify_row(
+        _row(identifier_type="ble_characteristic", device_category="unknown",
+             confidence=87),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label == "unknown_category"
+    # ble_characteristic + procurement → procurement_only (priority 1 wins).
+    bin_label, _ = _classify_row(
+        _row(identifier_type="ble_characteristic", source_type="procurement",
+             device_category="alpr", confidence=87),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label == "procurement_only"
 
 
 def test_classify_mac_range_drops_to_oversized_section_44() -> None:
@@ -384,6 +489,91 @@ def test_build_export_passes_when_assignments_align() -> None:
     )
     assert "severity" not in payload["entries"][0]
     assert assignments == {20: "unknown_category", 21: None}
+
+
+def test_build_export_meta_carries_cp13_drop_bins() -> None:
+    """CP13: `_meta.dropped_in_export` must carry keys for the three new
+    Wave G analytical-only types so MAC-45 reconciliation lines up
+    bin-for-bin against the writer's tally."""
+    rows = [
+        _row(id=70, identifier="FlockLPR-A2", identifier_type="ble_local_name",
+             device_category="alpr", manufacturer="Flock Safety", confidence=82,
+             geographic_scope="US"),
+        _row(id=71, identifier="0000aaaa-0000-1000-8000-00805f9b34fb",
+             identifier_type="ble_characteristic", device_category="alpr",
+             manufacturer="Flock Safety", confidence=87, geographic_scope="US"),
+        _row(id=72, identifier="WingmanCondor", identifier_type="product_family_codename",
+             device_category="alpr", manufacturer="Flock Safety", confidence=92,
+             geographic_scope="US"),
+    ]
+    payload, assignments = _build_export(
+        rows=rows,
+        file_label="argus_export.json",
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+        schema_version=9,
+        argus_run_id="abc",
+        exported_at="2026-05-10T00:00:00Z",
+        expected_drop_assignments={
+            "70": "ble_local_name",
+            "71": "ble_characteristic",
+            "72": "product_family_codename",
+        },
+    )
+    bins = payload["_meta"]["dropped_in_export"]
+    assert bins["ble_local_name"] == 1
+    assert bins["ble_characteristic"] == 1
+    assert bins["product_family_codename"] == 1
+    assert payload["_meta"]["record_count"] == 0
+    assert payload["entries"] == []
+    assert assignments == {
+        70: "ble_local_name",
+        71: "ble_characteristic",
+        72: "product_family_codename",
+    }
+
+
+def test_build_export_cp13_rows_never_appear_in_entries() -> None:
+    """CP13: a survivor `ble_service` row coexisting with CP13 DROPPED-class
+    rows must produce exactly the survivor in `entries[]`. The CP13 rows
+    must never bleed into the Lynceus pattern table — analytical-only."""
+    rows = [
+        # Survivor: ble_service is a proper Lynceus pattern_type.
+        _row(id=80, identifier="0000fd6f-0000-1000-8000-00805f9b34fb",
+             identifier_type="ble_service", device_category="alpr",
+             manufacturer="Flock Safety", confidence=87, geographic_scope="US"),
+        # All three CP13 DROPPED-class types.
+        _row(id=81, identifier="FlockLPR-A2", identifier_type="ble_local_name",
+             device_category="alpr", manufacturer="Flock Safety", confidence=82,
+             geographic_scope="US"),
+        _row(id=82, identifier="0000aaaa-0000-1000-8000-00805f9b34fb",
+             identifier_type="ble_characteristic", device_category="alpr",
+             manufacturer="Flock Safety", confidence=87, geographic_scope="US"),
+        _row(id=83, identifier="WingmanCondor", identifier_type="product_family_codename",
+             device_category="alpr", manufacturer="Flock Safety", confidence=92,
+             geographic_scope="US"),
+    ]
+    payload, _ = _build_export(
+        rows=rows,
+        file_label="argus_export_high_confidence.json",
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+        schema_version=9,
+        argus_run_id="abc",
+        exported_at="2026-05-10T00:00:00Z",
+        expected_drop_assignments={
+            "81": "ble_local_name",
+            "82": "ble_characteristic",
+            "83": "product_family_codename",
+        },
+    )
+    assert payload["_meta"]["record_count"] == 1
+    assert len(payload["entries"]) == 1
+    assert payload["entries"][0]["pattern_type"] == "ble_uuid"
+    # CP13 rows must never appear in entries; only ble_service survives.
+    cp13_identifiers = {"FlockLPR-A2", "0000aaaa-0000-1000-8000-00805f9b34fb", "WingmanCondor"}
+    for entry in payload["entries"]:
+        assert entry["pattern"] not in cp13_identifiers
 
 
 def test_meta_reconciliation_invariant() -> None:

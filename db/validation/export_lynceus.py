@@ -87,17 +87,22 @@ COVERAGE_MATRIX_MD_PATH = (
     REPO_ROOT / "extraction_outputs" / "mac45" / "coverage_matrix.md"
 )
 
-# §4.4 Talos pattern_type mapping (verbatim).
+# §4.4 Lynceus pattern_type mapping (verbatim).
 IDENTIFIER_TYPE_TO_PATTERN_TYPE: dict[str, str | None] = {
     "oui": "oui",
     "mac": "mac",
     "bssid": "mac",
     "ssid_exact": "ssid",
-    "ssid_pattern": None,  # DROPPED per §4.4 (no regex in Talos v0.2)
+    "ssid_pattern": None,  # DROPPED per §4.4 (no regex in Lynceus v0.2)
     "ble_uuid": "ble_uuid",
     "ble_service": "ble_uuid",
     "mac_range": None,  # expand or DROP per §4.4 (≤256 → expand else drop)
     "device_fingerprint": None,  # DROPPED per §4.4
+    # CP13 (§4.4) — Wave G analytical-only types. All three are DROPPED-class:
+    # carried in the canonical DB but never reach the Lynceus pattern table.
+    "ble_local_name": None,  # DROPPED — no GAP local-name match in Lynceus v0.3
+    "ble_characteristic": None,  # DROPPED — Lynceus discovers by service UUID, not characteristic
+    "product_family_codename": None,  # DROPPED — vendor-internal taxonomy / cohort strings
 }
 
 # §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
@@ -303,13 +308,20 @@ def _classify_row(
     canonical order:
 
         procurement_only > unknown_category > device_fingerprint
-        > ssid_pattern > oversized_mac_range > self_exclude_oui
+        > ssid_pattern > ble_local_name > ble_characteristic
+        > product_family_codename > oversized_mac_range > self_exclude_oui
         > below_confidence_threshold
 
     The §11 #14 procurement bin sits above §11 #13 unknown_category because
     procurement-only rows have no concrete identifier at all and are never
     in the main `identifiers` table by design (§4.5); the gate is here as
     defense-in-depth.
+
+    The CP13 type-drop bins (`ble_local_name`, `ble_characteristic`,
+    `product_family_codename`) sit above the confidence-floor gate and the
+    Pi self-exclude gate, so an analytical-only Wave G row is binned by its
+    type regardless of confidence (matches the existing handling of
+    `device_fingerprint` and `ssid_pattern`).
 
     The CP7 ``geographic_scope_mismatch`` bin is NOT applied here — it is a
     runtime parameter applied in ``_apply_geographic_scope_filter()`` after
@@ -329,6 +341,14 @@ def _classify_row(
     # §4.4 — ssid_pattern dropped (no regex in Lynceus v0.2).
     if row.identifier_type == "ssid_pattern":
         return "ssid_pattern", []
+    # §4.4 CP13 — Wave G analytical-only types. All three are DROPPED-class:
+    # carried in the canonical DB but never reach the Lynceus pattern table.
+    if row.identifier_type == "ble_local_name":
+        return "ble_local_name", []
+    if row.identifier_type == "ble_characteristic":
+        return "ble_characteristic", []
+    if row.identifier_type == "product_family_codename":
+        return "product_family_codename", []
     # §4.4 — mac_range expand or drop.
     if row.identifier_type == "mac_range":
         # No active mac_range row at HB36 has a category off `unknown`, so
@@ -565,6 +585,10 @@ def _build_export(
         "unknown_category": 0,
         "ssid_pattern": 0,
         "device_fingerprint": 0,
+        # CP13 (§4.4) — Wave G analytical-only types (DROPPED-class).
+        "ble_local_name": 0,
+        "ble_characteristic": 0,
+        "product_family_codename": 0,
         "oversized_mac_range": 0,
         "procurement_only": 0,
         "self_exclude_oui": 0,
@@ -659,6 +683,9 @@ def _build_coverage_report_md(
             ("procurement_only (§11 #14)", bins["procurement_only"]),
             ("device_fingerprint (§4.4)", bins["device_fingerprint"]),
             ("ssid_pattern (§4.4)", bins["ssid_pattern"]),
+            ("ble_local_name (§4.4 CP13)", bins["ble_local_name"]),
+            ("ble_characteristic (§4.4 CP13)", bins["ble_characteristic"]),
+            ("product_family_codename (§4.4 CP13)", bins["product_family_codename"]),
             ("oversized_mac_range (§4.4)", bins["oversized_mac_range"]),
             ("self_exclude_oui (§8.4 / §11 #12)", bins["self_exclude_oui"]),
             ("below_confidence_threshold (§7.5)", bins["below_confidence_threshold"]),
@@ -831,9 +858,10 @@ def _build_coverage_report_md(
     md_parts.append(
         "Each active canonical row is assigned to AT MOST one drop bin per file. "
         "Bin priority order matches MAC-45's pre-tally: `procurement_only > "
-        "unknown_category > device_fingerprint > ssid_pattern > oversized_mac_range "
+        "unknown_category > device_fingerprint > ssid_pattern > ble_local_name "
+        "> ble_characteristic > product_family_codename > oversized_mac_range "
         "> self_exclude_oui > below_confidence_threshold`. Survivors flow to the "
-        "Talos export's `entries` array. Reconciliation: "
+        "Lynceus export's `entries` array. Reconciliation: "
         "`source_record_count − sum(dropped_in_export) = entries.length`."
     )
     md_parts.append("")
