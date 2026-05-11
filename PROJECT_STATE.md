@@ -18,6 +18,79 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-11T~14:25Z–~20:00Z (**MAC-63 Wave-A CEO Ratification Run** — five-phase execution close + CP14 coordinated bible commit + 5 schema migrations + 5 promotion-cycle-1 writes + CP15 §8.2 amendment draft filed for separate-heartbeat ratification). Anchored on commits `06cc501` (CP14) / `72c0323` (§12 finalization) / `421b4b5` (export regen) per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory) — commit hashes and comment refs are the canonical anchors.
+
+**MAC-63 Wave-A CEO Ratification Run — close.** Human-CEO (Kev) delegated Bible §11 #11 amendment authority for this run per dispatch [`843f306b`](/MAC/issues/MAC-63#comment-843f306b-3e4d-493a-b58e-38a731687943) 2026-05-11. Closed 2026-05-11 via final handoff doc at `raw/wave_a/_ratification_run_2026-05-11.md` per board direction at [`2b2cb0cf`](/MAC/issues/MAC-63#comment-2b2cb0cf-7796-4a43-a39e-f16d77a435f6) ("MAC-63 closes when handoff doc lands"). Five-phase execution: (1) drafting, (2) CEO-skeptic self-review, (3) DDL fold-in + application, (4) candidates + Path B ingestion + promotion-cycle-1, (5) handoff.
+
+**11 commits this run** (Bible HEAD `1c67bea` → `421b4b5`):
+- `6665188` 0010_behavioral_signatures.sql (new TABLE per MAC-58 §5 Option B; 42 signatures HELD per §4.5)
+- `68bcf71` 0011_ble_manufacturer_id_identifier_type_extension.sql (G-3; +1 enum value)
+- `c9fca4e` 0012_paired_identifier_id.sql (G-7; new `paired_identifier_id` + `pair_kind` columns)
+- `a2bf451` 0013_drone_rid_and_proprietary_protocol_identifier_types_extension.sql (G-9 + Phase-4 8-type fold-in; +13 enum values; renamed per board direction `6516a9af`)
+- `7ba37d4` 0014_surveillance_metadata_identifier_types_extension.sql (G-10 alpr_model only; operator_profile HELD as G-17)
+- `d13e12a` db/schema_post_cp14.sql audit dump
+- `06cc501` **CP14 coordinated bible commit** — §8.4 four-amendment batch (G-1/G-4/G-13.3/G-15) + §11 #12 expansion + 4 draft files moved to `bible/history/cp14/`
+- `ef5362c` feedback memos commit (supply_chain_pki + migration_sequence_cumulative_enum)
+- `72c0323` §12 finalization (3 Wave-A open questions added to PROJECT_BIBLE.md §12 as bullets per CP3/CP5/CP12 precedent; no SAR numbering)
+- `5f7d224` Wave-A surfacing → raw_observations mechanical ingestion script (Path B per board direction `d3d1bbda`)
+- `9db3b1e` ingestion SHA-override patch (log-recovered commit_sha for opendroneid_receiver-android)
+- `421b4b5` promotion-cycle-1 export regeneration (coverage_matrix + 3 exports + coverage_report.md)
+
+**Schema-version delta:** 9 → **14**. Cumulative `identifiers.identifier_type` enum: **27 values** (verified post-0014 against board's expected algebra `9 pre-CP13 + 3 CP13 + 1 from 0011 + 13 from 0013 + 1 from 0014`). `pair_kind` enum: 4 values + NULL. 154 identifiers rows preserved across 4 table rebuilds.
+
+**Promotion-cycle-1 (transaction-wrapped, defensive `db/argus.db.pre_promotion_cycle_1_backup`).** 5 atomic writes per the revised cohort ratified at MAC-63 [`d3d1bbda`](/MAC/issues/MAC-63#comment-d3d1bbda-2511-471a-bb34-05804f727ada):
+- **Axon `00:25:DF`** id=450 → cat=unknown→`body_cam`, conf=55→**80**; id=484 superseded_by=450
+- **DJI `60:60:1F`** id=431 → conf=55→**80**; id=509 superseded_by=431
+- **DJI `48:1C:B9`** id=421 → conf=55→**80**; id=503 superseded_by=421
+- **DJI `34:D2:62`** id=447 → conf=55→**80**; id=501 superseded_by=447
+- **DJI `62:60:1F` LA-variant** — NEW id=566 cat=drone conf=40 `paired_identifier_id=431` `pair_kind='la_bit_flip'` (FIRST PAIRED-IDENTIFIER WRITE IN PROJECT HISTORY; board-eyeballed SQL executed verbatim modulo NOT-NULL `source_type='crowdsourced'` fill per new `feedback_not_null_fill_discipline_for_board_spec_sql.md` discipline ratified at `2b2cb0cf`)
+- **Raven UUIDs id=554..558** (5 rows) → cat=alpr→`gunshot_detect`, conf=70→**75** (CATEGORY CORRECTION via manufacturer-direct naming authority; §11 #8 explicitly does NOT apply per board direction `9cfaf239`)
+
+24 raw_observations.promoted_identifier_id back-links populated; integrity_check=ok; foreign_key_check=[].
+
+**Architectural firsts** flagged by board at `2b2cb0cf` as proof points for future contributors:
+1. **First row using G-7 `paired_identifier_id` column** — id=566 ↔ id=431 via `la_bit_flip` (CP14 0012's paired-identifier discipline lands its first concrete instance).
+2. **First time `argus_export_high_confidence.json` has populated content** — 12 rows (was 0 prior).
+3. **First Bible CP with four §8.4 amendments in a coordinated commit** — CP14 batches G-1/G-4/G-13.3/G-15 + §11 #12 expansion into single commit `06cc501`.
+4. **First feedback-memo for migration-sequence discipline** — `feedback_migration_sequence_cumulative_enum_carryforward.md` (cumulative-enum carry-forward catch from Phase-3 DDL fold-in audit).
+5. **First CEO-class direct execution of ExtractionWorker-shape work** — mechanical Wave-A JSON-to-row ingestion (~803 rows) authorized by board as "translation of already-staged artifacts" per Bible §7.3 spirit.
+
+**Active state at close:** identifiers total 154→**155** (+ new LA-variant id=566); active (`superseded_by IS NULL`) 96→**97**; schema_version 9→14; high-conf Lynceus export **12 survivors** (first populated); standard export 28 survivors; argus_export.csv rich-feed 97 rows. Coverage report regenerated; halts=0; drop-tally reconciliation arithmetic holds.
+
+**conflicts table** populated for the first time: 3 rows (G-6 Pelco/Motorola + 4c Parrot 90:3A:E6 + 6γ AIMSICD DF_id=4 per dispatch §4.4).
+
+**Wave-A ingestion to raw_observations:** **803 of ~1,162 surfaced observations** ingested via Path B per board direction `d3d1bbda` (mechanical JSON-to-row, not ExtractionWorker re-mine). 18 new sources rows (s.id=16-33) + 18 extraction_runs audit-trail rows. ~360 remaining HELD for custom-mapper heartbeat (5+ dirs with custom JSON shapes).
+
+**§11 stop-the-line trips:** 0. **PII boundary crossings:** 0. **Halts:** 0.
+
+**CP15 §8.2 `primary_registry` amendment draft** filed at `raw/wave_a/_bible_amendment_cp15_primary_registry_draft_2026-05-11.md` per board direction `2b2cb0cf`. NOT applied this run — ratification deferred to separate human-CEO heartbeat. Promotion-cycle-2 §6.1 (483 rows: FAA RID 481 + Apple `0x004C` + XUNTONG `0x09C8`) unblocks at CP15 ratification + the schema-sibling migration 0015 application.
+
+**Promotion-cycle-2 queue (grouped by unblock-event per board direction `2b2cb0cf`):**
+- **CP15 ratification unblocks:** FAA RID 481 + Apple `0x004C` + XUNTONG `0x09C8` (483 rows, all single-source primary_registry, target conf=85)
+- **Wave-B second-source unblocks:** 42 behavioral_signatures (NDSS 2025 Marlin paper + Rayhunter operator PCAPs as targets)
+- **Custom-mapper heartbeat unblocks:** ~360 secondary-batch obs (eylonK14, nixxxo, AIMSICD, RemoteIDReceiver, non-list-JSON dirs — SHAs recovered from logs, mappers TBD)
+- **Standalone hold:** E4:AA:EA id=1 (waits for future Wave surfacing)
+- **G-17 architectural hold:** `operator_profile` (operators-table-vs-type decision deferred to validator-side review; trigger at Wave-D/E ≥10 candidates OR Lynceus integration request)
+
+**Bible HEAD pre-MAC-63:** `1c67bea` (MAC-57 CP13 export fix). **Bible HEAD post-MAC-63:** `421b4b5`. **Schema version:** 9 → 14.
+
+**Memory entries codified this run:**
+- `feedback_cumulative_check_enum_across_sequenced_migrations.md` (agent project memory) — schema-evolution discipline for sequenced rebuild-pattern migrations
+- `project_mac63_wave_a_ratification_run.md` (agent project memory) — multi-heartbeat phase tracker
+- `feedback_not_null_fill_discipline_for_board_spec_sql.md` (Argus repo) — operational discipline for board-spec'd SQL with missing NOT NULL fields
+- `feedback_supply_chain_pki_lineage.md` (Argus repo) — Xiaomi-PKI G-13.1 reclassification + validator-side disposition rule
+- `feedback_migration_sequence_cumulative_enum_carryforward.md` (Argus repo) — sister memo to the agent-memory cumulative-enum discipline
+
+**Forward sequence:**
+- Promotion-cycle-2 (CP15-unblocked 483-row batch) — separate scoped heartbeat after CP15 ratification heartbeat
+- Custom-mapper ingestion heartbeat — separate scoped heartbeat for the ~360 secondary-batch obs
+- Wave-B dispatch (NDSS Marlin + Rayhunter PCAPs) — separate scoped heartbeat for behavioral_signatures second-source corroboration
+- G-17 operator_profile architectural decision — validator-side review; trigger at Wave-D/E volume threshold
+
+---
+
+**Prior heartbeat (HB51) entry preserved below verbatim for audit trail per `feedback_fresh_ratification_supersedes_mutation` discipline; do not mutate.**
+
 CEO heartbeat 2026-05-09T~04:30Z (HB51 — **MAC-50 rev 2 ratification captured · plan rev 3 landed · §4 license-files chunk surfaced for board · Lynceus engineer dict-key inquiry teed up**).
 
 **HB51 — board wake on MAC-1 [`ed2340ee`](/MAC/issues/MAC-1#comment-ed2340ee-bcab-4629-8c36-13517b38df1c) 2026-05-09T04:17:06Z** ("Rev 2 plan reviewed. Comprehensive work — ratifying with two pushbacks and several refinements"). MAC-50 plan rev 2 (`a2103d56`) ratified across all 15 ratification points with **3 explicit overrides** (PROJECT_STATE.md (b)→(c) replace contents / author-rewrite generic placeholder→Github noreply pattern `<id>+<username>@users.noreply.github.com` / Talos→Lynceus dict-keys preserve-just-in-case→verify-with-Lynceus-engineer-first) + several refinements (WiGLE email "[N weeks]"→"3-4 weeks" / WiGLE subsystem disposition gated on §2 outcome / scrub execution as single coordinated commit / THREAT_MODEL.md disclaimer paragraph / CP13 single coordinated commit immediately pre-flip / LEGAL_POSTURE.md top-level / CI/CD v1.0 with basic checks ratified / GitHub org pending trademark check (preliminary `argus-watch`) / 4-step §8 ladder + 4-6 week wall-clock acknowledged).
