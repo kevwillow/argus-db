@@ -1,16 +1,16 @@
 {
   "_meta": {
-    "argus_version": "9",
-    "exported_at": "2026-05-11T03:49:02Z",
-    "record_count": 26,
+    "argus_version": "14",
+    "exported_at": "2026-05-11T18:22:52Z",
+    "record_count": 28,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "2f1129a5-2f02-542a-bb67-bb6f3913a8b7",
-    "source_record_count": 96,
+    "argus_run_id": "02ed168e-5489-57c6-918d-6a904cead7de",
+    "source_record_count": 97,
     "dropped_in_export": {
-      "unknown_category": 45,
+      "unknown_category": 44,
       "ssid_pattern": 5,
       "device_fingerprint": 0,
       "ble_local_name": 3,
@@ -29,6 +29,12 @@
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "108e8f0bd4b6da48"
+    },
+    {
+      "pattern": "00:25:df",
+      "pattern_type": "oui",
+      "description": "Axon body_cam",
+      "argus_record_id": "219fd3f03346950a"
     },
     {
       "pattern": "e8ccbb38-9532-46a8-9fe5-1814df172e6f",
@@ -75,7 +81,7 @@
     {
       "pattern": "00003300-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
-      "description": "Flock Safety alpr",
+      "description": "Flock Safety gunshot_detect",
       "argus_record_id": "52f6bf7990060f7a"
     },
     {
@@ -85,9 +91,15 @@
       "argus_record_id": "5a15545c78f88aed"
     },
     {
+      "pattern": "62:60:1f",
+      "pattern_type": "oui",
+      "description": "DJI drone",
+      "argus_record_id": "5e3430aacafbd6c8"
+    },
+    {
       "pattern": "00003200-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
-      "description": "Flock Safety alpr",
+      "description": "Flock Safety gunshot_detect",
       "argus_record_id": "5ef22302a7634fb4"
     },
     {
@@ -141,7 +153,7 @@
     {
       "pattern": "00003100-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
-      "description": "Flock Safety alpr",
+      "description": "Flock Safety gunshot_detect",
       "argus_record_id": "d3548b94fac0f910"
     },
     {
@@ -153,13 +165,13 @@
     {
       "pattern": "00003400-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
-      "description": "Flock Safety alpr",
+      "description": "Flock Safety gunshot_detect",
       "argus_record_id": "e427dbb1d2e2029a"
     },
     {
       "pattern": "00003500-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
-      "description": "Flock Safety alpr",
+      "description": "Flock Safety gunshot_detect",
       "argus_record_id": "e42c67030014e18e"
     },
     {
