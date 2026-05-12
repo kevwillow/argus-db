@@ -114,6 +114,10 @@ SOURCE_TYPE_CEILINGS: dict[str, int] = {
     # CP12 (bible §8.2) — vendor companion app static-analysis extract.
     # Outer band 60–95; sub-banded per identifier class (§8.2 table).
     "manufacturer_app": 95,
+    # CP15 (bible §8.2) — authoritative numerical-allocation registries
+    # (IEEE OUI, Bluetooth SIG company IDs, FAA RID, IANA). Single-source
+    # ceiling 85; up to 95 with cross-band corroboration (§8.2 formula).
+    "primary_registry": 85,
 }
 
 # §8.4 / §11 #12 Pi self-exclude OUIs.
