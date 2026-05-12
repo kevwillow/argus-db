@@ -18,6 +18,81 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-12T~16:48Z–~21:30Z (**MAC-63 CP15 ratification + promotion-cycle-2 close — Wave-A structurally done**). Anchored on commits `1e83517` (CP15) / `e663ae5` (migration 0015) / `cc45440` (CP15 sibling discipline patch) / `58ef039` (post-cycle-2 export regen) per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
+
+**MAC-63 closes; Wave-A structurally done.** Second MAC-63 CEO-class delegated authority (CP15 ratification + promotion-cycle-2 after CP16 dependency closed at MAC-75 `554a420`/`a4bc7b9`/`d37e9dc`) wraps with final handoff doc at `raw/wave_a/_mac63_run_2026-05-12.md` per dispatch [`acc6dac6`](/MAC/issues/MAC-63#comment-acc6dac6-5169-486c-8342-a1e00135eafa) + Phase 6 ratification [`119039a3`](/MAC/issues/MAC-63#comment-119039a3-1aa8-48be-8ec2-ce22d9e99f7b).
+
+**Cycle-2 batch (4 commits):**
+- `1e83517` **CP15: §8.2 primary_registry source-type band** (resolves FAA RID + SIG-registry structural-equivalence finding; Phase-1 refinements 1.1/1.2/1.3 + pre-Phase-2 grep-check drift fix on §2.2/§2.3 reclassification parity)
+- `e663ae5` feat(db): migration 0015 — primary_registry source-type extension (two-table rebuild; cumulative CHECK 10 values per table)
+- `cc45440` fix(validation): coverage_matrix.py — primary_registry source_type ceiling (CP15 downstream-consumer sibling gap caught + patched at Phase 6; **third post-memo recurrence** of `feedback_bible_amendment_downstream_consumer_audit.md`)
+- `58ef039` **feat(exports): regenerate after promotion-cycle-2 — CP15 primary_registry batch (416 rows: FAA RID 415 + SIG 2; Zephyr '1' HELD)** — includes board direction `119039a3` item 3 in-flight UPDATE on id=568 Apple notes (`apple_airtag_disambiguation_path` annotation documenting that 0x004C resolves to 'tracker' only with AirTag-specific advertising-data byte patterns — behavioral-signature scope not manufacturer-ID scope)
+
+**Promotion-cycle-2 transaction (db/argus.db state delta, gitignored):**
+- 2 SIG ble_manufacturer_id rows: id=567 XUNTONG `0x09C8` + id=568 Apple `0x004C` (cat='unknown' per §11 #13; conf=85 primary_registry; source_url at canonical SIG Bitbucket YAML; verbatim YAML excerpts; both URLs revalidated HTTP 200 at apply time per dispatch §4 §11 #1 fetchability discipline)
+- 415 FAA RID drone_id_prefix rows: id=569..983 (cat='drone'; conf=85 primary_registry; source_url at `uasdoc.faa.gov/listDocs`; manufacturer per existing alphafox02 raw_obs ancestor)
+- 1 row HELD per Phase-5 disposition: prefix `'1'` Zephyr Systems (data-quality follow-up scoped separately per dispatch §0 OUT-of-scope)
+- 2 new raw_observations rows for SIG + new `sources.id=34` Bluetooth SIG canonical registry (primary_registry tier=1) + new extraction_runs row
+- raw_observations.promoted_identifier_id back-links populated for 417 ancestor rows
+
+**Post-cycle-2 state:**
+- identifiers total 155 → **572** (+417)
+- identifiers active 97 → **514** (+417, all new INSERTs are active)
+- argus_export.json (standard, conf≥30): 28 → **443** survivors (28 prior + 415 FAA RID; 2 SIG cat='unknown' excluded per §11 #13 strict reading — board's 445 prediction was an unjustified carveout per Phase 6 ratification `119039a3` item 2)
+- argus_export_high_confidence.json (conf≥70): 12 → **427** survivors (**~35x lift; first substantive high-conf content in project history**; matches board prediction exactly)
+- argus_export.csv (rich-feed, unfiltered): 97 → **514** rows
+- coverage_report.md regenerated; Halts: 0; reconciliation arithmetic holds (443+71=514 ✓; 427+87=514 ✓)
+- integrity_check=ok; foreign_key_check=[]; CP14 first-paired-write at id=566 preserved
+
+**Six architectural firsts** captured per board ratifications `2b2cb0cf` + `119039a3`:
+1. First row using G-7 `paired_identifier_id` column (id=566 ↔ id=431 via `la_bit_flip`)
+2. **First substantive high-conf export content (12 → 427; ~35x lift)**
+3. First Bible CP with four §8.4 amendments in coordinated commit (CP14)
+4. First feedback-memo for migration-sequence discipline
+5. First CEO-class direct execution of ExtractionWorker-shape work (Wave-A Path B ingestion)
+6. **First sibling-discipline downstream-consumer gap caught + patched in same heartbeat** (cycle-2 CP15 coverage_matrix.py sibling at `cc45440` + export-regen at `58ef039`)
+
+**S.7 discipline-evolution candidate** flagged for next CP-class memo update per board direction `119039a3` item 1: "Downstream-consumer audit enumerates every consumer that reads from the affected surface, not just the primary one. Maintain an explicit inventory of consumers per surface." S.1 from CP16 fired correctly at Phase 6 but its enumeration was incomplete (named export_lynceus.py but missed coverage_matrix.py). Third post-memo recurrence of the bible-amendment-downstream-consumer-update pattern (CP13→MAC-57 / CP14→CP16 / CP15→cycle-2 sibling). Not blocking; CP17+ folds.
+
+**§11 #13 strict-reading governance** acknowledged in handoff: "Records with `device_category='unknown'` are NEVER exported to Lynceus under any confidence level" — excludes unknown-cat from BOTH standard AND high-conf, not just high-conf. CC composed with the rule correctly; board's standard-export 445 prediction added an unjustified carveout; actual 443 is governance-correct.
+
+**Cross-cycle promotion totals:** 5 cycle-1 writes + 5 Raven cat corrections + 4 supersessions + 1 LA-variant first paired write + 417 cycle-2 promotions = **432 mutations** (423 promotion writes + 9 corrections/supersessions).
+
+**Promotion-cycle-3 queue** (grouped by unblock-event, per handoff §4):
+- Wave-B second-source unblocks: 42 behavioral_signatures (NDSS Marlin paper + Rayhunter operator PCAPs as targets)
+- Custom-mapper ingestion heartbeat unblocks: ~360 secondary-batch obs (10 dirs with custom JSON shapes)
+- Data-quality follow-up: 1 row (Zephyr `'1'`)
+- Future Wave surfacing: E4:AA:EA id=1
+- G-17 architectural decision: `operator_profile` (3 staged rows)
+- Wave-B+ IEEE-anchored sources reclassification sweep: bounded by §11 #8 direct-source_url tightening per board `02d6fb2b`
+
+**§11 stop-the-line trips:** 0 across the entire MAC-63 run (Wave-A + cycle-2). **PII boundary crossings:** 0. **Halts at close:** 0.
+
+**Memory entries codified across MAC-63 timeline:**
+- `feedback_supply_chain_pki_lineage.md` (Xiaomi-PKI G-13.1 reclass)
+- `feedback_migration_sequence_cumulative_enum_carryforward.md` (cumulative CHECK-enum discipline)
+- `feedback_not_null_fill_discipline_for_board_spec_sql.md` (NOT-NULL fill discipline ratified at `2b2cb0cf`)
+- Plus CP16's strengthened `feedback_bible_amendment_downstream_consumer_audit.md` (cycle-2 contributes the S.7 candidate)
+- `project_mac63_wave_a_ratification_run.md` (agent project memory — multi-heartbeat phase tracker)
+- `feedback_cumulative_check_enum_across_sequenced_migrations.md` (agent project memory)
+
+**CEO-class delegated §11 #11 authority expires** with this filing. Subsequent CP-class amendment work + Wave-B dispatches + custom-mapper worker + sources-reclassification sweep + S.7 memo evolution require fresh human-CEO delegation OR direct human-CEO authoring.
+
+**Forward sequence (next strategic conversations):**
+- Wave-B planning (NDSS Marlin paper mining + Rayhunter operator PCAPs for behavioral_signatures unblock)
+- Custom-mapper worker dispatch for ~360 secondary-batch raw_observations
+- IEEE-anchored sources reclassification sweep (Wave-B+ batch task; bounded per §11 #8 + dispatch `02d6fb2b`)
+- Public-flip preparation (parallel Track A/D work — operates on different surface)
+- S.7 + S.1 discipline-evolution memo update at next CP-class amendment
+
+**Defensive backups retained** through this close (per board direction `119039a3` "retain through Phase 7 close, then can be cleaned up"):
+- `db/argus.db.pre_cp15_backup`
+- `db/argus.db.pre_promotion_cycle_2_backup` (272MB)
+
+---
+
+### Prior action — MAC-75 CP16 Run (preserved verbatim)
+
 CEO heartbeat 2026-05-12 (**MAC-75 CP16 Run** — six-phase verify-and-halt close + §4.4 Lynceus mapping for CP14 identifier_type cluster + memory-rule strengthening with 7 sub-rules + 5 architectural firsts). Anchored on commits `d37e9dc` (CP16 bible) / `a4bc7b9` (CP16 code-sibling) per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
 
 **MAC-75 CP16 Run — close.** Fresh CEO §11 #11 delegation 2026-05-12 (MAC-75 wake [`017df17b`](/MAC/issues/MAC-75#comment-017df17b-1798-4606-bdae-5723bdb7ef25)) for the §4.4 Lynceus mapping amendment closing the CP14→§4.4 downstream-consumer gap surfaced at MAC-63 Phase 5 export-regen attempt 2026-05-11. Six phases: Phase 1 per-type audit ([`ee60c712`](/MAC/issues/MAC-75#comment-ee60c712-fcef-4795-a1ac-8727e70b8045)) → Phase 2 cumulative full-enum audit ([`5b9212ce`](/MAC/issues/MAC-75#comment-5b9212ce-5276-4fb6-9bd7-dae62d2e53f3)) → Phase 3 draft staging ([`369cb7c7`](/MAC/issues/MAC-75#comment-369cb7c7-269d-48fe-a0b6-e2d5cd369a15)) → Phase 4 CEO-skeptic self-review + 5 revisions ([`dbfb5da6`](/MAC/issues/MAC-75#comment-dbfb5da6-a3a2-4434-99d7-da9b46d9acd8)) → Phase 5 coordinated commit apply ([`ae2008d6`](/MAC/issues/MAC-75#comment-ae2008d6-c269-4891-b7ff-f7c6e41714bc)) → Phase 6 handoff doc (this entry; `raw/wave_a/_cp16_run_2026-05-12.md`).
