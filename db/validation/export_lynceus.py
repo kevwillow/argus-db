@@ -103,6 +103,42 @@ IDENTIFIER_TYPE_TO_PATTERN_TYPE: dict[str, str | None] = {
     "ble_local_name": None,  # DROPPED — no GAP local-name match in Lynceus v0.3
     "ble_characteristic": None,  # DROPPED — Lynceus discovers by service UUID, not characteristic
     "product_family_codename": None,  # DROPPED — vendor-internal taxonomy / cohort strings
+    # CP16 (§4.4) — CP14 identifier_type cluster MAP cases (3 new pattern_types).
+    # The 12 CP14-cluster DROPPED types live in DROPPED_REASONS below (lean-
+    # refactor per board direction at MAC-75 5b9212ce). See PROJECT_BIBLE.md
+    # §4.4 amendment for per-type rationale + Lynceus-side scanner work notes
+    # + architectural-separation paragraph (Argus and Lynceus are parallel
+    # tracks; Argus exports unconditionally regardless of Lynceus scanner
+    # support state).
+    "ble_manufacturer_id": "ble_manufacturer_id",  # MAP — new pattern_type; BLE adv manuf_data[0:2] match
+    "drone_id_prefix": "drone_id_prefix",  # MAP — new pattern_type; Remote ID prefix string match (WiFi NAN/Beacon/BLE Legacy 4.x); BLE5 LE Coded PHY is a current-hardware boundary
+    "wifi_aware_service_name": "wifi_aware_service_name",  # MAP — new pattern_type; WiFi NAN service-name UTF-8 match; capability-gated by Lynceus-side NAN support (consumer-carries-state)
+}
+
+
+# CP16 (§4.4) — CP14 identifier_type cluster DROPPED cases (12 entries).
+# Per board direction at MAC-75 5b9212ce: 12 CP14-cluster DROPPED types live
+# here keyed on identifier_type → bin_label string. _classify_row gets ONE
+# new branch (below) checking this dict; existing 6 explicit early-return
+# branches (device_fingerprint, ssid_pattern, ble_local_name, ble_characteristic,
+# product_family_codename, mac_range) stay verbatim — stable, working, no
+# regression risk.
+#
+# Future hygiene-pass-only: the 6 legacy branches could fold into this same
+# dict if a later commit wants to consolidate. Out of CP16 scope.
+DROPPED_REASONS: dict[str, str] = {
+    "icao_24bit_address": "icao_24bit_address",  # Out-of-band RF (1090 MHz ADS-B; SDR upgrade path)
+    "rf_channel": "rf_channel",  # Parametric metadata, not a wire-observable identifier
+    "burst_cadence_ms": "burst_cadence_ms",  # Parametric metadata
+    "bandwidth_mhz": "bandwidth_mhz",  # Parametric metadata
+    "device_class_id": "device_class_id",  # Semantic enum, not match value
+    "rf_burst_duration": "rf_burst_duration",  # Parametric metadata
+    "rf_protocol_constant": "rf_protocol_constant",  # Sub-protocol-level / SDR-required
+    "wifi_ie_element_id": "wifi_ie_element_id",  # Overly-coarse 1-byte tag
+    "bluetooth_le_pdu_type": "bluetooth_le_pdu_type",  # Overly-coarse 4-bit enum
+    "wifi_frame_control_subtype": "wifi_frame_control_subtype",  # Overly-coarse enum
+    "wifi_nan_param_signature": "wifi_nan_param_signature",  # Derived multi-field aggregate
+    "alpr_model": "alpr_model",  # Vendor-internal taxonomy, not RF-broadcast (companion to product_family_codename)
 }
 
 # §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
@@ -351,11 +387,23 @@ def _classify_row(
         return "product_family_codename", []
     # §4.4 — mac_range expand or drop.
     if row.identifier_type == "mac_range":
-        # No active mac_range row at HB36 has a category off `unknown`, so
-        # any mac_range that reaches this gate is from a future Phase-5
-        # reopening. The expansion logic stays codified for that case.
-        # (At HB36, mac_range rows hit the unknown_category gate above.)
+        # The expansion logic stays codified for the case of a non-`unknown`-
+        # category mac_range row reaching this gate. Currently no such row
+        # exists in the active identifiers set (all live mac_range rows have
+        # category='unknown' and hit the §11 #13 unknown_category gate above);
+        # the branch fires only on a future Phase-5 reopening or category-
+        # correction promotion that lifts a mac_range out of unknown.
         return "oversized_mac_range", []
+    # §4.4 CP16 — CP14 identifier_type cluster DROPPED-with-reason filter.
+    # 12 new analytical-only types from migrations 0011/0013/0014; carried
+    # in the canonical DB but never reach the Lynceus pattern table. See
+    # PROJECT_BIBLE.md §4.4 (CP16 amendment) for per-type rationale.
+    # Future hygiene-pass-only: the 6 legacy branches above (device_fingerprint,
+    # ssid_pattern, ble_local_name, ble_characteristic, product_family_codename,
+    # mac_range) could fold into DROPPED_REASONS in a later cleanup commit.
+    # Out of CP16 scope.
+    if row.identifier_type in DROPPED_REASONS:
+        return DROPPED_REASONS[row.identifier_type], []
     # §8.4 / §11 #12 — Pi self-exclude OUI list (high-confidence file only).
     if (
         apply_pi_self_exclude
@@ -590,6 +638,24 @@ def _build_export(
         "ble_characteristic": 0,
         "product_family_codename": 0,
         "oversized_mac_range": 0,
+        # CP16 (§4.4) — CP14 identifier_type cluster DROPPED-class types.
+        # Keys match DROPPED_REASONS values one-to-one (one zero-init per
+        # new CP16 bin label) so the aggregation loop `bins[drop_bin] += 1`
+        # succeeds for the new branch's returns. Phase-3 architectural claim
+        # that this needed no code change was wrong; Phase-4 dry-run caught
+        # the gap. See feedback memo S.6 (architectural-absorption sub-rule).
+        "icao_24bit_address": 0,
+        "rf_channel": 0,
+        "burst_cadence_ms": 0,
+        "bandwidth_mhz": 0,
+        "device_class_id": 0,
+        "rf_burst_duration": 0,
+        "rf_protocol_constant": 0,
+        "wifi_ie_element_id": 0,
+        "bluetooth_le_pdu_type": 0,
+        "wifi_frame_control_subtype": 0,
+        "wifi_nan_param_signature": 0,
+        "alpr_model": 0,
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,
@@ -687,6 +753,19 @@ def _build_coverage_report_md(
             ("ble_characteristic (§4.4 CP13)", bins["ble_characteristic"]),
             ("product_family_codename (§4.4 CP13)", bins["product_family_codename"]),
             ("oversized_mac_range (§4.4)", bins["oversized_mac_range"]),
+            # CP16 (§4.4) — CP14 identifier_type cluster DROPPED-class types.
+            ("icao_24bit_address (§4.4 CP16)", bins["icao_24bit_address"]),
+            ("rf_channel (§4.4 CP16)", bins["rf_channel"]),
+            ("burst_cadence_ms (§4.4 CP16)", bins["burst_cadence_ms"]),
+            ("bandwidth_mhz (§4.4 CP16)", bins["bandwidth_mhz"]),
+            ("device_class_id (§4.4 CP16)", bins["device_class_id"]),
+            ("rf_burst_duration (§4.4 CP16)", bins["rf_burst_duration"]),
+            ("rf_protocol_constant (§4.4 CP16)", bins["rf_protocol_constant"]),
+            ("wifi_ie_element_id (§4.4 CP16)", bins["wifi_ie_element_id"]),
+            ("bluetooth_le_pdu_type (§4.4 CP16)", bins["bluetooth_le_pdu_type"]),
+            ("wifi_frame_control_subtype (§4.4 CP16)", bins["wifi_frame_control_subtype"]),
+            ("wifi_nan_param_signature (§4.4 CP16)", bins["wifi_nan_param_signature"]),
+            ("alpr_model (§4.4 CP16)", bins["alpr_model"]),
             ("self_exclude_oui (§8.4 / §11 #12)", bins["self_exclude_oui"]),
             ("below_confidence_threshold (§7.5)", bins["below_confidence_threshold"]),
             ("geographic_scope_mismatch (CP7)", bins["geographic_scope_mismatch"]),

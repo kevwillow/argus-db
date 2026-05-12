@@ -29,6 +29,7 @@ from db.validation.export_lynceus import (
     DEFAULT_GEOGRAPHIC_SCOPE_FILTER,
     DESCRIPTION_MAX_CHARS,
     DESCRIPTION_VENDOR_UNATTRIBUTED,
+    DROPPED_REASONS,
     IDENTIFIER_TYPE_TO_PATTERN_TYPE,
     PI_SELF_EXCLUDE_OUIS,
     ActiveRow,
@@ -97,25 +98,46 @@ def _row(**kw) -> ActiveRow:
 
 
 def test_type_mapping_covers_every_identifier_type() -> None:
+    # Post-CP16: dispositions are split across IDENTIFIER_TYPE_TO_PATTERN_TYPE
+    # (15 MAP cases) + DROPPED_REASONS (12 DROPPED cases) per CP16's lean-
+    # refactor design (board direction at MAC-75 5b9212ce). Union must equal
+    # the full post-CP14 identifier_type enum (27 values).
     expected = {
-        "oui",
-        "mac",
-        "mac_range",
-        "bssid",
-        "ssid_exact",
-        "ssid_pattern",
-        "ble_uuid",
-        "ble_service",
+        # Pre-CP13 (migration 0001)
+        "oui", "mac", "mac_range", "bssid",
+        "ssid_exact", "ssid_pattern",
+        "ble_uuid", "ble_service",
         "device_fingerprint",
-        # CP13 (§4.4) — Wave G analytical-only types.
-        "ble_local_name",
-        "ble_characteristic",
-        "product_family_codename",
+        # CP13 (migration 0009) — Wave G analytical-only types
+        "ble_local_name", "ble_characteristic", "product_family_codename",
+        # CP14 (migration 0011) — G-3 BLE SIG manufacturer IDs
+        "ble_manufacturer_id",
+        # CP14 (migration 0013) — Drone-RID + proprietary-protocol cluster
+        "drone_id_prefix", "icao_24bit_address",
+        "rf_channel", "burst_cadence_ms", "bandwidth_mhz",
+        "device_class_id", "rf_burst_duration", "rf_protocol_constant",
+        "wifi_aware_service_name",
+        "wifi_ie_element_id", "bluetooth_le_pdu_type",
+        "wifi_frame_control_subtype", "wifi_nan_param_signature",
+        # CP14 (migration 0014) — surveillance metadata
+        "alpr_model",
     }
-    assert set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()) == expected
+    assert (
+        set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()) | set(DROPPED_REASONS.keys())
+        == expected
+    )
+    # CP16 split-structure invariant — no key overlap between MAP dict and
+    # DROPPED_REASONS (every type has exactly one disposition surface).
+    assert (
+        set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys())
+        & set(DROPPED_REASONS.keys())
+        == set()
+    )
 
 
 def test_type_mapping_drops_match_44_verbatim() -> None:
+    # Legacy DROPPED entries (still live in IDENTIFIER_TYPE_TO_PATTERN_TYPE per
+    # CP16 board direction at MAC-75 5b9212ce: legacy branches preserved).
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ssid_pattern"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["device_fingerprint"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["mac_range"] is None
@@ -125,6 +147,15 @@ def test_type_mapping_drops_match_44_verbatim() -> None:
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_local_name"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_characteristic"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["product_family_codename"] is None
+    # CP16 (§4.4) — 3 new MAP entries flow through the dict (new pattern_types).
+    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_manufacturer_id"] == "ble_manufacturer_id"
+    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["drone_id_prefix"] == "drone_id_prefix"
+    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["wifi_aware_service_name"] == "wifi_aware_service_name"
+    # CP16 (§4.4) — 12 new DROPPED entries live in DROPPED_REASONS with bin
+    # labels matching identifier_type names (consistent with the legacy
+    # ble_local_name / ble_characteristic / product_family_codename pattern).
+    for k in DROPPED_REASONS:
+        assert DROPPED_REASONS[k] == k
 
 
 def test_severity_field_dropped_from_export_shape_per_cp8() -> None:
