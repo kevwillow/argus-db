@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 97,
+  "pre_active_count": 514,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -1622,6 +1622,282 @@
   ],
   "vendor_corroboration": [
     {
+      "canonical_name": "A2Z",
+      "aliases_used": [
+        "A2Z"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "ABZ Innovation",
+      "aliases_used": [
+        "ABZ Innovation"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "ACSL",
+      "aliases_used": [
+        "ACSL"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Aero Systems West",
+      "aliases_used": [
+        "Aero Systems West"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Aerobits",
+      "aliases_used": [
+        "Aerobits"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Aeroo",
+      "aliases_used": [
+        "Aeroo"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Aerostar Dynamics",
+      "aliases_used": [
+        "Aerostar Dynamics"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "AgEagle (senseFly)",
+      "aliases_used": [
+        "AgEagle (senseFly)"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 7
+    },
+    {
+      "canonical_name": "Airobotics",
+      "aliases_used": [
+        "Airobotics"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Amazon Prime Air",
+      "aliases_used": [
+        "Amazon Prime Air"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Antigravity",
+      "aliases_used": [
+        "Antigravity"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Anzu Robotics",
+      "aliases_used": [
+        "Anzu Robotics"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Apple, Inc.",
+      "aliases_used": [
+        "Apple, Inc."
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Applied Aeronautics",
+      "aliases_used": [
+        "Applied Aeronautics"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 1,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Arcsky",
+      "aliases_used": [
+        "Arcsky"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Ascent AeroSystems",
+      "aliases_used": [
+        "Ascent AeroSystems"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Ascent AeroSystems Inc",
+      "aliases_used": [
+        "Ascent AeroSystems Inc"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Atom UAV",
+      "aliases_used": [
+        "Atom UAV"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Atom UAV (OEM)",
+      "aliases_used": [
+        "Atom UAV (OEM)"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Aurelia",
+      "aliases_used": [
+        "Aurelia"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 1,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 11
+    },
+    {
+      "canonical_name": "Aurora Flight Sciences",
+      "aliases_used": [
+        "Aurora Flight Sciences"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Autel Robotics",
+      "aliases_used": [
+        "Autel Robotics"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 28,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 20
+    },
+    {
+      "canonical_name": "Avidrone",
+      "aliases_used": [
+        "Avidrone"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
       "canonical_name": "Avigilon",
       "aliases_used": [
         "Avigilon"
@@ -1660,12 +1936,217 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "BRINC",
+      "aliases_used": [
+        "BRINC",
+        "BRINC Drones"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 97,
+      "deployment_observations_count": 23,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Black Swift Technologies",
+      "aliases_used": [
+        "Black Swift Technologies"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 1,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 4
+    },
+    {
+      "canonical_name": "Blackswift Technologies",
+      "aliases_used": [
+        "Blackswift Technologies"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "BlueMark",
+      "aliases_used": [
+        "BlueMark"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 11
+    },
+    {
+      "canonical_name": "Broadcast",
+      "aliases_used": [
+        "Broadcast"
+      ],
+      "fcc_grantees_count": 64,
+      "procurement_records_count": 1,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Broadcast Module",
+      "aliases_used": [
+        "Broadcast Module"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Bwine",
+      "aliases_used": [
+        "Bwine"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 5
+    },
+    {
+      "canonical_name": "C100",
+      "aliases_used": [
+        "C100"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "CHCNAV",
+      "aliases_used": [
+        "CHCNAV"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Caelone 01",
+      "aliases_used": [
+        "Caelone 01"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Camflite",
+      "aliases_used": [
+        "Camflite"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 8
+    },
+    {
       "canonical_name": "Cellebrite",
       "aliases_used": [
         "Cellebrite"
       ],
       "fcc_grantees_count": 0,
       "procurement_records_count": 1868,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Censys Technologies",
+      "aliases_used": [
+        "Censys Technologies"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Cider Copter",
+      "aliases_used": [
+        "Cider Copter"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Cinnamon Drones",
+      "aliases_used": [
+        "Cinnamon Drones"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Commaris",
+      "aliases_used": [
+        "Commaris"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Contixo Inc.",
+      "aliases_used": [
+        "Contixo Inc."
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Coretronic Intelligent Robotics Corporation",
+      "aliases_used": [
+        "Coretronic Intelligent Robotics Corporation"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -1686,6 +2167,18 @@
       "active_identifier_count": 2
     },
     {
+      "canonical_name": "DIY-D LLC",
+      "aliases_used": [
+        "DIY-D LLC"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "DJI",
       "aliases_used": [
         "DJI",
@@ -1696,7 +2189,31 @@
       "deployment_observations_count": 750,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 14
+      "active_identifier_count": 65
+    },
+    {
+      "canonical_name": "DMR Technologies",
+      "aliases_used": [
+        "DMR Technologies"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "DeltaQuad",
+      "aliases_used": [
+        "DeltaQuad"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
     },
     {
       "canonical_name": "Digital Receiver Technology",
@@ -1714,6 +2231,222 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Draganfly Innovations",
+      "aliases_used": [
+        "Draganfly Innovations"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 8,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Drone Defence",
+      "aliases_used": [
+        "Drone Defence"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Drone Volt",
+      "aliases_used": [
+        "Drone Volt"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Drone-Clone Xperts",
+      "aliases_used": [
+        "Drone-Clone Xperts"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Dronetag",
+      "aliases_used": [
+        "Dronetag"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 5
+    },
+    {
+      "canonical_name": "Dunlevy Consulting",
+      "aliases_used": [
+        "Dunlevy Consulting"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "ELIOS 3 UAV",
+      "aliases_used": [
+        "ELIOS 3 UAV"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "EVO Lite",
+      "aliases_used": [
+        "EVO Lite"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "EXO",
+      "aliases_used": [
+        "EXO"
+      ],
+      "fcc_grantees_count": 19,
+      "procurement_records_count": 1,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Elsight Ltd.",
+      "aliases_used": [
+        "Elsight Ltd."
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Event38 Unmanned Systems",
+      "aliases_used": [
+        "Event38 Unmanned Systems"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Exedy Drones",
+      "aliases_used": [
+        "Exedy Drones"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Explorer",
+      "aliases_used": [
+        "Explorer"
+      ],
+      "fcc_grantees_count": 2,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "FACEGLE",
+      "aliases_used": [
+        "FACEGLE"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "FIMI X8 SE 2022 Drone",
+      "aliases_used": [
+        "FIMI X8 SE 2022 Drone"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "FIMI X8 Tele Drone",
+      "aliases_used": [
+        "FIMI X8 Tele Drone"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Field",
+      "aliases_used": [
+        "Field"
+      ],
+      "fcc_grantees_count": 47,
+      "procurement_records_count": 2,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Flightwave",
+      "aliases_used": [
+        "Flightwave"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Flock Safety",
       "aliases_used": [
         "Flock Safety",
@@ -1725,6 +2458,54 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 33
+    },
+    {
+      "canonical_name": "Flytrex",
+      "aliases_used": [
+        "Flytrex"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Fotokite",
+      "aliases_used": [
+        "Fotokite"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 3,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "FrSky",
+      "aliases_used": [
+        "FrSky"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Freefly Systems",
+      "aliases_used": [
+        "Freefly Systems"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
     },
     {
       "canonical_name": "Genetec",
@@ -1751,6 +2532,30 @@
       "active_identifier_count": 2
     },
     {
+      "canonical_name": "Gleesfun",
+      "aliases_used": [
+        "Gleesfun"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Global Drone",
+      "aliases_used": [
+        "Global Drone"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
       "canonical_name": "Harris",
       "aliases_used": [
         "Harris",
@@ -1762,6 +2567,90 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
       "active_identifier_count": 5
+    },
+    {
+      "canonical_name": "Harris Aerial",
+      "aliases_used": [
+        "Harris Aerial"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 1,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Heilongjiang Huida Technology Co., Ltd",
+      "aliases_used": [
+        "Heilongjiang Huida Technology Co., Ltd"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Holy Stone",
+      "aliases_used": [
+        "Holy Stone"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 12
+    },
+    {
+      "canonical_name": "Holyton",
+      "aliases_used": [
+        "Holyton"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Hoverfly Technologies",
+      "aliases_used": [
+        "Hoverfly Technologies"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Hylio",
+      "aliases_used": [
+        "Hylio"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 9
+    },
+    {
+      "canonical_name": "Inspired Flight",
+      "aliases_used": [
+        "Inspired Flight"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
     },
     {
       "canonical_name": "Jacobs",
@@ -1802,6 +2691,114 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "LISHI",
+      "aliases_used": [
+        "LISHI"
+      ],
+      "fcc_grantees_count": 9,
+      "procurement_records_count": 1,
+      "deployment_observations_count": 1,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Leica Geosystems AG",
+      "aliases_used": [
+        "Leica Geosystems AG"
+      ],
+      "fcc_grantees_count": 2,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Light Quadcopter UAV",
+      "aliases_used": [
+        "Light Quadcopter UAV"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 4
+    },
+    {
+      "canonical_name": "Lucid Bots",
+      "aliases_used": [
+        "Lucid Bots"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Lumenier",
+      "aliases_used": [
+        "Lumenier"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Matternet",
+      "aliases_used": [
+        "Matternet"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Meteodrone",
+      "aliases_used": [
+        "Meteodrone"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "MicroFlight Inc",
+      "aliases_used": [
+        "MicroFlight Inc"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Microdrones",
+      "aliases_used": [
+        "Microdrones"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 4
+    },
+    {
       "canonical_name": "Motorola Solutions",
       "aliases_used": [
         "Motorola Solutions",
@@ -1818,6 +2815,30 @@
       "active_identifier_count": 10
     },
     {
+      "canonical_name": "NewBeeDrone",
+      "aliases_used": [
+        "NewBeeDrone"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "PARROT",
+      "aliases_used": [
+        "PARROT"
+      ],
+      "fcc_grantees_count": 7,
+      "procurement_records_count": 49,
+      "deployment_observations_count": 14,
+      "council_minutes_matters_count": 2,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
       "canonical_name": "Parrot",
       "aliases_used": [
         "Parrot"
@@ -1830,11 +2851,227 @@
       "active_identifier_count": 5
     },
     {
+      "canonical_name": "Percepto",
+      "aliases_used": [
+        "Percepto"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 6
+    },
+    {
+      "canonical_name": "Percepto AirMax",
+      "aliases_used": [
+        "Percepto AirMax"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 14
+    },
+    {
+      "canonical_name": "Phoenix UAS",
+      "aliases_used": [
+        "Phoenix UAS"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Pierce Aerospace",
+      "aliases_used": [
+        "Pierce Aerospace"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Potensic",
+      "aliases_used": [
+        "Potensic"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "PrecisionVision",
+      "aliases_used": [
+        "PrecisionVision"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Pyka",
+      "aliases_used": [
+        "Pyka"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Quadcopter",
+      "aliases_used": [
+        "Quadcopter"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Quantum-Systems",
+      "aliases_used": [
+        "Quantum-Systems"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 5
+    },
+    {
+      "canonical_name": "Rainmaker",
+      "aliases_used": [
+        "Rainmaker"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "RigiTech",
+      "aliases_used": [
+        "RigiTech"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Ruko",
+      "aliases_used": [
+        "Ruko"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 17
+    },
+    {
+      "canonical_name": "SHANGHENG",
+      "aliases_used": [
+        "SHANGHENG"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "SJRC",
+      "aliases_used": [
+        "SJRC"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 13
+    },
+    {
+      "canonical_name": "SKYFISH",
+      "aliases_used": [
+        "SKYFISH"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "SPECTA",
+      "aliases_used": [
+        "SPECTA"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Sentera",
+      "aliases_used": [
+        "Sentera"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Septier",
       "aliases_used": [
         "Septier"
       ],
       "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "ShenZhen C-Fly Intelligent Technology Co.,Ltd",
+      "aliases_used": [
+        "ShenZhen C-Fly Intelligent Technology Co.,Ltd"
+      ],
+      "fcc_grantees_count": 2,
       "procurement_records_count": 0,
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
@@ -1856,6 +3093,30 @@
       "active_identifier_count": 6
     },
     {
+      "canonical_name": "SkyRanger / SkyRaider",
+      "aliases_used": [
+        "SkyRanger / SkyRaider"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "SkySpecs",
+      "aliases_used": [
+        "SkySpecs"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 4
+    },
+    {
       "canonical_name": "Skydio",
       "aliases_used": [
         "Skydio"
@@ -1865,7 +3126,43 @@
       "deployment_observations_count": 21,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
+      "active_identifier_count": 5
+    },
+    {
+      "canonical_name": "Skyfront",
+      "aliases_used": [
+        "Skyfront"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
       "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "SmartDrone",
+      "aliases_used": [
+        "SmartDrone"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Sony",
+      "aliases_used": [
+        "Sony"
+      ],
+      "fcc_grantees_count": 9,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
     },
     {
       "canonical_name": "SoundThinking",
@@ -1881,6 +3178,210 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Spektrum",
+      "aliases_used": [
+        "Spektrum"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Sunflower Labs",
+      "aliases_used": [
+        "Sunflower Labs"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "SwellPro",
+      "aliases_used": [
+        "SwellPro"
+      ],
+      "fcc_grantees_count": 2,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 2,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Swoop Aero",
+      "aliases_used": [
+        "Swoop Aero"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "TRIPLEFINE",
+      "aliases_used": [
+        "TRIPLEFINE"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Talos Drones",
+      "aliases_used": [
+        "Talos Drones"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Teal Drones",
+      "aliases_used": [
+        "Teal Drones"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 1,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Tofect",
+      "aliases_used": [
+        "Tofect"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "TopXGun",
+      "aliases_used": [
+        "TopXGun"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Triad Drones",
+      "aliases_used": [
+        "Triad Drones"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Tucok",
+      "aliases_used": [
+        "Tucok"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "UAS",
+      "aliases_used": [
+        "UAS"
+      ],
+      "fcc_grantees_count": 17,
+      "procurement_records_count": 4,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Veeniix",
+      "aliases_used": [
+        "Veeniix"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 4
+    },
+    {
+      "canonical_name": "Vesper UAS",
+      "aliases_used": [
+        "Vesper UAS"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Vision Aerial",
+      "aliases_used": [
+        "Vision Aerial"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Voliro",
+      "aliases_used": [
+        "Voliro"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "WISPR",
+      "aliases_used": [
+        "WISPR"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 7
+    },
+    {
       "canonical_name": "WatchGuard",
       "aliases_used": [
         "WatchGuard",
@@ -1892,6 +3393,198 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Watts Innovations",
+      "aliases_used": [
+        "Watts Innovations"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 4
+    },
+    {
+      "canonical_name": "Wing Aviation LLC",
+      "aliases_used": [
+        "Wing Aviation LLC"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 4
+    },
+    {
+      "canonical_name": "Wingtra",
+      "aliases_used": [
+        "Wingtra"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 2,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Workhorse Aero",
+      "aliases_used": [
+        "Workhorse Aero"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "XAG",
+      "aliases_used": [
+        "XAG"
+      ],
+      "fcc_grantees_count": 6,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 5
+    },
+    {
+      "canonical_name": "XM2 Labs",
+      "aliases_used": [
+        "XM2 Labs"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "XPECE",
+      "aliases_used": [
+        "XPECE"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "XUNTONG",
+      "aliases_used": [
+        "XUNTONG"
+      ],
+      "fcc_grantees_count": 5,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "XiL",
+      "aliases_used": [
+        "XiL"
+      ],
+      "fcc_grantees_count": 9,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "ZERO ZERO ROBOTICS",
+      "aliases_used": [
+        "ZERO ZERO ROBOTICS"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Zephyr Systems",
+      "aliases_used": [
+        "Zephyr Systems"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "Zing Drone Solutions",
+      "aliases_used": [
+        "Zing Drone Solutions"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Zipline",
+      "aliases_used": [
+        "Zipline"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "blueflite",
+      "aliases_used": [
+        "blueflite"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
+      "canonical_name": "idME",
+      "aliases_used": [
+        "idME"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "uAvionix",
+      "aliases_used": [
+        "uAvionix"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
     }
   ],
   "drop_tally_standard": {
@@ -1899,7 +3592,7 @@
     "confidence_floor": 30,
     "drop_pi_self_exclude": false,
     "bins": {
-      "unknown_category": 44,
+      "unknown_category": 46,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
@@ -1910,8 +3603,8 @@
       "ble_characteristic": 3,
       "product_family_codename": 14
     },
-    "survivors": 28,
-    "reconciles": 97,
+    "survivors": 443,
+    "reconciles": 514,
     "drop_assignments": {
       "413": "unknown_category",
       "414": "unknown_category",
@@ -1981,7 +3674,9 @@
       "562": "ssid_pattern",
       "563": "ssid_pattern",
       "564": "ble_local_name",
-      "565": "ble_local_name"
+      "565": "ble_local_name",
+      "567": "unknown_category",
+      "568": "unknown_category"
     }
   },
   "drop_tally_high_confidence": {
@@ -1989,7 +3684,7 @@
     "confidence_floor": 70,
     "drop_pi_self_exclude": true,
     "bins": {
-      "unknown_category": 44,
+      "unknown_category": 46,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 16,
@@ -2000,8 +3695,8 @@
       "ble_characteristic": 3,
       "product_family_codename": 14
     },
-    "survivors": 12,
-    "reconciles": 97,
+    "survivors": 427,
+    "reconciles": 514,
     "drop_assignments": {
       "1": "below_confidence_threshold",
       "413": "unknown_category",
@@ -2087,7 +3782,9 @@
       "563": "ssid_pattern",
       "564": "ble_local_name",
       "565": "ble_local_name",
-      "566": "below_confidence_threshold"
+      "566": "below_confidence_threshold",
+      "567": "unknown_category",
+      "568": "unknown_category"
     }
   },
   "halts": []
