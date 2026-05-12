@@ -1237,3 +1237,70 @@ Phase-1 verification report at MAC-63 [`7642f54a`](/MAC/issues/MAC-63#comment-76
 ### §11 #11 self-binding satisfied
 
 This entry is itself the §11 #11 amendment-log pairing for the §8.2 edits in this coordinated commit. Bible HEAD bumps from `9c31603` (post-MAC-63-Wave-A state) to the CP15 coordinated commit landed alongside this entry. Schema-sibling migration 0015 is the next deliverable (Phase-3 dispatch), tracking the CP15 amendment's contract with the database schema.
+
+---
+
+## Correction Pass 16 — §4.4 Lynceus mapping for CP14 identifier_type cluster
+
+**Date:** 2026-05-12
+**Source:** [MAC-75](/MAC/issues/MAC-75) CP16 dispatch. Trigger: MAC-63 Phase 5 HALT (CP14→§4.4 downstream-consumer gap; second post-memo recurrence of the bible-amendment-downstream-consumer-update pattern after CP12→CP13 + CP13→MAC-57). Six-phase verify-and-halt dispatch under fresh CEO §11 #11 delegation 2026-05-12. Phase ratifications at: Phase 1 [`ee60c712`](/MAC/issues/MAC-75#comment-ee60c712-fcef-4795-a1ac-8727e70b8045), Phase 2 [`5b9212ce`](/MAC/issues/MAC-75#comment-5b9212ce-5276-4fb6-9bd7-dae62d2e53f3), Phase 3 [`369cb7c7`](/MAC/issues/MAC-75#comment-369cb7c7-269d-48fe-a0b6-e2d5cd369a15), Phase 4 [`dbfb5da6`](/MAC/issues/MAC-75#comment-dbfb5da6-a3a2-4434-99d7-da9b46d9acd8).
+**Authority:** Fresh CEO §11 #11 delegation 2026-05-12 (MAC-75 wake comment [`017df17b`](/MAC/issues/MAC-75#comment-017df17b-1798-4606-bdae-5723bdb7ef25)).
+**Bible commit:** PROJECT_BIBLE.md §4.4 (15 new mapping rows + 3 new pattern_type introductions + architectural-separation paragraph) + BIBLE_AMENDMENTS.md CP16 entry (this entry) + bible-amendment draft moved from `raw/wave_a/_bible_amendment_cp16_lynceus_mapping_draft_2026-05-12.md` to `bible/history/cp16/`. Single coordinated commit titled "CP16: §4.4 Lynceus mapping for CP14 identifier_type cluster".
+**Code-sibling commit (paired, second commit per CP14/CP15 precedent):** `db/validation/export_lynceus.py` (3 MAP dict additions + new `DROPPED_REASONS` dict + new `_classify_row` branch + `bins` initializer expansion + `fmt_bin_table` rendering expansion + `mac_range` stale-comment refresh) + `tests/test_export_lynceus.py` (union-assertion + structural-invariant + new MAP/DROPPED assertions) + `feedback_bible_amendment_downstream_consumer_audit.md` (memory-rule strengthening: S.1 case-study + S.2 + S.3 + S.4 + S.5 + S.6). Code-patch draft retired from `db/validation/_drafts/` (first instance of code-patch staging mirroring `db/migrations/_drafts/` shape per new memo S.5). Commit titled "chore(export): CP16 Lynceus mapping coordinated patch + memory-rule strengthening".
+**Binds:** Export Worker (§7.5 — 3 new pattern_type values + 12 DROPPED-reason buckets in coverage report; runtime aggregation/reconciliation surfaces extended), Validator (§11 #7 promotion-cycle-2 sweep of 417 HOLD candidates now unblocked post-CP16), Lynceus integration team (independent sequencing of the 3 new pattern_types into v0.4+ scanner-config schema; consumer-carries-capability-state posture explicit).
+
+### Why this Correction Pass exists
+
+CP14 added 15 new `identifier_type` enum values via migrations 0011/0013/0014 but did NOT update §4.4 Lynceus mapping or `IDENTIFIER_TYPE_TO_PATTERN_TYPE` in lockstep. The feedback memo codifying parallel-sibling-commit discipline existed (authored after CP12→CP13 schema gap; refined after CP13→MAC-57 export gap), but the CP14 batch missed it — the discipline rule lived in memory but did not propagate into dispatch templates as an explicit phase. MAC-63 Phase-5 export-regen attempt 2026-05-11 surfaced the gap on the 417-row promotion-cycle-2 candidate batch (Apple `0x004C` + XUNTONG `0x09C8` + FAA RID 415 drone_id_prefix). CP16 closes the gap and strengthens the memo with explicit dispatch-checkpoint language (S.1), cumulative-full-enum audit sub-rule (S.2), recurrence-count audit trail (S.3), composition discipline (S.4), code-patch staging shape (S.5), and architectural-absorption sub-rule (S.6).
+
+### Items
+
+1. **§4.4 Lynceus mapping table** — 15 new rows in CP14 migration-source order (0011 → 0013 cluster → 0014). 3 MAP cases introduce new `pattern_type` values: `ble_manufacturer_id` (BLE adv manuf_data parsing), `drone_id_prefix` (Remote ID across WiFi NAN/Beacon/BLE Legacy 4.x; BLE5 LE Coded PHY capability boundary documented), `wifi_aware_service_name` (capability-gated by Lynceus NAN support; consumer-carries-state posture). 12 DROPPED cases carry explicit hardware/architectural rationale + upgrade-path-X-unlocks framing where applicable (current-hardware-not-permanent posture).
+2. **Architectural-separation paragraph** in §4.4 — explicit "Argus and Lynceus are parallel tracks, not a serial dependency" statement; runtime match coverage gated by Lynceus's track separately from Argus's apply-time export. Addresses the framing concern surfaced at Phase-3 ratification by board addition of self-review item #6.
+3. **Code-sibling patch (export_lynceus.py)** — 3 new dict entries for MAP types; new `DROPPED_REASONS` dict for the 12 DROPPED types; one new `_classify_row` branch keyed on `DROPPED_REASONS`. Existing 6 legacy DROPPED branches preserved (stable, working). `bins` dict initializer (line 584 region) and `fmt_bin_table` bin_rows tuple (line 681 region) extended with 12 new bin labels — Phase-4 dry-run caught the Phase-3 architectural-absorption claim that "no code change needed" was wrong; revisions A applied. `mac_range` stale "HB36" comment refreshed in-pass per Phase 2 board direction `5b9212ce`.
+4. **Test-fixture sibling update (test_export_lynceus.py)** — `test_type_mapping_covers_every_identifier_type` rewritten to assert `set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()) | set(DROPPED_REASONS.keys())` covers the full 27-value post-CP14 enum + structural-invariant that the two surfaces don't overlap. `test_type_mapping_drops_match_44_verbatim` extended with assertions on the 3 new MAP entries + all DROPPED_REASONS bin labels. Phase-4 audit-trail note: this test existed at CP13 and would have caught the CP14 §4.4 gap at apply time if anyone had run it; the strengthened memo's S.1 + new S.1 case-study sub-rule cite this concrete case for future dispatches.
+5. **Memory rule strengthening (feedback_bible_amendment_downstream_consumer_audit.md)**:
+   - **S.1** Explicit dispatch-checkpoint language — every CP/SAR adding values to a field with downstream consumers MUST include a "downstream-consumer audit" phase by name in the dispatch §2 phase breakdown, verify-and-halt before apply.
+   - **S.1 case-study sub-rule** (board-requested at Phase 4 ratification `dbfb5da6`) — concrete case study citing `tests/test_export_lynceus.py:99-115`'s CP13-hardcoded 12-key assertion as the CP14 fixture-side miss that would have caught the §4.4 gap. Abstract rules get violated; case-study rules stick.
+   - **S.2** Cumulative-audit-runs-against-FULL-enum — the audit checks the ENTIRE field's value set, not just the CP's new additions; affirmative "clean beyond [CP-N]" anchor or explicit latent-gap list. Phase 2 of MAC-75 produced the first such anchor ("clean beyond CP14 additions").
+   - **S.3** Recurrence-count audit trail with dual-framing (post-memo count = 2 per board direction; full historical count = 3 preserved for audit-trail).
+   - **S.4** Composition discipline with Validator-side companion memo + cumulative-CHECK-enum memo.
+   - **S.5** Code-patch staging shape — `<code-module>/_drafts/<patch>.<ext>.draft` for sibling code patches, mirroring `db/migrations/_drafts/`. `db/validation/_drafts/` introduced by CP16 is the first instance.
+   - **S.6** Architectural-absorption sub-rule (board-requested at Phase 4 ratification `dbfb5da6`) — claims about "X composes naturally with new Y without code changes" require runtime exercise against actual data, not just static-analysis confirmation. Common blind spot: the data structure under a composable loop may itself be enumerated exhaustively elsewhere. CP16 Phase-3 architectural-validation claim about `_reconcile()` was wrong because Phase 3 didn't dry-run; Phase 4 dry-run caught it. Pre-Phase-5 dispatches that make architectural-absorption claims now require Phase-4-style runtime exercise.
+
+### Discipline-strengthening
+
+The codified memory rule (post-MAC-55) caught CP13→MAC-57 retroactively but did not prevent CP14's recurrence at dispatch-design time. CP16's S.1+S.6 strengthening adds:
+- Dispatch-template checkpoint language so future dispatches enumerate §4.4 + IDENTIFIER_TYPE_TO_PATTERN_TYPE + relevant test fixtures + relevant hardcoded-enumeration surfaces as an explicit phase.
+- Cumulative-full-enum sub-rule catches any latent earlier-CP gaps the rule missed retroactively.
+- Concrete case study (S.1 sub-rule) makes the test-fixture audit memorable rather than abstract.
+- Architectural-absorption sub-rule (S.6) prevents Phase-3-style over-ratification of composability claims without runtime evidence.
+- Second post-memo recurrence is the trigger for this strengthening; if S.1+S.6 work as designed, recurrence count stays at 2 going forward.
+
+### Resolved §12 questions
+
+None directly. CP16 closes the operational finding logged by MAC-63 G-18 (CP14→§4.4 mapping gap) but the finding was not a §12 open question.
+
+### New open §12 questions
+
+None. Phase 1 audit's 3 pause-for-human flags were ratified without surfacing new §12-class structural questions; Phase 2 cumulative audit confirmed no latent §4.4 surfaces are open post-CP16.
+
+### §11 hard-rule discipline
+
+- **§11 #1 (no fabrication)** — every DROPPED row has explicit hardware / architectural / sub-protocol rationale; no "out of scope" placeholders. Every MAP row names the canonical match-surface mechanism.
+- **§11 #11 (coordinated commit)** — bible + amendment log + draft move land in commit 1 (this entry); code patch + test update + memo strengthening + code-patch-draft retirement land in commit 2 (paired sibling commit per CP14/CP15 precedent).
+- **§11 #12 / §11 #13** — unchanged. CP16's type-level DROPPED-with-reason composes with row-level §11 #13 unknown-category carveout; both fire independently at export time. §11 #12 operator-stack self-exclude applies orthogonally on OUI / VID:PID rows.
+
+### Sequencing post-acceptance
+
+1. **CP16 ratifies at this commit + paired code-sibling commit.** Bible HEAD bumps from `3b37e69` (post-CP15 + migration 0016 LICENSE column) to the CP16 commit.
+2. **Promotion-cycle-2 unblocked** — MAC-63 Phase 6/7 can resume on a separate dispatch. 417 candidates (415 FAA RID `drone_id_prefix` + Apple `0x004C` + XUNTONG `0x09C8`) become promotion-eligible at conf=85 single-source under post-CP15 `primary_registry` band + post-CP16 §4.4 disposition. Predicted post-CP16 high-confidence Lynceus export delta: +417 entries (each `device_category ≠ 'unknown'` per §11 #13; FAA RID rows = `drone`, SIG company-ID rows = TBD per row analysis — XUNTONG/Apple at `device_category='unknown'` per CP15 §11 #13 carveout would NOT ride high-conf export; FAA RID 415 at `device_category='drone'` would).
+3. **Lynceus integration sequencing** — independent of Argus-side timing. Lynceus team adds `ble_manufacturer_id` / `drone_id_prefix` / `wifi_aware_service_name` to v0.4+ scanner-config schema at their own pace. Argus-side export ships unconditionally with the new pattern_types per consumer-carries-capability-state posture.
+
+### Why a Correction Pass, not a SAR
+
+§4.4 mapping table edit + new architectural-separation paragraph + sibling code patch + sibling test update all touch bible §-text and downstream-consumer code surfaces. CP-class is the right framing per CP11/CP12/CP13/CP14/CP15 precedent for coordinated bible §-text + sibling-implementation amendments. SAR is reserved for interpretive sub-agent rules without bible §-text change.
+
+### §11 #11 self-binding satisfied
+
+This CP16 entry is the §11 #11 amendment-log pairing for the §4.4 amendment in the coordinated commit. Bible HEAD bumps from `3b37e69` (post-CP15 + migration 0016) to the CP16 commit landed alongside this entry. Schema-version unchanged (CP16 is a mapping-table + code-patch CP, not a schema CP).
