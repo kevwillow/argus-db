@@ -475,8 +475,8 @@ def _stage_deployment_observations(
         "source_id, extraction_run_id, source_url, source_row_key, "
         "agency_name, agency_type, juris_type, city, county, state, country, "
         "lat, lon, technology_category, vendor_raw, citation_url, "
-        "source_excerpt, notes"
-        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "source_excerpt, notes, license"
+        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
 
     def _flush() -> None:
@@ -545,6 +545,7 @@ def _stage_deployment_observations(
                 r.link1 or None,          # citation_url = per-row Link 1
                 excerpt,
                 notes,
+                "CC-BY-NC-SA-4.0",        # license — EFF Atlas upstream license (migration 0016)
             )
         )
 
