@@ -266,7 +266,7 @@ def test_single_row_active_set(conn: sqlite3.Connection) -> None:
     conn.commit()
     report = run_coverage_matrix(conn)
     assert report.pre_active_count == 1
-    assert len(report.cells) == 12 * 12
+    assert len(report.cells) == len(DEVICE_CATEGORIES) * len(IDENTIFIER_TYPES)
     non_empty = [c for c in report.cells if c.n > 0]
     assert len(non_empty) == 1
     cell = non_empty[0]

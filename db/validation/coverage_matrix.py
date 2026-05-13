@@ -99,7 +99,49 @@ IDENTIFIER_TYPES: tuple[str, ...] = (
     "ble_local_name",
     "ble_characteristic",
     "product_family_codename",
+    # CP16 (§4.4) — CP14 identifier_type cluster (migrations 0011/0013/0014).
+    # 3 MAP entries (new pattern_types) + 12 DROPPED-with-reason entries.
+    # Coverage_matrix lag from sibling commit a4bc7b9 (export_lynceus.py CP16
+    # patch) caught by MAC-92 Wave-B Phase-B dry-run when first CP16 rows
+    # landed via Phase-A promotion. Same architectural-absorption gap class
+    # as commit a4bc7b9's Phase-3-claim correction.
+    "ble_manufacturer_id",          # MAP
+    "drone_id_prefix",              # MAP
+    "wifi_aware_service_name",      # MAP
+    "icao_24bit_address",           # DROPPED
+    "rf_channel",                   # DROPPED
+    "burst_cadence_ms",             # DROPPED
+    "bandwidth_mhz",                # DROPPED
+    "device_class_id",              # DROPPED
+    "rf_burst_duration",            # DROPPED
+    "rf_protocol_constant",         # DROPPED
+    "wifi_ie_element_id",           # DROPPED
+    "bluetooth_le_pdu_type",        # DROPPED
+    "wifi_frame_control_subtype",   # DROPPED
+    "wifi_nan_param_signature",     # DROPPED
+    "alpr_model",                   # DROPPED
 )
+
+
+# CP16 (§4.4) — DROPPED-with-reason lookup mirroring export_lynceus.py
+# DROPPED_REASONS dict. Identifier_type → bin label (one-to-one). Used by
+# `_assign_drop_bin` so coverage_matrix.py and export_lynceus.py classify
+# CP14-cluster rows identically — the canonical-chain reconciliation gate
+# in `db/validation/export_lynceus.py::_reconcile` relies on this parity.
+DROPPED_REASONS: dict[str, str] = {
+    "icao_24bit_address": "icao_24bit_address",
+    "rf_channel": "rf_channel",
+    "burst_cadence_ms": "burst_cadence_ms",
+    "bandwidth_mhz": "bandwidth_mhz",
+    "device_class_id": "device_class_id",
+    "rf_burst_duration": "rf_burst_duration",
+    "rf_protocol_constant": "rf_protocol_constant",
+    "wifi_ie_element_id": "wifi_ie_element_id",
+    "bluetooth_le_pdu_type": "bluetooth_le_pdu_type",
+    "wifi_frame_control_subtype": "wifi_frame_control_subtype",
+    "wifi_nan_param_signature": "wifi_nan_param_signature",
+    "alpr_model": "alpr_model",
+}
 
 # §8.2 confidence-band ceilings — annotation reference only (no mutations).
 SOURCE_TYPE_CEILINGS: dict[str, int] = {
@@ -193,8 +235,8 @@ class DropBinTally:
     Each row is assigned to AT MOST one bin (priority order: procurement_only
     > unknown_category > device_fingerprint > ssid_pattern > ble_local_name
     > ble_characteristic > product_family_codename > oversized_mac_range >
-    self_exclude_oui > below_confidence_threshold). Survivors → eligible for
-    export.
+    {CP16 12 DROPPED-class types in DROPPED_REASONS} > self_exclude_oui >
+    below_confidence_threshold). Survivors → eligible for export.
     """
 
     file_label: str
@@ -211,6 +253,11 @@ class DropBinTally:
     ble_local_name: int
     ble_characteristic: int
     product_family_codename: int
+    # CP16 (§4.4) — CP14 identifier_type cluster DROPPED-class types.
+    # Bin keys mirror DROPPED_REASONS verbatim so `_drop_tally_to_dict`
+    # produces a `bins` dict that reconciles 1:1 against export_lynceus.py's
+    # `dropped_in_export` block.
+    cp16_dropped: dict[str, int]
     survivors: int
     drop_assignments: dict[int, str]  # row_id → bin name (only dropped rows)
 
@@ -441,6 +488,12 @@ def _assign_drop_bin(
         and mac_range_size(row.identifier) > MAC_RANGE_EXPANSION_CEILING
     ):
         return "oversized_mac_range"
+    # CP16 (§4.4) — CP14-cluster DROPPED-class types. Branch placement mirrors
+    # `db/validation/export_lynceus.py::_classify_row` (after the 6 legacy
+    # DROPPED branches, before the Pi self-exclude branch). DROPPED_REASONS
+    # values are the bin labels.
+    if row.identifier_type in DROPPED_REASONS:
+        return DROPPED_REASONS[row.identifier_type]
     if drop_pi_self_exclude and matches_pi_self_exclude(
         row.identifier, row.identifier_type
     ):
@@ -470,6 +523,11 @@ def _compute_drop_tally(
         "ble_characteristic": 0,
         "product_family_codename": 0,
     }
+    # CP16 (§4.4) — CP14 identifier_type cluster DROPPED-class types
+    # initialized to zero (per-bin presence required for the bins-dict
+    # increment in the loop below + reconciliation against export_lynceus.py).
+    for cp16_bin in DROPPED_REASONS.values():
+        bins[cp16_bin] = 0
     drop_assignments: dict[int, str] = {}
     survivors = 0
     for r in rows:
@@ -495,6 +553,7 @@ def _compute_drop_tally(
         ble_local_name=bins["ble_local_name"],
         ble_characteristic=bins["ble_characteristic"],
         product_family_codename=bins["product_family_codename"],
+        cp16_dropped={k: bins[k] for k in DROPPED_REASONS.values()},
         survivors=survivors,
         drop_assignments=drop_assignments,
     )
@@ -520,6 +579,7 @@ def _check_halts(
         + standard.ble_local_name
         + standard.ble_characteristic
         + standard.product_family_codename
+        + sum(standard.cp16_dropped.values())  # CP16 (§4.4) cluster
     )
     if standard_sum + standard.survivors != n:
         halts.append(
@@ -543,6 +603,7 @@ def _check_halts(
         + high_conf.ble_local_name
         + high_conf.ble_characteristic
         + high_conf.product_family_codename
+        + sum(high_conf.cp16_dropped.values())  # CP16 (§4.4) cluster
     )
     if high_conf_sum + high_conf.survivors != n:
         halts.append(
@@ -682,37 +743,28 @@ def report_to_dict(report: CoverageMatrixReport) -> dict:
 
 
 def _drop_tally_to_dict(t: DropBinTally) -> dict:
+    bins: dict[str, int] = {
+        "unknown_category": t.unknown_category,
+        "procurement_only": t.procurement_only,
+        "self_exclude_oui": t.self_exclude_oui,
+        "below_confidence_threshold": t.below_confidence_threshold,
+        "oversized_mac_range": t.oversized_mac_range,
+        "ssid_pattern": t.ssid_pattern,
+        "device_fingerprint": t.device_fingerprint,
+        # CP13 (§4.4) — Wave G analytical-only types.
+        "ble_local_name": t.ble_local_name,
+        "ble_characteristic": t.ble_characteristic,
+        "product_family_codename": t.product_family_codename,
+    }
+    # CP16 (§4.4) — CP14 cluster DROPPED-class bins (12 entries).
+    bins.update(t.cp16_dropped)
     return {
         "file_label": t.file_label,
         "confidence_floor": t.confidence_floor,
         "drop_pi_self_exclude": t.drop_pi_self_exclude,
-        "bins": {
-            "unknown_category": t.unknown_category,
-            "procurement_only": t.procurement_only,
-            "self_exclude_oui": t.self_exclude_oui,
-            "below_confidence_threshold": t.below_confidence_threshold,
-            "oversized_mac_range": t.oversized_mac_range,
-            "ssid_pattern": t.ssid_pattern,
-            "device_fingerprint": t.device_fingerprint,
-            # CP13 (§4.4) — Wave G analytical-only types.
-            "ble_local_name": t.ble_local_name,
-            "ble_characteristic": t.ble_characteristic,
-            "product_family_codename": t.product_family_codename,
-        },
+        "bins": bins,
         "survivors": t.survivors,
-        "reconciles": (
-            t.unknown_category
-            + t.procurement_only
-            + t.self_exclude_oui
-            + t.below_confidence_threshold
-            + t.oversized_mac_range
-            + t.ssid_pattern
-            + t.device_fingerprint
-            + t.ble_local_name
-            + t.ble_characteristic
-            + t.product_family_codename
-            + t.survivors
-        ),
+        "reconciles": sum(bins.values()) + t.survivors,
         "drop_assignments": {str(k): v for k, v in sorted(t.drop_assignments.items())},
     }
 
@@ -776,13 +828,17 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
     lines.append("## §6.1 Coverage matrix (rows × cols)")
     lines.append("")
     lines.append(
-        "Rows = `device_category` enum (12 values, migration 0001 verbatim). "
-        "Cols = `identifier_type` enum (12 values: 9 from migration 0001 + "
-        "3 from migration 0009 / CP13 — `ble_local_name`, `ble_characteristic`, "
-        "`product_family_codename` — Wave G structural fidelity, all "
-        "DROPPED-class for Lynceus). "
-        "Cells show `n` only; per-source-type breakdown + confidence "
-        "distribution in the cell-detail table below."
+        f"Rows = `device_category` enum ({len(DEVICE_CATEGORIES)} values, "
+        f"migration 0001 verbatim). "
+        f"Cols = `identifier_type` enum ({len(IDENTIFIER_TYPES)} values: 9 "
+        f"from migration 0001 + 3 from migration 0009 / CP13 — `ble_local_name`, "
+        f"`ble_characteristic`, `product_family_codename` — Wave G structural "
+        f"fidelity, all DROPPED-class for Lynceus + CP16 cluster from "
+        f"migrations 0011/0013/0014: 3 MAP — `ble_manufacturer_id`, "
+        f"`drone_id_prefix`, `wifi_aware_service_name` — and "
+        f"{len(DROPPED_REASONS)} DROPPED). "
+        f"Cells show `n` only; per-source-type breakdown + confidence "
+        f"distribution in the cell-detail table below."
     )
     lines.append("")
     header = "| device_category \\ identifier_type | " + " | ".join(IDENTIFIER_TYPES) + " | **row total** |"
@@ -945,9 +1001,20 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
             ("`ble_characteristic` (§4.4 CP13)", tally.ble_characteristic),
             ("`product_family_codename` (§4.4 CP13)", tally.product_family_codename),
             ("`oversized_mac_range` (§4.4)", tally.oversized_mac_range),
-            ("`self_exclude_oui` (§8.4 / §11 #12)", tally.self_exclude_oui),
-            ("`below_confidence_threshold` (§7.5)", tally.below_confidence_threshold),
         ]
+        # CP16 (§4.4) — CP14 cluster DROPPED-class bins. Stable insertion
+        # order matches DROPPED_REASONS dict order so the markdown rendering
+        # is deterministic across runs.
+        for cp16_bin in DROPPED_REASONS.values():
+            bins_table.append(
+                (f"`{cp16_bin}` (§4.4 CP16)", tally.cp16_dropped[cp16_bin])
+            )
+        bins_table.extend(
+            [
+                ("`self_exclude_oui` (§8.4 / §11 #12)", tally.self_exclude_oui),
+                ("`below_confidence_threshold` (§7.5)", tally.below_confidence_threshold),
+            ]
+        )
         lines.append("| Bin | Count |")
         lines.append("|---|---|")
         for name, count in bins_table:
