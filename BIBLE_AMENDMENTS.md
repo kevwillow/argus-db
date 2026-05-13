@@ -1431,3 +1431,273 @@ Wave G pre-v1 autonomous static-analysis session 2026-05-10 (MAC-52 [`ddc193cd`]
 ### §11 #11 self-binding satisfied
 
 This CP17 entry is the §11 #11 amendment-log pairing for the §8.2 + SAR-11 + Runbook amendments in the coordinated commit. Bible HEAD bumps from `1fd254a` to the CP17 commit landed alongside this entry. Schema-version unchanged (CP17 is a §-text + SAR-row + runbook + repo-hygiene CP; the `vendor_template_namespace_uuid` schema sibling defers to first-promotion-time per `feedback_enum_amendment_needs_schema_migration_sibling.md` forward-looking-codification caveat).
+
+---
+
+═══════════════════════════════════════════════════════════════════════
+SAR-12 — Dispatch-Preamble Live-State Verification
+═══════════════════════════════════════════════════════════════════════
+
+**Date:** 2026-05-13
+**Codification surface:** BIBLE_AMENDMENTS.md (this entry — canonical) +
+  /home/kev/argus/feedback_s7_dispatch_preamble_live_state_verification.md
+  (ExtractionWorker reference) +
+  /home/kev/.claude/projects/.../memory/feedback_dispatch_preamble_live_state_verification.md
+  (CEO-side reference)
+**Binding scope:** All three actor classes that author dispatches —
+  board, CEO orchestrator, ExtractionWorker (Claude Code).
+**Status:** Acknowledged and approved by board; sibling memos to land
+  post-ratification.
+
+---
+
+## §1 — Rule
+
+Dispatch authoring (board-side, CEO-side, ExtractionWorker-side) MUST
+run a pre-flight live-state verification before asserting any of the
+following classes of fact in dispatch text. The verification result
+MUST be pasted inline in the dispatch text with a timestamp, not
+cited by external reference.
+
+  (a) Baseline row counts
+      e.g., "N staged behavioral_signatures from Wave-A"
+
+  (b) API or schema field names
+      e.g., "documentNumber field in FAA endpoint"
+
+  (c) Enum membership in identifier_type, source_type, or
+      device_category
+      e.g., "§2.1 #14 category name"
+
+  (d) Source completion state
+      e.g., "USAspending is a Wave-C-new source"
+
+  (e) CP / SAR / memo boundary claims
+      e.g., "per CP14", "ratified at SAR-9", "deferred per
+      feedback_X.md caveat"
+
+## §2 — Verification paths per class
+
+Each class has a specific verification path. The verification result
+MUST be pasted inline in the dispatch text, not cited externally.
+Citation can hide stale data; paste with timestamp is reproducible.
+
+  Class (a) — Baseline row counts
+    Path: SELECT COUNT(*) from the live DB against the relevant
+          filter.
+    Paste: count + filter clause + timestamp inline.
+    Example:
+      $ sqlite3 db/argus.db "SELECT COUNT(*) FROM raw_observations
+        WHERE candidate_type='behavioral_signature' AND
+        promotion_status IS NULL;"
+      33
+      (as of 2026-05-13T17:00:00Z)
+
+  Class (b) — API or schema field names
+    Path: Fetch one sample record from the live API; OR inspect
+          the live schema for the table/column.
+    Paste: actual field name + sample value inline.
+    Example:
+      $ curl -s https://uasdoc.faa.gov/api/v1/publicDOCRev/OOP000000046
+        | jq '.publicRevision | keys'
+      ["fccIdentifier","serialNumberDescription","serialNumberEnd",
+       "serialNumberStart", ...]
+      (NOT documentNumber; field name is trackingNumber on the
+       LIST endpoint, serialNumber* on DETAIL)
+
+  Class (c) — Enum membership
+    Path: grep current PROJECT_BIBLE.md and BIBLE_AMENDMENTS.md
+          for the enum definition; verify against any subsequent
+          CP-class extensions.
+    Paste: §-section heading + commit SHA + extracted enum line
+           inline.
+    Example:
+      $ grep -n "device_category" PROJECT_BIBLE.md | head -1
+      112:| `device_category` | TEXT NOT NULL | enum from §2.1
+          (alpr, imsi_catcher, body_cam, police_radio,
+           in_vehicle_router, drone, gunshot_detect, hacking_tool,
+           covert_cam, gps_tracker, face_recog, drone_detect) |
+      (12 values; bible HEAD <commit-SHA>; no §2.1 #14 exists)
+
+  Class (d) — Source completion state
+    Path: Check live sources table + extraction_runs ledger.
+          Convention: a source is "complete" if it has rows in the
+          target table AND has at least one extraction_runs row
+          with status='ok'. Per CEO memo-discipline note dated
+          2026-05-13, "source completion state" requires checking
+          BOTH sources.last_fetched_at (staging signal) AND
+          extraction_runs.started_at (ingestion signal).
+    Paste: source.id + name + last_fetched_at + last extraction_runs
+           row + target table row count inline.
+    Example:
+      $ sqlite3 db/argus.db "SELECT s.id, s.name, s.last_fetched_at,
+        e.started_at, e.records_out FROM sources s LEFT JOIN
+        extraction_runs e ON e.source_id=s.id WHERE s.name LIKE
+        '%USAspending%' ORDER BY e.started_at DESC LIMIT 1;"
+      8 | USAspending federal contracts | 2026-05-04T... |
+        2026-05-04T... | 43483
+      (USAspending = src 8; DONE at 43,483 procurement_records;
+       NOT a Wave-C-new source)
+
+  Class (e) — CP / SAR / memo boundary claims
+    Path: grep BIBLE_AMENDMENTS.md for the CP/SAR entry; grep the
+          filesystem for the cited memo across all relevant agent
+          memory directories.
+    Paste: heading line + on-disk file path inline. If the citation
+           doesn't resolve, paste "MEMO-NOT-FOUND-ON-DISK" or
+           equivalent and surface as a fact-without-verification
+           event before proceeding.
+    Example:
+      $ find /home/kev/argus /home/kev/.claude -name
+        "feedback_enum_amendment_needs_schema_migration_sibling.md"
+      /home/kev/argus/feedback_enum_amendment_needs_schema_migration_sibling.md
+      (authored 2026-05-13T15:55Z; resolves cleanly)
+
+## §3 — Binding scope nuance
+
+Per the multi-actor memo-scope finding surfaced in MAC-87 follow-up:
+discipline rules don't bind agents that don't read them. Agent memory
+directories are per-actor-class:
+
+  - CEO orchestrator: /home/kev/.claude/projects/<paperclip-uuid>/memory/
+  - argus worker context: /home/kev/.claude/projects/-home-kev-argus/memory/
+  - other paperclip-company agent contexts: various
+
+S.7's three-surface landing matches the three-actor binding precisely
+so each actor reads the rule in their own context. Any future SAR or
+memo intended to bind multiple actor classes MUST land canonical text
+in each actor's read-path; landing in only one surface and assuming
+cross-actor binding is a class-(e)-adjacent error.
+
+## §4 — Anchored case studies
+
+The four-recurrence pattern that triggered S.7 codification (plus the
+fifth recurrence discovered during S.7 authoring itself). Each case
+is anchored to a durable location per
+feedback_avoid_hb_labels_in_durable_artifacts.md.
+
+### Case 1 — Wave-B Marlin baseline count drift (class a)
+
+Dispatch cited "42 staged behavioral_signatures" against actual 33
+in raw_observations. Anchor:
+  raw/wave_b/_wave_b_bulk_load_2026-05-13.md §3 Board Elevation Item #1
+
+The "42" propagated from earlier Wave-A reporting without
+verification at dispatch authoring time. CC validated against live DB
+state during pre-flight context load and surfaced the correction.
+
+### Case 2 — Wave-B FAA documentNumber field name drift (class b)
+
+Dispatch §3.3.3 cited documentNumber as the prefix-bearing field on
+the FAA RID API. Actual field is trackingNumber on the LIST endpoint
+and serialNumberStart/End on the DETAIL endpoint (prefix derived via
+LCP). Anchor:
+  raw/wave_b/_wave_b_bulk_load_2026-05-13.md (Source 3 stop-the-line
+  section, FAA API-shape decision)
+
+The dispatch asserted field shape without fetching a sample record
+first; CC halted at stop-the-line discipline rather than improvising
+past the gap.
+
+### Case 3 — Wave-C FCC EAS §2.1 #14 invention + sources.id=7 band
+mismatch (classes c + d)
+
+Dispatch invented §2.1 #14 for Hak5 (actual §2.1 #8) and asserted
+source_type_hint='regulatory' for fcc_grantees (existing sources.id=7
+has different band classification). Anchor:
+  raw/wave_c/fcc_eas/2026-05-13T18-04-01Z_surfacing.md
+
+CC caught both during pre-flight context load.
+
+### Case 4 — Wave-C USAspending proposed-but-done (class d)
+
+Board proposed USAspending as a Wave-C-new source. Actual: USAspending
+= sources.id=8 = 43,483 procurement_records, completed Phase 3 at
+2026-05-04 (MAC-8). Anchor:
+  MAC-87 snapshot doc §4.2
+
+Crossed the codify threshold (fourth recurrence).
+
+### Case 5 — CP17 phantom-memo citation cascade (class e)
+
+CP17 BIBLE_AMENDMENTS.md entry cited
+feedback_enum_amendment_needs_schema_migration_sibling.md which did
+not exist on disk at CP17 authoring time. The phantom citation
+propagated into MAC-87 §1.4 + §8.2 and CEO memory entries before
+verification surfaced it during S.7 authoring. Anchor:
+  /home/kev/argus/feedback_enum_amendment_needs_schema_migration_sibling.md
+  (memo authored retroactively 2026-05-13T15:55Z per disposition
+  option (i) — bibliographic repair) + MAC-87 §8.2 (board awareness
+  of the cascade)
+
+Demonstrates that S.7 class (e) verification protects against
+citation cascades where a single unverified reference propagates
+across surfaces.
+
+## §5 — Inline demonstration
+
+The first dispatch under S.7 will demonstrate the discipline by
+including the pre-flight as the first §-section of the dispatch
+text. Each assertion class touched by the dispatch gets a paste-
+result inline. The discipline is most useful when it's visible at
+consumption time, not buried in authoring notes.
+
+Subsequent dispatches inherit the pattern. Over time, dispatches
+develop a standard "pre-flight" preamble shape that consumers
+(other agents, future board members, anyone reading the dispatch
+record) can scan to verify the dispatch's working model before
+acting on its instructions.
+
+## §6 — Recurrence accounting
+
+Per the recurrence-count audit-trail discipline established at the
+S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
+
+  - Recurrence #1 (pre-S.7): Wave-B Marlin 42→33 baseline drift
+  - Recurrence #2 (pre-S.7): Wave-B FAA documentNumber field
+  - Recurrence #3 (pre-S.7): Wave-C FCC EAS §2.1 #14 + band mismatch
+  - Recurrence #4 (pre-S.7): Wave-C USAspending proposed-but-done
+  - Recurrence #5 (during-S.7-authoring): CP17 phantom-memo cascade
+
+Future S.7 recurrences (if any post-codification) get appended to
+this list with anchor + class. Three recurrences post-S.7 would
+trigger a CP-class revision of S.7 itself per the meta-discipline
+that no sub-rule is permanent if it fails to bind in practice.
+
+## §7 — Composition with prior discipline
+
+S.7 composes with:
+
+  - feedback_bible_amendment_downstream_consumer_audit.md (S.1
+    through S.6) — S.1 case-study sub-rule precedent for anchored
+    case studies; S.3 recurrence-count audit trail; S.6
+    architectural-absorption pattern (over-ratification at static-
+    analysis time, caught at runtime)
+  - feedback_enum_amendment_needs_schema_migration_sibling.md —
+    sibling-write discipline for schema migrations at first
+    promotion
+  - feedback_verify_cross_referenced_artifacts_in_public_prose.md —
+    parent discipline that S.7 class (e) operationalizes
+  - feedback_avoid_hb_labels_in_durable_artifacts.md — anchor
+    discipline for case studies (S.7 §4)
+
+S.7 specifically addresses dispatch-authoring-time verification gaps;
+the adjacent disciplines address consumer-side, schema-side, or
+artifact-durability concerns. The four together form a coherent
+pre-flight + downstream + sibling-write + anchor discipline stack
+for any dispatch-class work.
+
+## §8 — Codification surfaces
+
+  | Surface | Purpose | Author |
+  |---|---|---|
+  | BIBLE_AMENDMENTS.md `## SAR-12` | Canonical board-side codification; public-shippable | Board (this entry) |
+  | /home/kev/argus/feedback_s7_dispatch_preamble_live_state_verification.md | ExtractionWorker reference | CEO post-SAR-12 |
+  | /home/kev/.claude/projects/.../memory/feedback_dispatch_preamble_live_state_verification.md | CEO-side reference | CEO post-SAR-12 |
+
+Sibling memos mirror this canonical text substantively. Surface-
+specific framing is allowed (worker examples in worker context, CEO
+examples in CEO context) but the rule body, verification paths, and
+binding scope remain identical across surfaces.
+
+═══════════════════════════════════════════════════════════════════════
