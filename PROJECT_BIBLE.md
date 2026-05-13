@@ -114,7 +114,7 @@ The schema is the contract. All sub-agents output rows conforming to this.
 | `model` | TEXT | when known |
 | `confidence` | INTEGER | 0–100, see §8.2 |
 | `source_url` | TEXT NOT NULL | direct URL to the evidence |
-| `source_type` | TEXT NOT NULL | enum: `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc`, `manufacturer_app` (last added Correction Pass 13 — CP12 §8.2 schema sibling) |
+| `source_type` | TEXT NOT NULL | enum: `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc`, `manufacturer_app` (added Correction Pass 13 — CP12 §8.2 schema sibling), `primary_registry` (last added Correction Pass 15 — §8.2 sub-banding for FAA RID + Bluetooth SIG + IEEE OUI cluster) |
 | `source_excerpt` | TEXT | short quoted/paraphrased justification (≤200 chars) |
 | `geographic_scope` | TEXT | ISO country/region codes, comma-sep, or `global` |
 | `first_seen` | DATETIME | when we first ingested this record |
