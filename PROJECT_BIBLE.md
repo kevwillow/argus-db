@@ -108,7 +108,7 @@ The schema is the contract. All sub-agents output rows conforming to this.
 |---|---|---|
 | `id` | INTEGER PK | autoincrement |
 | `identifier` | TEXT NOT NULL | the actual MAC/OUI/UUID/SSID/BSSID, normalized |
-| `identifier_type` | TEXT NOT NULL | enum: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`, `ble_local_name`, `ble_characteristic`, `product_family_codename` (last three added Correction Pass 13 — Wave G structural fidelity) |
+| `identifier_type` | TEXT NOT NULL | enum: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`, `ble_local_name`, `ble_characteristic`, `product_family_codename` (three above added Correction Pass 13 — Wave G structural fidelity), `ble_manufacturer_id` (added Correction Pass 14 — migration 0011 BLE SIG 16-bit company-identifier namespace), `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature` (thirteen above added Correction Pass 14 — migration 0013 Drone-RID + proprietary RF-protocol cluster), `alpr_model` (last added Correction Pass 14 — migration 0014 surveillance metadata: ALPR/camera product profile) |
 | `device_category` | TEXT NOT NULL | enum from §2.1 (alpr, imsi_catcher, body_cam, police_radio, in_vehicle_router, drone, gunshot_detect, hacking_tool, covert_cam, gps_tracker, face_recog, drone_detect) |
 | `manufacturer` | TEXT | normalized vendor name |
 | `model` | TEXT | when known |
