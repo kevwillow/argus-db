@@ -18,6 +18,61 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-13T~22:50Z–~23:55Z (**MAC-88 Wave-B Validation Run — promotion-cycle-3 close + first behavioral_signatures population**). Anchored on commits `e0368b3` (Validator promotion-cycle-3 ingestion) / `ca2d68a` (coverage_matrix.py CP16 lag fix — code-sibling) / `fb2afe9` (post-promotion export regen) plus this CEO Phase C commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
+
+**MAC-88 closes; Wave-B validated and ingested.** Board dispatch [`41b0e213`](/MAC/issues/MAC-88#comment-41b0e213-09e9-4d0c-8c16-89fd52257a59) authorized full CEO decomposition latitude for the 22,106 staged candidates at `raw/wave_b/`. CEO decomposed into two sequenced worker dispatches plus CEO Phase C surface-back: [MAC-91](/MAC/issues/MAC-91) Validator promotion-cycle-3 (3a Sources 1-3 + 3b Marlin) → [MAC-92](/MAC/issues/MAC-92) ExtractionWorker (coverage + Lynceus export regen + reconciliation) → this Phase C close. Final handoff doc at `raw/wave_b/_wave_b_validation_handoff_2026-05-13.md`.
+
+**Promotion-cycle-3 transaction (db/argus.db state delta, gitignored):**
+- **18,306 identifiers** promoted at conf=85 primary_registry (3,967 SIG `ble_manufacturer_id` + 14,327 IEEE `mac_range` across MA-M/MA-S/IAB + 12 FAA RID `drone_id_prefix`)
+- **55 behavioral_signatures** promoted at conf=80 academic-corroborated (53 Marlin NDSS 2025 + 2 Wave-A unlocks #220359 Identity Request DIRECT + #220361 catalog-reference)
+- **6 new extraction_runs rows** (id 94-99), one per unique source × staging dir
+- **3 new sources rows**: id=35 IEEE IAB (Wave-B re-pull), id=36 FAA UAS RID DETAIL endpoint, id=37 Marlin NDSS 2025
+- **22,106 raw_observations** Wave-B writes; 18,306 promoted + 3,521 IEEE pii_review_hold + 133 IEEE Private placeholders + 90 FAA dedup-skip + 2 SIG dedup-skip + 1 Zephyr hold = 22,106 ✓
+- DB backup at `db/argus.db.pre_mac91_step_backup` (272 MB pre-state)
+
+**Post-cycle-3 state:**
+- identifiers total 572 → **18,878** (+18,306)
+- identifiers active 514 → **18,820** (+18,306; all new INSERTs active)
+- behavioral_signatures **0 → 55 (+55)** — first substantive population of the table in project history
+- argus_export_high_confidence.json: 427 → **427** survivors (zero new, zero dropped — all Phase-A inserts filtered by §11 #13 unknown-cat carveout for 18,294 vendor-OUI-clear-product-unknown + CP7 geographic_scope_mismatch for 12 NULL-scope FAA rows; governance-correct, see §6.3 of handoff doc)
+- coverage report regenerated at `raw/wave_b/coverage_post_wave_b_20260513T232441Z.md`; Halts: 0; reconciliation arithmetic holds
+- extraction_runs MAX(id): 93 → **99** (+6); sources MAX(id): 34 → **37** (+3)
+
+**Six architectural firsts** captured this run (per Wave-B handoff doc §7):
+1. **First substantive `behavioral_signatures` table population** (0 → 55); validates CP14 migration 0010 schema under real data
+2. **First Path (b) cellular_generation normalization** — 36 cross-gen rows with NULL scalar + `cross_gen_membership` list in `threshold_json`
+3. **First §8.3 academic + dual-source corroboration promotion** — Marlin sigs at conf=80 via academic 75 base + rayhunter #220361 catalog-reference +5 bonus
+4. **First worker-authored code-sibling commit** absorbing prior CP into downstream consumer (`ca2d68a` mirrors CP15 cycle-2 `cc45440` discipline); pattern previously CEO-authored, MAC-92 worker recognized and applied autonomously
+5. **First Wave-B+ sources rows created** (id=35/36/37) all landing as `primary_registry` source_type per CP15 §8.2
+6. **First CEO decomposition of a board dispatch into 2 parallel-sequenced worker dispatches with CEO Phase C surface-back**; establishes the dispatch-decomposition pattern (board prompt → Validator → ExtractionWorker → CEO Phase C → board ratification of surface items)
+
+**Code-sibling discipline — fourth post-memo recurrence** of `feedback_bible_amendment_downstream_consumer_audit.md`: CP13→MAC-57 / CP14→CP16 / CP15→cycle-2 `cc45440` / **CP16→MAC-92 `ca2d68a`**. The MAC-92 instance is the first worker-autonomous absorption — surfaces a discipline-evolution candidate: S.1/S.7 consumer inventory should explicitly include `db/validation/coverage_matrix.py` alongside `db/validation/export_lynceus.py`.
+
+**§11 stop-the-line trips:** 0. **PII boundary crossings:** 0. **CEO HALT-AND-SURFACE invocations:** 0 (Validator pre-flight scan over all 53 Marlin `cellular_generation` values returned 0 hits for `5G_SA`/`5G_FR1`/`5G_FR2` — no CHECK-extension CP needed). **Halts at close:** 0.
+
+**Test suites:** MAC-91 close 400 passed / 2 skipped; MAC-92 post-patch 335 passed.
+
+**Four CP-class surface items queued for board ratification** (none blocked closure):
+1. `behavioral_signatures` Lynceus export shape — CEO endorses Option 1 status-quo default-defer (consumer-side Rayhunter integration TBD); Options 2 (sibling export file) / 3 (discriminated-union, discouraged) tabled
+2. `coverage_matrix.py` CP16 lag absorbed inline at `ca2d68a` — informational, not a CP; recommend S.1/S.7 consumer inventory update
+3. 12 FAA RID rows dropped to `geographic_scope_mismatch` — backfill candidate (UPDATE `geographic_scope='US'` would lift those 12 into high-conf export); Phase-C follow-up or next sweep dispatch
+4. `ble_device_name_substring` enum extension tracker — first concrete post-codification check-in for `feedback_enum_amendment_needs_schema_migration_sibling.md`; 0 rows landed in Wave-B (forward-tracked to Wave-C/D/E)
+
+**Forward sequence (next strategic conversations):**
+- Wave-B+ sources reclassification sweep (90 FAA upgrades / 325 FAA downgrades / IEEE source.id=1 reclass / sources.id=7 fcc_grantees band reconciliation)
+- IEEE 3,521 pii_review_hold entity-type validator dispatch
+- 31 held Wave-A behavioral_signatures pending Wave-C/D/E second-source
+- Custom-mapper ingestion heartbeat (~360 secondary-batch obs from Wave-A deferred custom JSON dirs)
+- FCC EAS per-FCC-ID retry (apps.fcc.gov degraded; Wave-C retry queue)
+
+**Defensive backups retained** through this close:
+- `db/argus.db.pre_mac91_step_backup` (272 MB)
+- `exports/argus_export_high_confidence.json.pre_mac92_backup` (73,921 bytes)
+
+---
+
+### Prior action — MAC-63 CP15 + Promotion-Cycle-2 Close (preserved verbatim)
+
 CEO heartbeat 2026-05-12T~16:48Z–~21:30Z (**MAC-63 CP15 ratification + promotion-cycle-2 close — Wave-A structurally done**). Anchored on commits `1e83517` (CP15) / `e663ae5` (migration 0015) / `cc45440` (CP15 sibling discipline patch) / `58ef039` (post-cycle-2 export regen) per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
 
 **MAC-63 closes; Wave-A structurally done.** Second MAC-63 CEO-class delegated authority (CP15 ratification + promotion-cycle-2 after CP16 dependency closed at MAC-75 `554a420`/`a4bc7b9`/`d37e9dc`) wraps with final handoff doc at `raw/wave_a/_mac63_run_2026-05-12.md` per dispatch [`acc6dac6`](/MAC/issues/MAC-63#comment-acc6dac6-5169-486c-8342-a1e00135eafa) + Phase 6 ratification [`119039a3`](/MAC/issues/MAC-63#comment-119039a3-1aa8-48be-8ec2-ce22d9e99f7b).
