@@ -1634,6 +1634,32 @@ Demonstrates that S.7 class (e) verification protects against
 citation cascades where a single unverified reference propagates
 across surfaces.
 
+### Case 6 — Bible line 112 device_category enum drift vs. live schema (class c)
+
+SAR-12 class (c) example applied to its own commit revealed a
+set-membership drift between PROJECT_BIBLE.md line 112
+(`alpr, ..., in_vehicle_router, ..., drone_detect` — 12 values)
+and the live schema CHECK constraint
+(`alpr, ..., drone_detect, unknown` — 12 values). 11-of-12 overlap;
+bible has `in_vehicle_router` (§2.1 narrative #5; schema-migration
+sibling deferred per
+feedback_enum_amendment_needs_schema_migration_sibling.md); schema
+has `unknown` (§8.4 / line 537 / §11 #13). MAC-87 §2.5 had asserted
+"no drift, matches verbatim" without set-membership verification.
+Anchor:
+  PROJECT_BIBLE.md line 112 (corrected in the same commit appending
+  this case study) + MAC-87 follow-up thread comment d521e669 / f095dfc7
+
+Demonstrates S.7 class (c)'s drift-catching refinement: enum
+verification requires comparing BOTH bible-side AND schema-side, not
+just confirming each independently. The error class — asserting "no
+drift" or "matches verbatim" without set-membership paste-result — is
+structurally distinct from the four pre-S.7 recurrences that asserted
+positive facts without verification. Same rule applies (class c,
+paste-result inline) but the absence-of-drift framing needs the
+comparison paste itself, not just citing each side. Codified in the
+CEO sibling memo at authoring time.
+
 ## §5 — Inline demonstration
 
 The first dispatch under S.7 will demonstrate the discipline by
@@ -1658,6 +1684,9 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
   - Recurrence #3 (pre-S.7): Wave-C FCC EAS §2.1 #14 + band mismatch
   - Recurrence #4 (pre-S.7): Wave-C USAspending proposed-but-done
   - Recurrence #5 (during-S.7-authoring): CP17 phantom-memo cascade
+  - Recurrence #6 (during-SAR-12-ratification): bible line 112
+    device_category enum drift vs. live schema; "no drift" absence-
+    assertion failure mode (class c)
 
 Future S.7 recurrences (if any post-codification) get appended to
 this list with anchor + class. Three recurrences post-S.7 would
