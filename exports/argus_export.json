@@ -1,16 +1,16 @@
 {
   "_meta": {
     "argus_version": "16",
-    "exported_at": "2026-05-12T20:52:35Z",
-    "record_count": 443,
+    "exported_at": "2026-05-13T23:21:09Z",
+    "record_count": 455,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "25054309-4514-5cc6-9590-fa3c8feed5d5",
-    "source_record_count": 514,
+    "argus_run_id": "374ea998-1f29-5bdf-85a2-23668cea4ab0",
+    "source_record_count": 18820,
     "dropped_in_export": {
-      "unknown_category": 46,
+      "unknown_category": 18340,
       "ssid_pattern": 5,
       "device_fingerprint": 0,
       "ble_local_name": 3,
@@ -109,6 +109,12 @@
       "argus_record_id": "08b46bd7bed5e482"
     },
     {
+      "pattern": "1587A540002APD",
+      "pattern_type": "drone_id_prefix",
+      "description": "AgEagle (senseFly) drone",
+      "argus_record_id": "0a9662b53ccfb421"
+    },
+    {
       "pattern": "1581F6GK",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -149,6 +155,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "WISPR drone",
       "argus_record_id": "0c9eb59220eadc85"
+    },
+    {
+      "pattern": "1748CJD1",
+      "pattern_type": "drone_id_prefix",
+      "description": "Autel Robotics drone",
+      "argus_record_id": "0ca8d3bc83ca8639"
     },
     {
       "pattern": "1581F4BN",
@@ -257,6 +269,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "WISPR drone",
       "argus_record_id": "146e916e99f61a91"
+    },
+    {
+      "pattern": "1587A0510001TBT",
+      "pattern_type": "drone_id_prefix",
+      "description": "AgEagle (senseFly) drone",
+      "argus_record_id": "150f53c8e8e78fb6"
     },
     {
       "pattern": "1895FBC00000000000",
@@ -811,6 +829,12 @@
       "argus_record_id": "4b28644fd371264a"
     },
     {
+      "pattern": "1748FEV3HMA",
+      "pattern_type": "drone_id_prefix",
+      "description": "Autel Robotics drone",
+      "argus_record_id": "4b9424d14d84cd92"
+    },
+    {
       "pattern": "1701DGAS00150623PR",
       "pattern_type": "drone_id_prefix",
       "description": "Percepto AirMax drone",
@@ -833,6 +857,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "MicroFlight Inc drone",
       "argus_record_id": "4d3d594ff5321e2a"
+    },
+    {
+      "pattern": "1869DGIM2",
+      "pattern_type": "drone_id_prefix",
+      "description": "Ruko drone",
+      "argus_record_id": "4d76ed5a76dd6c44"
     },
     {
       "pattern": "18136H8E",
@@ -863,6 +893,12 @@
       "pattern_type": "oui",
       "description": "Skydio drone",
       "argus_record_id": "50894ea2e4d6f1e4"
+    },
+    {
+      "pattern": "1767CSRH801191425",
+      "pattern_type": "drone_id_prefix",
+      "description": "SkyRanger / SkyRaider drone",
+      "argus_record_id": "50abf6b9067ac504"
     },
     {
       "pattern": "1581F3N3",
@@ -1255,6 +1291,12 @@
       "argus_record_id": "776d17d86157516e"
     },
     {
+      "pattern": "1748CJD3",
+      "pattern_type": "drone_id_prefix",
+      "description": "Autel Robotics drone",
+      "argus_record_id": "777ba58a5fbbcdc9"
+    },
+    {
       "pattern": "19476",
       "pattern_type": "drone_id_prefix",
       "description": "Swoop Aero drone",
@@ -1349,6 +1391,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "XAG drone",
       "argus_record_id": "8140864e360e4db0"
+    },
+    {
+      "pattern": "1587A5400024GH",
+      "pattern_type": "drone_id_prefix",
+      "description": "AgEagle (senseFly) drone",
+      "argus_record_id": "8161bb6838bb9d9e"
     },
     {
       "pattern": "1668BS20FA00",
@@ -1457,6 +1505,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "SHANGHENG drone",
       "argus_record_id": "8b21a6e6617fa76f"
+    },
+    {
+      "pattern": "1798F1132400",
+      "pattern_type": "drone_id_prefix",
+      "description": "Sentera drone",
+      "argus_record_id": "8b4c4b0cdefe9b3a"
     },
     {
       "pattern": "1817913",
@@ -1717,6 +1771,12 @@
       "argus_record_id": "9f8f21c016a4d616"
     },
     {
+      "pattern": "1701DGAS00100123PR",
+      "pattern_type": "drone_id_prefix",
+      "description": "Percepto AirMax drone",
+      "argus_record_id": "9f98cc258dd511b1"
+    },
+    {
       "pattern": "1924A01",
       "pattern_type": "drone_id_prefix",
       "description": "Arcsky drone",
@@ -1739,6 +1799,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
       "argus_record_id": "a16a52cf6fce4677"
+    },
+    {
+      "pattern": "AA2",
+      "pattern_type": "drone_id_prefix",
+      "description": "Applied Aeronautics drone",
+      "argus_record_id": "a22b218f37826650"
     },
     {
       "pattern": "1620A110240",
@@ -2351,6 +2417,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "d9aa22dacfcd8611"
+    },
+    {
+      "pattern": "1587A051000075Y",
+      "pattern_type": "drone_id_prefix",
+      "description": "AgEagle (senseFly) drone",
+      "argus_record_id": "d9dc189420ddf7ad"
     },
     {
       "pattern": "1866ASDD000",

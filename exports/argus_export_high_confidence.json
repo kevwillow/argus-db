@@ -1,16 +1,16 @@
 {
   "_meta": {
     "argus_version": "16",
-    "exported_at": "2026-05-12T20:52:35Z",
+    "exported_at": "2026-05-13T23:21:09Z",
     "record_count": 427,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "25054309-4514-5cc6-9590-fa3c8feed5d5",
-    "source_record_count": 514,
+    "argus_run_id": "374ea998-1f29-5bdf-85a2-23668cea4ab0",
+    "source_record_count": 18820,
     "dropped_in_export": {
-      "unknown_category": 46,
+      "unknown_category": 18340,
       "ssid_pattern": 5,
       "device_fingerprint": 0,
       "ble_local_name": 3,
@@ -32,7 +32,7 @@
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 16,
-      "geographic_scope_mismatch": 0
+      "geographic_scope_mismatch": 12
     }
   },
   "entries": [
