@@ -922,6 +922,67 @@ The change. §6 Phase 5 #4 line currently reading `argus_export.csv (human-reada
 
 ---
 
+## SAR-11 — Wave G framework-UUID + third-party-library FP suppression (chunked Priority A/B/C/D)
+
+**Date:** 2026-05-13
+**Source:** Wave G pre-v1 autonomous static-analysis session 2026-05-10 (MAC-52 [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b); deliverables surfaced at MAC-1 [`5b000045`](/MAC/issues/MAC-1#comment-5b000045-1265-4be4-88b2-dfeaac46c6df) HB56). Board-ratified chunking structure at MAC-1 [`e492ac66`](/MAC/issues/MAC-1#comment-e492ac66-7109-412a-acb3-8db1d247310d) HB57 §E.2. SAR-11 codification landed at CP17 coordinated commit per HB99/HB101 drafts.
+**Bible commit:** SAR-11 amendment-log entry lands paired with CP17 coordinated commit (this entry).
+**Binds:** ExtractionWorker (Wave G `wave_g_extractor.py` FP-filter pipeline + `looks_like_third_party_lib()` path heuristic), Validator (§11 #7 promotion gate — pre-v1 candidates classified per these FP-classes at promotion-time).
+
+**Authoritative machine-readable scope:** `android_test/extraction_outputs/wave_g_pre_v1/calibration/proposed_fp_classes.json` (16 calibration-window classes + 7 cohort-B-E classes + 1 Priority-A bug fix + ambiguous/validator-review cases). The §-text below summarizes the discipline; the JSON catalog is the operational reference for ExtractionWorker.
+
+### Priority A — `looks_like_third_party_lib()` path-filter bug fix (immediate)
+
+**Bug.** Wave G calibration surfaced that `looks_like_third_party_lib()` in `wave_g_extractor.py` required `/sources/<pkg>` (leading slash) but jadx emits relative paths starting `sources/<pkg>` (no leading slash). Path-based FP filter never matched; ~30 vendor-1 + ~60 vendor-2 FPs leaked through as candidates.
+
+**Fix.** Replace leading-slash requirement with substring match supporting (a) jadx layout `sources/<pkg>`, (b) apktool smali layout `smali_classesN/<pkg>` + `smali/<pkg>`, (c) prefix-without-leading-slash forms. Priority A is the immediate operational fix that unblocks all downstream FP-class disambig.
+
+### Priority B — high-evidence-count FP classes (single chunk)
+
+Classes surfaced ≥4× in calibration window across two vendors:
+
+- **`android_audioeffect_framework_uuid`** (BLE service UUID FP). Android `AudioEffect` framework identifiers (Mobile NS, AEC, AGC, etc.) used by WebRTC / AudioEffect API. Pattern: `-0002a5d5c51b` suffix is the AudioEffect vendor namespace. Disambig: exact value match + suffix pattern.
+- **`bundled_fork_path`** (BLE service UUID FP). Apps bundling forked WebRTC / Twilio / Agora / LiveKit / tvo library code under non-standard top-level package paths. Disambig: path-substring match on `sources/livekit/`, `sources/tvo/`, `sources/org/webrtc/`, `sources/com/twilio/`, `sources/io/agora/`.
+- **`third_party_analytics_sdk_application_id`** (BLE service UUID FP). UUIDs hardcoded as configuration IDs for FullStory / Datadog / LaunchDarkly / Sentry / Mapbox / Amplitude / Mixpanel / Bugsnag / Segment / Intercom / Pendo / Auth0 / Firebase / Crashlytics / Branch / Google. Disambig: line-context token set (BUILD_ID, APPLICATION_ID, PROJECT_ID, CLIENT_ID, API_KEY, SDK_KEY, APP_ID, vendor-specific prefixes, MAPBOX_TOKEN, GOOGLE_APP_ID) + cross-site value-propagation.
+- **`kotlin_compose_composable_or_identifier_name`** (SSID FP). Strings matching SSID prefix that are actually Jetpack Compose composable function names, color names, theme names, UI element names. Disambig: pure-CamelCase shape check + UI-suffix match + Compose-keyword in line + `.smali` / `res/values/` source-path check.
+- **`no_wifi_api_context_in_line`** (SSID filter requirement). SSID candidates MUST appear in same source line as a WiFi-related API token (`SSID`, `WifiConfiguration`, `WifiManager`, `WifiNetworkSpecifier`, `ScanResult`, `setSSID`, `getSsid`). Without WiFi context, vendor-prefixed strings are almost always UI element names or branding strings, not WiFi SSIDs.
+- **`shared_preferences_or_json_key_name`** (credential FP). Short identifier-like values matched on field-declaration / preference-key context tokens (`KEY`, `getString`, `putString`, `FIELD`, `HEADER`, `EXTRA_`, `@SerializedName`, `@JsonProperty`).
+- **`screaming_snake_case_constant_value`** (credential FP). Standalone SCREAMING_SNAKE_CASE values ≥8 chars containing underscores. Almost always Java/Kotlin constants, not credentials.
+- **`transistorsoft_cordova_plugin`** (all categories FP). `transistorsoft.*` is a third-party Cordova plugin company. Surfaces in Cordova-based apps. Added to `looks_like_third_party_lib()` prefix list.
+
+### Priority C — lower-evidence + cohort-B-E FP classes (single chunk)
+
+Classes surfaced 1-3× in calibration or surfaced in cohort-B-E review:
+
+- **`rfc6455_websocket_accept_magic`** (BLE service UUID FP). RFC 6455 WebSocket Accept-magic GUID `258eafa5-e914-47da-95ca-c5ab0dc85b11`. Used by any okhttp3/OkHttp-based app. Disambig: exact value match.
+- **`androidx_work_workmanager_internal_uuid`** (BLE service UUID FP). androidx.work WorkManager internal placeholder UUID `95ed6082-b8e9-46e8-a73f-ff56f00f5d9d`. Disambig: exact value match.
+- **`decompiler_string_concat_artifact`** (credential FP). jadx-decompiled string concatenation artifacts (leading `'+ `, trailing ` +'`, `'+ this.X'` inside value, ` + identifier + ` inside value). Disambig: regex pattern match on value.
+- **`library_namespace_constant`** (credential FP). Values prefixed with `com.X.Y` / `io.X.Y` / `sdk.X.Y` namespaces. Disambig: value-prefix match.
+- **`screaming_snake_case_constant_name`** (credential FP). Java idiom `static final String FOO_BAR = "FOO_BAR"`. Disambig: regex match on declaration pattern + value equals var name.
+- **`template_placeholder_value`** (credential FP, cohort-B). `{refreshToken}`, `${X}`, `<X>`, `%s`, `%d` are template placeholders. Disambig: regex match on value shape.
+- **`logback_or_log4j_error_message_string`** (credential FP, cohort-B). Long English-prose strings containing word "token" as part of error template. Disambig: value starts with error phrase + spaces in value + >30 chars.
+- **`value_level_propagated_post_processing`** (all categories FP). Post-extraction join: if a (value_class, value) pair is FP-classified at any site, demote all candidates with same pair to FP. Disambig: post-extraction join on value.
+- **`xmp_image_metadata`** (cohort-B). XMP image-metadata UUIDs in PNG/JPEG/MP4 binary headers and `META-INF/MANIFEST.MF` entries. Not BLE.
+- **`date_misparsed_as_mac_oui`** (cohort-C). 6-octet date-formatted hex (e.g., `20:26:05:10:03:08`) misparsed as MAC OUI. Disambig: shape-check against ISO-8601-numeric form.
+- **`placeholder_mac_oui_values`** (cohort-C). Documentation/test placeholder MAC OUI values (`aa:bb:cc:dd:ee:ff`, `01:02:03:04:05:06`, `de:ad:be:ef:*`). Disambig: explicit reject list per bible §7.3.
+- **`rxjava_meta_inf_build_host_uuid`** (cohort-D). RxJava library `META-INF/MANIFEST.MF` Build-Host UUID surfacing in any RxJava-using app. Disambig: META-INF path + Build-Host context.
+- **`uuid_v1_timeuuid_in_json_test_fixtures`** (cohort-D). UUID v1 time-based UUIDs in JSON test-fixture files. Disambig: UUID-version check + JSON-test-fixture path heuristic.
+- **`json_test_fixture_company_id_uuids`** (cohort-D). UUID-shaped strings in JSON test-fixture `company_id` / `account_id` / `org_id` fields.
+- **`microsoft_msal_azure_ad_uuids`** (cohort-E). Microsoft MSAL / Azure AD application/tenant UUIDs used for OAuth authentication. Disambig: MSAL package-name path + AzureAD context tokens.
+
+### Priority D — Validator-judgment cases (per author labeling)
+
+Cases the calibration surfaced but where author/Validator labels each instance individually rather than via a uniform FP rule:
+
+- **`vendor_brand_string`** (proposed sub-class). Brand-only matches (literal vendor company name appearing in the vendor's own app). Distinct from true product-family taxonomy. Proposed confidence band: 50-70 (informational, not actionable). Reserve product-family 90-95 band for true sub-product names.
+- **Ambiguous product-family hits** (per-instance Validator judgment). Examples surfaced in calibration: Flock `Raven` confirmed real Flock Raven audio sensor; promote at 90-95. Other ambiguous CamelCase product-name candidates: Validator labels per-instance per-context.
+
+**Operational sequencing.** Priority A bug fix lands in the CP17-D code-sibling commit per standard CP precedent (CP14/CP15/CP16 paired-commit pattern). Priorities B + C codify as a single chunk in this SAR-11 row. Priority D labels emerge per-candidate at Validator-promotion time; aggregate findings may seed a future SAR-11 amendment if patterns crystallize.
+
+**Composition with bible rules.** SAR-11 composes with bible §11 #1 (no fabrication — FP-classed candidates do NOT promote to `identifiers`), §11 #4 (no detection logic — SAR-11 is FP suppression, not scanner rule), §11 #6 (no ToS violations — calibration runs on legally-acquired binaries per §11 #15 license posture), §11 #7 (no promotion without provenance — Priority A bug fix ensures provenance-bearing candidates aren't lost to incorrect FP filter), §11 #8 (no confidence drift — FP demotion is a category-correction not a confidence-floor change).
+
+---
+
 ## Correction Pass 12 — Wave G (Phase 6) vendor companion app static analysis: §8.2 `manufacturer_app` confidence bands + §11 #15 license-posture rule + §12 three open questions
 
 **Date:** 2026-05-08
@@ -1304,3 +1365,69 @@ None. Phase 1 audit's 3 pause-for-human flags were ratified without surfacing ne
 ### §11 #11 self-binding satisfied
 
 This CP16 entry is the §11 #11 amendment-log pairing for the §4.4 amendment in the coordinated commit. Bible HEAD bumps from `3b37e69` (post-CP15 + migration 0016) to the CP16 commit landed alongside this entry. Schema-version unchanged (CP16 is a mapping-table + code-patch CP, not a schema CP).
+
+---
+
+## Correction Pass 17 — §8.2 manufacturer_app coalesce-pass + SAR-11 chunked codification + WAVE_G_RUNBOOK §3 + §11 #7 + scan-ignore landing
+
+**Date:** 2026-05-13
+**Source:** Track E CP16 proposal-shape surfaced at MAC-1 [`a8b17428`](/MAC/issues/MAC-1#comment-a8b17428-0032-49ed-9f56-e9b4b6ac018c) HB73 2026-05-11 (12-unit envelope; HB70 9 high-level → expanded per HB73). CP16-1 through CP16-7 META decisions ratified at HB74 [`bb5c58a8`](/MAC/issues/MAC-1#comment-bb5c58a8-0723-4afa-b5a8-618f4b7dafd4) 2026-05-12 (12-unit enumeration locked + single coordinated commit + §8.2 coalesce-pass + single SAR-11 row with A/B/C sub-rules + Runbook §3 corrections + path-γ MAC-53 re-base + slot-0016 verify-wrapper test). **Renumbered to CP17 at HB98 [`71077702`](/MAC/issues/MAC-1#comment-71077702-c932-4121-a2b0-646272829404) 2026-05-13** post-bible-CP16-numbering-collision finding: bible CP16 had already committed at `d37e9dc` for §4.4 Lynceus mapping (MAC-75 dispatch). Track E retained the META ratifications carried forward as CP17 META. CP17 scope-refresh per HB98 status audit collapsed the original 12-unit envelope to 4 components (CP17-A SAR-11 + CP17-B §8.2 coalesce + CP17-C Runbook + CP17-D coordinated-commit-composition) plus 1 paired code-sibling. Composition surfaced HB102 [`f63db2dd-placeholder`]; board prose-quality ratification batch HB103 [`e7405643`](/MAC/issues/MAC-1#comment-e7405643-77f2-4635-a97e-4ca661f8cd65); commit-firing HB104.
+**Bible commit:** This entry + SAR-11 row insert into BIBLE_AMENDMENTS.md § Sub-agent rule additions + PROJECT_BIBLE.md §8.2 manufacturer_app block replacement + android_test/WAVE_G_RUNBOOK.md §3 + §11 #7 + .gitleaksignore + .trufflehogignore + .gitignore §11 #15 carveout) + paired code-sibling commit (android_test/tools/extraction/wave_g_extractor.py Priority A bug fix, already-applied during Wave G calibration 2026-05-10; this commit is the first-git-tracked occurrence) + state-rotation commit (PROJECT_STATE.md HB102+HB103+HB104 close).
+**Binds:** ExtractionWorker (Wave G `wave_g_extractor.py` FP-filter pipeline + cohort-distinction queue-ordering + `vendor_template_namespace_uuid` extraction logic per §8.2 sub-banding rule + SAR-11 Priority A/B/C FP-class disambig at extraction-time), Validator (§11 #7 promotion gate + SAR-11 Priority D Validator-judgment per-candidate labeling + short-ID-walking inference for `vendor_template_namespace_uuid` templates per §8.2 sub-rule), Lynceus integration team (no immediate consumer-side effect; `vendor_template_namespace_uuid` identifier_type lands at first-promotion-time with schema sibling per `feedback_enum_amendment_needs_schema_migration_sibling.md` forward-looking-codification caveat).
+
+### Why this Correction Pass exists
+
+Wave G pre-v1 autonomous static-analysis session 2026-05-10 (MAC-52 [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b)) surfaced two structural findings + one large operational artifact set: (a) the operator-vs-installer cohort distinction (operator apps yield product-family taxonomy ONLY; installer/pairing apps yield BLE/SSID/credential identifiers), (b) the `vendor_template_namespace_uuid` sub-class observation (Getac BWC Viewer's 2-UUID shared-suffix `-1b7f-430ea194e6cf` pattern), (c) the 23 novel FP classes + 1 Priority-A bug fix (path-filter `looks_like_third_party_lib()` leading-slash mismatch) from the calibration-window + cohort-B-E analysis. HB57 §E ladder [`e492ac66`](/MAC/issues/MAC-1#comment-e492ac66-7109-412a-acb3-8db1d247310d) ratified the 8-item bundle for CP14 coordinated commit; CP14's actual commit body landed only the §8.4 four-amendment batch + §11 #12 expansion + 5 schema migrations, deferring SAR-11 + §8.2 sub-amends + Runbook corrections to a future CP. Track E proposal-shape surfaced the deferred bundle at HB73 with 12-unit envelope expansion; HB74 META-ratified the chunked structure; HB98 surfaced + resolved the bible-CP16-vs-Track-E-CP16 numbering collision; HB99-HB101 drafted the four CP17-A/B/C/D component §-texts; HB102 composed the 3-commit coordinated landing; HB103 dispositioned two structural-integrity flags (hunk-staging discipline + decompile-carveout scope-narrowing). This CP17 lands the deferred bundle.
+
+### Corrections applied
+
+1. **SAR-11 chunked codification (CP17-A; HB99 [`d1588ea1`](/MAC/issues/MAC-1#comment-d1588ea1-8da5-4195-a2b8-e8153e786042)).** New SAR-11 row in BIBLE_AMENDMENTS.md § Sub-agent rule additions, structured per HB57 §E.2 board-ratified chunking (Priority A `looks_like_third_party_lib()` jadx/apktool/prefix-without-leading-slash three-layout support; Priority B 8 high-evidence FP classes; Priority C 15 lower-evidence + cohort-B-E FP classes; Priority D Validator-judgment per-author labeling). Authoritative machine-readable scope at `android_test/extraction_outputs/wave_g_pre_v1/calibration/proposed_fp_classes.json`.
+
+2. **§8.2 manufacturer_app coalesce-pass (CP17-B; HB100 ratified at MAC-1 [`cd305c6a`](/MAC/issues/MAC-1#comment-cd305c6a-30f9-4133-a855-498643dcf890)).** PROJECT_BIBLE.md §8.2 `manufacturer_app sub-banding` block replaced verbatim by expanded block. Four sub-amends folded into single forward-write per CP16-3 META carried as CP17-3: (a) cohort distinction paragraph (operator-facing vs installer/pairing/technician; Wave G evidence base of 8 operator apps yielding 0 BLE UUIDs vs 2 installer apps yielding 6 unique vendor BLE UUIDs), (b) new `vendor_template_namespace_uuid` sub-band 75-90 + ExtractionWorker 4-step recipe, (c) product-family taxonomy row split into three rows (`marketing_name` / `internal_codename` / `device_type_enum_value`; all at 90-95 sub-band), (d) closing-paragraph SAR-11 reference updated from "(proposed; gated on Step-2 calibration)" to "(ratified at Correction Pass 17, 2026-05-13)" + new "Typical cohort" column on sub-banding table.
+
+3. **WAVE_G_RUNBOOK §3 8 package-name corrections + vendor-unavailable block (CP17-C 2a; HB101).** Runbook §3 vendor target list updated with Wave G calibration discoveries: Flock Safety (operator + installer two-app deployment); SoundThinking (`alerts` not `respondr`); Axon (`com.evidence` + `com.evidence.flex` LE-only; View XL Windows-platform-mismatch); Cradlepoint (`.manager` suffix); Hak5 (`org.hak5.pineappleconnector`; Cloud C2 desktop/web platform-mismatch); Autel Robotics (`com.autelrobotics.explorer`); Avigilon (`com.avigilon.acc_mobile`); Genetec (`com.genetec.platformmobile`). Vendor-unavailable-on-Android documentation block absorbs 11 vendors per HB57 §E.8.
+
+4. **WAVE_G_RUNBOOK §3 scan-command lines paragraph (CP17-C 2b).** New paragraph after vendor-unavailable block documents canonical secret-scanning pre-commit workflow: `gitleaks git --no-banner` (fingerprint allowlist via `.gitleaksignore`) + `trufflehog git file://. --exclude-paths=.trufflehogignore --no-update --json` (path-exclusion via `.trufflehogignore`). Pre-commit checkpoint per §11 #11 amendment-log discipline composition.
+
+5. **WAVE_G_RUNBOOK §11 #7 Option B-broad replacement (CP17-C 2c).** §-text replacement codifies window-around-match whenever line >200 chars regardless of file type, with `excerpt_type` field REQUIRED on every candidate. 4-class enumeration: `full_line` / `window` (with `match_offset_in_window`) / `binary` (hex-encoded) / `other`. Fabrication discipline per project-bible §11 #1 still binds; relaxation widens source-line-length permitted, not evidence-fidelity required. **Distinct from project-bible §11 #7** (same numbering, different surface).
+
+6. **`.gitleaksignore` + `.trufflehogignore` git-track landing (CP17-C-paired).** Both files exist at repo root with substantive content (gitleaks fingerprint allowlist + trufflehog path-exclusion list); triaged at MAC-50 [`2714377b`] + board-ratified at MAC-59 [`b4d9afa0`]. `git add` lands them in CP17-D bible-amendment coordinated commit. Each entry carries `# FP:` comment per `feedback_strategic_steers.md` audit-trail discipline.
+
+7. **Paired code-sibling: `wave_g_extractor.py` Priority A bug fix (per CP17-A SAR-11 Priority A immediate clause).** `looks_like_third_party_lib()` patched per HB99 SAR-11 §-text: three-layout support for jadx (`sources/<pkg>`), apktool smali (`smali_classesN/<pkg>` + `smali/<pkg>`), and prefix-without-leading-slash forms. Fix was applied during Wave G calibration 2026-05-10; this commit is the first-git-tracked occurrence of the corrected extractor. Lands as paired second commit per CP14/CP15/CP16 precedent (NOT in bible-amendment commit body — code/bible separation discipline preserved).
+
+8. **`.gitignore` §11 #15 decompile-source carveout extension.** Add `android_test/raw/` + `android_test/extraction_outputs/` exclusions. `android_test/tools/` NOT excluded per HB103 Flag 2 disposition (workflow code is not decompile-source per §11 #15 intent). `android_test/WAVE_G_RUNBOOK.md` git-tracked at sandbox path per HB102 §1d option (A) + HB103 Flag 2 alignment.
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — SAR-11 Priority A bug fix preserves provenance-bearing candidates that the leading-slash mismatch had been incorrectly FP-classing. §11 #7 Option B-broad window-around-match relaxation explicitly preserves verbatim-source-text fidelity; fabrication-risk profile unchanged.
+- **§11 #4 (no detection logic)** — SAR-11 is FP suppression INSIDE the extraction pipeline; not scanner detection rules. Downstream consumer (Lynceus) detection logic unchanged.
+- **§11 #6 (no ToS violations)** — Wave G calibration ran on legally-acquired binaries per §11 #15 license posture; SAR-11 codifies FP-suppression rules derived from the calibration. No ToS implications.
+- **§11 #7 (no promotion without provenance)** — Priority A bug fix ensures provenance-bearing candidates aren't lost to incorrect FP filter; promotion gate semantics unchanged.
+- **§11 #8 (no confidence drift)** — FP demotion is category-correction not confidence-floor change; existing promotion-cycle confidence-band rules unchanged. `vendor_template_namespace_uuid` 75-90 sub-band sits below hardcoded-BLE-service tier (80-95) per §8.2 attestation-strength logic.
+- **§11 #11 (amendment-log discipline)** — this CP17 entry is the amendment-log pairing for the §8.2 §-text + SAR-11 row + Runbook corrections in the coordinated commit. Bible HEAD bumps from `1fd254a` to CP17 commit.
+- **§11 #12 (operator-stack self-exclude)** — unchanged; CP17 doesn't touch the Pi-OUI or Rayhunter-supported-modem self-exclude lists.
+- **§11 #13 (unknown-category Lynceus-banned)** — unchanged; CP17 doesn't touch the unknown-category carveout.
+- **§11 #15 (no decompiled-source commit)** — operationalized by the new `.gitignore` carveout (`android_test/raw/` + `android_test/extraction_outputs/` excluded; workflow code + WAVE_G_RUNBOOK.md NOT excluded per HB103 Flag 2 disposition). Vendor-derived artifacts continue NOT entering git index; workflow code + runbook documentation gain tracked-at-sandbox-path status for stable git-history anchor.
+
+### Sequencing post-acceptance
+
+1. **CP17 ratifies at this commit.** Bible HEAD bumps from `1fd254a` to CP17 commit SHA.
+2. **Paired code-sibling commit** (`wave_g_extractor.py` Priority A bug fix; already-applied at Wave G calibration) lands immediately after the bible-amendment commit per CP14/CP15/CP16 precedent.
+3. **State-rotation commit** (PROJECT_STATE.md HB102+HB103+HB104 close + post-CP17 baseline) lands after the code-sibling commit.
+4. **Schema-migration sibling for `vendor_template_namespace_uuid` identifier_type defers to first-promotion-time** per `feedback_enum_amendment_needs_schema_migration_sibling.md` forward-looking-codification caveat (HB101 codified extension).
+5. **Validator-promotion of Wave G pre-v1 staged candidates** per §11 #8 gate + ratified SAR-11 (path-γ authorized via HB57 §E.3 [`e492ac66`] override of MAC-53 three pre-conditions for path-γ shape specifically).
+6. **Round-2 ExtractionWorker dispatch** (installer-class additions per path-γ shape) — separate dispatch when scope-proposal surfaces post-v1.0.0.
+7. **Wave G' / Phase 7 iOS** (full Wave G yield ships v1.1.0) remains gated post-v1.0.0 per CP12 Path-A sequencing.
+
+### §12 Open Questions impact
+
+- **WAVE_G_RUNBOOK §11 #7 source_excerpt cap relaxation** (HB56 pre-v1 deliverable; HB57 §E.1 ratification) — **RESOLVED at CP17 (2026-05-13)** via §11 #7 Option B-broad replacement with `excerpt_type` field. Distinct from project-bible §11 #7.
+- **Wave G Step 0 path-γ scope** (HB57 §E.3 path-γ override) — **PARTIALLY RESOLVED** at HB57; CP17-A SAR-11 codification + Priority A bug fix complete the immediate Wave G pre-v1 deliverables. Full Wave G Step 0 fires per CP12 sequencing post-v1.0.0.
+- **Bible §8.2 manufacturer_app four sub-amends** (HB56 board surface; HB57 §E.4 ratification) — **RESOLVED at CP17 (2026-05-13)** via §8.2 manufacturer_app coalesce-pass single forward-write.
+- **Runbook §3 8 package-name corrections** (HB56 board surface; HB57 §E.7 ratification) — **RESOLVED at CP17 (2026-05-13)** via Runbook §3 vendor target list update + vendor-unavailable-on-Android documentation block.
+- **Skydio Enterprise alt-channel scope-proposal** (HB57 §E.6 ratification) — **CARRIED FORWARD**; 1-paragraph tracking entry at `research_leads/skydio_enterprise_alt_channel.md` lands at first-Wave-B+ heartbeat post-v1.0.0 per HB103 disposition.
+- **DMCA-takedown counter-notice template** (bible §12 deferred-item) — **PARTIALLY RESOLVED at CP16 (2026-05-12) + LEGAL_POSTURE.md HB96 (2026-05-13)**; project-side legal-posture grounding lives publicly at `LEGAL_POSTURE.md`; verbatim §512(g) counter-notice template stays customized-per-takedown rather than pre-drafted.
+
+### §11 #11 self-binding satisfied
+
+This CP17 entry is the §11 #11 amendment-log pairing for the §8.2 + SAR-11 + Runbook amendments in the coordinated commit. Bible HEAD bumps from `1fd254a` to the CP17 commit landed alongside this entry. Schema-version unchanged (CP17 is a §-text + SAR-row + runbook + repo-hygiene CP; the `vendor_template_namespace_uuid` schema sibling defers to first-promotion-time per `feedback_enum_amendment_needs_schema_migration_sibling.md` forward-looking-codification caveat).

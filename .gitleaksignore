@@ -1,0 +1,20 @@
+# Argus .gitleaksignore — false-positive allowlist for gitleaks `generic-api-key` rule.
+#
+# Each fingerprint below was triaged at MAC-50 [comment 2714377b] and board-ratified
+# at MAC-59 [comment b4d9afa0] as a domain false-positive, NOT a leaked credential.
+# Future contributors: re-run `gitleaks git` after any change to these files;
+# the rest of the codebase MUST scan clean.
+#
+# Format per gitleaks docs: {commit-sha}:{file-path}:{rule-id}:{start-line}
+
+# FP: validation gate ID; JSON "key":" shape, not credential
+8850ca62f9782ffd74b4224f8ee9f77b2d2a4b38:db/validation/wave_a_first_promotion.py:generic-api-key:260
+
+# FP: SHA-256 hash of upstream public data per migration 0006 source_row_key
+8850ca62f9782ffd74b4224f8ee9f77b2d2a4b38:extraction_outputs/mac38/wave_a_first_promotion_proposal.json:generic-api-key:29
+
+# FP: validation gate ID JSON dump duplicate of finding #1
+8850ca62f9782ffd74b4224f8ee9f77b2d2a4b38:extraction_outputs/mac38/wave_a_first_promotion_proposal.json:generic-api-key:153
+
+# FP: IMSI-catcher vendor names (KeyW, Jacobs/Engility) in PROJECT_BIBLE.md §3.2 device-category enumeration — surveillance equipment domain vocabulary, not credentials
+0513762cd260062e4053431e93bbef0cef2d9739:PROJECT_BIBLE.md:generic-api-key:41

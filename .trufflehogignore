@@ -1,0 +1,26 @@
+# Argus .trufflehogignore — false-positive path-exclusion list for trufflehog.
+#
+# trufflehog (as of v3.95.2) has no native per-fingerprint allowlist like
+# gitleaks; the closest equivalent is `--exclude-paths` taking a file of
+# path/glob entries. This file IS that exclude-paths file.
+#
+# Canonical scan command (run from repo root):
+#   trufflehog git file://. --exclude-paths=.trufflehogignore --no-update --json
+#
+# Each path below was triaged at MAC-50 [comment 2714377b sibling] and
+# board-ratified at MAC-59 [comment b4d9afa0] as a domain false-positive,
+# NOT a leaked credential. Future contributors: when adding entries here,
+# include a comment block explaining WHY the path is excluded — reviewers
+# need to distinguish FPs from accidentally-committed secrets that someone
+# tried to hide via allowlist.
+#
+# Argus-wide invariant: this file MUST stay narrow (per-file path entries).
+# Never exclude an entire directory; that would silently skip future
+# accidentally-committed secrets in that directory.
+
+# FP: URI detector hits on `http://user:pass@1.2.3.4` — textbook placeholder
+# (literal "user"/"pass" + TEST-NET-1 reserved IP) quoted in source_excerpt
+# from an extracted Rust vapix client documentation example. Argus's own
+# a2_classifications notes already triaged this as documentation-example FP.
+extraction_outputs/mac25/a2_candidates.json
+extraction_outputs/mac25/a2_classifications.json

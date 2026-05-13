@@ -599,17 +599,36 @@ Adjust within range based on specificity, recency, and corroboration. Two indepe
 - **G-7 `paired_identifier_id` + `pair_kind`.** Independent. Pairing discipline operates on identifier structure (LA-bit flip, vendor-as-container, firmware-generation); source-band classification is orthogonal.
 - **G-9 `drone_id_prefix`.** FAA RID is the canonical `primary_registry` case driving CP15. The 481-row FAA RID batch HELD from Phase-4 promotion-cycle-1 promotes at confidence 85 per `primary_registry` single-source rule once CP15 ratifies.
 
-**`manufacturer_app` sub-banding** (added Correction Pass 12 for Wave G — Phase 6 vendor companion app static analysis). The 60–95 outer band breaks down per identifier class, because vendor apps yield different attestation strength per class:
+**`manufacturer_app` sub-banding** (added Correction Pass 12 for Wave G — Phase 6 vendor companion app static analysis; expanded Correction Pass 17 with operator-vs-installer cohort distinction + `vendor_template_namespace_uuid` sub-class + product-family field formalization + SAR-11 codification reference update). The 60–95 outer band breaks down per identifier class, because vendor apps yield different attestation strength per class — and per cohort, because operator-facing apps and installer/pairing-flow apps yield structurally different identifier types.
 
-| Identifier class extracted from vendor app | Sub-band | Rationale |
-|---|---|---|
-| Hardcoded BLE service UUID (128-bit or 16-bit-in-context) | 80–95 | BLE specs require service UUID for discovery; vendor app must contain the canonical value. Highest tier. |
-| Default SSID pattern (vendor-prefix WiFi name) | 70–85 | Clear vendor attestation in code; hardware match TBV at scan time. |
-| Default credential string (plaintext) | 60–80 | Vendor-attested at app version, but firmware may have rotated. Encoded/hashed values dropped (require runtime analysis). |
-| MAC OUI from validation code path | 75–90 | Confirms OUI assignment; cross-checks against IEEE Tier-1 registry. Disagreement → manual flag. |
-| Product-family taxonomy (model names, internal hardware IDs) | 90–95 | Vendor's own product naming inside their own app is near-canonical; primarily feeds aliases / inference candidates. |
+**Cohort distinction (CP17 — Wave G macro thesis).** Vendor companion apps fall into two cohorts that yield different identifier shapes:
 
-Default per-row confidence at extraction time = midpoint of the relevant sub-band. SAR-7 / SAR-8 / SAR-9 corroboration adjusts up; framework-string proximity, single-app-only surfacing, or cross-vendor-default appearance adjusts down. SAR-11 (proposed; gated on Step-2 calibration of first 2 vendor apps) handles framework-UUID and third-party-BLE-library FP classes if calibration shows >5% FP rate from those sources. §8.4 strict-promotion rule (≥80) applies as written.
+- **Operator-facing cohort** (pilot/control/monitor/dashboard/viewer apps used by the end operator). Yields **product-family taxonomy only** — marketing names, internal codenames, device-type enums for the operator's own equipment. Does NOT typically yield BLE service UUIDs, SSID patterns, or default credentials — those identifiers live on the device side and are not surfaced to the operator-facing app. Wave G evidence: 8 operator/pilot apps surveyed yielded 0 BLE UUIDs.
+- **Installer / pairing-flow / technician cohort** (technician-facing setup apps, pairing flows, factory-mode tools). Yields **BLE service UUIDs + default SSID patterns + default credential strings + product-family taxonomy** — the full identifier set because pairing requires the installer app to know the device-side identifier values. Wave G evidence: 2 installer/pairing apps (Flock FS Installer + Getac BWC Viewer) yielded 6 unique vendor BLE UUIDs + complete DeviceType taxonomy.
+
+ExtractionWorker queue ordering should prioritize the installer/pairing-flow cohort for non-product-family identifiers; operator-facing cohort processing produces product-family yield only.
+
+| Identifier class extracted from vendor app | Sub-band | Rationale | Typical cohort |
+|---|---|---|---|
+| Hardcoded BLE service UUID (128-bit or 16-bit-in-context) | 80–95 | BLE specs require service UUID for discovery; vendor app must contain the canonical value. Highest tier. | installer/pairing |
+| `vendor_template_namespace_uuid` (vendor-specific UUID-suffix template; see CP17 sub-amend below) | 75–90 | Vendor-chosen UUID-suffix namespace (e.g., Getac's `-1b7f-430ea194e6cf` suffix). Pattern observation: Validator can enumerate additional vendor UUIDs by walking short-IDs at this template's prefix once the suffix is identified. Below hardcoded-BLE-service tier because individual values are inferred-by-pattern rather than directly attested. | installer/pairing |
+| Default SSID pattern (vendor-prefix WiFi name) | 70–85 | Clear vendor attestation in code; hardware match TBV at scan time. | installer/pairing |
+| Default credential string (plaintext) | 60–80 | Vendor-attested at app version, but firmware may have rotated. Encoded/hashed values dropped (require runtime analysis). | installer/pairing |
+| MAC OUI from validation code path | 75–90 | Confirms OUI assignment; cross-checks against IEEE Tier-1 registry. Disagreement → manual flag. | installer/pairing (validation paths are typically installer-side) |
+| Product-family taxonomy — `marketing_name` (e.g., "Mavic Pro", "Inspire 2") | 90–95 | Vendor's own marketing product naming inside their own app is near-canonical. | both cohorts |
+| Product-family taxonomy — `internal_codename` (e.g., Flock `AVICORE` / `FALCON` / `RAVEN`; DJI internal SKU codes) | 90–95 | Engineering-internal naming surfacing in app code (tracking analytics, debug paths, telemetry tags). Often more stable than marketing names across product revs. | both cohorts |
+| Product-family taxonomy — `device_type_enum_value` (e.g., Flock `DeviceType.CONDOR` / `DeviceType.DRONEDOCKINGSTATION` / `DeviceType.PICARDPTZ`) | 90–95 | Authoritative product-family taxonomy from vendor's own enum declaration in app code. Highest specificity tier of product-family identifiers; primarily feeds aliases / inference candidates. | both cohorts |
+
+**`vendor_template_namespace_uuid` sub-class** (CP17 sub-amend (b); Wave G evidence base). When a vendor's BLE UUIDs share a common non-standard suffix (e.g., Getac's `00000000-0000-1000-1b7f-430ea194e6cf` + `0000200b-0000-1000-1b7f-430ea194e6cf` both share `-1b7f-430ea194e6cf`), the suffix represents the vendor's UUID-namespace allocation. ExtractionWorker should:
+
+1. Identify the template via cross-UUID suffix-match (≥2 UUIDs in the vendor's app sharing identical 12+ hex-char suffix).
+2. Stage the template as a candidate `identifier_type='vendor_template_namespace_uuid'` row with `identifier=<suffix>` at confidence midpoint of 75–90 sub-band.
+3. Stage individual UUID values matching the template at the standard hardcoded-BLE-service tier (80–95) per the existing rule — the template-namespace and individual-value rows compose, not exclude.
+4. At Validator-promotion time, the template row enables short-ID-walking inference (test additional UUIDs at the same template prefix against on-device probes) without requiring binary-decompile evidence for each.
+
+The Getac BWC Viewer 2-UUID pattern (Wave G HB56 deliverable) is the canonical evidence base. Future Wave G' / iOS surfaces may broaden the evidence base; SAR-11 candidate-FP-class enumeration applies to `vendor_template_namespace_uuid` extracts as it does to other UUID candidates.
+
+Default per-row confidence at extraction time = midpoint of the relevant sub-band. SAR-7 / SAR-8 / SAR-9 corroboration adjusts up; framework-string proximity, single-app-only surfacing, or cross-vendor-default appearance adjusts down. **SAR-11 (ratified at Correction Pass 17, 2026-05-13)** handles framework-UUID and third-party-BLE-library FP classes per the chunked Priority A/B/C/D structure documented at BIBLE_AMENDMENTS.md SAR-11. §8.4 strict-promotion rule (≥80) applies as written.
 
 ### 8.3 Dedup logic
 

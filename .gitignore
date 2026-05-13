@@ -37,3 +37,10 @@ venv/
 # Pattern parity with raw/ + logs/ exclusions above; canonical DB rows live in db/argus.db.
 wigle/raw/
 wigle/pacer.json
+
+# Wave G sandbox — vendor-derived artifacts per bible §11 #15 decompile-source carveout.
+# NOT gitignored: android_test/WAVE_G_RUNBOOK.md (workflow document) +
+# android_test/tools/extraction/wave_g_extractor.py (workflow code).
+# Added Correction Pass 17 (2026-05-13).
+android_test/raw/
+android_test/extraction_outputs/
