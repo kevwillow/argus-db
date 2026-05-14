@@ -39,6 +39,7 @@ from db.validation.export_lynceus import (
     _classify_row,
     _derive_argus_run_id,
     _format_description,
+    _normalize_datetime,
     _open_readonly,
     _passes_geographic_scope,
     run,
@@ -1324,6 +1325,58 @@ def test_csv_description_byte_stable_for_three_rows(tmp_path: Path) -> None:
     assert by_id["3"]["description"] == "Raspberry Pi Foundation unknown"
 
 
+# ---------------------------------------------------------------------------
+# CP22 (2026-05-14) — `_normalize_datetime` helper coverage.
+# Bible §7.5 sub-amend codifies canonical timestamp format as ISO-8601 UTC
+# with `Z` suffix at seconds precision. The helper accepts the four
+# DATETIME shapes the historical write paths emit + idempotency on the
+# canonical form. F6 dispatch close.
+# ---------------------------------------------------------------------------
+
+
+def test_normalize_datetime_empty_and_none() -> None:
+    assert _normalize_datetime(None) == ""
+    assert _normalize_datetime("") == ""
+
+
+def test_normalize_datetime_iso_with_microseconds_offset() -> None:
+    # Real CSV row shape from the `last_verified` write path.
+    assert (
+        _normalize_datetime("2026-05-14T06:13:42.204792+00:00")
+        == "2026-05-14T06:13:42Z"
+    )
+
+
+def test_normalize_datetime_iso_with_z_is_idempotent() -> None:
+    assert _normalize_datetime("2026-05-11T18:21:50Z") == "2026-05-11T18:21:50Z"
+
+
+def test_normalize_datetime_space_separated_treats_as_utc() -> None:
+    # Wave-A historical write-path form.
+    assert _normalize_datetime("2026-05-06 00:30:28") == "2026-05-06T00:30:28Z"
+
+
+def test_normalize_datetime_date_only_emits_midnight_utc() -> None:
+    # Date-only CSV row preserves only the day signal; emit midnight UTC.
+    assert _normalize_datetime("2026-05-10") == "2026-05-10T00:00:00Z"
+
+
+def test_normalize_datetime_iso_with_nonzero_offset_coerces_to_utc() -> None:
+    # 2026-05-14T08:13:42-04:00 == 2026-05-14T12:13:42Z.
+    assert (
+        _normalize_datetime("2026-05-14T08:13:42-04:00") == "2026-05-14T12:13:42Z"
+    )
+
+
+def test_normalize_datetime_unrecognized_shape_raises() -> None:
+    # A future write path emitting a fifth shape MUST surface, not silently
+    # produce malformed CSV (the F6 class of bug).
+    import pytest
+
+    with pytest.raises(ValueError):
+        _normalize_datetime("not-a-timestamp")
+
+
 def test_csv_first_seen_non_empty_for_wave_a_row(tmp_path: Path) -> None:
     """CP11 verification clause #1: `first_seen` is non-empty for the Wave-A
     row.
@@ -1347,7 +1400,11 @@ def test_csv_first_seen_non_empty_for_wave_a_row(tmp_path: Path) -> None:
 
     _, csv_rows = _read_cp11_csv(exports_dir / "argus_export.csv")
     wave_a = next(row for row in csv_rows if row["id"] == "1")
-    assert wave_a["first_seen"] == "2026-05-06 00:30:28"
+    # CP22 (2026-05-14) — `first_seen` / `last_verified` normalized to canonical
+    # ISO-8601 UTC with `Z` at seconds precision per bible §7.5 sub-amend.
+    # Source DB row carries the historical space-separated form
+    # `"2026-05-06 00:30:28"`; `_normalize_datetime` coerces to Z form.
+    assert wave_a["first_seen"] == "2026-05-06T00:30:28Z"
     # NULL → "" per the existing `manufacturer or ""` handling pattern.
     assert wave_a["last_verified"] == ""
     # Other rows: both NULL → both empty.

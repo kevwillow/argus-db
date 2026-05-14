@@ -550,7 +550,27 @@ The split exists because: (a) JSON is sized for runtime alert-feed consumption w
 **CSV population logic (CP11 sub-A).**
 - `argus_record_id` — call `db.export.argus_record_id.argus_record_id(row.identifier_type, row.identifier)` per SAR-10. 16-char hex.
 - `description` — call shared `_format_description(row)` (CP8 ≤80-char flat) — same function powers JSON and CSV; single source of truth.
-- `first_seen` / `last_verified` — direct from `identifiers` table columns.
+- `first_seen` / `last_verified` — emitted in canonical timestamp format per the **CP22 sub-amend** below; CSV writer calls `_normalize_datetime()` against the underlying DB value before writing.
+
+**CSV timestamp canonical format — CP22 (2026-05-14) directive.**
+
+The `identifiers.first_seen` and `identifiers.last_verified` SQLite columns carry type `DATETIME` (typeless TEXT — no SQL-level format constraint), and historical write paths produced at least four distinct shapes across 22,532 rows: ISO-8601 with `Z`, ISO-8601 with explicit UTC offset (often with microseconds), space-separated `YYYY-MM-DD HH:MM:SS`, and date-only `YYYY-MM-DD`. The MAC-124 F6 smoke test (2026-05-14T22:17Z, board-authorized at MAC-124 [`330573f0`](/MAC/issues/MAC-124#comment-330573f0-97e5-40c5-9dcf-000af16c782e)) surfaced the resulting downstream-consumer impact: 53 of 103 Lynceus-recognized rows errored at `_parse_date` parse rather than importing.
+
+**Canonical CSV emission format:** `"YYYY-MM-DDTHH:MM:SSZ"` (ISO-8601 UTC, `Z` suffix, seconds precision). Matches the precedent set by `_meta.exported_at` in the JSON exports (which already uses this form per `_utc_now_iso`). Microseconds are dropped at emission. Date-only DB rows project to `"YYYY-MM-DDT00:00:00Z"` (midnight UTC; preserves the only signal the row carries). Empty / `NULL` DB rows emit as the empty string `""`.
+
+**Emission pipeline:** `db/validation/export_lynceus.py::_normalize_datetime(value)` is called against `row.first_seen` and `row.last_verified` immediately before `csv.DictWriter.writerow`. The helper is conservative: any value it cannot parse into one of the four accepted historical shapes raises `ValueError`, which surfaces as an export-time halt rather than silently producing a malformed CSV row (the F6 class of bug). A future write path emitting a fifth shape immediately fails the export rather than degrading the contract.
+
+**Consumer-side disposition (Lynceus):** Lynceus's `_parse_date` is multi-format tolerant for backward compatibility with archived exports that pre-date the CP22 normalization landing — it accepts ISO-with-Z (canonical), ISO-with-offset, space-separated, and date-only in priority order. The defense-in-depth posture (Argus normalizes + Lynceus tolerates) lets archived pre-CP22 exports continue to import cleanly while new exports carry the canonical shape. Consumers building parsers against the v1.0+ contract should target the Z form per this directive.
+
+**Companion §7.5-column shape-vs-format audit (CP22 surface; not fixed in this dispatch).** Authoring the CP22 timestamp normalization, the following adjacent §7.5 column shape questions surfaced as candidate findings — board may queue for future CPs as drift surfaces, none are ship-blocking for v1.0.0:
+
+- **`identifier`** column normalization is type-specific per §4.4 but the CSV column itself has no canonical-form spec independent of identifier_type. SAR-10 hashing assumes the normalized form, so DB writes must already be canonical — but a CSV consumer that re-normalizes risks divergence. Codification candidate if a Lynceus-side normalization mismatch surfaces.
+- **`manufacturer` / `model`** strings carry no codified casing / whitespace / Unicode normalization. Same vendor may surface as `"Apple"`, `"Apple Inc."`, `"APPLE"` across sources. Affects Lynceus operator-side `vendor_overrides.yaml` key matching (exact-string lookup per `import_argus.py::resolve_severity`). Codification candidate if vendor_override hit-rate complaints surface.
+- **`source_url`** carries no scheme/trailing-slash/case canonicalization spec. Affects dedup if URL comparison is used as a key elsewhere.
+- **`notes`** field carries heterogeneous structured content across CPs: facts-only basis citations (§11 #16), `upstream_license_posture` canonical key (CP21 + sid=41 MAC-118), and free-form prose. No JSON / structured-content parsing contract for downstream consumers. Codification candidate if a consumer parser ships against `notes` semantics.
+- **`confidence`** range 0-100 is codified per §8.2 source-band rules but not restated in §7.5. Minor docs gap; format is structurally enforced via the §8.2 ladder and CP19 source_type exclusion.
+
+These findings are surfaced now to bound the audit's scope; CP22 codifies the timestamp shape only. Future CPs may codify the others as drift surfaces.
 
 **Behavioral-signatures sibling export — CP18 (2026-05-13) directive.**
 

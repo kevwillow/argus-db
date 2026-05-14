@@ -345,6 +345,64 @@ def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _normalize_datetime(value: str | None) -> str:
+    """Normalize a `DATETIME` column value to canonical ISO-8601 UTC with `Z`.
+
+    Per CP22 (bible §7.5 sub-amend), the canonical timestamp format for
+    `first_seen` and `last_verified` in `argus_export.csv` is ISO-8601 UTC
+    with `Z` suffix at seconds precision: ``"YYYY-MM-DDTHH:MM:SSZ"``. The
+    `identifiers` table column type is `DATETIME` (SQLite-typeless TEXT)
+    with no SQL-level format constraint, and historical write paths produced
+    at least four distinct shapes:
+
+    - empty (``""`` or ``NULL``): ``""`` (preserved)
+    - ISO-8601 with offset (``"2026-05-14T06:13:42.204792+00:00"``): coerced
+      to UTC, microseconds dropped, emitted as Z form.
+    - ISO-8601 with `Z` (``"2026-05-11T18:21:50Z"``): idempotent.
+    - space-separated (``"2026-05-06 00:30:28"``): treated as UTC, emitted
+      as Z form.
+    - date-only (``"2026-05-10"``): emitted as midnight UTC Z form
+      (``"2026-05-10T00:00:00Z"``); preserves the only signal the row
+      carries (write path lost intra-day precision).
+
+    Any input that does not parse into one of the above shapes raises
+    `ValueError` so a future write-path emitting a fifth shape surfaces
+    immediately rather than silently producing malformed CSV (the F6
+    smoke-test class of bug).
+    """
+    if value is None or value == "":
+        return ""
+    raw = value.strip()
+    # ISO-8601 with explicit offset or `Z` — Python 3.11+ `fromisoformat`
+    # accepts both. Coerce to UTC, drop microseconds, emit Z form.
+    if "T" in raw:
+        normalized = raw[:-1] + "+00:00" if raw.endswith("Z") else raw
+        try:
+            dt = datetime.fromisoformat(normalized)
+        except ValueError as exc:
+            raise ValueError(f"unparseable ISO-8601 timestamp: {value!r}") from exc
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        else:
+            dt = dt.astimezone(timezone.utc)
+        return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+    # Space-separated `YYYY-MM-DD HH:MM:SS` — historical write-path form.
+    if " " in raw:
+        try:
+            dt = datetime.strptime(raw, "%Y-%m-%d %H:%M:%S")
+        except ValueError as exc:
+            raise ValueError(f"unparseable space-separated timestamp: {value!r}") from exc
+        return dt.replace(tzinfo=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # Date-only `YYYY-MM-DD` — midnight UTC.
+    if len(raw) == 10 and raw.count("-") == 2:
+        try:
+            dt = datetime.strptime(raw, "%Y-%m-%d")
+        except ValueError as exc:
+            raise ValueError(f"unparseable date-only timestamp: {value!r}") from exc
+        return dt.replace(tzinfo=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    raise ValueError(f"unrecognized timestamp shape: {value!r}")
+
+
 def _format_description(row: ActiveRow) -> str:
     """Build a §7.5-compliant description ≤80 chars per CP8 flat form.
 
@@ -659,8 +717,8 @@ def _write_csv(path: Path, rows: list[ActiveRow], schema_version: int, exported_
                     "source_excerpt": (row.source_excerpt or "").replace("\r\n", "\n"),
                     "geographic_scope": row.geographic_scope or "",
                     "description": _format_description(row),
-                    "first_seen": (row.first_seen or "").replace("\r\n", "\n"),
-                    "last_verified": (row.last_verified or "").replace("\r\n", "\n"),
+                    "first_seen": _normalize_datetime(row.first_seen),
+                    "last_verified": _normalize_datetime(row.last_verified),
                     "notes": (row.notes or "").replace("\r\n", "\n"),
                 }
             )

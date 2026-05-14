@@ -2458,3 +2458,60 @@ Each touch has independent ratification anchor (per Source enumeration above). T
 This CP21 entry is the §11 #11 amendment-log pairing for the §4.4 + §11 #16 + §8.2 §-text changes in the coordinated commit. Bible HEAD bumps from [`9979015`](https://github.com/CascadeForge/argus/commit/9979015) to the CP21 commit landed alongside this entry. Schema-version unchanged (CP21 is a §-text + amendment-log CP; no DB migration touched). The §4.4 mapping table reaches 48 cumulative entries matching the live identifier_type CHECK enum (27 pre + 14 mig-0018 + 7 mig-0019 = 48; verified live at CP21 authoring time).
 
 ═══════════════════════════════════════════════════════════════════════
+
+
+## Correction Pass 22 — §7.5 CSV timestamp canonical format (`first_seen` / `last_verified` ISO-8601 UTC `Z`)
+
+**Date:** 2026-05-14
+**Source:** MAC-124 F6 surface-back ([`1b4b77b4`](/MAC/issues/MAC-124#comment-1b4b77b4-91e2-4471-b2f0-8ea081379397)) + board ratification of Option (c) — Argus normalizes + Lynceus tolerates + bible codifies — at MAC-124 [`c077ba04`](/MAC/issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60).
+
+**Bible commit:** This entry + PROJECT_BIBLE.md §7.5 sub-amend (canonical timestamp format directive + §7.5-column shape-vs-format audit findings) + `db/validation/export_lynceus.py::_normalize_datetime` helper + helper applied at CSV writer + `tests/test_export_lynceus.py` 7 new `_normalize_datetime` unit tests + 1 updated CP11 first_seen-shape assertion. Bible HEAD bumps from [previous CP21 HEAD] → this CP22 commit.
+
+**Status:** Ratified by board at MAC-124 [`c077ba04`](/MAC/issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60). CEO authored coordinated bible-text + Argus-side normalization helper + Lynceus-side `_parse_date` multi-format tolerance (defense in depth) + paired test coverage on both sides; no schema change; no migration; no worker dispatch.
+
+**Binds:** Validator (no execution — §7.5 sub-amend is export-discipline reference; helper applied at export_lynceus.py CSV writer time), DBArchitect (none — no migration), ExtractionWorker (none — write paths continue to emit any-shape DATETIME values; `_normalize_datetime` coerces at CSV emission time only), Lynceus integration team (informational — `_parse_date` extended to 4-format tolerant; canonical Z form is the v1.0+ contract; archived pre-CP22 exports continue to import via tolerance).
+
+### Why this Correction Pass exists
+
+The MAC-124 F6 smoke test (`lynceus-import-argus --dry-run` against `argus_export.csv` HEAD `851f76b`, board-authorized at MAC-124 [`330573f0`](/MAC/issues/MAC-124#comment-330573f0-97e5-40c5-9dcf-000af16c782e)) produced unexpected divergence from the §6.3 prediction: 50 imported / 53 errors instead of the predicted 103 imported / 0 errors. **All 53 errors were timestamp parse failures** rooted in a v0.3 contract gap the HB39 Lynceus-handoff bundle missed: `identifiers.first_seen` / `identifiers.last_verified` SQLite columns carry type `DATETIME` (typeless TEXT, no SQL constraint) and historical Argus write paths emit at least four distinct shapes — but Lynceus's `_parse_date` (with comment "UTC timestamps in Argus exports use this format") accepted only the space-separated `"%Y-%m-%d %H:%M:%S"` form, present in only 1 of 22,532 rows.
+
+CP22 codifies the canonical CSV timestamp format, lands the Argus-side normalization, lands the Lynceus-side multi-format tolerance for backward compatibility, and surfaces adjacent §7.5 column shape-vs-format gaps as audit findings.
+
+### Corrections applied
+
+1. **PROJECT_BIBLE.md §7.5 sub-amend (`CSV timestamp canonical format — CP22 (2026-05-14) directive`)** appended after the CP11 sub-A clause. Codifies:
+   - Canonical CSV emission: `"YYYY-MM-DDTHH:MM:SSZ"` (ISO-8601 UTC, Z suffix, seconds precision; matches `_meta.exported_at` precedent).
+   - Date-only DB rows project to `"YYYY-MM-DDT00:00:00Z"` (preserves day signal).
+   - Empty / NULL → empty string `""`.
+   - Conservative emission helper raises `ValueError` on unrecognized shapes (future write paths surface immediately rather than silently producing malformed CSV).
+   - Consumer-side disposition: Lynceus `_parse_date` is multi-format tolerant for archived-export backward compat (Argus normalizes + Lynceus tolerates = defense in depth).
+2. **PROJECT_BIBLE.md §7.5 CP11 sub-A bullet for `first_seen` / `last_verified`** updated to reference CP22 normalization helper.
+3. **PROJECT_BIBLE.md §7.5 column shape-vs-format audit (CP22 surface; not fixed in this dispatch)** appended to the CP22 sub-amend block. Five candidate findings flagged for future-CP queueing as drift surfaces: `identifier` normalization, `manufacturer`/`model` casing/whitespace/Unicode, `source_url` URL canonicalization, `notes` heterogeneous structured content, `confidence` 0-100 range docs gap. None ship-blocking for v1.0.0.
+4. **`db/validation/export_lynceus.py::_normalize_datetime(value)`** helper added with full docstring covering accepted shapes + canonical output + raise-on-unrecognized-shape behavior. Applied to `row.first_seen` and `row.last_verified` immediately before `csv.DictWriter.writerow`.
+5. **`tests/test_export_lynceus.py`** + 7 new `_normalize_datetime` unit tests covering empty/None, ISO-with-µs-offset, ISO-with-Z idempotency, space-separated, date-only, ISO-with-nonzero-offset → UTC coercion, and unrecognized-shape ValueError. Updated `test_csv_first_seen_non_empty_for_wave_a_row` assertion from `"2026-05-06 00:30:28"` (pre-CP22 space-separated form, which the test fixture still emits at the DB layer) to `"2026-05-06T00:30:28Z"` (post-CP22 normalized form). Full suite 69/69 → 76/76 passing.
+6. **`~/lynceus-warden-main/src/lynceus/cli/import_argus.py::_parse_date(value)`** extended to multi-format tolerant. Tries ISO-with-Z (canonical) → ISO-with-offset → space-separated → date-only in priority order. Returns int Unix UTC timestamp or None for empty. Backward-compat with archived pre-CP22 exports.
+7. **`~/lynceus-warden-main/tests/test_import_argus.py`** + 5 new `_parse_date` tolerance tests covering all 4 shapes + non-zero-offset coercion-to-UTC. Restored a `_wl_count` assertion to `test_malformed_date_logged_as_row_error` that was orphaned by the CP22 edit. Full suite 77/77 → 82/82 passing.
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — unchanged; CP22 amendments codify already-emitted-but-unspec'd format conventions.
+- **§11 #8 (no confidence drift)** — unchanged; CP22 operates at CSV emission layer only; confidence values pass through unchanged.
+- **§11 #11 (amendment-log discipline)** — this CP22 entry is the §11 #11 amendment-log pairing for the §7.5 sub-amend `+` `_normalize_datetime` helper `+` `_parse_date` tolerance commits. Bible HEAD bumps to the CP22 commit alongside this entry.
+
+### Sequencing post-acceptance
+
+1. **CP22 ratifies at this commit.** Bible HEAD bumps to CP22 commit SHA. Schema unchanged; no migration; no worker dispatch.
+2. **CSV regen runs as Step 4 of F6 dispatch** to capture post-CP22 `argus_export.csv` with normalized `first_seen` / `last_verified` columns and a fresh sha256 anchor.
+3. **Smoke test re-runs as Step 5 of F6 dispatch** (`lynceus-import-argus --dry-run` against the regenerated CSV). Expected output: Total 22,532 / Imported **103** / Errors **0** / mac_range 17,794 / unknown_type 4,635 / reconciliation holds.
+4. **Decisions A1/A2/B1/B2 (enum extension scope + source_type discipline placement)** stay deferred per board direction at MAC-124 [`c077ba04`](/MAC/issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60); CP22 unblocks the 103-row clean baseline that A1/A2/B1/B2 builds on.
+
+### §12 Open Questions impact
+
+- **`first_seen` / `last_verified` canonical CSV format** — RESOLVED at CP22 per board ratification. Canonical: ISO-8601 UTC with `Z`, seconds precision. Pre-CP22 archived-export backward compat preserved Lynceus-side via `_parse_date` multi-format tolerance.
+- **Adjacent §7.5 column shape-vs-format gaps (`identifier`, `manufacturer`/`model`, `source_url`, `notes`, `confidence` docs gap)** — SURFACED at CP22 audit. Not fixed in this dispatch; future CP candidates as drift surfaces.
+
+### §11 #11 self-binding satisfied
+
+This CP22 entry is the §11 #11 amendment-log pairing for the §7.5 sub-amend §-text changes in the coordinated commit. Bible HEAD bumps to the CP22 commit landed alongside this entry. Schema-version unchanged (CP22 is a §-text + helper + tests CP; no DB migration touched).
+
+═══════════════════════════════════════════════════════════════════════
