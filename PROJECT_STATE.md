@@ -18,6 +18,63 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-14T~13:45Z–~14:30Z (**MAC-101 close-of-close — three-item batch (Item A manufacturers-xcheck predicate + Item B Watts A/S CSV regen lag + Item C Wave-A deferred-dir custom-mapper heartbeat) fully landed; CP20 (SAR-13 S.1+S.2+S.3 + §11 #16 Feist) + SAR-12 §6 recurrence #9 (class (b)-adjacent table-scope sub-class first instance) ratified by board**). Anchored on commits `ff2d771` (Item A: multi-registry xcheck predicate + 13/75 Class B clears + close regen) / `b2563c7` + `d5623d4` (Item C Phase 1: per-shape mappers + 365 raw_observations staged) / `0921003` (Item C Phase 2 initial triage: 0 immediate promotions + 1 §7.3 reject + 364 HOLDs) / `8de7309` (CP20 bible: SAR-13 + §11 #16) / `dd26b59` (CP20 fix: MAC-105/106/107 → MAC-108/109/110 ID-collision remap) / `42d7860` (MAC-108: Phase-1 mapper URL-template rerun under SAR-13 S.2; 199 source-url-direct corrections) / `5f1bf2e` (MAC-110: Stage 1 + Stage 2 + export regen; 24 row-ops Stage 1 + 145 Stage 2 promotions + 38 bx_sig backfills + Q5 leg 1 conf uplift + 1 Q7 conflict + 15 CVE-FP) / `047a273` (CEO bible append: SAR-12 §6 recurrence #9) plus this CEO Phase C state-rotation commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
+
+**MAC-101 three-item batch dispatch CLOSED.** Board dispatch [`c81b8df5`](/MAC/issues/MAC-101#comment-c81b8df5-38a5-473f-9638-518c74e47849) authorized three structurally-independent items with CEO empowered to route. CEO decomposed into [MAC-102](/MAC/issues/MAC-102) (Item A → Validator; Item B coalesced) + [MAC-103](/MAC/issues/MAC-103) (Item C Phase 1 → ExtractionWorker) + [MAC-104](/MAC/issues/MAC-104) (Item C Phase 2 → Validator). Cascade extended at MAC-104 CEO ratification slate (CP20 + 3 grandchildren): [MAC-108](/MAC/issues/MAC-108) (ExtractionWorker mapper-rerun) + [MAC-109](/MAC/issues/MAC-109) (DBArchitect migration 0018 + SAR-13 S.3 routing) + [MAC-110](/MAC/issues/MAC-110) (Validator close-out; auto-woke on chain unblock). Board ratification at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) accepted all three CEO Phase-C ratifications (option β multi-registry + SAR-13 + §11 #16); declared SAR-12 recurrence #9 (table-scope sub-class).
+
+**Aggregate outcomes:**
+
+- **Item A (Class B re-triage):** 13/75 cleared (diverged from board's anticipated ~60). Validator caught at §7 case 4: `manufacturers` table is §2.1 surveillance lexicon (34 rows, not corporate registry). CEO ratified option β at MAC-102 [`ad5a564d`](/MAC/issues/MAC-102#comment-ad5a564d): multi-registry positive-evidence xcheck across `fcc_grantees` (50,153 rows) + `procurement_records.recipient_name`. 13 clears via fcc_grantees (8 Becton Dickinson + 2 Logical Product + Atlas Copco + Cardinal Health + Seek Thermal); 62 sustained with `registry_xcheck_attempted=true` (first S.7 cumulative-full-enum self-check application post-codification at db5cd53). Sibling memo `feedback_predicate_spec_table_semantics_audit.md` codifies the table-semantics declaration discipline. SAR-12 §6 recurrence #9 board-codified at `047a273`.
+- **Item B (CSV regen lag):** coalesced into Item A close-regen per board §3.2 authorization. `argus_export.csv` 22,265 → 22,280 (Item A close) → 22,464 (MAC-110 final). Watts A/S id=22735 row paste-verified in regenerated CSV.
+- **Item C (Wave-A deferred-dir custom-mapper heartbeat):** 365 raw_observations staged at Phase 1 (10 per-shape mappers under `scripts/wave_a_deferred_dir_mappers/`; 6 NEW sources rows ids 38-43 with NO_LICENSE_DECLARED sentinels for sids 39/42 — first Feist-defensible §11 #16 case study). Phase 2 initial triage 0 immediate + 1 §7.3 reject + 364 HOLDs across 6 reason classes; CEO ratified Q1-Q7 slate at MAC-104 [`3daf49f0`](/MAC/issues/MAC-104#comment-3daf49f0) → CP20 bible amendment at `8de7309` (SAR-13 S.1+S.2+S.3 + §11 #16). MAC-107 refined-pass landed 40 promotions @ conf=65 crowdsourced before cancellation-as-superseded; MAC-110 close-out landed Stage 1 (22 supersedure inserts + 1 id=1 conf uplift + 1 Q7 conflict + 1 CP19 audit) + Stage 2 (145 promotions + 107 held round-2 + 15 CVE-FP filed + 19 mac58 deferred) + 38 bx_sig backfills per SAR-13 §S.3 routing. **TOTAL ITEM C: 185 raw_observations promoted to identifiers + 38 to behavioral_signatures.**
+
+**Net DB deltas (MAC-88 baseline → MAC-101 close):**
+
+| Metric | MAC-88 baseline | MAC-101 close | Delta |
+|---|---|---|---|
+| `identifiers` active (`superseded_by IS NULL`) | 22,266 | **22,464** | +198 (13 Item A + 40 MAC-107 + 145 MAC-110 Stage 2) |
+| `identifiers` total | 22,324 | 22,544 | +220 (incl. 22 supersedure inserts) |
+| `identifiers` superseded | 58 | 80 | +22 (MAC-107→MAC-110 lens-reclass chain) |
+| `behavioral_signatures` | 55 | **93** | +38 (SAR-13 §S.3 bx_sig backfill from src=31/32 detector-internal patterns) |
+| `conflicts` | 4 | 20 | +16 (1 Q7 attribution-pending + 15 CVE-FP per SAR-7 #1) |
+| `source_reclassifications` | 808 | 809 | +1 (Q5 leg 1 e4:aa:ea conf 65→70 CP19 audit) |
+| `sources` rows | 37 | 43 | +6 (sids 38-43 Wave-A deferred-dir resolutions; §11 #16 license_posture sentinels for sids 39/42) |
+| `schema_version` | 17 | 18 | +1 (MAC-109 migration 0018: 18 new identifier_types CHECK extension per SAR-13 S.3 routing) |
+| `argus_export.json` standard | 455 | 494 | +39 entries |
+| `argus_export_high_confidence.json` | 113 | 113 | 0 (CP19 source_type exclusion: all 198 MAC-101 promotions are crowdsourced or unknown-cat) |
+| `argus_export_behavioral_signatures.json` | 55 | 55 | 0 (all 38 backfills at conf=65 below ≥70 floor) |
+
+**Architectural firsts (cumulative across MAC-101 + grandchildren):**
+
+1. Multi-registry xcheck predicate (formerly single-table; option β scope-extension to in-DB registries is CEO-ratifiable pattern)
+2. B→A reclassification of held PII-review rows via positive-evidence path
+3. Validator §7 case 4 halt where as-spec predicate was load-bearing but data-empirically vacuous
+4. First substantive S.7 cumulative-full-enum application post-codification at db5cd53
+5. First per-shape custom-mapper precedent codified (SAR-13 S.1; one mapper per shape; lives in `scripts/wave_a_deferred_dir_mappers/`)
+6. First Feist-defensible promotion from NO_LICENSE_DECLARED source (§11 #16; sid=39 EthanThePhoenix38 OUIs + e4:aa:ea uplift)
+7. First "promote then cancel issue" pattern (MAC-107; CP19 source_row_key keeps landed work idempotent; cancellation stops further heartbeats but NOT committed work) — `feedback_cancelled_issue_landed_writes_survive.md`
+8. First MAC-107→MAC-110 lens-reclass supersedure chain (22 rows demonstrate supersedure-vs-update discipline for attribution-lens re-ratification under §11 #7 + §11 #8 binding)
+9. First post-CP20 bx_sig backfill via SAR-13 §S.3 routing (38 detector-internal rows routed to behavioral_signatures, not identifiers)
+10. First MAC-63 deferred-dir cohort fully flushed (10/10 dirs; all 365 Wave-A deferred-dir raw_observations now have dispositions)
+11. First sub-class-aware SAR-12 §6 threshold revision (board's "two more before meta-revision" framing → meta-revision triggers on three SAME-sub-class recurrences, not three total post-codification; codified at recurrence #9 entry)
+
+**Forward sequence (carried from MAC-110 §E.4 + MAC-101 close §6.5):**
+
+- **CP21 candidate — `device_category='alpr_camera'` dispatch-typo bible-side fix** (standardize on `alpr`; id=1 + 30 Flock rows already use `alpr`). Surfaced by MAC-110 Validator. Not blocking.
+- **CP21 candidate — round-2 vocab extension for 107 held candidates** (src=27 asdstan_* + dji_protocol_struct_format; src=29 ble_* cascade-ordering probe needed; src=41 android_package_name + rest_endpoint + cloud_endpoint_fqdn + gpt_partition_uuid + lan_endpoint_url + boot_log_signature; src=42 chipset_codename ×39 + firmware_build_string + firmware_build_uuid). Board decides extension vs accept-as-out-of-scope.
+- **CP21 candidate — 14 net-new MAC-109 (migration 0018) identifier_types are DROPPED-class by default in Lynceus export** (no §4.4 MAP). Most legitimately analytical/sub-field; a few plausibly MAP-able: `ble_service_uuid` (aliases existing `ble_service`), `ble_company_id` (aliases `ble_manufacturer_id`). Suggest CP21 §4.4 MAP amendment if v1.x Lynceus consumer wants those wired through.
+- **§11 #16 ↔ migration 0016 LICENSE column composition documentation** (tracked-for-future per board at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8); not blocking). Next memo-refinement cycle.
+- **Land-children-FIRST-then-bible-memo discipline** (candidate SAR-class refinement per board; CP20 8de7309 referenced draft MAC-105/106/107, system assigned MAC-108/109/110, required fix dd26b59). Tracked at `feedback_bible_amendment_child_issue_id_ordering.md`. Next memo-refinement cycle.
+- **§6 meta-revision threshold language revision** (sub-class-aware re-counting per board's recurrence #9 framing). Tracked at SAR-12 §6 recurrence #9 entry; next memo-refinement cycle.
+
+**Out-of-scope items (board §5 deferrals; not addressed in this dispatch):** 31 held Wave-A behavioral_signatures (Wave-C/D/E second-source corroboration); FCC EAS per-FCC-ID retry; public-flip preparation; Rayhunter v0.X migration; goal-title PATCH (board's separate parallel action); SAR-12 class (b) sub-class split (one more table-scope recurrence away from meta-revision per board's sub-class-aware count); Wave-C source dispatch planning.
+
+**PROJECT_STATE.md header (lines 3-7) staleness flag:** the current header still cites Phase 3 / Phase 4 wave-B-first / pitch-behavior 2026-05-18 binding from CP3-era (2026-05-04). Actual state is post-Wave-B + post-CP20. Header rewrite is a board-class refresh decision; not actioning unilaterally as part of this state rotation. Flagged for next memo-refinement cycle or board direction.
+
+---
+
+### Prior action — MAC-88 Stream 1+2 close (preserved verbatim)
+
 CEO heartbeat 2026-05-14T~03:00Z–~04:30Z (**MAC-88 Stream 1 + Stream 2 close — IEEE pii_review_hold entity-type triage + 4-refinement discipline-evolution batch + SAR-12 recurrence #8 (class (b) rule-scope sub-class first instance) + Class D Watts A/S CEO ratification**). Anchored on commits `db5cd53` (Stream 2: SAR-12 §2 class (a) methodology + source_reclassifications unit tests) / `c77621d` (MAC-99 Validator IEEE PII triage; 3,445 Class A promotions) / `ddc9b30` (MAC-100 ExtractionWorker post-promotion regen) plus this CEO Phase C state-rotation commit (Class D ratification + SAR-12 §6 recurrence #8 append) per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
 
 **MAC-88 two-stream board ratification dispatch CLOSED.** Board dispatch [`848e58fc`](/MAC/issues/MAC-88#comment-848e58fc-5ee0-4032-ac13-4757adca15c0) authorized two parallel streams (IEEE PII review + discipline-evolution memo refinements). CEO executed:
