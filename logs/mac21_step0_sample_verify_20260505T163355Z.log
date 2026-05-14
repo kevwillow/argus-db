@@ -1,4 +1,4 @@
-[2026-05-05T16:33:55.448705+00:00] MAC-21 Step-0 sample-verify start; out=/home/kev/argus/raw/github/20260505T162207Z/_step0_sample
+[2026-05-05T16:33:55.448705+00:00] MAC-21 Step-0 sample-verify start; out=<repo>/raw/github/20260505T162207Z/_step0_sample
 [2026-05-05T16:33:55.448911+00:00] 
 === hak5/usbrubberducky-payloads (Hak5) ===
 [2026-05-05T16:33:55.695826+00:00]   README.md: status=200 bytes=22329 mac=0 uuid=0 fcc=13 ssid_kw=0 ble_kw=0 creds_kw=0 pw_literal=0 vendor_prox=100

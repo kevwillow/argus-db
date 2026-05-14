@@ -1,4 +1,4 @@
-[2026-05-05T16:22:07.586184+00:00] MAC-21 Step-0 discovery start; out=/home/kev/argus/raw/github/20260505T162207Z/_step0
+[2026-05-05T16:22:07.586184+00:00] MAC-21 Step-0 discovery start; out=<repo>/raw/github/20260505T162207Z/_step0
 [2026-05-05T16:22:07.586254+00:00] Surface 1: /search/repositories — 34 vendors @ 7.0s spacing
 [2026-05-05T16:22:08.491390+00:00]   [ 1/34] Avigilon: 47 total, top 10 captured (rl_remaining=9)
 [2026-05-05T16:22:16.125969+00:00]   [ 2/34] Axis Communications: 32 total, top 10 captured (rl_remaining=8)

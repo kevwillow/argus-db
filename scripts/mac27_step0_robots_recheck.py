@@ -41,7 +41,7 @@ HOSTS = [
     "https://dspace.mit.edu/robots.txt",
 ]
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 TS = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 OUT = REPO_ROOT / "raw" / "academic" / "_step0_robots_recheck" / TS
 OUT.mkdir(parents=True, exist_ok=True)

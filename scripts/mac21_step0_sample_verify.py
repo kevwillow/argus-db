@@ -45,7 +45,7 @@ TIMEOUT_S = 30
 SPACING_S = 1.5
 DISCOVERY_RUN = "20260505T162207Z"  # parent discovery batch
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 TS = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 OUT = REPO_ROOT / "raw" / "github" / DISCOVERY_RUN / "_step0_sample"
 OUT.mkdir(parents=True, exist_ok=True)

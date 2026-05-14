@@ -62,7 +62,7 @@ S2_SPACING_S = 1.2  # free tier ~1 RPS; conservative
 ARXIV_SPACING_S = 15.0  # robots Crawl-delay
 USENIX_SPACING_S = 10.0  # robots Crawl-delay
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 TS = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 OUT = REPO_ROOT / "raw" / "academic" / TS / "_step0"
 OUT.mkdir(parents=True, exist_ok=True)

@@ -1,4 +1,4 @@
-Wave-B2 Step 1 batch root: /home/kev/argus/raw/vendor_docs/20260505T143454Z
+Wave-B2 Step 1 batch root: <repo>/raw/vendor_docs/20260505T143454Z
 Hard cap: 120 HTTP calls (88 base + 35 recovery)
 User-Agent: ArgusSourceWorker/0.1 (Phase4 Wave B2 Step 1 corpus fetch; +https://github.com/argus-project)
 
@@ -88,5 +88,5 @@ User-Agent: ArgusSourceWorker/0.1 (Phase4 Wave B2 Step 1 corpus fetch; +https://
   [ 71/120] psdk_landing         200      21176B  ef74ac47f5115c7b  https://developer.dji.com/payload-sdk
   [ 72/120] udp_protocol_landi   404      12854B  da81be1c2b4f366e  https://developer.dji.com/udp-protocol
 
-Manifest written: /home/kev/argus/raw/vendor_docs/20260505T143454Z/_manifest.json
+Manifest written: <repo>/raw/vendor_docs/20260505T143454Z/_manifest.json
 Aggregate: calls=72/120, wall=223.1s

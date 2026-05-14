@@ -97,7 +97,7 @@ def vp_count(regex, txt, vendor):
 
 
 def main():
-    repo_root = Path('/home/kev/argus')
+    repo_root = Path(__file__).resolve().parents[1]
     wave_root = repo_root / 'raw' / 'github' / '20260505T200235Z'
     cohort_dirs = sorted([p for p in wave_root.iterdir() if p.is_dir() and p.name.startswith('cohort_')])
     vmap = build_vendor_map(cohort_dirs)

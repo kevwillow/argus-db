@@ -10,7 +10,7 @@ Per dispatch contract MAC-23 (description):
 - NO retries on 429 / 403-rate-limit (parity with WiGLE no-retry discipline).
 - DRY_RUN_DEFAULT = True. Live fire requires --live-fire-wave-a + --confirm
   with the exact token below.
-- PAT loaded from /home/kev/argus/.env/.env (key `GITHUB_PAT`); value never
+- PAT loaded from <repo>/.env/.env (key `GITHUB_PAT`); value never
   logged or surfaced in comments / commit messages / PROJECT_STATE / manifest.
 - Cohorts A1 → A2 → A3 → A4 → A5 (see clause 10). Cop-car cluster sequenced
   first within A1 per clause 13.
@@ -64,7 +64,7 @@ from typing import Optional
 
 # ─── Constants (binding per MAC-23 dispatch contract) ─────────────────────
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ENV_PATH = REPO_ROOT / ".env" / ".env"
 DEFAULT_PACER_LEDGER = REPO_ROOT / "logs" / "github_pacer.json"
 DEFAULT_RAW_ROOT = REPO_ROOT / "raw" / "github"

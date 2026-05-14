@@ -39,7 +39,7 @@ MIN_SPACING_S = 2.0
 TIMEOUT_S = 30
 HARD_CALL_CAP = 80  # Step-0 sample budget
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def now_utc_compact() -> str:

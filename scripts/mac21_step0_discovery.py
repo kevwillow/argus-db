@@ -46,7 +46,7 @@ TIMEOUT_S = 30
 SEARCH_SPACING_S = 7.0  # 10/min unauth -> safe at 7s
 CORE_SPACING_S = 1.5
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 TS = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 OUT = REPO_ROOT / "raw" / "github" / TS / "_step0"
 OUT.mkdir(parents=True, exist_ok=True)

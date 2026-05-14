@@ -46,8 +46,8 @@ Future cron-based ingestion appends to the same tables.
 
 The full pipeline is built and tested. Cron context steps:
 
-1. **Auth:** load `GITHUB_PAT`-equivalent — `WIGLE_API_NAME` + `WIGLE_API_TOKEN` from `/home/kev/argus/.env/.env`. HTTP Basic auth per WiGLE's swagger `securityDefinitions.basic`.
-2. **Module import:** `from db.sources import wigle` (works from any Python invocation rooted at `/home/kev/argus/`).
+1. **Auth:** load `GITHUB_PAT`-equivalent — `WIGLE_API_NAME` + `WIGLE_API_TOKEN` from `<repo>/.env/.env`. HTTP Basic auth per WiGLE's swagger `securityDefinitions.basic`.
+2. **Module import:** `from db.sources import wigle` (works from any Python invocation rooted at `<repo>/`).
 3. **Path constants** in `db/sources/wigle.py` already point at this folder:
    - `DEFAULT_RAW_ROOT = REPO_ROOT / "wigle" / "raw"`
    - `DEFAULT_PACER_LEDGER = REPO_ROOT / "wigle" / "pacer.json"`
@@ -84,5 +84,5 @@ These disciplines apply to ANY future WiGLE engagement, including cron-based:
 - **First-fire dispatch contract:** MAC-9 [`251a65f3`](https://paperclip.example/MAC/issues/MAC-9#comment-251a65f3-1d2d-4a5f-ac29-2c20e714ea6e)
 - **First-fire readiness checklist:** MAC-9 [`d0230a91`](https://paperclip.example/MAC/issues/MAC-9#comment-d0230a91-9c28-402c-b3bd-a77d70eaad3e)
 - **First-fire heartbeat report (1 query / 100 rows / NO deviations):** MAC-9 [`0c98a7ed`](https://paperclip.example/MAC/issues/MAC-9#comment-0c98a7ed-bb18-41a4-bdcc-efb2400060d9)
-- **Bible:** `/home/kev/argus/PROJECT_BIBLE.md` (HEAD `35900f0`) §6 Phase 3 + §11 #2/#6 + Phase 5 export shape
+- **Bible:** `<repo>/PROJECT_BIBLE.md` (HEAD `35900f0`) §6 Phase 3 + §11 #2/#6 + Phase 5 export shape
 - **SAR-1** (LAA-bit penalty), **SAR-4** (robots.txt routing), **SAR-5** (PII redaction), **SAR-6** (per-wave checkpoint discipline) — all apply to cron-context fires

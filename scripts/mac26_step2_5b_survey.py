@@ -27,7 +27,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 # Ensure repo root on path so db.extraction.* import works.
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 from db.extraction.fcc_grantees_allowlist import (  # type: ignore
     validate_fcc_id_match,

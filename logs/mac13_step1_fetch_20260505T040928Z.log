@@ -1,4 +1,4 @@
-Batch root: /home/kev/argus/raw/vendor_docs/20260505T040929Z
+Batch root: <repo>/raw/vendor_docs/20260505T040929Z
 Hard ceiling: 1500 HTTP calls aggregate
 Per-vendor cap: 50 calls
 User-Agent: ArgusSourceWorker/0.1 (Phase4 Wave B Step 1 raw fetch; +https://github.com/argus-project)
@@ -202,5 +202,5 @@ Vendors: 22 fetch + 1 deferred + 2 skip-documented
   [BRINC 0] robots                    status=None err=url_error: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'www.brinc.com'. (_ssl.c:1000) bytes=0
   [BRINC 1] primary_host_probe        status=None err=url_error: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'www.brinc.com'. (_ssl.c:1000) bytes=0
 
-Manifest written: /home/kev/argus/raw/vendor_docs/20260505T040929Z/_manifest.json
+Manifest written: <repo>/raw/vendor_docs/20260505T040929Z/_manifest.json
 Aggregate: 22 vendors fetched, 151 HTTP calls, 38.61 MiB persisted, 14.15 min wall-clock

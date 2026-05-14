@@ -65,7 +65,7 @@ HOSTS = [
     "https://www.qrz.com/robots.txt",
 ]
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 TS = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 OUT = REPO_ROOT / "raw" / "news_forums" / "_step0_robots_recheck" / TS
 OUT.mkdir(parents=True, exist_ok=True)

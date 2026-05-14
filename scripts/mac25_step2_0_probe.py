@@ -12,7 +12,7 @@ Per MAC-25 dispatch §17 + §3 + §17 binding:
 - Pacer ledger continuity: writes to logs/github_pacer.json (same shape
   + path as MAC-23 driver). PAT-quota-burn supplementary count rolls
   forward as 379 + ≤30 = ≤409 / 2,500 = ≤16.4%.
-- PAT loaded from /home/kev/argus/.env/.env (key GITHUB_PAT).
+- PAT loaded from <repo>/.env/.env (key GITHUB_PAT).
 
 Vendors per dispatch §17 (cop-car cluster + first-party A1):
     cradlepoint, sierra-wireless, sierrawireless, dji, dji-sdk,
@@ -53,7 +53,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ENV_PATH = REPO_ROOT / ".env" / ".env"
 DEFAULT_PACER_LEDGER = REPO_ROOT / "logs" / "github_pacer.json"
 DEFAULT_RAW_ROOT = REPO_ROOT / "raw" / "github_step2"

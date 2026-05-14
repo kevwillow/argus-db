@@ -40,7 +40,7 @@ ARXIV_SPACING_S = 15.0
 USENIX_SPACING_S = 10.0
 NDSS_SPACING_S = 2.0
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 TS = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 DISCOVERY_RUN = "20260506T012828Z"
 OUT = REPO_ROOT / "raw" / "academic" / DISCOVERY_RUN / "_step0_sample"

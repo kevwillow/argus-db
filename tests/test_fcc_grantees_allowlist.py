@@ -6,7 +6,7 @@ Covers:
     SAR-7 #3 — is_commercial_model_name_fp()        (Cradlepoint MBR-1200
                                                        FP class + siblings)
 
-Reads the canonical `fcc_grantees` table from `/home/kev/argus/db/argus.db`
+Reads the canonical `fcc_grantees` table from `<repo>/db/argus.db`
 (50,153 rows, schema_version=6). All tests are read-only against the DB and
 deterministic: no fixtures are written.
 """
@@ -24,7 +24,7 @@ from db.extraction.fcc_grantees_allowlist import (
     validate_fcc_id_match,
 )
 
-DB_PATH = Path("/home/kev/argus/db/argus.db")
+DB_PATH = Path(__file__).resolve().parents[1] / "db" / "argus.db"
 
 
 # ───────────────────────── SAR-7 #1 — CVE/CWE/NIST stop-list ────────────────

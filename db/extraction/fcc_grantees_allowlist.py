@@ -39,7 +39,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 
-DB_PATH_DEFAULT = Path("/home/kev/argus/db/argus.db")
+DB_PATH_DEFAULT = Path(__file__).resolve().parents[2] / "db" / "argus.db"
 
 # FCC-ID shape per Wave-A tightened regex (MAC-21 §9.11): mandatory hyphen,
 # grantee prefix + 4-14-char product code. We re-parse the matched string

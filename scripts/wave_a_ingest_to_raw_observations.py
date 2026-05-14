@@ -26,8 +26,9 @@ import os
 import hashlib
 import shutil
 from datetime import datetime, timezone
+from pathlib import Path
 
-REPO = '/home/kev/argus'
+REPO = str(Path(__file__).resolve().parents[1])
 DB = f'{REPO}/db/argus.db'
 WAVE_A_DIR = f'{REPO}/raw/wave_a'
 NOW = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')

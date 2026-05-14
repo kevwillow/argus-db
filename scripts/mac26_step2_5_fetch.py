@@ -18,7 +18,7 @@ Per dispatch contract MAC-26 (description):
 - Pacing: core bucket ≥0.75s gap, RL_REMAINING_BUFFER[core]=20 (reduced
   from precedent 200 per dispatch clause 3 carry-forward finding).
 - NO retries on 429/403-rate-limit. Failure logged, query NOT reattempted.
-- PAT loaded from /home/kev/argus/.env/.env (key `GITHUB_PAT`); never
+- PAT loaded from <repo>/.env/.env (key `GITHUB_PAT`); never
   logged or surfaced.
 - Idempotent: per-repo `_meta.json` short-circuits a re-run.
 - Confirm-token gate parity with MAC-23 driver.

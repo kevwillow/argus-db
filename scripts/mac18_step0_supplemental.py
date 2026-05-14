@@ -18,7 +18,7 @@ from pathlib import Path
 USER_AGENT = "ArgusSourceWorker/0.1 (Phase4 Wave B2 Step 0 supplemental; +https://github.com/argus-project)"
 MIN_SPACING_S = 2.0
 TIMEOUT_S = 30
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 BATCH = "raw/vendor_docs/20260505T140959Z"
 OUT_ROOT = REPO_ROOT / BATCH
 

@@ -23,7 +23,7 @@ Usage:
     --package com.flocksafety.sweetwater \
     --version 1.64.0 \
     --apk-sha256 <full-sha> \
-    --output-dir /home/kev/argus/android_test/extraction_outputs/wave_g_pre_v1/per_vendor/flock_safety_<short>/ \
+    --output-dir <repo>/android_test/extraction_outputs/wave_g_pre_v1/per_vendor/flock_safety_<short>/ \
     [--vendor-prefix Flock] \
     [--product-family-keywords Falcon Talon Raven Sparrow]
 """

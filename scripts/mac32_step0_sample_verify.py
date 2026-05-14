@@ -64,7 +64,7 @@ HN_SPACING_S = 30.0       # robots Crawl-delay 30
 STACKEX_SPACING_S = 1.5   # api.stackexchange = 30 req/sec free; conservative
 MAVIC_SPACING_S = 2.0
 
-REPO_ROOT = Path("/home/kev/argus")
+REPO_ROOT = Path(__file__).resolve().parents[1]
 TS = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 DISCOVERY_RUN = "20260506T044612Z"
 OUT = REPO_ROOT / "raw" / "news_forums" / DISCOVERY_RUN / "_step0_sample"

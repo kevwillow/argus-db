@@ -66,15 +66,15 @@ These are bible §11 hard rules. Violations halt the session.
 
 **Host:** Linux Mint (apt-based; assume Mint 21.x or 22.x).
 
-**Working directory:** `/home/kev/argus`
+**Working directory:** `<repo>`
 
-**Python venv:** `/home/kev/argus/venv`
+**Python venv:** `<repo>/venv`
 
 If venv doesn't exist or doesn't have required packages, activate or
 create:
 
 ```bash
-cd /home/kev/argus
+cd <repo>
 python3 -m venv venv 2>/dev/null
 source venv/bin/activate
 ```
@@ -114,7 +114,7 @@ tools.
 ## 2. Output directory structure
 
 Create this layout at session start:
-/home/kev/argus/
+<repo>/
 ├── raw/
 │   └── vendor_apps/                              # gitignored
 │       └── <vendor>/<package>/<version>/<sha256>.apk
@@ -258,15 +258,15 @@ WORKSPACE=$(mktemp -d /tmp/wave_g_decompile.XXXXXX)
 cd "$WORKSPACE"
 
 # jadx for Java/Kotlin source
-jadx -d ./jadx_out "/home/kev/argus/raw/vendor_apps/<vendor>/<package>/<version>/<sha256>.apk" 2>jadx.log
+jadx -d ./jadx_out "<repo>/raw/vendor_apps/<vendor>/<package>/<version>/<sha256>.apk" 2>jadx.log
 
 # apktool for resources (strings.xml, AndroidManifest.xml)
-apktool d "/home/kev/argus/raw/vendor_apps/<vendor>/<package>/<version>/<sha256>.apk" -o ./apktool_out 2>apktool.log
+apktool d "<repo>/raw/vendor_apps/<vendor>/<package>/<version>/<sha256>.apk" -o ./apktool_out 2>apktool.log
 
 # androguard for programmatic AndroidManifest analysis (optional but useful)
 python3 -c "
 from androguard.core.bytecodes.apk import APK
-apk = APK('/home/kev/argus/raw/vendor_apps/<vendor>/<package>/<version>/<sha256>.apk')
+apk = APK('<repo>/raw/vendor_apps/<vendor>/<package>/<version>/<sha256>.apk')
 print('package:', apk.get_package())
 print('main_activity:', apk.get_main_activity())
 print('permissions:', apk.get_permissions())
@@ -603,7 +603,7 @@ Explicit non-goals (don't accidentally do these):
 - Bible §8.2 manufacturer_app confidence bands
 - Bible §11 #15 decompiled-source-no-commit rule
 - Bible §12 Wave G open questions (DMCA / EULA / iOS)
-- This runbook lives at `/home/kev/argus/WAVE_G_RUNBOOK.md`
+- This runbook lives at `<repo>/WAVE_G_RUNBOOK.md`
 
 ---
 
