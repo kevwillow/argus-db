@@ -1687,6 +1687,18 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
   - Recurrence #6 (during-SAR-12-ratification): bible line 112
     device_category enum drift vs. live schema; "no drift" absence-
     assertion failure mode (class c)
+  - Recurrence #7 (post-codification, MAC-88 sweep pre-flight
+    2026-05-14): partition-count drift on FAA Scope 1/2 baseline
+    (board §0 paste-result cited 90/325 from Wave-B-candidate-level
+    counting; CEO live re-derivation showed 80/335 at Wave-A-row-
+    level; the 10-row delta is within-Wave-B duplicates — same
+    drone_id_prefix under multiple FAA DOC numbers). Cardinality-
+    mismatch class — class (a) baseline cited at one counting
+    granularity but consumed at another. Informational, not
+    blocking; CEO surfaced + proceeded with 80/335 per board
+    ratification at MAC-88 [`a1dab600`](/MAC/issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05).
+    First post-codification recurrence; 2 more before meta-revision
+    trigger per §6 threshold.
 
 Future S.7 recurrences (if any post-codification) get appended to
 this list with anchor + class. Three recurrences post-S.7 would
