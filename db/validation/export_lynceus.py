@@ -167,6 +167,17 @@ PI_SELF_EXCLUDE_OUIS: frozenset[str] = frozenset(
     {"b8:27:eb", "dc:a6:32", "e4:5f:01", "28:cd:c1"}
 )
 
+# CP19 (§7.5) — source_type values excluded from the high-confidence Lynceus
+# export regardless of confidence value. Single-source `inferred` /
+# `crowdsourced` rows still satisfy CP18's ≥70 confidence floor (75 / 70
+# ceilings per §8.2) but lack a §8.3 cross-band corroboration anchor, so
+# they are not safe to publish on the high-confidence operational feed.
+# The standard export (≥30 floor) retains them — wider-net rich-import
+# consumers still benefit. Mirrors `coverage_matrix.py::EXCLUDED_SOURCE_TYPES`;
+# the two modules must classify CP19 rows identically (`_reconcile` halts on
+# any mismatch).
+EXCLUDED_SOURCE_TYPES: frozenset[str] = frozenset({"inferred", "crowdsourced"})
+
 # §4.4 mac_range expansion ceiling.
 MAC_RANGE_EXPANSION_CEILING = 256
 
@@ -336,6 +347,7 @@ def _classify_row(
     *,
     confidence_threshold: int,
     apply_pi_self_exclude: bool,
+    apply_excluded_source_type: bool = False,
 ) -> tuple[str | None, list[TalosEntry]]:
     """Classify a row for a Lynceus export file (static gates only).
 
@@ -345,8 +357,9 @@ def _classify_row(
 
         procurement_only > unknown_category > device_fingerprint
         > ssid_pattern > ble_local_name > ble_characteristic
-        > product_family_codename > oversized_mac_range > self_exclude_oui
-        > below_confidence_threshold
+        > product_family_codename > oversized_mac_range
+        > {CP16 DROPPED_REASONS} > self_exclude_oui
+        > below_confidence_threshold > excluded_source_type
 
     The §11 #14 procurement bin sits above §11 #13 unknown_category because
     procurement-only rows have no concrete identifier at all and are never
@@ -358,6 +371,13 @@ def _classify_row(
     Pi self-exclude gate, so an analytical-only Wave G row is binned by its
     type regardless of confidence (matches the existing handling of
     `device_fingerprint` and `ssid_pattern`).
+
+    The CP19 ``excluded_source_type`` bin (§7.5) sits AFTER the confidence
+    floor: a row with `source_type ∈ {inferred, crowdsourced}` AND
+    `confidence < threshold` attributes the drop to the more specific
+    confidence reason; the CP19 bin only catches rows that would otherwise
+    have survived every prior gate. Gated by `apply_excluded_source_type`
+    (True for the high-confidence file, False for the standard file).
 
     The CP7 ``geographic_scope_mismatch`` bin is NOT applied here — it is a
     runtime parameter applied in ``_apply_geographic_scope_filter()`` after
@@ -414,6 +434,14 @@ def _classify_row(
     # §7.5 — confidence floor.
     if row.confidence < confidence_threshold:
         return "below_confidence_threshold", []
+    # CP19 (§7.5) — high-conf-only source_type exclusion. A row reaching this
+    # gate has cleared every prior static filter (incl. CP18's ≥70 floor for
+    # the high-conf file); the CP19 bin captures rows excluded for lack of a
+    # §8.3 cross-band corroboration anchor. Standard export (≥30 floor)
+    # passes inferred/crowdsourced through. Mirrors
+    # `coverage_matrix.py::_assign_drop_bin`'s identical late-priority gate.
+    if apply_excluded_source_type and row.source_type in EXCLUDED_SOURCE_TYPES:
+        return "excluded_source_type", []
 
     pattern_type = IDENTIFIER_TYPE_TO_PATTERN_TYPE.get(row.identifier_type)
     if pattern_type is None:
@@ -620,6 +648,7 @@ def _build_export(
     exported_at: str,
     expected_drop_assignments: dict[str, str],
     geographic_scope_filter: tuple[str, ...] = DEFAULT_GEOGRAPHIC_SCOPE_FILTER,
+    apply_excluded_source_type: bool = False,
 ) -> tuple[dict[str, Any], dict[int, str | None]]:
     """Classify every row, reconcile vs MAC-45 (static gates), apply CP7
     geographic_scope filter post-reconciliation, return the §7.5 payload.
@@ -659,6 +688,11 @@ def _build_export(
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,
+        # CP19 (§7.5) — source_type exclusion bin. Zero-init in BOTH files so
+        # the dict shape is parallel; only the high-conf file populates non-zero
+        # via `apply_excluded_source_type=True`. The standard export keeps
+        # `excluded_source_type=0` per CP19 narrow-targeting directive.
+        "excluded_source_type": 0,
         "geographic_scope_mismatch": 0,
     }
     bin_assignments: dict[int, str | None] = {}
@@ -668,6 +702,7 @@ def _build_export(
             row,
             confidence_threshold=confidence_threshold,
             apply_pi_self_exclude=apply_pi_self_exclude,
+            apply_excluded_source_type=apply_excluded_source_type,
         )
         bin_assignments[row.id] = drop_bin
         if drop_bin is not None:
@@ -768,6 +803,7 @@ def _build_coverage_report_md(
             ("alpr_model (§4.4 CP16)", bins["alpr_model"]),
             ("self_exclude_oui (§8.4 / §11 #12)", bins["self_exclude_oui"]),
             ("below_confidence_threshold (§7.5)", bins["below_confidence_threshold"]),
+            ("excluded_source_type (§7.5 CP19)", bins["excluded_source_type"]),
             ("geographic_scope_mismatch (CP7)", bins["geographic_scope_mismatch"]),
         ]
         lines = [
@@ -896,6 +932,15 @@ def _build_coverage_report_md(
         "unconditionally; ISO-code matches against the filter pass; `unknown` / "
         "NULL passes the standard export but fails the high-confidence export. "
         "Default filter = `[\"US\"]`."
+    )
+    md_parts.append(
+        "- **CP19 (§7.5 source_type exclusion on high-conf export)** — "
+        "`source_type IN ('inferred', 'crowdsourced')` is excluded from "
+        "`argus_export_high_confidence.json` regardless of confidence value. "
+        "Single-source `inferred`/`crowdsourced` rows lack a §8.3 cross-band "
+        "corroboration anchor; tally bin `excluded_source_type` captures the "
+        "drop attribution. Standard export retains these rows for "
+        "wider-net rich-import consumers."
     )
     md_parts.append(
         "- **CP8 (description format + severity reframe)** — flat `{vendor} "
@@ -1183,6 +1228,7 @@ def run(
         exported_at=exported_at,
         expected_drop_assignments=drop_assignments["argus_export_high_confidence.json"],
         geographic_scope_filter=geographic_scope_filter,
+        apply_excluded_source_type=True,  # CP19 (§7.5): high-conf-only source_type filter
     )
     high_path = exports_dir / "argus_export_high_confidence.json"
     high_size = _write_json(high_path, high_payload)

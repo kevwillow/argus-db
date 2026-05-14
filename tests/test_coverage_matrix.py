@@ -26,6 +26,7 @@ import pytest
 
 from db.validation.coverage_matrix import (
     DEVICE_CATEGORIES,
+    EXCLUDED_SOURCE_TYPES,
     EXPORT_HIGH_CONFIDENCE_FLOOR,
     EXPORT_STANDARD_FLOOR,
     IDENTIFIER_TYPES,
@@ -249,6 +250,83 @@ def test_drop_bin_survivor() -> None:
 
 
 # ────────────────────────────────────────────────────────────────────────────
+# CP19 — source_type exclusion on high-conf export
+# ────────────────────────────────────────────────────────────────────────────
+
+
+def test_excluded_source_types_constant_is_inferred_and_crowdsourced() -> None:
+    """CP19 (§7.5): the set is exactly {'inferred', 'crowdsourced'} per the
+    bible amendment. Set-assertion mirrors the parallel test in
+    test_export_lynceus.py; the two modules MUST classify identically."""
+    assert EXCLUDED_SOURCE_TYPES == frozenset({"inferred", "crowdsourced"})
+
+
+def test_drop_bin_excluded_source_type_high_conf_crowdsourced() -> None:
+    """A crowdsourced row at conf=75 with all other gates passing drops to
+    `excluded_source_type` in the high-conf file."""
+    r = _row(device_category="alpr", confidence=75, identifier_type="mac",
+             identifier="aa:bb:cc:dd:ee:ff", source_type="crowdsourced")
+    assert _assign_drop_bin(
+        r, EXPORT_HIGH_CONFIDENCE_FLOOR, drop_pi_self_exclude=True,
+        drop_source_types=EXCLUDED_SOURCE_TYPES,
+    ) == "excluded_source_type"
+
+
+def test_drop_bin_excluded_source_type_high_conf_inferred() -> None:
+    """Likewise `inferred` source_type drops to `excluded_source_type`."""
+    r = _row(device_category="alpr", confidence=70, identifier_type="mac",
+             identifier="aa:bb:cc:dd:ee:ff", source_type="inferred")
+    assert _assign_drop_bin(
+        r, EXPORT_HIGH_CONFIDENCE_FLOOR, drop_pi_self_exclude=True,
+        drop_source_types=EXCLUDED_SOURCE_TYPES,
+    ) == "excluded_source_type"
+
+
+def test_drop_bin_excluded_source_type_standard_export_passes() -> None:
+    """CP19 is high-conf only: standard export (empty drop_source_types)
+    lets crowdsourced/inferred rows survive."""
+    r = _row(device_category="alpr", confidence=75, identifier_type="mac",
+             identifier="aa:bb:cc:dd:ee:ff", source_type="crowdsourced")
+    assert _assign_drop_bin(
+        r, EXPORT_STANDARD_FLOOR, drop_pi_self_exclude=False,
+        drop_source_types=frozenset(),
+    ) is None
+
+
+def test_drop_bin_excluded_source_type_priority_below_confidence() -> None:
+    """Priority: crowdsourced + conf<floor attributes to below_confidence_threshold
+    (more specific) NOT to excluded_source_type. The CP19 bin only catches
+    rows that would otherwise have survived every prior gate."""
+    r = _row(device_category="alpr", confidence=50, identifier_type="mac",
+             identifier="aa:bb:cc:dd:ee:ff", source_type="crowdsourced")
+    assert _assign_drop_bin(
+        r, EXPORT_HIGH_CONFIDENCE_FLOOR, drop_pi_self_exclude=True,
+        drop_source_types=EXCLUDED_SOURCE_TYPES,
+    ) == "below_confidence_threshold"
+
+
+def test_drop_bin_excluded_source_type_priority_below_unknown_category() -> None:
+    """A crowdsourced row with device_category='unknown' attributes to
+    unknown_category (§11 #13 priority over CP19)."""
+    r = _row(device_category="unknown", confidence=75, identifier_type="oui",
+             identifier="aa:bb:cc", source_type="crowdsourced")
+    assert _assign_drop_bin(
+        r, EXPORT_HIGH_CONFIDENCE_FLOOR, drop_pi_self_exclude=True,
+        drop_source_types=EXCLUDED_SOURCE_TYPES,
+    ) == "unknown_category"
+
+
+def test_drop_bin_excluded_source_type_default_drop_source_types_empty() -> None:
+    """Default value of drop_source_types is the empty frozenset — preserves
+    pre-CP19 behavior for callers that don't pass the kwarg (used in
+    pre-existing tests across this file)."""
+    r = _row(device_category="alpr", confidence=75, identifier_type="mac",
+             identifier="aa:bb:cc:dd:ee:ff", source_type="crowdsourced")
+    # No drop_source_types passed → defaults to frozenset() → survives.
+    assert _assign_drop_bin(r, EXPORT_HIGH_CONFIDENCE_FLOOR, drop_pi_self_exclude=True) is None
+
+
+# ────────────────────────────────────────────────────────────────────────────
 # Single-row sentinel
 # ────────────────────────────────────────────────────────────────────────────
 
@@ -307,10 +385,11 @@ def test_drop_tally_reconciles_with_mixed_active_set(conn: sqlite3.Connection) -
         # 3: oversized mac_range with non-unknown category.
         dict(rid=3, identifier="10:63:a3:1", identifier_type="mac_range",
              source_type="inferred", device_category="alpr", confidence=60),
-        # 4: high-conf survivor in standard, drops to self_exclude in high-conf.
+        # 4: standard survivor, drops to self_exclude in high-conf (Pi OUI).
         dict(rid=4, identifier="b8:27:eb", source_type="crowdsourced",
              device_category="alpr", confidence=80),
-        # 5: full survivor in BOTH files.
+        # 5: standard survivor; CP19 drops to excluded_source_type in high-conf
+        # (crowdsourced source_type with no §8.3 cross-band corroboration).
         dict(rid=5, identifier="aa:bb:cc:dd:ee:ff", identifier_type="mac",
              source_type="crowdsourced", device_category="alpr", confidence=80),
     ]
@@ -328,11 +407,12 @@ def test_drop_tally_reconciles_with_mixed_active_set(conn: sqlite3.Connection) -
     assert s.oversized_mac_range == 1  # row 3
     assert s.self_exclude_oui == 0     # standard keeps Pi OUIs
     assert s.below_confidence_threshold == 0
+    assert s.excluded_source_type == 0  # CP19: standard export doesn't apply CP19 filter
     assert s.survivors == 2            # rows 4 and 5
     sum_bins_s = (
         s.unknown_category + s.procurement_only + s.self_exclude_oui +
         s.below_confidence_threshold + s.oversized_mac_range +
-        s.ssid_pattern + s.device_fingerprint
+        s.ssid_pattern + s.device_fingerprint + s.excluded_source_type
     )
     assert sum_bins_s + s.survivors == n
 
@@ -342,11 +422,12 @@ def test_drop_tally_reconciles_with_mixed_active_set(conn: sqlite3.Connection) -
     assert h.unknown_category == 1
     assert h.oversized_mac_range == 1
     assert h.self_exclude_oui == 1     # row 4 drops here
-    assert h.survivors == 1            # only row 5
+    assert h.excluded_source_type == 1  # CP19: row 5 (crowdsourced, conf=80) drops here
+    assert h.survivors == 0            # CP19 closes the last survivor path for crowdsourced rows
     sum_bins_h = (
         h.unknown_category + h.procurement_only + h.self_exclude_oui +
         h.below_confidence_threshold + h.oversized_mac_range +
-        h.ssid_pattern + h.device_fingerprint
+        h.ssid_pattern + h.device_fingerprint + h.excluded_source_type
     )
     assert sum_bins_h + h.survivors == n
     assert not report.halts

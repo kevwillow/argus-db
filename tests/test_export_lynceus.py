@@ -30,6 +30,7 @@ from db.validation.export_lynceus import (
     DESCRIPTION_MAX_CHARS,
     DESCRIPTION_VENDOR_UNATTRIBUTED,
     DROPPED_REASONS,
+    EXCLUDED_SOURCE_TYPES,
     IDENTIFIER_TYPE_TO_PATTERN_TYPE,
     PI_SELF_EXCLUDE_OUIS,
     ActiveRow,
@@ -747,6 +748,152 @@ def test_build_export_unknown_scope_high_conf_drops_per_cp7() -> None:
     assert standard_payload["_meta"]["dropped_in_export"]["geographic_scope_mismatch"] == 0
     assert high_payload["_meta"]["record_count"] == 0
     assert high_payload["_meta"]["dropped_in_export"]["geographic_scope_mismatch"] == 1
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# CP19 — source_type exclusion on high-confidence export
+# ────────────────────────────────────────────────────────────────────────────
+
+
+def test_excluded_source_types_constant_is_inferred_and_crowdsourced() -> None:
+    """CP19 (§7.5): the set is exactly {'inferred', 'crowdsourced'} per the
+    bible amendment. Mirrors the IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()
+    set-assertion pattern (S.1 architectural invariant) — a future change to
+    EXCLUDED_SOURCE_TYPES is a stop-the-line event for the export contract."""
+    assert EXCLUDED_SOURCE_TYPES == frozenset({"inferred", "crowdsourced"})
+
+
+def test_classify_excluded_source_type_drops_for_high_conf() -> None:
+    """A row with `source_type='crowdsourced'` AND conf>=70 AND every other
+    static gate passing drops to `excluded_source_type` in the high-conf file."""
+    bin_label, entries = _classify_row(
+        _row(source_type="crowdsourced", confidence=75, device_category="alpr"),
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+        apply_excluded_source_type=True,
+    )
+    assert bin_label == "excluded_source_type"
+    assert entries == []
+
+
+def test_classify_excluded_source_type_drops_inferred_too() -> None:
+    """`source_type='inferred'` falls into the same bin per CP19."""
+    bin_label, _ = _classify_row(
+        _row(source_type="inferred", confidence=85, device_category="alpr"),
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+        apply_excluded_source_type=True,
+    )
+    assert bin_label == "excluded_source_type"
+
+
+def test_classify_excluded_source_type_passes_in_standard_export() -> None:
+    """CP19 is high-conf only: standard export passes crowdsourced/inferred
+    through. The `apply_excluded_source_type=False` (default) ensures parity
+    with pre-CP19 behavior on the standard export."""
+    bin_label, entries = _classify_row(
+        _row(source_type="crowdsourced", confidence=75, device_category="alpr",
+             manufacturer="Acme"),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+        apply_excluded_source_type=False,
+    )
+    assert bin_label is None
+    assert len(entries) == 1
+
+
+def test_classify_excluded_source_type_priority_below_confidence() -> None:
+    """Priority order: a crowdsourced row with conf<70 attributes the drop
+    to `below_confidence_threshold` (the more specific reason), NOT to
+    `excluded_source_type`. The CP19 bin only catches rows that would have
+    survived every prior gate."""
+    bin_label, _ = _classify_row(
+        _row(source_type="crowdsourced", confidence=50, device_category="alpr"),
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+        apply_excluded_source_type=True,
+    )
+    assert bin_label == "below_confidence_threshold"
+
+
+def test_classify_excluded_source_type_priority_below_unknown_category() -> None:
+    """A crowdsourced row with `device_category='unknown'` attributes the
+    drop to `unknown_category` (§11 #13 takes priority over CP19)."""
+    bin_label, _ = _classify_row(
+        _row(source_type="crowdsourced", confidence=75, device_category="unknown"),
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+        apply_excluded_source_type=True,
+    )
+    assert bin_label == "unknown_category"
+
+
+def test_build_export_high_conf_drops_crowdsourced_per_cp19() -> None:
+    """End-to-end through `_build_export`: a crowdsourced row at conf=75
+    drops to `excluded_source_type` in high-conf but survives in standard."""
+    rows = [
+        _row(id=600, identifier="e4:aa:ea:80:a1:9b", identifier_type="mac",
+             device_category="alpr", manufacturer="Flock Safety",
+             source_type="crowdsourced", confidence=75, geographic_scope="US"),
+    ]
+    high_payload, high_assignments = _build_export(
+        rows=rows,
+        file_label="argus_export_high_confidence.json",
+        confidence_threshold=70,
+        apply_pi_self_exclude=True,
+        schema_version=17,
+        argus_run_id="abc",
+        exported_at="2026-05-13T00:00:00Z",
+        expected_drop_assignments={"600": "excluded_source_type"},
+        apply_excluded_source_type=True,
+    )
+    assert high_payload["_meta"]["record_count"] == 0
+    assert high_payload["_meta"]["dropped_in_export"]["excluded_source_type"] == 1
+    assert high_assignments[600] == "excluded_source_type"
+
+    standard_payload, standard_assignments = _build_export(
+        rows=rows,
+        file_label="argus_export.json",
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+        schema_version=17,
+        argus_run_id="abc",
+        exported_at="2026-05-13T00:00:00Z",
+        expected_drop_assignments={},
+        apply_excluded_source_type=False,
+    )
+    assert standard_payload["_meta"]["record_count"] == 1
+    assert standard_payload["_meta"]["dropped_in_export"]["excluded_source_type"] == 0
+    assert standard_assignments[600] is None
+
+
+def test_build_export_meta_carries_excluded_source_type_key_in_both_files() -> None:
+    """CP19 contract: the `dropped_in_export` block carries the
+    `excluded_source_type` key in BOTH files (zero in standard, populated in
+    high-conf). Parallel dict shape simplifies downstream reconciliation
+    arithmetic and matches the existing `geographic_scope_mismatch` pattern."""
+    rows = [
+        _row(id=601, identifier="e4:aa:ea:80:a1:9c", identifier_type="mac",
+             device_category="alpr", manufacturer="Acme",
+             source_type="manufacturer_doc", confidence=85,
+             geographic_scope="US"),
+    ]
+    standard_payload, _ = _build_export(
+        rows=rows, file_label="argus_export.json", confidence_threshold=30,
+        apply_pi_self_exclude=False, schema_version=17, argus_run_id="abc",
+        exported_at="2026-05-13T00:00:00Z",
+        expected_drop_assignments={}, apply_excluded_source_type=False,
+    )
+    high_payload, _ = _build_export(
+        rows=rows, file_label="argus_export_high_confidence.json",
+        confidence_threshold=70, apply_pi_self_exclude=True, schema_version=17,
+        argus_run_id="abc", exported_at="2026-05-13T00:00:00Z",
+        expected_drop_assignments={}, apply_excluded_source_type=True,
+    )
+    assert "excluded_source_type" in standard_payload["_meta"]["dropped_in_export"]
+    assert "excluded_source_type" in high_payload["_meta"]["dropped_in_export"]
+    assert standard_payload["_meta"]["dropped_in_export"]["excluded_source_type"] == 0
+    assert high_payload["_meta"]["dropped_in_export"]["excluded_source_type"] == 0
 
 
 # ────────────────────────────────────────────────────────────────────────────

@@ -167,6 +167,15 @@ PI_SELF_EXCLUDE_OUIS: frozenset[str] = frozenset(
     {"b8:27:eb", "dc:a6:32", "e4:5f:01", "28:cd:c1"}
 )
 
+# CP19 (§7.5) — source_type values excluded from the high-confidence Lynceus
+# export regardless of confidence value. Single-source `inferred` /
+# `crowdsourced` rows still satisfy CP18's ≥70 confidence floor (75 / 70
+# ceilings per §8.2) but lack a §8.3 cross-band corroboration anchor, so
+# they are not safe to publish on the high-confidence operational feed.
+# The standard export (≥30 floor) retains them — they remain useful for
+# wider-net rich-import consumers.
+EXCLUDED_SOURCE_TYPES: frozenset[str] = frozenset({"inferred", "crowdsourced"})
+
 # §6.2 Phase-3 corroboration thresholds (dispatch verbatim).
 HIGH_CORROBORATION_GRANTEES_FLOOR = 10
 HIGH_CORROBORATION_PROCUREMENT_FLOOR = 10
@@ -236,7 +245,8 @@ class DropBinTally:
     > unknown_category > device_fingerprint > ssid_pattern > ble_local_name
     > ble_characteristic > product_family_codename > oversized_mac_range >
     {CP16 12 DROPPED-class types in DROPPED_REASONS} > self_exclude_oui >
-    below_confidence_threshold). Survivors → eligible for export.
+    below_confidence_threshold > excluded_source_type). Survivors → eligible
+    for export.
     """
 
     file_label: str
@@ -258,6 +268,11 @@ class DropBinTally:
     # produces a `bins` dict that reconciles 1:1 against export_lynceus.py's
     # `dropped_in_export` block.
     cp16_dropped: dict[str, int]
+    # CP19 (§7.5) — source_type exclusion for the high-conf export (sits below
+    # below_confidence_threshold in priority order so a row with
+    # source_type='inferred'/'crowdsourced' AND conf<floor attributes the drop
+    # to the more specific confidence reason).
+    excluded_source_type: int
     survivors: int
     drop_assignments: dict[int, str]  # row_id → bin name (only dropped rows)
 
@@ -450,6 +465,7 @@ def _assign_drop_bin(
     row: ActiveRow,
     confidence_floor: int,
     drop_pi_self_exclude: bool,
+    drop_source_types: frozenset[str] = frozenset(),
 ) -> Optional[str]:
     """Return the drop-bin name a row falls into, or None if it survives.
 
@@ -462,8 +478,16 @@ def _assign_drop_bin(
       6. ble_characteristic          (§4.4 CP13)
       7. product_family_codename     (§4.4 CP13)
       8. oversized_mac_range         (§4.4)
+     8a. CP16 DROPPED_REASONS        (§4.4 CP16 — 12 analytical-only types)
       9. self_exclude_oui            (§8.4 / §11 #12 — high-conf file only)
      10. below_confidence_threshold  (§7.5)
+     11. excluded_source_type        (§7.5 CP19 — high-conf file only; sits
+                                      AFTER below_confidence_threshold so a
+                                      crowdsourced/inferred row with conf<70
+                                      attributes the drop to the more specific
+                                      confidence reason; the CP19 filter only
+                                      catches rows that would have survived
+                                      every prior gate)
     """
     if row.source_type == "procurement":
         return "procurement_only"
@@ -500,6 +524,13 @@ def _assign_drop_bin(
         return "self_exclude_oui"
     if row.confidence < confidence_floor:
         return "below_confidence_threshold"
+    # CP19 (§7.5) — high-conf-only source_type exclusion. `drop_source_types`
+    # is empty for the standard export; it carries `EXCLUDED_SOURCE_TYPES`
+    # ({'inferred', 'crowdsourced'}) for the high-conf export. A row reaching
+    # this gate has passed every prior static filter; the bin captures the
+    # CP19-specific drop attribution.
+    if drop_source_types and row.source_type in drop_source_types:
+        return "excluded_source_type"
     return None
 
 
@@ -509,6 +540,7 @@ def _compute_drop_tally(
     file_label: str,
     confidence_floor: int,
     drop_pi_self_exclude: bool,
+    drop_source_types: frozenset[str] = frozenset(),
 ) -> DropBinTally:
     bins: dict[str, int] = {
         "unknown_category": 0,
@@ -522,6 +554,10 @@ def _compute_drop_tally(
         "ble_local_name": 0,
         "ble_characteristic": 0,
         "product_family_codename": 0,
+        # CP19 (§7.5) — source_type exclusion bin (high-conf file only;
+        # zero-init in both files so the bins dict shape is parallel and
+        # reconciliation arithmetic carries through with no NULL-handling).
+        "excluded_source_type": 0,
     }
     # CP16 (§4.4) — CP14 identifier_type cluster DROPPED-class types
     # initialized to zero (per-bin presence required for the bins-dict
@@ -532,7 +568,10 @@ def _compute_drop_tally(
     survivors = 0
     for r in rows:
         bin_name = _assign_drop_bin(
-            r, confidence_floor, drop_pi_self_exclude=drop_pi_self_exclude
+            r,
+            confidence_floor,
+            drop_pi_self_exclude=drop_pi_self_exclude,
+            drop_source_types=drop_source_types,
         )
         if bin_name is None:
             survivors += 1
@@ -554,6 +593,7 @@ def _compute_drop_tally(
         ble_characteristic=bins["ble_characteristic"],
         product_family_codename=bins["product_family_codename"],
         cp16_dropped={k: bins[k] for k in DROPPED_REASONS.values()},
+        excluded_source_type=bins["excluded_source_type"],
         survivors=survivors,
         drop_assignments=drop_assignments,
     )
@@ -580,6 +620,7 @@ def _check_halts(
         + standard.ble_characteristic
         + standard.product_family_codename
         + sum(standard.cp16_dropped.values())  # CP16 (§4.4) cluster
+        + standard.excluded_source_type  # CP19 (§7.5) — zero for standard file
     )
     if standard_sum + standard.survivors != n:
         halts.append(
@@ -604,6 +645,7 @@ def _check_halts(
         + high_conf.ble_characteristic
         + high_conf.product_family_codename
         + sum(high_conf.cp16_dropped.values())  # CP16 (§4.4) cluster
+        + high_conf.excluded_source_type  # CP19 (§7.5)
     )
     if high_conf_sum + high_conf.survivors != n:
         halts.append(
@@ -678,12 +720,14 @@ def run_coverage_matrix(conn: sqlite3.Connection) -> CoverageMatrixReport:
         file_label="argus_export.json",
         confidence_floor=EXPORT_STANDARD_FLOOR,
         drop_pi_self_exclude=False,  # §8.4: standard export keeps Pi OUIs
+        drop_source_types=frozenset(),  # CP19: standard export keeps all source_types
     )
     high_conf = _compute_drop_tally(
         rows,
         file_label="argus_export_high_confidence.json",
         confidence_floor=EXPORT_HIGH_CONFIDENCE_FLOOR,
         drop_pi_self_exclude=True,  # §8.4 / §11 #12: high-conf drops Pi OUIs
+        drop_source_types=EXCLUDED_SOURCE_TYPES,  # CP19 (§7.5): high-conf drops inferred + crowdsourced
     )
 
     halts = _check_halts(rows, standard, high_conf)
@@ -758,6 +802,8 @@ def _drop_tally_to_dict(t: DropBinTally) -> dict:
     }
     # CP16 (§4.4) — CP14 cluster DROPPED-class bins (12 entries).
     bins.update(t.cp16_dropped)
+    # CP19 (§7.5) — source_type exclusion bin (high-conf only, zero in standard).
+    bins["excluded_source_type"] = t.excluded_source_type
     return {
         "file_label": t.file_label,
         "confidence_floor": t.confidence_floor,
@@ -983,9 +1029,10 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
         "`procurement_only` > `unknown_category` > `device_fingerprint` > "
         "`ssid_pattern` > `ble_local_name` > `ble_characteristic` > "
         "`product_family_codename` > `oversized_mac_range` > "
-        "`self_exclude_oui` > `below_confidence_threshold`). Survivors are "
-        "eligible for the corresponding Lynceus export file. Reconciliation: "
-        "`pre_active_count − sum(bins) = survivors`."
+        "{CP16 DROPPED_REASONS} > `self_exclude_oui` > "
+        "`below_confidence_threshold` > `excluded_source_type`). Survivors "
+        "are eligible for the corresponding Lynceus export file. "
+        "Reconciliation: `pre_active_count − sum(bins) = survivors`."
     )
     lines.append("")
     for tally in (report.drop_tally_standard, report.drop_tally_high_confidence):
@@ -1013,6 +1060,7 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
             [
                 ("`self_exclude_oui` (§8.4 / §11 #12)", tally.self_exclude_oui),
                 ("`below_confidence_threshold` (§7.5)", tally.below_confidence_threshold),
+                ("`excluded_source_type` (§7.5 CP19)", tally.excluded_source_type),
             ]
         )
         lines.append("| Bin | Count |")
