@@ -18,6 +18,59 @@ CEO (`62a86779-651b-4c59-8773-cee9e0f53334`) — orchestrating MAC-101 pre-ship 
 
 ## Last action
 
+CEO heartbeat 2026-05-14T~14:30Z–~19:30Z (**MAC-101 pre-ship cleanup + public-flip prep dispatch fully landed — v1.0.0 ship-ready state achieved**). Anchored on commits `b0332be` (§2.1(a) alpr_camera canonical-form fix) / `106689b` (§3.5 F3 operator-path scrub across 34 tracked files) / `18c3d23` (§3.6 sid=41 license_posture placeholder resolution + 14-id `notes.upstream_license_posture` backfill) / `9322500` (SAR-12 §4 Case 10 + §6 recurrence #10 — decomposition-time-projection-stale sub-class) / `ced0dca` (SAR-14 — bible-amendment child-issue-ID-ordering) / `9979015` (SAR-12 §6 threshold cleanup + meta-pattern observation) / `5df357d` (§11 #16 ↔ migration 0016 LICENSE composition addendum) / `1495984` + `4de0233` (PROJECT_STATE.md header + active-sub-agents refresh) / `41da1d6` + `30a0252` (MAC-117: migration 0019 7 net-new identifier_types + 68 promotions + 38 bx_sig backfills + 1 HOLD; cumulative CHECK 41→48) / `ead49a3` (§3.1 LICENSE family Argus-specific preambles + ODbL-1.0 / AGPL-3.0 / CC-BY-SA-4.0 ratifications) / `7ce5bc5` (CP21 coordinated amendment — §4.4 MAP +21 + §11 #16 canonical sentinel-key + §8.2 strict-reading + SAR-12 §4 Case 11 + §6 #11 + sub-class (e) + (α)/(β) decision + board-vs-CEO divergence preservation) / `f1a3405` (§3.4 CREDITS substantive refresh) / `e383143` (§3.3 CHANGELOG substantive refresh) / `5b037a4` (§3.2 README substantive refresh; 9 dispatch-spec sections) plus this CEO Phase C state-rotation commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
+
+**MAC-101 pre-ship dispatch CLOSED.** Board dispatch [`fd6146a3`](/MAC/issues/MAC-101#comment-fd6146a3-ee4b-4d9a-a38d-623ba0cdb463) authorized two parallel streams (Tier 1 cleanup + Tier 3 public-flip prep). All gates verified at §3.7 pre-ship gate: test suite 500/500 PASS in 0.96s; all 4 exports regenerate cleanly with byte-stable consumer contract; coverage report regenerates with reconciliation arithmetic holding (Halts: 0); no §11 hard-rule trips on Stream 1+2 work; this PROJECT_STATE rotation captures the full post-dispatch state; deferred items accounted for via README §3.2 "Known held items" section + CHANGELOG roadmap.
+
+**Aggregate post-MAC-101-pre-ship state:**
+
+| Metric | MAC-88 baseline | MAC-101 close-of-close (Items A+B+C) | MAC-101 pre-ship close (v1.0.0 ship-ready) | Δ from MAC-88 |
+|---|---|---|---|---|
+| `identifiers` active | 22,266 | 22,464 | **22,532** | +266 |
+| `identifiers` total | 22,324 | 22,544 | **22,612** | +288 |
+| `behavioral_signatures` | 55 | 93 | **131** | +76 |
+| `conflicts` | 4 | 20 | 20 | +16 |
+| `source_reclassifications` | 808 | 809 | 809 | +1 |
+| `sources` rows | 37 | 43 | 43 | +6 |
+| Schema version | 17 | 18 | **19** | +2 (mig-0018 + mig-0019) |
+| `argus_export.json` standard | 455 | 494 | 494 | +39 |
+| `argus_export_high_confidence.json` | 113 | 113 | 113 | 0 |
+| `argus_export_behavioral_signatures.json` | 55 | 55 | 55 | 0 |
+| `argus_export.csv` data rows | 22,265 | 22,464 | 22,532 | +267 |
+| CP count | 19 | 20 | **21** | +2 (CP20 + CP21) |
+| SAR count | 12 | 13 | **14** | +2 (SAR-13 + SAR-14) |
+
+**Architectural firsts in this dispatch:**
+
+1. First substantive board-vs-CEO ratification divergence on a discipline-evolution question (CEO recommended (β); board selected (α); CEO honored)
+2. SAR-12 §6 sub-class taxonomy extended to 5 classes (a)/(b)/(c)/(d)/(e) — each post-codification recurrence a distinct sub-class first instance (meta-pattern threshold crossed)
+3. SAR-14 codified — bible-amendment child-issue-ID-ordering discipline (preventive complement to S.8 append-don't-mutate fix discipline)
+4. First 5-tier per-source license-posture taxonomy across 43 sources (CC-BY-NC-SA-4.0 / ODbL-1.0 / AGPL-3.0 inherited / AGPL-3.0 declared / NO_LICENSE_DECLARED §11 #16 Feist / CC-BY-NC-ND-4.0 with research-use clause / public-domain registry / permissive+academic)
+5. First 3-layer per-row license-posture composition codified (sources.notes.license_posture / deployment_observations.LICENSE / identifiers.notes.upstream_license_posture)
+6. First public-shippable doc set (LICENSE / LICENSE-DATA / LICENSE-DOCS / README / CHANGELOG / CREDITS / METHODOLOGY / DATA_DICTIONARY) with substantive Argus-specific framing
+7. First coordinated CP21 amendment combining 5 distinct touches (§4.4 MAP + §11 #16 canonical + §8.2 strict-reading + SAR-12 §4 Case 11 + §6 recurrence #11 with sub-class (e) + (α)/(β) decision)
+8. (β) escalation trigger pre-commitment armed at CP21 (second class (e) recurrence within next 10 board+CEO heartbeats escalates S.7 extension to ratifier-class actions without further board deliberation)
+
+**Forward sequence (post-v1.0.0; documented in README §3.2 "Known held items" + CHANGELOG roadmap):**
+
+- 31 Wave-A behavioral_signatures pending Wave-C/D/E second-source corroboration
+- 62 Class B sustained holds (Wave-B IEEE individual-attributed-pii with registry_xcheck_attempted=true; contribution path: international corporate registries)
+- 133 IEEE Private permanent holds (registry-declared private; §11 #3 + IEEE-Private discipline)
+- 142 Item C round-2 held rows (107 vocab-extension candidates + 19 MAC-58 bx_sig deferred + 15 CVE-FP per SAR-7 #1 + 1 Q7 attribution-pending)
+- Sources-row metadata cleanup (sources 1/2/3/7 pre-CP15 vestige; identifier-row data correctly labeled post-CP19/CP21)
+- §11 #16 ↔ migration 0016 LICENSE column further composition discipline
+- Wave-C / Wave-D / Wave-E source dispatch planning
+- Wave-G' Phase 7 iOS coverage
+- Skydio Enterprise alt-channel scope-proposal
+- 14 net-new MAC-109 identifier_types §4.4 MAP review extensions (post-Lynceus integration team feedback)
+- (β) escalation trigger if class (e) recurs within window
+
+**v1.0.0 ship-readiness recommendation:** SHIP. All 7 §3.7 pre-ship gates verified clean. Held items documented with rationale + contribution paths per dispatch §3.2 framing. License posture clean across three artifact classes. Discipline architecture (21 CPs + 14 SARs + §11 hard rules) load-bearing and audit-trail-anchored. Build process reproducible from upstream sources per CHANGELOG "Reproducibility" section.
+
+---
+
+### Prior action — MAC-101 close-of-close — three-item batch (Items A+B+C) (preserved verbatim)
+
 CEO heartbeat 2026-05-14T~13:45Z–~14:30Z (**MAC-101 close-of-close — three-item batch (Item A manufacturers-xcheck predicate + Item B Watts A/S CSV regen lag + Item C Wave-A deferred-dir custom-mapper heartbeat) fully landed; CP20 (SAR-13 S.1+S.2+S.3 + §11 #16 Feist) + SAR-12 §6 recurrence #9 (class (b)-adjacent table-scope sub-class first instance) ratified by board**). Anchored on commits `ff2d771` (Item A: multi-registry xcheck predicate + 13/75 Class B clears + close regen) / `b2563c7` + `d5623d4` (Item C Phase 1: per-shape mappers + 365 raw_observations staged) / `0921003` (Item C Phase 2 initial triage: 0 immediate promotions + 1 §7.3 reject + 364 HOLDs) / `8de7309` (CP20 bible: SAR-13 + §11 #16) / `dd26b59` (CP20 fix: MAC-105/106/107 → MAC-108/109/110 ID-collision remap) / `42d7860` (MAC-108: Phase-1 mapper URL-template rerun under SAR-13 S.2; 199 source-url-direct corrections) / `5f1bf2e` (MAC-110: Stage 1 + Stage 2 + export regen; 24 row-ops Stage 1 + 145 Stage 2 promotions + 38 bx_sig backfills + Q5 leg 1 conf uplift + 1 Q7 conflict + 15 CVE-FP) / `047a273` (CEO bible append: SAR-12 §6 recurrence #9) plus this CEO Phase C state-rotation commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
 
 **MAC-101 three-item batch dispatch CLOSED.** Board dispatch [`c81b8df5`](/MAC/issues/MAC-101#comment-c81b8df5-38a5-473f-9638-518c74e47849) authorized three structurally-independent items with CEO empowered to route. CEO decomposed into [MAC-102](/MAC/issues/MAC-102) (Item A → Validator; Item B coalesced) + [MAC-103](/MAC/issues/MAC-103) (Item C Phase 1 → ExtractionWorker) + [MAC-104](/MAC/issues/MAC-104) (Item C Phase 2 → Validator). Cascade extended at MAC-104 CEO ratification slate (CP20 + 3 grandchildren): [MAC-108](/MAC/issues/MAC-108) (ExtractionWorker mapper-rerun) + [MAC-109](/MAC/issues/MAC-109) (DBArchitect migration 0018 + SAR-13 S.3 routing) + [MAC-110](/MAC/issues/MAC-110) (Validator close-out; auto-woke on chain unblock). Board ratification at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) accepted all three CEO Phase-C ratifications (option β multi-registry + SAR-13 + §11 #16); declared SAR-12 recurrence #9 (table-scope sub-class).
