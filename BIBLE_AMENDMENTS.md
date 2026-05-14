@@ -2185,3 +2185,64 @@ This CP20 entry is the §11 #11 amendment-log pairing for the SAR-13 section add
 [See CP20 §A above for full text.]
 
 ---
+
+## SAR-14 — Bible-amendment child-issue-ID-ordering discipline
+
+**Origin:** CP20 [`8de7309`](https://github.com/CascadeForge/argus/commit/8de7309) drafted bible-text referencing downstream child issues by DRAFT IDs (MAC-105/106/107) before the Paperclip system assigned actual IDs. System assigned MAC-108/MAC-109/MAC-110 to the three CEO-spawned children. Required fix commit [`dd26b59`](https://github.com/CascadeForge/argus/commit/dd26b59) to remap the bible references to landed reality per `feedback_bible_amendment_downstream_consumer_audit.md` discipline. Pattern surfaced at MAC-101 close §6.3.f; board flagged as "worth a small SAR-class refinement at next memo-refinement cycle" at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) 2026-05-14. Codified here per MAC-101 §2.1(c) dispatch directive.
+
+**Bible-binding:** SAR-14 binds bible-amendment authors (CEO, sub-CEO, and workers when surfacing bible-class changes via halt-and-surface). It pairs with `feedback_bible_amendment_downstream_consumer_audit.md` (S.8 append-don't-mutate sub-rule) — the existing downstream-consumer-audit memo covers the FIX behavior when a collision is found; SAR-14 covers the PREVENT behavior to avoid the collision in the first place.
+
+### §1 — The rule
+
+When a bible amendment will reference downstream child issues by ID (e.g., `Child issues to follow: MAC-X mapper rerun, MAC-Y migration, MAC-Z close-out`), the authoring agent MUST land the child issues FIRST and capture their actual system-assigned identifiers BEFORE writing the bible memo. Do not draft predictive IDs in the bible.
+
+**Forward-only authoring ordering:**
+
+1. Decompose work into child issues + spawn them via `POST /api/companies/{companyId}/issues` (capture returned `identifier` field).
+2. Confirm system-assigned identifiers by reading the response.
+3. Interleave the captured IDs into the bible memo draft.
+4. Commit the bible amendment with consistent IDs throughout the §-text + amendment-log entry + sequencing-post-acceptance section + any cross-references.
+
+**If ordering must be reversed** (rare; bible memo must commit before children spawn for some operational reason): use placeholder text in the bible memo such as "Child issues to be spawned post-ratification; identifiers captured in dispatch follow-on comment." Do NOT use draft IDs that may collide with system-assigned ranges. The follow-on comment on the parent issue captures the actual IDs as a separate audit-trail entry.
+
+### §2 — Case study
+
+**CP20 (2026-05-14) initial commit [`8de7309`](https://github.com/CascadeForge/argus/commit/8de7309)** referenced draft IDs MAC-105/106/107 across:
+- `### Status` (next-action enumeration)
+- `### Binds` (worker dispatch references)
+- `### Sequencing post-acceptance` (child-issue ladder)
+- `### S.2` (URL-template-discipline rerun child)
+
+System actually assigned MAC-108/MAC-109/MAC-110 to the three CEO-spawned children. (MAC-105/106 had become unrelated productivity-review issues; MAC-107 was a duplicate-spawn against the MAC-104 scope and was cancelled-as-superseded.) Required fix commit [`dd26b59`](https://github.com/CascadeForge/argus/commit/dd26b59) to remap 7 bible-text occurrences per `feedback_bible_amendment_downstream_consumer_audit.md` discipline.
+
+Fix-commit anchor in dd26b59:
+> The MAC-105/MAC-106/MAC-107 identifiers used in CP20 §"Status" / §"Binds" / §"Sequencing post-acceptance" / §S.2 were draft predictions; the system assigned MAC-108/MAC-109/MAC-110 to the three child issues spawned by CEO heartbeat. ... Updating the bible references to match landed reality per feedback_bible_amendment_downstream_consumer_audit.md.
+
+Cost: one corrective commit + bible HEAD bump (`8de7309` → `dd26b59`). Avoidable cost; reordering authoring would have prevented it entirely.
+
+### §3 — Composition with prior discipline
+
+SAR-14 composes with:
+
+- `feedback_bible_amendment_downstream_consumer_audit.md` S.8 (append-don't-mutate audit-table discipline) — S.8 is the FIX behavior when a collision/drift surfaces; SAR-14 is the PREVENT behavior at authoring time. Both share the root: bible-text references to other surfaces must match landed reality, not drafted predictions.
+- `feedback_avoid_hb_labels_in_durable_artifacts.md` — anchor discipline for durable artifacts. SAR-14 specifically governs MAC-issue identifiers (a class of durable artifact); the broader rule against drift-prone labels (HB#, sprint #, etc.) applies to all anchors.
+- SAR-12 class (e) — citation discipline (memos resolve on disk). SAR-14 governs the parallel discipline for issue-ID citations (resolve to landed system-assigned IDs, not draft IDs).
+
+The three together form a coherent anchor-stability stack for any bible amendment that cites external surfaces.
+
+### §4 — Codification surfaces (sibling memo + audit-trail entry)
+
+| Surface | Purpose | Author |
+|---|---|---|
+| `BIBLE_AMENDMENTS.md` SAR-14 (this entry) | Canonical board-side codification; public-shippable; binds bible-amendment authors | Board (this entry, MAC-101 §2.1(c) ratification) |
+| `feedback_bible_amendment_child_issue_id_ordering.md` (CEO memory) | CEO-side reference + decomposition-time checklist | CEO post-CP20 dd26b59 fix |
+
+Both files convey the same rule. SAR-14 (board-side) is canonical for binding scope; CEO-memory copy is the decomposition-time checklist surface.
+
+### §5 — Forward expectation
+
+If a future bible amendment surfaces a collision pattern that SAR-14 doesn't cover (e.g., a different anchor class: approval IDs, run IDs, commit SHAs from a yet-to-land sibling branch), the discipline carries forward with extension to that anchor class. The principle: **bible-text references must resolve to landed reality, not predictions**.
+
+Bible HEAD bumps with this entry. Schema unchanged. Docs-only commit per the small-bible-amendment precedent (ab2cc6a / 047a273 / 9322500).
+
+---
