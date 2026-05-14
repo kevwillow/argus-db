@@ -99,10 +99,11 @@ def _row(**kw) -> ActiveRow:
 
 
 def test_type_mapping_covers_every_identifier_type() -> None:
-    # Post-CP16: dispositions are split across IDENTIFIER_TYPE_TO_PATTERN_TYPE
-    # (15 MAP cases) + DROPPED_REASONS (12 DROPPED cases) per CP16's lean-
-    # refactor design (board direction at MAC-75 5b9212ce). Union must equal
-    # the full post-CP14 identifier_type enum (27 values).
+    # Post-MAC-109 (migration 0018): dispositions are split across
+    # IDENTIFIER_TYPE_TO_PATTERN_TYPE (15 MAP cases) + DROPPED_REASONS (12
+    # CP16 DROPPED cases + 14 MAC-109 vocab-extension DROPPED cases = 26).
+    # Union must equal the full post-mig-0018 identifier_type enum (41
+    # cumulative values per migration 0018 amendment).
     expected = {
         # Pre-CP13 (migration 0001)
         "oui", "mac", "mac_range", "bssid",
@@ -122,6 +123,15 @@ def test_type_mapping_covers_every_identifier_type() -> None:
         "wifi_frame_control_subtype", "wifi_nan_param_signature",
         # CP14 (migration 0014) — surveillance metadata
         "alpr_model",
+        # MAC-109 (migration 0018) — SAR-13 §S.3 vendor-anchored /
+        # device-naming cluster (14 net-new). All DROPPED-class by default
+        # pending §4.4 MAP ratification (MAC-110 §E architectural firsts).
+        "ble_protocol_byte_table", "ble_service_uuid", "ble_company_id",
+        "frequency_band", "ble_protocol_byte", "operator_profile",
+        "x509_cert_sha256_prefix", "ble_adv_interval", "ble_payload_offset",
+        "firmware_sha256_hash", "network_endpoint",
+        "firmware_image_variant", "qualcomm_chip_format_id",
+        "firmware_branded_string",
     }
     assert (
         set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()) | set(DROPPED_REASONS.keys())

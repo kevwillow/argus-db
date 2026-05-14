@@ -141,6 +141,25 @@ DROPPED_REASONS: dict[str, str] = {
     "wifi_frame_control_subtype": "wifi_frame_control_subtype",
     "wifi_nan_param_signature": "wifi_nan_param_signature",
     "alpr_model": "alpr_model",
+    # Migration 0018 / SAR-13 §S.3 — 14 net-new identifier_types added at
+    # MAC-109. Default DROPPED-class pending board ratification of §4.4 MAP
+    # additions (MAC-110 §E architectural firsts). Mirrors
+    # export_lynceus.py::DROPPED_REASONS verbatim — the reconcile gate at
+    # export_lynceus.py::_reconcile requires byte-identical parity.
+    "ble_protocol_byte_table": "ble_protocol_byte_table",
+    "ble_service_uuid": "ble_service_uuid",
+    "ble_company_id": "ble_company_id",
+    "frequency_band": "frequency_band",
+    "ble_protocol_byte": "ble_protocol_byte",
+    "operator_profile": "operator_profile",
+    "x509_cert_sha256_prefix": "x509_cert_sha256_prefix",
+    "ble_adv_interval": "ble_adv_interval",
+    "ble_payload_offset": "ble_payload_offset",
+    "firmware_sha256_hash": "firmware_sha256_hash",
+    "network_endpoint": "network_endpoint",
+    "firmware_image_variant": "firmware_image_variant",
+    "qualcomm_chip_format_id": "qualcomm_chip_format_id",
+    "firmware_branded_string": "firmware_branded_string",
 }
 
 # §8.2 confidence-band ceilings — annotation reference only (no mutations).

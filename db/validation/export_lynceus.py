@@ -139,6 +139,25 @@ DROPPED_REASONS: dict[str, str] = {
     "wifi_frame_control_subtype": "wifi_frame_control_subtype",  # Overly-coarse enum
     "wifi_nan_param_signature": "wifi_nan_param_signature",  # Derived multi-field aggregate
     "alpr_model": "alpr_model",  # Vendor-internal taxonomy, not RF-broadcast (companion to product_family_codename)
+    # Migration 0018 / SAR-13 §S.3 — 14 net-new identifier_types added at
+    # MAC-109. Default DROPPED-class pending board ratification of §4.4 MAP
+    # additions (MAC-110 §E architectural firsts). Each carries the same
+    # "carried in canonical DB but not in Lynceus pattern table v0.1"
+    # disposition as the CP16 cluster.
+    "ble_protocol_byte_table": "ble_protocol_byte_table",  # Sub-protocol byte table; not wire-pattern
+    "ble_service_uuid": "ble_service_uuid",  # Service-uuid variant of ble_service; awaiting §4.4 alias confirm
+    "ble_company_id": "ble_company_id",  # Company-id variant of ble_manufacturer_id; awaiting §4.4 alias confirm
+    "frequency_band": "frequency_band",  # Parametric (GSM900/DCS1800/etc.) — not wire-pattern
+    "ble_protocol_byte": "ble_protocol_byte",  # Sub-field byte — too coarse for Lynceus match
+    "operator_profile": "operator_profile",  # G-17 corporate operator entity — analytical-only
+    "x509_cert_sha256_prefix": "x509_cert_sha256_prefix",  # Firmware-anchored cert; Lynceus has no cert-prefix pattern_type
+    "ble_adv_interval": "ble_adv_interval",  # Parametric advertisement interval — not wire-pattern
+    "ble_payload_offset": "ble_payload_offset",  # Sub-field byte offset — too coarse
+    "firmware_sha256_hash": "firmware_sha256_hash",  # Firmware blob hash — not RF-broadcast
+    "network_endpoint": "network_endpoint",  # Cloud endpoint — out-of-band IP/DNS; not RF-pattern
+    "firmware_image_variant": "firmware_image_variant",  # Vendor-internal taxonomy
+    "qualcomm_chip_format_id": "qualcomm_chip_format_id",  # Chip-format id — not wire-pattern
+    "firmware_branded_string": "firmware_branded_string",  # Branded string — too vague for match
 }
 
 # §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
@@ -685,6 +704,22 @@ def _build_export(
         "wifi_frame_control_subtype": 0,
         "wifi_nan_param_signature": 0,
         "alpr_model": 0,
+        # Migration 0018 / SAR-13 §S.3 — 14 net-new identifier_types from MAC-109.
+        # See DROPPED_REASONS for rationale.
+        "ble_protocol_byte_table": 0,
+        "ble_service_uuid": 0,
+        "ble_company_id": 0,
+        "frequency_band": 0,
+        "ble_protocol_byte": 0,
+        "operator_profile": 0,
+        "x509_cert_sha256_prefix": 0,
+        "ble_adv_interval": 0,
+        "ble_payload_offset": 0,
+        "firmware_sha256_hash": 0,
+        "network_endpoint": 0,
+        "firmware_image_variant": 0,
+        "qualcomm_chip_format_id": 0,
+        "firmware_branded_string": 0,
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,
@@ -801,6 +836,21 @@ def _build_coverage_report_md(
             ("wifi_frame_control_subtype (§4.4 CP16)", bins["wifi_frame_control_subtype"]),
             ("wifi_nan_param_signature (§4.4 CP16)", bins["wifi_nan_param_signature"]),
             ("alpr_model (§4.4 CP16)", bins["alpr_model"]),
+            # Migration 0018 / SAR-13 §S.3 — MAC-109 vocab-extension cluster.
+            ("ble_protocol_byte_table (§4.4 mig0018)", bins["ble_protocol_byte_table"]),
+            ("ble_service_uuid (§4.4 mig0018)", bins["ble_service_uuid"]),
+            ("ble_company_id (§4.4 mig0018)", bins["ble_company_id"]),
+            ("frequency_band (§4.4 mig0018)", bins["frequency_band"]),
+            ("ble_protocol_byte (§4.4 mig0018)", bins["ble_protocol_byte"]),
+            ("operator_profile (§4.4 mig0018)", bins["operator_profile"]),
+            ("x509_cert_sha256_prefix (§4.4 mig0018)", bins["x509_cert_sha256_prefix"]),
+            ("ble_adv_interval (§4.4 mig0018)", bins["ble_adv_interval"]),
+            ("ble_payload_offset (§4.4 mig0018)", bins["ble_payload_offset"]),
+            ("firmware_sha256_hash (§4.4 mig0018)", bins["firmware_sha256_hash"]),
+            ("network_endpoint (§4.4 mig0018)", bins["network_endpoint"]),
+            ("firmware_image_variant (§4.4 mig0018)", bins["firmware_image_variant"]),
+            ("qualcomm_chip_format_id (§4.4 mig0018)", bins["qualcomm_chip_format_id"]),
+            ("firmware_branded_string (§4.4 mig0018)", bins["firmware_branded_string"]),
             ("self_exclude_oui (§8.4 / §11 #12)", bins["self_exclude_oui"]),
             ("below_confidence_threshold (§7.5)", bins["below_confidence_threshold"]),
             ("excluded_source_type (§7.5 CP19)", bins["excluded_source_type"]),
