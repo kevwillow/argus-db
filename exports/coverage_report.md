@@ -15514,17 +15514,17 @@ Pre-tally source: MAC-45 `coverage_matrix_report.json` (`drop_tally_standard` + 
 | alpr_model (§4.4 CP16) | 0 |
 | self_exclude_oui (§8.4 / §11 #12) | 0 |
 | below_confidence_threshold (§7.5) | 16 |
-| geographic_scope_mismatch (CP7) | 12 |
-| **sum(dropped_in_export)** | **18393** |
-| **survivors → entries.length** | **427** |
-| **reconciliation** | **18820 − 18393 = 427** ✅ |
+| geographic_scope_mismatch (CP7) | 0 |
+| **sum(dropped_in_export)** | **18381** |
+| **survivors → entries.length** | **439** |
+| **reconciliation** | **18820 − 18381 = 439** ✅ |
 
 ### MAC-45 ↔ Step-6 cross-check
 
 - MAC-45 `drop_tally_standard.bins` = {"alpr_model": 0, "bandwidth_mhz": 0, "below_confidence_threshold": 0, "ble_characteristic": 3, "ble_local_name": 3, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "device_class_id": 0, "device_fingerprint": 0, "icao_24bit_address": 0, "oversized_mac_range": 0, "procurement_only": 0, "product_family_codename": 14, "rf_burst_duration": 0, "rf_channel": 0, "rf_protocol_constant": 0, "self_exclude_oui": 0, "ssid_pattern": 5, "unknown_category": 18340, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0} → survivors 455 (reconciles 18820).
 - Step-6 `argus_export.json._meta.dropped_in_export` = {"alpr_model": 0, "bandwidth_mhz": 0, "below_confidence_threshold": 0, "ble_characteristic": 3, "ble_local_name": 3, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "device_class_id": 0, "device_fingerprint": 0, "geographic_scope_mismatch": 0, "icao_24bit_address": 0, "oversized_mac_range": 0, "procurement_only": 0, "product_family_codename": 14, "rf_burst_duration": 0, "rf_channel": 0, "rf_protocol_constant": 0, "self_exclude_oui": 0, "ssid_pattern": 5, "unknown_category": 18340, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0} → survivors 455 (reconciles 18820).
 - MAC-45 `drop_tally_high_confidence.bins` = {"alpr_model": 0, "bandwidth_mhz": 0, "below_confidence_threshold": 16, "ble_characteristic": 3, "ble_local_name": 3, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "device_class_id": 0, "device_fingerprint": 0, "icao_24bit_address": 0, "oversized_mac_range": 0, "procurement_only": 0, "product_family_codename": 14, "rf_burst_duration": 0, "rf_channel": 0, "rf_protocol_constant": 0, "self_exclude_oui": 0, "ssid_pattern": 5, "unknown_category": 18340, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0} → survivors 439 (reconciles 18820).
-- Step-6 `argus_export_high_confidence.json._meta.dropped_in_export` = {"alpr_model": 0, "bandwidth_mhz": 0, "below_confidence_threshold": 16, "ble_characteristic": 3, "ble_local_name": 3, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "device_class_id": 0, "device_fingerprint": 0, "geographic_scope_mismatch": 12, "icao_24bit_address": 0, "oversized_mac_range": 0, "procurement_only": 0, "product_family_codename": 14, "rf_burst_duration": 0, "rf_channel": 0, "rf_protocol_constant": 0, "self_exclude_oui": 0, "ssid_pattern": 5, "unknown_category": 18340, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0} → survivors 427 (reconciles 18820).
+- Step-6 `argus_export_high_confidence.json._meta.dropped_in_export` = {"alpr_model": 0, "bandwidth_mhz": 0, "below_confidence_threshold": 16, "ble_characteristic": 3, "ble_local_name": 3, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "device_class_id": 0, "device_fingerprint": 0, "geographic_scope_mismatch": 0, "icao_24bit_address": 0, "oversized_mac_range": 0, "procurement_only": 0, "product_family_codename": 14, "rf_burst_duration": 0, "rf_channel": 0, "rf_protocol_constant": 0, "self_exclude_oui": 0, "ssid_pattern": 5, "unknown_category": 18340, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0} → survivors 439 (reconciles 18820).
 - Conclusion: per-bin equality + per-row `drop_assignments` equality verified by `_reconcile()` for both files; halts at 0.
 
 ## §6.3 distribution summary (Step-6 layer over the matrix)
@@ -15534,7 +15534,7 @@ Single-axis tallies of the active canonical set, derived directly from the 63 ac
 - **By `device_category`:** `alpr`=26, `body_cam`=3, `drone`=442, `drone_detect`=2, `gunshot_detect`=6, `hacking_tool`=1, `unknown`=18340
 - **By `identifier_type`:** `ble_characteristic`=3, `ble_local_name`=3, `ble_manufacturer_id`=3969, `ble_service`=8, `drone_id_prefix`=427, `mac`=1, `mac_range`=14335, `oui`=55, `product_family_codename`=14, `ssid_pattern`=5
 - **By `source_type`:** `crowdsourced`=14, `inferred`=62, `manufacturer_app`=21, `primary_registry`=18723
-- **By `geographic_scope` (CP7):** `US`=450, `global`=64, `unknown`=18306
+- **By `geographic_scope` (CP7):** `US`=462, `global`=64, `unknown`=18294
 - **CP7 filter applied:** standard=['US'], high-confidence=['US'] (records with `geographic_scope` matching ANY filter element pass; `global` passes unconditionally; `unknown`/NULL passes standard but fails high-confidence).
 
 ## §7.5 description-format compliance (Talos exports only)
@@ -16015,7 +16015,72 @@ These items were flagged by the MAC-45 coverage matrix as CP5 board-class but ar
 | File | Path | record_count | source_record_count |
 |---|---|---|---|
 | Talos standard | `argus/exports/argus_export.json` | 455 | 18820 |
-| Talos high-conf | `argus/exports/argus_export_high_confidence.json` | 427 | 18820 |
+| Talos high-conf | `argus/exports/argus_export_high_confidence.json` | 439 | 18820 |
 | CSV (full canonical) | `argus/exports/argus_export.csv` | 18820 | 18820 |
 | Coverage matrix (MAC-45) | `extraction_outputs/mac45/coverage_matrix.md` | (matrix) | 18820 |
 
+<!-- BEGIN behavioral_signatures section (CP18) -->
+
+## Behavioral-signatures export reconciliation (§9 item 9, CP18)
+
+Sibling export `argus_export_behavioral_signatures.json` per §7.5 CP18.
+`argus_run_id`: `97bf9bc5-7515-5399-b9c6-9cbefdaa47bd` (deterministic UUID5; stable across re-runs).
+
+- Source record count: **55** (rows in `behavioral_signatures` table)
+- Confidence threshold: **≥ 70**
+- Exported entries: **55** (in `argus_export_behavioral_signatures.json`)
+
+### Dropped from sibling export
+
+| Bin | Count |
+|---|---|
+| `below_confidence_threshold` | 0 |
+| `unknown_category` | 0 |
+| **TOTAL DROPPED** | **0** |
+
+Reconciliation: 55 source − 0 dropped = 55 entries ✓
+
+<!-- END behavioral_signatures section (CP18) -->
+
+<!-- BEGIN cp18_item_c_faa_backfill section -->
+
+## CP18 Item C — FAA RID `geographic_scope='US'` backfill reconciliation
+
+One-time backfill event (MAC-93, 2026-05-13). Twelve `identifier_type='drone_id_prefix'`
+rows in `identifiers` registered via the FAA RID portal (`uasdoc.faa.gov/api/v1/publicDOCRev/*`)
+had `geographic_scope IS NULL` and were therefore filtered out of the high-confidence
+Lynceus export by the CP7 `geographic_scope_mismatch` gate. Per board direction (FAA RID
+registration IS the US scope assignment regardless of manufacturer origin), the 12 rows
+were lifted to `geographic_scope='US'`.
+
+### Spot-check decision
+
+| Manufacturer | NULL row count | HOLD outcome |
+|---|---|---|
+| AgEagle (senseFly) | 4 | no HOLD — AgEagle is US-headquartered, senseFly is the acquired sub-brand |
+| Autel Robotics | 3 | no HOLD — FAA-RID-registration anchors US scope (manufacturer origin China is irrelevant per board) |
+| SkyRanger / SkyRaider | 1 | no HOLD — FLIR/Teledyne-owned (US) |
+| Sentera | 1 | no HOLD — US-headquartered (Minneapolis, MN) |
+| Ruko | 1 | no HOLD — FAA-RID-registration anchors US scope |
+| Percepto AirMax | 1 | no HOLD — FAA-RID-registration anchors US scope |
+| Applied Aeronautics | 1 | no HOLD — US-headquartered (Austin, TX) |
+| **TOTAL** | **12** | **0 HELD; 12 backfilled** |
+
+### Pre/post state
+
+| Metric | Pre | Post | Delta |
+|---|---|---|---|
+| `identifiers WHERE identifier_type='drone_id_prefix' AND geographic_scope='US'` | 415 | 427 | +12 |
+| `identifiers WHERE identifier_type='drone_id_prefix' AND geographic_scope IS NULL` | 12 | 0 | −12 |
+| `identifiers` active count (`superseded_by IS NULL`) | 18,820 | 18,820 | 0 (UPDATE not INSERT) |
+| `argus_export_high_confidence.json` `_meta.record_count` | 427 | 439 | +12 |
+| `argus_export_high_confidence.json` `_meta.dropped_in_export.geographic_scope_mismatch` | 12 | 0 | −12 |
+
+### Reconciliation arithmetic
+
+Post-backfill `argus_export_high_confidence.json`: `record_count = 439 = 18,820 source − 18,381 dropped`.
+Dropped bin breakdown: `unknown_category=18,340 + below_confidence_threshold=16 + ssid_pattern=5 + ble_local_name=3 + ble_characteristic=3 + product_family_codename=14 + geographic_scope_mismatch=0` (CP14 cluster bins all 0; CP16 alpr/wifi/rf bins all 0). Sum = 18,381 ✓.
+
+Defensive backup: `db/argus.db.pre_cp18_item_c_backup` (sha256 `a01c5a71ca3a4f391d177f563ca16c8b7efb06b5995d245c12d79cfba2634eea`).
+
+<!-- END cp18_item_c_faa_backfill section -->

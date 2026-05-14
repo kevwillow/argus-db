@@ -1,0 +1,1615 @@
+{
+  "_meta": {
+    "argus_version": "16",
+    "exported_at": "2026-05-14T00:17:51Z",
+    "record_count": 55,
+    "confidence_threshold": 70,
+    "argus_run_id": "97bf9bc5-7515-5399-b9c6-9cbefdaa47bd",
+    "source_record_count": 55,
+    "dropped_in_export": {
+      "below_confidence_threshold": 0,
+      "unknown_category": 0
+    }
+  },
+  "entries": [
+    {
+      "signature_name": "5G NSA inherits 4G LTE IMSI-exposing-message catalog (via TS 137.340)",
+      "cellular_generation": "5G_NSA",
+      "threshold_json": {
+        "message_type": "5G_NSA_INHERITANCE_META",
+        "inherits_from": "4G LTE",
+        "inherits_via_spec_ref": "3GPP TS 137.340 Sec. 7.1",
+        "paper_table_iii_row_count_method": "Marlin Table III bottom row: \"5G NR (NSA): Same as 4G LTE\" — this meta row represents the inheritance pointer, completing the 52 cross-gen-deduped (msg_type, cause) rows + 1 meta = 53 total.",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "043d3a1aa5a5c4f3"
+    },
+    {
+      "signature_name": "Diagnostic detector for IMSI-exposing NAS messages (Marlin paper catalog)",
+      "cellular_generation": null,
+      "threshold_json": {
+        "wave_a_observation_id": 220361,
+        "wave_a_rayhunter_source_url": "https://github.com/EFForg/rayhunter/blob/c4eca245b9/lib/src/analysis/diagnostic.rs",
+        "dispatch_normalization_path": "b",
+        "cross_gen_membership": null,
+        "qualitative_signature": true
+      },
+      "confidence": 80,
+      "argus_record_id": "132b999706d54159"
+    },
+    {
+      "signature_name": "Tracking Area Update Reject Cause #12",
+      "cellular_generation": "4G",
+      "threshold_json": {
+        "message_type": "Tracking Area Update Reject",
+        "cause_code": 12,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.3.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "142ff632d439c955"
+    },
+    {
+      "signature_name": "Attach Reject Cause #35",
+      "cellular_generation": "4G",
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 35,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "181a6d655f0725cc"
+    },
+    {
+      "signature_name": "Routing Area Update Reject Cause #3",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Routing Area Update Reject",
+        "cause_code": 3,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.5.1.4"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "20edc8acbf0e3b43"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #7",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 7,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "22b17127d189c356"
+    },
+    {
+      "signature_name": "Attach Reject Cause #6",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 6,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "265201c3ab60c2e8"
+    },
+    {
+      "signature_name": "Location Updating Reject Cause #11",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Location Updating Reject",
+        "cause_code": 11,
+        "cause_text_original": "#2-3, 6, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.4.4.7"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.4.4.7"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "299e3499e302720a"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #14",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 14,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "2a671b20bfec786d"
+    },
+    {
+      "signature_name": "Location Updating Reject Cause #13",
+      "cellular_generation": "2G",
+      "threshold_json": {
+        "message_type": "Location Updating Reject",
+        "cause_code": 13,
+        "cause_text_original": "#2-3, 6, 11-13",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.4.4.7"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "32baef3455182e44"
+    },
+    {
+      "signature_name": "Routing Area Update Reject Cause #6",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Routing Area Update Reject",
+        "cause_code": 6,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.5.1.4"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "351ded24bbbca240"
+    },
+    {
+      "signature_name": "Service Reject Cause #11",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Service Reject",
+        "cause_code": 11,
+        "cause_text_original": "#3, 6-7, 9, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.13.4"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.6.1.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "38aa061340c75d14"
+    },
+    {
+      "signature_name": "Tracking Area Update Reject Cause #11",
+      "cellular_generation": "4G",
+      "threshold_json": {
+        "message_type": "Tracking Area Update Reject",
+        "cause_code": 11,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.3.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "3999bd67242f33f2"
+    },
+    {
+      "signature_name": "Attach Reject Cause #15",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 15,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "3dcbdc24f04c5b73"
+    },
+    {
+      "signature_name": "Identity Request",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Identity Request",
+        "cause_code": null,
+        "cause_text_original": null,
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.3.3.1"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.3.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 4.3.3"
+          }
+        ],
+        "mechanism": "explicit_imsi_request",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "3e990879d6883988"
+    },
+    {
+      "signature_name": "Service Reject Cause #7",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Service Reject",
+        "cause_code": 7,
+        "cause_text_original": "#3, 6-7, 9, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.13.4"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.6.1.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "50beb42909a10955"
+    },
+    {
+      "signature_name": "Attach Reject Cause #12",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 12,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "621ebef6d360ccc7"
+    },
+    {
+      "signature_name": "Routing Area Update Reject Cause #12",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Routing Area Update Reject",
+        "cause_code": 12,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.5.1.4"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "636380413ed77376"
+    },
+    {
+      "signature_name": "Attach Reject Cause #13",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 13,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "6f1ab57b65690e13"
+    },
+    {
+      "signature_name": "Tracking Area Update Reject Cause #6",
+      "cellular_generation": "4G",
+      "threshold_json": {
+        "message_type": "Tracking Area Update Reject",
+        "cause_code": 6,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.3.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "6ffbc4ae0f99fc96"
+    },
+    {
+      "signature_name": "Authentication Reject",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Authentication Reject",
+        "cause_code": null,
+        "cause_text_original": null,
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.3.2.5"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.1.1.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "733fc7a6f5b525d3"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #2",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 2,
+        "cause_text_original": "#2-3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "76cd490d47c673c6"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #15",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 15,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "78f036b4d0fe2442"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #11",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 11,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "7d29f438cb802406"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #6",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 6,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "8aa7419e95102e62"
+    },
+    {
+      "signature_name": "Identity (IMSI or IMEI) requested in suspicious manner",
+      "cellular_generation": null,
+      "threshold_json": {
+        "wave_a_observation_id": 220359,
+        "wave_a_rayhunter_source_url": "https://github.com/EFForg/rayhunter/blob/c4eca245b9/lib/src/analysis/imsi_requested.rs",
+        "dispatch_normalization_path": "b",
+        "cross_gen_membership": null,
+        "qualitative_signature": true
+      },
+      "confidence": 80,
+      "argus_record_id": "8e87f801d578dbf3"
+    },
+    {
+      "signature_name": "Abort Cause #6",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Abort",
+        "cause_code": 6,
+        "cause_text_original": "#6",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.3.5.2"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.3.5.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "90b959061532a705"
+    },
+    {
+      "signature_name": "Location Updating Reject Cause #12",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Location Updating Reject",
+        "cause_code": 12,
+        "cause_text_original": "#2-3, 6, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.4.4.7"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.4.4.7"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "9451a868ee05106a"
+    },
+    {
+      "signature_name": "Routing Area Update Reject Cause #9",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Routing Area Update Reject",
+        "cause_code": 9,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.5.1.4"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "965b6a151f713ebf"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #3",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 3,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "97604a668edab8de"
+    },
+    {
+      "signature_name": "Tracking Area Update Reject Cause #7",
+      "cellular_generation": "4G",
+      "threshold_json": {
+        "message_type": "Tracking Area Update Reject",
+        "cause_code": 7,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.3.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "9a15b5388175bf24"
+    },
+    {
+      "signature_name": "Service Reject Cause #12",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Service Reject",
+        "cause_code": 12,
+        "cause_text_original": "#3, 6-7, 9, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.13.4"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.6.1.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "9c97f7252faecd63"
+    },
+    {
+      "signature_name": "CM Service Reject Cause #6",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "CM Service Reject",
+        "cause_code": 6,
+        "cause_text_original": "#4, 6",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.5.1.1"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.5.1.1"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "a0e499c107aaddd1"
+    },
+    {
+      "signature_name": "Tracking Area Update Reject Cause #9",
+      "cellular_generation": "4G",
+      "threshold_json": {
+        "message_type": "Tracking Area Update Reject",
+        "cause_code": 9,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.3.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "a2aac4a4f776bd2a"
+    },
+    {
+      "signature_name": "Tracking Area Update Reject Cause #14",
+      "cellular_generation": "4G",
+      "threshold_json": {
+        "message_type": "Tracking Area Update Reject",
+        "cause_code": 14,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.3.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "a575f3ec2e9fcb9d"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #13",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 13,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "a89f0ef5c5e003c8"
+    },
+    {
+      "signature_name": "CM Service Reject Cause #4",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "CM Service Reject",
+        "cause_code": 4,
+        "cause_text_original": "#4, 6",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.5.1.1"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.5.1.1"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "abdbccc2956d8c39"
+    },
+    {
+      "signature_name": "Service Reject Cause #3",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Service Reject",
+        "cause_code": 3,
+        "cause_text_original": "#3, 6-7, 9, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.13.4"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.6.1.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "b2f6ae8c211f8d8f"
+    },
+    {
+      "signature_name": "Routing Area Update Reject Cause #14",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Routing Area Update Reject",
+        "cause_code": 14,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.5.1.4"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "b56d70cbecb85797"
+    },
+    {
+      "signature_name": "Attach Reject Cause #3",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 3,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "b76ca8b9e9edaf66"
+    },
+    {
+      "signature_name": "Location Updating Reject Cause #3",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Location Updating Reject",
+        "cause_code": 3,
+        "cause_text_original": "#2-3, 6, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.4.4.7"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.4.4.7"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "b7b81ad88ef87b56"
+    },
+    {
+      "signature_name": "Routing Area Update Reject Cause #11",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Routing Area Update Reject",
+        "cause_code": 11,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.5.1.4"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "c221a532ed1efa93"
+    },
+    {
+      "signature_name": "Routing Area Update Reject Cause #7",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Routing Area Update Reject",
+        "cause_code": 7,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.5.1.4"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "c440fa088561903d"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #8",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 8,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "ce1654b1a3bdaef6"
+    },
+    {
+      "signature_name": "Attach Reject Cause #7",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 7,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "d734487e55b8d730"
+    },
+    {
+      "signature_name": "Service Reject Cause #9",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Service Reject",
+        "cause_code": 9,
+        "cause_text_original": "#3, 6-7, 9, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.13.4"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.6.1.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "da9a90bff388f679"
+    },
+    {
+      "signature_name": "Location Updating Reject Cause #2",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Location Updating Reject",
+        "cause_code": 2,
+        "cause_text_original": "#2-3, 6, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.4.4.7"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.4.4.7"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "dc13bbfe8718446c"
+    },
+    {
+      "signature_name": "Attach Reject Cause #11",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 11,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "e0b61c52122eca21"
+    },
+    {
+      "signature_name": "Authentication and Ciphering Reject",
+      "cellular_generation": "3G",
+      "threshold_json": {
+        "message_type": "Authentication and Ciphering Reject",
+        "cause_code": null,
+        "cause_text_original": null,
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.7.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "e3126f96d236318b"
+    },
+    {
+      "signature_name": "Attach Reject Cause #14",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 14,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "e347940c439c96af"
+    },
+    {
+      "signature_name": "Tracking Area Update Reject Cause #3",
+      "cellular_generation": "4G",
+      "threshold_json": {
+        "message_type": "Tracking Area Update Reject",
+        "cause_code": 3,
+        "cause_text_original": "#3, 6-7, 9, 11-12, 14",
+        "type_value": null,
+        "applicable_generations": [
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.3.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "e5e2edcdc2fc80a2"
+    },
+    {
+      "signature_name": "Detach Request (Type='re-attach not required') Cause #12",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Detach Request",
+        "cause_code": 12,
+        "cause_text_original": "#3, 6-8, 11-15",
+        "type_value": "re-attach not required",
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.4.2.2"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.2.3.2"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "f22d28d1092c68b7"
+    },
+    {
+      "signature_name": "Service Reject Cause #6",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Service Reject",
+        "cause_code": 6,
+        "cause_text_original": "#3, 6-7, 9, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.13.4"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.6.1.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "f3f5d2b100d3690e"
+    },
+    {
+      "signature_name": "Attach Reject Cause #8",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Attach Reject",
+        "cause_code": 8,
+        "cause_text_original": "#3, 6-8, 11-15, 35",
+        "type_value": null,
+        "applicable_generations": [
+          "3G UMTS",
+          "4G LTE"
+        ],
+        "spec_refs": [
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.7.3.1.3"
+          },
+          {
+            "generation": "4G LTE",
+            "spec_ref": "3GPP TS 124.301 Sec. 5.5.1.2.5"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "3G",
+          "4G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "f55ead4a92147d5c"
+    },
+    {
+      "signature_name": "Location Updating Reject Cause #6",
+      "cellular_generation": null,
+      "threshold_json": {
+        "message_type": "Location Updating Reject",
+        "cause_code": 6,
+        "cause_text_original": "#2-3, 6, 11-12",
+        "type_value": null,
+        "applicable_generations": [
+          "2G GSM",
+          "3G UMTS"
+        ],
+        "spec_refs": [
+          {
+            "generation": "2G GSM",
+            "spec_ref": "GSM TS 04.08 Sec. 4.4.4.7"
+          },
+          {
+            "generation": "3G UMTS",
+            "spec_ref": "3GPP TS 124.008 Sec. 4.4.4.7"
+          }
+        ],
+        "mechanism": "tmsi_delete_then_reattach",
+        "paper_table_iii_row_count_method": "cross-generation-deduplicated (message_type, cause_code) tuples — matches paper abstract \"53 messages\" count when combined with +1 5G NSA meta row",
+        "cross_gen_membership": [
+          "2G",
+          "3G"
+        ],
+        "dispatch_normalization_path": "b"
+      },
+      "confidence": 80,
+      "argus_record_id": "fc623e219855cfa3"
+    }
+  ]
+}
