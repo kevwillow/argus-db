@@ -1691,6 +1691,34 @@ paste-result inline) but the absence-of-drift framing needs the
 comparison paste itself, not just citing each side. Codified in the
 CEO sibling memo at authoring time.
 
+### Case 10 — MAC-116 §2.3 sweep all 4 sub-items no-op at decomposition time (class a/b decomposition-time-projection-stale sub-class)
+
+CEO sub-dispatch MAC-116 (MAC-101 Stream 1 §2.3 Wave-B+ sources
+reclassification sweep) authored 4 per-sub-item §0 baseline-count
+projections sourced from CP19-prep notes (~90 FAA listDocs URL-upgrade
+candidates, ~325 jlrjr primary_registry rows for band-downgrade,
+per-row IEEE upgrade candidates, sources.id=7 'regulatory' band).
+Validator ran §6.0 pre-flight count queries at heartbeat start;
+**all 4 sub-items tripped the 5%-divergence threshold simultaneously**:
+
+| Sub-item | Decomposition-time projection | Live live-DB | Disposition |
+|---|---|---|---|
+| (a) 90 FAA listDocs source_url upgrade candidates | 90 | **0** | already absent (MAC-63/MAC-88 closeout post-state) |
+| (b) 325 jlrjr primary_registry rows for downgrade | 325 | **0** | already crowdsourced (MAC-88 [`c12bedd`](https://github.com/CascadeForge/argus/commit/c12bedd) jlrjr-refinement post-state) |
+| (c) per-row IEEE upgrade candidates | variable | **degenerate** | all 17,844 IEEE rows already primary_registry post-state |
+| (d) sources.id=7 in `regulatory` band | `regulatory` | **`primary_registry`** | CP15 §8.2 strict-reading direction-reversal; FCC EAS grantee data is registry-class allocator, not filing-class regulatory |
+
+All four projections were stale assumptions from CP19-prep notes that pre-dated MAC-63/MAC-88/MAC-96 closeouts. Aggregate baselines (identifiers active = 22,464, source_reclassifications = 809, sources = 43) all matched verbatim — the staleness was strictly at the per-sub-item cohort level.
+
+Anchor:
+  MAC-116 surface-back comment (Validator §6.0 pre-flight + per-sub-item §6.1-§6.4 disposition tables) + this case study commit + CEO sibling memo `feedback_db_verify_dispatch_claims.md` recurrence #2
+
+Demonstrates a structurally new sub-class: **decomposition-time-projection-stale** — distinct from prior class (a)/(b)/(c) sub-classes. The dispatch authoring did the aggregate-level live-state pre-flight correctly (per S.7 §6.0 5%-divergence threshold) but failed to run per-sub-item count queries at decomposition time. Aggregate baselines can match while per-sub-item cohorts have already drifted to post-state from prior sweeps. The refinement: when DECOMPOSING an aggregate dispatch into per-sub-item child issues with §0 baseline counts, the decomposing agent (CEO or sub-CEO) MUST run each per-sub-item count query at decomposition time, not just the aggregate-level baseline. Validator's §6.0 check is the final defense; this rule prevents the Validator round-trip in the first place.
+
+This is also the **first sources-row vs identifiers-row band-labeling inconsistency** surfaced (sub-item (d)). Sources 1/2/3/7 carry historic `regulatory` band assertions in `sources.source_type` while the identifiers-row data has been correctly labeled `primary_registry` post-CP15. Deferred to single-purpose post-ship work per CEO recommendation + board MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c) ratification — not ship-blocking (identifiers-row data correctly labeled, exports unaffected); requires downstream-consumer audit before flip per S.1; new sub-rule (sources-row metadata vs identifiers-row reclassification) needs explicit codification that benefits from its own dedicated heartbeat. Documented in README §3.2 (per dispatch §3.2 contribution-guidance section) as "known sources-row metadata discrepancy (pre-CP15 vestige; identifiers-row data correctly labeled; cleanup queued post-ship)".
+
+Codified in CEO sibling memo `feedback_db_verify_dispatch_claims.md` recurrence #2 (extension to the dispatch-claim-verification rule covering decomposition-time-projection too, not just dispatch-authoring-time).
+
 ## §5 — Inline demonstration
 
 The first dispatch under S.7 will demonstrate the discipline by
@@ -1815,6 +1843,45 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
     decomposition gate. Pre-existing memo flagged the discipline-
     evolution candidate at MAC-101 close; board's recurrence #9
     declaration is the corresponding board-side audit-trail entry.
+  - Recurrence #10 (post-codification, MAC-101 dispatch §2.3
+    child sub-issue MAC-116 authoring 2026-05-14): class (a)/(b)-
+    adjacent **decomposition-time-projection-stale sub-class** —
+    structurally distinct from #7 cardinality-mismatch, #8
+    rule-scope, and #9 table-scope. CEO sub-dispatch MAC-116
+    (Wave-B+ sources reclassification sweep) authored 4 per-sub-
+    item §0 baseline-count projections sourced from CP19-prep
+    notes that pre-dated MAC-63/MAC-88/MAC-96 closeouts. Validator
+    §6.0 pre-flight count queries tripped the 5%-divergence
+    threshold on **all 4 sub-items simultaneously**: (a) 90 → 0,
+    (b) 325 → 0, (c) per-row degenerate, (d) `regulatory` →
+    `primary_registry` direction-reversal. Aggregate baselines
+    (22,464 / 809 / 43) all matched verbatim; staleness was
+    strictly at per-sub-item cohort level. Full case study at
+    SAR-12 §4 Case 10 above.
+
+    Decomposition-time-projection-stale sub-class structurally
+    distinct from prior sub-classes: concerns assertions where
+    the dispatch-authoring agent correctly ran aggregate-level
+    pre-flight but failed to run per-sub-item count queries at
+    decomposition time. Aggregate baselines can match verbatim
+    while per-sub-item cohorts have drifted to post-state from
+    prior sweeps. Worth tracking the sub-class taxonomy:
+    (a) cardinality-mismatch, (b) rule-scope, (c) table-scope,
+    (d) decomposition-time-projection-stale.
+
+    Board ratification at MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c) 2026-05-14:
+    "decomposition-time-projection-stale is structurally distinct
+    sub-class from #7 cardinality / #8 rule-scope / #9 table-scope.
+    The class (a)/(b) sub-class taxonomy continues to bifurcate.
+    CEO's discipline refinement at feedback_db_verify_dispatch_claims.md
+    recurrence #2 is the right rule extension."
+
+    Sibling CEO-side memo: `feedback_db_verify_dispatch_claims.md`
+    recurrence #2 codifies the decomposition-time-projection-verification
+    refinement (per-sub-item count queries at decomposition time,
+    not just aggregate-level baseline). Pre-existing memo authored
+    at MAC-116 decomposition; board's recurrence #10 declaration
+    is the corresponding board-side audit-trail entry.
 
 Future S.7 recurrences (if any post-codification) get appended to
 this list with anchor + class. The original "three recurrences
@@ -1822,7 +1889,19 @@ post-S.7 would trigger a CP-class revision of S.7 itself" threshold
 is superseded by the board's recurrence #9 framing: meta-revision
 triggers on three SAME-sub-class recurrences (not three total
 post-codification). Threshold-language revision queued for next
-memo-refinement cycle.
+memo-refinement cycle (THIS dispatch's §2.1(d) item).
+
+Sub-class taxonomy so far (post-codification):
+  - (a) cardinality-mismatch class — recurrence #7 (one occurrence)
+  - (b) rule-scope class — recurrence #8 (one occurrence)
+  - (c) table-scope class — recurrence #9 (one occurrence)
+  - (d) decomposition-time-projection-stale class — recurrence #10 (one occurrence)
+
+No sub-class has hit the three-recurrence meta-revision threshold;
+each post-codification recurrence has been a distinct sub-class first
+instance, which is consistent with S.7's broad-strokes coverage but
+suggests the sub-class taxonomy will keep bifurcating as new
+dispatch-shape edge cases surface.
 
 ## §7 — Composition with prior discipline
 
