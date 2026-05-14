@@ -1719,6 +1719,48 @@ This is also the **first sources-row vs identifiers-row band-labeling inconsiste
 
 Codified in CEO sibling memo `feedback_db_verify_dispatch_claims.md` recurrence #2 (extension to the dispatch-claim-verification rule covering decomposition-time-projection too, not just dispatch-authoring-time).
 
+### Case 11 — MAC-118 F2/F3 second-disposition authored from stale mental model (class (e) ratifier-disposition-stale-state sub-class)
+
+CEO authored TWO contradictory dispositions on MAC-118 — the second authored from a stale mental model HOURS after the first had been ratified, executed, and the issue closed. Substantive state remained clean; the discipline failure is purely on the ratifier-author side (CEO).
+
+**Full provenance chain (timestamps UTC; surfaces are MAC-118 comment ids):**
+
+| Time | Actor | Surface | Event |
+|---|---|---|---|
+| 14:49Z | Validator (da137694) | [`7110a211`](/MAC/issues/MAC-118#comment-7110a211) | MAC-118 audit surface-back: F1 sentinel-key consistency + F2 sid=41 `<verify-in-mapper-from-LICENSE-file>` placeholder + F3 operator-path scrub (193 occurrences / 77 files) |
+| **14:53Z** | **CEO** | **[`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69)** | **First CEO ratification:** F1 → defer CP21 + F2 → Option (a) verify-in-mapper + F3 → Option B1+B2 scrub with carveouts |
+| 15:03Z | Validator (commit) | [`106689b`](https://github.com/CascadeForge/argus/commit/106689b) | F3 path scrub: 34 tracked files (23 Python B1 + 7 prose B2 + B2-extended); bible / §8.4 / wigle-grant-response carveouts preserved |
+| 15:05Z | Validator (commit) | [`18c3d23`](https://github.com/CascadeForge/argus/commit/18c3d23) | F2 sid=41 backfill: posture = `CC-BY-NC-ND-4.0_with_research_use_clause` + 14 promoted identifiers backfilled with `notes.upstream_license_posture` (canonical key per F1 deferred-ratification) |
+| 15:08Z | Validator | [`ed4a51af`](/MAC/issues/MAC-118#comment-ed4a51af) | Surface-back: F2 + F3 commits landed; pre-ship gate PASS |
+| 15:11Z | CEO | [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) | Ratification close: MAC-118 → `done` |
+| ... ~2h gap (parallel work on other MAC-101 items) ... | | | |
+| **17:23Z** | **CEO** | **[`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6)** | **SECOND CEO disposition: F2 → Option (b) defer-to-prose + F3 → spawn MAC-119 child for scrub.** Authored as if findings were still pending; did NOT paste-verify current state. |
+| 17:24Z | CEO | MAC-119 filed | Spuriously filed F3 scrub child (REDUNDANT — F3 already landed at 15:03Z) |
+| 17:28Z | Validator | [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) | MAC-119 surface-back: "scrub already landed (commit `106689b`); recommend done" |
+| 17:29Z | CEO | [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) | **CEO reconciliation comment** — self-identifies as "dispatch-preamble-live-state-verification miss on the disposition author's part — rule applies symmetrically to CEO dispositions, not just dispatches" |
+| 17:35Z | CEO | [`5789aeb8`](/MAC/issues/MAC-119#comment-5789aeb8) | MAC-119 → `done` (redundant scrub-already-done ratification) |
+
+Anchor:
+  MAC-118 thread [`7110a211`](/MAC/issues/MAC-118#comment-7110a211) → [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) → [`ed4a51af`](/MAC/issues/MAC-118#comment-ed4a51af) → [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) → [`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6) → [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) + commits [`18c3d23`](https://github.com/CascadeForge/argus/commit/18c3d23) + [`106689b`](https://github.com/CascadeForge/argus/commit/106689b) + CEO investigation surface-back MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) + board ratification MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125)
+
+**Class (e) ratifier-disposition-stale-state sub-class designation:** when a ratifier (CEO or board) authors a SECOND disposition on an issue that has already been ratified, executed, and closed at an earlier surface, without paste-verifying current state. Structurally distinct from class (d) decomposition-time-projection-stale (which is dispatch-authoring-time projection against live data; this is post-resolution disposition against already-landed reality).
+
+Actor-neutral framing preferred per board ratification (MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125) §2): "ratifier-disposition-stale-state" applies symmetrically to CEO and board ratifications.
+
+**Failure-mode classification** (per CEO investigation [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §2 + board ratification §1): the board's pre-investigation hypotheses — (i) worker-applied-without-surfacing / (ii) manual-edit-outside-dispatch / (iii) unrecorded-dispatch — were each explicitly tested against the evidence and none applied. The actual mode is class (e): CEO authored both dispositions; the second was authored from a stale mental model.
+
+**Substantive outcome (zero harm):**
+
+- 17:23Z second disposition did not propagate
+- MAC-119 redundant filing caught by Validator surface-back at [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) within 5 minutes
+- Canonical state stays clean: sid=41 = `CC-BY-NC-ND-4.0_with_research_use_clause`, CREDITS.md (commit [`f1a3405`](https://github.com/CascadeForge/argus/commit/f1a3405)) reflects, LICENSE-DATA §2.1 (commit [`ead49a3`](https://github.com/CascadeForge/argus/commit/ead49a3)) references correctly
+- No §11 hard-rule trip, no data corruption, no consumer-facing impact
+- [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) reconciliation comment captures the discipline lesson in audit-trail surface
+
+**Discipline-self-catch shape:** the 17:29Z reconciliation comment self-identified the discipline failure without board intervention. This is the discipline-self-catch shape that makes S.7's audit-trail mechanism load-bearing — recurrence #11 represents the discipline working as designed (Validator + CEO + reconciliation chain caught the drift; canonical state stays clean).
+
+Whether to extend S.7's authoring rule explicitly to ratifier-class actions is the (α)/(β) decision codified at §6 below (board selected (α) with explicit (β) escalation trigger).
+
 ## §5 — Inline demonstration
 
 The first dispatch under S.7 will demonstrate the discipline by
@@ -1896,42 +1938,100 @@ sub-class first instance). The sub-class-aware count is the load-
 bearing rule; the prior "three total post-codification" framing is
 historical and not binding.
 
-**Sub-class taxonomy so far (post-codification):**
+  - Recurrence #11 (post-codification, MAC-118 F2/F3 second-disposition
+    2026-05-14): class **(e) ratifier-disposition-stale-state** sub-
+    class first instance. CEO authored TWO contradictory dispositions
+    on MAC-118: first ratification at [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) 14:53Z (F2 → Option (a)
+    verify-in-mapper); Validator executed at commits [`18c3d23`](https://github.com/CascadeForge/argus/commit/18c3d23) + [`106689b`](https://github.com/CascadeForge/argus/commit/106689b)
+    (15:03Z–15:05Z); CEO closed issue at [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) (15:11Z). HOURS
+    later at [`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6) (17:23Z) CEO authored SECOND disposition
+    (F2 → Option (b) defer-to-prose + F3 → spawn child) as if findings
+    were still pending; spuriously filed MAC-119 redundant scrub child.
+    Validator caught redundancy at [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) (17:28Z); CEO posted
+    reconciliation at [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) (17:29Z) self-identifying the
+    discipline failure ("dispatch-preamble-live-state-verification
+    miss on the disposition author's part — rule applies symmetrically
+    to CEO dispositions, not just dispatches"). Full case study at
+    §4 Case 11 above.
 
-  - (a) cardinality-mismatch class — recurrence #7 (one occurrence)
-  - (b) rule-scope class — recurrence #8 (one occurrence)
-  - (c) table-scope class — recurrence #9 (one occurrence)
-  - (d) decomposition-time-projection-stale class — recurrence #10 (one occurrence)
+    Ratifier-disposition-stale-state sub-class structurally distinct
+    from prior sub-classes (a/b/c/d): concerns POST-RESOLUTION
+    disposition-author actions on issues that already have ratified-
+    and-executed audit-trail. Distinct from class (d) decomposition-
+    time-projection-stale (which is dispatch-authoring-time projection
+    against live data; class (e) is post-resolution disposition
+    against already-landed reality). Actor-neutral framing per board
+    ratification (MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2):
+    "ratifier-disposition-stale-state" applies symmetrically to CEO
+    and board ratifications.
 
-**Meta-pattern observation (board flagged at MAC-101 [`63b72454`](/MAC/issues/MAC-101#comment-63b72454-5555-4c71-adb6-1f15f7ebdc83) 2026-05-14):**
-each post-codification recurrence has been a distinct sub-class first
-instance. No sub-class has yet accumulated a second occurrence, let
-alone hit the three-recurrence meta-revision threshold. The discipline
-is generating new sub-classes faster than it accumulates within-sub-
-class repeats — itself an interesting meta-pattern.
+    Zero substantive harm: 17:23Z second disposition did not propagate;
+    MAC-119 redundant filing caught within 5 minutes; canonical state
+    stays clean (sid=41 = `CC-BY-NC-ND-4.0_with_research_use_clause`;
+    CREDITS.md + LICENSE-DATA §2.1 reflect accurately); fc284872
+    reconciliation captures discipline lesson in audit-trail.
 
-**Forward expectation:** if a fifth post-codification recurrence (#11)
-surfaces as yet another first-instance sub-class — extending the
-sub-class taxonomy to (e) — that pattern is worth its own meta-
-observation at the next memo-refinement cycle. Two interpretations
-would compete:
+    Board ratification at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) 2026-05-14: "Confirm
+    SAR-12 recurrence #11 = class (e) CEO-disposition-stale-state.
+    New sub-class first instance. Actor-neutral framing preferred:
+    'ratifier-disposition-stale-state' applies symmetrically to CEO
+    and board ratifications. Land canonical class (e) wording with
+    the actor-neutral framing."
 
-  - (i) S.7's coverage is intentionally broad-strokes; each new
-    dispatch-shape edge case naturally surfaces a new sub-class
-    first instance, and the sub-class taxonomy is the right
-    granularity for the audit-trail without any need to revise
-    S.7's authoring rule itself.
-  - (ii) S.7's "paste-result inline" verification has gaps that
-    are masked by sub-class bifurcation — each new first instance
-    is evidence of authoring-time blind spots that S.7 should
-    cover but doesn't. A CP-class revision of S.7's verification
-    paths (§2 per-class catalog) would be warranted.
+**Sub-class taxonomy so far (post-codification; actor-neutral framing per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2):**
 
-Both readings are coherent; neither is currently load-bearing. CEO
-+ board surface the distinction at the next memo-refinement cycle
-when a fifth distinct first-instance recurrence (or a same-sub-class
-second instance) provides the empirical anchor to decide between
-them.
+  - (a) cardinality-mismatch class — recurrence #7 (one occurrence) — MAC-88 sweep FAA partition-count drift
+  - (b) rule-scope class — recurrence #8 (one occurrence) — MAC-100 §11 #13 unknown-cat exclusion scope
+  - (c) table-scope class — recurrence #9 (one occurrence) — MAC-101 Item A manufacturers-table semantics
+  - (d) decomposition-time-projection-stale class — recurrence #10 (one occurrence) — MAC-116 §2.3 sweep all 4 sub-items
+  - (e) **ratifier-disposition-stale-state class** — recurrence #11 (one occurrence) — MAC-118 F2/F3 second-disposition
+
+**Meta-pattern observation (board flagged at MAC-101 [`63b72454`](/MAC/issues/MAC-101#comment-63b72454-5555-4c71-adb6-1f15f7ebdc83) 2026-05-14 + threshold-crossing confirmed at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b)):**
+each post-codification recurrence (#7 through #11) has been a distinct
+sub-class first instance. No sub-class has yet accumulated a second
+occurrence, let alone hit the three-recurrence meta-revision threshold.
+The discipline is generating new sub-classes faster than it accumulates
+within-sub-class repeats — itself an interesting meta-pattern.
+
+The five-class taxonomy threshold has been crossed: at recurrence #11
+the meta-pattern is empirically established (5 first instances; 0
+within-sub-class repeats). Two competing interpretations were
+identified at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4:
+
+  - (α) S.7's broad-strokes coverage is correct; sub-class bifurcation
+    is the right audit-trail granularity; the discipline is succeeding
+    (each fresh sub-class first instance is the discipline catching
+    a new shape of pre-execution drift at the right time via §6.0
+    5%-divergence threshold + audit-trail-event mechanism).
+  - (β) S.7 has authoring-time blind spots that sub-class bifurcation
+    is masking; the taxonomy keeps bifurcating because S.7's authoring
+    rule isn't tight enough. A CP-class revision of S.7's verification
+    paths (§2 per-class catalog) would be warranted to explicitly
+    cover ratifier-class actions (or whatever the next surfacing
+    sub-class is).
+
+**Board ratification (α) selected with explicit (β) escalation trigger** at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) 2026-05-14 §3 (CEO had recommended (β) at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4):
+
+**(α) reasoning (board-articulated):** the load-bearing question isn't "is the pattern common"; it's "does the pattern produce substantive harm that the existing audit-trail mechanism doesn't catch." Recurrence #11 produced zero substantive harm (17:23Z second disposition didn't propagate; MAC-119 caught within 5 minutes; canonical state stayed clean; fc284872 reconciliation captures the lesson). If the pattern is operationally common AND produces zero substantive harm because the discipline mechanism catches it, that's evidence the discipline is appropriately scoped — not evidence it needs tightening. Codifying a CP-class S.7 extension on n=1 for class (e) is heavy; better to escalate to (β) on n=2 if the (e) pattern recurs specifically.
+
+**(β) escalation trigger (pre-committed at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.2):** if a second class (e) recurrence (ratifier-disposition-stale-state) surfaces within the next 10 board+CEO heartbeats from this codification, escalate to (β) without further board deliberation. CP21 (or subsequent CP) extends S.7's authoring rule:
+
+> "Any ratifier-class action (CEO or board) authoring forward-looking
+> direction on an issue with existing audit-trail comments MUST paste-
+> verify current issue state before authoring. Symmetric application
+> of SAR-12 §2 verification paths to issue-level disposition events."
+
+Trigger condition: **second class (e) recurrence specifically.** NOT "any sub-class recurrence" — the threshold fires on (e) re-occurrence, not on (a)/(b)/(c)/(d) which have different structural shapes. The (β) extension is specifically for the ratifier-disposition surface.
+
+If the (β) trigger fires, CEO authors the extension dispatch without re-asking board — board's pre-commitment under (α) makes the (β) path conditional but pre-authorized.
+
+**Board-vs-CEO divergence preservation note (per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.3 + §6):**
+this codification represents the **first substantive board-vs-CEO ratification divergence on a discipline-evolution question** since the architecture took current shape. CEO recommended (β) with strong reasoning at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4; board considered, weighed evidence differently, selected (α) at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.
+
+Healthy deference shape: CEO surfaces (β) with clear argument → board considers, weights differently → board lands (α) with explicit (β) trigger → CEO honors ratification, doesn't relitigate. The architecture has decision authority on canonical contract changes resting with board; CEO surfaces best reasoning; board decides; CEO honors. Future discipline-evolution questions inherit this shape: recommendation + ratification + honored disposition + audit-trail preservation of the divergence reasoning. The discipline doesn't require board+CEO to always agree; it requires the divergence to be visible and the decision authority to be respected.
+
+Future S.7 recurrences (if any post-codification) get appended to
+this list with anchor + class.
 
 ## §7 — Composition with prior discipline
 
@@ -2276,3 +2376,85 @@ If a future bible amendment surfaces a collision pattern that SAR-14 doesn't cov
 Bible HEAD bumps with this entry. Schema unchanged. Docs-only commit per the small-bible-amendment precedent (ab2cc6a / 047a273 / 9322500).
 
 ---
+
+═══════════════════════════════════════════════════════════════════════
+Correction Pass 21 — coordinated amendment: §4.4 MAP entries + §11 #16 canonical sentinel-key + §8.2 strict-reading acknowledgment + SAR-12 §4 Case 11 + §6 recurrence #11 + sub-class (e) ratifier-disposition-stale-state + (α)/(β) decision + board-vs-CEO divergence preservation
+═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 21 — coordinated CP21 amendment
+
+**Date:** 2026-05-14
+**Source:** MAC-101 pre-ship dispatch [`fd6146a3`](/MAC/issues/MAC-101#comment-fd6146a3-ee4b-4d9a-a38d-623ba0cdb463) §2.6 coordinated CP21 directive; consolidating multiple board-ratified amendments into a single coordinated commit per dispatch §2.6 framing.
+
+Specific items + ratification anchors:
+
+- **§4.4 MAP entries (2 MAP + 12 DROP from mig-0018 + 7 DROP from mig-0019):** CEO §2.5 recommendation at MAC-101 [`4367e10b`](/MAC/issues/MAC-101#comment-4367e10b-ff72-486c-84e8-98f3fd7ac75d) + board ratification at MAC-101 [`e246a32a`](/MAC/issues/MAC-101#comment-e246a32a-5a28-467d-b20e-72901a5a3d88). MAC-117 closed at commits [`41da1d6`](https://github.com/CascadeForge/argus/commit/41da1d6) (migration 0019) + [`30a0252`](https://github.com/CascadeForge/argus/commit/30a0252) (routing execution); the 7 net-new identifier_types from mig-0019 fold into this CP21 batch per the same DROP framework.
+- **§11 #16 canonical sentinel-key (`notes.upstream_license_posture`):** MAC-118 F1 CEO ratification at MAC-118 [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) + reconfirmed at MAC-118 [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) reconciliation + LICENSE-DATA §3 cross-reference at commit [`ead49a3`](https://github.com/CascadeForge/argus/commit/ead49a3).
+- **§8.2 strict-reading acknowledgment:** MAC-116 §2.3(d) sources.id=7 direction-reversal finding (dispatch projected `regulatory`, strict reading produces `primary_registry`) + board ratification at MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c) §2.
+- **SAR-12 §4 Case 11 + §6 recurrence #11 + sub-class taxonomy extension (a/b/c/d/e):** CEO investigation surface-back at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) + board ratification + actor-neutral framing directive at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b). Sub-class (e) ratifier-disposition-stale-state codified.
+- **(α)/(β) decision + (β) escalation trigger pre-commitment:** board selected (α) at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3 (diverging from CEO recommendation of (β) at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4). (β) escalation trigger armed: second class (e) recurrence within next 10 board+CEO heartbeats from this codification escalates to (β) without further board deliberation.
+- **Board-vs-CEO divergence preservation note:** first substantive board-vs-CEO ratification divergence on a discipline-evolution question since the architecture took current shape; per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.3 + §6.
+
+**Bible commit:** This entry + PROJECT_BIBLE.md §4.4 +21 mapping rows + §11 #16 canonical sentinel-key sub-rule + §8.2 strict-reading acknowledgment + BIBLE_AMENDMENTS.md SAR-12 §4 Case 11 + §6 recurrence #11 + §6 sub-class taxonomy actor-neutral extension + §6 (α)/(β) decision + escalation trigger pre-commitment + board-vs-CEO divergence preservation note. Bible HEAD bumps from [`9979015`](https://github.com/CascadeForge/argus/commit/9979015) (§6 threshold cleanup) → this CP21 commit.
+
+**Status:** Ratified by board across multiple comments (e246a32a / dd7bd55c / 5d6a8125 / fc284872) over the MAC-101 pre-ship dispatch lifecycle. CEO authors the coordinated bible-text + amendment-log entry; no worker dispatch (no schema change; no migration; no DB-side execution).
+
+**Binds:** Validator (no execution — §4.4 MAP additions are export-discipline reference; new DROPPED-class identifier_types default-handled by existing export pipeline per MAC-110 [`5f1bf2e`](https://github.com/CascadeForge/argus/commit/5f1bf2e) DROPPED_REASONS extension + MAC-117 [`30a0252`](https://github.com/CascadeForge/argus/commit/30a0252) migration 0019 DROPPED-class default), DBArchitect (none — no migration), ExtractionWorker (none — Phase-1 mappers + Validator-side promoters converge on canonical sentinel-key `notes.upstream_license_posture` per §11 #16 sub-rule going forward), Lynceus integration team (informational — §4.4 MAP grows by 21 entries; no new pattern_types to support; the 2 alias-collapses route to existing `ble_uuid` / `ble_manufacturer_id` pattern_types).
+
+### Why this Correction Pass exists
+
+MAC-101 pre-ship dispatch [`fd6146a3`](/MAC/issues/MAC-101#comment-fd6146a3-ee4b-4d9a-a38d-623ba0cdb463) authorized §2.6 coordinated CP21 amendment to bundle multiple bible-text touches that emerged across Stream 1 sub-items + Stream 2 surface-backs + the MAC-118 F1/F2/F3 investigation chain. Per dispatch §2.6: "Anything touching §-text in PROJECT_BIBLE.md coordinates as one CP if there are multiple touches; anything that's pure code or pure docs lands separately."
+
+Five distinct touches consolidated:
+
+1. §4.4 Lynceus mapping table — 21 net-new entries (14 from mig-0018 + 7 from mig-0019)
+2. §11 #16 canonical sentinel-key sub-rule
+3. §8.2 strict-reading acknowledgment
+4. SAR-12 §4 Case 11 + §6 recurrence #11 + sub-class taxonomy extension
+5. SAR-12 §6 (α)/(β) decision + (β) escalation trigger + board-vs-CEO divergence preservation
+
+Each touch has independent ratification anchor (per Source enumeration above). The coordinated commit preserves the §2.6 dispatch directive while honoring per-touch audit-trail discipline.
+
+### Corrections applied
+
+1. **PROJECT_BIBLE.md §4.4 Lynceus mapping table (lines 148-176 + 21 new rows).** 2 MAP (alias-collapse) + 19 DROP entries appended:
+   - **MAP (×2):** `ble_service_uuid → ble_uuid` (CP13 `ble_service` precedent); `ble_company_id → ble_manufacturer_id` (CP14 / migration 0011 precedent). Both alias-collapses per option α at MAC-101 §2.5.
+   - **DROP (×12 from mig-0018):** `ble_protocol_byte_table`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`. All forensic / parametric / sub-protocol-level / firmware-anchored; cite existing CP13/CP16 DROP precedents per row.
+   - **DROP (×7 from mig-0019):** `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`. CEO MAC-101 §2.5 prediction confirmed (forecast was "likely all DROP per broadcast-class-but-not-Lynceus-scannable analysis"). All 7 are broadcast-class enum values OR forensic firmware-anchored identifiers that don't function as single-string match values at the Lynceus pattern_type granularity.
+   - Cumulative §4.4 mapping post-CP21: 27 pre-existing + 21 new = **48 cumulative mappings** matching live identifier_type CHECK enum count (post-mig-0019).
+2. **PROJECT_BIBLE.md §11 #16 canonical sentinel-key sub-rule** appended to the §11 #16 entry. Canonical key: `notes.upstream_license_posture` (more discoverable than alt-key `notes.facts_only_basis`; alphabetically first in serializations; literal posture-value semantics). Alt-key form preserved on extant rows (no rewrite); new promotions land on canonical form forward-only.
+3. **PROJECT_BIBLE.md §8.2 strict-reading acknowledgment** appended after the CP15 §8.2 `primary_registry` sub-banding section. When historical assertions place a source in `regulatory` band but CP15 §8.2 strict reading produces `primary_registry`, the CP15 strict reading governs. Sources 1/2/3/7 sources-row metadata cleanup queued post-ship; identifier-row data already correctly labeled.
+4. **BIBLE_AMENDMENTS.md SAR-12 §4 Case 11** anchored case study (MAC-118 F2/F3 second-disposition-from-stale-mental-model with full provenance chain through 11 timestamped events from 14:49Z to 17:35Z). Demonstrates class (e) sub-class structural distinction from prior classes (a)/(b)/(c)/(d).
+5. **BIBLE_AMENDMENTS.md SAR-12 §6 recurrence #11** with class (e) ratifier-disposition-stale-state designation (actor-neutral framing per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2 directive).
+6. **BIBLE_AMENDMENTS.md SAR-12 §6 sub-class taxonomy section** extended from 4 to 5 sub-classes with actor-neutral framing across all 5: (a) cardinality-mismatch / (b) rule-scope / (c) table-scope / (d) decomposition-time-projection-stale / (e) ratifier-disposition-stale-state.
+7. **BIBLE_AMENDMENTS.md SAR-12 §6 (α)/(β) decision + (β) escalation trigger pre-commitment** codified. Board selected (α) at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3 with explicit (β) trigger: second class (e) recurrence within next 10 board+CEO heartbeats escalates to (β) without further board deliberation. (β) text drafted in bible for pre-commitment honor.
+8. **BIBLE_AMENDMENTS.md SAR-12 §6 board-vs-CEO divergence preservation note** captured. First substantive board-vs-CEO ratification divergence on a discipline-evolution question since architecture took current shape. CEO recommended (β); board selected (α); CEO honored. Healthy deference shape documented for future inheritance.
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — unchanged; CP21 amendments add §-text covering already-ratified architectural decisions; no fabricated identifier values, no fabricated source attributions.
+- **§11 #7 (no promotion without provenance)** — unchanged; CP21 amendments operate at bible-text + amendment-log layer; the canonical sentinel-key sub-rule (§11 #16) ensures provenance trail forward-only.
+- **§11 #8 (no confidence drift)** — unchanged; the §8.2 strict-reading acknowledgment clarifies which band a source qualifies for under strict reading (CP15 codification); the sources-row metadata cleanup is queued post-ship and not in CP21 scope.
+- **§11 #11 (amendment-log discipline)** — this CP21 entry is the §11 #11 amendment-log pairing for the §4.4 + §11 #16 + §8.2 §-text changes in the coordinated commit. Bible HEAD bumps from `9979015` to this CP21 commit alongside this entry.
+- **§11 #13 (unknown-cat Lynceus-banned)** — unchanged; CP21 §4.4 MAP entries operate at identifier_type-mapping layer; device_category=unknown rows continue to be excluded from Lynceus exports per §11 #13 regardless of identifier_type MAP status.
+- **§11 #16 (Feist facts-only)** — strengthened with canonical sentinel-key sub-rule (`notes.upstream_license_posture`); forward-only canonical-form convergence; extant rows preserved.
+
+### Sequencing post-acceptance
+
+1. **CP21 ratifies at this commit.** Bible HEAD bumps from `9979015` → CP21 commit SHA. Schema unchanged; no migration; no worker dispatch; no DB-side execution.
+2. **No paired code-sibling commit needed.** §4.4 MAP additions are export-discipline reference; existing DROPPED_REASONS extensions at MAC-110 [`5f1bf2e`](https://github.com/CascadeForge/argus/commit/5f1bf2e) + MAC-117 [`30a0252`](https://github.com/CascadeForge/argus/commit/30a0252) already handle the 21 new identifier_types as DROPPED-class default. The 2 alias-collapse MAPs route to existing pattern_types (`ble_uuid` / `ble_manufacturer_id`) — no new Lynceus pattern_types to integrate.
+3. **No paired state-rotation commit.** PROJECT_STATE.md already captures MAC-101 close-of-close at [`1e87b85`](https://github.com/CascadeForge/argus/commit/1e87b85) + header refresh at [`1495984`](https://github.com/CascadeForge/argus/commit/1495984) + lines-8-18 refresh at [`4de0233`](https://github.com/CascadeForge/argus/commit/4de0233); CP21 amendments are bible-internal and do not surface to PROJECT_STATE rotation.
+4. **(β) escalation trigger state tracked in CEO memory durables** — CEO records the trigger arm time (this commit timestamp) + the 10-heartbeat counter; if a second class (e) recurrence surfaces within the window, CEO authors the (β) extension dispatch per pre-commitment.
+
+### §12 Open Questions impact
+
+- **§4.4 MAP entries for mig-0018 + mig-0019 net-new identifier_types** — RESOLVED at CP21 per CEO §2.5 recommendation + board ratification. 14 + 7 = 21 net-new entries; all dispositioned (2 MAP + 19 DROP).
+- **§11 #16 sentinel-key canonical form** — RESOLVED at CP21 per MAC-118 F1 board ratification.
+- **§8.2 strict-reading vs historical assertion conflicts** — RESOLVED at CP21 per MAC-116 §2.3(d) finding + board ratification.
+- **Sources 1/2/3/7 sources-row metadata cleanup** — DEFERRED post-ship per CEO recommendation + board ratification at MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c); CP21 §8.2 acknowledgment documents the disposition.
+
+### §11 #11 self-binding satisfied
+
+This CP21 entry is the §11 #11 amendment-log pairing for the §4.4 + §11 #16 + §8.2 §-text changes in the coordinated commit. Bible HEAD bumps from [`9979015`](https://github.com/CascadeForge/argus/commit/9979015) to the CP21 commit landed alongside this entry. Schema-version unchanged (CP21 is a §-text + amendment-log CP; no DB migration touched). The §4.4 mapping table reaches 48 cumulative entries matching the live identifier_type CHECK enum (27 pre + 14 mig-0018 + 7 mig-0019 = 48; verified live at CP21 authoring time).
+
+═══════════════════════════════════════════════════════════════════════
