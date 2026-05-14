@@ -99,11 +99,11 @@ def _row(**kw) -> ActiveRow:
 
 
 def test_type_mapping_covers_every_identifier_type() -> None:
-    # Post-MAC-109 (migration 0018): dispositions are split across
+    # Post-MAC-117 (migration 0019): dispositions are split across
     # IDENTIFIER_TYPE_TO_PATTERN_TYPE (15 MAP cases) + DROPPED_REASONS (12
-    # CP16 DROPPED cases + 14 MAC-109 vocab-extension DROPPED cases = 26).
-    # Union must equal the full post-mig-0018 identifier_type enum (41
-    # cumulative values per migration 0018 amendment).
+    # CP16 DROPPED cases + 14 MAC-109 mig-0018 DROPPED cases + 7 MAC-117
+    # mig-0019 DROPPED cases = 33). Union must equal the full post-mig-0019
+    # identifier_type enum (48 cumulative values per migration 0019).
     expected = {
         # Pre-CP13 (migration 0001)
         "oui", "mac", "mac_range", "bssid",
@@ -132,6 +132,12 @@ def test_type_mapping_covers_every_identifier_type() -> None:
         "firmware_sha256_hash", "network_endpoint",
         "firmware_image_variant", "qualcomm_chip_format_id",
         "firmware_branded_string",
+        # MAC-117 (migration 0019) — round-2 vocab extension (7 net-new) per
+        # SAR-13 §S.3 routing slate (A). All DROPPED-class by default
+        # pending §4.4 MAP ratification at next CP21 round.
+        "asdstan_message_type", "asdstan_enum_value",
+        "dji_protocol_struct_format", "gpt_partition_uuid",
+        "chipset_codename", "firmware_build_string", "firmware_build_uuid",
     }
     assert (
         set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()) | set(DROPPED_REASONS.keys())

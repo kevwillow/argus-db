@@ -160,6 +160,18 @@ DROPPED_REASONS: dict[str, str] = {
     "firmware_image_variant": "firmware_image_variant",
     "qualcomm_chip_format_id": "qualcomm_chip_format_id",
     "firmware_branded_string": "firmware_branded_string",
+    # MAC-117 / migration 0019 — round-2 vocab extension (7 net-new identifier_types
+    # per SAR-13 §S.3 routing slate (A)). Default DROPPED-class pending §4.4
+    # MAP ratification at next CP21 round. Mirrors export_lynceus.py::
+    # DROPPED_REASONS verbatim — the reconcile gate at
+    # export_lynceus.py::_reconcile requires byte-identical parity.
+    "asdstan_message_type": "asdstan_message_type",
+    "asdstan_enum_value": "asdstan_enum_value",
+    "dji_protocol_struct_format": "dji_protocol_struct_format",
+    "gpt_partition_uuid": "gpt_partition_uuid",
+    "chipset_codename": "chipset_codename",
+    "firmware_build_string": "firmware_build_string",
+    "firmware_build_uuid": "firmware_build_uuid",
 }
 
 # §8.2 confidence-band ceilings — annotation reference only (no mutations).

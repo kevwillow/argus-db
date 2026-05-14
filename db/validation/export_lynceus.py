@@ -158,6 +158,17 @@ DROPPED_REASONS: dict[str, str] = {
     "firmware_image_variant": "firmware_image_variant",  # Vendor-internal taxonomy
     "qualcomm_chip_format_id": "qualcomm_chip_format_id",  # Chip-format id — not wire-pattern
     "firmware_branded_string": "firmware_branded_string",  # Branded string — too vague for match
+    # MAC-117 / migration 0019 — round-2 vocab extension (7 net-new identifier_types
+    # per SAR-13 §S.3 routing slate (A)). Default DROPPED-class pending §4.4
+    # MAP ratification at next CP21 round. Same "carried in canonical DB but
+    # not in Lynceus pattern table v0.1" disposition as the mig-0018 cluster.
+    "asdstan_message_type": "asdstan_message_type",  # ASTM Remote ID broadcast enum class — awaiting §4.4 MAP review
+    "asdstan_enum_value": "asdstan_enum_value",  # ASTM Remote ID field-encoded enum (ua_category/id_type/height_type/location_source)
+    "dji_protocol_struct_format": "dji_protocol_struct_format",  # DJI Drone-ID broadcast struct format — awaiting §4.4 MAP review
+    "gpt_partition_uuid": "gpt_partition_uuid",  # Device-side storage layout UUID — not RF-broadcast
+    "chipset_codename": "chipset_codename",  # Firmware-anchored device model class — not wire-pattern
+    "firmware_build_string": "firmware_build_string",  # Firmware build version string — not RF-broadcast
+    "firmware_build_uuid": "firmware_build_uuid",  # Firmware build GUID — not RF-broadcast
 }
 
 # §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
@@ -720,6 +731,15 @@ def _build_export(
         "firmware_image_variant": 0,
         "qualcomm_chip_format_id": 0,
         "firmware_branded_string": 0,
+        # MAC-117 / migration 0019 — 7 net-new identifier_types per SAR-13 §S.3
+        # routing slate (A). See DROPPED_REASONS for rationale.
+        "asdstan_message_type": 0,
+        "asdstan_enum_value": 0,
+        "dji_protocol_struct_format": 0,
+        "gpt_partition_uuid": 0,
+        "chipset_codename": 0,
+        "firmware_build_string": 0,
+        "firmware_build_uuid": 0,
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,
@@ -851,6 +871,14 @@ def _build_coverage_report_md(
             ("firmware_image_variant (§4.4 mig0018)", bins["firmware_image_variant"]),
             ("qualcomm_chip_format_id (§4.4 mig0018)", bins["qualcomm_chip_format_id"]),
             ("firmware_branded_string (§4.4 mig0018)", bins["firmware_branded_string"]),
+            # MAC-117 / migration 0019 — round-2 vocab extension cluster.
+            ("asdstan_message_type (§4.4 mig0019)", bins["asdstan_message_type"]),
+            ("asdstan_enum_value (§4.4 mig0019)", bins["asdstan_enum_value"]),
+            ("dji_protocol_struct_format (§4.4 mig0019)", bins["dji_protocol_struct_format"]),
+            ("gpt_partition_uuid (§4.4 mig0019)", bins["gpt_partition_uuid"]),
+            ("chipset_codename (§4.4 mig0019)", bins["chipset_codename"]),
+            ("firmware_build_string (§4.4 mig0019)", bins["firmware_build_string"]),
+            ("firmware_build_uuid (§4.4 mig0019)", bins["firmware_build_uuid"]),
             ("self_exclude_oui (§8.4 / §11 #12)", bins["self_exclude_oui"]),
             ("below_confidence_threshold (§7.5)", bins["below_confidence_threshold"]),
             ("excluded_source_type (§7.5 CP19)", bins["excluded_source_type"]),
