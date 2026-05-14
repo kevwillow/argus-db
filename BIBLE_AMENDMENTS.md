@@ -1946,3 +1946,106 @@ None. CP19 doesn't open or close any §12 open question.
 ### §11 #11 self-binding satisfied
 
 This CP19 entry is the §11 #11 amendment-log pairing for the §-text + schema-migration in the coordinated commit. Bible HEAD bumps from `ab2cc6a` to the CP19 commit landed alongside this entry. Schema version 16 → 17.
+
+═══════════════════════════════════════════════════════════════════════
+Correction Pass 20 — SAR-13 per-shape mapper precedent + §11 #16 facts-only promotion from public-but-unlicensed sources
+═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 20 — SAR-13 per-shape mapper precedent + §11 #16 facts-only promotion from public-but-unlicensed sources
+
+**Date:** 2026-05-14
+**Source:** MAC-104 Validator surface-back [`3e34d5d0`](/MAC/issues/MAC-104#comment-3e34d5d0-c5b6-4e88-b5aa-220266c3cc04) §6.4 + §6.5 Q1/Q2/Q4/Q6 batched ratification slate. Originating dispatch: MAC-101 Item C Phase 2 [`c81b8df5`](/MAC/issues/MAC-101#comment-c81b8df5-38a5-473f-9638-518c74e47849). Validator commit at staging: [`0921003`](/MAC/issues/MAC-104) (365 deferred-dir rows triaged; 0 promotions; 1 §7.3 reject; 364 HOLDs).
+**Bible commit:** This entry + PROJECT_BIBLE.md §11 #16 (new hard rule) + SAR-13 section addition. Coordinated commit per established CP14/15/16/19 bible-pairing pattern.
+**Status:** Ratified at MAC-104 CEO response 2026-05-14. Sibling commits (child issues MAC-105 Phase-1 mapper rerun, MAC-106 migration 0011 identifier_types extension + bx_sig routing, MAC-107 Validator close-out) block on this commit landing.
+**Binds:** ExtractionWorker (Phase-1 mapper template per SAR-13 §S.2; rerun against 199 source-url-direct violations), DBArchitect (migration 0011 identifier_types CHECK enum extension per Q1 18-type slate; behavioral_signatures backfill per S.3 routing for 6 detector-internal types), Validator (Q3 Flock-attribution promotion, Q4 facts-only promotion per new §11 #16, Q5 §8.3 e4:aa:ea uplift with CP19 audit entry, Q7 attribution_conflict file; post-MAC-105/106 re-triage of 199+85 unblocked rows), CEO (MAC-101 close aggregation pending child landings).
+
+### Why this Correction Pass exists
+
+MAC-104 (MAC-101 Item C Phase 2) is the first substantive heartbeat against the MAC-63 deferred-dir backlog. The Validator's batched surface-back raised seven CP-class questions; four (Q1, Q2, Q4, Q6) are discipline codifications that the bible must hold before downstream execution can land coherently. Three (Q3, Q5, Q7) are row-level execution calls that compose against existing §8.4 + §8.3 + §4.2 discipline and don't require bible amendment — they ride along in the child-issue dispatches.
+
+The four discipline calls are coupled at the cohort level:
+
+1. **Per-shape mapper precedent (Q6).** The 4-shape decomposition Phase 1 used (flat-list / typed-bucket / diff-against-upstream / firmware-binary-mining) kept the Validator's disposition cascade deterministic across 10 deferred dirs with materially different per-repo identifier shapes. Without codification, future deferred-dir cohorts have no protocol-of-record for shape decomposition.
+2. **Mapper URL template (Q2).** 199 of 365 Phase-1 rows (54.5%) failed §11 #1 source-url-direct because mappers for repo-aggregated-README cohorts used `<repo>#<section_anchor>` rather than `<repo>/blob/<sha>/README.md#<section>`. The fix is mechanical (template change), not semantic — but the template requirement belongs as an SAR-13 sub-rule so future Phase-1 mappers don't recur.
+3. **identifier_type vs behavioral_signatures routing (Q1).** 24 candidate_types staged; 6 are detector-internal patterns (tunable thresholds, logcat detection strings, threat-level enums, OEM probe commands, wireshark filters, modem device paths) that belong in `behavioral_signatures.signature_name` (free TEXT, no enum constraint) rather than `identifiers.identifier_type` (CHECK-enum-constrained). The routing principle composes with the existing §4.2 behavioral_signatures table semantics — codifying it prevents migration-0011-style enum sprawl for detector-internal patterns.
+4. **NO_LICENSE_DECLARED public-but-unlicensed source promotion (Q4).** src=39 EthanThePhoenix38/flock-you-camera-detector fork carries an explicit `NO_LICENSE_DECLARED` sentinel and 20 OUI observations. Facts (OUI values) are uncopyrightable per *Feist v. Rural Telephone Service* (499 U.S. 340 (1991)); the source's compilation arrangement may carry unclear copyright posture but the individual factual claims do not. This pattern will recur (community-research repos often lack explicit licenses); codifying the Argus posture as a §11 hard rule prevents per-source ad-hoc deliberation.
+
+Landing these four as a single coordinated CP20 aligns the bible discipline with the child-issue dispatches that execute against it.
+
+### Corrections applied
+
+**A — SAR-13 (new sub-agent rule) per-shape mapper precedent codification.** Inserted after SAR-12 in BIBLE_AMENDMENTS.md. SAR-13 carries three sub-rules:
+
+- **S.1 — Per-shape mapper decomposition for community-research-repo cohorts.** When a Wave-N cohort spans more than one community-research repo with materially different per-repo identifier shapes, the per-shape mapper IS the canonical Phase-1 implementation — not a single union-of-shapes mapper. Sub-classes recognized: (a) **flat-list** — single repository file enumerates identifiers one-per-line or one-per-row (typical: OUI lists, MAC fingerprint lists); (b) **typed-bucket** — repository organizes identifiers by typed sub-sections (BLE services, manufacturer IDs, advertisement intervals); (c) **diff-against-upstream-fork** — identifiers staged as a delta over a known upstream collection (fork commits add net-new rows); (d) **firmware-binary-mining** — identifiers extracted from vendor-shipped firmware binaries via static analysis (Qualcomm MBN strings, NXP MFBL constants, etc.). The per-shape mapper produces clean candidate_type + source_row_key tuples per shape sub-class.
+- **S.2 — Mapper URL template (mandatory `/blob/<sha>/<path>#<anchor>` form).** Every Phase-1 mapper output row MUST carry `source_url` in `<repo>/blob/<sha>/<path>#L<line>` form OR `<repo>/blob/<sha>/<path>#<section-anchor>` form for README-anchored content. The bare `<repo>#<anchor>` form is NON-COMPLIANT — it lacks the commit-pinned file path required by §11 #1 (source-url-direct gate). README content anchors as `<repo>/blob/<sha>/README.md#<section>`, NOT as `<repo>#<section>`. This sub-rule retroactively binds the MAC-104 199-row source-url-direct violation cohort to mapper rerun before re-triage (per MAC-105 dispatch).
+- **S.3 — identifier_type vs behavioral_signatures routing for novel candidate types.** When a Phase-1 mapper surfaces a novel candidate_type, the routing decision between `identifiers.identifier_type` (CHECK-enum-constrained) and `behavioral_signatures.signature_name` (free TEXT) follows the **device-naming vs detector-internal-pattern boundary**:
+  - **identifier_type (CHECK-enum extension via migration):** types that *name a device or device-anchor* — chipset format ids, firmware hashes, BLE service UUIDs, BLE company IDs, RF channel/frequency/protocol constants tied to a vendor product, ALPR camera model strings, x509 cert prefixes embedded in vendor firmware. These rows answer "what device is this?" at query time.
+  - **behavioral_signatures.signature_name (free TEXT, no enum):** patterns that describe *detector-side observation surfaces* — tunable thresholds (signal-strength deltas), logcat detection strings (SMS-pattern signatures), threat-level enums (detector-internal state machines), OEM probe commands (modem service-mode hooks), wireshark display-filter strings (tshark traffic patterns), modem-side device paths (`/dev/smd*` AT-command interface paths). These rows answer "what does the detector look for?" at runtime — they belong with the existing 55 behavioral_signatures rows seeded from Wave-A cellular-paper analysis (src=37 NDSS Marlin et al.) rather than as new identifier-type-CHECK entries.
+
+**Decision rule for ambiguous cases:** if the candidate is *vendor-anchored* (the OUI/chipset/binary that ships it is in scope §2.1), route to `identifier_type`. If the candidate is *purpose-anchored* (the value names what to detect, not what is detecting), route to `behavioral_signatures`. When unclear after one heartbeat of deliberation, default to behavioral_signatures (the free-TEXT table has no migration cost; identifier_type CHECK enums require schema migrations).
+
+**B — §11 #16 (new hard rule) facts-only promotion from public-but-unlicensed sources.** Inserted as new §11 #16 in PROJECT_BIBLE.md after §11 #15. Verbatim text:
+
+> 16. **Public-but-unlicensed-source facts-only promotion.** When a public source (community GitHub repo, blog, forum) lacks an explicit license declaration (a `NO_LICENSE_DECLARED` sentinel or the absence of a `LICENSE` file), Argus MAY extract and promote *factual claims* (identifier values, manufacturer attributions, operational context) under the *Feist v. Rural Telephone Service* (499 U.S. 340 (1991)) facts-not-copyrightable doctrine. Argus MUST NOT redistribute the *compilation arrangement* (copying a list-snippet verbatim into `source_excerpt`, mirroring repository structure, or reproducing the source's selection/organization beyond what a single-fact citation requires). Per-row provenance discipline: `source_url` cites the upstream file at a pinned commit (per §11 #1); `source_excerpt` captures the minimal factual context needed for audit (typically the identifier value plus a single-sentence Argus-authored operational note); `notes.upstream_license_posture` records the source's declared posture (`'NO_LICENSE_DECLARED'`, `'MIT'`, etc.) for audit trail. Confidence ceiling follows §8.2 source-band rules (community = `crowdsourced` 50-75; ratification-required cases default to ≤70). This rule composes with §11 #2 (no non-public data — `NO_LICENSE_DECLARED` public repos remain public, so §11 #2 is satisfied) and §11 #15 (no decompiled vendor app source committed — applies orthogonally to any source class). (CP20 — 2026-05-14.)
+
+**C — Validator interpretive guidance for MAC-104 cohort execution (companion to SAR-13 + §11 #16, not bible-binding but documented here for cross-reference).** Q3, Q5, Q7 execute under existing discipline:
+
+- **Q3 (src=38 DeflockJoplin 3 net-new Flock-context MACs):** Promote with `manufacturer='Flock Safety'` (product-vendor lens per §8.4 dual-lens discipline, consistent with id=1 Wave-A precedent), `notes.oui_registry_assignee='Liteon Technology Corporation'` (chip-vendor lens retained for audit), `source_type='crowdsourced'`, `confidence` ≤70 per §8.2 + dispatch §2 ceiling.
+- **Q5 (e4:aa:ea §8.3 multi-source corroboration uplift):** Apply §8.3 corroboration formula `min(99, max(originals) + 5) = min(99, 65+5) = 70` to existing id=1 (the Wave-A first Flock detector ratified row at conf=65). UPDATE id=1 confidence 65 → 70 with CP19 `source_reclassifications` audit entry (`reclassification_reason='§8.3 corroboration uplift from src=38 + src=39 multi-source Flock-context observation'`). Separately INSERT a new `oui=e4:aa:ea` row at conf=70 (crowdsourced ceiling) capturing OUI granularity that the existing id=1 MAC-level row doesn't. The new OUI row does NOT enter `argus_export_high_confidence.json` (CP19 source_type exclusion: `crowdsourced` is excluded regardless of confidence). It does enter `argus_export.json` and `argus_export.csv` (no source_type exclusion there).
+- **Q7 (src=40 FoggedLens Motorola/Vigilant single-profile attribution_conflict):** File the row as a `conflicts` table entry with `reason='attribution_history_pending_ma_verification'` per memory rule that M&A/registration history claims require verification before validator handoff. Defer resolution to the standing M&A-verification pass (no separate child issue spawned; backlog item).
+
+### §11 hard-rule discipline (cite verbatim from bible HEAD `c883cec`, pre-CP20 lines)
+
+CP20 introduces §11 #16 as a new hard rule. Composition with existing §11 hard rules:
+
+- **§11 #1 (no fabrication)** — composes naturally; §11 #16 binds source_url + source_excerpt provenance discipline for facts-only promotion, preserving §11 #1 strictness.
+- **§11 #2 (no non-public data)** — composes orthogonally; §11 #16 explicitly scopes to public-but-unlicensed sources. A `NO_LICENSE_DECLARED` public GitHub repo is public; §11 #2 is satisfied.
+- **§11 #7 (no promotion without provenance)** — composes naturally; §11 #16 requires per-row source_url + source_excerpt + `notes.upstream_license_posture` for facts-only promotion. Provenance discipline strengthened, not weakened.
+- **§11 #8 (no confidence drift upward without corroboration)** — composes naturally; §11 #16 caps facts-only promotions at §8.2 crowdsourced band (50-75) absent explicit cross-validation. CP19 audit-trail discipline applies if a facts-only-promoted row later upgrades via corroboration.
+- **§11 #11 (amendment-log discipline)** — this CP20 entry IS the amendment-log pairing for the §11 #16 + SAR-13 additions in the coordinated commit. Bible HEAD bumps from `c883cec` to the CP20 commit.
+- **§11 #15 (no decompiled vendor app source committed)** — composes orthogonally; §11 #15 binds the *content type* committed to git, §11 #16 binds the *license posture* of the source upstream of extraction. Both compose AND-ed.
+
+### Sequencing post-acceptance (child issue ladder)
+
+1. **CP20 ratifies at this commit.** Bible HEAD bumps from `c883cec` to CP20 commit SHA. Schema version unchanged (CP20 is §-text + SAR addition; no DB migration touched). PROJECT_BIBLE.md §11 #16 inserted. BIBLE_AMENDMENTS.md SAR-13 + CP20 entry appended.
+2. **MAC-105 (ExtractionWorker, immediate)** — Phase-1 mapper rerun for 199 source-url-direct violations under SAR-13 S.2. Rerun produces corrected `source_url` values for affected rows; Validator re-triage unblocks 199 rows for Q1-banded promotion.
+3. **MAC-106 (DBArchitect, immediate, parallel to MAC-105)** — Migration 0011 identifier_types extension adding 18 new types per Q1 slate (ble_protocol_byte_table, rf_channel, alpr_model, ble_service_uuid, ble_company_id, frequency_band, ble_protocol_byte, operator_profile, x509_cert_sha256_prefix, ble_adv_interval, rf_protocol_constant, ble_payload_offset, firmware_sha256_hash, network_endpoint, firmware_image_variant, qualcomm_chip_format_id, firmware_branded_string, rf_burst_duration). Per feedback memory `feedback_cumulative_check_enum_across_sequenced_migrations.md` the migration MUST carry forward ALL prior identifier_type enum values, not just the 18 deltas. Sibling: behavioral_signatures routing for 6 detector-internal types per SAR-13 S.3 (tunable_threshold, wireshark_field, logcat_detection_string, threat_level_enum, modem_device_path, oem_service_mode_command — backfill executes against the 38 affected raw_observations rows via Validator re-triage in MAC-107).
+4. **MAC-107 (Validator, blocked by MAC-105 + MAC-106)** — Immediate-actionable Q3 + Q5 + Q7 (3 MACs + 1 uplift + 1 OUI insert + 1 conflict file = ~6 row-level operations) AND post-MAC-105/106 re-triage of 199 mapper-corrected rows + 123 vocab-extension-cleared rows. CP19 audit entry on Q5 uplift. Per-source_id batched transactions. Full export regen at close.
+5. **MAC-101 close (CEO, blocked by MAC-107)** — Parent close-aggregation comment, PROJECT_STATE.md rotation, architectural-firsts capture, MAC-63 deferred-dir backlog status update (10 of 10 dirs flushed; MAC-101 fully closed).
+
+### §12 Open Questions impact
+
+- **Q1 vocab-extension slate routing** — RESOLVED at SAR-13 S.3 (18 → identifier_type via migration 0011; 6 → behavioral_signatures via S.3 routing).
+- **Q2 Phase-1 mapper template** — RESOLVED at SAR-13 S.2 (mandatory `/blob/<sha>/<path>#<anchor>` form, rerun directive for 199 violations).
+- **Q4 NO_LICENSE_DECLARED facts-only promotion** — RESOLVED at §11 #16 (Feist-grounded facts-only promotion permitted with provenance + audit-posture discipline).
+- **Q6 per-shape mapper codification** — RESOLVED at SAR-13 S.1 (4-shape sub-class decomposition canonical for future deferred-dir cohorts).
+
+New §12 questions opened: none.
+
+### Why a Correction Pass, not separate SARs
+
+CP20 introduces (a) a new SAR (SAR-13 with 3 sub-rules) AND (b) a new §11 hard rule (#16). Per CP14 / CP19 precedent, when an amendment-batch touches BOTH the SAR catalog AND PROJECT_BIBLE.md §-text in a single coordinated commit, the pairing surfaces as a Correction Pass rather than separate SAR + standalone §-text edit. The CP-class wrapper preserves the discipline that "every bible §-text edit pairs with an amendment-log entry under §11 #11."
+
+### §11 #11 self-binding satisfied
+
+This CP20 entry is the §11 #11 amendment-log pairing for the SAR-13 section addition + §11 #16 §-text addition in the coordinated commit. Bible HEAD bumps from `c883cec` to the CP20 commit landed alongside this entry. Schema version unchanged (16 → 16; no migration).
+
+---
+
+## SAR-13 — Per-shape mapper precedent + URL template + identifier_type vs behavioral_signatures routing
+
+**Origin:** MAC-104 Validator surface-back [`3e34d5d0`](/MAC/issues/MAC-104#comment-3e34d5d0-c5b6-4e88-b5aa-220266c3cc04) §6.4 Q6 + Q2 + Q1 batched ratification slate. CEO ratified at MAC-104 close 2026-05-14. Bible-binding: SAR-13 carries three sub-rules (S.1, S.2, S.3) per CP20 §A above. Verbatim §S.1 / §S.2 / §S.3 text lives under CP20 §A — this header anchors SAR-13 in the sub-agent rule catalog. Future deferred-dir cohort dispatches cite SAR-13 in their Phase-1 mapper acceptance criteria.
+
+### S.1 — Per-shape mapper decomposition for community-research-repo cohorts
+
+[See CP20 §A above for full text.]
+
+### S.2 — Mapper URL template (mandatory `/blob/<sha>/<path>#<anchor>` form)
+
+[See CP20 §A above for full text.]
+
+### S.3 — identifier_type vs behavioral_signatures routing for novel candidate types
+
+[See CP20 §A above for full text.]
+
+---
