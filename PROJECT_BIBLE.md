@@ -131,6 +131,7 @@ The schema is the contract. All sub-agents output rows conforming to this.
 - **`fcc_grantees`** — staging table for FCC EAS grantee registrations (Phase 3 / MAC-7; first source = opendata.fcc.gov dataset `3b3k-34jp`, USGOV_WORKS public domain). Holds grantee_code → entity-name + mailing/contact metadata + date_received. Identifier columns intentionally absent — `grantee_code` is a regulatory entity prefix, not a per-device identifier (per-device FCC IDs are formed `grantee_code + product_code`, owned by Phase 4 `fcc_equipment_filings` if/when created). Idempotency keyed by `(source_id, source_row_key=grantee_code)`. Stale-mirror sources: `sources.notes` MUST carry `dataset_freeze_date` + `staleness_warning` when the upstream mirror is documented stale (3b3k-34jp is frozen at 2021-03-22; Flock Safety + post-2020 grantees absent — Phase 4 owns the gap). Added in Correction Pass 6 (BIBLE_AMENDMENTS).
 - **`extraction_runs`** — log of every extraction job: agent id, source, started_at, finished_at, records_in, records_out, errors
 - **`conflicts`** — when two sources disagree on the same identifier; reviewed and resolved by CEO
+- **`source_reclassifications`** — audit table for row-level reclassification events on `identifiers` rows (band downgrade, source_url upgrade, source_type change). Codified at CP19 (2026-05-13) as the structural audit-trail surface for §11 #8 strict-reading sweeps and any future row-level band changes on already-promoted canonical rows. Per-row entry captures pre/post `source_url`, `source_type`, `confidence` snapshot + `sweep_event_id` grouping + substantive `reclassification_reason` (convention: self-explanatory at row-level without cross-referencing the dispatch) + `reclassification_anchor` citation. First population: MAC-88 Wave-B+ sources reclassification sweep (2026-05-14; 335 Scope 2 downgrades + 14 Scope 3 lifts of non-unknown rows). Added in Correction Pass 19 (BIBLE_AMENDMENTS).
 
 ### 4.3 Normalization rules
 
@@ -575,6 +576,21 @@ Per Wave-B promotion-cycle-3 first-population of `behavioral_signatures` table a
 
 Three alternatives were considered at MAC-88 surface-back; board selected the sibling-file approach over (1) status-quo "Rayhunter reads the table directly via TBD path" — which punts on the consumer integration problem and couples Rayhunter to schema, and (3) discriminated-union `entry_kind` field on the existing high-conf JSON — which is discouraged because the `{pattern, pattern_type, description, argus_record_id}` contract is load-bearing for §4.4 mapping consumers and shouldn't degrade to "may have shape X or shape Y depending on entry." The sibling file preserves contract purity AND gives Rayhunter a stable surface AND lets each export's `_meta` block carry its own reconciliation arithmetic without cross-file aggregation.
 
+**High-confidence export source_type exclusion — CP19 (2026-05-14) directive.**
+
+Beyond the ≥70 confidence floor codified at §7.5 + `feedback_high_confidence_export_floor.md`, `argus_export_high_confidence.json` excludes rows by `source_type` regardless of confidence value:
+
+- `inferred` source_type — excluded from high-conf export
+- `crowdsourced` source_type — excluded from high-conf export
+
+Rationale: "high confidence" semantics couple to band-meaning (provenance strength), not just confidence-value-meaning. The `crowdsourced` ceiling is 75 per §8.2 (still ≥70 floor); the `inferred` ceiling is 70 (right at floor). Allowing rows in high-conf at 75 or 70 from those bands conflates band-strength with confidence-value. The CP19 exclusion makes high-conf export semantically "rows from official / regulatory / primary_registry / manufacturer_doc / academic / foia / procurement / manufacturer_app source_types AND confidence ≥ 70 AND device_category != 'unknown' AND geographic_scope passes CP7".
+
+Standard export (`argus_export.json`) retains the existing ≥30 floor without source_type exclusion; CSV (`argus_export.csv`) is unfiltered per CP11. The behavioral_signatures sibling export (`argus_export_behavioral_signatures.json`) retains the CP18 ≥70 floor; CP19 source_type exclusion does not apply to behavioral_signatures (which have a distinct shape).
+
+`_meta.dropped_in_export` gains a new key `excluded_source_type` capturing the count of rows dropped by this filter (parallel to the existing 8-key `dropped_in_export` block in §7.5).
+
+First effect: MAC-88 CP19 sweep landing 335 Scope 2 downgrades from primary_registry → crowdsourced (which would otherwise stay in high-conf at conf=75 under the ≥70 floor alone) and dropping them out of high-conf.
+
 **Don'ts:**
 - Do not include the `raw_observations` table in exports
 - Do not include `superseded_by` pointers in exports (resolve them first)
@@ -583,6 +599,7 @@ Three alternatives were considered at MAC-88 surface-back; board selected the si
 - Do not export procurement-only records (no concrete identifier) to Lynceus (see §4.5 and §11 #14)
 - Do not include OUIs from the Pi self-exclude list (§8.4) in `argus_export_high_confidence.json`
 - Do not include `behavioral_signatures` rows in the Lynceus-bound exports (`argus_export.json` / `argus_export_high_confidence.json` / `argus_export.csv`). They export to the sibling file `argus_export_behavioral_signatures.json` per the CP18 directive above. Mixing them into the wire-pattern-keyed Lynceus exports would violate the load-bearing `{pattern, pattern_type, description, argus_record_id}` contract.
+- Do not include records with `source_type IN ('inferred', 'crowdsourced')` in `argus_export_high_confidence.json`. Per CP19 (2026-05-14), high-conf export couples band-meaning to confidence-value-meaning; rows from those bands stay in standard export but not high-conf, tallied as `excluded_source_type` in coverage report. (Note this is orthogonal to but complementary with §11 #13 unknown-category exclusion.)
 
 ---
 
@@ -799,6 +816,7 @@ These are hard rules. Violating any of these is a stop-the-line event.
 6. **Do not violate ToS or scrape sources that explicitly forbid it.** Document the skip in `coverage_report.md` instead. WiGLE in particular: respect their API ToS — they're allies, not adversaries.
 7. **Do not promote a record to the main table without provenance.** Provenance is the database. Without it, we have a rumor.
 8. **Do not let confidence drift upward without corroboration.** Confidence only rises when a second independent source confirms.
+    - **CP19 sub-rule (2026-05-14):** Row-level reclassifications of `identifiers` rows — band changes (`source_type` UPDATE), confidence changes (UP or DOWN), or `source_url` upgrade/downgrade per §11 #8 strict reading — MUST land an entry in the `source_reclassifications` audit table (per §4.2 + migration 0017) in the SAME transaction as the identifier-row UPDATE. The audit entry captures the pre/post state snapshot + substantive per-row rationale (convention: self-explanatory at row-level without cross-referencing the dispatch) + `sweep_event_id` grouping + CP/dispatch citation anchor. The audit table is forensic: it answers "show me every identifier ever reclassified, when, why, and by which sweep" as an O(1) query, eliminating reliance on git-archaeology for this discipline-class question.
 9. **Do not skip checkpoints.** Even if a phase looks easy, stop and report.
 10. **Do not categorize at the OUI level for multi-purpose vendors** (see §8.4). *(Reframed by CP10 (2026-05-07): narrow-read carve-out — Argus-side categorization of single-product-line §2.1 vendors whose entire product line falls within the canonical surveillance category is permitted, regardless of whether the vendor also makes consumer/commercial variants of that category. FP-suppression for multi-purpose vendors is delegated to the Lynceus operator-override layer (`severity_overrides.yaml`), not Argus-side gatekeeping. Argus ships factual vendor-attribution; Lynceus operators tune alert behavior per their threat model. See CP10 in BIBLE_AMENDMENTS.md for the 17-row v0.1 cutover slate and the operator-override-as-FP-layer architecture.)*
 11. **Do not skip the `BIBLE_AMENDMENTS.md` log entry when making in-place bible edits or adding sub-agent-level rules.** The git diff is the source of truth, but the amendment log is the human-readable trail. An undocumented amendment is a process violation regardless of whether the edit itself is correct.

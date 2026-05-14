@@ -1811,3 +1811,76 @@ If a future Rayhunter integration finds the ≥70 floor too noisy for some opera
 ### §11 #11 self-binding satisfied
 
 This CP18 entry is the §11 #11 amendment-log pairing for the §7.5 + §9 §-text changes in the coordinated commit. Bible HEAD bumps from `d33491c` to the CP18 commit landed alongside this entry. Schema-version unchanged (CP18 is a §-text export-shape CP; no DB migration touched — the behavioral_signatures table + cellular_generation CHECK + UNIQUE constraint were already CP14 migration 0010 stable).
+
+═══════════════════════════════════════════════════════════════════════
+
+
+═══════════════════════════════════════════════════════════════════════
+Correction Pass 19 — §4.2 source_reclassifications + §7.5 source_type exclusion + §11 #8 audit-trail sub-rule
+═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 19 — §4.2 + §7.5 + §11 #8 — coordinated audit-trail + source_type exclusion landing
+
+**Date:** 2026-05-14
+**Source:** MAC-88 board ratification dispatch [`a1dab600`](/MAC/issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05) (§2 audit-trail framing Option α ratified + §5 high-conf source_type exclusion A3 ratified). CEO pre-flight at [`99bb1438`](/MAC/issues/MAC-88#comment-99bb1438-30a5-4e69-9164-69cacbda649a) surfaced both items.
+**Bible commit:** This entry + PROJECT_BIBLE.md §4.2 supporting-table addition + §7.5 source-type exclusion sub-block + §7.5 Don't bullet + §11 #8 sub-rule + migration 0017 (db/migrations/0017_source_reclassifications.sql). Coordinated commit per board explicit bundling.
+**Status:** Ratified at MAC-88 a1dab600 2026-05-14. Worker dispatches (Validator full sweep + ExtractionWorker export regen) block on this commit landing.
+**Binds:** Validator (sweep execution writes source_reclassifications audit entries per row in same transaction as identifier-row UPDATEs; per-row reclassification_reason must be substantive), ExtractionWorker (post-sweep Lynceus high-conf export regen MUST honor CP19 source_type exclusion + new excluded_source_type _meta key), DBArchitect (migration 0017 sibling commit per established CP14/15/16 pattern), CEO (Phase C surface-back enumerates first population stats + reconciliation arithmetic + architectural firsts).
+
+### Why this Correction Pass exists
+
+MAC-88 Wave-B+ sources reclassification sweep dispatch surfaced two coupled CP-class items at pre-flight:
+
+1. **§11 #8 audit-trail discipline** — the Scope 2 downgrade (335 FAA RID rows from `primary_registry` band to `crowdsourced`) is the first row-level confidence-band DOWNGRADE on already-promoted canonical rows. Prior CPs produced new rows / new bands / upward reclassification, never downward. The existing audit surfaces (git history + extraction_runs + amendment-log) don't make per-row reclassification queryable as a forensic surface. CEO surfaced 4 options at MAC-88 §5.2 (α separate audit table / β raw_observations FK column / γ both / δ rely on git history). Board ratified **Option α** at a1dab600 §2.
+
+2. **High-conf export source_type semantics** — under CP18's ≥70 floor, the 335 Scope 2 downgrades would stay in `argus_export_high_confidence.json` at the new conf=75 value (75 ≥ 70). Board §3.3 expectation was that they drop out (correctness-regression-fix per §11 #8 strict reading: rows whose provenance doesn't support primary_registry shouldn't anchor high-confidence-export semantics). CEO surfaced 3 sub-options at MAC-88 §5.5 (A1 accept +14 lift / A2 revert to ≥80 floor / A3 add source_type exclusion). Board ratified **Option A3** at a1dab600 §5.
+
+The two items are coupled: the audit-table captures the pre/post snapshot for each Scope 2 downgrade, AND the source_type exclusion makes the downgrade actually affect high-conf export semantics. Landing them in one coordinated CP19 commit aligns the audit-trail surface with the export-policy change in a single board-ratification anchor.
+
+### Corrections applied
+
+1. **§4.2 (new bullet — supporting tables).** Added `source_reclassifications` bullet per §3.1 above. Sister to `deployment_observations` (CP4) and `procurement_records` (CP5 sibling carveout). One additive migration (0017), no main-table impact.
+
+2. **§7.5 (new "Source-type exclusion for high-conf export — CP19 directive" sub-block).** Inserted after the CP18 sibling-export directive block, before the Don'ts section. Specifies the new exclusion (`inferred` + `crowdsourced` source_types excluded regardless of confidence value), the rationale (band-meaning coupling), and the orthogonality with §7.5 ≥70 floor + §11 #13 unknown-cat carveout.
+
+3. **§7.5 (new Don't bullet).** Added: "Do not include records with `source_type IN ('inferred', 'crowdsourced')` in `argus_export_high_confidence.json`."
+
+4. **§7.5 _meta extension.** `_meta.dropped_in_export` gains the `excluded_source_type` key (parallel to existing 8 keys). The ExtractionWorker code-sibling commit per CP19 worker dispatch lands the export-script implementation.
+
+5. **§11 #8 sub-rule (new).** Extended §11 #8 with the CP19 sub-rule about row-level reclassification audit-trail discipline. Audit entries land in `source_reclassifications` table per migration 0017 + §4.2 above, in the same transaction as the identifier-row UPDATE.
+
+### Confidence threshold composition (CP18 + CP19)
+
+CP18 ratified ≥70 floor for `argus_export_high_confidence.json`. CP19 layers source_type exclusion on top, orthogonally. The composite filter for high-conf inclusion is now:
+
+```
+confidence >= 70
+AND device_category != 'unknown'
+AND source_type NOT IN ('inferred', 'crowdsourced')
+AND geographic_scope passes CP7 filter
+```
+
+Standard export (`argus_export.json`) retains ≥30 floor without source_type exclusion. CSV (`argus_export.csv`) is unfiltered per CP11. Behavioral_signatures sibling (`argus_export_behavioral_signatures.json`) retains CP18 ≥70 floor without CP19 source_type exclusion (different shape; doesn't have source_type per row in same way).
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — unchanged; CP19 doesn't touch provenance discipline beyond strengthening the audit-trail.
+- **§11 #7 (no promotion without provenance)** — unchanged.
+- **§11 #8 (no confidence drift upward without corroboration)** — extended with the CP19 sub-rule (per §3.3 Option A above). Audit-trail discipline composes naturally with the existing rule; no contradiction with the upward-drift constraint.
+- **§11 #11 (amendment-log discipline)** — this CP19 entry IS the amendment-log pairing for the §-text edits in the coordinated commit. Bible HEAD bumps from `ab2cc6a` to the CP19 commit.
+- **§11 #13 (unknown-category Lynceus-banned)** — orthogonal to CP19; both filters compose AND-ed in high-conf export.
+
+### Sequencing post-acceptance
+
+1. **CP19 ratifies at this commit.** Bible HEAD bumps from `ab2cc6a` to CP19 commit SHA. Schema version 16 → 17 via migration 0017.
+2. **Validator dispatch (sibling-blocked)** — full sweep execution across Scopes 1-4 with per-row `source_reclassifications` audit entries. Validator's commit lands AFTER CP19 (it depends on the migration 0017 table being available).
+3. **ExtractionWorker dispatch (blocked by Validator)** — post-sweep Lynceus high-conf export regen honoring CP19 source_type exclusion + new `excluded_source_type` _meta key. Coverage report regen with both CP18 + CP19 reconciliation sections.
+4. **CEO Phase C surface-back** — handoff doc, PROJECT_STATE.md rotation, architectural-firsts capture.
+
+### §12 Open Questions impact
+
+None. CP19 doesn't open or close any §12 open question.
+
+### §11 #11 self-binding satisfied
+
+This CP19 entry is the §11 #11 amendment-log pairing for the §-text + schema-migration in the coordinated commit. Bible HEAD bumps from `ab2cc6a` to the CP19 commit landed alongside this entry. Schema version 16 → 17.
