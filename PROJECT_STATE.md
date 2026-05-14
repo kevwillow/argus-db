@@ -18,6 +18,73 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-14T~00:00Z–~00:30Z (**MAC-88 post-Wave-B board ratification dispatch — CP18 §7.5 sibling export + downstream-consumer memo refinement + FAA RID geographic_scope backfill**). Anchored on commits `7993536` (CP18 bible §7.5 + §9 amendment) / `478e5a5` (CP18 code-sibling: `export_behavioral_signatures.py` + 31 new tests) / `aa78e23` (first-run sibling JSON + FAA RID geographic_scope='US' backfill +12) plus this CEO Phase C state-rotation commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
+
+**MAC-88 post-ratification three-item dispatch CLOSED.** Board reopened MAC-88 via comment [`459daaca`](/MAC/issues/MAC-88#comment-459daaca-ef04-46b1-b337-4480e548ca0a) 2026-05-13T23:58Z with three batched items: (A) `behavioral_signatures` Lynceus export shape — board selected Option 2 (sibling export file) over CEO's Option 1 endorsement; (B) `feedback_bible_amendment_downstream_consumer_audit.md` refinement (S.1 explicit `coverage_matrix.py` consumer + S.6.1 worker-autonomous absorption sub-rule); (C) FAA RID `geographic_scope='US'` backfill on the 12 NULL rows from MAC-88 §4.3 Item 3. CEO decomposed into Phase 1 (CEO-direct CP18 amendment) + Phase 2 (ExtractionWorker MAC-93 dispatch) + Item B (CEO-side memory update) + Phase C close (this rotation).
+
+**CP18 amendment — §7.5 + §9 sibling-export shape:**
+- New §7.5 "Behavioral-signatures sibling export — CP18 directive" block defines `argus_export_behavioral_signatures.json` per-record shape `{signature_name, cellular_generation, threshold_json, confidence, argus_record_id}`, two-key `_meta.dropped_in_export` (`below_confidence_threshold` + `unknown_category`), `argus_record_id` recipe (sha256(`behavioral_signature|<name>|<source_id>|<cellular_gen-or-NULL-literal>`)[:16]), confidence floor **≥70** matching §7.5 canonical Lynceus floor
+- New §7.5 Don't bullet against mixing behavioral_signatures into Lynceus-bound exports
+- §9 deliverables enumeration extended + item 9 reconciliation-arithmetic parallel section
+- **CEO threshold rationale**: ≥70 chosen over ≥80 academic-band cap for (1) contract purity — bending floor per-consumer fragments §7.5, (2) internal-vs-export concern separation, (3) forward-proofing for non-academic-band signatures at conf 70-79, (4) today-vs-tomorrow neutrality (all 55 current rows uniform conf=80; choice is forward-only)
+
+**MAC-93 deliverables (ExtractionWorker):**
+- `db/validation/export_behavioral_signatures.py` new sibling module — CP18 §7.5 shape implementation; distinct UUID5 namespace from Lynceus exporter (architectural-first noted)
+- `tests/test_export_behavioral_signatures.py` 31 new tests covering structural invariants per S.1 case-study sub-rule discipline
+- `exports/argus_export_behavioral_signatures.json` first run: **55 entries** (all Marlin 53 + 2 Wave-A unlocks at conf=80; 0 dropped); sha256 `6c06ddf1cee3fdf28a497ce07289330255b6b5993d2643ff8616f641a3d507a2`; size 55,063 bytes
+- §2.1 strict-adherence checks all pass: JSON `null` for NULL `cellular_generation` (not string), parsed JSON dict for `threshold_json` (not stringified), integer 70 for `confidence_threshold`, literal `"NULL"` string in `argus_record_id` hash recipe for NULL `cellular_generation`
+- Item C: 12 FAA RID rows backfilled to `geographic_scope='US'` (0 HOLDs surfaced; worker spot-check confirmed CEO authoring-time finding — FAA RID registration anchors US scope regardless of manufacturer origin; AgEagle 4 + Autel 3 + others 5)
+- `argus_export_high_confidence.json` regenerated: **427 → 439 entries (+12)**; `_meta.dropped_in_export.geographic_scope_mismatch` 12 → 0; sha256 `5d65d741…` → `d4fa7f1ece…`
+- Defensive backup `db/argus.db.pre_cp18_item_c_backup` (272 MB; byte-identical to live pre-UPDATE)
+- Coverage report extended with two new BEGIN/END-marker sections: behavioral_signatures reconciliation (auto-regenerated; idempotent replace-in-place) + CP18 Item C FAA backfill (one-time event record; durable via data commit)
+- Test suite: **431 passed, 2 skipped** (was 335 at MAC-92 close; +96 from MAC-93 31 + intervening test growth; 0 regressions)
+
+**Item B — CEO-side memory refinement applied at single surface:**
+- §"How to apply" consumer inventory now explicitly names `db/validation/coverage_matrix.py` as first-class consumer (distinct from the report output); disambiguation note added
+- S.3 extended with recurrences **#4 CP15→cycle-2 `cc45440`** and **#5 CP16→MAC-92 `ca2d68a` worker-autonomous**; forward-expectation section revised to incorporate fifth-recurrence findings + sixth-recurrence threshold
+- New **S.6.1 sub-rule "Worker-autonomous absorption"** with MAC-92 case study + worker-side how-to-apply (same-shape vs novel-shape authorization gate; same-shape inline absorption + separate commit + handback informational finding; novel-shape halt-and-escalate)
+- Frontmatter description + MEMORY.md index updated
+
+**Class (e) drift surface — found during pre-flight, surfaced to board:**
+Board §0 asserted `feedback_bible_amendment_downstream_consumer_audit.md` "resolves on disk per CEO HB117 §pre-flight class (e)"; live disk + git log verify the memo has NEVER existed in argus repo — only at CEO-side memory. Same pattern as `feedback_verify_cross_referenced_artifacts_in_public_prose.md` codified earlier. Board's Item B §4 hedged for this case ("CEO surfaces during authoring whether parallel surfaces exist or this is single-surface"); per the hedge, Updates 1 + 2 landed as single-surface CEO memory. **Open question surfaced to board:** keep single-surface (CEO endorsed Option a) vs create canonical argus-repo file (Option b). Board can confirm in next dispatch or via comment.
+
+**Post-CP18 state delta:**
+- `identifiers` active: **18,820 → 18,820** (Item C UPDATE not INSERT)
+- `behavioral_signatures`: 55 (unchanged)
+- `drone_id_prefix WHERE geographic_scope='US'`: 415 → **427** (+12)
+- `drone_id_prefix WHERE geographic_scope IS NULL`: 12 → **0**
+- `argus_export_high_confidence.json` `_meta.record_count`: 427 → **439** (+12)
+- `argus_export_behavioral_signatures.json`: NEW — 55 entries, 55,063 bytes
+- Bible HEAD: `d33491c` → `7993536` (CP18); schema version unchanged at 16
+- `exports/coverage_report.md`: regenerated with two new sections
+
+**Three architectural firsts captured this run:**
+1. **First CP-class amendment authored by CEO without a prior Validator pre-flight** — CP18 §7.5 + §9 amendment was board-ratified shape change with CEO-direct authorship and no schema implications, distinguishing it from CP14-17 pattern that required Validator/DBArchitect cycles. Establishes precedent for export-shape-only CPs.
+2. **First sibling-export-file shape established** (`argus_export_behavioral_signatures.json`) — sets precedent for future non-wire-pattern export classes if any; the discriminated-union alternative (Option 3) is now formally discouraged in §7.5 with rationale anchored.
+3. **First worker-autonomous absorption captured as discipline (S.6.1)** — MAC-92's `ca2d68a` pattern from the prior heartbeat now formally codified at the discipline-evolution layer, with explicit worker-side authorization gate (same-shape vs novel-shape). Discipline propagation across the third actor class (board → CEO → worker) empirically confirmed.
+
+**Class (e) finding** (downstream-consumer memo's missing argus-repo surface) anchors a generalizable pattern: CEO memos referenced in durable prose (PROJECT_STATE entries, BIBLE_AMENDMENTS, board dispatches) should have their on-disk surface explicitly verified before assertion. Codification deferred to S.7 next-revision (board's call whether to amend or accept as known).
+
+**§11 stop-the-line trips:** 0. **PII boundary crossings:** 0. **CEO HALT-AND-SURFACE invocations:** 0. **Halts at close:** 0.
+
+**Forward sequence (carry over from MAC-88 surface-back §10):**
+- Wave-B+ sources reclassification sweep (90 FAA upgrades / 325 FAA downgrades / IEEE source-id reclass / fcc_grantees band reconciliation)
+- IEEE 3,521 pii_review_hold entity-type validator dispatch
+- 31 held Wave-A behavioral_signatures pending Wave-C/D/E second-source
+- Custom-mapper ingestion heartbeat (~360 secondary-batch obs)
+- FCC EAS per-FCC-ID retry (apps.fcc.gov degraded; Wave-C retry queue)
+- Item B canonical-surface board decision (Option a single-surface vs Option b create canonical argus-repo file)
+- Rayhunter v0.X migration to read from `argus_export_behavioral_signatures.json` — out-of-Argus downstream consumer work
+
+**Defensive backups retained:**
+- `db/argus.db.pre_mac91_step_backup` (272 MB; pre-Wave-B)
+- `db/argus.db.pre_cp18_item_c_backup` (272 MB; pre-FAA-backfill)
+- `exports/argus_export_high_confidence.json.pre_mac92_backup` (73,921 bytes; pre-Wave-B export)
+
+---
+
+### Prior action — MAC-88 Wave-B Validation Run (preserved verbatim)
+
 CEO heartbeat 2026-05-13T~22:50Z–~23:55Z (**MAC-88 Wave-B Validation Run — promotion-cycle-3 close + first behavioral_signatures population**). Anchored on commits `e0368b3` (Validator promotion-cycle-3 ingestion) / `ca2d68a` (coverage_matrix.py CP16 lag fix — code-sibling) / `fb2afe9` (post-promotion export regen) plus this CEO Phase C commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
 
 **MAC-88 closes; Wave-B validated and ingested.** Board dispatch [`41b0e213`](/MAC/issues/MAC-88#comment-41b0e213-09e9-4d0c-8c16-89fd52257a59) authorized full CEO decomposition latitude for the 22,106 staged candidates at `raw/wave_b/`. CEO decomposed into two sequenced worker dispatches plus CEO Phase C surface-back: [MAC-91](/MAC/issues/MAC-91) Validator promotion-cycle-3 (3a Sources 1-3 + 3b Marlin) → [MAC-92](/MAC/issues/MAC-92) ExtractionWorker (coverage + Lynceus export regen + reconciliation) → this Phase C close. Final handoff doc at `raw/wave_b/_wave_b_validation_handoff_2026-05-13.md`.
