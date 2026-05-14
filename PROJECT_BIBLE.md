@@ -530,6 +530,51 @@ The split exists because: (a) JSON is sized for runtime alert-feed consumption w
 - `description` — call shared `_format_description(row)` (CP8 ≤80-char flat) — same function powers JSON and CSV; single source of truth.
 - `first_seen` / `last_verified` — direct from `identifiers` table columns.
 
+**Behavioral-signatures sibling export — CP18 (2026-05-13) directive.**
+
+Per Wave-B promotion-cycle-3 first-population of `behavioral_signatures` table at MAC-88 close (2026-05-13; 0 → 55 rows landed via MAC-91), behavioral_signatures rows export to a sibling file `argus_export_behavioral_signatures.json` rather than to the existing Lynceus-bound `argus_export.json` / `argus_export_high_confidence.json`. Justification: the §7.5 contract `{pattern, pattern_type, description, argus_record_id}` is wire-pattern-keyed by construction (per the §4.4 mapping); `behavioral_signatures` rows have no wire-pattern string (they're descriptive prose like "Identity Request" plus thresholded multi-message rules in `threshold_json`). The sibling file preserves the existing contract purity per the `argus_export.json` shape's load-bearing property while giving downstream consumers (Rayhunter) a stable schema-decoupled surface to read from rather than direct DB reads (direct reads couple consumers to schema; the CP14 migration 0010 design explicitly established `behavioral_signatures` as a canonical surface that downstream consumers should read from a stable contract).
+
+**File shape (`argus_export_behavioral_signatures.json`):**
+
+```json
+{
+  "_meta": {
+    "argus_version": "<schema version>",
+    "exported_at": "<ISO8601 UTC timestamp>",
+    "record_count": 0,
+    "confidence_threshold": 70,
+    "argus_run_id": "<UUID for this export run>",
+    "source_record_count": 0,
+    "dropped_in_export": {
+      "below_confidence_threshold": 0,
+      "unknown_category": 0
+    }
+  },
+  "entries": [
+    {
+      "signature_name": "<from behavioral_signatures.signature_name>",
+      "cellular_generation": "<NULL or 2G|3G|4G|5G_NSA from behavioral_signatures.cellular_generation>",
+      "threshold_json": <verbatim JSON value from behavioral_signatures.threshold_json>,
+      "confidence": <integer 0-100>,
+      "argus_record_id": "<16 hex chars: sha256('behavioral_signature|' + signature_name + '|' + source_id + '|' + cellular_generation_or_NULL_literal)[:16]>"
+    }
+  ]
+}
+```
+
+**Field notes:**
+- `confidence_threshold` is `70`, matching the canonical §7.5 high-confidence floor (per the codified floor-discipline; the academic-band §8.3 corroboration math lifts Marlin rows to 80, comfortably above the floor). Filters rows with `confidence < 70` per the floor rule. Consumer-side tighter filtering (e.g., Rayhunter limiting to conf ≥85 for strict-mode alerts) is operator-decided, not export-side gated.
+- `argus_record_id` uses a behavioral_signatures-specific recipe: `sha256(f"behavioral_signature|{signature_name}|{source_id}|{cellular_generation if cellular_generation is not None else 'NULL'}").hexdigest()[:16]`. The 3-tuple UNIQUE constraint on `(signature_name, source_id, cellular_generation)` per CP14 migration 0010 makes this hash stable under re-extraction + dedup events (same stability property as SAR-10's `argus_record_id` for identifiers rows).
+- `cellular_generation` exports as the scalar value (literal JSON `null`, `"2G"`, `"3G"`, `"4G"`, or `"5G_NSA"`). Path (b) cross-gen rows (scalar NULL with `cross_gen_membership` list in `threshold_json`) surface the cross-gen list via the `threshold_json` field — consumers read both fields.
+- `threshold_json` exports verbatim from the DB (no transformation; both `json_valid()`-gated CHECK constraints prove the field is well-formed JSON at INSERT). Schema-stable enough that direct consumption is safe; CHECK-enum extension (5G_SA / 5G_FR1 / 5G_FR2) lands as a schema CHECK addition + this export file's enum docs update per the schema-migration-sibling discipline.
+- `_meta.dropped_in_export` keys are smaller than `argus_export_high_confidence.json`'s 8-key set because the §4.4 wire-pattern-specific drop categories don't apply: behavioral_signatures don't have `ssid_pattern` / `device_fingerprint` / `oversized_mac_range` / `procurement_only` / `self_exclude_oui` / `geographic_scope_mismatch` patterns. Two keys suffice today: `below_confidence_threshold` (rows with conf < 70) + `unknown_category` (forward-proofing if Wave-C/D/E surfaces behavioral_signatures with `device_category='unknown'`; behavioral_signatures inherit the same §11 #13 unknown-category Lynceus carveout per the table's `device_category` enum reuse). Future drop categories add keys per the same coverage-report reconciliation arithmetic.
+- The coverage report (§9 item 9) reconciliation arithmetic extends to this export file: `source_record_count − sum(dropped_in_export) = entries.length`.
+- **Severity intentionally absent** matching the parent `argus_export_high_confidence.json`'s CP8 architecture. Severity is operator-side (Rayhunter / Lynceus consumer-side filtering via consumer-specific override files).
+
+**Why the file is a sibling, not a discriminated-union extension to existing JSONs:**
+
+Three alternatives were considered at MAC-88 surface-back; board selected the sibling-file approach over (1) status-quo "Rayhunter reads the table directly via TBD path" — which punts on the consumer integration problem and couples Rayhunter to schema, and (3) discriminated-union `entry_kind` field on the existing high-conf JSON — which is discouraged because the `{pattern, pattern_type, description, argus_record_id}` contract is load-bearing for §4.4 mapping consumers and shouldn't degrade to "may have shape X or shape Y depending on entry." The sibling file preserves contract purity AND gives Rayhunter a stable surface AND lets each export's `_meta` block carry its own reconciliation arithmetic without cross-file aggregation.
+
 **Don'ts:**
 - Do not include the `raw_observations` table in exports
 - Do not include `superseded_by` pointers in exports (resolve them first)
@@ -537,6 +582,7 @@ The split exists because: (a) JSON is sized for runtime alert-feed consumption w
 - Do not export records with `device_category='unknown'` to Lynceus under any confidence threshold (see §8.4 and §11 #13)
 - Do not export procurement-only records (no concrete identifier) to Lynceus (see §4.5 and §11 #14)
 - Do not include OUIs from the Pi self-exclude list (§8.4) in `argus_export_high_confidence.json`
+- Do not include `behavioral_signatures` rows in the Lynceus-bound exports (`argus_export.json` / `argus_export_high_confidence.json` / `argus_export.csv`). They export to the sibling file `argus_export_behavioral_signatures.json` per the CP18 directive above. Mixing them into the wire-pattern-keyed Lynceus exports would violate the load-bearing `{pattern, pattern_type, description, argus_record_id}` contract.
 
 ---
 
@@ -717,16 +763,17 @@ This run is "done" when all of the following are true:
    - `argus_export.json` (Lynceus-consumable, all confidences ≥30)
    - `argus_export_high_confidence.json` (Lynceus-consumable, confidence ≥70)
    - `argus_export.csv` (rich-import feed per CP11; 15 columns; all active records, unfiltered)
+   - `argus_export_behavioral_signatures.json` (Rayhunter-consumable sibling export per CP18; confidence ≥70; shape per §7.5 CP18 directive; behavioral_signatures table rows only)
    - `coverage_report.md`
 
-   Each Lynceus-consumable JSON file conforms to the schema in §7.5 (including the §4.4 type mapping, §4.5 severity derivation, and the description-format constraints). Each is independently parseable and includes a complete `_meta` block.
+   Each Lynceus-consumable JSON file conforms to the schema in §7.5 (including the §4.4 type mapping, §4.5 severity derivation, and the description-format constraints). Each is independently parseable and includes a complete `_meta` block. `argus_export_behavioral_signatures.json` conforms to the §7.5 CP18 sibling-export shape and reconciles independently of the Lynceus-bound files.
 3. `coverage_report.md` exists and shows category coverage with honest gap analysis
 4. Every record in the main table has a working source_url
 5. The validator has run a final pass and `conflicts` table is empty (or every entry is human-resolved)
 6. The `argus_cli.py` utility works for `status`, `query`, `export`, `validate`
 7. README.md at the project root describes: what the database is, how to consume the export, the schema, the confidence scoring, the limitations, and the legal/ethical scope (§2.2 + §11)
 
-9. Coverage report includes a "Dropped from Lynceus export" section tallying records held back by category: `unknown_category`, `ssid_pattern`, `device_fingerprint`, `oversized_mac_range`, `procurement_only`, `self_exclude_oui`, `below_confidence_threshold`. Tallies must sum correctly: `source_record_count − sum(dropped) = exported entries count` for each Lynceus-bound JSON file (matching the `_meta.dropped_in_export` block defined in §7.5).
+9. Coverage report includes a "Dropped from Lynceus export" section tallying records held back by category: `unknown_category`, `ssid_pattern`, `device_fingerprint`, `oversized_mac_range`, `procurement_only`, `self_exclude_oui`, `below_confidence_threshold`. Tallies must sum correctly: `source_record_count − sum(dropped) = exported entries count` for each Lynceus-bound JSON file (matching the `_meta.dropped_in_export` block defined in §7.5). The coverage report ALSO includes a "Behavioral-signatures export reconciliation" section (added CP18) tallying `behavioral_signatures` source-record count − `below_confidence_threshold` − `unknown_category` = `argus_export_behavioral_signatures.json` `entries` count, matching the `_meta.dropped_in_export` two-key block defined in §7.5 CP18.
 
 ---
 

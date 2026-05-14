@@ -1730,3 +1730,72 @@ examples in CEO context) but the rule body, verification paths, and
 binding scope remain identical across surfaces.
 
 ═══════════════════════════════════════════════════════════════════════
+
+
+═══════════════════════════════════════════════════════════════════════
+Correction Pass 18 — §7.5 + §9 behavioral_signatures sibling export
+═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 18 — §7.5 + §9 behavioral_signatures sibling export file (`argus_export_behavioral_signatures.json`)
+
+**Date:** 2026-05-13
+**Source:** Board MAC-88 ratification dispatch [`459daaca`](/MAC/issues/MAC-88#comment-459daaca-ef04-46b1-b337-4480e548ca0a) §3 Item A (board selected Option 2 over CEO's Option 1 at MAC-88 surface-back).
+**Bible commit:** This entry + PROJECT_BIBLE.md §7.5 "Behavioral-signatures sibling export — CP18 directive" block insertion + §7.5 Don't bullet addition + §9 deliverables list addition (`argus_export_behavioral_signatures.json`) + §9 item 9 reconciliation-arithmetic section-naming extension. Bible HEAD bumps from `d33491c` to this CP18 commit.
+**Status:** Ratified by board at MAC-88 reopen-via-comment 2026-05-13T23:58Z. CEO authors the §-text amendment + amendment-log entry; worker dispatch (ExtractionWorker) lands the export-script code-sibling commit + first generated `argus_export_behavioral_signatures.json` + coverage report extension. Phase C closes at MAC-88 surface-back on worker completion.
+**Binds:** ExtractionWorker (new export-script code-sibling commit implementing the §7.5 CP18 shape; first run; reconciliation arithmetic against `behavioral_signatures` table state; coverage-report extension), Validator (no change; behavioral_signatures promotion gates were ratified at MAC-91 Wave-B promotion-cycle-3 close), Lynceus integration team (no change; new export file is Rayhunter-bound not Lynceus-bound), Rayhunter integration (downstream consumer; out-of-Argus migration to read from the new export file lands at Rayhunter v0.X work — surface as separate MAC issue if/when needed).
+
+### Why this Correction Pass exists
+
+MAC-88 Wave-B validation closed 2026-05-13T23:24Z with the first substantive population of the `behavioral_signatures` table (0 → 55 rows; Marlin 53 + 2 Wave-A unlocks at conf=80 via §8.3 academic-corroboration math). The MAC-92 ExtractionWorker handback surfaced §4.4 — at confidence floor ≥70, all 55 behavioral_signatures qualified for export, but `behavioral_signatures` rows have no wire-pattern string suitable for the existing §7.5 high-conf JSON shape `{pattern, pattern_type, description, argus_record_id}`. ExtractionWorker halted-and-surfaced as a CP-class question with three options. Board selected Option 2 (sibling export file) over Option 1 (status-quo, defer to Rayhunter direct-DB-reads) and Option 3 (discriminated-union `entry_kind` field, discouraged per Lynceus-export-shape-purity discipline).
+
+Board's Option 2 reasoning (paraphrased from dispatch §3): direct DB reads couple consumers to schema; the CP14 migration 0010 design specifically established behavioral_signatures as a canonical surface that downstream consumers should read from a stable contract. The sibling file preserves §7.5 contract purity AND gives Rayhunter the canonical surface it needs. Cost: one additional export file paid once. Benefit: consumer-side decoupling from schema evolution (CHECK-enum extensions like 5G_SA / 5G_FR2 / 5G_FR1 if surfaced).
+
+### Corrections applied
+
+1. **§7.5 (new "Behavioral-signatures sibling export — CP18 directive" block).** Inserted after the CP11 dual-artifact paragraph, before the "**Don'ts:**" section. Specifies the new file name (`argus_export_behavioral_signatures.json`), per-record shape `{signature_name, cellular_generation, threshold_json, confidence, argus_record_id}`, `_meta` block (two-key `dropped_in_export`: `below_confidence_threshold` + `unknown_category`), `argus_record_id` recipe (`sha256('behavioral_signature|' + signature_name + '|' + source_id + '|' + cellular_generation_or_NULL_literal)[:16]`), confidence threshold (`70` matching §7.5 canonical high-conf floor), and the alternatives-considered narrative documenting the Option 1 / 2 / 3 decision.
+
+2. **§7.5 Don't bullet (new).** Added: "Do not include `behavioral_signatures` rows in the Lynceus-bound exports (`argus_export.json` / `argus_export_high_confidence.json` / `argus_export.csv`). They export to the sibling file `argus_export_behavioral_signatures.json` per the CP18 directive above. Mixing them into the wire-pattern-keyed Lynceus exports would violate the load-bearing `{pattern, pattern_type, description, argus_record_id}` contract."
+
+3. **§9 deliverables list (item 2 — `exports/` enumeration).** Added new bullet `argus_export_behavioral_signatures.json (Rayhunter-consumable sibling export per CP18; confidence ≥70; shape per §7.5 CP18 directive; behavioral_signatures table rows only)`. Also extended the trailing sentence of item 2 to note that the new file conforms to the §7.5 CP18 sibling-export shape and reconciles independently of the Lynceus-bound files.
+
+4. **§9 item 9 reconciliation-arithmetic.** Extended the existing "Dropped from Lynceus export" reconciliation-arithmetic sentence with a parallel "Behavioral-signatures export reconciliation" section requirement: `behavioral_signatures` source-record count − `below_confidence_threshold` − `unknown_category` = `argus_export_behavioral_signatures.json` `entries` count, matching the `_meta.dropped_in_export` two-key block.
+
+### Confidence threshold rationale (≥70, not ≥80)
+
+The board's dispatch §3 explicitly invited the CEO's read on the right threshold. Two options were on the table:
+
+- **≥70** — matches §7.5 canonical high-conf Lynceus floor; symmetric with `argus_export_high_confidence.json`; consumer-side filtering (Rayhunter strict-mode) can apply tighter floors operator-side.
+- **≥80** — matches the §8.3 academic-band corroboration ceiling (Marlin sigs land at conf=80); more conservative for behavioral-signature export specifically.
+
+CEO selected **≥70** for the following reasons:
+
+1. **Contract purity.** The canonical §7.5 high-conf floor is ≥70 per the codified floor-discipline. Bending the floor for one consumer's potential preference fragments the contract; future export files would each get their own ad-hoc floor with no governing rationale.
+2. **Internal vs export concern.** The "academic-band 80" framing is internal corroboration math (§8.3 confidence assignment), not export-shape policy. Export filtering operates at the floor; consumer-side tighter filtering operates at the consumption layer. These are different concerns and shouldn't conflate.
+3. **Forward-proofing.** Future behavioral_signatures from non-academic sources at conf 70-79 (e.g., a regulatory advisory mentioning a specific cellular-detection signature) would be exported under ≥70 and excluded under ≥80. Excluding them at the export layer loses information that the consumer would otherwise have visibility to.
+4. **Today-vs-tomorrow neutrality.** All 55 current rows sit at conf=80 exactly (MAC-91 close: min=max=avg=80.0 uniform). Both ≥70 and ≥80 produce identical 55-row export for the current data. The choice is forward-only.
+
+If a future Rayhunter integration finds the ≥70 floor too noisy for some operator class, the operator-side override file (mirroring Lynceus's `severity_overrides.yaml` CP8 architecture) is the right place to handle it. The export-floor decision is "what's the load-bearing canonical floor for the contract"; that answer is ≥70 today and changes only with a coordinated CP-class amendment, not with per-consumer preference.
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — unchanged; new export file mirrors verbatim DB content for `signature_name` / `cellular_generation` / `threshold_json` / `confidence` fields. No transformation that could introduce fabrication.
+- **§11 #7 (no promotion without provenance)** — unchanged; behavioral_signatures promotion gate (the Validator-side §8.3 corroboration check) is the load-bearing provenance discipline; the export file mirrors post-promotion state.
+- **§11 #8 (no confidence drift)** — unchanged; export filter (≥70) operates on the stored confidence value without modification.
+- **§11 #11 (amendment-log discipline)** — this CP18 entry is the amendment-log pairing for the §7.5 + §9 §-text changes in the coordinated commit. Bible HEAD bumps from `d33491c` to the CP18 commit alongside this entry.
+- **§11 #13 (unknown-category Lynceus-banned)** — composes via the new `_meta.dropped_in_export.unknown_category` key; behavioral_signatures rows with `device_category='unknown'` (none today; forward-proofing) will be excluded from the sibling export at the same governance level as identifiers rows are excluded from Lynceus high-conf.
+
+### Sequencing post-acceptance
+
+1. **CP18 ratifies at this commit.** Bible HEAD bumps from `d33491c` to CP18 commit SHA.
+2. **Paired code-sibling commit** (ExtractionWorker dispatch — new export script implementing §7.5 CP18 shape + first run generating `exports/argus_export_behavioral_signatures.json` + coverage report extension). Lands as a separate commit per CP14/CP15/CP16/CP17 precedent (code/bible separation discipline preserved).
+3. **State-rotation commit** (PROJECT_STATE.md post-CP18 rotation). Lands at MAC-88 Phase C surface-back (separate heartbeat) after the code-sibling commit closes.
+4. **First export reconciliation** at the worker's first-run delivery: 55 rows in DB; expected 55 entries in `argus_export_behavioral_signatures.json`; 0 dropped (all conf=80 ≥70 and none unknown-category in current data).
+5. **Rayhunter v0.X migration** (downstream consumer) to read from the new export file — out-of-Argus follow-on; surface as separate MAC issue if/when needed per dispatch §6 OUT-of-scope notation.
+
+### §12 Open Questions impact
+
+- **`behavioral_signatures` Lynceus export shape** (MAC-88 §4.3 Item 1; board's CP-class halt-and-surface from MAC-92 §4.4) — **RESOLVED at CP18 (2026-05-13)** via the sibling-export-file directive above.
+
+### §11 #11 self-binding satisfied
+
+This CP18 entry is the §11 #11 amendment-log pairing for the §7.5 + §9 §-text changes in the coordinated commit. Bible HEAD bumps from `d33491c` to the CP18 commit landed alongside this entry. Schema-version unchanged (CP18 is a §-text export-shape CP; no DB migration touched — the behavioral_signatures table + cellular_generation CHECK + UNIQUE constraint were already CP14 migration 0010 stable).
