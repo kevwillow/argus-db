@@ -1,0 +1,319 @@
+# METHODOLOGY.md — Argus v1.0.0
+
+## §1. What this document covers
+
+Argus is an open-source database of public-record-derived surveillance equipment identifiers (Bluetooth MACs, BLE service UUIDs, FCC grantee codes, default SSIDs, IMSI patterns, RID transmitter IDs, and related fingerprints). This document describes the methodology behind v1.0.0: how identifiers are sourced, how confidence scores are assigned, how duplicate observations are corroborated, and how the dataset was built.
+
+METHODOLOGY.md is the public-OSS distillation of an internal project bible used to coordinate the build. For column-level reference, see [DATA_DICTIONARY.md](DATA_DICTIONARY.md). For onboarding and quickstart, see [README.md](README.md). For threat-model and adversarial-posture detail, see [THREAT_MODEL.md](THREAT_MODEL.md).
+
+**Glossary anchor:** Throughout this document, *database* refers to the queryable SQLite artifact (`argus.db`); *dataset* refers to exported JSON/CSV artifacts (`argus_export.json`, `argus_export_high_confidence.json`, `argus_export.csv`); *pipeline* refers to the migration + source-loader scripts that deterministically reproduce the database from upstream sources.
+
+## §2. Mission and scope
+
+Argus catalogs equipment identifiers, not people. Every row in the database describes a piece of equipment — a Flock Safety camera MAC prefix, a DJI drone manufacturer OUI, an Axon body-camera Bluetooth identifier, a Cradlepoint in-vehicle router model — and the public-record evidence that links that identifier to a manufacturer, operator, or deployment context. **No row identifies an individual person.** Operator names appear only where they are themselves public record (e.g., a city PD purchase order for Flock cameras).
+
+Argus is **public-record-derived**: every identifier in v1.0.0 is sourced from publicly available material — FCC equipment authorization grants, federal procurement contracts (USAspending.gov), crowdsourced deployment maps (EFF Atlas of Surveillance, DeFlock), municipal council minutes, manufacturer documentation, and public research artifacts. Sources, source-type bands, and per-source confidence caps are documented in §3 and §5.
+
+**What Argus is for:** giving researchers, journalists, civil-society monitors, and field operators a queryable reference for "what is this identifier?" — turning a Bluetooth MAC observed in a parking lot into "this is a Flock Safety camera, here's the FCC grantee, here's the procurement contract that put it there." The dataset is intended to be **operator-side-readable** (downstream consumers apply their own severity overrides and suppression filters; see §5 for the confidence-vs-severity separation).
+
+**What Argus is not for:** real-time tracking, individual identification, or active interception. The database is a fingerprint-to-equipment-context lookup; it does not produce live observations.
+
+## §3. Sources and source-type hierarchy
+
+Argus organizes sources by **`source_type`**, a schema-level enum that determines the confidence ceiling each source can contribute (see §5 for confidence bands). The v1.0.0 schema enum (post-migration 0015) carries 10 values. Listed in descending order of active-identifier representation at v1.0.0:
+
+- **`primary_registry`** — authoritative registries operated by the entity that owns the identifier namespace itself: FAA Remote ID registration, Bluetooth SIG company-identifier assignments. Distinguishing test: the registry IS the authoritative source-of-truth for what the identifier means; analogous to a CA/PKI root for fingerprint provenance. Confidence band: **70–85 single-source; up to 95 with cross-band corroboration per §5.2**. *v1.0.0 active identifiers: **417 (81.1%)** from Bluetooth SIG company-identifier registry + FAA RID prefix registry.*
+- **`inferred`** — derived or computed identifiers that lack direct source citation in the artifact itself: identifier-to-manufacturer attributions computed from an upstream registry record (e.g., OUI→manufacturer inference from an IEEE registry walk) rather than copied verbatim from a source row. Confidence band: **30–70, capped**. *v1.0.0 active identifiers: **62 (12.1%)** — Wave-A IEEE OUI promotion-cycle-1 outputs.*
+- **`manufacturer_app`** — vendor mobile/desktop companion applications statically analyzed for embedded identifiers (BLE service UUIDs, default credentials, pairing codes). Confidence band: **60–95, sub-banded by identifier class; highest tier 80–95 for hardcoded BLE service UUIDs**. Operator-app vs installer-app sub-banding applies — installer/pairing-flow apps yield BLE/SSID/credential identifiers; operator apps yield product-family taxonomy only. *v1.0.0 active identifiers: **21 (4.1%)** from Flock Safety FS Installer + Getac BWC Viewer companion apps.*
+- **`crowdsourced`** — community-curated deployment maps where contributors submit observations of physical equipment in the field. Tier-1 sources at v1.0.0: EFF Atlas of Surveillance, DeFlock. Confidence band: **50–75**. Community-curated sources classify here, not as a separate "community" tier (single canonical naming). *v1.0.0 active identifiers: **14 (2.7%)**.*
+- **`official`** — court-verifiable government records distinct from regulatory filings: FCC EAS equipment authorization grants, FAA enforcement orders, court-ordered disclosures. Confidence band: **90–100**. *v1.0.0 sources: 1 (FCC EAS Equipment Authorization Grantee Registrations). No active identifiers promoted at v1.0.0 — the FCC EAS corpus is staged in `raw_observations` for Phase-4+ extraction.*
+- **`manufacturer_doc`** — manufacturer-published technical documentation (datasheets, integration guides, SDK documentation, technical reference manuals). Confidence band: **75–90**. *v1.0.0 sources: 2 (Hak5 product documentation Wayback snapshots; 0xXyc/flock-you-wifi-recon Wave-A repo). No active identifiers promoted at v1.0.0.*
+- **`regulatory`** — government regulatory filings: FOIA-released equipment lists, court-verifiable government records, IEEE OUI registry (MA-L / MA-M / MA-S blocks) at v1.0.0¹. Confidence band: **80–95**. *v1.0.0 sources: 3 (IEEE OUI MA-L + MA-M + MA-S registry rows). No active identifiers promoted directly at v1.0.0 — derived OUI→manufacturer inferences are classified `inferred` per the §11 #8 boundary rule (third-party citation lineage stays in originating band).*
+- **`procurement`** — federal/state/local procurement records: USAspending.gov contract awards, municipal purchase orders, vendor-agency contracts. Confidence band: **70–85** (proves *purchase*, not *deployment*). *v1.0.0 sources: 2 (USAspending.gov spending_by_award API; Granicus Legistar council/legislative-matters API). No active identifiers promoted at v1.0.0.*
+- **`academic`** — peer-reviewed or conference-published research artifacts. Confidence band: **70–90**. *No v1.0.0 sources. Reserved for future ingest of academic-conference papers, thesis artifacts, peer-reviewed catalog publications.*
+- **`foia`** — FOIA-released documents from federal/state/local FOIA requests. Confidence band: **65–85**. *No v1.0.0 sources. Reserved for future ingest of FOIA-released equipment manifests, contract records, and operational documents.*
+
+¹ *IEEE OUI sources are classified as `regulatory` at v1.0.0 ship. The internal project bible specifies `primary_registry` as the canonical destination band; reclassification of the IEEE OUI source rows is a documented post-v1.0.0 batch task.*
+
+**Source-vs-`source_type` distinction:** A single `source_type` may have multiple `sources` entries. Each `sources` row carries its own license metadata, license attribution, and source-class confidence ceiling within the `source_type` band.
+
+**Provenance gate (§11 #7 bible rule, prose form):** Every row in the live `identifiers` table carries traceable provenance — a `source_url` pointing at the upstream artifact and a `source_excerpt` capturing the relevant text. Provenance discipline is absolute and universal: a candidate without ancestry in a fetched source artifact does not promote, regardless of source-type or apparent corroboration. *"Provenance is the database. Without it, we have a rumor."*
+
+**Corroboration & single-source eligibility:** Most source-types require independent-source corroboration for promotion — a candidate identifier observed in only one source remains staged in `raw_observations` until a second source from a different `source_type` confirms the same identifier-to-manufacturer (or identifier-to-operator) binding. A `crowdsourced` observation alone does not promote; a `crowdsourced` observation paired with a `regulatory` or `manufacturer_doc` row does. **`primary_registry` carveout:** A single `primary_registry` citation IS sufficient for promotion at confidence 85, because the registry IS the authoritative source-of-truth for the identifier — asking for "three independent sources" of what FAA Remote ID block `1581Fxxx` means at FAA is structurally ill-defined; FAA's registry is the source of truth, and there is no parallel source-of-truth to corroborate against. Cross-band corroboration with `regulatory` or `manufacturer_doc` lifts up to 95 per §5.2. The carveout is `primary_registry`-only; other source-types' corroboration cut-offs remain in force.
+
+**Confidence ceiling rule (§11 #8 bible rule, prose form):** Within those eligibility rules, no identifier's confidence may exceed the lowest source-type band ceiling among its contributing sources. A `regulatory` (ceiling 95) + `crowdsourced` (ceiling 75) corroboration produces a row with confidence ≤ 75 — the lowest contributing band wins per §11 #8. The corroboration boost from §5.2 (multi-source dedup, `min(99, max(originals) + 5)`) is applied within the ceiling, not over it.
+
+## §4. Identifier types and the `identifier_type` enum
+
+Argus distinguishes between identifiers that a wire-observing scanner (e.g., Lynceus, the canonical downstream consumer) can match against broadcast traffic, identifiers that exist only as analytical cross-reference taxonomy, and parametric metadata that describes a property of an emission rather than a discrete match value. The schema's **`identifier_type`** enum makes this distinction explicit at row-creation time, so downstream consumers know exactly which entries flow into scanner watchlists and which are analytical-only.
+
+### §4.1 Three categories
+
+Every `identifier_type` enum value falls into one of three structural categories:
+
+1. **Wire-observable** — values a scanner can read off a broadcast frame and match against a fixed pattern. Examples: a 6-byte MAC address, a 3-byte OUI, a BLE service UUID, an SSID broadcast in a Probe Response, a Remote ID drone identifier prefix. These ride the Lynceus export and become live scanner-watchlist entries.
+
+2. **Analytical-only** — taxonomy values, vendor-internal cohort labels, fingerprint cluster identifiers, and structurally-wire-observable identifiers whose downstream-consumer support is not yet implemented at the v1.0.0 ship version of Lynceus. Captured to cross-reference and disambiguate identifier rows, but never exported as a scanner pattern at v1.0.0. Examples: a Flock Safety `DeviceType` enum string (`product_family_codename`), a fingerprint cluster label (`device_fingerprint`), an ALPR vendor-product name (`alpr_model`), a BLE GAP local-name string (`ble_local_name`; structurally wire-observable but Lynceus v0.3 lacks GAP local-name match support), an ICAO 24-bit aircraft address (`icao_24bit_address`; structurally wire-observable but out-of-band RF for the baseline Pi BLE/WiFi scanner — RTL-SDR upgrade unlocks observability).
+
+3. **Parametric metadata** — properties of an emission rather than discrete match values: an RF channel number, a burst cadence in milliseconds, a bandwidth in megahertz, a sub-protocol-level fragment that is structurally too coarse or too composite to function as a Lynceus watchlist pattern. These are captured during analysis to drive triage and category-attribution heuristics but are never exported, scanner-side or analytical-side, as a pattern-match value.
+
+The category determines export fate; the per-type semantics determine extraction rules, confidence-band ceilings, and disambiguation criteria. Forward-extensibility: as the Lynceus consumer adds capability (GAP local-name matching, characteristic-discovery, RTL-SDR ADS-B decode, etc.), structurally-wire-observable identifiers currently classified analytical-only re-categorize to `wire-observable` at the Argus version that lands the consumer-side capability. The category column on a row reflects the v1.0.0 export fate, not the structural nature of the identifier.
+
+### §4.2 The v1.0.0 enum
+
+At v1.0.0, the `identifier_type` enum has 26 values. Eleven are foundational (added in initial schema + Wave G structural-fidelity extensions); fifteen were added in subsequent extensions to accommodate RF-layer, parametric, and sub-protocol identifier classes surfaced during vendor companion-app static analysis + FAA RID drone registry + BLE SIG manufacturer-ID clusters.
+
+**Foundational types:**
+
+| Type | Category | Semantics |
+|---|---|---|
+| `oui` | wire-observable | IEEE-allocated 3-octet vendor prefix (e.g., `aa:bb:cc`). Matches the first three octets of any MAC address. |
+| `mac` | wire-observable | Full 6-octet MAC address. Matches a specific device. |
+| `mac_range` | wire-observable | OUI-28 / OUI-36 sub-allocation block. Expanded to individual MACs at export time only if range size ≤ 256; otherwise dropped from Lynceus export and noted in the coverage report. |
+| `bssid` | wire-observable | Wireless access point MAC, broadcast in 802.11 Beacon and Probe Response frames. Maps to Lynceus `pattern_type=mac` at export time. |
+| `ssid_exact` | wire-observable | Exact-string SSID match. Broadcast in 802.11 Beacon frames or returned in Probe Response. |
+| `ssid_pattern` | analytical-only | POSIX regex SSID pattern. Dropped from Lynceus v0.3 export (no regex support in the consumer scanner); analytical-only at v1.0.0. |
+| `ble_uuid` | wire-observable | Bluetooth Low Energy service or characteristic UUID, broadcast in BLE GAP advertising frames. |
+| `ble_service` | wire-observable | BLE service UUID specifically (subset of `ble_uuid` typing for analytical clarity). Maps to Lynceus `pattern_type=ble_uuid` at export time. |
+| `device_fingerprint` | analytical-only | Hardware fingerprint cluster label. v0.3 Lynceus has no fingerprint matching; analytical-only. |
+| `ble_local_name` | analytical-only | BLE GAP Local Name field string. Structurally wire-observable (broadcast in BLE GAP advertising frames); analytical-only at v1.0.0 because Lynceus v0.3 lacks GAP local-name match support. Re-categorizes to `wire-observable` at the Argus version that lands a Lynceus release with GAP local-name matching. |
+| `ble_characteristic` | analytical-only | BLE characteristic UUID. Structurally wire-observable but analytical-only at v1.0.0 because Lynceus discovers devices by service UUID, not by characteristic; characteristic-discovery is a consumer-side capability gap. Re-categorizes to `wire-observable` when Lynceus adds characteristic-discovery. |
+| `product_family_codename` | analytical-only | Vendor-internal cohort identifier — e.g., a Flock Safety `DeviceType` enum value (`FALCON_LR3`, `RAVEN_R6`). Vendor-internal taxonomy; never matched by a wire scanner. |
+
+**RF / parametric / sub-protocol additions:**
+
+| Type | Category | Semantics |
+|---|---|---|
+| `ble_manufacturer_id` | wire-observable | 2-byte Bluetooth SIG company-identifier value embedded in BLE manufacturer-specific advertising data (e.g., Apple `0x004C`, XUNTONG `0x09C8`). |
+| `drone_id_prefix` | wire-observable | ASTM F3411-22a Remote ID frame prefix (e.g., FAA RID `1581Fxxx` block). Broadcast across WiFi NAN action frames, WiFi Beacon vendor IE, and BLE Legacy 4.x advertising. BLE5 LE Coded PHY decode is a baseline-Pi-BLE-chipset limitation; coverage on baseline hardware is dominated by the WiFi-NAN / Beacon variants. |
+| `wifi_aware_service_name` | wire-observable | WiFi NAN (Neighbor Awareness Networking) service-discovery service-name string. Capability-gated by Lynceus-side NAN support; Argus exports unconditionally per the consumer-carries-capability-state posture. |
+| `icao_24bit_address` | analytical-only | 24-bit ICAO aircraft / drone Mode S address broadcast in 1090MHz ADS-B Out frames. Structurally wire-observable but analytical-only at v1.0.0 because ADS-B is out-of-band for the baseline Pi BLE/WiFi scanner; an RTL-SDR upgrade path unlocks observability. Re-categorizes to `wire-observable` for ADS-B-equipped scanners at the Lynceus version that lands RTL-SDR ADS-B decode support. |
+| `alpr_model` | analytical-only | Vendor-product taxonomy string (e.g., "Flock Safety Falcon", "Motorola Vigilant", "Genetec AutoVu"). Concrete ALPR-camera identifiers flow via `oui`/`mac`/`bssid`/`ssid_exact`; `alpr_model` is the analytical taxonomy column. |
+| `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `rf_burst_duration` | parametric metadata | Temporal and spectral-occupancy properties of an observation. Captured for analytical triage and category attribution, never exported. |
+| `device_class_id` | parametric metadata | Proprietary-protocol device-class enum label. A categorization-time attribute, not a wire-observable identifier string. |
+| `rf_protocol_constant` | parametric metadata | PHY-layer constants (sync words, frame markers) not surfaced by the Linux WiFi/BT subsystem to userspace at the baseline Pi capability envelope. |
+| `wifi_ie_element_id` | parametric metadata | 1-byte 802.11 Information-Element tag (0–255), structurally too coarse to function as a watchlist pattern alone. |
+| `bluetooth_le_pdu_type`, `wifi_frame_control_subtype` | parametric metadata | Link-layer / frame-control enum values (4-bit BLE PDU type, 802.11 frame-control subtype). |
+| `wifi_nan_param_signature` | parametric metadata | Derived signature over multiple NAN service-info fields. Lynceus's pattern engine matches single identifier strings, not multi-field aggregates; future Lynceus signature-matching capability would be a new `pattern_type`. |
+
+### §4.3 Why three categories matter for downstream consumers
+
+The three-category split makes the export contract explicit: a wire-observable row of confidence ≥ 70 will appear in `argus_export_high_confidence.json` (subject to the `device_category='unknown'` carveout and the geographic-scope filter); an analytical-only row never enters the Lynceus scanner JSON regardless of confidence; a parametric metadata row enters neither the scanner JSON nor the analytical CSV (it lives in the canonical database and the coverage report only).
+
+Consumers building integrations should anchor on the `identifier_type` column when deciding match logic. A row with `identifier_type='product_family_codename'` is a vendor-internal taxonomy label; matching against device traffic is structurally undefined. A row with `identifier_type='mac_range'` requires range-expansion logic on the consumer side or use of the pre-expanded Lynceus shape.
+
+## §5. Confidence model
+
+Argus assigns a numeric `confidence` to every row in the `identifiers` table — an integer representing the strength of the evidence binding the identifier to its claimed attribution (manufacturer, device category, operator, deployment-locality fact). Downstream consumers use this value to threshold what enters scanner watchlists, what enters the analytical export only, and what stays staged for review.
+
+Confidence is not a probability. It is a calibrated band representing the underlying source-type's reliability adjusted for corroboration, specificity, and recency. The operational scale is bounded at 99 (never 100) — perfect certainty is never claimed; the residual 1 is a humility margin for fabrication, transcription, or registry-mutation risk that no public-source-derived value can fully retire. (Schema-level CHECK constraint permits 0-100; the 99 cap is enforced operationally at the corroboration-boost + ceiling-rule layers.)
+
+### §5.1 Default confidence comes from `source_type`
+
+Each row's default confidence sits within the source-type's band, per the table below (ordered by band ceiling descending — this is the confidence-hierarchy view; §3's source_type framing orders the same enumeration by v1.0.0 active-row count for the dataset-composition view). Within a band, the exact value is adjusted up for specificity (full-octet vs. OUI-only, hardcoded vs. configuration-derivable), recency (citation within the past 24 months vs. >5 years old), and corroboration (independent second-source agreement); adjusted down for known-FP-class proximity (framework-string sub-rule per SAR-11), staleness, or thin extraction context.
+
+| Source type | Default confidence band |
+|---|---|
+| `official` (court-verifiable government filings — FCC EAS, FAA enforcement orders, court-ordered disclosures) | 90–100¹ |
+| `primary_registry` (authoritative numerical-allocation registries — see §5.3 sub-banding) | 70–85 single-source; up to 95 with cross-band corroboration |
+| `regulatory` (gov't filings + court order text — non-`official`-tier regulatory provenance) | 80–95 |
+| `manufacturer_doc` (vendor spec sheet, datasheet, integration guide) | 75–90 |
+| `manufacturer_app` (vendor companion APK/IPA static-analysis extract — see §5.4 sub-banding) | 60–95, sub-banded by identifier class |
+| `procurement` (SAM.gov, USAspending.gov, state portals) | 70–85 (proves *purchase*, not *deployment*) |
+| `academic` (peer-reviewed or conference) | 70–90 |
+| `foia` (FOIA-released documents) | 65–85 |
+| `crowdsourced` (community-curated deployment maps: WiGLE, DeFlock, EFF Atlas) | 50–75 |
+| `inferred` (computed from upstream registry records) | 30–70, capped |
+
+¹ Band ceilings listed represent each source-type's theoretical maximum. Actual per-row confidence is capped at 99 (never 100) via the §5.2 corroboration formula and the §5.6 ceiling rule.
+
+### §5.2 Corroboration boost — multi-source dedup
+
+When two independent sources independently attest the same identifier-to-attribution binding, Argus's dedup pass (§6) collapses them into a single canonical row and applies a corroboration boost. The formula:
+
+> `confidence_canonical = min(99, max(confidence_originals) + 5)`
+
+Two independent `crowdsourced` sources at 70 each corroborate to a single canonical row at 75. A `crowdsourced` at 70 plus a `regulatory` at 90: the boost formula yields `min(99, max(70,90)+5) = 95`, but §5.6's ceiling rule caps confidence at the lowest contributing band ceiling — `crowdsourced`'s 75. Final canonical confidence: **75**. See §5.6 for the ceiling-rule rationale.
+
+The +5 boost is a single bonus per dedup pass, not compounding per additional source; a row corroborated by five sources gets +5 once, not +25. The corroboration boost composes within the §5.6 ceiling rule, never over it.
+
+### §5.3 `primary_registry` — single-source-sufficient with sub-band
+
+Authoritative numerical-allocation registries — IEEE OUI registry, Bluetooth SIG company-identifier registry, FAA ANSI/CTA-2063-A Remote ID registry — get a special carveout: a single citation from the registry IS sufficient evidence for promotion, because the registry IS the authoritative source-of-truth for what the identifier means.
+
+The 70–85 single-source band's ceiling (85) reaches above `crowdsourced`'s ceiling (75) — registry issuance carries more authority than community curation. The same band's ceiling (85) sits below `regulatory`'s 95 — registries are issuer-of-record but not court-verifiable in the regulatory-filing sense. Cross-band corroboration with `regulatory` or `manufacturer_doc` lifts up to 95 per §5.2 with §5.6 composition.
+
+**Reclassification discipline** (row-level discipline, distinct from source-level migration): A row in the `identifiers` table reclassifies from `crowdsourced` or `inferred` to `primary_registry` only when its existing `source_url` already points DIRECTLY at the registry issuer's own publication (FAA's database URL, SIG's company-identifier registry URL, IEEE's MA-L assignment record URL). If the `source_url` points at a third-party citation — community repo, blog post, aggregator, academic paper that cites the registry — the row stays in its current band. To establish `primary_registry` classification with the higher confidence band, a new `raw_observations` row citing the registry directly is required.
+
+### §5.4 `manufacturer_app` — sub-banded by identifier class
+
+The `manufacturer_app` 60–95 outer band breaks down per identifier class:
+
+| Identifier class extracted from vendor app | Sub-band | Rationale | Typical cohort |
+|---|---|---|---|
+| Hardcoded BLE service UUID (128-bit or 16-bit-in-context) | 80–95 | BLE specs require the service UUID for discovery; the vendor app must contain the canonical value. | installer/pairing |
+| `vendor_template_namespace_uuid` | 75–90 | Vendor-chosen UUID-suffix namespace (e.g., Getac's `-1b7f-430ea194e6cf` suffix). Below hardcoded-BLE-service tier because individual values are inferred-by-pattern. | installer/pairing |
+| Default SSID pattern (vendor-prefix WiFi name) | 70–85 | Clear vendor attestation in code; hardware match TBV at scan time. | installer/pairing |
+| Default credential string (plaintext) | 60–80 | Vendor-attested at app version, but firmware may have rotated. | installer/pairing |
+| MAC OUI from validation code path | 75–90 | Confirms OUI assignment; cross-checks against IEEE Tier-1 registry. | installer/pairing |
+| Product-family taxonomy — `marketing_name` | 90–95 | Vendor's own marketing product naming inside their own app. | both cohorts |
+| Product-family taxonomy — `internal_codename` | 90–95 | Engineering-internal naming surfacing in app code. | both cohorts |
+| Product-family taxonomy — `device_type_enum_value` | 90–95 | Authoritative product-family taxonomy from vendor's own enum declaration. Highest specificity tier. | both cohorts |
+
+**Cohort distinction:** Operator-facing apps yield product-family taxonomy ONLY (Wave G evidence: 8 operator/pilot apps surveyed yielded 0 BLE UUIDs). Installer/pairing-flow apps yield BLE service UUIDs + SSID patterns + credentials + product-family taxonomy (Wave G evidence: 2 installer/pairing apps yielded 6 unique vendor BLE UUIDs + complete DeviceType taxonomy). ExtractionWorker queue ordering should prioritize the installer/pairing-flow cohort for non-product-family identifiers.
+
+### §5.5 Export thresholds
+
+Downstream consumers pull from one of two JSON export shapes plus the analytical CSV:
+
+- **`argus_export.json` (standard export)** — all active wire-observable rows with `confidence ≥ 30`, excluding rows with `device_category='unknown'`. v1.0.0 row count: **443**. Composition: 415 FAA RID `drone_id_prefix` rows (`primary_registry`, confidence 85, `device_category='drone'`) + 28 pre-cycle-2 rows (Wave G calibration-window survivors + Wave-A promotion-cycle-1 corroborated promotions). Two `ble_manufacturer_id` rows (Apple `0x004C` + XUNTONG `0x09C8`) classified `primary_registry` at the source-type level but `device_category='unknown'` at the row level are excluded from the standard export per the unknown-category carveout (vendor-level identifier, model-level evidence absent). 62 Wave-A IEEE OUI promotion-cycle-1 outputs are classified `inferred` per the third-party-citation-lineage boundary.
+- **`argus_export_high_confidence.json` (high-confidence export)** — all active wire-observable rows with `confidence ≥ 70`, excluding rows with `device_category='unknown'`. v1.0.0 row count: **427**.
+- **`argus_export.csv` (analytical CSV — rich-feed)** — all active rows (wire-observable + analytical-only) regardless of confidence, with the full per-row column set including license, scope, and provenance fields. v1.0.0 row count: **514**.
+
+The standard-export ≥ 30 floor exists to drop rows where the underlying evidence is structurally thin while still allowing operators with their own filtering logic to consume the broader set. The high-confidence-export ≥ 70 floor is calibrated to surface rows that an operator running an unattended scanner can act on without per-row review.
+
+### §5.6 The ceiling rule (prose form)
+
+Within the corroboration boost (§5.2) and per-band defaults (§5.1), no identifier's final confidence may exceed the **lowest** source-type band ceiling among its contributing sources.
+
+A `regulatory` (ceiling 95) row corroborated by a `crowdsourced` (ceiling 75) row produces a canonical record at confidence ≤ 75 — the corroboration is real evidence, but the binding has not been independently established by a higher-band source. The corroboration boost from §5.2 applies WITHIN the ceiling, not OVER it: `min(99, max(originals) + 5)` is bounded above by the lowest contributing band's ceiling.
+
+**Why the lowest-ceiling-wins rule:** if a `crowdsourced` claim is the only `crowdsourced` evidence for a binding, that binding's evidence is no stronger than `crowdsourced` evidence alone — the higher-band corroborator is corroborating a `crowdsourced`-class observation, not creating an independent higher-band attestation. The ceiling reflects the weakest contributor, because the binding's evidence quality is gated by its weakest source. To lift the ceiling, an independent higher-band source must directly attest the identifier-to-attribution binding (not corroborate a lower-band claim about it).
+
+### §5.7 Confidence is calibrated, not Bayesian
+
+Argus does not run a Bayesian update over heterogeneous evidence sources. The confidence model is a deliberately simple calibration scheme — source-type band + corroboration boost + per-class sub-bands + ceiling rule — chosen for auditability over expressiveness. A reader of the database can reproduce any row's confidence from its `source_type`, its corroboration count, and the §5.2/§5.4/§5.6 rules, without consulting opaque internal weights. The trade-off is real: the scheme cannot represent fine-grained per-source reliability differences within a band, and corroboration is treated as a single +5 boost rather than a more nuanced per-pair weighting.
+
+Future-version refinements (per-source-class reliability priors, identifier-class-specific corroboration boosts, decay-over-time models) are out of scope for v1.0.0. The auditable simple-calibration model ships first; refinements gate on a documented operator-class need.
+
+## §6. Dedup logic
+
+The dedup pass is the single most consequential transformation in the Argus pipeline. It is the operation that takes the raw multi-source observation stream — N citations of the same identifier across N different upstream sources — and collapses it to a single canonical row in the `identifiers` table with appropriately accumulated provenance, corroboration boost, and superseded-row trail. Get dedup wrong and the database either over-counts (the same identifier appears N times under different `id` values) or under-counts (independent corroborating sources are silently merged without the +5 boost).
+
+Dedup runs at promotion time and at re-ingest time when a new `raw_observations` row arrives whose normalized identifier matches an existing canonical `identifiers` row.
+
+### §6.1 Dedup key
+
+Two `raw_observations` records are duplicates if:
+
+- Their `identifier_type` values are identical, AND their normalized `identifier` values are identical, OR
+- One record's identifier is a strict subset of the other (e.g., a full MAC `aa:bb:cc:dd:ee:ff` within an OUI range `aa:bb:cc:00:00:00/24`).
+
+**Normalization rules** (applied at ingest, before dedup):
+
+- MAC addresses: lowercased, colon-separated, zero-padded to canonical octet form.
+- OUI / OUI-28 / OUI-36 prefixes: lowercased, colon-separated, with explicit `/N` mask notation for sub-OUI allocations.
+- SSIDs and BLE local names: case-sensitive (vendor casing is identifying); whitespace trimmed; non-printable bytes hex-escaped.
+- Numeric registry IDs (FAA RID prefix, Bluetooth SIG company ID, IEEE OUI binary): canonical numeric or canonical hex form per identifier_type.
+- UUIDs: lowercased, hyphen-separated, no `0x` prefix; canonical form per RFC 4122.
+
+Normalization is identifier-type-specific and applied **at ingest** by the ingest worker, not at dedup time. The dedup pass assumes its inputs are already normalized and operates on byte-for-byte equality of normalized values.
+
+### §6.2 Dedup mechanics — which row wins canonical
+
+When two records match the dedup key, Argus selects the canonical record using the following ordered tiebreakers:
+
+1. **Higher source-type band ceiling first.** A `primary_registry` row outranks a `crowdsourced` row regardless of timestamp. The intuition: the higher-band citation is the more authoritative attribution of identifier-to-meaning; the canonical row should bear that attribution. **In the rare `primary_registry`-vs-`regulatory` edge case** (e.g., an IEEE OUI directly cited in both the IEEE registry and an FCC test report citing the same OUI), the band-ceiling rule fires `regulatory`-wins per the ordered ceiling (95 > 85) — the registry-of-record reading is NOT a canonical-attribution override. The rule is band-ceiling-strict; reader intuitions about "registry should be canonical" are addressed at the corroboration boost (§5.2) and the §5.6 ceiling rule, where `primary_registry`'s band-extension to 95 with cross-band corroboration applies.
+2. **Higher per-row confidence within the same band.** A `crowdsourced` row at confidence 70 outranks a `crowdsourced` row at confidence 55.
+3. **Earlier `first_seen` timestamp.** When source-type and confidence tie, the older row wins canonical (preserves Argus's evidence-history continuity).
+4. **Lower `identifiers.id` (creation order).** Final tiebreaker for deterministic re-runs.
+
+On dedup:
+
+- Keep the canonical-winning row in `identifiers` with its original `id`; it stays at its current `source_type` and `device_category`.
+- Append all source URLs and source excerpts from the superseded row's lineage into the canonical row's `notes` JSON under `corroboration_chain` (keyed by superseded row id, with each entry preserving `source_id` / `source_url` / `source_excerpt` / `raw_observation_id`).
+- Mark the losing row's `superseded_by = <canonical.id>` and `superseded_at = <utc_now>`; the row stays in the `identifiers` table for audit-trail purposes but is filtered out of all exports and active-row queries via the `superseded_by IS NULL` predicate.
+- Recompute the canonical row's confidence per §5.2 / §5.6: `confidence_canonical = min(99, min(lowest_band_ceiling, max(confidence_originals) + 5))`.
+
+### §6.3 Independent-source-count vs raw-observation-count
+
+The `+5` corroboration boost applies when the dedup pass detects two or more **independent** source citations — meaning two distinct `sources.id` values, each with its own `source_type`, contributed to the corroborated canonical row's lineage. Multiple `raw_observations` rows from the same `sources.id` are NOT independent corroboration; they count as a single source for the +5 calculation.
+
+The `identifiers.independent_source_count` column tallies the distinct `sources.id` values feeding the canonical row's corroboration chain (initially 1; incremented at each dedup pass that adds a new `sources.id`). The promotion-cycle cut-off for non-`primary_registry` source-types requires `independent_source_count ≥ 3`; `primary_registry` waives the count cut-off per §5.3. The `+5` boost fires on the first new independent source (count 1 → 2); subsequent independent sources beyond the second do not compound the boost.
+
+### §6.4 Superseded-row preservation discipline
+
+Argus does NOT delete superseded rows. The `identifiers` table retains the full historical lineage under `superseded_by IS NOT NULL`, with every superseded row preserving its original `source_type`, `confidence`, `first_seen`, and `notes.source_excerpt`. The reasoning is auditability: a downstream consumer (or a future Argus operator validating a flagged false-positive) can trace a canonical row's full corroboration history without re-querying upstream sources. Exports filter on `superseded_by IS NULL` unconditionally — the operational scanner consumes the active set only.
+
+### §6.5 The strict-subset case — MAC within OUI range
+
+The strict-subset case (one identifier is a normalized prefix of the other) is the most subtle dedup discipline. Example: an OUI-24 row `aa:bb:cc:00:00:00/24` and a full MAC row `aa:bb:cc:dd:ee:ff` — the full MAC's first three octets match the OUI's prefix. These are NOT automatically merged at the canonical-row level:
+
+- The full MAC row and the OUI-prefix row remain **separate canonical rows** in `identifiers`. They represent different observation granularities and carry independent provenance.
+- The full MAC row inherits the OUI-prefix row's `manufacturer` / `device_category` attribution via the validator's prefix-lookup pass, preserved on the full-MAC row's `notes.prefix_attribution_source_id`.
+- The dedup +5 corroboration boost does NOT fire on the prefix-relationship alone — bit-pattern containment is structural, not evidentiary. The boost requires two independent `sources.id` values each directly attesting the full identifier.
+- When the full-MAC row promotes and the OUI-prefix row already exists, the full-MAC row's confidence is computed from its own direct provenance, capped by the §5.6 ceiling rule.
+
+This discipline keeps the active set's row count honest: full-MAC observations and OUI-prefix attributions are counted separately rather than collapsing the full-MAC count into the OUI-prefix tally.
+
+## §7. Provenance discipline
+
+Provenance is the database. The phrase is from the project bible's §11 #7: *"Do not promote a record to the main table without provenance. Provenance is the database. Without it, we have a rumor."* The principle is load-bearing — Argus's value to a downstream scanner operator is not the identifier list (any vendor catalog has those) but the auditable evidence chain binding each identifier to its claimed attribution. A row whose provenance is broken — dead link, scrubbed excerpt, paraphrased citation — is not a low-quality row; it is not a row at all.
+
+### §7.1 `raw_observations` is the source-of-truth
+
+Every active `identifiers` row in Argus is anchored to one or more rows in `raw_observations`, each preserving the *original* source citation as it appeared at ingest time: `source_id`, `source_url`, `source_excerpt`, `extracted_at`, `extraction_method` (regex / structured-API / vendor-app-static-analysis / human-OSINT).
+
+The `identifiers` table is *derived* from `raw_observations` via the dedup pass (§6) and the promotion pass. A row in `identifiers` can always be reconstructed from its `raw_observations` lineage; the inverse is not true. When provenance reconciliation surfaces a discrepancy (a canonical row's claimed source no longer matches the underlying `raw_observations` excerpt), the canonical row is treated as drifted and routed to the `conflicts` table for re-evaluation — `raw_observations` is the source of truth, not `identifiers`.
+
+### §7.2 `source_url` must be working at ingest time and preserved verbatim
+
+Every `raw_observations` row must carry a `source_url` that:
+
+- Was fetched and yielded a 200 OK at extraction time.
+- Contains the verbatim text from which the identifier was extracted (re-fetching the URL must return content containing the `source_excerpt`, modulo upstream content-rotation; if the upstream rotates content, an archive snapshot URL is added as `source_url_archive`).
+- Points DIRECTLY at the source — no aggregator URLs, no redirect chains, no shortened-URL services.
+
+When a `source_url` is later confirmed dead (404 / domain expiration / paywall) at re-verification time, the original `source_url` is preserved verbatim and an archive snapshot URL (preferably Internet Archive `web.archive.org`) is added as `source_url_archive`. Dead-link rows are not deleted; their canonical attribution stays in `identifiers` with `last_verified` updated and the archive-snapshot URL serving as the working citation.
+
+### §7.3 No-fabrication rule
+
+Argus does not synthesize plausible identifiers. The hard rule: *"If a source doesn't yield concrete data, the answer is 'no records,' not 'plausible records.'"*
+
+Concrete examples of what this rule rejects:
+
+- A vendor's marketing page mentions a product family but does not enumerate per-model MAC OUIs. The output is "no MAC OUIs for this product family" — NOT "plausible MAC OUIs inferred from vendor naming conventions."
+- A regulatory filing lists a model number but does not include the firmware version. The output is `firmware_version = NULL` — NOT a plausible-firmware-version guess.
+- A vendor app's binary contains a UUID pattern that looks BLE-service-shaped but is not used in a discovery context. The output is "candidate, route to manual review" — NOT "promoted to `identifiers` with `manufacturer_app` source_type."
+
+The validator's `conflicts` table absorbs the borderline cases: any extraction step that produces a value the validator cannot cleanly attribute is routed to `conflicts` for human disposition.
+
+### §7.4 Third-party-citation-lineage boundary
+
+Argus's evidence discipline composes upward: a row's confidence ceiling is gated by its **direct** provenance, not by upstream ancestry. *Rows whose direct provenance is third-party stay capped at their current band's ceiling regardless of upstream-registry ancestry.*
+
+Operational consequence: a community OSINT GitHub repository citing the IEEE OUI registry is NOT a `primary_registry` source for the `identifiers` rows promoted from it. The rows' direct provenance is the GitHub repository (a community curation = `crowdsourced` or `inferred`); the IEEE registry is upstream ancestry. To establish a `primary_registry` row for the same OUI, a new `raw_observations` row citing IEEE's MA-L assignment record URL directly is required.
+
+The boundary is what keeps confidence honest at scale. Without it, every row citing an aggregator that cites a registry would inflate to the registry's band — the band would lose its discriminating power.
+
+### §7.5 No PII
+
+Argus is about *equipment*, not *people*. *"This database is about equipment, not people. If a source mentions an officer's name, badge, home address — strip it. We identify categories of devices, not individuals."*
+
+Operational discipline:
+
+- `source_excerpt` is sanitized at ingest: names, badge numbers, home addresses, license-plate numbers, and individual-identifying personal references are redacted (replaced with `[REDACTED-PII]` token) before the excerpt lands in `raw_observations`.
+- Identifier columns themselves (`identifier`, `manufacturer`, `model`, `device_category`, `geographic_scope`) are equipment-categorical by design and cannot carry PII per the schema constraints.
+- When a procurement record names an individual (purchasing officer, contracting officer), only the agency-level identifier is retained; the individual's name is dropped at ingest.
+
+The export shape never carries personal references. Downstream consumers can correlate identifier-to-deployment-locality at the agency level (e.g., "this OUI is deployed by Houston PD"), never at the individual-officer level.
+
+### §7.6 Amendment-log discipline
+
+Every in-place change to `PROJECT_BIBLE.md` or to a sub-agent-level rule carries a corresponding entry in `BIBLE_AMENDMENTS.md`. The git diff is the source of truth, but the amendment log is the human-readable trail. *"An undocumented amendment is a process violation regardless of whether the edit itself is correct."*
+
+Operational mechanics:
+
+- Every CP-class commit (Correction Pass) lands as a coordinated commit touching `PROJECT_BIBLE.md` + `BIBLE_AMENDMENTS.md` + any schema migration / verify-wrapper / sibling artifact. The amendment-log entry cross-references the migration slot, the commit SHA, the originating issue identifier, and the verbatim §-text diff.
+- Every SAR-class (Sub-Agent Rule) and every CP carries a §-citation back to the bible row it modifies; readers can trace any rule's origin via the amendment log.
+- The `BIBLE_AMENDMENTS.md` log is append-only in practice (entries are never rewritten); historical entries preserve the project's evidentiary trail even as the live bible text evolves.
+
+The discipline composes with §7.1 (`raw_observations` as source-of-truth): the bible amendment log is to the bible what `raw_observations` is to `identifiers` — the immutable evidence record from which the live document is derived.
+
+## §8. Build process and agent-orchestrated disclosure
+
+**Argus v1.0.0 was built by a Paperclip agent ensemble** — a multi-agent orchestration platform where specialist agents (CEO, Validator, SourceWorker, ExtractionWorker) coordinate over an issue tracker and a single canonical "project bible" document that defines schema, source-type bands, confidence rules, and per-phase exit criteria. Commit metadata reflects this orchestration: Paperclip-platform agents and the human board author appear in commit history + CREDITS attribution per the project's authorship discipline.
+
+The build process was **bible-as-contract**: bible amendments (CPs — "checkpoints", in-place edits to bible §-text) and sub-agent rule additions (SARs — "Sub-Agent Rules", operational rules that bind sub-agents without amending bible §-text) are board-ratified before implementation. Every promotion of a candidate identifier to the live database is gated on §11 (promotion gates) of the bible at the version current at promotion-time. This document distills the methodology to public-OSS prose; the bible itself remains an internal CEO-orchestration artifact and is not part of v1.0.0 release.
+
+**Reproducibility:** the migrations and source-loaders in this repo deterministically reproduce the live database from upstream public sources; the agent ensemble is not required at runtime. Re-running the build today against current upstream snapshots will yield drift from the v1.0.0-tagged DB because upstream sources change. Tagged DB releases (downloadable from GitHub Releases) are the canonical artifact for downstream consumers.

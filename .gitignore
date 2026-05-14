@@ -38,9 +38,32 @@ venv/
 wigle/raw/
 wigle/pacer.json
 
+# Flock-back source admission session deliverables — staged for Paperclip
+# Validator review; CEO commits selectively after promotion. Per runbook §4.
+extraction_outputs/flock_back_admission/
+
 # Wave G sandbox — vendor-derived artifacts per bible §11 #15 decompile-source carveout.
 # NOT gitignored: android_test/WAVE_G_RUNBOOK.md (workflow document) +
 # android_test/tools/extraction/wave_g_extractor.py (workflow code).
 # Added Correction Pass 17 (2026-05-13).
 android_test/raw/
 android_test/extraction_outputs/
+
+# Android decompile tooling — large, per-host binaries; reinstall locally.
+# env.sh has hardcoded $HOME paths so it is not portable; keep local-only.
+android_test/tools/apkeep
+android_test/tools/apktool/
+android_test/tools/jadx/
+android_test/tools/jdk/
+android_test/tools/env.sh
+
+# Point-in-time DB / export / extraction snapshots — local rollback aid only.
+# Pattern matches files like `argus.db.pre_mac101_backup`,
+# `argus_export.csv.pre_mac110_backup`, etc.
+db/argus.db.pre_*_backup
+exports/*.pre_*_backup
+extraction_outputs/**/*.pre_*_backup
+
+# Pre-filter-repo `.git/` safety copy (history rewrite rollback aid).
+# Delete locally once push to remote is verified.
+.git.pre-filter-backup/
