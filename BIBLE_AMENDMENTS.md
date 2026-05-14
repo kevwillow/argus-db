@@ -1493,6 +1493,37 @@ Citation can hide stale data; paste with timestamp is reproducible.
       33
       (as of 2026-05-13T17:00:00Z)
 
+    Methodology-specification clarification (added post-recurrence
+    #7, 2026-05-14):
+
+    For counts where multiple counting methodologies are structurally
+    valid (Wave-X-candidate-level vs canonical-row-level; by-source
+    vs by-row; by-tracking-number vs by-prefix; by-DB-row vs by-
+    distinct-key; etc.), the paste-result inline MUST specify which
+    methodology the count uses.
+
+    Concrete case study: SAR-12 recurrence #7 at CP19 §6.6 (MAC-88
+    sweep pre-flight) — board dispatch §0 cited 90/325 Scope 1/2
+    partition (Wave-B-candidate-level counting: 90 Wave-B candidate
+    entries collided with Wave-A); CEO live re-derivation surfaced
+    80/335 (Wave-A-row-level counting: 80 Wave-A rows whose
+    identifier matched any Wave-B canonical identifier); 10-row
+    delta is within-Wave-B duplicates (same drone_id_prefix under
+    multiple FAA DOC tracking numbers). Both counts are correct
+    under their respective methodologies; ambiguity over which
+    methodology was being asserted caused the first post-codification
+    SAR-12 recurrence.
+
+    Methodology must be specified at the paste-result, not deferred
+    to a later clarification. Sentinel phrasings: "...by-row count
+    over identifiers" / "...candidate-level count over Wave-X
+    staging" / "...distinct-key count grouped by source_id" / etc.
+    If a count is ambiguous-by-methodology and the dispatch text
+    needs only ONE specific cardinality, choose the methodology
+    that matches the downstream usage of the assertion (typically
+    canonical-row-level for DB-side queries, candidate-level for
+    staging-side queries).
+
   Class (b) — API or schema field names
     Path: Fetch one sample record from the live API; OR inspect
           the live schema for the table/column.
