@@ -18,6 +18,81 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-14T~02:00Z–~03:00Z (**MAC-88 CP19 Wave-B+ sources reclassification sweep close — first row-level downgrade discipline + source_reclassifications audit table established + Lynceus high-conf source_type exclusion**). Anchored on commits `ab2cc6a` (SAR-12 §6 recurrence #7 audit-trail append) / `c883cec` (CP19 coordinated commit: migration 0017 + §4.2/§7.5/§11 #8 amendments + BIBLE_AMENDMENTS) / `c121bec` (Validator main sweep) / `c12bedd` (Validator corrective sub-sweep with append-don't-mutate audit-trail discipline) / `55f0a09` (ExtractionWorker CP19 export-script code-sibling + 14 new tests) / `413f2d0` (post-sweep export regen) plus this CEO Phase C state-rotation commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
+
+**MAC-88 Wave-B+ sources reclassification sweep CLOSED.** Board dispatch [`cf3c4016`](/MAC/issues/MAC-88#comment-cf3c4016-e8ab-482c-8155-7d7f5693ce46) (sweep dispatch) + [`a1dab600`](/MAC/issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05) (ratification of CEO pre-flight surface-back) authorized the four-scope sweep. CEO decomposed into pre-flight halt-and-surface → DBArchitect [MAC-95](/MAC/issues/MAC-95) CP19 coordinated commit → Validator [MAC-96](/MAC/issues/MAC-96) main sweep + corrective sub-sweep → ExtractionWorker [MAC-97](/MAC/issues/MAC-97) export regen → CEO Phase C close (this rotation). Full handoff doc at `raw/wave_b/_cp19_sweep_run_2026-05-14.md`.
+
+**CP19 amendment** — §4.2 + §7.5 + §11 #8 sub-rule:
+- §4.2 new supporting table `source_reclassifications` (audit-trail surface for row-level reclassification events; sister to deployment_observations + procurement_records)
+- §7.5 new "Source-type exclusion for high-conf export — CP19 directive" sub-block; high-conf filter gains `source_type NOT IN ('inferred','crowdsourced')` clause + new `_meta.dropped_in_export.excluded_source_type` key
+- §11 #8 sub-rule codifying row-level reclassification audit-trail discipline (same-transaction `source_reclassifications` INSERT per identifier UPDATE)
+- Migration 0017 schema sibling per `feedback_enum_amendment_needs_schema_migration_sibling.md` discipline
+- BIBLE_AMENDMENTS CP19 entry captures full rationale
+
+**Sweep execution (db/argus.db state delta, gitignored):**
+- **Scope 1**: 80 Wave-A FAA rows source_url UPGRADE (listDocs → per-record DETAIL URL); 9 multi-DETAIL rows lex-min applied; same primary_registry/85 band
+- **Scope 2**: 335 Wave-A FAA rows band DOWNGRADE (primary_registry/85 → crowdsourced/75); first row-level confidence-band downgrade in project history
+- **Scope 2 corrective sub-sweep**: 335 rows source_url further refined (alphafox02/DragonSync → jlrjr/faa-rid-lookup) via second audit-trail-event under `sweep_event_id='MAC-88-cp19-sweep-1-jlrjr-refinement'`; append-don't-mutate discipline
+- **Scope 3**: 58 IEEE-direct rows LIFT (inferred → primary_registry); 54 conf=55→85 + 4 conf=80 kept at 80 (per board's subordinate-question ratification — per-row §8.3 corroboration semantics not band ceiling alone); 0 HELD (all source_urls resolved at HEAD-request)
+- **Scope 4**: sources.id=7 band UPDATE (official → primary_registry); 0 downstream identifier impact (no FCC-source identifiers yet)
+- **`source_reclassifications` populated**: 808 audit rows = 473 main-sweep + 335 jlrjr-refinement
+- DB backup: `db/argus.db.pre_cp19_sweep_backup` (272 MB; byte-identical to pre-sweep)
+
+**Post-CP19 state:**
+- `identifiers` active: **18,820** (unchanged — Scopes mutate existing rows, no INSERTs/DELETEs)
+- `behavioral_signatures`: 55 (unchanged; out of CP19 scope)
+- `source_reclassifications`: 0 → **808** (first substantive population in project history)
+- `argus_export_high_confidence.json`: 439 → **113** entries (−326 net; −340 CP19 source_type exclusion + 14 Scope 3 lifts); sha256 `d4fa7f1ece…` → `884f86354a…`; size 76,050 → 19,953
+- `argus_export.json` (standard): 455 → **455** (unchanged; Scope 2 rows stay at conf=75 ≥30 standard floor; no source_type exclusion on standard)
+- `argus_export.csv`: 18,820 rows unfiltered (unchanged count; per-row source_type values updated)
+- `argus_export_behavioral_signatures.json`: 55 entries unchanged (out of CP19 scope)
+- Bible HEAD: `08dbd91` → `413f2d0` (post-CP19 sequence)
+- Schema version: 16 → **17** (migration 0017 source_reclassifications)
+- coverage report regenerated with CP19 sweep section + 9-key dropped_in_export reconciliation; halts=0
+
+**+5 variance vs board projection — CORRECTNESS-REGRESSION-FIX BEYOND SCOPE.** Board a1dab600 §5 projected `excluded_source_type=335` (Scope 2 only); actual landed at **340** because 5 pre-existing crowdsourced Flock Safety `ble_service` rows (rids 554-558, source_url `github.com/NSM-Barii/flock-back`, conf=75, US, gunshot_detect) were ALREADY in high-conf pre-sweep — semantically miscategorized at crowdsourced/75. CP19's source_type filter legitimately catches them. Net high-conf 439→113 (−326) decomposes as: −340 source_type exclusion (335 Scope 2 + 5 pre-existing) + 14 Scope 3 lifts. Discipline-evolution candidate: CP-class scope-impact audits should apply cumulative-full-enum sweep to the post-CP filter's full applicable set, not just rows directly mutated (sibling to S.1 cumulative-full-enum from downstream-consumer-audit memo).
+
+**Seven architectural firsts** captured this run (handoff doc §6):
+1. **First row-level confidence-band DOWNGRADE on already-promoted canonical rows** (Scope 2 — 335 rows)
+2. **First `source_reclassifications` audit-table population** (808 rows across 2 sweep_event_id values)
+3. **First CP applying source_type filter on high-conf export** (CP19 §7.5)
+4. **First sweep across 4 distinct scopes in one dispatch** (Scope 1+2+3+4 combined)
+5. **First compositional CP layering on immediately-prior CP** (CP18 + CP19 same-day cluster)
+6. **First worker-initiated corrective sub-sweep with append-don't-mutate audit-trail discipline** (Validator's `c12bedd` after `c121bec`)
+7. **First +5 correctness-regression-fix beyond CP scope projection** (5 pre-existing Flock Safety crowdsourced rows caught by CP19's full applicable set)
+
+**SAR-12 recurrence #7 captured** at `ab2cc6a` pre-execution — cardinality-mismatch class (board §0 paste-result counted Wave-B candidates 90/325; CEO live re-derivation counted Wave-A rows 80/335; 10-row delta from within-Wave-B duplicates). First post-codification recurrence; 2 more before meta-revision trigger per §6 threshold.
+
+**§11 stop-the-line trips:** 0. **PII boundary crossings:** 0. **CEO HALT-AND-SURFACE invocations:** 0. **Halts at close:** 0.
+
+**Test suites:** MAC-95 close 431/2; MAC-96 close 431/2; MAC-97 close **446/2** (+14 new CP19 tests; 0 regressions).
+
+**Three discipline-evolution candidates surfaced for future heartbeats:**
+1. `source_reclassifications` direct unit-test coverage (Validator MAC-96 §6 follow-up; FK CASCADE + CHECK + NOT NULL invariants currently exercised only implicitly)
+2. CP-class scope-impact cumulative-full-enum-sweep sub-rule (sibling to S.1 in `feedback_bible_amendment_downstream_consumer_audit.md`; closes the +5 variance class)
+3. Append-don't-mutate audit-trail discipline as explicit sub-rule on `source_reclassifications` table contract (codify Validator's `c12bedd` pattern by design rather than ad-hoc judgment)
+
+**Forward sequence (carry over from MAC-88 §10 + emergent):**
+- IEEE 3,521 pii_review_hold entity-type validator dispatch
+- 31 held Wave-A behavioral_signatures pending Wave-C/D/E second-source
+- Custom-mapper ingestion heartbeat (~360 secondary-batch obs)
+- FCC EAS per-FCC-ID retry (apps.fcc.gov degraded)
+- Goal-title PATCH (board's separate parallel action)
+- Public-flip preparation (LICENSE / CREDITS / README work)
+- Rayhunter v0.X migration to consume sibling export (out-of-Argus)
+- Three CP19-emergent discipline candidates above
+
+**Defensive backups retained** through this close:
+- `db/argus.db.pre_mac91_step_backup` (272 MB; pre-Wave-B)
+- `db/argus.db.pre_cp18_item_c_backup` (272 MB; pre-MAC-93 FAA backfill)
+- `db/argus.db.pre_cp19_sweep_backup` (272 MB; pre-MAC-96 main sweep)
+- `exports/argus_export_high_confidence.json.pre_mac92_backup` (pre-Wave-B export)
+- `exports/argus_export*.pre_cp19_sweep_backup` (×4; pre-MAC-97 regen)
+
+---
+
+### Prior action — MAC-88 post-Wave-B ratification dispatch (preserved verbatim)
+
 CEO heartbeat 2026-05-14T~00:00Z–~00:30Z (**MAC-88 post-Wave-B board ratification dispatch — CP18 §7.5 sibling export + downstream-consumer memo refinement + FAA RID geographic_scope backfill**). Anchored on commits `7993536` (CP18 bible §7.5 + §9 amendment) / `478e5a5` (CP18 code-sibling: `export_behavioral_signatures.py` + 31 new tests) / `aa78e23` (first-run sibling JSON + FAA RID geographic_scope='US' backfill +12) plus this CEO Phase C state-rotation commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
 
 **MAC-88 post-ratification three-item dispatch CLOSED.** Board reopened MAC-88 via comment [`459daaca`](/MAC/issues/MAC-88#comment-459daaca-ef04-46b1-b337-4480e548ca0a) 2026-05-13T23:58Z with three batched items: (A) `behavioral_signatures` Lynceus export shape — board selected Option 2 (sibling export file) over CEO's Option 1 endorsement; (B) `feedback_bible_amendment_downstream_consumer_audit.md` refinement (S.1 explicit `coverage_matrix.py` consumer + S.6.1 worker-autonomous absorption sub-rule); (C) FAA RID `geographic_scope='US'` backfill on the 12 NULL rows from MAC-88 §4.3 Item 3. CEO decomposed into Phase 1 (CEO-direct CP18 amendment) + Phase 2 (ExtractionWorker MAC-93 dispatch) + Item B (CEO-side memory update) + Phase C close (this rotation).
