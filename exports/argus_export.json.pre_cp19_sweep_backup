@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "argus_version": "17",
-    "exported_at": "2026-05-14T02:54:34Z",
+    "argus_version": "16",
+    "exported_at": "2026-05-14T00:17:44Z",
     "record_count": 455,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "c9238264-fd33-5ad0-859f-a20d3a7b17eb",
+    "argus_run_id": "374ea998-1f29-5bdf-85a2-23668cea4ab0",
     "source_record_count": 18820,
     "dropped_in_export": {
       "unknown_category": 18340,
@@ -32,7 +32,6 @@
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
-      "excluded_source_type": 0,
       "geographic_scope_mismatch": 0
     }
   },

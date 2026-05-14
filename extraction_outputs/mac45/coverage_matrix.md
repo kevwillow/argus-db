@@ -38,24 +38,24 @@ Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `iden
 
 | device_category | identifier_type | n | n_by_source_type | min_conf | max_conf | median_conf | row_ids |
 |---|---|---|---|---|---|---|---|
-| `alpr` | `oui` | 1 | inferred=1 | 55 | 55 | 55 | 449 |
+| `alpr` | `oui` | 1 | primary_registry=1 | 85 | 85 | 85 | 449 |
 | `alpr` | `mac` | 1 | crowdsourced=1 | 65 | 65 | 65 | 1 |
 | `alpr` | `ssid_pattern` | 5 | crowdsourced=5 | 60 | 70 | 60 | 559, 560, 561, 562, 563 |
 | `alpr` | `ble_service` | 2 | manufacturer_app=2 | 87 | 87 | 87.0 | 533, 535 |
 | `alpr` | `ble_local_name` | 3 | crowdsourced=2, manufacturer_app=1 | 60 | 82 | 70 | 539, 564, 565 |
 | `alpr` | `ble_characteristic` | 2 | manufacturer_app=2 | 87 | 87 | 87.0 | 534, 536 |
 | `alpr` | `product_family_codename` | 12 | manufacturer_app=12 | 92 | 92 | 92.0 | 540, 541, 544, 545, 546, 547, 548, 549 … +4 |
-| `body_cam` | `oui` | 1 | inferred=1 | 80 | 80 | 80 | 450 |
+| `body_cam` | `oui` | 1 | primary_registry=1 | 80 | 80 | 80 | 450 |
 | `body_cam` | `ble_service` | 1 | manufacturer_app=1 | 87 | 87 | 87 | 537 |
 | `body_cam` | `ble_characteristic` | 1 | manufacturer_app=1 | 87 | 87 | 87 | 538 |
-| `drone` | `oui` | 15 | crowdsourced=1, inferred=14 | 40 | 80 | 55 | 421, 423, 424, 431, 432, 435, 436, 444 … +7 |
-| `drone` | `drone_id_prefix` | 427 | primary_registry=427 | 85 | 85 | 85 | 569, 570, 571, 572, 573, 574, 575, 576 … +419 |
-| `gunshot_detect` | `oui` | 1 | inferred=1 | 55 | 55 | 55 | 417 |
+| `drone` | `oui` | 15 | crowdsourced=1, primary_registry=14 | 40 | 85 | 85 | 421, 423, 424, 431, 432, 435, 436, 444 … +7 |
+| `drone` | `drone_id_prefix` | 427 | crowdsourced=335, primary_registry=92 | 75 | 85 | 75 | 569, 570, 571, 572, 573, 574, 575, 576 … +419 |
+| `gunshot_detect` | `oui` | 1 | primary_registry=1 | 85 | 85 | 85 | 417 |
 | `gunshot_detect` | `ble_service` | 5 | crowdsourced=5 | 75 | 75 | 75 | 554, 555, 556, 557, 558 |
-| `hacking_tool` | `oui` | 1 | inferred=1 | 55 | 55 | 55 | 443 |
+| `hacking_tool` | `oui` | 1 | primary_registry=1 | 85 | 85 | 85 | 443 |
 | `drone_detect` | `product_family_codename` | 2 | manufacturer_app=2 | 92 | 92 | 92.0 | 542, 543 |
-| `unknown` | `oui` | 36 | inferred=36 | 55 | 55 | 55.0 | 413, 414, 415, 416, 418, 419, 420, 422 … +28 |
-| `unknown` | `mac_range` | 14335 | inferred=8, primary_registry=14327 | 50 | 85 | 85 | 467, 468, 469, 470, 488, 489, 490, 491 … +14327 |
+| `unknown` | `oui` | 36 | primary_registry=36 | 85 | 85 | 85.0 | 413, 414, 415, 416, 418, 419, 420, 422 … +28 |
+| `unknown` | `mac_range` | 14335 | inferred=4, primary_registry=14331 | 50 | 85 | 85 | 467, 468, 469, 470, 488, 489, 490, 491 … +14327 |
 | `unknown` | `ble_manufacturer_id` | 3969 | primary_registry=3969 | 85 | 85 | 85 | 567, 568, 984, 985, 986, 987, 988, 989 … +3961 |
 
 ### Shape-gap surface (CP5 board-class, NOT halt per dispatch)
@@ -15348,7 +15348,7 @@ Per active vendor, count rows in the four Phase-3 corpora whose free-text vendor
 
 ## §6.3 / §9 item 9 "Dropped from Talos export" pre-tally
 
-Each row is assigned to AT MOST one drop bin (priority order: `procurement_only` > `unknown_category` > `device_fingerprint` > `ssid_pattern` > `ble_local_name` > `ble_characteristic` > `product_family_codename` > `oversized_mac_range` > `self_exclude_oui` > `below_confidence_threshold`). Survivors are eligible for the corresponding Lynceus export file. Reconciliation: `pre_active_count − sum(bins) = survivors`.
+Each row is assigned to AT MOST one drop bin (priority order: `procurement_only` > `unknown_category` > `device_fingerprint` > `ssid_pattern` > `ble_local_name` > `ble_characteristic` > `product_family_codename` > `oversized_mac_range` > {CP16 DROPPED_REASONS} > `self_exclude_oui` > `below_confidence_threshold` > `excluded_source_type`). Survivors are eligible for the corresponding Lynceus export file. Reconciliation: `pre_active_count − sum(bins) = survivors`.
 
 ### `argus_export.json` (confidence ≥ 30; Pi self-exclude drop = False)
 
@@ -15376,6 +15376,7 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `alpr_model` (§4.4 CP16) | 0 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
 | `below_confidence_threshold` (§7.5) | 0 |
+| `excluded_source_type` (§7.5 CP19) | 0 |
 | **sum(bins)** | **18365** |
 | **survivors → eligible entries** | **455** |
 | **reconciliation** | **18820 − 18365 = 455** ✅ |
@@ -15405,10 +15406,11 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `wifi_nan_param_signature` (§4.4 CP16) | 0 |
 | `alpr_model` (§4.4 CP16) | 0 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
-| `below_confidence_threshold` (§7.5) | 16 |
-| **sum(bins)** | **18381** |
-| **survivors → eligible entries** | **439** |
-| **reconciliation** | **18820 − 18381 = 439** ✅ |
+| `below_confidence_threshold` (§7.5) | 2 |
+| `excluded_source_type` (§7.5 CP19) | 340 |
+| **sum(bins)** | **18707** |
+| **survivors → eligible entries** | **113** |
+| **reconciliation** | **18820 − 18707 = 113** ✅ |
 
 
 ### mac_range secondary-constraint note (CP5 board-class)

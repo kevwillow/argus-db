@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "argus_version": "17",
-    "exported_at": "2026-05-14T02:54:34Z",
-    "record_count": 455,
-    "confidence_threshold": 30,
+    "argus_version": "16",
+    "exported_at": "2026-05-14T00:17:44Z",
+    "record_count": 439,
+    "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "c9238264-fd33-5ad0-859f-a20d3a7b17eb",
+    "argus_run_id": "374ea998-1f29-5bdf-85a2-23668cea4ab0",
     "source_record_count": 18820,
     "dropped_in_export": {
       "unknown_category": 18340,
@@ -31,8 +31,7 @@
       "alpr_model": 0,
       "procurement_only": 0,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 0,
-      "excluded_source_type": 0,
+      "below_confidence_threshold": 16,
       "geographic_scope_mismatch": 0
     }
   },
@@ -234,12 +233,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Sunflower Labs drone",
       "argus_record_id": "102f5b4c367c83e7"
-    },
-    {
-      "pattern": "88:29:85",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "108e8f0bd4b6da48"
     },
     {
       "pattern": "2111FP602523B2",
@@ -450,12 +443,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aero Systems West drone",
       "argus_record_id": "26c1c46c426d0c3c"
-    },
-    {
-      "pattern": "9c:5a:8a",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "26c3eded4bd7bdc1"
     },
     {
       "pattern": "19069B040140",
@@ -764,12 +751,6 @@
       "argus_record_id": "439880795a99b070"
     },
     {
-      "pattern": "58:b8:58",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "448af7459a52e1cc"
-    },
-    {
       "pattern": "1787F03BM23030002225",
       "pattern_type": "drone_id_prefix",
       "description": "Commaris drone",
@@ -780,12 +761,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Bwine drone",
       "argus_record_id": "471f71f7b1e55272"
-    },
-    {
-      "pattern": "4c:43:f6",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "47f7062efe51278d"
     },
     {
       "pattern": "2110F313",
@@ -890,12 +865,6 @@
       "argus_record_id": "4f0af62510035b6d"
     },
     {
-      "pattern": "38:1d:14",
-      "pattern_type": "oui",
-      "description": "Skydio drone",
-      "argus_record_id": "50894ea2e4d6f1e4"
-    },
-    {
       "pattern": "1767CSRH801191425",
       "pattern_type": "drone_id_prefix",
       "description": "SkyRanger / SkyRaider drone",
@@ -980,12 +949,6 @@
       "argus_record_id": "598a6fdfb8e4ef80"
     },
     {
-      "pattern": "b4:1e:52",
-      "pattern_type": "oui",
-      "description": "Flock Safety alpr",
-      "argus_record_id": "5a15545c78f88aed"
-    },
-    {
       "pattern": "1581F4XF",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -1026,12 +989,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Tofect drone",
       "argus_record_id": "5cc0a58aa405670e"
-    },
-    {
-      "pattern": "62:60:1f",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "5e3430aacafbd6c8"
     },
     {
       "pattern": "1748CJD2",
@@ -1116,12 +1073,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aurelia drone",
       "argus_record_id": "67c387985acf6f79"
-    },
-    {
-      "pattern": "ec:72:f7",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "690ec880c2e8716f"
     },
     {
       "pattern": "1869AU11S0000",
@@ -1266,18 +1217,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Wingtra drone",
       "argus_record_id": "753f22fb3961a014"
-    },
-    {
-      "pattern": "8c:58:23",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "759d22ae8c310a68"
-    },
-    {
-      "pattern": "e4:7a:2c",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "76619ed0f14e349c"
     },
     {
       "pattern": "179060802",
@@ -2228,12 +2167,6 @@
       "argus_record_id": "cb4c74698628ede3"
     },
     {
-      "pattern": "f8:40:68",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "ccbe7f8e094c1ed2"
-    },
-    {
       "pattern": "1748CNA09221118",
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
@@ -2316,12 +2249,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Drone-Clone Xperts drone",
       "argus_record_id": "d3083a054303f0c2"
-    },
-    {
-      "pattern": "d4:11:d6",
-      "pattern_type": "oui",
-      "description": "SoundThinking gunshot_detect",
-      "argus_record_id": "d30df38a13b98013"
     },
     {
       "pattern": "1900CMAX2S00000",
@@ -2454,12 +2381,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Percepto AirMax drone",
       "argus_record_id": "dc07a163cf10f2fe"
-    },
-    {
-      "pattern": "00:16:00",
-      "pattern_type": "oui",
-      "description": "Cellebrite hacking_tool",
-      "argus_record_id": "dcaccb6a6f5318ae"
     },
     {
       "pattern": "1596F33",
@@ -2636,12 +2557,6 @@
       "argus_record_id": "edabbffbf2d13adf"
     },
     {
-      "pattern": "04:a8:5a",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "edbac6b416864b33"
-    },
-    {
       "pattern": "1869CU11GM20000",
       "pattern_type": "drone_id_prefix",
       "description": "Ruko drone",
@@ -2652,12 +2567,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "ELIOS 3 UAV drone",
       "argus_record_id": "ee1aa32c59cc4dab"
-    },
-    {
-      "pattern": "e4:aa:ea:80:a1:9b",
-      "pattern_type": "mac",
-      "description": "Flock Safety alpr",
-      "argus_record_id": "eea6f74486eea9c0"
     },
     {
       "pattern": "1668BE10JA00",
@@ -2694,12 +2603,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aurelia drone",
       "argus_record_id": "f1dab316f0f1425a"
-    },
-    {
-      "pattern": "0c:9a:e6",
-      "pattern_type": "oui",
-      "description": "DJI drone",
-      "argus_record_id": "f328f535d79393e4"
     },
     {
       "pattern": "20686S2",
