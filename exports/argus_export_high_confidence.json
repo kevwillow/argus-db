@@ -1,16 +1,16 @@
 {
   "_meta": {
-    "argus_version": "18",
-    "exported_at": "2026-05-14T12:04:50Z",
+    "argus_version": "19",
+    "exported_at": "2026-05-14T17:38:00Z",
     "record_count": 113,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "a12cd924-ed44-5913-8577-4d277df5f2da",
-    "source_record_count": 22464,
+    "argus_run_id": "73ac4d6c-fa94-545d-a825-46c1c60db864",
+    "source_record_count": 22532,
     "dropped_in_export": {
-      "unknown_category": 21839,
+      "unknown_category": 21878,
       "ssid_pattern": 5,
       "device_fingerprint": 0,
       "ble_local_name": 3,
@@ -43,6 +43,13 @@
       "firmware_image_variant": 1,
       "qualcomm_chip_format_id": 1,
       "firmware_branded_string": 1,
+      "asdstan_message_type": 7,
+      "asdstan_enum_value": 14,
+      "dji_protocol_struct_format": 2,
+      "gpt_partition_uuid": 3,
+      "chipset_codename": 0,
+      "firmware_build_string": 2,
+      "firmware_build_uuid": 1,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 39,
