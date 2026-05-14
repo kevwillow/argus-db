@@ -614,3 +614,304 @@ def test_sar9_predicate_determinism(candidate: str, canonical: str) -> None:
     a = vendor_match_disposition(candidate, canonical)
     b = vendor_match_disposition(candidate, canonical)
     assert a == b
+
+
+# ---------------------------------------------------------------------------
+# MAC-101 Item A — multi-registry positive-evidence xcheck predicate tests.
+# Coverage: registry_xcheck_manufacturers + registry_xcheck_fcc_grantees +
+# registry_xcheck_disposition.
+# ---------------------------------------------------------------------------
+
+from db.extraction.vendor_name_disambig import (  # noqa: E402
+    MATCH_KIND_ALIAS_EXACT,
+    MATCH_KIND_CANDIDATE_IS_PREFIX,
+    MATCH_KIND_CANONICAL_EXACT,
+    MATCH_KIND_COMPOUND_TOKEN_TOLERANCE,
+    MATCH_KIND_EXACT_NORM,
+    REGISTRY_SOURCE_FCC_GRANTEES,
+    REGISTRY_SOURCE_MANUFACTURERS,
+    _split_aliases,
+    registry_xcheck_disposition,
+    registry_xcheck_fcc_grantees,
+    registry_xcheck_manufacturers,
+)
+
+
+_MFR_FIXTURE: list[tuple[str, str | None]] = [
+    ("Flock Safety", "Flock"),
+    ("Vigilant Solutions", "Vigilant"),
+    ("Motorola Solutions",
+     "Motorola Vigilant, Motorola APX, Motorola V300, Motorola V500"),
+    ("Genetec", None),
+    ("Axis Communications", "Axis"),
+    ("Harris", "Harris Corporation"),
+    ("L3Harris", "L3Harris Technologies"),
+    ("KeyW", "KeyW Corporation"),
+    ("Atlas Copco", " Atlas Copco A/S , Atlas Copco BLM "),
+    ("Axon", "TASER International (legacy)"),
+]
+
+
+_GRANTEES_FIXTURE: list[str] = [
+    "Becton Dickinson and Company",
+    "Cardinal Health Commercial Technologies, LLC",
+    "LOGICAL PRODUCT CORPORATION",
+    "Seek Thermal, Incorporated",
+    "Atlas Copco BLM",
+    "Atlas Copco Industrial Technique AB",
+    "GENERAL MOTORS LLC",
+    "Atlas Networks Inc",
+    "Hyundai Mobis Co., Ltd.",
+]
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        (None, []),
+        ("", []),
+        ("Flock", ["Flock"]),
+        ("Vigilant", ["Vigilant"]),
+        ("Motorola Vigilant, Motorola APX, Motorola V300",
+         ["Motorola Vigilant", "Motorola APX", "Motorola V300"]),
+        ("  whitespace pad ,  inner  ,, empty ",
+         ["whitespace pad", "inner", "empty"]),
+    ],
+)
+def test_split_aliases(raw: str | None, expected: list[str]) -> None:
+    assert _split_aliases(raw) == expected
+
+
+def test_xcheck_manufacturers_canonical_exact() -> None:
+    hit = registry_xcheck_manufacturers("Flock Safety", _MFR_FIXTURE)
+    assert hit == ("Flock Safety", MATCH_KIND_CANONICAL_EXACT)
+
+
+def test_xcheck_manufacturers_canonical_exact_case_insensitive() -> None:
+    hit = registry_xcheck_manufacturers("FLOCK SAFETY", _MFR_FIXTURE)
+    assert hit == ("Flock Safety", MATCH_KIND_CANONICAL_EXACT)
+
+
+def test_xcheck_manufacturers_alias_exact_vigilant() -> None:
+    hit = registry_xcheck_manufacturers("Vigilant", _MFR_FIXTURE)
+    assert hit == ("Vigilant Solutions", MATCH_KIND_ALIAS_EXACT)
+
+
+def test_xcheck_manufacturers_alias_exact_motorola_apx() -> None:
+    hit = registry_xcheck_manufacturers("Motorola APX", _MFR_FIXTURE)
+    assert hit == ("Motorola Solutions", MATCH_KIND_ALIAS_EXACT)
+
+
+def test_xcheck_manufacturers_canonical_exact_direct() -> None:
+    hit = registry_xcheck_manufacturers("Atlas Copco", _MFR_FIXTURE)
+    assert hit == ("Atlas Copco", MATCH_KIND_CANONICAL_EXACT)
+
+
+def test_xcheck_manufacturers_alias_exact_atlas_copco_as() -> None:
+    """``Atlas Copco A/S`` (alias with corporate suffix) → alias_exact."""
+    hit = registry_xcheck_manufacturers("Atlas Copco A/S", _MFR_FIXTURE)
+    assert hit == ("Atlas Copco", MATCH_KIND_ALIAS_EXACT)
+
+
+def test_xcheck_manufacturers_compound_token_tolerance() -> None:
+    """compound_token_tolerance fires when post-norm equality holds AND
+    the candidate is not raw-equal nor alias-matched.
+
+    ``Atlas Copco SA`` normalizes to ``atlas copco`` (``sa`` stripped),
+    matching canonical ``Atlas Copco``. The aliases (``Atlas Copco A/S``,
+    ``Atlas Copco BLM``) normalize to different strings, so alias_exact
+    does NOT fire and compound_token_tolerance wins.
+    """
+    hit = registry_xcheck_manufacturers("Atlas Copco SA", _MFR_FIXTURE)
+    assert hit == ("Atlas Copco", MATCH_KIND_COMPOUND_TOKEN_TOLERANCE)
+
+
+def test_xcheck_manufacturers_becton_dickinson_absent() -> None:
+    hit = registry_xcheck_manufacturers("Becton Dickinson", _MFR_FIXTURE)
+    assert hit is None
+
+
+def test_xcheck_manufacturers_sar8_fp_axon_networks_rejected() -> None:
+    """SAR-8 FP discipline preserved: Axon Networks Inc. is NOT Axon."""
+    hit = registry_xcheck_manufacturers("Axon Networks Inc.", _MFR_FIXTURE)
+    assert hit is None
+
+
+def test_xcheck_manufacturers_sar9_fp_motorola_mobility_rejected() -> None:
+    """SAR-9 FP discipline preserved: Motorola Mobility ≠ Motorola Solutions."""
+    hit = registry_xcheck_manufacturers(
+        "Motorola Mobility LLC, a Lenovo Company", _MFR_FIXTURE
+    )
+    assert hit is None
+
+
+def test_xcheck_manufacturers_no_match_individual() -> None:
+    hit = registry_xcheck_manufacturers("Walter Grotkasten", _MFR_FIXTURE)
+    assert hit is None
+
+
+def test_xcheck_manufacturers_empty_candidate() -> None:
+    assert registry_xcheck_manufacturers("", _MFR_FIXTURE) is None
+
+
+def test_xcheck_manufacturers_empty_fixture() -> None:
+    assert registry_xcheck_manufacturers("Flock Safety", []) is None
+
+
+def test_xcheck_fcc_grantees_exact_norm_logical_product() -> None:
+    """``Logical Product`` → ``LOGICAL PRODUCT CORPORATION`` via exact_norm."""
+    hit = registry_xcheck_fcc_grantees("Logical Product", _GRANTEES_FIXTURE)
+    assert hit == ("LOGICAL PRODUCT CORPORATION", MATCH_KIND_EXACT_NORM)
+
+
+def test_xcheck_fcc_grantees_candidate_is_prefix_becton() -> None:
+    hit = registry_xcheck_fcc_grantees("Becton Dickinson", _GRANTEES_FIXTURE)
+    assert hit == ("Becton Dickinson and Company", MATCH_KIND_CANDIDATE_IS_PREFIX)
+
+
+def test_xcheck_fcc_grantees_candidate_is_prefix_cardinal_health() -> None:
+    hit = registry_xcheck_fcc_grantees("Cardinal Health", _GRANTEES_FIXTURE)
+    assert hit is not None
+    name, kind = hit
+    assert kind == MATCH_KIND_CANDIDATE_IS_PREFIX
+    assert name.startswith("Cardinal Health")
+
+
+def test_xcheck_fcc_grantees_candidate_is_prefix_seek_thermal() -> None:
+    """``Seek Thermal`` matches ``Seek Thermal, Incorporated`` via prefix
+    (the ``incorporated`` suffix is NOT in ``_VENDOR_SUFFIX_STRIPS``, so
+    the grantee norm retains the trailing token and the candidate sits
+    as a prefix). This mirrors Validator's halt-comment classification."""
+    hit = registry_xcheck_fcc_grantees("Seek Thermal", _GRANTEES_FIXTURE)
+    assert hit is not None
+    name, kind = hit
+    assert kind == MATCH_KIND_CANDIDATE_IS_PREFIX
+    assert name == "Seek Thermal, Incorporated"
+
+
+def test_xcheck_fcc_grantees_prefix_picks_first_match() -> None:
+    """Multi-token candidate, no exact_norm; first prefix-match wins."""
+    hit = registry_xcheck_fcc_grantees("Atlas Copco", _GRANTEES_FIXTURE)
+    assert hit is not None
+    name, kind = hit
+    assert kind == MATCH_KIND_CANDIDATE_IS_PREFIX
+    assert name == "Atlas Copco BLM"
+
+
+def test_xcheck_fcc_grantees_single_token_candidate_no_prefix_match() -> None:
+    """Single-token candidate (Hyundai) must NOT match prefix-shape grantees."""
+    hit = registry_xcheck_fcc_grantees("Hyundai", _GRANTEES_FIXTURE)
+    assert hit is None
+
+
+def test_xcheck_fcc_grantees_no_match() -> None:
+    hit = registry_xcheck_fcc_grantees("Walter Grotkasten", _GRANTEES_FIXTURE)
+    assert hit is None
+
+
+def test_xcheck_fcc_grantees_empty_inputs() -> None:
+    assert registry_xcheck_fcc_grantees("", _GRANTEES_FIXTURE) is None
+    assert registry_xcheck_fcc_grantees("Becton Dickinson", []) is None
+
+
+def test_xcheck_disposition_manufacturers_wins_over_grantees() -> None:
+    """Match precedence: manufacturers > fcc_grantees.
+
+    ``Atlas Copco`` is in both registries (manufacturers canonical_exact +
+    fcc_grantees candidate_is_prefix). The match_source MUST attribute
+    to ``manufacturers`` per CEO precedence directive.
+    """
+    result = registry_xcheck_disposition(
+        "Atlas Copco",
+        manufacturers_rows=_MFR_FIXTURE,
+        fcc_grantee_names=_GRANTEES_FIXTURE,
+    )
+    assert result is not None
+    assert result["match_source"] == REGISTRY_SOURCE_MANUFACTURERS
+    assert result["match_canonical"] == "Atlas Copco"
+    assert result["match_kind"] == MATCH_KIND_CANONICAL_EXACT
+
+
+def test_xcheck_disposition_falls_through_to_grantees() -> None:
+    result = registry_xcheck_disposition(
+        "Becton Dickinson",
+        manufacturers_rows=_MFR_FIXTURE,
+        fcc_grantee_names=_GRANTEES_FIXTURE,
+    )
+    assert result is not None
+    assert result["match_source"] == REGISTRY_SOURCE_FCC_GRANTEES
+    assert result["match_canonical"] == "Becton Dickinson and Company"
+    assert result["match_kind"] == MATCH_KIND_CANDIDATE_IS_PREFIX
+
+
+def test_xcheck_disposition_no_match() -> None:
+    result = registry_xcheck_disposition(
+        "Walter Grotkasten",
+        manufacturers_rows=_MFR_FIXTURE,
+        fcc_grantee_names=_GRANTEES_FIXTURE,
+    )
+    assert result is None
+
+
+def test_xcheck_disposition_empty_candidate() -> None:
+    assert (
+        registry_xcheck_disposition(
+            "",
+            manufacturers_rows=_MFR_FIXTURE,
+            fcc_grantee_names=_GRANTEES_FIXTURE,
+        )
+        is None
+    )
+
+
+def test_xcheck_disposition_only_manufacturers_provided() -> None:
+    result = registry_xcheck_disposition(
+        "Becton Dickinson", manufacturers_rows=_MFR_FIXTURE
+    )
+    assert result is None
+
+
+def test_xcheck_disposition_only_grantees_provided() -> None:
+    result = registry_xcheck_disposition(
+        "Becton Dickinson", fcc_grantee_names=_GRANTEES_FIXTURE
+    )
+    assert result is not None
+    assert result["match_source"] == REGISTRY_SOURCE_FCC_GRANTEES
+
+
+def test_xcheck_disposition_determinism() -> None:
+    args = dict(
+        manufacturers_rows=_MFR_FIXTURE, fcc_grantee_names=_GRANTEES_FIXTURE
+    )
+    a = registry_xcheck_disposition("Becton Dickinson", **args)
+    b = registry_xcheck_disposition("Becton Dickinson", **args)
+    assert a == b
+    assert (
+        registry_xcheck_disposition("Walter Grotkasten", **args)
+        == registry_xcheck_disposition("Walter Grotkasten", **args)
+        is None
+    )
+
+
+@pytest.mark.parametrize(
+    "candidate",
+    [
+        "Yuval Fichman",
+        "Rudy Tellert",
+        "Walter Grotkasten",
+        "Ingenieurbüro Schober",
+    ],
+)
+def test_xcheck_disposition_hold_under_pii_discipline(candidate: str) -> None:
+    """§11 #3 — candidate absent from both registries yields None.
+
+    None signals "no positive-evidence corporate confirmation" — caller
+    MUST default to HOLD per §11 #3. The predicate does NOT downgrade
+    these to confirmed-individual; absence is not downgrade evidence.
+    """
+    result = registry_xcheck_disposition(
+        candidate,
+        manufacturers_rows=_MFR_FIXTURE,
+        fcc_grantee_names=_GRANTEES_FIXTURE,
+    )
+    assert result is None

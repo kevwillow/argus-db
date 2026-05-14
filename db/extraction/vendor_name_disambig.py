@@ -446,3 +446,230 @@ def is_fp_rejected(candidate: str, vendor_canonical: str) -> bool:
         vendor_match_disposition(candidate, vendor_canonical)
         == _DISPOSITION_REJECT_FP
     )
+
+
+# ---------------------------------------------------------------------------
+# MAC-101 Item A — multi-registry positive-evidence xcheck predicate.
+#
+# CEO ratification (MAC-102 [`ad5a564d`](/MAC/issues/MAC-102#comment-ad5a564d)
+# 2026-05-14) ratified option β: extend Class-B corporate-entity confirmation
+# beyond the §2.1 ``manufacturers`` lexicon to broader in-DB registries
+# (``fcc_grantees`` and, when available, ``procurement_records``). Per-source
+# match-kind vocabulary + per-source attribution preserved verbatim from
+# ratification:
+#
+#   manufacturers   → 'canonical_exact' | 'alias_exact' | 'compound_token_tolerance'
+#   fcc_grantees    → 'exact_norm'      | 'candidate_is_prefix'
+#   procurement_*   → mirror of fcc_grantees (gate #5; runtime-skipped on
+#                     this HEAD because the column the CEO directive named
+#                     does not exist on ``d91b7b6``)
+#
+# Match precedence (across sources): manufacturers > fcc_grantees >
+# procurement_records — §2.1 lexicon membership is the strongest signal even
+# though the cohort surfaces zero lexicon hits.
+#
+# Discipline preservation:
+# - Predicate is positive-evidence-only — presence-in-registry confirms
+#   corporate-entity; absence is NOT downgrade evidence (§11 #3 default-to-
+#   HOLD remains binding).
+# - Predicate is B → A only — never A → B.
+# - SAR-9 alias-iteration discipline preserved — manufacturers aliases are
+#   resolved via :func:`alias_equality` once per canonical (not once per
+#   alias-string parameter to :func:`vendor_match_disposition`).
+# ---------------------------------------------------------------------------
+
+# Registry source attribution strings — canonical surface for the
+# ``registry_xcheck_match_source`` notes-JSON field.
+REGISTRY_SOURCE_MANUFACTURERS: Final[str] = "manufacturers"
+REGISTRY_SOURCE_FCC_GRANTEES: Final[str] = "fcc_grantees"
+REGISTRY_SOURCE_PROCUREMENT_RECORDS: Final[str] = "procurement_records"
+
+# Match-kind vocabulary — canonical surface for the
+# ``registry_xcheck_match_kind`` notes-JSON field.
+MATCH_KIND_CANONICAL_EXACT: Final[str] = "canonical_exact"
+MATCH_KIND_ALIAS_EXACT: Final[str] = "alias_exact"
+MATCH_KIND_COMPOUND_TOKEN_TOLERANCE: Final[str] = "compound_token_tolerance"
+MATCH_KIND_EXACT_NORM: Final[str] = "exact_norm"
+MATCH_KIND_CANDIDATE_IS_PREFIX: Final[str] = "candidate_is_prefix"
+
+
+def _split_aliases(aliases_field: str | None) -> list[str]:
+    """Parse a manufacturers.aliases field into a list of alias strings.
+
+    Storage convention (verified at MAC-102): comma-separated. Empty / None
+    yields an empty list. Whitespace around each alias is stripped.
+    """
+    if not aliases_field:
+        return []
+    return [a.strip() for a in aliases_field.split(",") if a.strip()]
+
+
+def registry_xcheck_manufacturers(
+    candidate: str,
+    manufacturers_rows: list[tuple[str, str | None]],
+) -> tuple[str, str] | None:
+    """Resolve ``candidate`` against the §2.1 manufacturers lexicon.
+
+    ``manufacturers_rows`` is an iterable of ``(canonical_name, aliases)``
+    tuples drawn from the ``manufacturers`` table (aliases column may be
+    ``None`` or comma-separated). Returns ``(canonical_name, match_kind)``
+    on the first hit, or ``None`` if no row matches.
+
+    Match-kind precedence (within manufacturers):
+
+    1. ``canonical_exact`` — raw-lowercased candidate == raw-lowercased
+       canonical_name (no suffix-strip needed).
+    2. ``alias_exact`` — :func:`alias_equality` returns True for an alias
+       on this row (SAR-9 alias-iteration discipline).
+    3. ``compound_token_tolerance`` — normalized candidate == normalized
+       canonical_name AND raw forms differ (the corporate-suffix strip is
+       what made them equal; e.g. candidate ``Atlas Copco`` vs canonical
+       ``Atlas Copco A/S``).
+
+    All match-kinds preserve SAR-8/SAR-9 FP discipline: if the candidate
+    hits a ``VENDOR_FP_LIST`` substring for the canonical (e.g.
+    ``Axon Networks`` against ``Axon``), :func:`vendor_match_disposition`
+    returns ``reject_fp`` and we skip the row.
+    """
+    if not candidate:
+        return None
+
+    candidate_lower = candidate.lower().strip()
+    candidate_norm = _normalize_vendor(_strip_geographic_prefix(candidate))
+    if not candidate_norm:
+        return None
+
+    for canonical_name, aliases in manufacturers_rows:
+        if not canonical_name:
+            continue
+        # Skip if SAR-8/SAR-9 FP rules reject this candidate against this
+        # canonical (e.g. ``Axon Networks Inc.`` against ``Axon``). Preserve
+        # the existing discipline rather than silently accepting on
+        # canonical-exact match.
+        disp = vendor_match_disposition(candidate, canonical_name)
+        if disp == _DISPOSITION_REJECT_FP:
+            continue
+
+        canonical_lower = canonical_name.lower().strip()
+        canonical_norm = _normalize_vendor(canonical_name)
+
+        # 1. canonical_exact — raw-lowercased equality (pre-normalization).
+        if candidate_lower == canonical_lower:
+            return (canonical_name, MATCH_KIND_CANONICAL_EXACT)
+
+        # 2. alias_exact — SAR-9 caller-restructure: once per canonical,
+        #    alias-equality lookup per alias-string.
+        for alias in _split_aliases(aliases):
+            if alias_equality(candidate, alias):
+                return (canonical_name, MATCH_KIND_ALIAS_EXACT)
+
+        # 3. compound_token_tolerance — normalized equality where the raw
+        #    forms differ (corporate-suffix strip made them match).
+        if (
+            canonical_norm
+            and candidate_norm == canonical_norm
+            and candidate_lower != canonical_lower
+        ):
+            return (canonical_name, MATCH_KIND_COMPOUND_TOKEN_TOLERANCE)
+
+    return None
+
+
+def registry_xcheck_fcc_grantees(
+    candidate: str,
+    grantee_names: list[str],
+) -> tuple[str, str] | None:
+    """Resolve ``candidate`` against ``fcc_grantees.grantee_name`` strings.
+
+    Returns ``(matched_grantee_name, match_kind)`` on the first hit, or
+    ``None`` if no row matches. Match-kind precedence:
+
+    1. ``exact_norm`` — normalized candidate equals normalized grantee_name
+       (e.g. ``Logical Product`` ↔ ``LOGICAL PRODUCT CORPORATION``, since
+       ``_normalize_vendor`` strips the ``corporation`` suffix).
+    2. ``candidate_is_prefix`` — normalized grantee_name starts with
+       ``<normalized candidate> + " "`` (e.g. ``Becton Dickinson`` ↔
+       ``Becton Dickinson and Company``).
+
+    Single-token candidates are NOT used as ``candidate_is_prefix`` matches
+    against multi-token grantees — a single token like ``Atlas`` would
+    over-match every ``Atlas X`` grantee. The candidate must itself be a
+    multi-token corporate-shape name. (For the MAC-102 cohort all 75
+    candidates are ≥2 tokens, so this constraint is documentary not
+    load-bearing, but it guards future cohorts.)
+    """
+    if not candidate:
+        return None
+
+    candidate_norm = _normalize_vendor(_strip_geographic_prefix(candidate))
+    if not candidate_norm:
+        return None
+    candidate_is_multi_token = " " in candidate_norm
+
+    # Pass 1 — exact_norm has higher precedence than candidate_is_prefix.
+    for grantee in grantee_names:
+        if not grantee:
+            continue
+        grantee_norm = _normalize_vendor(grantee)
+        if grantee_norm and grantee_norm == candidate_norm:
+            return (grantee, MATCH_KIND_EXACT_NORM)
+
+    # Pass 2 — candidate_is_prefix (multi-token candidates only).
+    if candidate_is_multi_token:
+        for grantee in grantee_names:
+            if not grantee:
+                continue
+            grantee_norm = _normalize_vendor(grantee)
+            if grantee_norm and grantee_norm.startswith(candidate_norm + " "):
+                return (grantee, MATCH_KIND_CANDIDATE_IS_PREFIX)
+
+    return None
+
+
+def registry_xcheck_disposition(
+    candidate: str,
+    *,
+    manufacturers_rows: list[tuple[str, str | None]] | None = None,
+    fcc_grantee_names: list[str] | None = None,
+) -> dict | None:
+    """Multi-registry positive-evidence xcheck predicate (MAC-102 Item A).
+
+    Returns a dict ``{"match_source", "match_canonical", "match_kind"}`` on
+    the first hit per the manufacturers > fcc_grantees precedence order, or
+    ``None`` if neither registry matches. Caller is responsible for
+    threading the matched dict into the ``identifiers.notes`` /
+    ``raw_observations.notes`` JSON under the
+    ``registry_xcheck_match_source`` / ``registry_xcheck_match`` /
+    ``registry_xcheck_match_kind`` keys (CEO ratification field naming).
+
+    ``procurement_records`` is NOT a parameter here: the CEO-ratified
+    column ``recipient_name`` does not exist on HEAD ``d91b7b6`` (the
+    actual column is ``vendor_canonical_name``). Per gate #5, the source
+    is dropped from β; surface in close. A future caller can extend this
+    function with a ``procurement_records_names`` parameter once the
+    column-name divergence is ratified.
+    """
+    if not candidate:
+        return None
+
+    if manufacturers_rows:
+        hit = registry_xcheck_manufacturers(candidate, manufacturers_rows)
+        if hit is not None:
+            canonical, kind = hit
+            return {
+                "match_source": REGISTRY_SOURCE_MANUFACTURERS,
+                "match_canonical": canonical,
+                "match_kind": kind,
+            }
+
+    if fcc_grantee_names:
+        hit = registry_xcheck_fcc_grantees(candidate, fcc_grantee_names)
+        if hit is not None:
+            canonical, kind = hit
+            return {
+                "match_source": REGISTRY_SOURCE_FCC_GRANTEES,
+                "match_canonical": canonical,
+                "match_kind": kind,
+            }
+
+    return None

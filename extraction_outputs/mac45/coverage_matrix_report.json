@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 22265,
+  "pre_active_count": 22279,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -3607,10 +3607,10 @@
     {
       "device_category": "unknown",
       "identifier_type": "mac_range",
-      "n": 17780,
+      "n": 17794,
       "n_by_source_type": {
         "inferred": 4,
-        "primary_registry": 17776
+        "primary_registry": 17790
       },
       "min_conf": 50,
       "max_conf": 85,
@@ -21395,7 +21395,21 @@
         22731,
         22732,
         22733,
-        22734
+        22734,
+        22735,
+        22736,
+        22737,
+        22738,
+        22739,
+        22740,
+        22741,
+        22742,
+        22743,
+        22744,
+        22745,
+        22746,
+        22747,
+        22748
       ]
     },
     {
@@ -41705,6 +41719,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Atlas Copco",
+      "aliases_used": [
+        "Atlas Copco"
+      ],
+      "fcc_grantees_count": 4,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Atlas Copco IAS GmbH",
       "aliases_used": [
         "Atlas Copco IAS GmbH"
@@ -47442,6 +47468,18 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Becton Dickinson",
+      "aliases_used": [
+        "Becton Dickinson"
+      ],
+      "fcc_grantees_count": 2,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 8
     },
     {
       "canonical_name": "Bedo Elektronik GmbH",
@@ -59486,6 +59524,18 @@
       ],
       "fcc_grantees_count": 0,
       "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Cardinal Health",
+      "aliases_used": [
+        "Cardinal Health"
+      ],
+      "fcc_grantees_count": 3,
+      "procurement_records_count": 9,
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -131046,6 +131096,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Logical Product",
+      "aliases_used": [
+        "Logical Product"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
       "canonical_name": "Logical Tools s.r.l.",
       "aliases_used": [
         "Logical Tools s.r.l."
@@ -184138,6 +184200,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Seek Thermal",
+      "aliases_used": [
+        "Seek Thermal"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Seekwave Technology Co.,ltd.",
       "aliases_used": [
         "Seekwave Technology Co.,ltd."
@@ -225350,6 +225424,18 @@
       "active_identifier_count": 2
     },
     {
+      "canonical_name": "Watts A/S",
+      "aliases_used": [
+        "Watts A/S"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Watts Innovations",
       "aliases_used": [
         "Watts Innovations"
@@ -242599,7 +242685,7 @@
     "confidence_floor": 30,
     "drop_pi_self_exclude": false,
     "bins": {
-      "unknown_category": 21785,
+      "unknown_category": 21799,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
@@ -242624,7 +242710,7 @@
       "excluded_source_type": 0
     },
     "survivors": 455,
-    "reconciles": 22265,
+    "reconciles": 22279,
     "drop_assignments": {
       "413": "unknown_category",
       "414": "unknown_category",
@@ -264435,7 +264521,21 @@
       "22731": "unknown_category",
       "22732": "unknown_category",
       "22733": "unknown_category",
-      "22734": "unknown_category"
+      "22734": "unknown_category",
+      "22735": "unknown_category",
+      "22736": "unknown_category",
+      "22737": "unknown_category",
+      "22738": "unknown_category",
+      "22739": "unknown_category",
+      "22740": "unknown_category",
+      "22741": "unknown_category",
+      "22742": "unknown_category",
+      "22743": "unknown_category",
+      "22744": "unknown_category",
+      "22745": "unknown_category",
+      "22746": "unknown_category",
+      "22747": "unknown_category",
+      "22748": "unknown_category"
     }
   },
   "drop_tally_high_confidence": {
@@ -264443,7 +264543,7 @@
     "confidence_floor": 70,
     "drop_pi_self_exclude": true,
     "bins": {
-      "unknown_category": 21785,
+      "unknown_category": 21799,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 2,
@@ -264468,7 +264568,7 @@
       "excluded_source_type": 340
     },
     "survivors": 113,
-    "reconciles": 22265,
+    "reconciles": 22279,
     "drop_assignments": {
       "1": "below_confidence_threshold",
       "413": "unknown_category",
@@ -286621,7 +286721,21 @@
       "22731": "unknown_category",
       "22732": "unknown_category",
       "22733": "unknown_category",
-      "22734": "unknown_category"
+      "22734": "unknown_category",
+      "22735": "unknown_category",
+      "22736": "unknown_category",
+      "22737": "unknown_category",
+      "22738": "unknown_category",
+      "22739": "unknown_category",
+      "22740": "unknown_category",
+      "22741": "unknown_category",
+      "22742": "unknown_category",
+      "22743": "unknown_category",
+      "22744": "unknown_category",
+      "22745": "unknown_category",
+      "22746": "unknown_category",
+      "22747": "unknown_category",
+      "22748": "unknown_category"
     }
   },
   "halts": []
