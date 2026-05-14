@@ -1884,24 +1884,54 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
     is the corresponding board-side audit-trail entry.
 
 Future S.7 recurrences (if any post-codification) get appended to
-this list with anchor + class. The original "three recurrences
-post-S.7 would trigger a CP-class revision of S.7 itself" threshold
-is superseded by the board's recurrence #9 framing: meta-revision
-triggers on three SAME-sub-class recurrences (not three total
-post-codification). Threshold-language revision queued for next
-memo-refinement cycle (THIS dispatch's §2.1(d) item).
+this list with anchor + class.
 
-Sub-class taxonomy so far (post-codification):
+**Meta-revision threshold (canonical, sub-class-aware per MAC-101 §2.1(d) dispatch directive):**
+A CP-class revision of S.7 itself triggers when three SAME-sub-class
+recurrences accumulate post-codification — not three total post-
+codification recurrences. This codifies the board's recurrence #9
+framing at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) ("two more before §6 meta-revision
+trigger" said in the context of recurrence #9 + the (c) table-scope
+sub-class first instance). The sub-class-aware count is the load-
+bearing rule; the prior "three total post-codification" framing is
+historical and not binding.
+
+**Sub-class taxonomy so far (post-codification):**
+
   - (a) cardinality-mismatch class — recurrence #7 (one occurrence)
   - (b) rule-scope class — recurrence #8 (one occurrence)
   - (c) table-scope class — recurrence #9 (one occurrence)
   - (d) decomposition-time-projection-stale class — recurrence #10 (one occurrence)
 
-No sub-class has hit the three-recurrence meta-revision threshold;
+**Meta-pattern observation (board flagged at MAC-101 [`63b72454`](/MAC/issues/MAC-101#comment-63b72454-5555-4c71-adb6-1f15f7ebdc83) 2026-05-14):**
 each post-codification recurrence has been a distinct sub-class first
-instance, which is consistent with S.7's broad-strokes coverage but
-suggests the sub-class taxonomy will keep bifurcating as new
-dispatch-shape edge cases surface.
+instance. No sub-class has yet accumulated a second occurrence, let
+alone hit the three-recurrence meta-revision threshold. The discipline
+is generating new sub-classes faster than it accumulates within-sub-
+class repeats — itself an interesting meta-pattern.
+
+**Forward expectation:** if a fifth post-codification recurrence (#11)
+surfaces as yet another first-instance sub-class — extending the
+sub-class taxonomy to (e) — that pattern is worth its own meta-
+observation at the next memo-refinement cycle. Two interpretations
+would compete:
+
+  - (i) S.7's coverage is intentionally broad-strokes; each new
+    dispatch-shape edge case naturally surfaces a new sub-class
+    first instance, and the sub-class taxonomy is the right
+    granularity for the audit-trail without any need to revise
+    S.7's authoring rule itself.
+  - (ii) S.7's "paste-result inline" verification has gaps that
+    are masked by sub-class bifurcation — each new first instance
+    is evidence of authoring-time blind spots that S.7 should
+    cover but doesn't. A CP-class revision of S.7's verification
+    paths (§2 per-class catalog) would be warranted.
+
+Both readings are coherent; neither is currently load-bearing. CEO
++ board surface the distinction at the next memo-refinement cycle
+when a fifth distinct first-instance recurrence (or a same-sub-class
+second instance) provides the empirical anchor to decide between
+them.
 
 ## §7 — Composition with prior discipline
 
