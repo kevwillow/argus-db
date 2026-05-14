@@ -1761,11 +1761,68 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
 
     Second post-codification recurrence; 1 more before meta-
     revision trigger per §6 threshold.
+  - Recurrence #9 (post-codification, MAC-101 dispatch §2.1
+    authoring 2026-05-14): class (b)-adjacent **table-scope
+    sub-class** — distinct from class (b) field-name (FAA
+    `documentNumber`→`trackingNumber` pre-S.7 recurrences) and
+    class (b) rule-scope (#8 §11 #13 unknown-cat). Board's
+    MAC-101 dispatch §2.1 (Item A — manufacturers-table-cross-
+    check predicate) asserted `manufacturers` table as a corporate-
+    entity registry with expected ~60/75 clears under canonical-
+    exact + alias-exact + compound-token tolerance. Validator
+    paste-verified at MAC-102 [`7260d2d9`](/MAC/issues/MAC-102#comment-7260d2d9): `manufacturers` is the
+    §2.1 surveillance-tech canonical lexicon (34 curated rows —
+    Avigilon, Axon, Cellebrite, DJI, Flock Safety, etc.), not a
+    general corporate-entity registry. None of the 75 Class B
+    candidate vendors (Becton Dickinson medical, Atlas Copco
+    compressors, Lumiplan Duhamel signage, etc.) are surveillance-
+    tech vendors → as-spec predicate yielded 0/75, not the
+    asserted ~60. Validator's halt at §7 case 4 was correct;
+    marking `attempted=true` under a mis-scoped predicate would
+    have silently consumed the re-entry surface for future
+    broader sweeps. CEO ratified option β (multi-registry positive-
+    evidence: extend xcheck to `fcc_grantees` 50,153 rows +
+    `procurement_records.recipient_name`) at MAC-102 [`ad5a564d`](/MAC/issues/MAC-102#comment-ad5a564d).
+    Final outcome: 13/75 cleared (all via `fcc_grantees`).
+
+    Table-scope sub-class structurally distinct from field-name
+    + rule-scope: concerns assertions about the SEMANTIC BASIS
+    of a named table (lexicon vs registry vs audit-index) and
+    the expected match-rate prediction grounded in that basis.
+    All three are class (b) "shape claim about source-of-truth";
+    they differ in which dimension of "shape" (field names vs
+    rule applicability vs table semantics) is the load-bearing
+    claim. Worth tracking the sub-class taxonomy for future
+    S.7 audit-trail granularity if recurrences continue.
+
+    Board ratification at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) (2026-05-14):
+    "class (b)-adjacent SAR-12 recurrence #9 — table-scope sub-
+    class rather than field-name or rule-scope. Worth tracking
+    in the recurrence chain. **Two more before §6 meta-revision
+    trigger.**" Board's "two more" framing supersedes the literal
+    "three post-codification" threshold-count language below (the
+    threshold is now sub-class-aware: post-codification recurrence
+    re-counts WITHIN a sub-class, not across sub-classes). Recurrence
+    #7 (cardinality-mismatch class a), #8 (rule-scope class b),
+    and #9 (table-scope class b) are each a distinct sub-class's
+    first occurrence — meta-revision triggers only if a SAME-sub-
+    class recurrence occurs three times. Flagged for explicit
+    §6 threshold-language revision at next memo-refinement cycle.
+
+    Sibling CEO-side memo: `feedback_predicate_spec_table_semantics_audit.md`
+    codifies the table-semantics declaration discipline (lexicon
+    vs registry vs audit-index basis) as a CEO sub-dispatch
+    decomposition gate. Pre-existing memo flagged the discipline-
+    evolution candidate at MAC-101 close; board's recurrence #9
+    declaration is the corresponding board-side audit-trail entry.
 
 Future S.7 recurrences (if any post-codification) get appended to
-this list with anchor + class. Three recurrences post-S.7 would
-trigger a CP-class revision of S.7 itself per the meta-discipline
-that no sub-rule is permanent if it fails to bind in practice.
+this list with anchor + class. The original "three recurrences
+post-S.7 would trigger a CP-class revision of S.7 itself" threshold
+is superseded by the board's recurrence #9 framing: meta-revision
+triggers on three SAME-sub-class recurrences (not three total
+post-codification). Threshold-language revision queued for next
+memo-refinement cycle.
 
 ## §7 — Composition with prior discipline
 
