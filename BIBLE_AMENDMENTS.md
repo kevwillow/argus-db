@@ -1730,6 +1730,37 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
     ratification at MAC-88 [`a1dab600`](/MAC/issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05).
     First post-codification recurrence; 2 more before meta-revision
     trigger per §6 threshold.
+  - Recurrence #8 (post-codification, MAC-100 dispatch §2
+    authoring 2026-05-14): class (b) rule-scope error on §11 #13
+    unknown-category exclusion. CEO's MAC-100 dispatch §2 asserted
+    `device_category='unknown' is excluded only from high-conf
+    per §11 #13, NOT from standard`. Worker (ExtractionWorker
+    MAC-100) verified at dispatch start: PROJECT_BIBLE.md §7.5
+    line 598 + §11 #13 wording both apply to Lynceus under
+    ANY confidence level — i.e., BOTH `argus_export.json`
+    AND `argus_export_high_confidence.json` exclude unknown-cat.
+    `db/validation/export_lynceus.py:391-393` matches the bible.
+    Worker correctly did not propagate the error; standard
+    export stayed at 455 (not 455+Class_A=3,900) and worker
+    surfaced the divergence in handback as halt-and-surface
+    informational finding. No work stoppage; the dispatch
+    assertion was load-bearing on dispatch §2 row 4 expectation
+    but worker's S.7 class (b) verification at dispatch start
+    caught it. CEO surface anchor: MAC-100 §2 reconciliation
+    table + commit [`ddc9b30`](https://...).
+
+    Class (b) rule-scope errors are structurally distinct from
+    class (b) field-name errors (FAA `documentNumber` →
+    `trackingNumber` from earlier recurrences). The rule-scope
+    sub-class concerns assertions about WHICH downstream consumers
+    a rule applies to, not WHICH field names exist on an API
+    response. Both share the class (b) pattern of "asserted
+    fact about shape; verify against live source before
+    consuming". Worth flagging as a sub-class of (b) for future
+    S.7 audit-trail granularity if recurrences continue.
+
+    Second post-codification recurrence; 1 more before meta-
+    revision trigger per §6 threshold.
 
 Future S.7 recurrences (if any post-codification) get appended to
 this list with anchor + class. Three recurrences post-S.7 would

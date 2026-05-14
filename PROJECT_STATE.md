@@ -18,6 +18,81 @@ SourceWorker MAC-6 DeFlock ingest **landed** (prior heartbeat). `db/sources/defl
 
 ## Last action
 
+CEO heartbeat 2026-05-14T~03:00Z–~04:30Z (**MAC-88 Stream 1 + Stream 2 close — IEEE pii_review_hold entity-type triage + 4-refinement discipline-evolution batch + SAR-12 recurrence #8 (class (b) rule-scope sub-class first instance) + Class D Watts A/S CEO ratification**). Anchored on commits `db5cd53` (Stream 2: SAR-12 §2 class (a) methodology + source_reclassifications unit tests) / `c77621d` (MAC-99 Validator IEEE PII triage; 3,445 Class A promotions) / `ddc9b30` (MAC-100 ExtractionWorker post-promotion regen) plus this CEO Phase C state-rotation commit (Class D ratification + SAR-12 §6 recurrence #8 append) per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
+
+**MAC-88 two-stream board ratification dispatch CLOSED.** Board dispatch [`848e58fc`](/MAC/issues/MAC-88#comment-848e58fc-5ee0-4032-ac13-4757adca15c0) authorized two parallel streams (IEEE PII review + discipline-evolution memo refinements). CEO executed:
+
+- **Stream 2 (CEO-direct, inline this batch)**: 4 memo refinements landed at commit `db5cd53` (R3 + R4) + CEO-side memory (R1 + R2). New sub-rules S.7 (CP-scope-impact cumulative-full-enum sweep) + S.8 (audit-table append-don't-mutate discipline) codified at `feedback_bible_amendment_downstream_consumer_audit.md`. SAR-12 §2 class (a) methodology-specification clarification three-surface landing.
+- **Stream 1 Validator MAC-99**: 3,654 pii_review_hold rows triaged across 4 classes:
+  - **Class A**: 3,445 promoted at `primary_registry`/85 / `device_category='unknown'` (§11 #13 multi-purpose carveout) / 94.3%
+  - **Class B**: 75 sustained-hold per §11 #3 PII discipline (2.1%; ~60 are recognizable corporations defaulting to HOLD per default-to-HOLD rule)
+  - **Class C**: 133 IEEE Private placeholder permanent-hold (3.6%; exact match to dispatch baseline)
+  - **Class D**: 1 escalated to CEO (`Watts A\S` Danish A/S encoding artifact); 0.027%
+- **Stream 1 ExtractionWorker MAC-100**: 4 export regens + coverage extension; standard stays 455, high-conf stays 113 (both excluded by §11 #13 unknown-cat). **Flagged class (b) error in CEO's MAC-100 dispatch §2** (CEO asserted §11 #13 excludes unknown-cat only from high-conf; bible+code apply to BOTH Lynceus exports). Worker caught via dispatch-start verification; no work stoppage. Captured as **SAR-12 §6 recurrence #8** this Phase C.
+- **Class D Phase C ratification**: Watts A/S (Danish A/S; backslash → forward slash encoding correction) promoted as one-row Class A — new identifier id=22735, new extraction_runs.id=101. Class D residual: 0.
+
+**Post-Stream-1+2 state:**
+- `identifiers` active: 18,820 → **22,266** (+3,446: MAC-99 batch 3,445 + Class D 1)
+- High-conf export: 113 (unchanged; §11 #13 excludes all 3,446 unknown-cat promotions)
+- Standard export: 455 (unchanged; §11 #13 applies to BOTH Lynceus exports — captured at SAR-12 recurrence #8)
+- CSV: 22,265 (MAC-100 regen lags Class D by 1 row; next regen captures +1)
+- Behavioral_signatures export: 55 (unchanged; out of scope)
+- `source_reclassifications`: 808 (unchanged; Stream 1 is promotion not reclassification)
+- `extraction_runs MAX(id)`: 99 → **101** (+2: MAC-99 batch run + CEO Class D run)
+- Bible HEAD: `503dc26` → `db5cd53` (Stream 2) → this Phase C commit
+- Schema version: 17 (unchanged; no migrations Stream 1 or 2)
+
+**Seven architectural firsts** captured this run (handoff doc §6):
+
+1. First substantive entity-type triage at scale (3,654 rows; 3,445 transaction-wrapped promotions)
+2. First IEEE Private placeholder permanent-hold framing (133 rows codified as registrant-choice HOLD)
+3. First batched validator dispatch where primary discipline gate is §11 #3 PII
+4. First classifier-cohort with a deliberate over-hold tail (~60 known-brand corporations defaulting to HOLD per §11 #3)
+5. First non-ASCII regex word-boundary handling pattern (OÜ / A.Ş / Sàrl / ООО / ЗАО tokens)
+6. First per-row CEO ratification of a Validator Class D escalation (Watts A/S)
+7. First class (b) rule-scope error caught by worker dispatch-start verification (SAR-12 recurrence #8 sub-class first instance)
+
+**SAR-12 recurrence #8 captured** at this Phase C: class (b) rule-scope sub-class — CEO's MAC-100 dispatch §2 misrepresented §11 #13's exclusion scope; worker S.7 class (b) verification at dispatch start caught the error before propagation. **Second post-codification recurrence; one more before §6 meta-revision trigger.** Sub-class refinement (rule-scope vs field-name) flagged for future SAR-12 §2 audit-trail granularity if pattern continues.
+
+**§11 stop-the-line trips:** 0. **PII boundary crossings:** 0. **HALT-AND-SURFACE invocations:** 0 (CEO); 1 worker-initiated informational (MAC-100 §11 #13 scope correction; no work stoppage). **Halts at close:** 0.
+
+**Test suites:** MAC-99 close 462/2 (+63 MAC-99 new tests); MAC-100 close **527/2** (+18 Stream 2 R3 + intervening growth). Zero regressions.
+
+**Six discipline-evolution candidates carry forward** (3 DONE Stream 2 + 3 NEW Stream 1):
+
+DONE this batch:
+- R3 `source_reclassifications` direct unit-test coverage (`tests/test_source_reclassifications.py`; 18 tests)
+- R1 CP-scope-impact cumulative-full-enum sweep sub-rule (S.7)
+- R2 audit-table append-don't-mutate discipline sub-rule (S.8)
+
+NEW this batch:
+- `manufacturers`-table-cross-check predicate for Class B clearance (MAC-99 §5.10 #4; ~60 known-brand corporations could lift from HOLD to Class A without weakening §11 #3)
+- SAR-12 class (b) sub-class granularity (rule-scope vs field-name; possible refinement to SAR-12 §2 if pattern continues)
+- Dispatch hedge-pattern discipline (board self-flag at d6626a2f; CEO-direct dispatches should adopt "or similar; <party> determines" hedge for unverified paths)
+
+**Forward sequence (deferred dispatches; out of MAC-88 scope per board §4):**
+
+- 31 held Wave-A behavioral_signatures pending Wave-C/D/E second-source
+- Custom-mapper ingestion heartbeat (~360 secondary-batch obs)
+- FCC EAS per-FCC-ID retry (apps.fcc.gov degraded)
+- Public-flip preparation (LICENSE / CREDITS / README work)
+- Rayhunter v0.X migration (out-of-Argus consumer work)
+- Goal-title PATCH (board's separate parallel action)
+
+**Defensive backups retained** through this close:
+
+- `db/argus.db.pre_mac91_step_backup` (272 MB; pre-Wave-B)
+- `db/argus.db.pre_cp18_item_c_backup` (272 MB; pre-MAC-93 FAA backfill)
+- `db/argus.db.pre_cp19_sweep_backup` (272 MB; pre-MAC-96 main sweep)
+- `db/argus.db.pre_mac99_step1_backup` (272 MB; pre-MAC-99 IEEE PII triage)
+- `exports/argus_export*.pre_mac100_backup` (×5; pre-MAC-100 regen)
+- `exports/argus_export_high_confidence.json.pre_mac92_backup` (pre-Wave-B export)
+- `exports/argus_export*.pre_cp19_sweep_backup` (×4; pre-MAC-97 regen)
+
+---
+
+### Prior action — MAC-88 CP19 Wave-B+ sources reclassification sweep close (preserved verbatim)
+
 CEO heartbeat 2026-05-14T~02:00Z–~03:00Z (**MAC-88 CP19 Wave-B+ sources reclassification sweep close — first row-level downgrade discipline + source_reclassifications audit table established + Lynceus high-conf source_type exclusion**). Anchored on commits `ab2cc6a` (SAR-12 §6 recurrence #7 audit-trail append) / `c883cec` (CP19 coordinated commit: migration 0017 + §4.2/§7.5/§11 #8 amendments + BIBLE_AMENDMENTS) / `c121bec` (Validator main sweep) / `c12bedd` (Validator corrective sub-sweep with append-don't-mutate audit-trail discipline) / `55f0a09` (ExtractionWorker CP19 export-script code-sibling + 14 new tests) / `413f2d0` (post-sweep export regen) plus this CEO Phase C state-rotation commit per [`feedback_avoid_hb_labels_in_durable_artifacts`](memory).
 
 **MAC-88 Wave-B+ sources reclassification sweep CLOSED.** Board dispatch [`cf3c4016`](/MAC/issues/MAC-88#comment-cf3c4016-e8ab-482c-8155-7d7f5693ce46) (sweep dispatch) + [`a1dab600`](/MAC/issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05) (ratification of CEO pre-flight surface-back) authorized the four-scope sweep. CEO decomposed into pre-flight halt-and-surface → DBArchitect [MAC-95](/MAC/issues/MAC-95) CP19 coordinated commit → Validator [MAC-96](/MAC/issues/MAC-96) main sweep + corrective sub-sweep → ExtractionWorker [MAC-97](/MAC/issues/MAC-97) export regen → CEO Phase C close (this rotation). Full handoff doc at `raw/wave_b/_cp19_sweep_run_2026-05-14.md`.
