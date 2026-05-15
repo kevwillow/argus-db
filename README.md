@@ -2,10 +2,12 @@
 
 > Open-source database of surveillance equipment identifiers
 
-[![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
-[![Data License: ODbL-1.0](https://img.shields.io/badge/Data-ODbL--1.0-orange.svg)](LICENSE-DATA)
-[![Docs License: CC-BY-SA-4.0](https://img.shields.io/badge/Docs-CC--BY--SA--4.0-yellow.svg)](LICENSE-DOCS)
-[![GitHub release](https://img.shields.io/github/v/release/kevwillow/argus-db?label=release)](../../releases)
+[![watching the watchers](https://img.shields.io/badge/watching-the%20watchers-black.svg)](#what-argus-is)
+[![argus never blinks](https://img.shields.io/badge/argus-never%20blinks-black.svg)](#what-argus-is)
+[![no flocks given](https://img.shields.io/badge/no-flocks%20given-red.svg)](#what-argus-is)
+[![flock around, find out](https://img.shields.io/badge/flock%20around-find%20out-red.svg)](#what-argus-is)
+[![zero flocks given](https://img.shields.io/badge/zero-flocks%20given-red.svg)](#what-argus-is)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
 ## What Argus is
 
