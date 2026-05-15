@@ -43,7 +43,7 @@ Argus v1.0.0 ships the canonical surveillance-equipment-identifier database as a
 - **USAspending.gov + Granicus Legistar** — federal/state/municipal procurement records (43,483 + 3 rows respectively).
 - **Wireshark `manuf` file** — community-maintained OUI cross-reference for vendor-name curation.
 - **NDSS 2025 Marlin IMSI-catcher research** at `academic` band — 53 behavioral-signature rows for cellular-detection signatures.
-- **Vendor companion applications** (Hak5 docs / Flock Safety FS Installer / Getac BWC Viewer) at `manufacturer_app` band — BLE service UUIDs + default credentials + product-family taxonomy extracted via static analysis under 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption per [LEGAL_POSTURE.md](LEGAL_POSTURE.md).
+- **Vendor companion applications** (Hak5 docs / Flock Safety FS Installer / Getac BWC Viewer) at `manufacturer_app` band — BLE service UUIDs + default credentials + product-family taxonomy extracted via static analysis under the 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption.
 - **22 canonical community-research GitHub repositories** at `crowdsourced` or `manufacturer_doc` band — drone Remote ID + BLE tracker catalogs + IMSI-catcher detection + ALPR-camera + flock-detection cohorts.
 - **5 secondary-batch repositories** at `crowdsourced` or `academic` band with explicit license-posture annotations (AGPL-3.0 inherited / AGPL-3.0 declared / NO_LICENSE_DECLARED under the Feist facts-only doctrine / CC-BY-NC-ND-4.0 with research-use clause).
 
@@ -68,7 +68,7 @@ Full per-source attribution + upstream-license chain in [CREDITS.md](CREDITS.md)
   - **Layer 2** `deployment_observations.LICENSE` (per-row NOT NULL column, migration 0016; Atlas rows quarantined under CC-BY-NC-SA-4.0 NC clause; DeFlock rows under ODbL-1.0)
   - **Layer 3** `identifiers.notes.upstream_license_posture` (per-promoted-identifier canonical sentinel key)
 - **Documentation:** CC-BY-SA-4.0 ([LICENSE-DOCS](LICENSE-DOCS)) — ShareAlike preserves the discipline-architecture open-availability for derivative documentation.
-- **DMCA / takedown posture:** project-side doctrinal grounding (Feist factual-data + 17 USC §1201(j) security-research exemption + 37 CFR §201.40(b) + nominative-fair-use) documented at [LEGAL_POSTURE.md](LEGAL_POSTURE.md); vendor attribution disputes route through [CONTRIBUTING.md](CONTRIBUTING.md).
+- **DMCA / takedown posture:** project-side doctrinal grounding is Feist factual-data + 17 USC §1201(j) security-research exemption + 37 CFR §201.40(b) + nominative fair use. Vendor attribution disputes route through a GitHub issue.
 
 ### Schema versioning
 
@@ -138,7 +138,7 @@ The dataset was built over roughly two weeks of intensive multi-agent orchestrat
 
 ### Known limitations + post-v1.0.0 roadmap
 
-Argus's v1.0.0 coverage is **intentionally narrow at this baseline** — do not assume comprehensive coverage of any specific surveillance equipment category. Expansion comes via the community contribution flow ([CONTRIBUTING.md](CONTRIBUTING.md)) + the following queued post-v1.0.0 work:
+Argus's v1.0.0 coverage is **intentionally narrow at this baseline** — do not assume comprehensive coverage of any specific surveillance equipment category. Expansion comes via the community contribution flow (standard GitHub PR + issue process) plus the following queued post-v1.0.0 work:
 
 **Documented held items with rationale** (framed as "known held items; contribution welcome" not "incomplete data"):
 
@@ -166,12 +166,6 @@ Argus's v1.0.0 coverage is **intentionally narrow at this baseline** — do not 
 Argus v1.0.0 was built using a multi-agent orchestration platform (Paperclip) with bible-as-contract discipline. Build-process detail in [METHODOLOGY.md §8](METHODOLOGY.md). Commit metadata reflects the agent-ensemble + human-operator authorship per the project's authorship discipline; full identity attribution lives in the git log + [CREDITS.md](CREDITS.md) "Build authorship" section.
 
 **Reproducibility:** the migrations and source-loaders in this repo deterministically reproduce the database from upstream public sources; the agent ensemble is not required at runtime. Re-running the build against current upstream snapshots will yield drift from the v1.0.0-tagged DB because upstream sources change. **Tagged DB releases (downloadable from GitHub Releases) are the canonical artifact for downstream consumers.**
-
-### Security + threat model
-
-- Technical vulnerabilities reporting path: [SECURITY.md](SECURITY.md) — GitHub Security Advisory as the canonical reporting channel.
-- Adversarial posture + threat-model analysis: [THREAT_MODEL.md](THREAT_MODEL.md) — 5 threat dimensions (surveillance operator / vendor / deployer-agency / bystander privacy / researcher-journalist) with explicit Argus mitigations + honest residual-risk acknowledgment.
-- Code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor Covenant 2.1 reference-adoption with enforcement via GitHub Security Advisory channel.
 
 ### Acknowledgments
 

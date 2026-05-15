@@ -16,7 +16,7 @@ Throughout this README: *database* refers to the queryable SQLite file (`db/argu
 
 Tools to surveil people are abundant; tools to detect surveillance are not. The asymmetry favors the surveillor. Argus narrows the gap by enumerating the wireless fingerprints of fixed ALPRs, IMSI catchers, body cameras, police drones, and related equipment, so that a downstream scanner (Rayhunter, Lynceus, or another consumer) can alert when matching devices are detected nearby.
 
-**Argus is for *detection* of public-record-derived surveillance equipment identifiers — NOT for evasion of legitimate law-enforcement interaction.** Argus operates as a passive identification database: identifiers and metadata only, no active interference, no jamming, no attack tooling, no deanonymization of individual officers or agencies. The scope is *equipment categories*, not people. Identifiers are derived exclusively from public sources — regulatory registries, public-records procurement data, open-source intelligence repositories, manufacturer-published documentation, and academic research. See [THREAT_MODEL.md](THREAT_MODEL.md) for the full adversarial-posture analysis and downstream-use guidance.
+**Argus is for *detection* of public-record-derived surveillance equipment identifiers — NOT for evasion of legitimate law-enforcement interaction.** Argus operates as a passive identification database: identifiers and metadata only, no active interference, no jamming, no attack tooling, no deanonymization of individual officers or agencies. The scope is *equipment categories*, not people. Identifiers are derived exclusively from public sources — regulatory registries, public-records procurement data, open-source intelligence repositories, manufacturer-published documentation, and academic research.
 
 ## Quickstart
 
@@ -94,7 +94,7 @@ Argus integrates data from 43 upstream sources organized across five tiers. Full
 
 **Tier 2-3 — Vendor companion applications** (`source_type='manufacturer_app'` + `manufacturer_doc'`):
 
-- **Hak5 product documentation, Flock Safety FS Installer, Getac BWC Viewer** — vendor companion apps statically analyzed under 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption per [LEGAL_POSTURE.md](LEGAL_POSTURE.md); decompiled source NOT redistributed per the decompiled-output non-redistribution rule
+- **Hak5 product documentation, Flock Safety FS Installer, Getac BWC Viewer** — vendor companion apps statically analyzed under the 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption; decompiled source NOT redistributed per the decompiled-output non-redistribution rule
 
 **Tier 1-3 — Community-research repositories** (`source_type='crowdsourced'` or `'academic'`):
 
@@ -167,22 +167,17 @@ External contribution is welcome under the discipline framework codified in [PRO
 - **Confidence ceiling per source band.** No confidence drift upward without second-source corroboration per the corroboration math. Row-level reclassifications land in the `source_reclassifications` audit table.
 - **Feist facts-only.** Public-but-unlicensed sources qualify for facts-only extraction; compilation arrangement (list-snippet verbatim copies; repository structure mirrors) is NOT republished. Per-row sentinel `notes.upstream_license_posture='NO_LICENSE_DECLARED'`.
 
-**For new identifiers** (extending vendor coverage, new device categories, new behavioral signatures): see [CONTRIBUTING.md](CONTRIBUTING.md) for the PR process, test requirements, source-admission workflow, and approval class for operator review.
+**For new identifiers** (extending vendor coverage, new device categories, new behavioral signatures): submit via the standard GitHub PR process. Substantive contributions carry per-row provenance, source-band classification, and confidence rationale per the discipline framework above.
 
 **For schema-impacting changes** (new tables, new `identifier_type` enum values, new `source_type` bands): coordinate with the canonical-bible amendment process documented at [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) — schema changes pair with `BIBLE_AMENDMENTS.md` entries per the amendment-log discipline.
 
-**For vendor attribution disputes** (a vendor disagrees with their inclusion or categorization): route through [CONTRIBUTING.md](CONTRIBUTING.md) "Vendor Attribution Dispute" path. Argus's posture (Feist factual data + 17 USC §1201(j) + 37 CFR §201.40(b) + nominative fair use) is documented at [LEGAL_POSTURE.md](LEGAL_POSTURE.md).
+**For vendor attribution disputes** (a vendor disagrees with their inclusion or categorization): open a GitHub issue describing the dispute. Argus's posture (Feist factual data + 17 USC §1201(j) + 37 CFR §201.40(b) + nominative fair use) governs the data-discipline response.
 
 ## Documentation
 
 - [METHODOLOGY.md](METHODOLOGY.md) — methodology, provenance discipline, source-tier hierarchy, agent-orchestrated build process
 - [DATA_DICTIONARY.md](DATA_DICTIONARY.md) — schema reference for every table, column, and enum value
 - [SETUP.md](SETUP.md) — local install, dependencies, optional API keys
-- [CONTRIBUTING.md](CONTRIBUTING.md) — contribution policy, PR process, test requirements, source-admission workflow
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Contributor Covenant 2.1
-- [SECURITY.md](SECURITY.md) — vulnerability disclosure path (GitHub Security Advisory)
-- [THREAT_MODEL.md](THREAT_MODEL.md) — adversarial threat model (5 dimensions: surveillance operator / vendor / deployer-agency / bystander privacy / researcher-journalist) + downstream-use posture
-- [LEGAL_POSTURE.md](LEGAL_POSTURE.md) — Feist factual-data doctrinal grounding + §1201(j) security-research exemption + DMCA counter-notice template
 - [CREDITS.md](CREDITS.md) — upstream attribution + 43 data-source credits + 34-entry surveillance-tech vendor lexicon
 - [CHANGELOG.md](CHANGELOG.md) — version history from v1.0.0 including the full amendment ledger, migration ledger 1 → 19, and pre-v1.0.0 history timeline
 - [PROJECT_BIBLE.md](PROJECT_BIBLE.md) — discipline architecture (hard rules, device_category vocabulary, Lynceus mapping, export shape)
@@ -202,7 +197,7 @@ Argus ships under three licenses by artifact class:
 
 **For users producing derived datasets:** honor the upstream license carry-forward chain. Commercial deployments MUST exclude `deployment_observations.LICENSE='CC-BY-NC-SA-4.0'` rows (Atlas NC clause); standard ODbL ShareAlike applies otherwise. See [CREDITS.md §9](CREDITS.md) for the 4-layer re-derivation discipline + [LICENSE-DATA §4](LICENSE-DATA) for downstream consumer integration guidance.
 
-**DMCA / takedown posture:** Argus's doctrinal grounding (Feist factual-data + 17 USC §1201(j) security-research exemption + 37 CFR §201.40(b) + nominative fair use) is documented at [LEGAL_POSTURE.md](LEGAL_POSTURE.md); vendor attribution disputes route through [CONTRIBUTING.md](CONTRIBUTING.md).
+**DMCA / takedown posture:** Argus's doctrinal grounding is Feist factual-data + 17 USC §1201(j) security-research exemption + 37 CFR §201.40(b) + nominative fair use. Vendor attribution disputes route through a GitHub issue.
 
 ---
 
