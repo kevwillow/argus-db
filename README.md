@@ -23,13 +23,11 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 ```bash
 git clone https://github.com/CascadeForge/argus.git
 cd argus
-pip install -r requirements.txt
-python3 -m db.init_db                              # build DB from migrations (or download release artifact)
 python3 argus_cli.py status                        # show DB path, schema version, row counts
 python3 argus_cli.py query e4:aa:ea:80:a1:9b       # lookup a Flock Safety ALPR MAC (id=1)
 ```
 
-See [SETUP.md](SETUP.md) for platform-specific dependencies, optional API keys, and WiGLE-grant gating.
+The repo ships with `db/argus.db` and the four canonical exports under `exports/` already populated; the read-path needs no `pip install`. See [SETUP.md](SETUP.md) for fresh-DB-init from migrations, source-ingest pipeline dependencies (per-domain pinned in `requirements-vendor-docs.txt` and `requirements-wigle.txt`), optional API keys, and WiGLE-grant gating.
 
 ## Status (v1.0.0)
 
