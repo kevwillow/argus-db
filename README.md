@@ -9,7 +9,7 @@
 
 ## What Argus is
 
-Argus is a consolidated, well-attributed, queryable database of wireless identifiers — MAC addresses, OUIs, BSSIDs, SSID patterns, BLE UUIDs, FAA Remote ID prefixes, Bluetooth SIG company IDs, vendor-app BLE service UUIDs, and behavioral-signature heuristics — for **surveillance and law-enforcement-adjacent equipment, derived entirely from public sources**. It ships as three artifacts under three licenses: a pipeline (AGPL-3.0-or-later), a dataset (ODbL-1.0, with Atlas-derived rows quarantined under CC-BY-NC-SA-4.0 per upstream NC clause), and documentation (CC-BY-SA-4.0).
+Argus is a consolidated, well-attributed, queryable database of wireless identifiers — MAC addresses, OUIs, BSSIDs, SSID patterns, BLE UUIDs, FAA Remote ID prefixes, Bluetooth SIG company IDs, vendor-app BLE service UUIDs, and behavioral-signature heuristics — for **surveillance and law-enforcement-adjacent equipment, derived entirely from public sources**. It ships as three artifacts under three licenses: a pipeline (AGPL-3.0-or-later), a dataset (ODbL-1.0), and documentation (CC-BY-SA-4.0).
 
 Throughout this README: *database* refers to the queryable SQLite file (`db/argus.db`); *dataset* refers to the exported JSON/CSV artifacts derived from it; *pipeline* refers to the migration + source-loader code that reproduces the database from upstream sources.
 
