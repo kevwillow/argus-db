@@ -19,7 +19,7 @@ No external system packages required for the read-path (querying the shipped DB 
 ## §2. Clone
 
 ```sh
-git clone https://github.com/CascadeForge/argus.git
+git clone https://github.com/kevwillow/argus-db.git
 cd argus
 ```
 

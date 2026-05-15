@@ -1704,7 +1704,7 @@ Validator ran §6.0 pre-flight count queries at heartbeat start;
 | Sub-item | Decomposition-time projection | Live live-DB | Disposition |
 |---|---|---|---|
 | (a) 90 FAA listDocs source_url upgrade candidates | 90 | **0** | already absent (MAC-63/MAC-88 closeout post-state) |
-| (b) 325 jlrjr primary_registry rows for downgrade | 325 | **0** | already crowdsourced (MAC-88 [`c12bedd`](https://github.com/CascadeForge/argus/commit/c12bedd) jlrjr-refinement post-state) |
+| (b) 325 jlrjr primary_registry rows for downgrade | 325 | **0** | already crowdsourced (MAC-88 [`c12bedd`](https://github.com/kevwillow/argus-db/commit/c12bedd) jlrjr-refinement post-state) |
 | (c) per-row IEEE upgrade candidates | variable | **degenerate** | all 17,844 IEEE rows already primary_registry post-state |
 | (d) sources.id=7 in `regulatory` band | `regulatory` | **`primary_registry`** | CP15 §8.2 strict-reading direction-reversal; FCC EAS grantee data is registry-class allocator, not filing-class regulatory |
 
@@ -1729,8 +1729,8 @@ CEO authored TWO contradictory dispositions on MAC-118 — the second authored f
 |---|---|---|---|
 | 14:49Z | Validator (da137694) | [`7110a211`](/MAC/issues/MAC-118#comment-7110a211) | MAC-118 audit surface-back: F1 sentinel-key consistency + F2 sid=41 `<verify-in-mapper-from-LICENSE-file>` placeholder + F3 operator-path scrub (193 occurrences / 77 files) |
 | **14:53Z** | **CEO** | **[`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69)** | **First CEO ratification:** F1 → defer CP21 + F2 → Option (a) verify-in-mapper + F3 → Option B1+B2 scrub with carveouts |
-| 15:03Z | Validator (commit) | [`106689b`](https://github.com/CascadeForge/argus/commit/106689b) | F3 path scrub: 34 tracked files (23 Python B1 + 7 prose B2 + B2-extended); bible / §8.4 / wigle-grant-response carveouts preserved |
-| 15:05Z | Validator (commit) | [`18c3d23`](https://github.com/CascadeForge/argus/commit/18c3d23) | F2 sid=41 backfill: posture = `CC-BY-NC-ND-4.0_with_research_use_clause` + 14 promoted identifiers backfilled with `notes.upstream_license_posture` (canonical key per F1 deferred-ratification) |
+| 15:03Z | Validator (commit) | [`106689b`](https://github.com/kevwillow/argus-db/commit/106689b) | F3 path scrub: 34 tracked files (23 Python B1 + 7 prose B2 + B2-extended); bible / §8.4 / wigle-grant-response carveouts preserved |
+| 15:05Z | Validator (commit) | [`18c3d23`](https://github.com/kevwillow/argus-db/commit/18c3d23) | F2 sid=41 backfill: posture = `CC-BY-NC-ND-4.0_with_research_use_clause` + 14 promoted identifiers backfilled with `notes.upstream_license_posture` (canonical key per F1 deferred-ratification) |
 | 15:08Z | Validator | [`ed4a51af`](/MAC/issues/MAC-118#comment-ed4a51af) | Surface-back: F2 + F3 commits landed; pre-ship gate PASS |
 | 15:11Z | CEO | [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) | Ratification close: MAC-118 → `done` |
 | ... ~2h gap (parallel work on other MAC-101 items) ... | | | |
@@ -1741,7 +1741,7 @@ CEO authored TWO contradictory dispositions on MAC-118 — the second authored f
 | 17:35Z | CEO | [`5789aeb8`](/MAC/issues/MAC-119#comment-5789aeb8) | MAC-119 → `done` (redundant scrub-already-done ratification) |
 
 Anchor:
-  MAC-118 thread [`7110a211`](/MAC/issues/MAC-118#comment-7110a211) → [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) → [`ed4a51af`](/MAC/issues/MAC-118#comment-ed4a51af) → [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) → [`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6) → [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) + commits [`18c3d23`](https://github.com/CascadeForge/argus/commit/18c3d23) + [`106689b`](https://github.com/CascadeForge/argus/commit/106689b) + CEO investigation surface-back MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) + board ratification MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125)
+  MAC-118 thread [`7110a211`](/MAC/issues/MAC-118#comment-7110a211) → [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) → [`ed4a51af`](/MAC/issues/MAC-118#comment-ed4a51af) → [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) → [`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6) → [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) + commits [`18c3d23`](https://github.com/kevwillow/argus-db/commit/18c3d23) + [`106689b`](https://github.com/kevwillow/argus-db/commit/106689b) + CEO investigation surface-back MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) + board ratification MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125)
 
 **Class (e) ratifier-disposition-stale-state sub-class designation:** when a ratifier (CEO or board) authors a SECOND disposition on an issue that has already been ratified, executed, and closed at an earlier surface, without paste-verifying current state. Structurally distinct from class (d) decomposition-time-projection-stale (which is dispatch-authoring-time projection against live data; this is post-resolution disposition against already-landed reality).
 
@@ -1753,13 +1753,40 @@ Actor-neutral framing preferred per board ratification (MAC-101 [`5d6a8125`](/MA
 
 - 17:23Z second disposition did not propagate
 - MAC-119 redundant filing caught by Validator surface-back at [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) within 5 minutes
-- Canonical state stays clean: sid=41 = `CC-BY-NC-ND-4.0_with_research_use_clause`, CREDITS.md (commit [`f1a3405`](https://github.com/CascadeForge/argus/commit/f1a3405)) reflects, LICENSE-DATA §2.1 (commit [`ead49a3`](https://github.com/CascadeForge/argus/commit/ead49a3)) references correctly
+- Canonical state stays clean: sid=41 = `CC-BY-NC-ND-4.0_with_research_use_clause`, CREDITS.md (commit [`f1a3405`](https://github.com/kevwillow/argus-db/commit/f1a3405)) reflects, LICENSE-DATA §2.1 (commit [`ead49a3`](https://github.com/kevwillow/argus-db/commit/ead49a3)) references correctly
 - No §11 hard-rule trip, no data corruption, no consumer-facing impact
 - [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) reconciliation comment captures the discipline lesson in audit-trail surface
 
 **Discipline-self-catch shape:** the 17:29Z reconciliation comment self-identified the discipline failure without board intervention. This is the discipline-self-catch shape that makes S.7's audit-trail mechanism load-bearing — recurrence #11 represents the discipline working as designed (Validator + CEO + reconciliation chain caught the drift; canonical state stays clean).
 
 Whether to extend S.7's authoring rule explicitly to ratifier-class actions is the (α)/(β) decision codified at §6 below (board selected (α) with explicit (β) escalation trigger).
+
+### Case 12 — Fabricated GitHub org URL via deterministic-template construction (class (b) field-value sub-class with bidirectional repo↔memory leak path)
+
+CEO authored a fabricated GitHub URL `https://github.com/CascadeForge/argus[.git OR /commit/<sha>]` across multiple bible-text edits, audit-trail entries, repo-doc edits, and memory files. The canonical operator URL is `https://github.com/kevwillow/argus-db`. The fabricated `CascadeForge` org-name is an operator-other-project-employee handle that propagated into Argus context across 25 in-repo + 11 in-memory occurrences before operator caught it at consumption time.
+
+**Surfaced:** Board finding at MAC-124 [`e539cd41`](/MAC/issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704) (2026-05-15) reviewing commit `81931d7`. The fabrication had been propagating since commit [`f45657d`](https://github.com/kevwillow/argus-db/commit/f45657d) (2026-05-14, prior CEO heartbeat).
+
+**Origin + propagation chain:**
+
+| Time | Surface | Event |
+|---|---|---|
+| 2026-05-14 (prior heartbeat) | bible commit [`f45657d`](https://github.com/kevwillow/argus-db/commit/f45657d) | First fabricated `CascadeForge/argus/commit/<sha>` URL introduced into PROJECT_BIBLE.md §3.1 device_category note |
+| 2026-05-14 (subsequent prior heartbeats) | commits [`dfdb052`](https://github.com/kevwillow/argus-db/commit/dfdb052), [`bd1e0e1`](https://github.com/kevwillow/argus-db/commit/bd1e0e1), [`4803ccf`](https://github.com/kevwillow/argus-db/commit/4803ccf), [`47403e3`](https://github.com/kevwillow/argus-db/commit/47403e3), [`da8f21c`](https://github.com/kevwillow/argus-db/commit/da8f21c), [`9295af8`](https://github.com/kevwillow/argus-db/commit/9295af8) | Pattern propagated into BIBLE_AMENDMENTS.md (16×), PROJECT_STATE.md (4×), README.md (3× — 2 shields.io badges + 1 clone URL) |
+| 2026-05-14 22:06Z | commit [`c9109de`](https://github.com/kevwillow/argus-db/commit/c9109de) | CEO (this session) introduced 1 new occurrence in SETUP.md Quickstart by drawing the pattern from the existing README clone-URL line as established convention |
+| 2026-05-15 02:55Z | commit [`81931d7`](https://github.com/kevwillow/argus-db/commit/81931d7) | CEO modified README.md Quickstart `pip install` line; did NOT touch the existing CascadeForge clone-URL line because edit was scoped to `pip install` only — the fabrication survived intact |
+| 2026-05-15 03:04Z | MAC-124 [`e539cd41`](/MAC/issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704) | Board surface-back: "Commit 81931d7 introduced a fabricated GitHub URL... CascadeForge does not refer to anything in the Argus project" |
+| 2026-05-15 03:05Z | MAC-124 [`acbf4eaa`](/MAC/issues/MAC-124#comment-acbf4eaa-8075-4876-bf19-9527acae433c) | CEO Phase 1 manifest: 25 in-repo + 11 in-memory occurrences traced + bidirectional leak-path identified |
+| 2026-05-15 03:16Z | MAC-124 [`06e328ea`](/MAC/issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) | Board ratifies replacement values + GO Phase 2 bundled fix |
+| 2026-05-15 (this commit) | this entry | Phase 2 fix landed: 24 in-repo replacements (25 minus 1 dropped CI badge) + 11 in-memory replacements + SAR-12 §4 Case 12 + §6 recurrence #12 + sub-rule clarification |
+
+**Class (b) field-value sub-class designation:** distinct from prior (b) sub-classes. Recurrence #8 was rule-scope (`§11 #13 unknown-cat exclusion scope`); recurrence #9 was table-scope (`manufacturers` semantics); the pre-codification recurrences were field-name (FAA `documentNumber` → `trackingNumber`). This is **field-value** — the assertion is about the value of a variable inside a deterministic template (the `<org>` variable in the `https://github.com/<org>/<repo>/commit/<sha>` template). The template structure was stable; the variable substitution was fabricated.
+
+**Bidirectional leak-path failure-mode insight:** the load-bearing finding from this recurrence is not the URL itself but the propagation mechanism. The fabrication seeded the repo at `f45657d`; CEO memory files captured the URL form when authoring close-of-close summaries (memory absorbed repo state); subsequent CEO heartbeats authoring new repo content drew the URL form from BOTH the existing repo state AND the memory files (memory reinforced repo). The repo↔memory loop is bidirectional: each surface seeded the other; each surface reinforced the other. Without paste-result verification at any intermediate consumption point, the fabrication propagated for ~24 hours across multiple commits, multiple memory files, and multiple agent heartbeats before operator caught it at MAC-124.
+
+**Why discipline failed at consumption time:** the URL pattern looked like established repo convention (25 occurrences before this session's commits). Each new authoring drew from the established pattern as if from a verified source. The `https://github.com/<org>/<repo>/commit/<sha>` template shape masked the assertion as "just constructing a link from facts" — but the underlying `<org>=CascadeForge` value was itself a fabrication, not a fact.
+
+**Substantive outcome:** zero data corruption (no DB writes), zero §11 hard-rule trip, zero consumer-facing impact (the fabricated URLs would have surfaced as 404s on click but the audit-trail anchors still pointed at the right SHAs). The repo-doc + memory-doc cleanup is mechanical; the load-bearing fix is the discipline codification (sub-rule below).
 
 ## §5 — Inline demonstration
 
@@ -1942,7 +1969,7 @@ historical and not binding.
     2026-05-14): class **(e) ratifier-disposition-stale-state** sub-
     class first instance. CEO authored TWO contradictory dispositions
     on MAC-118: first ratification at [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) 14:53Z (F2 → Option (a)
-    verify-in-mapper); Validator executed at commits [`18c3d23`](https://github.com/CascadeForge/argus/commit/18c3d23) + [`106689b`](https://github.com/CascadeForge/argus/commit/106689b)
+    verify-in-mapper); Validator executed at commits [`18c3d23`](https://github.com/kevwillow/argus-db/commit/18c3d23) + [`106689b`](https://github.com/kevwillow/argus-db/commit/106689b)
     (15:03Z–15:05Z); CEO closed issue at [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) (15:11Z). HOURS
     later at [`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6) (17:23Z) CEO authored SECOND disposition
     (F2 → Option (b) defer-to-prose + F3 → spawn child) as if findings
@@ -1977,11 +2004,53 @@ historical and not binding.
     'ratifier-disposition-stale-state' applies symmetrically to CEO
     and board ratifications. Land canonical class (e) wording with
     the actor-neutral framing."
+  - Recurrence #12 (post-codification, MAC-124 [`e539cd41`](/MAC/issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704)
+    2026-05-15): class **(b) field-value** sub-class first instance.
+    CEO authored fabricated `https://github.com/CascadeForge/argus[.git
+    OR /commit/<sha>]` URL across multiple bible-text edits, audit-
+    trail entries, repo-doc edits, and memory files (canonical:
+    `https://github.com/kevwillow/argus-db`). The fabricated `<org>`
+    value (an operator-other-project-employee handle) propagated
+    across 25 in-repo + 11 in-memory occurrences before operator
+    caught it at consumption time on commit [`81931d7`](https://github.com/kevwillow/argus-db/commit/81931d7). Origin
+    commit [`f45657d`](https://github.com/kevwillow/argus-db/commit/f45657d) (prior CEO heartbeat). Full case study at
+    SAR-12 §4 Case 12 above.
+
+    Field-value sub-class structurally distinct from prior (b) sub-
+    classes (field-name + rule-scope + table-scope): concerns the
+    VALUE of a variable inside an otherwise-deterministic-template
+    construction (e.g., `<org>` inside the
+    `https://github.com/<org>/<repo>/commit/<sha>` URL template).
+    Distinct from class (a) cardinality-mismatch (which is about
+    counting); distinct from class (e) ratifier-disposition-stale-
+    state (which is post-resolution; this is authoring-time fabrication).
+
+    **Bidirectional repo↔memory leak-path failure-mode insight:** the
+    load-bearing finding from this recurrence is not the URL itself
+    but the propagation mechanism. The fabrication seeded the repo at
+    `f45657d`; CEO memory files captured the URL form when authoring
+    close-of-close summaries (memory absorbed repo state); subsequent
+    CEO heartbeats authoring new repo content drew the URL form from
+    BOTH the existing repo state AND the memory files (memory
+    reinforced repo). Each surface seeded the other; each surface
+    reinforced the other. Without paste-result verification at any
+    intermediate consumption point, the fabrication propagated for
+    ~24 hours across multiple commits, multiple memory files, and
+    multiple agent heartbeats before operator caught it.
+
+    Board ratification at MAC-124 [`06e328ea`](/MAC/issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) 2026-05-15:
+    "Investigation discipline reads clean. Bundle Phase 2 commit
+    covering URL fix + memory cleanup + SAR-12 §4 Case 12 + §6
+    recurrence #12 + sub-rule clarification per [§6 deterministic-
+    template sub-rule] below. Cross-project context contamination
+    flagged but not codified now (defer larger memory-isolation
+    question to separate strategic conversation)."
 
 **Sub-class taxonomy so far (post-codification; actor-neutral framing per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2):**
 
   - (a) cardinality-mismatch class — recurrence #7 (one occurrence) — MAC-88 sweep FAA partition-count drift
   - (b) rule-scope class — recurrence #8 (one occurrence) — MAC-100 §11 #13 unknown-cat exclusion scope
+  - (b) **field-value class** — recurrence #12 (one occurrence) — MAC-124 fabricated GitHub `<org>` URL
   - (c) table-scope class — recurrence #9 (one occurrence) — MAC-101 Item A manufacturers-table semantics
   - (d) decomposition-time-projection-stale class — recurrence #10 (one occurrence) — MAC-116 §2.3 sweep all 4 sub-items
   - (e) **ratifier-disposition-stale-state class** — recurrence #11 (one occurrence) — MAC-118 F2/F3 second-disposition
@@ -2029,6 +2098,18 @@ If the (β) trigger fires, CEO authors the extension dispatch without re-asking 
 this codification represents the **first substantive board-vs-CEO ratification divergence on a discipline-evolution question** since the architecture took current shape. CEO recommended (β) with strong reasoning at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4; board considered, weighed evidence differently, selected (α) at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.
 
 Healthy deference shape: CEO surfaces (β) with clear argument → board considers, weights differently → board lands (α) with explicit (β) trigger → CEO honors ratification, doesn't relitigate. The architecture has decision authority on canonical contract changes resting with board; CEO surfaces best reasoning; board decides; CEO honors. Future discipline-evolution questions inherit this shape: recommendation + ratification + honored disposition + audit-trail preservation of the divergence reasoning. The discipline doesn't require board+CEO to always agree; it requires the divergence to be visible and the decision authority to be respected.
+
+**Deterministic-template sub-rule clarification (codified per MAC-124 [`06e328ea`](/MAC/issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) board direction; recurrence #12 case study):**
+
+URLs that follow deterministic templates (e.g., `https://github.com/<org>/<repo>/commit/<sha>`, `https://archive.org/wayback/<url>`, `https://api.fcc.gov/.../<id>`, etc.) require class (b) field-value verification on the variable parts (`<org>`, `<repo>`, root URL host) even when the template structure is itself stable. The deterministic shape masks the assertion as "just construction from facts" when the underlying facts themselves need verification.
+
+The failure mode the recurrence #12 case study surfaces: the template `https://github.com/<org>/<repo>/commit/<sha>` is a stable construction shape (every well-known git host follows the same form). The `<sha>` value is a verifiable fact pulled from `git log`. The `<org>` and `<repo>` values look like they're being constructed from established repo convention — but if the established convention is itself a fabrication that propagated unchallenged, the construction inherits the fabrication.
+
+**Verification discipline:** when authoring deterministic-template URLs (or any deterministic-template asserted values where the variable parts are class (b) field-value claims), paste-verify the variable parts at consumption time. For GitHub URLs specifically, the canonical `<org>/<repo>` value comes from `git config --get remote.origin.url` (or operator confirmation when no remote is configured) — NOT from grepping prior repo commits for the established pattern. Established repo convention can be a propagated fabrication; remote-URL inspection is the source-of-truth.
+
+**Bidirectional propagation surface:** when a fabricated deterministic-template variable lands in a repo, downstream agent memory captures the value as "established repo state" and reinforces it in subsequent authoring. Memory-side cleanup is therefore part of the fix discipline (per MAC-124 [`06e328ea`](/MAC/issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) §3 board direction: "Memory and repo must stay consistent — bidirectional leak path means bidirectional fix"). Repo-only fixes leave the propagation pump primed for recurrence.
+
+This sub-rule is a class (b) refinement, not a sixth top-level class. Future recurrences of class (b) field-value type get appended to §6 recurrence chain under existing class (b) accounting; the "third same-sub-class recurrence triggers meta-revision" rule applies to (b) field-value as it does to (b) rule-scope and (b) table-scope.
 
 Future S.7 recurrences (if any post-codification) get appended to
 this list with anchor + class.
@@ -2318,7 +2399,7 @@ This CP20 entry is the §11 #11 amendment-log pairing for the SAR-13 section add
 
 ## SAR-14 — Bible-amendment child-issue-ID-ordering discipline
 
-**Origin:** CP20 [`8de7309`](https://github.com/CascadeForge/argus/commit/8de7309) drafted bible-text referencing downstream child issues by DRAFT IDs (MAC-105/106/107) before the Paperclip system assigned actual IDs. System assigned MAC-108/MAC-109/MAC-110 to the three CEO-spawned children. Required fix commit [`dd26b59`](https://github.com/CascadeForge/argus/commit/dd26b59) to remap the bible references to landed reality per `feedback_bible_amendment_downstream_consumer_audit.md` discipline. Pattern surfaced at MAC-101 close §6.3.f; board flagged as "worth a small SAR-class refinement at next memo-refinement cycle" at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) 2026-05-14. Codified here per MAC-101 §2.1(c) dispatch directive.
+**Origin:** CP20 [`8de7309`](https://github.com/kevwillow/argus-db/commit/8de7309) drafted bible-text referencing downstream child issues by DRAFT IDs (MAC-105/106/107) before the Paperclip system assigned actual IDs. System assigned MAC-108/MAC-109/MAC-110 to the three CEO-spawned children. Required fix commit [`dd26b59`](https://github.com/kevwillow/argus-db/commit/dd26b59) to remap the bible references to landed reality per `feedback_bible_amendment_downstream_consumer_audit.md` discipline. Pattern surfaced at MAC-101 close §6.3.f; board flagged as "worth a small SAR-class refinement at next memo-refinement cycle" at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) 2026-05-14. Codified here per MAC-101 §2.1(c) dispatch directive.
 
 **Bible-binding:** SAR-14 binds bible-amendment authors (CEO, sub-CEO, and workers when surfacing bible-class changes via halt-and-surface). It pairs with `feedback_bible_amendment_downstream_consumer_audit.md` (S.8 append-don't-mutate sub-rule) — the existing downstream-consumer-audit memo covers the FIX behavior when a collision is found; SAR-14 covers the PREVENT behavior to avoid the collision in the first place.
 
@@ -2337,13 +2418,13 @@ When a bible amendment will reference downstream child issues by ID (e.g., `Chil
 
 ### §2 — Case study
 
-**CP20 (2026-05-14) initial commit [`8de7309`](https://github.com/CascadeForge/argus/commit/8de7309)** referenced draft IDs MAC-105/106/107 across:
+**CP20 (2026-05-14) initial commit [`8de7309`](https://github.com/kevwillow/argus-db/commit/8de7309)** referenced draft IDs MAC-105/106/107 across:
 - `### Status` (next-action enumeration)
 - `### Binds` (worker dispatch references)
 - `### Sequencing post-acceptance` (child-issue ladder)
 - `### S.2` (URL-template-discipline rerun child)
 
-System actually assigned MAC-108/MAC-109/MAC-110 to the three CEO-spawned children. (MAC-105/106 had become unrelated productivity-review issues; MAC-107 was a duplicate-spawn against the MAC-104 scope and was cancelled-as-superseded.) Required fix commit [`dd26b59`](https://github.com/CascadeForge/argus/commit/dd26b59) to remap 7 bible-text occurrences per `feedback_bible_amendment_downstream_consumer_audit.md` discipline.
+System actually assigned MAC-108/MAC-109/MAC-110 to the three CEO-spawned children. (MAC-105/106 had become unrelated productivity-review issues; MAC-107 was a duplicate-spawn against the MAC-104 scope and was cancelled-as-superseded.) Required fix commit [`dd26b59`](https://github.com/kevwillow/argus-db/commit/dd26b59) to remap 7 bible-text occurrences per `feedback_bible_amendment_downstream_consumer_audit.md` discipline.
 
 Fix-commit anchor in dd26b59:
 > The MAC-105/MAC-106/MAC-107 identifiers used in CP20 §"Status" / §"Binds" / §"Sequencing post-acceptance" / §S.2 were draft predictions; the system assigned MAC-108/MAC-109/MAC-110 to the three child issues spawned by CEO heartbeat. ... Updating the bible references to match landed reality per feedback_bible_amendment_downstream_consumer_audit.md.
@@ -2388,18 +2469,18 @@ Correction Pass 21 — coordinated amendment: §4.4 MAP entries + §11 #16 canon
 
 Specific items + ratification anchors:
 
-- **§4.4 MAP entries (2 MAP + 12 DROP from mig-0018 + 7 DROP from mig-0019):** CEO §2.5 recommendation at MAC-101 [`4367e10b`](/MAC/issues/MAC-101#comment-4367e10b-ff72-486c-84e8-98f3fd7ac75d) + board ratification at MAC-101 [`e246a32a`](/MAC/issues/MAC-101#comment-e246a32a-5a28-467d-b20e-72901a5a3d88). MAC-117 closed at commits [`41da1d6`](https://github.com/CascadeForge/argus/commit/41da1d6) (migration 0019) + [`30a0252`](https://github.com/CascadeForge/argus/commit/30a0252) (routing execution); the 7 net-new identifier_types from mig-0019 fold into this CP21 batch per the same DROP framework.
-- **§11 #16 canonical sentinel-key (`notes.upstream_license_posture`):** MAC-118 F1 CEO ratification at MAC-118 [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) + reconfirmed at MAC-118 [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) reconciliation + LICENSE-DATA §3 cross-reference at commit [`ead49a3`](https://github.com/CascadeForge/argus/commit/ead49a3).
+- **§4.4 MAP entries (2 MAP + 12 DROP from mig-0018 + 7 DROP from mig-0019):** CEO §2.5 recommendation at MAC-101 [`4367e10b`](/MAC/issues/MAC-101#comment-4367e10b-ff72-486c-84e8-98f3fd7ac75d) + board ratification at MAC-101 [`e246a32a`](/MAC/issues/MAC-101#comment-e246a32a-5a28-467d-b20e-72901a5a3d88). MAC-117 closed at commits [`41da1d6`](https://github.com/kevwillow/argus-db/commit/41da1d6) (migration 0019) + [`30a0252`](https://github.com/kevwillow/argus-db/commit/30a0252) (routing execution); the 7 net-new identifier_types from mig-0019 fold into this CP21 batch per the same DROP framework.
+- **§11 #16 canonical sentinel-key (`notes.upstream_license_posture`):** MAC-118 F1 CEO ratification at MAC-118 [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) + reconfirmed at MAC-118 [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) reconciliation + LICENSE-DATA §3 cross-reference at commit [`ead49a3`](https://github.com/kevwillow/argus-db/commit/ead49a3).
 - **§8.2 strict-reading acknowledgment:** MAC-116 §2.3(d) sources.id=7 direction-reversal finding (dispatch projected `regulatory`, strict reading produces `primary_registry`) + board ratification at MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c) §2.
 - **SAR-12 §4 Case 11 + §6 recurrence #11 + sub-class taxonomy extension (a/b/c/d/e):** CEO investigation surface-back at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) + board ratification + actor-neutral framing directive at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b). Sub-class (e) ratifier-disposition-stale-state codified.
 - **(α)/(β) decision + (β) escalation trigger pre-commitment:** board selected (α) at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3 (diverging from CEO recommendation of (β) at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4). (β) escalation trigger armed: second class (e) recurrence within next 10 board+CEO heartbeats from this codification escalates to (β) without further board deliberation.
 - **Board-vs-CEO divergence preservation note:** first substantive board-vs-CEO ratification divergence on a discipline-evolution question since the architecture took current shape; per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.3 + §6.
 
-**Bible commit:** This entry + PROJECT_BIBLE.md §4.4 +21 mapping rows + §11 #16 canonical sentinel-key sub-rule + §8.2 strict-reading acknowledgment + BIBLE_AMENDMENTS.md SAR-12 §4 Case 11 + §6 recurrence #11 + §6 sub-class taxonomy actor-neutral extension + §6 (α)/(β) decision + escalation trigger pre-commitment + board-vs-CEO divergence preservation note. Bible HEAD bumps from [`9979015`](https://github.com/CascadeForge/argus/commit/9979015) (§6 threshold cleanup) → this CP21 commit.
+**Bible commit:** This entry + PROJECT_BIBLE.md §4.4 +21 mapping rows + §11 #16 canonical sentinel-key sub-rule + §8.2 strict-reading acknowledgment + BIBLE_AMENDMENTS.md SAR-12 §4 Case 11 + §6 recurrence #11 + §6 sub-class taxonomy actor-neutral extension + §6 (α)/(β) decision + escalation trigger pre-commitment + board-vs-CEO divergence preservation note. Bible HEAD bumps from [`9979015`](https://github.com/kevwillow/argus-db/commit/9979015) (§6 threshold cleanup) → this CP21 commit.
 
 **Status:** Ratified by board across multiple comments (e246a32a / dd7bd55c / 5d6a8125 / fc284872) over the MAC-101 pre-ship dispatch lifecycle. CEO authors the coordinated bible-text + amendment-log entry; no worker dispatch (no schema change; no migration; no DB-side execution).
 
-**Binds:** Validator (no execution — §4.4 MAP additions are export-discipline reference; new DROPPED-class identifier_types default-handled by existing export pipeline per MAC-110 [`5f1bf2e`](https://github.com/CascadeForge/argus/commit/5f1bf2e) DROPPED_REASONS extension + MAC-117 [`30a0252`](https://github.com/CascadeForge/argus/commit/30a0252) migration 0019 DROPPED-class default), DBArchitect (none — no migration), ExtractionWorker (none — Phase-1 mappers + Validator-side promoters converge on canonical sentinel-key `notes.upstream_license_posture` per §11 #16 sub-rule going forward), Lynceus integration team (informational — §4.4 MAP grows by 21 entries; no new pattern_types to support; the 2 alias-collapses route to existing `ble_uuid` / `ble_manufacturer_id` pattern_types).
+**Binds:** Validator (no execution — §4.4 MAP additions are export-discipline reference; new DROPPED-class identifier_types default-handled by existing export pipeline per MAC-110 [`5f1bf2e`](https://github.com/kevwillow/argus-db/commit/5f1bf2e) DROPPED_REASONS extension + MAC-117 [`30a0252`](https://github.com/kevwillow/argus-db/commit/30a0252) migration 0019 DROPPED-class default), DBArchitect (none — no migration), ExtractionWorker (none — Phase-1 mappers + Validator-side promoters converge on canonical sentinel-key `notes.upstream_license_posture` per §11 #16 sub-rule going forward), Lynceus integration team (informational — §4.4 MAP grows by 21 entries; no new pattern_types to support; the 2 alias-collapses route to existing `ble_uuid` / `ble_manufacturer_id` pattern_types).
 
 ### Why this Correction Pass exists
 
@@ -2442,8 +2523,8 @@ Each touch has independent ratification anchor (per Source enumeration above). T
 ### Sequencing post-acceptance
 
 1. **CP21 ratifies at this commit.** Bible HEAD bumps from `9979015` → CP21 commit SHA. Schema unchanged; no migration; no worker dispatch; no DB-side execution.
-2. **No paired code-sibling commit needed.** §4.4 MAP additions are export-discipline reference; existing DROPPED_REASONS extensions at MAC-110 [`5f1bf2e`](https://github.com/CascadeForge/argus/commit/5f1bf2e) + MAC-117 [`30a0252`](https://github.com/CascadeForge/argus/commit/30a0252) already handle the 21 new identifier_types as DROPPED-class default. The 2 alias-collapse MAPs route to existing pattern_types (`ble_uuid` / `ble_manufacturer_id`) — no new Lynceus pattern_types to integrate.
-3. **No paired state-rotation commit.** PROJECT_STATE.md already captures MAC-101 close-of-close at [`1e87b85`](https://github.com/CascadeForge/argus/commit/1e87b85) + header refresh at [`1495984`](https://github.com/CascadeForge/argus/commit/1495984) + lines-8-18 refresh at [`4de0233`](https://github.com/CascadeForge/argus/commit/4de0233); CP21 amendments are bible-internal and do not surface to PROJECT_STATE rotation.
+2. **No paired code-sibling commit needed.** §4.4 MAP additions are export-discipline reference; existing DROPPED_REASONS extensions at MAC-110 [`5f1bf2e`](https://github.com/kevwillow/argus-db/commit/5f1bf2e) + MAC-117 [`30a0252`](https://github.com/kevwillow/argus-db/commit/30a0252) already handle the 21 new identifier_types as DROPPED-class default. The 2 alias-collapse MAPs route to existing pattern_types (`ble_uuid` / `ble_manufacturer_id`) — no new Lynceus pattern_types to integrate.
+3. **No paired state-rotation commit.** PROJECT_STATE.md already captures MAC-101 close-of-close at [`1e87b85`](https://github.com/kevwillow/argus-db/commit/1e87b85) + header refresh at [`1495984`](https://github.com/kevwillow/argus-db/commit/1495984) + lines-8-18 refresh at [`4de0233`](https://github.com/kevwillow/argus-db/commit/4de0233); CP21 amendments are bible-internal and do not surface to PROJECT_STATE rotation.
 4. **(β) escalation trigger state tracked in CEO memory durables** — CEO records the trigger arm time (this commit timestamp) + the 10-heartbeat counter; if a second class (e) recurrence surfaces within the window, CEO authors the (β) extension dispatch per pre-commitment.
 
 ### §12 Open Questions impact
@@ -2455,7 +2536,7 @@ Each touch has independent ratification anchor (per Source enumeration above). T
 
 ### §11 #11 self-binding satisfied
 
-This CP21 entry is the §11 #11 amendment-log pairing for the §4.4 + §11 #16 + §8.2 §-text changes in the coordinated commit. Bible HEAD bumps from [`9979015`](https://github.com/CascadeForge/argus/commit/9979015) to the CP21 commit landed alongside this entry. Schema-version unchanged (CP21 is a §-text + amendment-log CP; no DB migration touched). The §4.4 mapping table reaches 48 cumulative entries matching the live identifier_type CHECK enum (27 pre + 14 mig-0018 + 7 mig-0019 = 48; verified live at CP21 authoring time).
+This CP21 entry is the §11 #11 amendment-log pairing for the §4.4 + §11 #16 + §8.2 §-text changes in the coordinated commit. Bible HEAD bumps from [`9979015`](https://github.com/kevwillow/argus-db/commit/9979015) to the CP21 commit landed alongside this entry. Schema-version unchanged (CP21 is a §-text + amendment-log CP; no DB migration touched). The §4.4 mapping table reaches 48 cumulative entries matching the live identifier_type CHECK enum (27 pre + 14 mig-0018 + 7 mig-0019 = 48; verified live at CP21 authoring time).
 
 ═══════════════════════════════════════════════════════════════════════
 

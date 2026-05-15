@@ -5,8 +5,7 @@
 [![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 [![Data License: ODbL-1.0](https://img.shields.io/badge/Data-ODbL--1.0-orange.svg)](LICENSE-DATA)
 [![Docs License: CC-BY-SA-4.0](https://img.shields.io/badge/Docs-CC--BY--SA--4.0-yellow.svg)](LICENSE-DOCS)
-[![GitHub release](https://img.shields.io/github/v/release/CascadeForge/argus?label=release)](../../releases)
-[![CI](https://img.shields.io/github/actions/workflow/status/CascadeForge/argus/ci.yml?branch=main&label=CI)](../../actions)
+[![GitHub release](https://img.shields.io/github/v/release/kevwillow/argus-db?label=release)](../../releases)
 
 ## What Argus is
 
@@ -21,7 +20,7 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 ## Quickstart
 
 ```bash
-git clone https://github.com/CascadeForge/argus.git
+git clone https://github.com/kevwillow/argus-db.git
 cd argus
 python3 argus_cli.py status                        # show DB path, schema version, row counts
 python3 argus_cli.py query e4:aa:ea:80:a1:9b       # lookup a Flock Safety ALPR MAC (id=1)
