@@ -226,3 +226,33 @@ specification; this document is the public-facing summary.
 | export shape | `PROJECT_BIBLE.md` §7.5 |
 | source-type taxonomy refinement (registry-vs-regulatory) | `BIBLE_AMENDMENTS.md` CP15 |
 | behavioral_signatures sibling export | `BIBLE_AMENDMENTS.md` CP18 |
+
+
+
+## How I built this
+
+Argus is the result of many long days and longer nights of iterative work across multiple machines — Windows dev boxes for some scraping and analysis work, Linux dev machines and a Linux server for the database, orchestration, and most agent work. The build process spans research, scraping, validation, schema design, license posture, discipline framework, and the audit trail that backs every promotion. The substantive growth from a 514-row baseline to over 22,000 active identifiers happened across roughly two weeks of compressed work; the architectural framework that makes those promotions trustworthy took longer.
+
+### Operator-led orchestration
+
+I plan and orchestrate this project myself, using Claude chat as a strategic-planning collaborator, paperclipai as the company orchestration layer, and Claude Code as the execution agent across multiple specialist roles (extraction worker, source worker, validator, database architect, orchestrator). I have final decision authority on everything that lands in this repo. Strategic direction, architectural decisions, source-admission disputes, license posture, schema changes, and discipline-framework evolution are all operator-ratified before they commit.
+
+The AI agents are highly capable executors with substantial scoping autonomy inside the constraints I set. They surface findings, propose decompositions, escalate when something needs ratification, and run extensive verification work I couldn't do at scale manually. But they don't decide canonical contract. I do.
+
+This was not vibe-coded. Argus has 21 documented amendments to its canonical contract and 14 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough — provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
+
+### Notable technical work
+
+Two areas surfaced data that wasn't otherwise aggregated anywhere queryable:
+
+**Vendor app decompilation.** I downloaded Android APKs of setup and admin apps published by surveillance-equipment vendors (Flock Safety being one substantive example) and analyzed the binaries for embedded identifier patterns — BLE service UUIDs, MAC address prefixes, vendor-specific protocol fields, default device names. Vendor setup apps need to recognize and connect to their own equipment, so they ship with the identifiers needed to do that. Decompiling public app-store binaries surfaced this information directly. This is legal reverse-engineering of publicly-distributed software, but it required actually doing the work rather than waiting for vendors to publish identifier schemas (they don't).
+
+**GitHub researcher-repo aggregation.** Surveillance equipment has been studied by independent researchers for years — drone RID protocol work (alphafox02/DragonSync), cellular intercept detection (EFForg/rayhunter), BLE stalking-tracker research (seemoo-lab/AirGuard), FAA Remote ID database mirrors (jlrjr's wrapper), and more. The data exists across these projects but had never been pulled into a single queryable database with provenance discipline. Argus aggregates it: every identifier traces back to the specific researcher repo, the specific commit, the specific file path, with proper attribution under the original licenses. This is meta-research synthesis rather than primary discovery, but it makes a large amount of distributed researcher work actually usable.
+
+### The discipline framework
+
+The most substantive thing I built isn't the database. It's the framework that makes the database verifiable.
+
+Every active identifier carries source attribution, confidence scoring, source-type classification, and a chain of corroboration. The framework includes hard rules that prevent fabrication (every identifier must trace to a concrete public source), PII discipline (individual-attributed registrations stay held, not promoted), and downstream-consumer protection (downstream scanners receive only high-confidence canonical data). The framework evolved with the work — each substantive amendment is documented with case studies showing what went wrong (or could have gone wrong) and why the rule exists.
+
+Building this with AI tools is what made it possible at the scale and velocity it happened. Building it deliberately, with operator-final-say discipline and a binding correctness framework, is what makes the output trustworthy.
