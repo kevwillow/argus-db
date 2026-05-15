@@ -6,7 +6,7 @@ This document is the canonical schema reference for the Argus SQLite database (`
 
 **Audience:** downstream operators integrating Argus's exports, external researchers auditing the dataset, contributors adding new identifier candidates or methodology refinements, vendors reviewing how their equipment is represented.
 
-**Scope:** v1.0.0 schema (`schema_version=16` as of 2026-05-13). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
+**Scope:** v1.0.0 schema (`schema_version=19` as of 2026-05-15; live verification timestamp 2026-05-15T01:57:18Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
 
 **Conventions:**
 - Column shape: `name TYPE NOT NULL DEFAULT … CHECK(…)` notation matches the migration source-of-truth at `db/migrations/*.sql`.
@@ -27,7 +27,7 @@ Throughout this document and the Argus project:
 
 ## §3. Schema overview
 
-The v1.0.0 schema carries **13 tables** at `schema_version=16`. They group into four functional categories:
+The v1.0.0 schema carries **14 tables** at `schema_version=19`. They group into four functional categories:
 
 ### §3.1 Canonical-state tables (Layer 1)
 
@@ -53,6 +53,28 @@ The v1.0.0 schema carries **13 tables** at `schema_version=16`. They group into 
 - **`conflicts`** — validator-side disputed rows. 9 columns; see §4.11.
 - **`extraction_runs`** — per-run telemetry. 10 columns; see §4.12.
 - **`schema_version`** — migration ledger. 3 columns; see §4.13.
+- **`source_reclassifications`** — per-row source-band reclassification audit (added migration 0017 for the post-CP15 `primary_registry` band-correction sweeps). 13 columns; see §4.14.
+
+### §3.4.1 Live row counts
+
+Verified against `db/argus.db` at 2026-05-15T01:57:18Z (`SELECT COUNT(*)` over each table):
+
+| Table | Row count | Notes |
+|---|---:|---|
+| `identifiers` | **22,612** total = **22,532 active** + **80 superseded** | active = `superseded_by IS NULL` |
+| `raw_observations` | **133,134** | append-only provenance source-of-truth |
+| `sources` | **43** | source registry |
+| `manufacturers` | **34** | vendor metadata lookup |
+| `deployment_observations` | **116,668** | Layer 2 deployment-location records |
+| `procurement_records` | **43,483** | analytical-only (never exported to Lynceus per §11 #14) |
+| `fcc_grantees` | **50,153** | FCC EAS bulk-load |
+| `council_minutes_matters` | **3** | low-volume per format-fit cap discipline |
+| `wigle_anchor_priority` | **80,697** | pre-computed query priority; WiGLE API integration itself disabled in v1.0.0 pending operator quota grant |
+| `behavioral_signatures` | **131** | parametric metadata (added migration 0010) |
+| `conflicts` | **20** | validator-side disputed rows |
+| `extraction_runs` | **106** | per-run telemetry |
+| `source_reclassifications` | **809** | per-row band-correction audit (added migration 0017) |
+| `schema_version` | **19** | migration ledger; one row per applied migration |
 
 ### §3.5 Relationship summary
 
@@ -81,7 +103,7 @@ conflicts.raw_observation_id            → raw_observations.id (CASCADE)
 
 ### §4.1. `identifiers` (Layer 1 canonical)
 
-The canonical Argus identifier table. Every row represents one identifier-to-attribution binding. Row count at v1.0.0 ship: **514 active** (`superseded_by IS NULL`) + **58 superseded** = 572 total.
+The canonical Argus identifier table. Every row represents one identifier-to-attribution binding. Row count verified live 2026-05-15T01:57:18Z: **22,532 active** (`superseded_by IS NULL`) + **80 superseded** = **22,612 total**.
 
 #### Columns
 
@@ -89,7 +111,7 @@ The canonical Argus identifier table. Every row represents one identifier-to-att
 |---|---|---|---|---|
 | `id` | INTEGER | yes (PK) | autoincrement | Primary key. Stable per row; not directly exported to downstream consumers (consumer-facing stable identifier is `argus_record_id`, a 16-hex-char SHA-256 prefix; algorithm documented in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) — see Canonical sources at end). |
 | `identifier` | TEXT | yes | — | The identifier value itself (e.g., `aa:bb:cc:dd:ee:ff` MAC, `aa:bb:cc` OUI, `1581Fxxx` FAA RID drone prefix, `0x004C` BLE manufacturer ID, BLE service UUID, vendor SSID pattern). Normalization rules per identifier_type documented in METHODOLOGY §6.1 dedup-key normalization. |
-| `identifier_type` | TEXT | yes | — | Enum (26 values per on-disk CHECK constraint at schema_version=16): `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint` (baseline); `ble_local_name`, `ble_characteristic`, `product_family_codename` (migration 0009); `ble_manufacturer_id` (migration 0011); `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature` (migration 0013); `alpr_model` (migration 0014). The forward-codified `vendor_template_namespace_uuid` value (per the vendor-companion-app sub-banding amendment) is not in the current CHECK; it lands at first-promotion-time per the forward-looking-codification caveat. |
+| `identifier_type` | TEXT | yes | — | Enum extended cumulatively across migrations 0001–0019 (full roster in §5.1; 48 canonical values at `schema_version=19`). Baseline migration 0001: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`. Migration 0009: `ble_local_name`, `ble_characteristic`, `product_family_codename`. Migration 0011: `ble_manufacturer_id`. Migration 0013: `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`. Migration 0014: `alpr_model`. Migration 0018: `ble_protocol_byte_table`, `ble_service_uuid`, `ble_company_id`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`. Migration 0019 (CP21 round-2 vocab): `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`. The forward-codified `vendor_template_namespace_uuid` value (per the vendor-companion-app sub-banding amendment) is not in the current CHECK; it lands at first-promotion-time per the forward-looking-codification caveat. |
 | `device_category` | TEXT | yes | — | Enum (12 values per on-disk CHECK constraint): `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`. `unknown` rows are excluded from the Lynceus export per the multi-purpose-vendor discipline (canonical-only). |
 | `manufacturer` | TEXT | no | NULL | Vendor name in canonical form. Logical FK to `manufacturers.canonical_name` (not enforced). |
 | `model` | TEXT | no | NULL | Vendor's product name in marketing or internal form. Composes with METHODOLOGY §5.4 product-family taxonomy. |
@@ -117,7 +139,7 @@ Indexes follow the standard `idx_<table>_<column>` naming convention; primary lo
 
 ### §4.2. `raw_observations` (provenance source-of-truth)
 
-Provenance layer per METHODOLOGY §7.1. Every promoted `identifiers` row is anchored to one or more `raw_observations` rows. Row count at v1.0.0: **110,663**. Append-only invariant: rows do not mutate post-ingest (validator processing updates `processed_at` + `promoted_identifier_id` + `notes` only; never the source-evidence fields).
+Provenance layer per METHODOLOGY §7.1. Every promoted `identifiers` row is anchored to one or more `raw_observations` rows. Row count verified live 2026-05-15T01:57:18Z: **133,134**. Append-only invariant: rows do not mutate post-ingest (validator processing updates `processed_at` + `promoted_identifier_id` + `notes` only; never the source-evidence fields).
 
 #### Columns
 
@@ -152,7 +174,7 @@ Primary on `(id)`. Additional indexes on `(source_id, source_row_key)` for idemp
 
 ### §4.3. `sources` (upstream source registry)
 
-Source registry. FK target for `raw_observations.source_id`. Row count at v1.0.0: **34**.
+Source registry. FK target for `raw_observations.source_id`. Row count verified live 2026-05-15T01:57:18Z: **43**.
 
 #### Columns
 
@@ -446,7 +468,7 @@ Primary on `(id)`. Implicit unique on `(signature_name, source_id, cellular_gene
 
 ### §4.11. `conflicts` (validator-side disputed rows)
 
-validator-side disputed rows awaiting manual disposition. Row count at v1.0.0: **3** (the file's pre-existing count; CHANGELOG records 20 — refresh deferred per the maintenance posture in §7).
+validator-side disputed rows awaiting manual disposition. Row count verified live 2026-05-15T01:57:18Z: **20** (matches CHANGELOG; the previously-deferred refresh per the §7 maintenance posture has now landed).
 
 #### Columns
 
@@ -476,7 +498,7 @@ Primary on `(id)`. Additional on `(identifier_a_id)`, `(identifier_b_id)`, parti
 
 ### §4.12. `extraction_runs` (per-run telemetry)
 
-Per-run telemetry: worker / source / records-in / records-out / status / notes for each extraction batch. Row count at v1.0.0: **90 runs**.
+Per-run telemetry: worker / source / records-in / records-out / status / notes for each extraction batch. Row count verified live 2026-05-15T01:57:18Z: **106 runs**.
 
 #### Columns
 
@@ -510,9 +532,33 @@ Migration ledger: every applied migration has one row.
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=16` at v1.0.0 ship). |
-| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0016_license_column'`, `'0015_primary_registry_source_type_extension'`). |
+| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=19` at the post-CP21-round-2 v1.0.0 state, verified live 2026-05-15T01:57:18Z). |
+| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0019_identifier_types_round2'`, `'0017_source_reclassifications'`, `'0016_license_column'`). Full ledger 0001–0019 enumerated below. |
 | `applied_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of migration application. |
+
+Live migration ledger at `schema_version=19` (verified live 2026-05-15T01:57:18Z):
+
+| version | name | applied_at |
+|---:|---|---|
+| 1 | `0001_initial` | 2026-05-04T03:29:04Z |
+| 2 | `0002_deployment_observations` | 2026-05-04T05:07:21Z |
+| 3 | `0003_fcc_grantees` | 2026-05-04T14:41:33Z |
+| 4 | `0004_wigle_anchor_priority` | 2026-05-04T18:53:58Z |
+| 5 | `0005_council_minutes_matters` | 2026-05-04T19:12:50Z |
+| 6 | `0006_raw_observations_source_row_key` | 2026-05-05T12:53:35Z |
+| 7 | `0007_motorola_solutions_aliases_rescope` | 2026-05-06T18:25:16Z |
+| 8 | `0008_cp7_cp10_v01_cutover` | 2026-05-07T17:30:49Z |
+| 9 | `0009_manufacturer_app_and_identifier_type_extensions` | 2026-05-10T20:40:15Z |
+| 10 | `0010_behavioral_signatures` | 2026-05-11T17:13:55Z |
+| 11 | `0011_ble_manufacturer_id_identifier_type_extension` | 2026-05-11T17:14:09Z |
+| 12 | `0012_paired_identifier_id` | 2026-05-11T17:14:26Z |
+| 13 | `0013_drone_rid_and_proprietary_protocol_identifier_types_extension` | 2026-05-11T17:14:50Z |
+| 14 | `0014_surveillance_metadata_identifier_types_extension` | 2026-05-11T17:15:09Z |
+| 15 | `0015_primary_registry_source_type_extension` | 2026-05-11T23:10:37Z |
+| 16 | `0016_license_column` | 2026-05-12T17:41:41Z |
+| 17 | `0017_source_reclassifications` | 2026-05-14T02:22:23Z |
+| 18 | `0018_identifier_types_extension_batch` | 2026-05-14T05:47:15Z |
+| 19 | `0019_identifier_types_round2` | 2026-05-14T17:24:59Z |
 
 #### Indexes (1 index per current schema)
 
@@ -523,13 +569,54 @@ Primary on `(version)`. No additional indexes (small ledger; full-table scan acc
 - **Amendment-log discipline composition**: every schema-changing migration lands paired with a `BIBLE_AMENDMENTS.md` entry; the `schema_version` row is the runtime record of which migrations have been applied.
 - **Forward-only invariant**: migrations are never rolled back; version monotonically increases.
 
+### §4.14. `source_reclassifications` (band-correction audit)
+
+Per-row source-band reclassification audit, added by migration 0017 to support the post-CP15 `primary_registry` band-correction sweeps (canonical case study: MAC-94+sweeps moving Wave-A FAA RID rows from `crowdsourced` → `primary_registry` per CP15 §8.2 strict reading). Append-only — corrective sub-sweeps land with distinct `sweep_event_id` values rather than mutating parent-sweep audit rows. Row count verified live 2026-05-15T01:57:18Z: **809**.
+
+#### Columns
+
+| Column | Type | NOT NULL | Default | Description |
+|---|---|---|---|---|
+| `id` | INTEGER | yes (PK) | autoincrement | Primary key. |
+| `identifier_id` | INTEGER | yes | — | FK → `identifiers(id)` ON DELETE CASCADE. The reclassified row. |
+| `sweep_event_id` | TEXT | yes | — | Groups all rows in one sweep dispatch (e.g., `'MAC-94-sweep-1'`). Same shape convention as `argus_run_id` for exports. Corrective sub-sweeps use a distinct `sweep_event_id` per the audit-table append-don't-mutate sub-rule. |
+| `pre_source_url` | TEXT | yes | — | Source URL at sweep-start (snapshot). |
+| `post_source_url` | TEXT | yes | — | Source URL after reclassification. |
+| `pre_source_type` | TEXT | yes | — | Source-type band at sweep-start. |
+| `post_source_type` | TEXT | yes | — | Source-type band after reclassification. |
+| `pre_confidence` | INTEGER | yes | — | CHECK `BETWEEN 0 AND 100`. Confidence at sweep-start. |
+| `post_confidence` | INTEGER | yes | — | CHECK `BETWEEN 0 AND 100`. Confidence after reclassification. |
+| `reclassification_reason` | TEXT | yes | — | Per-row substantive rationale. Convention (NOT schema-enforced beyond NOT NULL): self-explanatory at row-level WITHOUT cross-referencing the dispatch — board's MAC-88 a1dab600 §2 refinement. |
+| `reclassification_anchor` | TEXT | yes | — | CP / bible commit / dispatch citation (audit anchor). |
+| `reclassified_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of the reclassification. |
+| `notes` | TEXT | no | NULL | Optional additional context. |
+
+#### Composition with METHODOLOGY + bible rules
+
+- **§11 #8 (no confidence drift) audit composition**: every confidence/source-band correction lands one row per affected identifier; the audit record proves the correction was deliberate + substantively justified rather than confidence drift.
+- **Append-don't-mutate sub-rule**: corrective sub-sweeps (when a CEO refinement comment races a worker commit) MUST use a distinct `sweep_event_id` and append new rows rather than mutating parent-sweep audit rows. Codified at MAC-96→MAC-98 c121bec→c12bedd. See `BIBLE_AMENDMENTS.md` SAR-13 §S.3 for the per-shape mapper precedent.
+
 ## §5. Enum reference (consolidated)
 
-Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at v1.0.0 ship (`schema_version=16`).
+Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP21-round-2 v1.0.0 state (`schema_version=19`, verified live 2026-05-15T01:57:18Z).
 
-### §5.1. `identifiers.identifier_type` — 26 values
+### §5.1. `identifiers.identifier_type` — 48 values
 
-`oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`, `ble_local_name`, `ble_characteristic`, `product_family_codename`, `ble_manufacturer_id`, `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`, `alpr_model`.
+The cumulative roster across migrations 0001–0019 (matches the bible §4.4 Lynceus mapping table at CP21 close — 48 entries). Distinct values currently present in `identifiers` (post-promotion): 38 of the 48 (the remaining 10 are codified at the schema layer but have not yet promoted any rows; CP14/CP16/CP21 architectural-separation posture lets the enum extend ahead of first-promotion).
+
+Baseline (migration 0001): `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`.
+
+Migration 0009: `ble_local_name`, `ble_characteristic`, `product_family_codename`.
+
+Migration 0011: `ble_manufacturer_id`.
+
+Migration 0013: `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`.
+
+Migration 0014: `alpr_model`.
+
+Migration 0018 (CP21 round-1): `ble_protocol_byte_table`, `ble_service_uuid`, `ble_company_id`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`.
+
+Migration 0019 (CP21 round-2): `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`.
 
 Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per the forward-looking-codification caveat in the vendor-companion-app sub-banding amendment; lands at first-promotion-time.
 
