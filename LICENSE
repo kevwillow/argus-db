@@ -10,11 +10,11 @@ and test suite at this repository. Specifically:
 - `scripts/` — one-off ingest + per-shape mapper scripts
 - `tests/` — pytest suites
 - `wigle/` — WiGLE integration tooling
-- `android_test/tools/extraction/` — Wave-G vendor-app companion tooling
+- `android_test/tools/extraction/` — vendor-app companion tooling
 
 **Companion licenses:**
 
-- The **database content** (canonical `db/argus.db` + all derived exports at `exports/`) is licensed under **ODbL-1.0** per `LICENSE-DATA`. Per-row license posture for upstream-sourced rows is tracked at `deployment_observations.LICENSE` per migration 0016; per-source posture is tracked at `sources.notes.license_posture`; per-identifier posture is tracked at `identifiers.notes.upstream_license_posture` per bible §11 #16. See `LICENSE-DATA` for the composition discipline.
+- The **database content** (canonical `db/argus.db` + all derived exports at `exports/`) is licensed under **ODbL-1.0** per `LICENSE-DATA`. Per-row license posture for upstream-sourced rows is tracked at `deployment_observations.LICENSE` per migration 0016; per-source posture is tracked at `sources.notes.license_posture`; per-identifier posture is tracked at `identifiers.notes.upstream_license_posture`. See `LICENSE-DATA` for the composition discipline.
 - The **documentation** (PROJECT_BIBLE.md, BIBLE_AMENDMENTS.md, PROJECT_STATE.md, README.md, CHANGELOG.md, CREDITS.md, and other prose .md files including `research_leads/`) is licensed under **CC-BY-SA-4.0** per `LICENSE-DOCS`.
 
 The AGPL-3.0-or-later license was selected over permissive alternatives
@@ -30,13 +30,14 @@ threat model:
 2. **Vendor-derivative-discipline.** A vendor-side scanner built on
    Argus's pipeline cannot privatize the derived tooling without
    honoring the source-availability obligation. This is structurally
-   the same posture Argus expects of its own Wave-A community sources
-   (AGPL-3.0 inherited from upstream fork-bases at sids 38/40/43).
+   the same posture Argus expects of its own community-contributed
+   sources (AGPL-3.0 inherited from upstream fork-bases at
+   `sources.id` 38/40/43).
 
-The MIT-recommended posture from the original dispatch (§3.1) is a
-defensible alternative; the CEO selection of AGPL-3.0 reflects the
-above structural reasoning and matches the AGPL-3.0 incoming-license
-inheritance pattern from Wave-A sources.
+An MIT-style permissive posture is a defensible alternative; the
+AGPL-3.0 selection reflects the above structural reasoning and
+matches the AGPL-3.0 incoming-license inheritance pattern from the
+community-contributed source repositories that Argus extracts from.
 
 The full AGPL-3.0 license text follows.
 

@@ -13,9 +13,9 @@ This document is the canonical schema reference for the Argus SQLite database (`
 - Enum values: enumerated in the column's CHECK constraint at the migration that introduced them.
 - Foreign keys: notated as `→ table.column` per SQL convention.
 - Cross-references to METHODOLOGY: `METHODOLOGY §X` (public-OSS-shipped artifact at repo root).
-- Cross-references to BIBLE_AMENDMENTS.md (CP-N / SAR-N entries): part of the audit trail; `BIBLE_AMENDMENTS.md` ships in repo.
+- Cross-references to BIBLE_AMENDMENTS.md (amendment entries): part of the audit trail; `BIBLE_AMENDMENTS.md` ships in repo.
 
-**Source-of-truth precedence at any disagreement:** (1) the on-disk schema at `db/argus.db` (PRAGMA table_info verifies live column shape), (2) the migration SQL at `db/migrations/*.sql` (immutable historical record), (3) PROJECT_BIBLE.md §4.1 schema-doc enum-list parenthetical (canonical roster), (4) this DATA_DICTIONARY (derived narrative).
+**Source-of-truth precedence at any disagreement:** (1) the on-disk schema at `db/argus.db` (PRAGMA table_info verifies live column shape), (2) the migration SQL at `db/migrations/*.sql` (immutable historical record), (3) `PROJECT_BIBLE.md` schema-section canonical enum roster, (4) this DATA_DICTIONARY (derived narrative).
 
 ## §2. Glossary — database / dataset / pipeline
 
@@ -31,7 +31,7 @@ The v1.0.0 schema carries **13 tables** at `schema_version=16`. They group into 
 
 ### §3.1 Canonical-state tables (Layer 1)
 
-- **`identifiers`** — the canonical identifier table. Every row is an identifier-to-attribution binding promoted from `raw_observations` per the §11 #7 promotion gate. 17 columns; see §4.1.
+- **`identifiers`** — the canonical identifier table. Every row is an identifier-to-attribution binding promoted from `raw_observations` per the promotion-gate hard rule. 17 columns; see §4.1.
 
 ### §3.2 Provenance + source tables
 
@@ -87,23 +87,23 @@ The canonical Argus identifier table. Every row represents one identifier-to-att
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `id` | INTEGER | yes (PK) | autoincrement | Primary key. Stable per row; not directly exported to downstream consumers (consumer-facing stable identifier is `argus_record_id`, a 16-hex-char SHA-256 prefix; see SAR-10 in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) for the canonical algorithm). |
+| `id` | INTEGER | yes (PK) | autoincrement | Primary key. Stable per row; not directly exported to downstream consumers (consumer-facing stable identifier is `argus_record_id`, a 16-hex-char SHA-256 prefix; algorithm documented in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) — see Canonical sources at end). |
 | `identifier` | TEXT | yes | — | The identifier value itself (e.g., `aa:bb:cc:dd:ee:ff` MAC, `aa:bb:cc` OUI, `1581Fxxx` FAA RID drone prefix, `0x004C` BLE manufacturer ID, BLE service UUID, vendor SSID pattern). Normalization rules per identifier_type documented in METHODOLOGY §6.1 dedup-key normalization. |
-| `identifier_type` | TEXT | yes | — | Enum (26 values per on-disk CHECK constraint at schema_version=16): `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint` (pre-CP13 baseline); `ble_local_name`, `ble_characteristic`, `product_family_codename` (CP13 migration 0009); `ble_manufacturer_id` (CP14 migration 0011); `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature` (CP14 migration 0013); `alpr_model` (CP14 migration 0014). The CP17-codified `vendor_template_namespace_uuid` value is forward-codified per METHODOLOGY §5.4 — schema sibling defers to first-promotion-time per the forward-looking-codification caveat. |
-| `device_category` | TEXT | yes | — | Enum (12 values per on-disk CHECK constraint): `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`. `unknown` rows are Lynceus-banned per project-bible §11 #13 (canonical-only). |
+| `identifier_type` | TEXT | yes | — | Enum (26 values per on-disk CHECK constraint at schema_version=16): `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint` (baseline); `ble_local_name`, `ble_characteristic`, `product_family_codename` (migration 0009); `ble_manufacturer_id` (migration 0011); `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature` (migration 0013); `alpr_model` (migration 0014). The forward-codified `vendor_template_namespace_uuid` value (per the vendor-companion-app sub-banding amendment) is not in the current CHECK; it lands at first-promotion-time per the forward-looking-codification caveat. |
+| `device_category` | TEXT | yes | — | Enum (12 values per on-disk CHECK constraint): `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`. `unknown` rows are excluded from the Lynceus export per the multi-purpose-vendor discipline (canonical-only). |
 | `manufacturer` | TEXT | no | NULL | Vendor name in canonical form. Logical FK to `manufacturers.canonical_name` (not enforced). |
 | `model` | TEXT | no | NULL | Vendor's product name in marketing or internal form. Composes with METHODOLOGY §5.4 product-family taxonomy. |
 | `confidence` | INTEGER | no | NULL | Integer per schema-level CHECK `BETWEEN 0 AND 100`. **Operational cap at 99** per METHODOLOGY §5 confidence model: the corroboration-boost formula `min(99, max(...) + 5)` + the §5.6 ceiling rule cap effective confidence at 99 (humility-margin invariant). Schema-level CHECK permits 0-100 to give the operational layer flexibility; the 99-cap is enforced at write-time by the validator/dedup pass, not the schema. |
 | `source_url` | TEXT | yes | — | Working URL where the identifier was extracted. Per METHODOLOGY §7.2: direct citation, no aggregators. |
-| `source_type` | TEXT | yes | — | Enum (10 values): `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc` (pre-CP13 baseline); `manufacturer_app` (CP13 migration 0009); `primary_registry` (CP15 migration 0015). Drives confidence band per METHODOLOGY §5.1. |
-| `source_excerpt` | TEXT | no | NULL | Verbatim excerpt. Schema-level CHECK: `IS NULL OR length(source_excerpt) <= 200`. PII-sanitized per project-bible §11 #3. |
-| `geographic_scope` | TEXT | no | NULL | Country-level scope: `US`, `EU`, `UK`, `global`, `unknown`, or specific ISO-3166 country code. CP7 export-time filter default `['US']`. |
+| `source_type` | TEXT | yes | — | Enum (10 values): `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc` (baseline); `manufacturer_app` (migration 0009); `primary_registry` (migration 0015). Drives confidence band per METHODOLOGY §5.1. |
+| `source_excerpt` | TEXT | no | NULL | Verbatim excerpt. Schema-level CHECK: `IS NULL OR length(source_excerpt) <= 200`. PII-sanitized per the no-PII hard rule. |
+| `geographic_scope` | TEXT | no | NULL | Country-level scope: `US`, `EU`, `UK`, `global`, `unknown`, or specific ISO-3166 country code. Default export-time filter: `['US']`. |
 | `first_seen` | DATETIME | no | NULL | UTC timestamp of first ingest. |
 | `last_verified` | DATETIME | no | NULL | UTC timestamp of most-recent re-verification. |
 | `notes` | TEXT | no | NULL | JSON blob carrying per-row metadata. |
 | `superseded_by` | INTEGER | no | NULL | Self-reference FK: if non-NULL, this row was superseded per METHODOLOGY §6.4. Exports filter on `superseded_by IS NULL`. |
 | `paired_identifier_id` | INTEGER | no | NULL | Self-reference FK to a paired identifier per `pair_kind`. |
-| `pair_kind` | TEXT | no | NULL | Enum (4 non-NULL values + NULL per on-disk CHECK constraint): `la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation`. CP14 migration 0012 pairing-discipline values. `static_mac_tracker` is a CP14 §12 deferred item (queued for Wave-D/E §-text codification) and is NOT currently in the enum. |
+| `pair_kind` | TEXT | no | NULL | Enum (4 non-NULL values + NULL per on-disk CHECK constraint): `la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation`. Pairing-discipline values from migration 0012. `static_mac_tracker` is a deferred item (queued for future canonical-bible §-text codification) and is NOT currently in the enum. |
 
 #### Indexes
 
@@ -113,7 +113,7 @@ Indexes follow the standard `idx_<table>_<column>` naming convention; primary lo
 
 - Confidence integer is per METHODOLOGY §5 confidence model (default by `source_type`, corroboration boost per §5.2, ceiling rule per §5.6).
 - `superseded_by` pointer semantics per METHODOLOGY §6.4 superseded-row preservation.
-- `paired_identifier_id` + `pair_kind` semantics per project-bible §8.4 G-4 LA-bit pairing + G-7 vendor-as-container + G-13.3 firmware-generation + CP14 G-1 FRDID pairing.
+- `paired_identifier_id` + `pair_kind` semantics per the canonical-bible pairing discipline (LA-bit pairing, vendor-as-container, firmware-generation, FRDID pairing).
 
 ### §4.2. `raw_observations` (provenance source-of-truth)
 
@@ -132,7 +132,7 @@ Provenance layer per METHODOLOGY §7.1. Every promoted `identifiers` row is anch
 | `candidate_type` | TEXT | no | NULL | Proposed `identifier_type`. |
 | `candidate_category` | TEXT | no | NULL | Proposed `device_category`. |
 | `candidate_manufacturer` | TEXT | no | NULL | Proposed manufacturer name. |
-| `source_excerpt` | TEXT | no | NULL | Verbatim excerpt from `source_url`. Sized per source-excerpt discipline: WAVE_G_RUNBOOK §11 #7 cap ≤200 chars baseline, with Option B-broad codified at CP17 allowing window-around-match (with `excerpt_type` field) for source-line >200 chars. Distinct from project-bible §11 #7 (no promotion without provenance; same numbering, different surface). PII-sanitized per project-bible §11 #3. |
+| `source_excerpt` | TEXT | no | NULL | Verbatim excerpt from `source_url`. Sized per the source-excerpt discipline: ≤200 chars baseline, with the broader window-around-match option (with `excerpt_type` field) for source-line >200 chars. (Distinct from the promotion-gate "no promotion without provenance" rule.) PII-sanitized per the no-PII hard rule. |
 | `captured_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of ingest. |
 | `processed_at` | DATETIME | no | NULL | UTC timestamp of validator-side processing. NULL = not-yet-processed. |
 | `promoted_identifier_id` | INTEGER | no | NULL | FK → `identifiers.id`. Non-NULL if promoted. |
@@ -145,10 +145,10 @@ Primary on `(id)`. Additional indexes on `(source_id, source_row_key)` for idemp
 
 #### Composition with METHODOLOGY rules
 
-- Append-only per §7.1; rows never mutate post-ingest.
-- Direct citation per §7.2 (no aggregators); archive snapshots in `notes`.
-- No fabrication per §11 #1: extraction yielding no concrete value routes to `conflicts` (§4.11), not to a synthetic `raw_observations` row.
-- PII-sanitization per §11 #3 at ingest.
+- Append-only per METHODOLOGY §7.1; rows never mutate post-ingest.
+- Direct citation per METHODOLOGY §7.2 (no aggregators); archive snapshots in `notes`.
+- No fabrication per the no-fabrication hard rule: extraction yielding no concrete value routes to `conflicts` (§4.11), not to a synthetic `raw_observations` row.
+- PII-sanitization at ingest per the no-PII hard rule.
 
 ### §4.3. `sources` (upstream source registry)
 
@@ -158,11 +158,11 @@ Source registry. FK target for `raw_observations.source_id`. Row count at v1.0.0
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `id` | INTEGER | yes (PK) | autoincrement | Primary key. Sources 1-3 are IEEE OUI registries (MA-L / MA-M / MA-S); CP15 forward-looking source-level migration deferred per BIBLE_AMENDMENTS.md CP15 sequencing line 1226 (Wave-B+ batch task). |
+| `id` | INTEGER | yes (PK) | autoincrement | Primary key. Sources 1-3 are IEEE OUI registries (MA-L / MA-M / MA-S); the forward-looking source-level migration to `primary_registry` is deferred (queued as a post-ship batch task). |
 | `name` | TEXT | yes | — | Human-readable source name. |
 | `url` | TEXT | yes | — | Primary upstream URL. |
-| `source_type` | TEXT | yes | — | Source-band classification; enum matches `identifiers.source_type`. Sources 1-3 (IEEE OUI) currently `'regulatory'` per CP15 source-level migration deferral. |
-| `tier` | INTEGER | no | NULL | Tier classification per project-bible §1 + §6 Phase 0. |
+| `source_type` | TEXT | yes | — | Source-band classification; enum matches `identifiers.source_type`. Sources 1-3 (IEEE OUI) currently `'regulatory'` pending the deferred source-level reclassification. |
+| `tier` | INTEGER | no | NULL | Tier classification per the canonical-bible source-tier hierarchy. |
 | `last_fetched_at` | DATETIME | no | NULL | UTC timestamp of most-recent fetch. |
 | `last_status` | TEXT | no | NULL | Status of most-recent fetch. |
 | `notes` | TEXT | no | NULL | JSON blob: per-source metadata, license attribution. |
@@ -174,7 +174,7 @@ Primary on `(id)`. Unique on `(name)`.
 #### Composition with METHODOLOGY rules
 
 - `sources.source_type` drives default confidence band for derived `raw_observations` per METHODOLOGY §5.1.
-- Source-level reclassification (changing `sources.source_type`) does NOT retroactively reclassify `identifiers` rows whose direct provenance is third-party per the §11 #8 third-party-citation-lineage boundary (METHODOLOGY §5.3 row-level discipline).
+- Source-level reclassification (changing `sources.source_type`) does NOT retroactively reclassify `identifiers` rows whose direct provenance is third-party — per the third-party-citation-lineage boundary (METHODOLOGY §5.3 row-level discipline; §7.4 third-party-citation-lineage detail).
 
 ### §4.4. `manufacturers` (vendor metadata lookup)
 
@@ -189,7 +189,7 @@ Vendor metadata + alias canonicalization. Row count at v1.0.0: **34**.
 | `aliases` | TEXT | no | NULL | JSON array of vendor-name aliases. |
 | `primary_category` | TEXT | no | NULL | Primary `device_category` enum value. NULL for multi-purpose vendors. |
 | `source_url` | TEXT | yes | — | Primary attribution URL. |
-| `notes` | TEXT | no | NULL | JSON blob: per-vendor metadata, corporate-split history (SAR-9). |
+| `notes` | TEXT | no | NULL | JSON blob: per-vendor metadata, corporate-split history (vendor-disambiguation discipline). |
 | `added_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of first registration. |
 
 #### Indexes
@@ -198,12 +198,12 @@ Primary on `(id)`. Unique on `(canonical_name)`.
 
 #### Composition with METHODOLOGY rules
 
-- Multi-purpose-vendor discipline per project-bible §8.4 + §11 #10: `primary_category=NULL` cannot lift `device_category` off `unknown` at OUI level. Model-level evidence required.
-- Corporate-split disambig per SAR-9 (Motorola Mobility / Motorola Solutions etc.); alias-iteration per SAR-8.
+- Multi-purpose-vendor discipline: `primary_category=NULL` cannot lift `device_category` off `unknown` at OUI level. Model-level evidence required.
+- Corporate-split disambiguation (Motorola Mobility / Motorola Solutions etc.) per the vendor-disambiguation discipline; alias-iteration per the once-per-canonical iteration sub-rule.
 
 ### §4.5. `deployment_observations` (Layer 2 deployment-location records)
 
-Layer 2 deployment-location records (Atlas of Surveillance + DeFlock). Row count at v1.0.0: **116,668** (Atlas 15,071 + DeFlock 101,597). Per METHODOLOGY §7.5 + project-bible §11 #3, agency-level identification only; never individual-officer level.
+Layer 2 deployment-location records (Atlas of Surveillance + DeFlock). Row count at v1.0.0: **116,668** (Atlas 15,071 + DeFlock 101,597). Per METHODOLOGY §7.5 and the no-PII hard rule, agency-level identification only; never individual-officer level.
 
 #### Columns
 
@@ -226,11 +226,11 @@ Layer 2 deployment-location records (Atlas of Surveillance + DeFlock). Row count
 | `technology_category` | TEXT | no | NULL | **Free-text** (no CHECK constraint) passing upstream-taxonomy values through. v1.0.0 DB carries 13 distinct values: `ALPR` (DeFlock; 101,597 rows), and 12 Atlas-classified categories (`Body-worn Cameras`, `Automated License Plate Readers`, `Drones`, `Third-party Investigative Platforms`, `Face Recognition`, `Camera Registry`, `Gunshot Detection`, `Real-Time Crime Center`, `Predictive Policing`, `Video Analytics`, `Cell-site Simulator`, `Fusion Center`). Note: `ALPR` (DeFlock) and `Automated License Plate Readers` (Atlas) are semantically equivalent — downstream consumers reconciling across both upstreams should treat them as the same category. |
 | `vendor_raw` | TEXT | no | NULL | Vendor name as recorded upstream (raw). Canonicalization deferred to query-time. |
 | `citation_url` | TEXT | no | NULL | Secondary citation URL. |
-| `source_excerpt` | TEXT | no | NULL | Verbatim excerpt. Schema-level CHECK enforces ≤200 chars at INSERT. WAVE_G_RUNBOOK §11 #7 extraction-time discipline applies in addition (distinct from project-bible §11 #7). PII-sanitized per §11 #3. |
+| `source_excerpt` | TEXT | no | NULL | Verbatim excerpt. Schema-level CHECK enforces ≤200 chars at INSERT. The extraction-time source-excerpt discipline applies in addition (distinct from the promotion-gate hard rule). PII-sanitized per the no-PII hard rule. |
 | `captured_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of ingest. |
 | `processed_at` | DATETIME | no | NULL | UTC timestamp of validator-side processing. |
 | `notes` | TEXT | no | NULL | JSON blob. |
-| `license` | TEXT | yes | — | Upstream license. **CHECK constraint** enumerates 5 values: `'ODbL-1.0'` (DeFlock; source_id=6), `'CC-BY-NC-SA-4.0'` (EFF Atlas; source_id=5), `'public-domain'` (reserved for future US-gov-public-domain ingest), `'foia'` (FOIA-released data per project-bible §11 #6), `'unspecified'` (default for rows ingested pre-migration-0016 or license unknown at ingest). Migration 0016 added this column. Per CREDITS.md upstream-license-chain: Atlas-derived rows quarantine under the NC clause; downstream derivatives filtering on `license != 'CC-BY-NC-SA-4.0'` produce ODbL-1.0-compatible derivatives. |
+| `license` | TEXT | yes | — | Upstream license. **CHECK constraint** enumerates 5 values: `'ODbL-1.0'` (DeFlock; source_id=6), `'CC-BY-NC-SA-4.0'` (EFF Atlas; source_id=5), `'public-domain'` (reserved for future US-gov-public-domain ingest), `'foia'` (FOIA-released data per the canonical-bible FOIA discipline), `'unspecified'` (default for rows ingested pre-migration-0016 or license unknown at ingest). Migration 0016 added this column. Per CREDITS.md upstream-license-chain: Atlas-derived rows quarantine under the NC clause; downstream derivatives filtering on `license != 'CC-BY-NC-SA-4.0'` produce ODbL-1.0-compatible derivatives. |
 
 #### Indexes (7 indexes per current schema)
 
@@ -239,29 +239,29 @@ Primary on `(id)`. Unique on `(source_id, source_row_key)` (idempotency). Additi
 #### Composition with METHODOLOGY rules
 
 - **License carry-forward** per CREDITS.md: Atlas (source_id=5) rows quarantine under CC-BY-NC-SA-4.0 per upstream NC clause; the `license` column (migration 0016) is the operational hook.
-- **Agency-only individuation** per project-bible §11 #3.
-- **Procurement-vs-deployment caveat** per METHODOLOGY §5 + project-bible §8.4.
-- **Disambiguation discipline** per the codified pattern memos.
-- **Vendor canonicalization deferred to query-time** per SAR-8 + SAR-9 alias-iteration.
+- **Agency-only individuation** per the no-PII hard rule.
+- **Procurement-vs-deployment caveat** per METHODOLOGY §5 and the canonical-bible deployment-evidence discipline.
+- **Disambiguation discipline** per the codified vendor-disambiguation rule.
+- **Vendor canonicalization deferred to query-time** per the alias-iteration sub-rules.
 
 ### §4.6. `procurement_records` (vendor-agency procurement records)
 
-Vendor-to-agency purchase records. Row count at v1.0.0: **43,483**. Per project-bible §8.4 + §11 #14: procurement records prove *purchase*, NOT *deployment*; procurement-only records are Lynceus-banned (canonical-only).
+Vendor-to-agency purchase records. Row count at v1.0.0: **43,483**. Procurement records prove *purchase*, NOT *deployment*; procurement-only records are excluded from the Lynceus export (canonical-only).
 
 #### Columns
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
 | `id` | INTEGER | yes (PK) | autoincrement | Primary key. |
-| `agency_name` | TEXT | yes | — | Purchasing agency name. Per project-bible §11 #3: PII-sanitized at ingest (individual contracting-officer names stripped). |
+| `agency_name` | TEXT | yes | — | Purchasing agency name. Per the no-PII hard rule: PII-sanitized at ingest (individual contracting-officer names stripped). |
 | `agency_geographic_scope` | TEXT | no | NULL | ISO country/region code. |
 | `vendor_canonical_name` | TEXT | yes | — | Vendor canonical name. |
 | `product_family` | TEXT | no | NULL | Vendor product family identifier. |
 | `contract_amount_usd` | REAL | no | NULL | Contract dollar amount (USD). |
 | `contract_date` | DATE | no | NULL | Contract execution date. |
-| `source_url` | TEXT | yes | — | Per project-bible §8.1 provenance discipline. |
+| `source_url` | TEXT | yes | — | Per the canonical-bible provenance discipline. |
 | `source_type` | TEXT | yes | — | **CHECK constraint** enumerates 4 values: `'procurement'`, `'foia'`, `'regulatory'`, `'official'`. Narrower subset than `identifiers.source_type` (10 values). |
-| `source_excerpt` | TEXT | no | NULL | Schema-level CHECK enforces ≤200 chars. PII-sanitized per §11 #3. |
+| `source_excerpt` | TEXT | no | NULL | Schema-level CHECK enforces ≤200 chars. PII-sanitized per the no-PII hard rule. |
 | `confidence` | INTEGER | no | NULL | Integer 0–100 per **CHECK constraint** (`confidence BETWEEN 0 AND 100`). Note: range diverges from `identifiers.confidence` operational cap (99) — procurement records are not subject to the METHODOLOGY §5 humility-margin invariant (identifier-attribution requires the residual-1-of-fabrication-risk margin; procurement records are about contract execution, a discrete event). See §6 confidence-shape divergence sub-section for the cross-table synthesis. |
 | `captured_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of ingest. |
 | `linked_identifier_id` | INTEGER | no | NULL | FK → `identifiers.id` (`ON DELETE SET NULL`). |
@@ -273,14 +273,14 @@ Primary on `(id)`. Additional on `(vendor_canonical_name)`, `(agency_name)`.
 
 #### Composition with METHODOLOGY + bible rules
 
-- **§11 #14 Lynceus-banned** per project-bible: procurement records with no concrete identifier are NEVER exported to Lynceus.
-- **Procurement-vs-deployment caveat** per project-bible §8.4: procurement proves *purchase*, not *deployment*.
-- **Cross-table confidence cap at 85** per METHODOLOGY §5 + project-bible §8.4 when procurement records corroborate `identifiers` rows.
-- **PII-sanitization** per project-bible §11 #3.
+- **Excluded from the Lynceus export**: procurement records with no concrete identifier are NEVER exported to Lynceus.
+- **Procurement-vs-deployment caveat**: procurement proves *purchase*, not *deployment*.
+- **Cross-table confidence cap at 85** per METHODOLOGY §5 + the canonical-bible procurement-corroboration rule when procurement records corroborate `identifiers` rows.
+- **PII-sanitization** per the no-PII hard rule.
 
 ### §4.7. `fcc_grantees` (FCC EAS bulk-load grantee registry)
 
-FCC Equipment Authorization System (EAS) grantee registry. Row count at v1.0.0: **50,153**. Used as allowlist for `fcc_id_anchored` disambig per CP14 G-9 + the SourceWorker MAC-23 Wave-A reconciliation (50,153-row allowlist + CVE/CWE/NVD stop-list).
+FCC Equipment Authorization System (EAS) grantee registry. Row count at v1.0.0: **50,153**. Used as the allowlist for `fcc_id_anchored` disambiguation (50,153-row corporate-registrant allowlist + CVE/CWE/NVD stop-list).
 
 #### Columns
 
@@ -299,7 +299,7 @@ FCC Equipment Authorization System (EAS) grantee registry. Row count at v1.0.0: 
 | `state` | TEXT | no | NULL | US state name or `N/A`. |
 | `country` | TEXT | no | NULL | Country name. |
 | `zip_code` | TEXT | no | NULL | Registrant ZIP. |
-| `contact_name` | TEXT | no | NULL | Corporate compliance contact per Q4 stage-as-is — corporate role only; individual operational-personnel names not in this column per project-bible §11 #3 + HB MAC-23 reconciliation. |
+| `contact_name` | TEXT | no | NULL | Corporate compliance contact — corporate role only; individual operational-personnel names are not in this column per the no-PII hard rule. |
 | `date_received` | TEXT | yes | — | ISO date. |
 | `source_excerpt` | TEXT | no | NULL | Schema-level CHECK ≤200 chars. |
 | `notes` | TEXT | no | NULL | JSON blob: raw row + Phase-5 hooks. |
@@ -316,16 +316,16 @@ Primary on `(id)`. Implicit unique on `(source_id, source_row_key)`. Additional 
 
 #### Composition with METHODOLOGY + bible rules
 
-- **§8.4 G-9 drone_id_prefix composition** per project-bible: FCC EAS grantees compose with FAA RID `drone_id_prefix` identifier-type at promotion.
-- **FCC-ID disambig allowlist** per HB MAC-23 Step-1 ratification.
-- **Vendor-name word-boundary discipline** per the codified memos.
-- **No PII-promotion** per project-bible §11 #3: corporate compliance role only.
+- **`drone_id_prefix` composition** per the canonical-bible: FCC EAS grantees compose with FAA RID `drone_id_prefix` identifier-type at promotion.
+- **FCC-ID disambiguation allowlist** for vendor attribution.
+- **Vendor-name word-boundary discipline** per the codified vendor-disambiguation rule.
+- **No PII promotion** per the no-PII hard rule: corporate compliance role only.
 
 ### §4.8. `council_minutes_matters` (municipal Granicus Legistar matters)
 
-Municipal council / legislative matters where vendor procurement decisions are documented. Sourced from Granicus Legistar instances. Row count at v1.0.0: **3** (low-volume per SAR-5 format-fit cap discipline). Largest table by column count in v1.0.0 (27 columns).
+Municipal council / legislative matters where vendor procurement decisions are documented. Sourced from Granicus Legistar instances. Row count at v1.0.0: **3** (low-volume per the format-fit cap discipline). Largest table by column count in v1.0.0 (27 columns).
 
-Per project-bible §11 #1 + SAR-5: only `matter_status='Passed'` rows are staged. PII-sanitization at ingest per §11 #3 + SAR-5 Rule 5.
+Per the canonical-bible no-fabrication hard rule and the Legistar-specific status-discipline sub-rule: only `matter_status='Passed'` rows are staged. PII-sanitization at ingest per the no-PII hard rule.
 
 #### Columns
 
@@ -341,20 +341,20 @@ Per project-bible §11 #1 + SAR-5: only `matter_status='Passed'` rows are staged
 | `matter_id` | INTEGER | yes | — | Legistar `MatterId` (jurisdiction-scoped). |
 | `matter_guid` | TEXT | no | NULL | Legistar `MatterGuid`. |
 | `matter_file` | TEXT | no | NULL | Human-readable matter file identifier. |
-| `matter_title` | TEXT | yes | — | Matter title verbatim. PII-redacted at staging per §11 #3 + SAR-5 Rule 5. |
+| `matter_title` | TEXT | yes | — | Matter title verbatim. PII-redacted at staging per the no-PII hard rule and the Legistar-specific staging sub-rule. |
 | `matter_type_name` | TEXT | no | NULL | Legistar matter classification (free-text). |
 | `matter_body_name` | TEXT | no | NULL | Deliberating body. |
-| `matter_status_name` | TEXT | yes | — | Status name. Only `'Passed'` rows staged per §11 #1 + SAR-5. Single-value-by-discipline; not CHECK-enforced for future expansion-flexibility. |
+| `matter_status_name` | TEXT | yes | — | Status name. Only `'Passed'` rows staged per the no-fabrication hard rule and the Legistar status-discipline sub-rule. Single-value-by-discipline; not CHECK-enforced for future expansion-flexibility. |
 | `matter_intro_date` | DATE | no | NULL | Date introduced. |
 | `matter_passed_date` | DATE | no | NULL | Date passed. |
 | `matter_enactment_date` | DATE | no | NULL | Effective date. |
 | `matter_cost` | TEXT | no | NULL | Dollar amount raw (Legistar TEXT shape). |
-| `matched_vendor_label` | TEXT | yes | — | Canonical-label from MAC-8 Group A+B disambig. |
-| `vendor_canonical_name` | TEXT | yes | — | Vendor verbatim per MAC-8 Q1 staging-as-raw. |
+| `matched_vendor_label` | TEXT | yes | — | Canonical vendor label after disambiguation. |
+| `vendor_canonical_name` | TEXT | yes | — | Vendor name as recorded upstream (raw); canonicalization deferred to query-time. |
 | `source_url` | TEXT | yes | — | Per-matter Legistar UI URL. |
 | `source_type` | TEXT | yes | — | **CHECK constraint** 3 values: `'procurement'`, `'foia'`, `'official'` (narrower than procurement_records 4-value enum). |
 | `source_excerpt` | TEXT | no | NULL | Schema-level CHECK ≤200 chars. |
-| `confidence` | INTEGER | yes | — | **Discrete CHECK constraint** `IN (70, 75, 80)` per SAR-5 Rule (f). Distinct from continuous-range confidence in other tables. |
+| `confidence` | INTEGER | yes | — | **Discrete CHECK constraint** `IN (70, 75, 80)` per the Legistar item-grading sub-rule. Distinct from continuous-range confidence in other tables. |
 | `linked_identifier_id` | INTEGER | no | NULL | FK → `identifiers.id`. |
 | `captured_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of ingest. |
 | `notes` | TEXT | no | NULL | JSON blob. |
@@ -369,14 +369,14 @@ Primary on `(id)`. Implicit unique on `(source_id, source_row_key)`. Additional 
 
 #### Composition with METHODOLOGY + bible rules
 
-- **§11 #1 + SAR-5 Rule 5 status-discipline**: only `'Passed'` rows staged.
-- **§11 #3 PII-sanitization** at staging.
-- **MAC-8 Group A+B canonical-label** composition with raw-upstream preservation.
+- **Status-discipline**: only `'Passed'` rows staged.
+- **PII-sanitization** at staging per the no-PII hard rule.
+- **Canonical-label composition** with raw-upstream preservation.
 - **Cross-table contribution to identifiers** per METHODOLOGY §5 corroboration-boost formula.
 
 ### §4.9. `wigle_anchor_priority` (WiGLE planning state; disabled in v1.0.0)
 
-Pre-computed WiGLE-query priority rankings for `deployment_observations` rows. Row count at v1.0.0: **80,697**. **Operationally inert at v1.0.0 ship**: the WiGLE API integration itself is disabled per CP12 sequencing + WiGLE TOS gating (creds gated on the user's own quota grant).
+Pre-computed WiGLE-query priority rankings for `deployment_observations` rows. Row count at v1.0.0: **80,697**. **Operationally inert at v1.0.0 ship**: the WiGLE API integration itself is disabled pending the user's own WiGLE quota grant (per WiGLE Terms of Service).
 
 #### Columns
 
@@ -389,7 +389,7 @@ Pre-computed WiGLE-query priority rankings for `deployment_observations` rows. R
 | `state_or_country` | TEXT | yes | — | Geographic anchor. T1-T4 US codes; T5 ISO 3166 alpha-2. |
 | `intra_tier_rank` | INTEGER | yes | — | 1-based rank within `(priority_tier, state_or_country)`. |
 | `tier_rationale` | TEXT | no | NULL | Short string explaining tier+rank choice. |
-| `derivation_method` | TEXT | yes | — | **CHECK constraint** 2 values: `'atlas_state_column'` (Atlas direct), `'deflock_reverse_geocode'` (DeFlock via reverse_geocoder admin1 lookup per MAC-9 Q1 ratification). |
+| `derivation_method` | TEXT | yes | — | **CHECK constraint** 2 values: `'atlas_state_column'` (Atlas direct), `'deflock_reverse_geocode'` (DeFlock via reverse_geocoder admin1 lookup). |
 | `derivation_notes` | TEXT | no | NULL | Debug-trace metadata. |
 | `captured_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp. |
 
@@ -403,14 +403,14 @@ Primary on `(id)`. Implicit unique on `(deployment_id)`. Additional on `(extract
 
 #### Composition with METHODOLOGY + bible rules
 
-- **WiGLE disabled in v1.0.0** per CP12 sequencing + WiGLE TOS gating.
-- **Pre-computation discipline** per MAC-9 Step-2 ratification.
+- **WiGLE disabled in v1.0.0** pending user WiGLE-quota grant (per WiGLE Terms of Service).
+- **Pre-computation discipline**: rankings computed at v1.0.0 ship so post-grant activation is one-step.
 - **`atlas_state_column` vs `deflock_reverse_geocode` derivation_method asymmetry**: Atlas provides state directly; DeFlock requires reverse-geocoding via the `reverse_geocoder` pip package (bbox+centroid alternative tested at 24.6% multi-match prevalence; Amarillo TX canary case demonstrates reverse_geocoder admin1 lookup is correct).
 - **Disabled-but-materialized rationale**: rankings populated so post-grant activation is one-step.
 
 ### §4.10. `behavioral_signatures` (parametric metadata for behavioral signatures)
 
-Parametric metadata for behavioral-class detection signatures. CP14-era extension. Row count at v1.0.0: **0** (Wave-B+ surfacings will populate).
+Parametric metadata for behavioral-class detection signatures. Introduced in migration 0010. Row count at v1.0.0: **131** (per CHANGELOG; the v1.0.0 ship populated this table from the Marlin NDSS 2025 corpus and subsequent backfills).
 
 #### Columns
 
@@ -420,11 +420,11 @@ Parametric metadata for behavioral-class detection signatures. CP14-era extensio
 | `signature_name` | TEXT | yes | — | Signature identity. One `signature_name` per layer per Phase-2 self-review §2.4 staging-style (folds N code paths per signature). |
 | `cellular_generation` | TEXT | no | NULL | **CHECK constraint** 4 values + NULL: `'2G'`, `'3G'`, `'4G'`, `'5G_NSA'`. |
 | `threshold_json` | TEXT | no | NULL | **CHECK constraint** `json_valid()`. Structured thresholds. |
-| `evidence_json` | TEXT | no | NULL | **CHECK constraint** `json_valid()`. Evidence dossier per project-bible §11 #1. |
+| `evidence_json` | TEXT | no | NULL | **CHECK constraint** `json_valid()`. Evidence dossier per the no-fabrication hard rule. |
 | `source_id` | INTEGER | yes | — | FK → `sources.id` (`ON DELETE RESTRICT`). |
 | `source_file_relative` | TEXT | no | NULL | File path relative to source repo. |
 | `source_line` | INTEGER | no | NULL | Line number. |
-| `confidence` | INTEGER | no | NULL | **CHECK constraint** `BETWEEN 0 AND 100`. SAR-7 §7.3 intake-side rules apply. |
+| `confidence` | INTEGER | no | NULL | **CHECK constraint** `BETWEEN 0 AND 100`. The intake-time false-positive-class allowlist sub-rule applies. |
 | `device_category` | TEXT | yes | — | **CHECK constraint** 12 values mirroring `identifiers.device_category`: `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`. |
 | `notes` | TEXT | no | NULL | JSON or free-text. |
 | `created_at` | DATETIME | no | `CURRENT_TIMESTAMP` | UTC timestamp. |
@@ -432,7 +432,7 @@ Parametric metadata for behavioral-class detection signatures. CP14-era extensio
 
 #### Constraints
 
-`UNIQUE (signature_name, source_id, cellular_generation)` — 3-tuple per Phase-2 self-review §2.4 (forward-proof; SQLite UNIQUE treats multiple NULLs as distinct).
+`UNIQUE (signature_name, source_id, cellular_generation)` — 3-tuple (forward-proof; SQLite UNIQUE treats multiple NULLs as distinct).
 
 #### Indexes (5 indexes per current schema)
 
@@ -440,13 +440,13 @@ Primary on `(id)`. Implicit unique on `(signature_name, source_id, cellular_gene
 
 #### Composition with METHODOLOGY + bible rules
 
-- **§11 #1 evidence dossier**: every row carries `evidence_json` traceability.
-- **§11 #13 unknown-category Lynceus-banned** inherits.
-- **SAR-7 §7.3 intake-side rules** at confidence assignment.
+- **Evidence dossier**: every row carries `evidence_json` traceability per the no-fabrication hard rule.
+- **Unknown-category exclusion**: `device_category='unknown'` rows are excluded from the Lynceus export per the multi-purpose-vendor discipline.
+- **Intake-time false-positive-class allowlist** applies at confidence assignment.
 
 ### §4.11. `conflicts` (validator-side disputed rows)
 
-Validator-side disputed rows awaiting manual disposition. Row count at v1.0.0: **3**.
+validator-side disputed rows awaiting manual disposition. Row count at v1.0.0: **3** (the file's pre-existing count; CHANGELOG records 20 — refresh deferred per the maintenance posture in §7).
 
 #### Columns
 
@@ -468,10 +468,10 @@ Primary on `(id)`. Additional on `(identifier_a_id)`, `(identifier_b_id)`, parti
 
 #### Composition with METHODOLOGY + bible rules
 
-- **§11 #1 no-fabrication**: uncertain extractions route to `conflicts` per METHODOLOGY §7.3.
-- **§11 #11 stop-the-line**: unresolved conflicts touching CP/SAR-class amendments are stop-the-line.
-- **SAR-9 corporate-split FP class**: `'vendor_attribution_split'` is the canonical reason.
-- **CP14 G-4 LA-bit pairing**: `'la_bit_sibling_vendor_mismatch'` per project-bible §8.4 G-4.
+- **No-fabrication**: uncertain extractions route to `conflicts` per METHODOLOGY §7.3.
+- **Amendment-log discipline**: unresolved conflicts touching canonical-bible amendments halt new work until resolved.
+- **Vendor-disambiguation false-positive class**: `'vendor_attribution_split'` is the canonical reason.
+- **LA-bit sibling pairing mismatch**: `'la_bit_sibling_vendor_mismatch'` per the canonical-bible LA-bit pairing rule.
 - **Cascade-delete protection** on all three FK columns prevents orphan conflicts.
 
 ### §4.12. `extraction_runs` (per-run telemetry)
@@ -491,7 +491,7 @@ Per-run telemetry: worker / source / records-in / records-out / status / notes f
 | `records_out` | INTEGER | no | 0 | Count of `raw_observations` rows produced. |
 | `errors` | INTEGER | no | 0 | Count of per-row errors during the run. |
 | `status` | TEXT | no | NULL | Run status: `'running'`, `'ok'`, `'failed'`, `'partial'`. Free-text (no CHECK constraint). |
-| `notes` | TEXT | no | NULL | JSON or free-text run notes (commit SHAs, dispatch context, etc.). |
+| `notes` | TEXT | no | NULL | JSON or free-text run notes (commit SHAs, run context, etc.). |
 
 #### Indexes (3 indexes per current schema)
 
@@ -520,7 +520,7 @@ Primary on `(version)`. No additional indexes (small ledger; full-table scan acc
 
 #### Composition with METHODOLOGY + bible rules
 
-- **§11 #11 amendment-log discipline composition**: every CP-class schema migration lands paired with a BIBLE_AMENDMENTS.md entry; the `schema_version` row is the runtime record of which migrations have been applied. CP14 cluster (migrations 0011-0014) + CP15 (0015) + CP16-paired (0016 license_column) all in this ledger.
+- **Amendment-log discipline composition**: every schema-changing migration lands paired with a `BIBLE_AMENDMENTS.md` entry; the `schema_version` row is the runtime record of which migrations have been applied.
 - **Forward-only invariant**: migrations are never rolled back; version monotonically increases.
 
 ## §5. Enum reference (consolidated)
@@ -531,7 +531,7 @@ Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA tab
 
 `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`, `ble_local_name`, `ble_characteristic`, `product_family_codename`, `ble_manufacturer_id`, `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`, `alpr_model`.
 
-Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per CP17 forward-looking-codification caveat; lands at first-promotion-time.
+Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per the forward-looking-codification caveat in the vendor-companion-app sub-banding amendment; lands at first-promotion-time.
 
 ### §5.2. `identifiers.device_category` + `behavioral_signatures.device_category` — 12 values
 
@@ -557,7 +557,7 @@ Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per CP
 
 `la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation`, NULL.
 
-Forward-codified (NOT in current CHECK): `static_mac_tracker` per CP14 §12 deferred item; lands at Wave-D/E §-text codification.
+Forward-codified (NOT in current CHECK): `static_mac_tracker` is a deferred item; lands at future canonical-bible §-text codification.
 
 ### §5.8. `behavioral_signatures.cellular_generation` — 4 non-NULL values + NULL
 
@@ -588,24 +588,59 @@ Four confidence shapes ship in v1.0.0, each defensible per its domain. Two-axis 
 |---|---|---|---|
 | `identifiers.confidence` | `BETWEEN 0 AND 100` | **99** (METHODOLOGY §5 humility-margin invariant; enforced at corroboration-boost + ceiling-rule layers) | Identifier-attribution carries fabrication-risk residual; perfect-certainty never claimed |
 | `procurement_records.confidence` | `BETWEEN 0 AND 100` | 100 (no operational cap below schema) | Contract-execution is discrete event; no humility-margin needed |
-| `council_minutes_matters.confidence` | discrete `IN (70, 75, 80)` | (schema-level; no operational adjustment) | SAR-5 Rule (f) item-grading; discrete tier reflects matter shape + vendor-specificity |
-| `behavioral_signatures.confidence` | `BETWEEN 0 AND 100` | TBD at promotion per SAR-7 §7.3 | (covered in §4.10) |
+| `council_minutes_matters.confidence` | discrete `IN (70, 75, 80)` | (schema-level; no operational adjustment) | Legistar item-grading sub-rule; discrete tier reflects matter shape + vendor-specificity |
+| `behavioral_signatures.confidence` | `BETWEEN 0 AND 100` | TBD at promotion per the intake-time false-positive-class allowlist | (covered in §4.10) |
 
-**Cross-table corroboration semantics**: when non-identifier-table rows (procurement / council_minutes / behavioral_signatures) corroborate `identifiers.confidence` per METHODOLOGY §5.2, the contributing-source-type ceiling applies. Per METHODOLOGY §5.6 + project-bible §8.4: procurement records cap cross-table corroboration at confidence 85 ("Procurement records add geographic context but never raise an identifier above 85 confidence by themselves"). Council-matters contribute at the matter's discrete-grading value (70/75/80) but cap at the source-type ceiling per `source_type` band (procurement / foia / official).
+**Cross-table corroboration semantics**: when non-identifier-table rows (procurement / council_minutes / behavioral_signatures) corroborate `identifiers.confidence` per METHODOLOGY §5.2, the contributing-source-type ceiling applies. Per METHODOLOGY §5.6 and the canonical-bible procurement-corroboration rule: procurement records cap cross-table corroboration at confidence 85 ("Procurement records add geographic context but never raise an identifier above 85 confidence by themselves"). Council-matters contribute at the matter's discrete-grading value (70/75/80) but cap at the source-type ceiling per `source_type` band (procurement / foia / official).
 
 ### §6.3. Export shape composition
 
-- `argus_export.json` (METHODOLOGY §5.5 standard export, ≥30 confidence): wire-observable rows excluding `device_category='unknown'` per §11 #13.
-- `argus_export_high_confidence.json` (≥70 confidence): same exclusions + CP7 geographic_scope filter (default `['US']`).
+- `argus_export.json` (METHODOLOGY §5.5 standard export, ≥30 confidence): wire-observable rows excluding `device_category='unknown'` per the multi-purpose-vendor discipline.
+- `argus_export_high_confidence.json` (≥70 confidence): same exclusions + the default `geographic_scope` filter (`['US']`).
 - `argus_export.csv` (rich-import feed): all active rows including analytical-only.
 
 ## §7. Maintenance posture
 
-This document updates in lockstep with schema migrations + CP-class amendments:
+This document updates in lockstep with schema migrations and canonical-bible amendments:
 
 - **Schema migrations** (any `db/migrations/NNNN_*.sql` landing): the affected table sub-section in §4 updates; §5 enum reference roster updates if CHECK constraints change.
-- **CP-class amendments** to project-bible §4.1 (enum-list parenthetical sync): documented in BIBLE_AMENDMENTS.md; this document inherits via §5 enum reference roster.
+- **Canonical-bible amendments** to the schema-section enum roster: documented in `BIBLE_AMENDMENTS.md`; this document inherits via the §5 enum reference roster.
 - **METHODOLOGY refinements** (any §5 confidence model, §6 dedup, §7 provenance change): §6 cross-references update; specific column descriptions in §4 may update if operational composition changes.
-- **Verification discipline** at every update: `PRAGMA table_info()` + `sqlite_master.sql` CHECK-extract regex against on-disk database. Per the codified `feedback_cross_reference_path_existence_check.md` discipline (4-tier source-of-truth precedence per §1), this document is tier (4) — derived narrative — and must faithfully reflect tier (1) on-disk schema state.
+- **Verification discipline** at every update: `PRAGMA table_info()` + `sqlite_master.sql` CHECK-extract regex against the on-disk database. Per the 4-tier source-of-truth precedence in §1, this document is tier (4) — derived narrative — and must faithfully reflect tier (1) on-disk schema state.
 
-Contributions touching schema or DATA_DICTIONARY content land via the standard project PR process per [CONTRIBUTING.md](CONTRIBUTING.md); substantive schema-changing PRs carry a `BIBLE_AMENDMENTS.md` entry per project-bible §11 #11 amendment-log discipline.
+Contributions touching schema or DATA_DICTIONARY content land via the standard project PR process per [CONTRIBUTING.md](CONTRIBUTING.md); substantive schema-changing PRs carry a `BIBLE_AMENDMENTS.md` entry per the amendment-log discipline.
+
+---
+
+## Canonical sources
+
+Descriptive references used in this document map to canonical bible
+anchors as follows. The canonical bible (`PROJECT_BIBLE.md` and the
+amendment ledger `BIBLE_AMENDMENTS.md`) holds the authoritative
+specification; this DATA_DICTIONARY is the derived schema-reference
+narrative.
+
+| Descriptive reference (as used in this doc) | Canonical source |
+|---|---|
+| promotion-gate hard rule | `PROJECT_BIBLE.md` §11 #7 |
+| no-fabrication hard rule | `PROJECT_BIBLE.md` §11 #1 |
+| no-PII hard rule | `PROJECT_BIBLE.md` §11 #3 |
+| confidence-ceiling hard rule / third-party-citation-lineage boundary | `PROJECT_BIBLE.md` §11 #8 |
+| multi-purpose-vendor discipline | `PROJECT_BIBLE.md` §11 #10 + §11 #13 |
+| amendment-log discipline | `PROJECT_BIBLE.md` §11 #11 |
+| Feist facts-only / canonical sentinel-key | `PROJECT_BIBLE.md` §11 #16 |
+| canonical-bible LA-bit pairing rule / vendor-as-container / firmware-generation | `PROJECT_BIBLE.md` §8.4 + `BIBLE_AMENDMENTS.md` CP14 |
+| canonical-bible procurement-corroboration / deployment-evidence rule | `PROJECT_BIBLE.md` §8.4 |
+| FOIA discipline | `PROJECT_BIBLE.md` §11 #6 |
+| source-tier hierarchy | `PROJECT_BIBLE.md` §1 + §6 |
+| canonical-bible provenance discipline | `PROJECT_BIBLE.md` §8.1 |
+| `source_type='primary_registry'` band introduction | `BIBLE_AMENDMENTS.md` CP15 |
+| `geographic_scope` filter (default `['US']`) | `BIBLE_AMENDMENTS.md` CP7 |
+| identifier-type extension cluster (migrations 0008–0010) | `BIBLE_AMENDMENTS.md` CP13 |
+| migration 0011 `ble_manufacturer_id` enum extension | `BIBLE_AMENDMENTS.md` CP14 |
+| forward-looking-codification caveat (vendor-companion-app sub-banding) | `BIBLE_AMENDMENTS.md` CP17 |
+| vendor-disambiguation discipline | `BIBLE_AMENDMENTS.md` SAR-8 + SAR-9 |
+| Legistar status-discipline / item-grading / staging sub-rules | `BIBLE_AMENDMENTS.md` SAR-5 |
+| intake-time false-positive-class allowlist | `BIBLE_AMENDMENTS.md` SAR-7 |
+| `argus_record_id` stable-identifier algorithm | `BIBLE_AMENDMENTS.md` SAR-10 |
+| framework-string sub-rule (extraction-time FP discipline) | `BIBLE_AMENDMENTS.md` SAR-11 |

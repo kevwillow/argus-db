@@ -20,16 +20,14 @@ content of this repository. Specifically:
 - The **database content** (`db/argus.db` + exports at `exports/`) is licensed under **ODbL-1.0** per `LICENSE-DATA`.
 
 **License-choice note:** CC-BY-SA-4.0 (ShareAlike) was selected over
-CC-BY-4.0 (Attribution-only, the original dispatch recommendation at
-§3.1) because Argus's documentation includes the discipline
-architecture (PROJECT_BIBLE.md + BIBLE_AMENDMENTS.md SAR-N memos +
-feedback memos). Derivative documentation that adopts Argus's
-discipline framing should preserve the open-availability posture under
-the ShareAlike clause — the same posture Argus extends to its
-documentation. Attribution-only (CC-BY-4.0) would allow proprietary
-derivative documentation; ShareAlike preserves the symmetry. This is
-a CEO selection per dispatch §3.1's "CEO recommendation welcome if
-different fits" framing.
+the more permissive CC-BY-4.0 (Attribution-only) because Argus's
+documentation includes the discipline architecture (PROJECT_BIBLE.md
++ BIBLE_AMENDMENTS.md + the in-repo discipline-evolution memos).
+Derivative documentation that adopts Argus's discipline framing
+should preserve the open-availability posture under the ShareAlike
+clause — the same posture Argus extends to its documentation.
+Attribution-only (CC-BY-4.0) would allow proprietary derivative
+documentation; ShareAlike preserves the symmetry.
 
 The full CC-BY-SA-4.0 license text follows.
 

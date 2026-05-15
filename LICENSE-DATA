@@ -8,7 +8,7 @@ canonical SQLite database + all derived exports. Specifically:
 - `db/argus.db` — canonical SQLite database (22,464 active identifiers + 93 behavioral_signatures + 116,668 deployment_observations + ~80,000 raw_observations + 43 sources at v1.0.0; subject to revision per CHANGELOG.md)
 - `exports/argus_export.json` — Lynceus-bound standard export
 - `exports/argus_export_high_confidence.json` — Lynceus-bound high-confidence export
-- `exports/argus_export_behavioral_signatures.json` — Rayhunter-bound behavioral_signatures sibling export (per CP18 directive)
+- `exports/argus_export_behavioral_signatures.json` — Rayhunter-bound behavioral_signatures sibling export
 - `exports/argus_export.csv` — rich-import CSV
 - `exports/coverage_report.md` — coverage reconciliation report
 
@@ -21,9 +21,8 @@ canonical SQLite database + all derived exports. Specifically:
 
 ## 1 — License selection rationale
 
-ODbL-1.0 (Open Database License) was selected over the original
-dispatch recommendation of CC-BY-SA-4.0 (§3.1) for three structural
-reasons:
+ODbL-1.0 (Open Database License) was selected over the more
+permissive CC-BY-SA-4.0 option for three structural reasons:
 
 1. **Database-specific copyright posture.** ODbL is designed specifically
    for databases under both copyright (US) and database-rights regimes
@@ -45,10 +44,9 @@ reasons:
    (§4.4) explicitly; CC-BY-SA-4.0's "Adapted Material" framing is less
    clear for the join-and-filter operations operators perform.
 
-The CC-BY-SA-4.0 recommended posture from the original dispatch is a
-defensible alternative for a facts-only database under Feist; the CEO
-selection of ODbL-1.0 reflects the above structural reasoning + the
-compatibility constraint with DeFlock.
+A CC-BY-SA-4.0 posture is a defensible alternative for a facts-only
+database under Feist; the ODbL-1.0 selection reflects the above
+structural reasoning + the compatibility constraint with DeFlock.
 
 ---
 
@@ -61,9 +59,9 @@ license-tag propagation operates at three structurally-distinct layers:
 
 - **Layer 1** `sources.notes.license_posture` (per-source declaration)
 - **Layer 2** `deployment_observations.LICENSE` (per-row NOT NULL column added in migration 0016)
-- **Layer 3** `identifiers.notes.upstream_license_posture` (per-promoted-identifier sentinel key per §11 #16 canonical)
+- **Layer 3** `identifiers.notes.upstream_license_posture` (per-promoted-identifier sentinel key — canonical sentinel for facts-only promotions)
 
-See `PROJECT_BIBLE.md` §11 #16 for the full composition discipline.
+See `PROJECT_BIBLE.md` for the facts-only composition discipline (canonical bible anchor mapped in the Canonical sources table at end of this document).
 
 ### 2.1 — Upstream license postures by source class
 
@@ -71,22 +69,23 @@ See `PROJECT_BIBLE.md` §11 #16 for the full composition discipline.
 |---|---|---|---|
 | **CC-BY-NC-SA-4.0** (NC clause — non-commercial only) | 1 source (sid=5 EFF Atlas of Surveillance) | 15,071 deployment_observations | **DOWNSTREAM CAUTION:** the NC (NonCommercial) clause prohibits commercial redistribution of these rows or their derivatives. Operators using Argus exports for commercial surveillance-detection deployments MUST filter out `deployment_observations.LICENSE='CC-BY-NC-SA-4.0'` rows before commercial use. Non-commercial / research / journalist use is licensed. |
 | **ODbL-1.0** | 1 source (sid=6 DeFlock) | 101,597 deployment_observations | Compatible with this database's ODbL-1.0 compilation license. Standard ODbL attribution + ShareAlike applies to any derivative database. |
-| **Public-domain registry** (regulatory / primary_registry) | 7 sources (sids 1, 2, 3, 7, 34, 35, 36 — IEEE OUI MA-L/MA-M/MA-S, FCC EAS grantees, Bluetooth SIG, IEEE IAB, FAA UAS Remote-ID) | per-source counts in CREDITS.md | Public-domain (fact-only registries; not creative works). No attribution clause beyond Argus's own per-source citation in `sources` table. |
-| **AGPL-3.0** (inherited from upstream code/fork-base) | 3 sources (sids 38, 40, 43 — DeflockJoplin fork-of-id-20, FoggedLens/deflock-app, RUB-SysSec/DroneSecurity) | per-source identifier promotions (see CREDITS.md) | Argus extracts only **factual claims** (identifier values, manufacturer attributions, operational context) per Feist v. Rural Telephone Service (499 U.S. 340 (1991)). Facts are not copyrightable; the AGPL-3.0 obligation propagates only if downstream redistribute the upstream compilation arrangement (which Argus does NOT republish — see §3 below). |
-| **NO_LICENSE_DECLARED** (public-but-unlicensed; §11 #16 Feist facts-only) | 2 sources (sids 39, 42 — EthanThePhoenix38/flock-you-camera-detector, GainSec/flock-safety-falcon-sparrow-alpr-edl-firehose) | 27 promoted identifiers (19 + 8) | §11 #16 Feist facts-only regime applies. See §3 below. |
+| **Public-domain registry** (regulatory / primary_registry) | 7 sources (`sources.id` 1, 2, 3, 7, 34, 35, 36 — IEEE OUI MA-L/MA-M/MA-S, FCC EAS grantees, Bluetooth SIG, IEEE IAB, FAA UAS Remote-ID) | per-source counts in CREDITS.md | Public-domain (fact-only registries; not creative works). No attribution clause beyond Argus's own per-source citation in `sources` table. |
+| **AGPL-3.0** (inherited from upstream code/fork-base) | 3 sources (`sources.id` 38, 40, 43 — DeflockJoplin fork-of-id-20, FoggedLens/deflock-app, RUB-SysSec/DroneSecurity) | per-source identifier promotions (see CREDITS.md) | Argus extracts only **factual claims** (identifier values, manufacturer attributions, operational context) per Feist v. Rural Telephone Service (499 U.S. 340 (1991)). Facts are not copyrightable; the AGPL-3.0 obligation propagates only if downstream redistribute the upstream compilation arrangement (which Argus does NOT republish — see §3 below). |
+| **NO_LICENSE_DECLARED** (public-but-unlicensed; Feist facts-only doctrine) | 2 sources (`sources.id` 39, 42 — EthanThePhoenix38/flock-you-camera-detector, GainSec/flock-safety-falcon-sparrow-alpr-edl-firehose) | 27 promoted identifiers (19 + 8) | Feist facts-only regime applies. See §3 below. |
 | **Permissive (MIT / Apache-2.0 / BSD)** + **academic citations** | Remaining ~29 sources (community-research repos, academic papers) | per-source identifier promotions (see CREDITS.md) | Standard permissive attribution preserved in `sources` table + `identifiers.source_url` per-row. No share-alike obligation. |
 
-For exact per-source breakdown including license posture, deployment_obs row counts, raw_obs counts, and promoted identifier counts, see `CREDITS.md` (per dispatch §3.4).
+For exact per-source breakdown including license posture, deployment_obs row counts, raw_obs counts, and promoted identifier counts, see `CREDITS.md`.
 
 ---
 
-## 3 — §11 #16 Feist facts-only handling
+## 3 — Feist facts-only handling for unlicensed sources
 
 Argus's promotion regime for **public-but-unlicensed sources** (sources
 distributed publicly on GitHub or similar surfaces with no LICENSE
 file and no explicit license declaration) operates under the Feist v.
 Rural Telephone Service (499 U.S. 340 (1991)) facts-not-copyrightable
-doctrine, codified at `PROJECT_BIBLE.md` §11 #16.
+doctrine, with the canonical composition discipline defined in
+`PROJECT_BIBLE.md` (see Canonical sources table at end of this document).
 
 **The principle:** facts are not copyrightable. A list of MAC OUIs +
 manufacturer attributions extracted from a public-but-unlicensed
@@ -98,21 +97,20 @@ arrangement.
 **What Argus extracts** (facts; not copyrighted):
 - Identifier values (MAC OUIs, BLE service UUIDs, SSID strings, etc.)
 - Manufacturer attributions and operational-context single-sentence notes
-- Pinned source URL citations (e.g., `https://github.com/Owner/Repo/blob/<sha>/<path>#L<line>` per SAR-13 §S.2)
+- Pinned source URL citations (e.g., `https://github.com/Owner/Repo/blob/<sha>/<path>#L<line>` — pinned-SHA + line-anchored for verifiable provenance)
 
 **What Argus does NOT republish** (compilation arrangement; copyrighted):
 - Copying list-snippets verbatim into `source_excerpt`
 - Mirroring repository structure
 - Reproducing the source's selection or organization beyond what a single-fact citation requires
 
-**Per-row sentinel:** §11 #16 facts-only promotions carry the canonical
-sentinel `notes.upstream_license_posture='NO_LICENSE_DECLARED'` per
-MAC-118 F1 canonicalization (see PROJECT_BIBLE.md §11 #16 + MAC-118
-audit report).
+**Per-row sentinel:** facts-only promotions carry the canonical
+sentinel `notes.upstream_license_posture='NO_LICENSE_DECLARED'`. See
+`PROJECT_BIBLE.md` for the canonical sentinel-key specification.
 
 **Downstream consumer implication:** if you redistribute Argus's
 database content (in compliance with the ODbL-1.0 license below), you
-inherit the same facts-only posture for §11 #16-sourced rows. You do
+inherit the same facts-only posture for these rows. You do
 not inherit any obligation to seek permission from the original
 unlicensed upstream because no upstream license exists; Feist governs
 the regime.
@@ -146,10 +144,11 @@ license posture for identifiers lives in `notes.upstream_license_posture`
 target-clean for `NO_LICENSE_DECLARED`).
 
 For Lynceus high-confidence consumers:
-- §11 #16 NO_LICENSE_DECLARED rows are `source_type='crowdsourced'` per
-  §8.2 ceiling-rule. They are EXCLUDED from `argus_export_high_confidence.json`
-  per CP19 + §7.5 source_type exclusion (high-conf couples band-meaning
-  to confidence-value-meaning; crowdsourced never enters high-conf even
+- NO_LICENSE_DECLARED rows are `source_type='crowdsourced'` (per the
+  source-type confidence-band ceiling rule). They are EXCLUDED from
+  `argus_export_high_confidence.json` per the high-confidence export's
+  source-type exclusion policy (high-conf couples band-meaning to
+  confidence-value-meaning; crowdsourced never enters high-conf even
   at conf=70).
 - They DO flow to `argus_export.json` (standard) and `argus_export.csv`.
 - Consumer-side filter pattern for license-aware processing:
@@ -168,18 +167,18 @@ obligations as enumerated in §2.1 above.
 
 As of v1.0.0, sources rows 1/2/3/7 (IEEE OUI MA-L/MA-M/MA-S and FCC
 EAS) carry historic `source_type='regulatory'` metadata that pre-dates
-CP15's §8.2 strict reading codification. Per CP15 strict reading, these
-sources are `primary_registry` band (registry-class allocators, not
-filing-class regulators). The identifier-row data for the ~70,000+
-identifiers from these sources is **correctly labeled `primary_registry`**;
-only the sources-row metadata carries the pre-CP15 vestige. This is
-documented in `README.md` §3.2 as "known sources-row metadata
-discrepancy" and is queued for cleanup as a single-purpose post-ship
-work item per CEO recommendation + board ratification (MAC-101
-[`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c)). Downstream consumers
-filtering on `sources.source_type='primary_registry'` should also
-include `sources.id IN (1,2,3,7)` to capture all primary-registry
-sources until the cleanup lands.
+the source-type taxonomy refinement distinguishing registry-class
+allocators from filing-class regulators. Under the current strict
+reading, these sources are `primary_registry` band (registry-class
+allocators, not filing-class regulators). The identifier-row data for
+the ~70,000+ identifiers from these sources is **correctly labeled
+`primary_registry`**; only the sources-row metadata carries the
+historical vestige. This is documented as a known discrepancy in
+`README.md` and is queued for cleanup as a single-purpose post-ship
+work item. Downstream consumers filtering on
+`sources.source_type='primary_registry'` should also include
+`sources.id IN (1,2,3,7)` to capture all primary-registry sources
+until the cleanup lands.
 
 ### 4.5 — argus_export.csv parsing note
 
@@ -188,6 +187,25 @@ export timestamp / record count / confidence threshold. Line 2 is the
 column header. Consumers using `csv.DictReader` should skip line 1 or
 use a sniffer-aware reader; standard CSV tooling (pandas
 `pd.read_csv(comment='#')`) handles this automatically.
+
+---
+
+## Canonical sources
+
+Descriptive references used in this document map to canonical bible
+anchors as follows. The canonical bible (`PROJECT_BIBLE.md` and the
+amendment ledger `BIBLE_AMENDMENTS.md`) holds the authoritative
+specification; this document is the public-facing summary.
+
+| Descriptive reference (as used in this doc) | Canonical source |
+|---|---|
+| facts-only doctrine / Feist facts-only regime / facts-only composition discipline | `PROJECT_BIBLE.md` §11 #16 |
+| canonical sentinel-key specification (`notes.upstream_license_posture='NO_LICENSE_DECLARED'`) | `PROJECT_BIBLE.md` §11 #16 |
+| source-type confidence-band ceiling rule | `PROJECT_BIBLE.md` §8.2 |
+| high-confidence export's source-type exclusion policy | `PROJECT_BIBLE.md` §7.5 |
+| source-type taxonomy refinement (registry-vs-regulatory strict reading) | `BIBLE_AMENDMENTS.md` CP15 |
+| behavioral_signatures sibling export | `BIBLE_AMENDMENTS.md` CP18 |
+| pinned-SHA URL-anchored per-shape mapper precedent | `BIBLE_AMENDMENTS.md` SAR-13 |
 
 ---
 
