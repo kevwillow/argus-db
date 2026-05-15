@@ -255,3 +255,23 @@ The most substantive thing I built isn't the database. It's the framework that m
 Every active identifier carries source attribution, confidence scoring, source-type classification, and a chain of corroboration. The framework includes hard rules that prevent fabrication (every identifier must trace to a concrete public source), PII discipline (individual-attributed registrations stay held, not promoted), and downstream-consumer protection (downstream scanners receive only high-confidence canonical data). The framework evolved with the work — each substantive amendment is documented with case studies showing what went wrong (or could have gone wrong) and why the rule exists.
 
 Building this with AI tools is what made it possible at the scale and velocity it happened. Building it deliberately, with operator-final-say discipline and a binding correctness framework, is what makes the output trustworthy.
+
+
+
+---
+
+## Support the Project
+
+This project was built as a hobby by one person, a couple computers, and a couple of LLMs. It burned through quite a bit of token cost and mass amounts of personal time — but it was worth it. If Argus saves you some time or you just think it's cool, consider tossing a few sats my way. No pressure, but coffee and compute aren't free.
+
+- **Star this repo** — it's free and it helps others find the project
+- **Submit an issue or PR** — bug reports and feature ideas welcome
+- **Crypto donations** — if you're feeling generous:
+  - **BTC** — `bc1qmtzjlc2cw2y45nea2jqf4deh946j8mq502zvsw`
+  - **BTC (Unstoppable Domain)** — `gurutech.blockchain`
+  - **LTC** — `ltc1qf32n038a90ulajlq6zz67r3n2myewpjlj2ej6w`
+  - **ETH** — `0x9bf3311c4721fe37f58913dc57c2bf1722dc8a0f`
+  - **BCH** — `bitcoincash:qr2l294kuve9cw48u7xek9nklhed066ycvjtj4ymq9`
+  - **SOL** — `CuraE8usMpSrAhpY2QiWaQGoBjyJzkSaUNP6kRgAzscU`
+
+- **Contact** — kev@gurutechnology.services
