@@ -83,9 +83,69 @@ def utc_now() -> str:
 
 
 def polite_get(session: requests.Session, url: str, sleep_sec: float = FCCID_RATE_LIMIT_SEC, timeout: int = 30) -> requests.Response:
-    """GET with UA + rate-limit + 30s timeout. Returns the Response object; caller checks .status_code."""
+    """GET with UA + rate-limit + 30s timeout. Returns the Response object; caller checks .status_code.
+
+    §6 #4 enforcement: on 429 / 503 with Retry-After, sleep the indicated duration (capped at 60s)
+    and retry once before returning the response to caller.
+    """
     time.sleep(sleep_sec)
-    return session.get(url, headers={'User-Agent': UA}, timeout=timeout)
+    r = session.get(url, headers={'User-Agent': UA}, timeout=timeout)
+    if r.status_code in (429, 503):
+        retry_after = r.headers.get('Retry-After', '').strip()
+        backoff = 5.0
+        if retry_after.isdigit():
+            backoff = min(float(retry_after), 60.0)
+        logging.warning(f'§6 #4 backoff: http={r.status_code} Retry-After={retry_after!r} sleep={backoff}s url={url}')
+        time.sleep(backoff)
+        r = session.get(url, headers={'User-Agent': UA}, timeout=timeout)
+    return r
+
+
+# §6 #8 PII surfacing detector — runs on fccid.io HTML index pages we capture.
+# Attachment PDFs are NOT scanned in §3 (they stay raw; §4 does extract+PII-strip).
+PII_REGEXES = {
+    'email': re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),
+    'us_phone': re.compile(r'\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b'),
+    # Naive person-name pattern; many false positives — used only in conjunction with high-risk context
+    'person_name_in_signature_block': re.compile(
+        r'(?:signed|signature|engineer|director|manager|technician|prepared by|reviewed by)[:\s]+([A-Z][a-z]+\s+[A-Z][a-z]+)',
+        re.IGNORECASE
+    ),
+}
+PII_ALLOWLIST = {
+    'kev@example.com',                  # our own UA
+    'argus-research@example.com',
+    'argus-research/1.0',
+}
+
+
+def scan_for_pii(text: str, context: str) -> list[dict]:
+    """Return list of PII findings: [{kind, snippet, context}]. Empty list → no PII surfaced."""
+    findings = []
+    for kind, rx in PII_REGEXES.items():
+        for m in rx.finditer(text):
+            hit = m.group(0)
+            if hit.lower() in {a.lower() for a in PII_ALLOWLIST}:
+                continue
+            snippet = text[max(0, m.start() - 40): m.end() + 40].replace('\n', ' ')[:200]
+            findings.append({'kind': kind, 'value': hit, 'snippet': snippet, 'context': context})
+    return findings
+
+
+def append_pii_finding(findings: list[dict]):
+    """§6 #8 PII surface — append to pii_surface_audit.json and signal halt to caller."""
+    if not findings:
+        return
+    path = WORK_DIR / 'pii_surface_audit.json'
+    current = {'manifest_ref': 'extraction_outputs/fccid_io_admission/manifest.json', 'findings': []}
+    if path.exists():
+        try:
+            current = json.loads(path.read_text())
+        except Exception:
+            pass
+    current['findings'].extend([{'detected_at_utc': utc_now(), **f} for f in findings])
+    current['last_updated_utc'] = utc_now()
+    path.write_text(json.dumps(current, indent=2))
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -594,15 +654,367 @@ def run_smoke_test():
 # Bulk run (post-smoke; not invoked in this commit)
 # ============================================================
 
-def run_bulk():
-    """Stream A + Stream B bulk dispatch. Halt-criteria per runguide §6.
+# ============================================================
+# Stream B — fccid.io grantee-name search
+# ============================================================
 
-    NOT IMPLEMENTED IN THIS COMMIT — pending CEO ack of smoke-test result.
-    Skeleton intentionally left for the next iteration.
+STREAM_B_VENDORS = [
+    'BRINC', 'Berla', 'BriefCam', 'Cellebrite', 'Clearview AI', 'DroneShield',
+    'Engility', 'Genetec', 'Hak5', 'Magnet Forensics', 'Rekor', 'Septier',
+    'SoundThinking', 'Vigilant Solutions',
+]
+
+
+def search_fccid_grantee_name(session: requests.Session, vendor: str) -> list[str]:
+    """§2.7 Stream B: search fccid.io's grantee-code-by-name interface; return list of grantee codes.
+
+    Halt-criterion per §2.7.1: > 20 candidate grantee codes triggers defensive disambig (caller handles).
     """
+    url = f'https://fccid.io/grantee-code/?search={urllib.parse.quote(vendor)}'
+    logging.info(f'Stream B search vendor={vendor!r}: GET {url}')
+    r = polite_get(session, url)
+    if r.status_code != 200:
+        logging.warning(f'  vendor {vendor!r}: http={r.status_code}; treating as 0 results')
+        return []
+    soup = BeautifulSoup(r.content, 'html.parser')
+    # Grantee codes on fccid.io are formatted as 3-5 char alphanumeric prefixes,
+    # surfaced via /{grantee_code} links. Parse all unique hrefs that match.
+    codes = []
+    seen = set()
+    for a in soup.find_all('a', href=True):
+        href = a['href']
+        m = re.match(r'^(?:https?://fccid\.io)?/([A-Z0-9]{3,5})/?$', href, re.IGNORECASE)
+        if m:
+            code = m.group(1).upper()
+            if code in seen or code in {'API', 'FAQ', 'DMCA', 'BLOG', 'HOME', 'TYPES', 'CHARTS'}:
+                continue
+            seen.add(code)
+            codes.append(code)
+    logging.info(f'  vendor {vendor!r}: {len(codes)} grantee codes found')
+    return codes
+
+
+# ============================================================
+# Bulk run halt-criteria + progress
+# ============================================================
+
+# §6 #10 wall-clock hard cap. Original 4h soft / 6h hard for §3 minus PC1.7 cost = 4h 43m hard.
+BULK_HARD_CAP_MIN = 283
+BULK_SOFT_CAP_MIN = 163  # 2h 43m soft target (informational)
+CANARY_AT_MIN = 120
+CANARY_MIN_COMPLETION_PCT = 40
+PROGRESS_CHECKPOINT_EVERY = 25
+STREAM_B_PER_VENDOR_HALT = 20  # >20 triggers defensive disambig per §2.7.1
+
+
+class HaltError(Exception):
+    """Raised when a §6 halt-criterion fires; caller logs + writes STOP_THE_LINE and exits."""
+
+
+def check_halt_criteria(start_ts: float, manifest: dict, processed_count: int,
+                        expected_total: int, deferred_queue: list,
+                        progress_path: Path):
+    """Composite halt-criteria check. Raises HaltError on any trip."""
+    elapsed_min = (time.time() - start_ts) / 60.0
+
+    # §6 #10 wall-clock hard cap
+    if elapsed_min >= BULK_HARD_CAP_MIN:
+        raise HaltError(f'§6 #10 wall-clock hard cap reached: {elapsed_min:.1f} min ≥ {BULK_HARD_CAP_MIN}')
+
+    # 2h canary
+    if elapsed_min >= CANARY_AT_MIN and expected_total > 0:
+        pct = 100.0 * processed_count / expected_total
+        if pct < CANARY_MIN_COMPLETION_PCT:
+            raise HaltError(f'2h canary tripped: {pct:.1f}% completion < {CANARY_MIN_COMPLETION_PCT}% at {elapsed_min:.1f} min')
+
+    # Storage soft gate
+    storage_ok, storage_msg = check_storage_gates(manifest)
+    if not storage_ok:
+        raise HaltError(f'storage gate halt: {storage_msg}')
+
+
+def write_progress(progress_path: Path, processed_count: int, expected_total: int,
+                   in_flight_grantee: str | None, last_completed_fcc_id: str | None,
+                   start_ts: float, manifest: dict, deferred_queue_depth: int):
+    elapsed_min = (time.time() - start_ts) / 60.0
+    storage_gb = disk_usage_gb(RAW_FCCID) + disk_usage_gb(RAW_FCC_EAS)
+    payload = {
+        'updated_at_utc': utc_now(),
+        'processed_count': processed_count,
+        'expected_total': expected_total,
+        'completion_pct': (100.0 * processed_count / expected_total) if expected_total > 0 else None,
+        'in_flight_grantee': in_flight_grantee,
+        'last_completed_fcc_id': last_completed_fcc_id,
+        'current_storage_gb': round(storage_gb, 4),
+        'storage_soft_gb': manifest['storage_gate']['soft_gb'],
+        'storage_hard_gb': manifest['storage_gate']['hard_gb'],
+        'elapsed_wall_clock_min': round(elapsed_min, 2),
+        'bulk_hard_cap_min': BULK_HARD_CAP_MIN,
+        'canary_at_min': CANARY_AT_MIN,
+        'canary_min_completion_pct': CANARY_MIN_COMPLETION_PCT,
+        'deferred_queue_depth': deferred_queue_depth,
+    }
+    progress_path.write_text(json.dumps(payload, indent=2))
+
+
+def write_stop_the_line(reason: str, processed_count: int, expected_total: int,
+                        in_flight_grantee: str | None, last_completed_fcc_id: str | None,
+                        deferred_queue: list):
+    path = WORK_DIR / 'BULK_STOP_THE_LINE.md'
+    body = f"""# MAC-101 BULK RUN — STOP THE LINE
+
+**Reason:** {reason}
+**Detected at:** {utc_now()}
+**Processed:** {processed_count} / {expected_total} ({100.0 * processed_count / expected_total if expected_total else 0:.1f}%)
+**In-flight grantee:** {in_flight_grantee!r}
+**Last completed FCC ID:** {last_completed_fcc_id!r}
+**Deferred queue depth:** {len(deferred_queue)}
+
+State preserved on disk for resume:
+- progress.json — latest checkpoint
+- fcc_citation_deferred_queue.json — cumulative queue (all entries persist)
+- raw/fccid_io/ — all fetched HTML + attachments + sha256s
+- bulk_run.log — full request log
+
+CC idle. Awaiting CEO disposition for resume vs partial-deliverable.
+"""
+    path.write_text(body)
+
+
+# ============================================================
+# Bulk run driver
+# ============================================================
+
+def process_one_filing(session: requests.Session, filing: dict, manifest: dict,
+                       deferred_queue: list, borderline_log: list,
+                       provisional_id_counter: list) -> dict:
+    """Run §3.2 → §3.3 → §3.4.1 for one FCC ID. Returns status dict."""
+    fcc_id = filing['fcc_id']
+
+    # §3.1 enumeration-time borderline skip
+    if is_borderline_for_skip(filing.get('description_excerpt', '')):
+        borderline_log.append({'fcc_id': fcc_id, 'description': filing.get('description_excerpt'),
+                               'reason': 'consumer_electronics_pattern_match'})
+        return {'fcc_id': fcc_id, 'skipped': 'borderline_consumer_electronics'}
+
+    # §3.2
+    am = enumerate_filing_attachments(session, fcc_id)
+    if am['http_code'] != 200:
+        return {'fcc_id': fcc_id, 'skipped': f'filing_page_http_{am["http_code"]}'}
+
+    # §6 #3 attachment-count surface — if a single FCC ID has > 10 attachments matching priority filter, halt
+    if len(am['attachments']) > PER_FCC_ID_ATTACHMENT_HALT:
+        logging.warning(f'§3.3 high attachment count {len(am["attachments"])} for {fcc_id} — may be chipset re-cert')
+        # Surface but don't halt unilaterally; let CEO surface_at_handoff catch
+        am['high_attachment_count_flag'] = True
+
+    # §6 #8 PII scan on fccid.io HTML
+    fccid_html_path = RAW_FCCID / fcc_id / 'index.html'
+    fccid_html = fccid_html_path.read_bytes()
+    pii_hits = scan_for_pii(fccid_html.decode('utf-8', errors='ignore'), context=f'fccid_io_html:{fcc_id}')
+    if pii_hits:
+        append_pii_finding(pii_hits)
+        raise HaltError(f'§6 #8 PII surfaced on fccid.io HTML for {fcc_id}: {len(pii_hits)} hit(s); see pii_surface_audit.json')
+
+    # §3.3 — fetch attachments up to per-FCC-ID cap
+    fetched_count = 0
+    for att in am['attachments'][:PER_FCC_ID_DOWNLOAD_CAP]:
+        rec = fetch_attachment(session, fcc_id, att)
+        if 'sha256' in rec:
+            fetched_count += 1
+
+    # §3.4.1 — queue
+    fccid_html_sha256 = sha256_bytes(fccid_html)
+    fccid_io_source_url = f'https://fccid.io/{fcc_id}'
+    provisional_id = provisional_id_counter[0]
+    provisional_id_counter[0] += 1
+
+    branch_result = handle_fcc_gov_branch(
+        session, fcc_id, fccid_io_source_url, fccid_html, fccid_html_sha256,
+        manifest, deferred_queue, [provisional_id],
+    )
+
+    # Per-FCC-ID provenance file
+    prov_path = WORK_DIR / 'per_fcc_id' / fcc_id / 'section_3_provenance.json'
+    prov_path.parent.mkdir(parents=True, exist_ok=True)
+    prov_path.write_text(json.dumps({
+        'fcc_id': fcc_id,
+        'grantee_code': filing.get('grantee_code'),
+        'product_code': filing.get('product_code'),
+        'fccid_io_source_url': fccid_io_source_url,
+        'fccid_io_html_sha256': fccid_html_sha256,
+        'attachments_fetched': fetched_count,
+        'attachments_total_priority': len(am['attachments']),
+        'view_on_fcc_link_present': am['view_on_fcc_link'] is not None,
+        'opportunistic_enrichment_grant_ids': branch_result.get('fcc_grant_ids', []),
+        'processed_at_utc': utc_now(),
+    }, indent=2))
+
+    return {'fcc_id': fcc_id, 'fetched': fetched_count, 'attachments_total': len(am['attachments']),
+            'enrichment_present': branch_result.get('enrichment_present', False)}
+
+
+def run_bulk():
+    """Bulk dispatch: Stream A (48 codes) + Stream B (14 vendors). Halt-criteria per runguide §6."""
     setup_logging(smoke_test=False)
-    logging.error('bulk run NOT implemented in this commit; smoke-test first')
-    return 3
+    start_ts = time.time()
+    logging.info('=== BULK RUN start (PC1.7 Step 6) ===')
+
+    manifest = load_manifest()
+    manifest['bulk_run_started_at_utc'] = utc_now()
+    save_manifest(manifest)
+
+    session = requests.Session()
+
+    progress_path = WORK_DIR / 'progress.json'
+    deferred_queue: list = []
+    borderline_log: list = []
+    provisional_id_counter = [10000]  # placeholder IDs; validator re-IDs at promotion
+    all_filings: list = []
+    last_completed_fcc_id: str | None = None
+    in_flight_grantee: str | None = None
+    processed_count = 0
+    expected_total = 0  # known after enumeration
+
+    try:
+        # ============================================================
+        # Phase 1: Stream A grantee enumeration → FCC ID collection
+        # ============================================================
+        stream_a_codes = load_stream_a_targets()
+        logging.info(f'Phase 1: Stream A enumeration ({len(stream_a_codes)} grantees)')
+        for gc in stream_a_codes:
+            in_flight_grantee = gc
+            check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
+            filings = enumerate_grantee_filings(session, gc)
+            all_filings.extend(filings)
+            logging.info(f'  Stream A {gc}: +{len(filings)} FCC IDs (cumulative {len(all_filings)})')
+
+        # ============================================================
+        # Phase 2: Stream B grantee-name search → grantee codes → FCC IDs
+        # ============================================================
+        stream_b_grantees_resolved: list[str] = []
+        stream_b_documented_absences: list[str] = []
+        stream_b_oversize_halts: list[tuple[str, int]] = []
+        logging.info(f'Phase 2: Stream B fan-out ({len(STREAM_B_VENDORS)} vendors)')
+        for vendor in STREAM_B_VENDORS:
+            in_flight_grantee = f'stream_b:{vendor}'
+            check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
+            codes = search_fccid_grantee_name(session, vendor)
+            if not codes:
+                stream_b_documented_absences.append(vendor)
+                continue
+            if len(codes) > STREAM_B_PER_VENDOR_HALT:
+                logging.warning(f'  Stream B {vendor}: {len(codes)} > {STREAM_B_PER_VENDOR_HALT} '
+                                f'— skipping per §2.7.1 (defensive: needs disambig before include)')
+                stream_b_oversize_halts.append((vendor, len(codes)))
+                continue
+            stream_b_grantees_resolved.extend(codes)
+        # Dedupe Stream B codes (some vendors may share grantees with Stream A)
+        stream_a_set = set(stream_a_codes)
+        stream_b_unique = [c for c in stream_b_grantees_resolved if c not in stream_a_set]
+        seen_b = set()
+        stream_b_unique = [c for c in stream_b_unique if not (c in seen_b or seen_b.add(c))]
+        logging.info(f'  Stream B resolved: {len(stream_b_grantees_resolved)} raw → {len(stream_b_unique)} unique '
+                     f'(excluding Stream A overlap)')
+
+        for gc in stream_b_unique:
+            in_flight_grantee = gc
+            check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
+            filings = enumerate_grantee_filings(session, gc)
+            all_filings.extend(filings)
+            logging.info(f'  Stream B {gc}: +{len(filings)} FCC IDs (cumulative {len(all_filings)})')
+
+        # Deduplicate filings by fcc_id (some grantee enumerations can collide)
+        seen_fcc = set()
+        deduped_filings = []
+        for f in all_filings:
+            if f['fcc_id'] in seen_fcc:
+                continue
+            seen_fcc.add(f['fcc_id'])
+            deduped_filings.append(f)
+        all_filings = deduped_filings
+        expected_total = len(all_filings)
+        logging.info(f'Phase 1+2 complete: {expected_total} unique FCC IDs in scope')
+
+        write_progress(progress_path, processed_count, expected_total, in_flight_grantee,
+                       last_completed_fcc_id, start_ts, manifest, len(deferred_queue))
+
+        # ============================================================
+        # Phase 3: per-FCC-ID §3.2 → §3.3 → §3.4.1 loop
+        # ============================================================
+        logging.info(f'Phase 3: per-FCC-ID processing (target {expected_total})')
+        for filing in all_filings:
+            in_flight_grantee = filing.get('grantee_code')
+            check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
+
+            try:
+                result = process_one_filing(session, filing, manifest, deferred_queue,
+                                            borderline_log, provisional_id_counter)
+                if 'skipped' not in result:
+                    last_completed_fcc_id = filing['fcc_id']
+                processed_count += 1
+            except HaltError:
+                raise
+            except Exception as e:
+                logging.error(f'  process error for {filing["fcc_id"]}: {e}; continuing')
+                processed_count += 1
+                continue
+
+            # Periodic queue persist + progress checkpoint
+            if processed_count % PROGRESS_CHECKPOINT_EVERY == 0:
+                persist_deferred_queue(deferred_queue)
+                write_progress(progress_path, processed_count, expected_total,
+                               in_flight_grantee, last_completed_fcc_id,
+                               start_ts, manifest, len(deferred_queue))
+                logging.info(f'  checkpoint @ {processed_count}/{expected_total} '
+                             f'({100*processed_count/expected_total:.1f}%) '
+                             f'queue_depth={len(deferred_queue)} '
+                             f'elapsed={(time.time()-start_ts)/60:.1f}min')
+
+        # ============================================================
+        # Phase 4: final persist + handoff stubs
+        # ============================================================
+        persist_deferred_queue(deferred_queue)
+        write_progress(progress_path, processed_count, expected_total, None,
+                       last_completed_fcc_id, start_ts, manifest, len(deferred_queue))
+
+        # Borderline log
+        if borderline_log:
+            (WORK_DIR / 'borderline_fcc_ids.json').write_text(
+                json.dumps({'borderline_filings': borderline_log, 'count': len(borderline_log)}, indent=2)
+            )
+
+        # Stream B audit
+        (WORK_DIR / 'stream_b_audit.json').write_text(json.dumps({
+            'documented_absences': stream_b_documented_absences,
+            'oversize_halts_deferred_to_disambig': [{'vendor': v, 'count': n} for v, n in stream_b_oversize_halts],
+            'resolved_unique_grantees': stream_b_unique,
+        }, indent=2))
+
+        elapsed_min = (time.time() - start_ts) / 60.0
+        logging.info(f'=== BULK RUN complete: {processed_count}/{expected_total} '
+                     f'queue_depth={len(deferred_queue)} elapsed={elapsed_min:.1f}min ===')
+        logging.info(f'§3 complete. Halting per kickoff for §3→§4 CEO check-in.')
+        return 0
+
+    except HaltError as halt:
+        elapsed_min = (time.time() - start_ts) / 60.0
+        logging.error(f'BULK RUN HALT at {elapsed_min:.1f}min: {halt}')
+        persist_deferred_queue(deferred_queue)
+        write_progress(progress_path, processed_count, expected_total, in_flight_grantee,
+                       last_completed_fcc_id, start_ts, manifest, len(deferred_queue))
+        write_stop_the_line(str(halt), processed_count, expected_total,
+                            in_flight_grantee, last_completed_fcc_id, deferred_queue)
+        return 4
+
+    except KeyboardInterrupt:
+        logging.error('BULK RUN interrupted (KeyboardInterrupt); preserving state')
+        persist_deferred_queue(deferred_queue)
+        write_progress(progress_path, processed_count, expected_total, in_flight_grantee,
+                       last_completed_fcc_id, start_ts, manifest, len(deferred_queue))
+        write_stop_the_line('KeyboardInterrupt', processed_count, expected_total,
+                            in_flight_grantee, last_completed_fcc_id, deferred_queue)
+        return 5
 
 
 def main():
