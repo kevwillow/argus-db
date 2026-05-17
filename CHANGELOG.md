@@ -2,6 +2,12 @@
 
 All notable changes to Argus are documented in this file. The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project does not yet adopt semantic-versioning for the dataset shape itself — see "Schema versioning" below for the migration-ledger discipline.
 
+## [Unreleased]
+
+### Conventions
+
+- **Staging-JSON-vs-schema-column naming convention codified** (2026-05-17, patch cycle 1.6.C): staging JSON shapes emitted under `extraction_outputs/{runguide_slug}/` use `candidate_value` for human readability during validator review; the promoted `raw_observations` schema column is `candidate_identifier`. Validator handles the rename at promotion (one-to-one, no transformation). Documented in patch cycle 1 against the source-admission wave (10 runguides, MAC-101 through MAC-110). Re-evaluation trigger: if validator pushback at handoff makes the rename-at-promotion step error-prone, Patch 2.x can align the staging shape to the schema; default-if-silent is to hold the convention.
+
 ## [v1.1.0] — 2026-05-17
 
 ### What's new in v1.1.0
