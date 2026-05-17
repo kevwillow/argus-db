@@ -133,7 +133,7 @@ Every active `identifiers` row is traceable to:
 
 Argus is designed as a producer of detection data for downstream RF-scanner consumers. The intended downstream architecture:
 
-- **[Lynceus](https://github.com/...) (Raspberry-Pi-class RF security monitor)** — consumes `argus_export.json` (standard) or `argus_export_high_confidence.json` (operator-strict). Matches on `{pattern, pattern_type}` against live RF observations; alerts on match. Severity is owned operator-side via `severity_overrides.yaml`. Geographic-scope filter applied at export time.
+- **[Lynceus](https://github.com/kevwillow/lynceus-warden) (Raspberry-Pi-class RF security monitor)** — consumes `argus_export.json` (standard) or `argus_export_high_confidence.json` (operator-strict). Matches on `{pattern, pattern_type}` against live RF observations; alerts on match. Severity is owned operator-side via `severity_overrides.yaml`. Geographic-scope filter applied at export time.
 - **[Rayhunter](https://github.com/EFForg/rayhunter) (cellular IMSI-catcher detector on supported modems)** — consumes `argus_export_behavioral_signatures.json` (Rayhunter-bound sibling export). Matches on `{signature_name, threshold_json}` against live cellular-control-plane observations.
 - **Operator-side combined deployment** — an operator may run Lynceus + Rayhunter together on the same hardware; the two exports are non-overlapping (Lynceus = wire-observable patterns; Rayhunter = behavioral signatures).
 
