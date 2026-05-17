@@ -2892,3 +2892,88 @@ Surfaced by CP24 (queued for future CP candidacy as evidence accumulates):
 This CP24 entry is the §11 #11 amendment-log pairing for the §11 #8 three new sub-rules in the coordinated commit set. Bible HEAD bumps from the CP23 commit to the CP24 commit landed alongside this entry. Schema version unchanged (CP24 is §-text + row-local notes-pattern; no migration).
 
 ═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 25 — `cross_source_corroboration_reversals[]` audit-trail + CP24 §12 n-recount supersession + within-source-FP discipline-evolution carry-forward
+
+**Date:** 2026-05-17
+**Source:** MAC-171 CEO ratification dispatch [`35ebb1bf`](/MAC/issues/MAC-171#comment-35ebb1bf-d99b-46d3-b31b-c15b2399dfa5) (adjudications on the §7.4 validation report's four §H open questions; Q3 specifically authorized CP25 as a standalone single-sub-rule amendment over folding into CP24 per §S.8 append-don't-mutate). Validator §7.4 walk-through at MAC-171 [`727ffcf0`](/MAC/issues/MAC-171#comment-727ffcf0-8875-4580-a4b8-908a06ee81cb) surfaced three stop-the-line items in the SEC EDGAR P3 dispatch: 3 of 9 named-customer extractions were §11 #1 false-positives (SSTI×ICE about competitors, SSTI×DHS Item 1A about Congressional IG-investigation request, Rekor×FBI about CJIS compliance), 1 was ambiguous under the 30-word fair-use cap (SSTI×FBI Item 1A), and the 2 "STRONG" cross-source corroborations on USAspending procurement rows (id=86738 + 86741/86743/86744/86745/86747) were therefore invalid (FP) or undetermined (ambiguous). MAC-172's pre-existing `notes.cross_source_corroboration[]` marker on id=86738 required reversal under §11 #1.
+**Bible commit:** This entry only. Schema version unchanged (CP25 is §-text + row-local notes-pattern; no schema migration). DB writes that consume CP25 §1 (the MAC-171 reversal UPDATE on id=86738) land in the immediately-following MAC-171 ingest commit per CEO's ordered execution-sequencing (bible CP first, DB writes second, disk-stage third).
+**Status:** Ratified at MAC-171 35ebb1bf 2026-05-17. CP25 §1 schema is the contract that the MAC-171 reversal UPDATE writes against; CP25 §2 documents the SEC × USAspending `n` recount that the same UPDATE produces; CP25 §3 captures the observation that within-source FP identification at validation time is now a recurring CEO-class adjudication pattern.
+**Binds:** Validator (any future retraction of a `notes.cross_source_corroboration[]` marker under §11 #1 or §11 #8 review MUST append a parallel `notes.cross_source_corroboration_reversals[]` audit entry per CP25 §1 schema in the same transaction as the corroboration-array UPDATE); CEO + ExtractionWorker (future runguide §-text avoids the within-source FP failure mode by including the §11 #1 customer-relationship-vs-textual-mention disambiguation as a default §4 match-scoring step rather than punting to validator-time review).
+
+### Why this Correction Pass exists
+
+CP24 codified the within-source re-extraction strict-reading carve-out (Read B canon) and surfaced two open questions in §12 — including the cross-source corroboration enumeration discipline gated on the `n` of independent-collector pairs. CP24 logged `n=2` (RG5 SEC EDGAR × USAspending at MAC-172 id=86738) as the canonical first instance of genuinely-independent §11 #8-compliant corroboration.
+
+MAC-171's §7.4 walk-through against the same RG5 yield invalidated `n=2` after-the-fact: the SSTI × DHS Item 1A "STRONG match" excerpt is a Congressional IG-investigation reference, not a customer-relationship attestation. The "STRONG" pairing was a text-pattern-match artifact (agency-name token co-occurs with vendor-token within the §1A risk-factor narrative) that didn't survive §11 #1 semantic review. The SSTI × FBI Item 1A excerpt is similarly weak — historical 2011 reference whose meaning is masked by the 30-word fair-use cap; CEO adjudicated as defer-to-operator-review rather than re-fetch fuller filing context.
+
+CP25 needs to do three coupled things:
+
+1. Codify the `notes.cross_source_corroboration_reversals[]` audit-trail schema so the MAC-171 reversal UPDATE on id=86738 has a canonical contract to write against (parallel to CP24 sub-rule (b)'s `notes.confidence_history[]` pattern for procurement_records confidence changes — same forensic answer shape).
+2. Document the CP24 §12 `n` supersession explicitly. CP24's surfacing block said "Current n=2 (RG5 SEC EDGAR × USAspending at MAC-172 id=86738)"; post-MAC-171 reversal, the canonical `n` for SEC EDGAR × USAspending drops to 0. The future-expectation prose ("P3 + P6 may push n enough to warrant the table") narrows: P6 CourtListener is now the only net-new RG5 candidate that could reach the table-creation trigger threshold.
+3. Capture the within-source-FP-identification carry-forward observation. Within-source re-extraction was CP24's failure mode; within-source false-positive-identification (text-pattern match without semantic-relationship validation) is a parallel-but-distinct failure mode that MAC-172 had RG5 §3.5 + MAC-171 §C as two consecutive instances of. Flag as discipline-evolution candidate for future CP if frequency warrants a dedicated §11 sub-rule (matching CP24's path from "carve-out observed" → "sub-rule codified").
+
+### Corrections applied
+
+1. **§11 #8 sub-rule (CP25, 2026-05-17) — `cross_source_corroboration_reversals[]` audit-trail.** When a `notes.cross_source_corroboration[]` marker is retracted post-validation under §11 #1 or §11 #8 review, the retraction MUST append a parallel `notes.cross_source_corroboration_reversals[]` array entry in the same transaction as the corroboration-array UPDATE. Schema for each reversal entry (5 required keys):
+
+   ```json
+   {
+     "at_utc": "<ISO-8601 timestamp of the reversal UPDATE>",
+     "marker_key": "<the original cross_source_corroboration[] entry's marker_key, copied verbatim>",
+     "rationale": "<short prose citing the §11 hard rule that triggered the retraction + the §-anchor evidence>",
+     "dispatch": "<MAC-NNN issue identifier of the retracting dispatch>",
+     "cp_anchor": "<canonical CP citation, e.g. 'CP25 §1'>"
+   }
+   ```
+
+   The original `notes.cross_source_corroboration[]` entry is REMOVED from the array (not soft-deleted; the reversal-array IS the audit-trail). The marker_key copy preserves forensic recoverability — operators can grep the reversal-array for any historical marker without scanning the live corroboration-array. Composition with CP24 sub-rule (b): if the retracted corroboration had previously triggered a §8.3 +5 lift (and thus a `notes.confidence_history[]` UPDATE), the reversal-array entry composes with a separate `notes.confidence_history[]` rollback entry per CP24 sub-rule (b) — same transaction, two parallel audit-trail appends.
+
+2. **CP24 §12 Open Questions supersession (CP25 §2, 2026-05-17) — cross-source corroboration enumeration recount.** CP24's surfacing block recorded `n=2` for the SEC EDGAR × USAspending cross-source pair count (the two RG5 "STRONG" pairings flagged in `extraction_outputs/sec_edgar_admission/cross_validation_findings_data.json`). Post-MAC-171 §C semantic review: SSTI × DHS is a §11 #1 false-positive (reverted at this dispatch via CP25 §1); SSTI × FBI is operator-review-deferred (no DB write either way pending fuller filing context). The canonical `n` for SEC EDGAR × USAspending drops from 2 → **0**. Forward expectation prose updates: P6 CourtListener is the only remaining RG5 candidate that could reach the `cross_source_attestations` table threshold (n≥1 first-instance, n≥2 table-creation trigger). The CP24 §12 prose itself remains untouched per §S.8 append-don't-mutate; CP25 §2 IS the supersession record.
+
+3. **§11 carry-forward observation (CP25 §3, 2026-05-17) — within-source-FP discipline evolution.** Two consecutive validator-side adjudications now show within-source false-positive identification at validation time as a recurring CEO-class pattern: MAC-172 RG5 §3.5 (the original handoff flagged 7 OPERATOR-REVIEW pairs as not-corroborated-by-USAspending — implicitly an FP-suspect cohort) + MAC-171 §C (3 of 9 named-customer extractions were §11 #1 FPs on semantic review). Within-source FP identification is distinct from CP24's within-source re-extraction failure mode: re-extraction lifts conf without independent collection (procedural); FP-identification mis-attributes a relationship without semantic validation (substantive). CP25 §3 flags the pattern as a discipline-evolution candidate. Future-CP threshold: if a third comparable instance surfaces (validator catches FP-attribution after-the-fact at promotion-time), a dedicated §11 sub-rule codifying "text-pattern match + semantic-relationship-validation as a §4 match-scoring default" becomes the appropriate codification — matching CP24's evolution path from "carve-out observed in one dispatch" → "sub-rule codified after corrective ratification."
+
+### Reversal execution (MAC-171 id=86738 cross_source_corroboration retraction)
+
+Per CEO authorization at MAC-171 35ebb1bf, applied in the same transaction as the MAC-171 P3 ingest against `db/argus.db` immediately AFTER this CP25 entry lands:
+
+```python
+UPDATE procurement_records
+SET notes = ...  # cross_source_corroboration[] entry removed + reversals[] appended
+WHERE id = 86738  # PK-scoped per SAR-13 §6 discipline
+```
+
+Pre-reversal state: `notes.cross_source_corroboration[]` contains 1 entry (`marker_key="rg5_sec_edgar::…/ssti-20251231.htm::HSSS0116C0028"`, MAC-172 ratified).
+Post-reversal state: `notes.cross_source_corroboration[]` empty (or key absent); `notes.cross_source_corroboration_reversals[]` contains 1 entry with `rationale="§11 #1 FP — SEC Item 1A excerpt describes Congressional IG-investigation request, not a DHS customer relationship"`, `dispatch="MAC-171"`, `cp_anchor="CP25 §1"`. Confidence unchanged at 85 (MAC-172 never applied the §8.3 lift to id=86738 because RG5 §3.1 didn't propose one for the cross-source marker — only for the corroborated USAspending row's audit-trail, which was rolled back at CP24; no CP24 sub-rule (b) `confidence_history[]` companion entry is needed at CP25 §1).
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — strengthened. CP25 §1 makes corroboration-marker retraction a first-class forensic surface; CP25 §3 flags the discipline-evolution path for catching FP-attribution at extraction time rather than validator time.
+- **§11 #7 (no promotion without provenance)** — unchanged; CP25 §1 is provenance-retraction discipline, not provenance-relaxation.
+- **§11 #8 (no confidence drift upward without corroboration)** — composed with CP24 sub-rules (a)+(b)+(c). CP25 §1 is the retraction-audit complement to CP24 sub-rule (b)'s lift-audit pattern. The two are parallel: lift-audit answers "when did confidence go up and why?"; retraction-audit answers "when was a corroboration marker pulled and why?". Same forensic shape, different trigger.
+- **§11 #11 (amendment-log discipline)** — this CP25 entry IS the amendment-log pairing for the §11 #8 sub-rule (CP25 §1) + §12 Open Questions supersession (CP25 §2) + carry-forward observation (CP25 §3) in the coordinated commit. Bible HEAD bumps from the CP24 commit to the CP25 commit landed alongside this entry.
+- **§11 #14 (procurement-only never exported to Lynceus)** — orthogonal; CP25 row-local changes on `procurement_records` would not have leaked to Lynceus exports regardless. CP25 is a bible-fidelity correction, not a downstream-consumer impact correction.
+
+### Sequencing post-acceptance
+
+1. **CP25 ratifies at this commit.** Bible HEAD bumps from the CP24 commit to this CP25 commit. Schema version unchanged (21 → 21; CP25 is §-text + row-local notes-pattern; no schema migration).
+2. **MAC-171 ingest commit lands next.** The id=86738 reversal UPDATE consumes the CP25 §1 schema as its write contract. Same commit also carries the 1 source INSERT + 21 manufacturer-enrichment UPSERT + 5 net-new procurement_records + disk-stage operator-review files per CEO's authorized write-set.
+3. **MAC-171 close.** Validator reassigns to CEO with `in_review` after the CP25 commit + MAC-171 ingest commit land; close comment carries the paste-not-cite state-row preamble per [feedback_dispatch_preamble_live_state_verification](/MAC/agents/ceo).
+4. **No paired state-rotation commit needed.** PROJECT_STATE.md will refresh organically at the next post-MAC-171 close (CP25 + MAC-171 land together as the coordinated end-state).
+
+### §12 Open Questions impact
+
+Resolved by CP25:
+- **`cross_source_corroboration_reversals[]` audit-trail codification** — RESOLVED at CP25 §1; the MAC-171 id=86738 UPDATE is the first consumer.
+
+Updated by CP25:
+- **Cross-source corroboration enumeration discipline** (CP24 §12) — `n` recount: SEC EDGAR × USAspending drops 2 → 0. P6 CourtListener remains the active n-candidate; table-creation trigger threshold unchanged (n≥2).
+
+Surfaced by CP25 (queued for future CP candidacy as evidence accumulates):
+- **Within-source FP identification as a dedicated §11 sub-rule** — gated on a third comparable instance per CP25 §3 carry-forward criterion. Current evidence: 2 instances (MAC-172 RG5 §3.5 implicit cohort + MAC-171 §C explicit walk-through).
+
+### §11 #11 self-binding satisfied
+
+This CP25 entry is the §11 #11 amendment-log pairing for the §11 #8 sub-rule + §12 Open Questions supersession + carry-forward observation in the coordinated commit set. Bible HEAD bumps from the CP24 commit to the CP25 commit landed alongside this entry. Schema version unchanged (CP25 is §-text + row-local notes-pattern; no migration).
+
+═══════════════════════════════════════════════════════════════════════
