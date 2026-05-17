@@ -6,7 +6,9 @@ This document is the canonical schema reference for the Argus SQLite database (`
 
 **Audience:** downstream operators integrating Argus's exports, external researchers auditing the dataset, contributors adding new identifier candidates or methodology refinements, vendors reviewing how their equipment is represented.
 
-**Scope:** v1.0.0 schema (`schema_version=19` as of 2026-05-15; live verification timestamp 2026-05-15T01:57:18Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
+**Scope:** v1.0.0 schema (`schema_version=21` as of 2026-05-17; live verification timestamp 2026-05-17T05:07:32Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
+
+**Last refresh:** Correction Pass 23 (2026-05-17) — migrations 0020 (sources.source_type CHECK extension; 10 → 13 values) + 0021 (procurement_records.vendor_canonical_normalized column + index + backfill).
 
 **Conventions:**
 - Column shape: `name TYPE NOT NULL DEFAULT … CHECK(…)` notation matches the migration source-of-truth at `db/migrations/*.sql`.
@@ -27,7 +29,7 @@ Throughout this document and the Argus project:
 
 ## §3. Schema overview
 
-The v1.0.0 schema carries **14 tables** at `schema_version=19`. They group into four functional categories:
+The v1.0.0 schema carries **14 tables** at `schema_version=21`. They group into four functional categories:
 
 ### §3.1 Canonical-state tables (Layer 1)
 
@@ -74,7 +76,7 @@ Verified against `db/argus.db` at 2026-05-15T01:57:18Z (`SELECT COUNT(*)` over e
 | `conflicts` | **20** | validator-side disputed rows |
 | `extraction_runs` | **106** | per-run telemetry |
 | `source_reclassifications` | **809** | per-row band-correction audit (added migration 0017) |
-| `schema_version` | **19** | migration ledger; one row per applied migration |
+| `schema_version` | **21** | migration ledger; one row per applied migration |
 
 ### §3.5 Relationship summary
 
@@ -183,11 +185,11 @@ Source registry. FK target for `raw_observations.source_id`. Row count verified 
 | `id` | INTEGER | yes (PK) | autoincrement | Primary key. Sources 1-3 are IEEE OUI registries (MA-L / MA-M / MA-S); the forward-looking source-level migration to `primary_registry` is deferred (queued as a post-ship batch task). |
 | `name` | TEXT | yes | — | Human-readable source name. |
 | `url` | TEXT | yes | — | Primary upstream URL. |
-| `source_type` | TEXT | yes | — | Source-band classification; enum matches `identifiers.source_type`. Sources 1-3 (IEEE OUI) currently `'regulatory'` pending the deferred source-level reclassification. |
+| `source_type` | TEXT | yes | — | Source-band classification. **CHECK constraint** post-migration 0020: 13 values — `'official'`, `'regulatory'`, `'procurement'`, `'academic'`, `'foia'`, `'crowdsourced'`, `'inferred'`, `'manufacturer_doc'`, `'manufacturer_app'`, `'primary_registry'`, plus **CP23 additions** `'judicial_filing'`, `'disclosure_filing'`, `'procurement_disclosure'`. Sources 1-3 (IEEE OUI) currently `'regulatory'` pending the deferred source-level reclassification. The 3 CP23 values are sources-tier taxonomy only; identifier-row promotion still binds on the separate `identifiers.source_type` enum (10 values, NOT extended in CP23). |
 | `tier` | INTEGER | no | NULL | Tier classification per the canonical-bible source-tier hierarchy. |
 | `last_fetched_at` | DATETIME | no | NULL | UTC timestamp of most-recent fetch. |
 | `last_status` | TEXT | no | NULL | Status of most-recent fetch. |
-| `notes` | TEXT | no | NULL | JSON blob: per-source metadata, license attribution. |
+| `notes` | TEXT | no | NULL | JSON blob: per-source metadata + license fields. **CP23 license-into-notes folding contract:** `notes.license` + `notes.license_attribution` + `notes.license_posture` + `notes.access_mode` + per-admission audit fields live INSIDE `notes`, NOT as top-level columns. Registered `notes.license` vocabulary (CP23 initial set; not a CHECK constraint, free-form for future extension): `OGL-3.0` (UK Companies House), `PUBLIC_DOMAIN` (US federal-gov per 17 USC §105), `US_STATE_PUBLIC_RECORDS` (DE/CA/TX SoS), `CC0` (CourtListener / Free Law Project), plus per-source declared postures (`MIT`, `AGPL-3.0_declared`, `CC-BY-NC-SA-4.0`, `ODbL-1.0`, `NO_LICENSE_DECLARED`, …). Registered `notes.access_mode` vocabulary (CP23): `automated_api`, `automated_html_parse`, `automated_with_auth`, `mixed_automated_manual`, `operator_manual_only`. Absent-access_mode is equivalent to `automated_api` per backward-compat. |
 
 #### Indexes
 
@@ -208,7 +210,7 @@ Vendor metadata + alias canonicalization. Row count at v1.0.0: **34**.
 |---|---|---|---|---|
 | `id` | INTEGER | yes (PK) | autoincrement | Primary key. FK target for `procurement_records.manufacturer_id`. |
 | `canonical_name` | TEXT | yes | — | Canonical vendor name. String-match target for `identifiers.manufacturer`. Word-boundary discipline: match `\bMotorola Solutions\b`, not `\bMotorola\b`. |
-| `aliases` | TEXT | no | NULL | JSON array of vendor-name aliases. |
+| `aliases` | TEXT | no | NULL | **Comma-separated TEXT string** of vendor-name aliases (e.g., `'Avigilon,Avigilon Corp,Avigilon Inc.,Avigilon Corporation'`); NOT a JSON array. Schema-truth formalized at Correction Pass 23 (wide-net cycle-3 §1 finding #1 + cycle-4 §1 finding #1). There is NO separate `manufacturers_aliases` table. Append semantics: `aliases = CASE WHEN aliases IS NULL OR aliases = '' THEN ? ELSE aliases || ',' || ? END WHERE id = ?`. Lookup semantics: `WHERE aliases LIKE '%term%' OR LOWER(canonical_name) = LOWER(?)`. |
 | `primary_category` | TEXT | no | NULL | Primary `device_category` enum value. NULL for multi-purpose vendors. |
 | `source_url` | TEXT | yes | — | Primary attribution URL. |
 | `notes` | TEXT | no | NULL | JSON blob: per-vendor metadata, corporate-split history (vendor-disambiguation discipline). |
@@ -275,9 +277,10 @@ Vendor-to-agency purchase records. Row count at v1.0.0: **43,483**. Procurement 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
 | `id` | INTEGER | yes (PK) | autoincrement | Primary key. |
-| `agency_name` | TEXT | yes | — | Purchasing agency name. Per the no-PII hard rule: PII-sanitized at ingest (individual contracting-officer names stripped). |
+| `agency_name` | TEXT | yes | — | Purchasing agency name. **Concatenated `"Awarding Agency / Awarding Sub Agency"`** per upstream USAspending shape (CP23 — cycle-3 §1 finding #5 schema-truth formalization). Split on `" / "` for hierarchical use. Per the no-PII hard rule: PII-sanitized at ingest (individual contracting-officer names stripped). |
 | `agency_geographic_scope` | TEXT | no | NULL | ISO country/region code. |
-| `vendor_canonical_name` | TEXT | yes | — | Vendor canonical name. |
+| `vendor_canonical_name` | TEXT | yes | — | **Upstream USAspending verbatim recipient name** (CP23 — cycle-3 §1 finding #4 schema-truth formalization). NOT Argus-canonical. Often inconsistent across awards for the same vendor (e.g., `'AXON ENTERPRISE INC'` vs `'Axon Enterprise, Inc.'` vs `'AXON ENT INC'` all map to the same canonical entity). Cross-validation queries MUST use the companion `vendor_canonical_normalized` join key or an alias-aware JOIN against `manufacturers` (see `vendor_canonical_normalized` description below). |
+| `vendor_canonical_normalized` | TEXT | yes | `''` | **Deterministic alias-collapse join key** (added migration 0021 at CP23). NOT NULL DEFAULT `''`. Materialized via `db/normalize_vendor.py::normalize_vendor_name`. Normalization algorithm (apply in order): (1) `LOWER()`; (2) strip ALL punctuation chars `. , ; : ' " ( ) [ ] { } / \ \`​ ~ ! @ # $ % ^ & * + = | < > ?`; (3) collapse runs of whitespace → single space; (4) strip leading/trailing whitespace; (5) repeatedly strip trailing whole-word suffix tokens (`inc`, `incorporated`, `corp`, `corporation`, `llc`, `l l c`, `ltd`, `limited`, `plc`, `co`, `company`, `lp`, `llp`, `gmbh`, `ag`, `sa`, `pty`, `bv`); (6) re-strip whitespace; (7) empty result stores `''`. Examples: `'AXON ENTERPRISE, INC.'` → `'axon enterprise'`; `'BERLA CORPORATION'` → `'berla'`; `'L3HARRIS TECHNOLOGIES, INC.'` → `'l3harris technologies'`. Live collapse evidence post-backfill: 1,157 distinct raw → 1,141 distinct normalized (0.9862 ratio); top wins `motorola solutions` (3 raw variants), `cellebrite`/`dedrone defense`/`engility`/`general dynamics information technology` (2 raw variants each). |
 | `product_family` | TEXT | no | NULL | Vendor product family identifier. |
 | `contract_amount_usd` | REAL | no | NULL | Contract dollar amount (USD). |
 | `contract_date` | DATE | no | NULL | Contract execution date. |
@@ -291,7 +294,7 @@ Vendor-to-agency purchase records. Row count at v1.0.0: **43,483**. Procurement 
 
 #### Indexes
 
-Primary on `(id)`. Additional on `(vendor_canonical_name)`, `(agency_name)`.
+Primary on `(id)`. Additional on `(vendor_canonical_name)`, `(agency_name)`, `(linked_identifier_id)`, and (CP23 — migration 0021) **`(vendor_canonical_normalized)`** for alias-collapse join coverage.
 
 #### Composition with METHODOLOGY + bible rules
 
@@ -299,6 +302,7 @@ Primary on `(id)`. Additional on `(vendor_canonical_name)`, `(agency_name)`.
 - **Procurement-vs-deployment caveat**: procurement proves *purchase*, not *deployment*.
 - **Cross-table confidence cap at 85** per METHODOLOGY §5 + the canonical-bible procurement-corroboration rule when procurement records corroborate `identifiers` rows.
 - **PII-sanitization** per the no-PII hard rule.
+- **Alias-aware-join discipline (CP23)**: cross-validation queries against `procurement_records` MUST use the `vendor_canonical_normalized` join key or an alias-aware JOIN against `manufacturers.canonical_name` + `manufacturers.aliases`. Direct equality on `vendor_canonical_name` misses legitimate matches because the column carries upstream USAspending verbatim recipient names with vendor-side inconsistency across awards.
 
 ### §4.7. `fcc_grantees` (FCC EAS bulk-load grantee registry)
 
@@ -532,11 +536,11 @@ Migration ledger: every applied migration has one row.
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=19` at the post-CP21-round-2 v1.0.0 state, verified live 2026-05-15T01:57:18Z). |
-| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0019_identifier_types_round2'`, `'0017_source_reclassifications'`, `'0016_license_column'`). Full ledger 0001–0019 enumerated below. |
+| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=21` at the post-CP23 v1.0.0 state, verified live 2026-05-17T05:07:32Z). |
+| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0021_procurement_vendor_canonical_normalized'`, `'0020_source_type_enum_extension'`, `'0019_identifier_types_round2'`, `'0017_source_reclassifications'`, `'0016_license_column'`). Full ledger 0001–0021 enumerated below. |
 | `applied_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of migration application. |
 
-Live migration ledger at `schema_version=19` (verified live 2026-05-15T01:57:18Z):
+Live migration ledger at `schema_version=21` (verified live 2026-05-17T05:07:32Z):
 
 | version | name | applied_at |
 |---:|---|---|
@@ -559,6 +563,8 @@ Live migration ledger at `schema_version=19` (verified live 2026-05-15T01:57:18Z
 | 17 | `0017_source_reclassifications` | 2026-05-14T02:22:23Z |
 | 18 | `0018_identifier_types_extension_batch` | 2026-05-14T05:47:15Z |
 | 19 | `0019_identifier_types_round2` | 2026-05-14T17:24:59Z |
+| 20 | `0020_source_type_enum_extension` | 2026-05-17T05:07:17Z |
+| 21 | `0021_procurement_vendor_canonical_normalized` | 2026-05-17T05:07:32Z |
 
 #### Indexes (1 index per current schema)
 
@@ -598,7 +604,7 @@ Per-row source-band reclassification audit, added by migration 0017 to support t
 
 ## §5. Enum reference (consolidated)
 
-Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP21-round-2 v1.0.0 state (`schema_version=19`, verified live 2026-05-15T01:57:18Z).
+Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP23 v1.0.0 state (`schema_version=21`, verified live 2026-05-17T05:07:32Z).
 
 ### §5.1. `identifiers.identifier_type` — 48 values
 
@@ -627,6 +633,12 @@ Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per th
 ### §5.3. `identifiers.source_type` + `raw_observations.source_type` (mirror) — 10 values
 
 `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc`, `manufacturer_app`, `primary_registry`.
+
+NOT extended at CP23. The 3 new bands (`judicial_filing`, `disclosure_filing`, `procurement_disclosure`) added by migration 0020 land on **`sources.source_type` only** — see §5.3a. Identifier-row promotion from sources of those new classes still lands under existing identifiers.source_type bands per §8.2 strict reading.
+
+### §5.3a. `sources.source_type` — 13 values (post-migration 0020)
+
+`official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc`, `manufacturer_app`, `primary_registry`, **`judicial_filing`** (CP23 — CourtListener / RECAP-class), **`disclosure_filing`** (CP23 — SEC EDGAR / corporate-disclosure), **`procurement_disclosure`** (CP23 — supplier-self-disclosure / vendor-side procurement artifacts).
 
 ### §5.4. `procurement_records.source_type` — 4-value subset
 

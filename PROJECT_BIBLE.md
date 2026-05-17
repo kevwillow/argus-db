@@ -124,10 +124,10 @@ The schema is the contract. All sub-agents output rows conforming to this.
 
 ### 4.2 Supporting tables
 
-- **`sources`** — registry of every source crawled, with last-fetch timestamp and status
+- **`sources`** — registry of every source crawled, with last-fetch timestamp and status. `source_type` CHECK enum (live post-migration 0020 — 13 values): `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc`, `manufacturer_app` (added CP13 — migration 0009), `primary_registry` (added CP15 — migration 0015), `judicial_filing` / `disclosure_filing` / `procurement_disclosure` (last three added Correction Pass 23 — migration 0020; wide-net cycle-3 §1 finding #2 taxonomy refinement). The 3 CP23 values are sources-tier taxonomy only; identifier-row promotion still binds on the separate `identifiers.source_type` enum per §8.2. License + license_attribution + license_posture + access_mode + per-admission audit fields live INSIDE `notes_json` (Correction Pass 23 — cycle-1 finding #1 license-into-notes folding contract); no top-level license column on the `sources` row. Top-level columns: `id`, `name`, `url`, `source_type`, `tier`, `last_fetched_at`, `last_status`, `notes`.
 - **`raw_observations`** — staging table; raw extracted records before normalization (preserve forever for audit). Holds rows that carry an actual or candidate identifier (MAC/OUI/BSSID/SSID/UUID) in `candidate_identifier` keyed by §4.1 `identifier_type`.
 - **`deployment_observations`** — staging table for Tier 1 sources that yield agency × technology × location × vendor metadata but **no** MAC/OUI/SSID/UUID identifier (EFF Atlas of Surveillance, DeFlock). Identifier columns intentionally absent — promotion to `identifiers` requires a Phase 3+ inference linking a deployment to a concrete identifier candidate (§11 #1). Idempotency keyed by `(source_id, source_row_key)` where `source_row_key` is the source's stable per-row natural key (e.g. Atlas's `AOSNUMBER`). Added in Correction Pass 4 (BIBLE_AMENDMENTS).
-- **`procurement_records`** — staging table for Tier 2/3 procurement-only rows (SAM.gov, city council minutes, FOIA-released procurement docs) that name an agency × vendor purchase but carry **no** MAC/OUI/SSID/UUID identifier. Schema includes a nullable `linked_identifier_id` FK back to `identifiers` for the upgrade path when a later source attaches a concrete identifier to the same purchase. Per §4.5 procurement-only carveout / §11 #14, these rows are NEVER exported to Lynceus — they are analytical only. Created in MAC-2 / Phase 1 (signed off at Checkpoint 1); documented in §4.2 in Correction Pass 5 (BIBLE_AMENDMENTS).
+- **`procurement_records`** — staging table for Tier 2/3 procurement-only rows (SAM.gov, city council minutes, FOIA-released procurement docs) that name an agency × vendor purchase but carry **no** MAC/OUI/SSID/UUID identifier. Schema includes a nullable `linked_identifier_id` FK back to `identifiers` for the upgrade path when a later source attaches a concrete identifier to the same purchase. Per §4.5 procurement-only carveout / §11 #14, these rows are NEVER exported to Lynceus — they are analytical only. Created in MAC-2 / Phase 1 (signed off at Checkpoint 1); documented in §4.2 in Correction Pass 5 (BIBLE_AMENDMENTS). **Vendor-matching discipline (CP23 — migration 0021):** `vendor_canonical_name` carries the upstream USAspending verbatim recipient name (often inconsistent across awards for the same vendor: `'AXON ENTERPRISE INC'` vs `'Axon Enterprise, Inc.'` vs `'AXON ENT INC'` all collapse to a single canonical entity). The companion column `vendor_canonical_normalized TEXT NOT NULL DEFAULT ''` (added migration 0021) materializes a deterministic alias-collapse key for cross-validation against `manufacturers.canonical_name` and `manufacturers.aliases`. Normalization algorithm: LOWER → strip ALL punctuation → collapse whitespace → strip leading/trailing whitespace → repeatedly strip trailing whole-word suffix tokens (`inc`, `incorporated`, `corp`, `corporation`, `llc`, `l l c`, `ltd`, `limited`, `plc`, `co`, `company`, `lp`, `llp`, `gmbh`, `ag`, `sa`, `pty`, `bv`) → re-strip whitespace → empty result stores `''`. Algorithm canonical reference: `db/normalize_vendor.py::normalize_vendor_name` (pure function; DATA_DICTIONARY.md §-procurement_records carries the prose for downstream consumers). Index: `idx_procurement_records_vendor_canonical_normalized`. **Agency-matching discipline (CP23 — cycle-3 §1 finding #5):** `agency_name` is the upstream USAspending concatenation `"Awarding Agency / Awarding Sub Agency"`; split on `" / "` for hierarchical use. **source_excerpt cap:** ≤200 chars per the live CHECK constraint (NOT ≤500; see §4.3 per-table cap table).
 - **`fcc_grantees`** — staging table for FCC EAS grantee registrations (Phase 3 / MAC-7; first source = opendata.fcc.gov dataset `3b3k-34jp`, USGOV_WORKS public domain). Holds grantee_code → entity-name + mailing/contact metadata + date_received. Identifier columns intentionally absent — `grantee_code` is a regulatory entity prefix, not a per-device identifier (per-device FCC IDs are formed `grantee_code + product_code`, owned by Phase 4 `fcc_equipment_filings` if/when created). Idempotency keyed by `(source_id, source_row_key=grantee_code)`. Stale-mirror sources: `sources.notes` MUST carry `dataset_freeze_date` + `staleness_warning` when the upstream mirror is documented stale (3b3k-34jp is frozen at 2021-03-22; Flock Safety + post-2020 grantees absent — Phase 4 owns the gap). Added in Correction Pass 6 (BIBLE_AMENDMENTS).
 - **`extraction_runs`** — log of every extraction job: agent id, source, started_at, finished_at, records_in, records_out, errors
 - **`conflicts`** — when two sources disagree on the same identifier; reviewed and resolved by CEO
@@ -139,7 +139,55 @@ The schema is the contract. All sub-agents output rows conforming to this.
 - OUIs: lowercase, colon-separated 3 octets (`aa:bb:cc`)
 - BLE UUIDs: lowercase, hyphenated 8-4-4-4-12 format
 - SSIDs: stored exactly as broadcast; pattern fields use POSIX regex
-- Manufacturer names: matched against a canonical list maintained in `manufacturers` table; new vendors added explicitly
+- Manufacturer names: matched against a canonical list maintained in `manufacturers` table; new vendors added explicitly. **Aliases live as a comma-separated TEXT string on `manufacturers.aliases`** (CP23 — wide-net cycle-3 §1 finding #1 + cycle-4 §1 finding #1 formalization); there is NO `manufacturers_aliases` separate table. Append semantics: `aliases = CASE WHEN aliases IS NULL OR aliases = '' THEN ? ELSE aliases || ',' || ? END`. Lookup semantics: `WHERE aliases LIKE '%term%' OR LOWER(canonical_name) = LOWER(?)`.
+
+**source_excerpt per-table CHECK constraint cap table (Correction Pass 23 — DB-verified actuals; supersedes any contradicting prior runguide language).** Per cycle-3 §1 finding #3 contradicted by live schema; CP23 codifies the authoritative table:
+
+| Table | Live CHECK constraint |
+|---|---|
+| `identifiers` | `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)` |
+| `raw_observations` | no CHECK constraint (plain TEXT; app-level enforcement at 200 via `db/sources/vendor_docs.py::raise_on_overflow` per migration 0006 header) |
+| `procurement_records` | `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)` |
+| `council_minutes_matters` | `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)` |
+| `behavioral_signatures` | column does not exist (provenance via `source_id` + `source_file_relative` + `source_line` + `evidence_json` per migration 0010) |
+
+Future runguides MUST consult this CP23 table for the canonical per-table cap. Cycle-3 patch §1 finding #3 source_excerpt cap claims (≤500 for identifiers/raw_observations) are legacy schema-truth-as-of-2026-05-16-with-known-drift on this sub-item; the live actuals above govern.
+
+**`sources.notes_json` JSON contract (Correction Pass 23 — cycle-1 finding #1 license-into-notes folding).** License + license_attribution + license_posture + access_mode + per-admission audit fields live INSIDE `notes_json`, NOT as top-level columns. Canonical sources-row top-level keys: `id`, `name`, `url`, `source_type`, `tier`, `notes` (JSON-serializing `notes_json`), `last_fetched_at`, `last_status`.
+
+- `notes.license`              — short licence-posture identifier (vocabulary documented below; not a CHECK constraint, remains free-form for future extension)
+- `notes.license_attribution`  — verbatim attribution text per the source's licence page (≤200 chars convention)
+- `notes.license_posture`      — duplicates `notes.license` for downstream-consumer prose authoring; canonical surface for LICENSE-DATA prose + Validator promotion-time gates
+- `notes.access_mode`          — source-tier access shape (vocabulary below)
+- `notes.access_mode_reason`   — operator-facing explanation (informational)
+- `notes.session_admission`    — admission session identifier
+- `notes.admission_date_utc`   — admission timestamp
+- `notes.runguide_path`        — path to the authoring runguide
+- per-admission audit fields per the specific runguide's §9 contract
+
+**Registered `notes.license` vocabulary (Correction Pass 23 — initial set; open for future extension):**
+
+| Value | Meaning |
+|---|---|
+| `OGL-3.0` | UK government Open Government Licence v3.0 (UK Companies House cycle-1 admission) |
+| `PUBLIC_DOMAIN` | US federal-government work product per 17 USC §105 (SEC EDGAR cycle-1 admission) |
+| `US_STATE_PUBLIC_RECORDS` | US state public-records statutes (DE Title 8 §391, CA Gov Code §6253, TX Bus Org Code Ch 22 — cycle-3 DE/CA/TX state SoS admissions) |
+| `CC0` | CC0 1.0 Universal Public Domain Dedication (CourtListener cycle-4 admission; Free Law Project metadata) |
+| `MIT`, `AGPL-3.0_declared`, `CC-BY-NC-SA-4.0`, `ODbL-1.0`, `NO_LICENSE_DECLARED`, … | per-source declared posture from upstream license file; sentinel forms documented at §11 #16 + CP21 canonical sentinel-key |
+
+These compose with the per-promoted-identifier canonical sentinel key `notes.upstream_license_posture` documented at §11 #16 sub-rule (CP21 ratification). Source-tier `notes.license` documents the upstream posture; identifier-tier `notes.upstream_license_posture` carries it forward for downstream license-aware filtering.
+
+**`notes.access_mode` vocabulary (Correction Pass 23 — cycle-3 addendum §1):**
+
+| Value | Meaning |
+|---|---|
+| `automated_api` | Source queried via documented API; end-to-end automated |
+| `automated_html_parse` | Source queried via automated HTML scraping; no anti-bot wall |
+| `automated_with_auth` | Automated, but requires API key / token / user-agent |
+| `mixed_automated_manual` | Some candidates automated, some operator-manual |
+| `operator_manual_only` | All access is operator-manual via browser; automation structurally blocked (CAPTCHA, anti-bot wall, session gates) |
+
+**Discipline guarantees (uniform across access_modes):** per-row provenance discipline + promotion-gate confidence band are IDENTICAL regardless of access_mode. The `access_mode` field is informational/operational only, NOT a confidence modifier. Operator-manual findings carry `notes.fetch_mechanism="operator_manual_browser"` per-row (row-level, complementing the source-level access_mode). Sources admitted prior to CP23 do NOT require backfill — absent-access_mode is equivalent to `automated_api` per backward compat. First-class column promotion deferred to a future CP once the value-set stabilizes (per cycle-3 addendum §6 default recommendation).
 
 ### 4.4 Lynceus export mapping
 
@@ -747,6 +795,28 @@ On dedup:
 - Append all `source_url`s and `source_excerpt`s into the canonical record's notes
 - Mark the other record `superseded_by = canonical.id`
 - Recompute confidence: `min(99, max(originals) + 5)` for corroboration bonus
+
+**Vendor-matching alias-aware-join discipline (Correction Pass 23 — cycle-3 §1 finding #4).** Cross-validation queries against `procurement_records` MUST use the `vendor_canonical_normalized` join key (materialized at migration 0021) OR an alias-aware JOIN against `manufacturers.canonical_name` + `manufacturers.aliases`. Direct equality on `vendor_canonical_name` misses legitimate matches because the column carries upstream USAspending verbatim recipient names with vendor-side inconsistency across awards. Preferred query pattern:
+
+```sql
+-- Pre-computed normalized join (cheapest at 43k+ row scale)
+SELECT p.*
+FROM procurement_records p
+JOIN manufacturers m
+  ON p.vendor_canonical_normalized = LOWER(m.canonical_name)
+   OR m.aliases LIKE '%' || p.vendor_canonical_normalized || '%'
+WHERE m.canonical_name = ?;
+```
+
+Live collapse evidence (post-backfill): 1,157 distinct raw vendor_canonical_name values → 1,141 distinct normalized values (0.9862 collapse ratio); top alias-collapse wins include `motorola solutions` (3 raw variants), `cellebrite` / `dedrone defense` / `engility` / `general dynamics information technology` (2 raw variants each).
+
+**Short-vendor-name disambiguation discipline (Correction Pass 23 — cycle-4 §1 finding #6 — Berla collision).** Short vendor names (≤6 chars or single-word) in text-pattern-matching sources without entity disambiguation produce false-positive STRONG matches against unrelated cases with overlapping vocabulary. Case study: "Berla Kay Strong v. Thomas Wesley Strong" is a family-court matter where "Berla" is a given name, NOT the digital-forensics vendor; CourtListener's BM25 search returned the case as a STRONG match for vendor `Berla`. Future text-pattern-source runguides MUST bake disambiguation into §4 match scoring rather than punting to integration-time review. Disambiguation options (apply at extraction time, NOT integration time):
+
+1. **Co-occurrence filter** — require the matched query token to appear alongside another known vendor-specific token (product family name, industry term) within N words
+2. **Entity-type tagging** — if the source exposes party-role metadata (defendant vs plaintiff; corporate vs natural-person), filter to corporate-party-only matches
+3. **Operator review of WEAK/STRONG candidates** for short vendor names (≤6 chars or single-word) before promotion — non-default; reserved for cases where (1) + (2) are not available
+
+The discipline composes with §8.4 (multi-purpose vendor categorization restraint): short-name false positives are an extraction-time concern; multi-purpose-vendor categorization restraint is a promotion-time concern. Both gate against premature confidence-band assignment.
 
 ### 8.4 False-positive prevention
 

@@ -246,6 +246,47 @@ The strict-subset case (one identifier is a normalized prefix of the other) is t
 
 This discipline keeps the active set's row count honest: full-MAC observations and OUI-prefix attributions are counted separately rather than collapsing the full-MAC count into the OUI-prefix tally.
 
+### §6.6 Cross-validation alias-aware-join discipline (CP23 — 2026-05-17)
+
+Cross-validation queries against `procurement_records` MUST use the `vendor_canonical_normalized` join key (added migration 0021 at CP23) OR an alias-aware JOIN against `manufacturers.canonical_name` and `manufacturers.aliases`. Direct equality on `vendor_canonical_name` misses legitimate matches because the column carries upstream USAspending verbatim recipient names with vendor-side inconsistency across awards.
+
+**Algorithmic basis** (per `db/normalize_vendor.py::normalize_vendor_name`; canonical source for both the migration backfill and runtime cross-validation):
+
+1. `LOWER()`
+2. Strip ALL punctuation
+3. Collapse runs of whitespace → single space
+4. Strip leading/trailing whitespace
+5. Repeatedly strip trailing whole-word suffix tokens (`inc`, `incorporated`, `corp`, `corporation`, `llc`, `l l c`, `ltd`, `limited`, `plc`, `co`, `company`, `lp`, `llp`, `gmbh`, `ag`, `sa`, `pty`, `bv`)
+6. Re-strip whitespace
+7. Empty result returns `''`
+
+**Preferred query pattern** (cheapest at the 43k+ row scale; index-covered):
+
+```sql
+SELECT p.*
+FROM procurement_records p
+JOIN manufacturers m
+  ON p.vendor_canonical_normalized = LOWER(m.canonical_name)
+   OR m.aliases LIKE '%' || p.vendor_canonical_normalized || '%'
+WHERE m.canonical_name = ?;
+```
+
+**`manufacturers.aliases` shape**: comma-separated TEXT string on the `manufacturers` table; there is NO separate `manufacturers_aliases` table. Append semantics: `aliases = CASE WHEN aliases IS NULL OR aliases = '' THEN ? ELSE aliases || ',' || ? END WHERE id = ?`. Lookup semantics: `WHERE aliases LIKE '%term%' OR LOWER(canonical_name) = LOWER(?)`. Schema-truth formalized at CP23.
+
+**`agency_name` concatenation**: `procurement_records.agency_name` carries the upstream USAspending concatenation `"Awarding Agency / Awarding Sub Agency"`. Split on `" / "` for hierarchical use when an analytic needs the awarding-vs-sub-agency distinction (per CP23 — cycle-3 §1 finding #5).
+
+### §6.7 Short-vendor-name disambiguation discipline (CP23 — 2026-05-17, text-pattern sources)
+
+Short vendor names (≤6 chars or single-word) in text-pattern-matching sources without entity disambiguation produce false-positive STRONG matches against unrelated cases with overlapping vocabulary. Canonical case study: the **Berla collision** — 3 cases STRONG-matched for `Berla` against CourtListener returned `"Berla Kay Strong v. Thomas Wesley Strong"`, a family-court matter where "Berla" is a given name, NOT the digital-forensics vendor.
+
+Future text-pattern-source runguides MUST bake disambiguation into §4 match scoring at extraction time, NOT punt to integration-time review. Disambiguation options (in declining preference):
+
+1. **Co-occurrence filter** — require the matched query token to appear alongside another known vendor-specific token (product family name, industry term) within N words. Cheapest at extraction time; runs against the source's own returned snippet/description.
+2. **Entity-type tagging** — if the source exposes party-role metadata (defendant vs plaintiff, corporate vs natural-person), filter to corporate-party-only matches. Source-dependent; CourtListener V4 exposes `party[]` at the docket level.
+3. **Operator review of WEAK/STRONG candidates** for short vendor names (≤6 chars or single-word) before promotion — manual fallback when (1) and (2) are not available.
+
+The discipline composes with §8.4 multi-purpose-vendor categorization restraint (PROJECT_BIBLE.md §8.4): short-name false positives are an **extraction-time** concern; multi-purpose-vendor categorization restraint is a **promotion-time** concern. Both gate against premature confidence-band assignment.
+
 ## §7. Provenance discipline
 
 Provenance is the database. The phrase is from the canonical-bible's promotion-gate hard rule: *"Do not promote a record to the main table without provenance. Provenance is the database. Without it, we have a rumor."* The principle is load-bearing — Argus's value to a downstream scanner operator is not the identifier list (any vendor catalog has those) but the auditable evidence chain binding each identifier to its claimed attribution. A row whose provenance is broken — dead link, scrubbed excerpt, paraphrased citation — is not a low-quality row; it is not a row at all.

@@ -2596,3 +2596,220 @@ CP22 codifies the canonical CSV timestamp format, lands the Argus-side normaliza
 This CP22 entry is the §11 #11 amendment-log pairing for the §7.5 sub-amend §-text changes in the coordinated commit. Bible HEAD bumps to the CP22 commit landed alongside this entry. Schema-version unchanged (CP22 is a §-text + helper + tests CP; no DB migration touched).
 
 ═══════════════════════════════════════════════════════════════════════
+
+
+## Correction Pass 23 — coordinated amendment: wide-net cycle-{1,3,4} schema-contract patches + migrations 0020 + 0021 + downstream-consumer audit
+
+**Date:** 2026-05-17
+**Source:** MAC-169 dispatch (MAC-168 P1) — wide-net cycle-{1,3,4} schema-contract patches authored 2026-05-15 → 2026-05-16 and consolidated into a single coordinated bible-text + migrations + downstream-consumer audit per the [bible amendment downstream-consumer audit](feedback_bible_amendment_downstream_consumer_audit.md) discipline. Patch documents:
+
+- `~/argus-internal/new data 5.16/schema_contract_patch_notes_license.md` — cycle-1 (5 drifts; license-into-notes folding, cross-validation column renames)
+- `~/argus-internal/new data 5.16/schema_contract_patch_cycle3.md` — cycle-3 (7 findings; source_type enum gap, source_excerpt per-table caps, vendor_canonical_name verbatim semantics, agency_name concatenation, CourtListener token mandate, state SoS automated-access gating, manufacturers_aliases nonexistence)
+- `~/argus-internal/new data 5.16/schema_contract_patch_cycle4.md` — cycle-4 (6 findings; CourtListener V4 mandatory, V4 schema divergence + result-count compression, /search/ rate ceiling, text-pattern entity-disambiguation discipline)
+- `~/argus-internal/new data 5.16/state_sos_access_mode_admission_addendum.md` — `access_mode` notes_json convention spec
+- `~/argus-internal/new data 5.16/paperclip_integration_priority_brief.md` — integration route map (gates P2-P6 on CP23)
+
+**Bible commit:** This entry + PROJECT_BIBLE.md sibling §-text additions (§4.2 `sources.source_type` enum extension + new source-class bands; §4.2 `procurement_records` vendor_canonical_normalized column documentation; §4.2 `manufacturers.aliases` comma-string clarification; §4.3 source_excerpt per-table cap table + access_mode notes_json convention; §4.5 procurement-only carveout cross-reference unchanged; §8.2 vendor-matching alias-aware-join discipline; §8.3 short-vendor-name disambiguation discipline) + migration `db/migrations/0020_source_type_enum_extension.sql` + migration `db/migrations/0021_procurement_vendor_canonical_normalized.sql` + Python module `db/normalize_vendor.py` + backfill `db/backfill_0021.py` + DATA_DICTIONARY.md schema_version=21 refresh + METHODOLOGY.md disambiguation + alias-aware-join semantics. Bible HEAD bumps from [`c62dc1b`](https://github.com/kevwillow/argus-db/commit/c62dc1b) → this CP23 commit. **Schema version 19 → 21.**
+
+**Status:** CEO-authored coordinated bible-text + migrations + downstream-consumer audit per the MAC-169 dispatch directive. Both migrations applied to `db/argus.db`; live verification clean (43 sources / 43,483 procurement_records / `PRAGMA integrity_check = ok` / 507/507 tests passing). Backfill of `vendor_canonical_normalized` populated all 43,483 procurement_records rows with non-empty normalized keys (zero upstream-blank inputs spot-checked).
+
+**Binds:**
+- Validator (no execution in this CP; P2-P6 dispatches do the per-source admissions under the new bands and the alias-aware-join cross-validation pattern).
+- DBArchitect (this CP).
+- ExtractionWorker (no execution; the access_mode notes_json convention applies to future runguides; manufacturers.aliases append semantics are forward-only).
+- Lynceus integration team (informational — schema_version bumps 19 → 21; the new source_type values do not surface in Lynceus exports because Lynceus consumes `identifiers` rows not `sources` rows; the vendor_canonical_normalized column is internal cross-validation infrastructure, not an export surface).
+
+### Why this Correction Pass exists
+
+MAC-169 dispatch (CP23 coordinated amendment) gates Priorities 2-6 (UK Companies House, SEC EDGAR, USAspending deep-extension, State SoS, CourtListener) on CP23 ratification. Three patches authored across 2026-05-15 → 2026-05-16 surfaced schema-contract drift that pre-existing runguides had encoded incorrectly; folding the corrections into a single coordinated bible-text + migrations + audit avoids per-priority rework downstream and gives the future-state P2-P6 admissions a clean canonical reference.
+
+### Live-state preamble (paste-not-cite per S.7)
+
+Verified 2026-05-17 against `db/argus.db` (post-migration):
+
+```
+schema_version          = 21   (0021_procurement_vendor_canonical_normalized, 2026-05-17 05:07:32)
+                              (0020_source_type_enum_extension,             2026-05-17 05:07:17)
+                              (0019_identifier_types_round2,                2026-05-14 17:24:59)
+identifiers_total       = 22,612
+  non_superseded        = 22,532
+  superseded            = 80
+behavioral_signatures   = 131
+sources                 = 43        (unchanged; P2-P6 admit new rows)
+procurement_records     = 43,483    (unchanged; P3+P4 ingest)
+manufacturers           = 34
+source_reclassifications= 809
+PRAGMA integrity_check  = ok
+```
+
+### Corrections applied
+
+1. **Migration 0020 — `sources.source_type` enum extension (CP23 §-text addition + CEO Path B ruling).** Three net-new values appended to the `sources.source_type` CHECK enum via table-rebuild per the 0009 / 0015 / 0018 / 0019 precedent. Cumulative state: 10 prior + 3 net-new = 13 values. Live rebuild verified (43 sources rows preserved column-for-column; PRAGMA integrity_check ok; new values accepted, bogus rejected):
+   - `judicial_filing`        — Court records and RECAP-class artifacts (CourtListener V4 admissions cycle-3 RG3). Replaces the silent fallback to `regulatory` previously applied at staging.
+   - `disclosure_filing`      — SEC EDGAR + analogous corporate-disclosure filings (wide-net cycle-1 RG5 admission). Distinguishes corporate-self-disclosure from equipment-authorization regulatory records.
+   - `procurement_disclosure` — Supplier-self-disclosure / vendor-side procurement artifacts. Distinguishes vendor-disclosed contracts from the agency-side procurement records that the existing `procurement` band covers.
+
+   **The 3 new bands are source-tier taxonomy only.** Promotion-pipeline confidence bands (§8.2) bind on the identifier-row `source_type` (separate enum on the `identifiers` table; not extended in CP23), and identifier rows promoted from sources of these new classes still land under existing identifier source_type bands per §8.2 strict reading. The new sources-tier taxonomy is informational at the registry-of-sources tier; it does not lift any confidence ceiling.
+
+2. **Migration 0021 — `procurement_records.vendor_canonical_normalized` column.** Per cycle-3 §1 finding #4 + CEO Path B ruling, a deterministic alias-collapse join key is materialized as a column (rather than a per-query alias-aware JOIN) for query-plan-friendliness at the 43,483-row scale and forward-compat with future INSERT paths. Schema change is a single ALTER TABLE ADD COLUMN NOT NULL DEFAULT '' + supporting B-tree index. Backfill populated via the companion `db/backfill_0021.py` (calls the pure function `db.normalize_vendor.normalize_vendor_name`). Live state post-backfill:
+
+   ```
+   total procurement_records:               43,483
+   rows with non-empty normalized:          43,483
+   distinct vendor_canonical_name:          1,157
+   distinct vendor_canonical_normalized:    1,141    (collapse ratio 0.9862)
+   ```
+
+   Top alias-collapse wins (paste-not-cite):
+   - `motorola solutions`                          — 3 distinct raw variants
+   - `cellebrite` / `dedrone defense` / `engility` / `general dynamics information technology` — 2 distinct raw variants each
+
+   Spot-check AXON: `'AXON ENTERPRISE, INC.'` → `'axon enterprise'`. SOUNDTHINKING: `'SOUNDTHINKING, INC.'` → `'soundthinking'`. BERLA: `'BERLA CORPORATION'` → `'berla'`. MOTOROLA: `'MOTOROLA SOLUTIONS, INC.'` → `'motorola solutions'`.
+
+   **Normalization algorithm (apply in order; pure function over rows):**
+   1. `LOWER()`
+   2. Strip ALL punctuation (chars in `. , ; : ' " ( ) [ ] { } / \ \` ~ ! @ # $ % ^ & * + = | < > ?`)
+   3. Collapse runs of whitespace → single space
+   4. Strip leading/trailing whitespace
+   5. Repeatedly strip trailing whole-word suffix tokens (matched case-insensitively after step 1; iterate until no terminal suffix remains): `incorporated`, `corporation`, `company`, `limited`, `gmbh`, `llc`, `l l c`, `ltd`, `plc`, `inc`, `corp`, `co`, `lp`, `llp`, `ag`, `sa`, `pty`, `bv`
+   6. Re-strip whitespace
+   7. Empty result → store `''` (column is NOT NULL DEFAULT `''`)
+
+   Algorithm canonical reference: `db/normalize_vendor.py::normalize_vendor_name` (pure function, callable from cross-validation + tests without DB state). DATA_DICTIONARY.md §-procurement_records documents the prose for downstream-consumer audit.
+
+3. **PROJECT_BIBLE.md §4.2 `sources` supporting-table entry** — expanded with the three new source_type values + reference to migration 0020.
+
+4. **PROJECT_BIBLE.md §4.2 `procurement_records` supporting-table entry** — expanded with the `vendor_canonical_normalized` column documentation + reference to migration 0021 + normalization algorithm cross-reference to DATA_DICTIONARY.md.
+
+5. **PROJECT_BIBLE.md §4.2 `manufacturers` clarification** — codified that aliases live as a comma-separated TEXT string on `manufacturers.aliases`, **NOT** in a separate `manufacturers_aliases` table (which does not exist). Append semantics: `aliases = aliases || ',new'` with NULL/empty guard. Lookup semantics: `WHERE aliases LIKE '%term%'`.
+
+6. **PROJECT_BIBLE.md §4.3 source_excerpt per-table CHECK constraint cap table — CEO finding sub-block on cycle-3 §1 #3 contradiction.** This is the authoritative reference. **The cycle-3 patch §1 finding #3 source_excerpt cap claims contradict the live schema; CP23 codifies DB-verified actuals (verified 2026-05-17 against `db/argus.db` post-migration):**
+
+   | Table | Live CHECK constraint | Cycle-3 patch §1 #3 claim |
+   |---|---|---|
+   | `identifiers` | `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)` | claimed ≤500 |
+   | `raw_observations` | no CHECK constraint (plain TEXT) | claimed ≤500 |
+   | `procurement_records` | `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)` | claimed ≤200 (correct) |
+   | `council_minutes_matters` | `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)` | claimed TBD-verify |
+   | `behavioral_signatures` | column does not exist | claimed TBD-verify |
+
+   **DB-verified actuals supersede cycle-3 patch language wherever the two diverge.** Future runguides MUST consult this CP23 table for the canonical per-table cap; the cycle-3 patch document is legacy schema-truth-as-of-2026-05-16-with-known-drift on this single sub-item. The `identifiers` ≤200 cap is the live state post-0001 + CP14 batch rebuilds (matched the rebuild-pattern at each migration); the `raw_observations` lack-of-constraint is the live state per 0001 (app-level enforcement at 200 via `db/sources/vendor_docs.py::raise_on_overflow`, NOT a column CHECK; see 0006 migration header for the prose); `procurement_records` and `council_minutes_matters` both carry the ≤200 cap; `behavioral_signatures` has no source_excerpt column (provenance is captured via `source_id` + `source_file_relative` + `source_line` + `evidence_json` per the migration 0010 schema).
+
+7. **PROJECT_BIBLE.md §4.3 `access_mode` notes_json convention** — codified the `notes.access_mode` field on `sources` rows. Documented value vocabulary (initial set; open for future extension):
+   - `automated_api`             — source queried via documented API; end-to-end automated
+   - `automated_html_parse`      — source queried via automated HTML scraping; no anti-bot wall
+   - `automated_with_auth`       — automated, but requires API key / token / user-agent
+   - `mixed_automated_manual`    — some candidates automated, some operator-manual (e.g., the intl_registries cycle 2 mix)
+   - `operator_manual_only`      — all access is operator-manual via browser; automation structurally blocked (CAPTCHA, anti-bot wall, session gates)
+
+   **Discipline guarantees (uniform across access_modes):** per-row provenance discipline + promotion-gate confidence band are IDENTICAL regardless of access_mode. The `access_mode` field is informational/operational only, NOT a confidence modifier. Operator-manual findings carry `notes.fetch_mechanism="operator_manual_browser"` per-row (row-level, complementing the source-level access_mode).
+
+   **First-class column promotion deferred to future CP** once the value-set stabilizes (probably after 1-2 more cycles' worth of evidence; per cycle-3 addendum §6 default recommendation). Sources admitted prior to CP23 do NOT require backfill — absent-access_mode is equivalent to `automated_api` per backward compat.
+
+8. **PROJECT_BIBLE.md §4.3 license-posture register additions** — codified four documented license-posture vocabulary values that live in `sources.notes.license` (NOT a CHECK constraint; the field remains free-form for future extension). Values registered at CP23:
+   - `OGL-3.0`                   — UK Companies House cycle-1 admission; UK government Open Government Licence v3.0
+   - `PUBLIC_DOMAIN`             — SEC EDGAR cycle-1 admission; US federal-government work product (17 USC §105)
+   - `US_STATE_PUBLIC_RECORDS`   — DE / CA / TX state SoS cycle-3 admissions; US state public-records statutes (DE Title 8 §391, CA Gov Code §6253, TX Bus Org Code Ch 22)
+   - `CC0`                       — CourtListener cycle-4 admission (Free Law Project metadata dedication)
+
+   These compose with the pre-existing `notes.upstream_license_posture` canonical sentinel-key (CP21 §11 #16 sub-rule) for identifier-row promotion gates. Source-tier `notes.license` documents the upstream posture; identifier-tier `notes.upstream_license_posture` (CP21 canonical key) carries it forward to per-row license-aware downstream consumer filtering.
+
+9. **PROJECT_BIBLE.md §8.2 cross-validation alias-aware-join discipline.** Per cycle-3 §1 finding #4 (`procurement_records.vendor_canonical_name` is upstream USAspending verbatim, NOT Argus-canonical), cross-validation queries against `procurement_records` MUST use the new `vendor_canonical_normalized` join key OR an alias-aware JOIN against `manufacturers.canonical_name`/`manufacturers.aliases`. Direct equality on `vendor_canonical_name` misses legitimate matches (e.g., "AXON ENTERPRISE INC" vs "Axon Enterprise, Inc." vs "AXON ENT INC" — all collapse to `axon enterprise` in the normalized column; 3 of 5 raw variants for "MOTOROLA SOLUTIONS, INC." were captured in the live backfill collapse). Per CP23 default discipline: the pre-computed `vendor_canonical_normalized` is the preferred join key at integration time.
+
+10. **PROJECT_BIBLE.md §8.3 short-vendor-name disambiguation discipline** (per cycle-4 §1 finding #6 — the Berla collision). Short vendor names (≤6 chars or single-word) in text-pattern-matching sources without entity disambiguation produce false-positive STRONG matches against unrelated cases with overlapping vocabulary (Berla collision case study: "Berla Kay Strong v. Thomas Wesley Strong" is a family-court matter where "Berla" is a given name, NOT the digital-forensics vendor). Future text-pattern-source runguides MUST bake disambiguation into §4 match scoring rather than punting to integration-time review. Disambiguation options:
+    - Co-occurrence filter (require the matched query token to appear alongside another known vendor-specific token within N words)
+    - Entity-type tagging (filter to corporate-party-only matches if the source exposes party-role metadata)
+    - Operator review of WEAK/STRONG candidates for short vendor names (≤6 chars or single-word) before promotion
+
+    The cycle-3 RG3 Berla 3-case staging is captured with verbatim case_name + party_list for paperclip de-dupe at integration; future runguides bake disambiguation into match scoring upstream.
+
+11. **PROJECT_BIBLE.md §4.3 license-into-notes folding contract** (cycle-1 finding #1, formalized). `sources` table license fields live INSIDE `notes_json`, NOT as top-level columns. Canonical sources-row JSON contract: top-level keys are `name`, `url`, `source_type`, `tier`, `notes_json`, `last_fetched_at` (DATETIME), `last_status` (TEXT); `notes_json` includes `license`, `license_attribution`, `license_posture` + per-admission audit fields. Runguide-validator contract is direct JSON-to-JSON without intermediate transformation. Translator script `extraction_outputs/_tooling/translate_license_to_notes.py` (cycle-1 patch §2) covers retroactive translation of already-staged outputs from runguides authored before this clarification.
+
+12. **PROJECT_BIBLE.md §4.3 cross-validation column normalizations** (cycle-1 findings #2-#4, formalized). Cross-validation queries normalize to live schema columns:
+    - `procurement_records`: `vendor_canonical_name` (NOT `awardee_name`), `agency_name` (NOT `awarding_agency`); split `agency_name` on `" / "` for hierarchical use (`{awarding_agency, awarding_sub_agency}`).
+    - `council_minutes_matters`: `agency_name` + `agency_geographic_scope` (NOT `municipality`, single-field).
+    - `raw_observations`: `candidate_identifier` (NOT `candidate_value`); `candidate_manufacturer` is a top-level column; vendor-side organization detail lives at `notes.$.organization_address`.
+    - `identifiers`: `confidence` (NOT `current_confidence`).
+    - `schema_version` is the singular table name (NOT plural).
+
+### Schema migration siblings bound to CP23 (§11 #11 discipline)
+
+- `db/migrations/0020_source_type_enum_extension.sql` — sources.source_type CHECK enum 10 → 13 values
+- `db/migrations/0021_procurement_vendor_canonical_normalized.sql` — procurement_records.vendor_canonical_normalized column + index
+- `db/normalize_vendor.py` — pure normalization function (binding for backfill + cross-validation + tests)
+- `db/backfill_0021.py` — companion backfill (43,483 rows populated; idempotent — re-running overwrites with same deterministic value)
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — strengthened. The 3 new source_type bands codify taxonomy that was previously silent-fallback to `regulatory`; the `vendor_canonical_normalized` column is a deterministic derivation of upstream verbatim values; no new identifier values minted; no source attributions altered.
+- **§11 #7 (no promotion without provenance)** — composes naturally. The new bands are source-tier taxonomy only; identifier-row promotion still binds on identifiers.source_type + identifiers.source_url per §8.1. The vendor_canonical_normalized column is a cross-validation join key — the verbatim vendor_canonical_name remains the upstream provenance anchor.
+- **§11 #8 (no confidence drift)** — unchanged. No confidence-column writes in either migration. Future P2-P6 admissions land under per-band §8.2 ceilings; the new bands do not lift any ceiling.
+- **§11 #11 (amendment-log discipline)** — this CP23 entry IS the §11 #11 amendment-log pairing for the §4.2/§4.3/§8.2/§8.3 §-text additions + migrations 0020/0021 + DATA_DICTIONARY/METHODOLOGY downstream-consumer audit in the coordinated commit set. Bible HEAD bumps from [`c62dc1b`](https://github.com/kevwillow/argus-db/commit/c62dc1b) to the CP23 commit.
+- **§11 #16 (Feist facts-only)** — composes orthogonally. CP23 license-posture register adds 4 new posture values that may surface in future §11 #16 promotion paths via the canonical `notes.upstream_license_posture` sentinel-key (CP21); license-posture vocabulary registration does not alter §11 #16 promotion semantics.
+
+### Verification artifacts (paste-not-cite per S.7)
+
+Run AND captured verbatim from live `db/argus.db` post-CP23 migration:
+
+```
+# 1. PRAGMA integrity_check
+ok
+
+# 2. schema_version top-3
+(21, '0021_procurement_vendor_canonical_normalized', '2026-05-17 05:07:32')
+(20, '0020_source_type_enum_extension',             '2026-05-17 05:07:17')
+(19, '0019_identifier_types_round2',                '2026-05-14 17:24:59')
+
+# 3. sources count
+43        # unchanged; P2-P6 admit new rows
+
+# 4. procurement_records count
+43,483    # unchanged; P3+P4 ingest
+
+# 5. procurement_records with non-empty vendor_canonical_normalized
+43,483    # 100% backfill coverage
+
+# 6. Sample 5 AXON spot-check
+'AXON ENTERPRISE, INC.'  -> 'axon enterprise'   (×5 distinct rows)
+
+# 7. CP23 grep coverage (BIBLE_AMENDMENTS.md)
+≥ 8 references             # header + sub-amends + sequencing + verification block
+
+# 8. CP23 sibling-commit landings
+grep "CP23" PROJECT_BIBLE.md DATA_DICTIONARY.md METHODOLOGY.md   # non-zero
+
+# 9. Test suite smoke
+tests/test_export_lynceus.py  76/76 passing  (CP22 baseline preserved)
+tests/ full suite             507/507 passing
+```
+
+### Sequencing post-acceptance
+
+1. **CP23 ratifies at this commit.** Bible HEAD bumps from [`c62dc1b`](https://github.com/kevwillow/argus-db/commit/c62dc1b) → this CP23 commit. Schema version 19 → 21 (migrations 0020 + 0021). DB row counts unchanged in this CP (P2-P6 do the per-source admissions and ingest).
+2. **P2 (UK Companies House) unblocks** for CEO ratification dispatch immediately upon CP23 close.
+3. **P3 (SEC EDGAR) + P6 (CourtListener)** unblock to admit under the new `disclosure_filing` / `judicial_filing` bands respectively (replacing the silent fallback to `regulatory` from cycle-3 staging).
+4. **P4 (USAspending deep-extension)** unblocks to ingest 2,555 net-new + 2,718 corroboration rows using `vendor_canonical_normalized` as the preferred join key (per §8.2 CP23 discipline).
+5. **P5 (State SoS)** unblocks to admit DE/CA/TX rows with `notes.access_mode="operator_manual_only"`.
+6. **No paired state-rotation commit needed.** PROJECT_STATE.md schema-version reference will refresh organically at the next post-P6 close.
+
+### §12 Open Questions impact
+
+Resolved by CP23:
+- **`source_type` enum extension** (cycle-3 finding #2) — RESOLVED at Path B (judicial_filing + disclosure_filing + procurement_disclosure added; migration 0020 applied).
+- **Vendor alias normalization approach** (cycle-3 finding #4) — RESOLVED at pre-compute column (vendor_canonical_normalized; migration 0021 applied; 43,483 rows backfilled at 0.9862 collapse ratio).
+- **Per-table source_excerpt cap discovery for `behavioral_signatures` + `council_minutes_matters`** (cycle-3 finding #3) — RESOLVED at CP23 §4.3 table (behavioral_signatures has no source_excerpt column; council_minutes_matters carries the ≤200 cap; full per-table table is the canonical reference).
+- **`access_mode` placement** (cycle-3 addendum §6 item 4) — RESOLVED at notes_json field (deferred to first-class column once value-set stabilizes per cycle-3 addendum §6 default).
+- **License-posture vocabulary** (cycle-1 finding #1 extension) — RESOLVED at notes_json field with 4 new registered values (OGL-3.0, PUBLIC_DOMAIN, US_STATE_PUBLIC_RECORDS, CC0).
+- **Disambiguation discipline placement** (cycle-4 finding #6) — RESOLVED at bake-into-runguide §4 match scoring (per CP23 §8.3 + cycle-4 default recommendation).
+
+Surfaced by CP23 (queued for future CP candidacy as evidence accumulates):
+- **`access_mode` first-class column migration** — gated on value-set stabilization (~1-2 more cycles of new-source evidence).
+- **Adjacent §7.5 column shape-vs-format audit findings (CP22 surface)** carried forward unchanged.
+
+New §12 questions opened: none.
+
+### §11 #11 self-binding satisfied
+
+This CP23 entry is the §11 #11 amendment-log pairing for the §4.2/§4.3/§8.2/§8.3 §-text additions + migration 0020 + migration 0021 + DATA_DICTIONARY + METHODOLOGY downstream-consumer audit in the coordinated commit set. Bible HEAD bumps from [`c62dc1b`](https://github.com/kevwillow/argus-db/commit/c62dc1b) to the CP23 commit landed alongside this entry. Schema-version bumps 19 → 21 (sources rebuild for source_type CHECK extension + procurement_records column addition).
+
+═══════════════════════════════════════════════════════════════════════
