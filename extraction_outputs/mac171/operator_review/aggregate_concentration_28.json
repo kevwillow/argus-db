@@ -1,0 +1,233 @@
+{
+  "dispatch": "MAC-171",
+  "disposition": "operator-review tier; schema-rejected for procurement_records (agency_name NOT NULL); useful aggregate-financial context without specific-agency anchor",
+  "row_count": 28,
+  "rows": [
+    {
+      "concentration_pct": 10.0,
+      "manufacturer_id": 15,
+      "section_ref": "Item 1",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1069183/000162828026011360/axon-20251231.htm",
+      "vendor": "Axon Enterprise",
+      "verbatim_excerpt_30w": "ent key strategic advantages. Although the majority of our revenues are generated via direct sales, we also leverage distribution partners and third party resellers. No customer represented more than 10%"
+    },
+    {
+      "concentration_pct": 15.0,
+      "manufacturer_id": 15,
+      "section_ref": "Item 7",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1069183/000162828026011360/axon-20251231.htm",
+      "vendor": "Axon Enterprise",
+      "verbatim_excerpt_30w": "December 31, 2025 , we had an aggregate of $1.75 billion of Senior Notes outstanding. None of our subsidiaries guarantee the Senior Notes. Our non-guarantor subsidiaries accounted for approximately 15%"
+    },
+    {
+      "concentration_pct": 10.0,
+      "manufacturer_id": 15,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1069183/000162828026011360/axon-20251231.htm",
+      "vendor": "Axon Enterprise",
+      "verbatim_excerpt_30w": "the related credit exposure, management continually monitors the creditworthiness of the financial institutions where we have deposits. Major Customers and Suppliers No customer represented more than 10% of total net"
+    },
+    {
+      "concentration_pct": 10.0,
+      "manufacturer_id": 15,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1069183/000162828026011360/axon-20251231.htm",
+      "vendor": "Axon Enterprise",
+      "verbatim_excerpt_30w": "each country based on the shipping address of the distributor or customer. For the years ended December 31, 2025, 2024 and 2023, no individual country outside the United States represented"
+    },
+    {
+      "concentration_pct": 29.0,
+      "manufacturer_id": 26,
+      "section_ref": "Item 1",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1351636/000119312526132104/ssti-20251231.htm",
+      "vendor": "SoundThinking",
+      "verbatim_excerpt_30w": "rgest cities in the United States. As of December 31, 2025, we had 291 SafePointe lanes under contract. For the year ended December 31, 2025, our largest customer, the City"
+    },
+    {
+      "concentration_pct": 10.0,
+      "manufacturer_id": 26,
+      "section_ref": "Item 1",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1351636/000119312526132104/ssti-20251231.htm",
+      "vendor": "SoundThinking",
+      "verbatim_excerpt_30w": "customer, the City of New York, accounted for 29% of our revenues. For the year ended December 31, 2024, our two largest customers, the City of New York and the"
+    },
+    {
+      "concentration_pct": 23.0,
+      "manufacturer_id": 26,
+      "section_ref": "Item 1A",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1351636/000119312526132104/ssti-20251231.htm",
+      "vendor": "SoundThinking",
+      "verbatim_excerpt_30w": "November 2024. The City of Chicago was our second largest customer by revenue in 2023 and 2024. As a result, the significance of our largest customer by revenue, the City"
+    },
+    {
+      "concentration_pct": 29.0,
+      "manufacturer_id": 26,
+      "section_ref": "Item 1A",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1351636/000119312526132104/ssti-20251231.htm",
+      "vendor": "SoundThinking",
+      "verbatim_excerpt_30w": "cago was our second largest customer by revenue in 2023 and 2024. As a result, the significance of our largest customer by revenue, the City of New York, increased from"
+    },
+    {
+      "concentration_pct": 70.0,
+      "manufacturer_id": 26,
+      "section_ref": "Item 7",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1351636/000119312526132104/ssti-20251231.htm",
+      "vendor": "SoundThinking",
+      "verbatim_excerpt_30w": "024 and 2023, respectively, representing year-over-year increases of 2% and 10%. For the years ended December 31, 2025, 2024 and 2023, revenues from ShotSpotter represented approximately 64%, 71% and 70%"
+    },
+    {
+      "concentration_pct": 29.0,
+      "manufacturer_id": 26,
+      "section_ref": "Item 7",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1351636/000119312526132104/ssti-20251231.htm",
+      "vendor": "SoundThinking",
+      "verbatim_excerpt_30w": "ended December 31, 2025, 2024 and 2023, revenues from ShotSpotter represented approximately 64%, 71% and 70% of total revenues, respectively. Our largest customer, the City of New York, accounted for"
+    },
+    {
+      "concentration_pct": 62.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 1",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "services. 4 The principal products within each segment, by technology, are described below: Products and Systems Integration Segment In 2025, the segment\u2019s net sales were $7.3 billion, representing 62% of"
+    },
+    {
+      "concentration_pct": 38.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 1",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "Products and Systems Integration segment represented 16% of the net sales of the total segment in 2025. Software and Services Segment In 2025, the segment\u2019s net sales were $4.4 billion,"
+    },
+    {
+      "concentration_pct": 8.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 1",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "of the customers we serve. 6 Our largest customer is the U.S. government (through multiple contracts with its various branches and agencies, including the armed services), representing approximately 8% of"
+    },
+    {
+      "concentration_pct": 62.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "effectively. The principal products within each segment, by technology, are described below: Products and Systems Integration Segment In 2025, the segment\u2019s net sales were $7.3 billion, representing 62% of our"
+    },
+    {
+      "concentration_pct": 25.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "customers to increasingly rely on our cybersecurity protection and 24/7 managed and support services. Results of Operations Years ended December 31 (Dollars in millions, except per share amounts) 2025 %"
+    },
+    {
+      "concentration_pct": 24.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "singly rely on our cybersecurity protection and 24/7 managed and support services. Results of Operations Years ended December 31 (Dollars in millions, except per share amounts) 2025 % of Sales"
+    },
+    {
+      "concentration_pct": 23.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "cybersecurity protection and 24/7 managed and support services. Results of Operations Years ended December 31 (Dollars in millions, except per share amounts) 2025 % of Sales ** 2024 % of"
+    },
+    {
+      "concentration_pct": 62.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "ems Integration $ 7,253 $ 6,883 5 % Net sales from Software and Services 4,429 3,934 13 % Net sales $ 11,682 $ 10,817 8 % The Products and Systems"
+    },
+    {
+      "concentration_pct": 64.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "sales from Software and Services 4,429 3,934 13 % Net sales $ 11,682 $ 10,817 8 % The Products and Systems Integration segment\u2019s net sales represented 62% of our net"
+    },
+    {
+      "concentration_pct": 38.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "The Products and Systems Integration segment\u2019s net sales represented 62% of our net sales in 2025, compared to 64% of our net sales in 2024. The Software and Services segment\u2019s"
+    },
+    {
+      "concentration_pct": 36.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "ent\u2019s net sales represented 62% of our net sales in 2025, compared to 64% of our net sales in 2024. The Software and Services segment\u2019s net sales represented 38% of"
+    },
+    {
+      "concentration_pct": 51.7,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "024 % Change Gross margin from Products and Systems Integration $ 3,915 $ 3,668 7 % Gross margin from Software and Services 2,120 1,844 15 % Gross margin $ 6,035"
+    },
+    {
+      "concentration_pct": 51.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "and Systems Integration $ 3,915 $ 3,668 7 % Gross margin from Software and Services 2,120 1,844 15 % Gross margin $ 6,035 $ 5,512 9 % Gross margin was"
+    },
+    {
+      "concentration_pct": 16.0,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "rvices SG&A expenses primarily due to higher expenses associated with acquired businesses and employee incentive costs, partially offset by lower expenses related to legal matters. SG&A expenses were 16.0% of"
+    },
+    {
+      "concentration_pct": 16.2,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "igher expenses associated with acquired businesses and employee incentive costs, partially offset by lower expenses related to legal matters. SG&A expenses were 16.0% of net sales in 2025 compared to"
+    },
+    {
+      "concentration_pct": 8.3,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "on, or 4% increase in Products and Systems Integration R&D expenditures primarily due to higher employee incentive costs and higher expenses associated with acquired businesses. R&D expenditures were 8.3% of"
+    },
+    {
+      "concentration_pct": 8.5,
+      "manufacturer_id": 3,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/68505/000006850526000010/msi-20251231.htm",
+      "vendor": "Motorola Solutions",
+      "verbatim_excerpt_30w": "and Systems Integration R&D expenditures primarily due to higher employee incentive costs and higher expenses associated with acquired businesses. R&D expenditures were 8.3% of net sales in 2025 and 8.5%"
+    },
+    {
+      "concentration_pct": 10.0,
+      "manufacturer_id": 5,
+      "section_ref": "Item 8",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1697851/000143774926010647/rekr20251231_10k.htm",
+      "vendor": "Rekor Systems",
+      "verbatim_excerpt_30w": "ervice revenue 24,585 23,438 Total revenue $ 48,450 $ 46,028 For the years ended December 31, 2025 and 2024 except for the United States, total revenue in any single country"
+    }
+  ],
+  "session": "sec_edgar_admission",
+  "staged_at_utc": "2026-05-17T06:27:10Z"
+}

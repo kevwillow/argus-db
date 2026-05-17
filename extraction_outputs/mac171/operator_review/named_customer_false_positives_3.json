@@ -1,0 +1,39 @@
+{
+  "dispatch": "MAC-171",
+  "disposition": "\u00a711 #1 false-positives \u2014 DO NOT promote",
+  "row_count": 3,
+  "rows": [
+    {
+      "context_excerpt_30w": "the data sharing practices of some of these competitors, including sharing customer data with other police agencies and federal agencies such as U.S. Immigration and Customs Enforcement without the consent",
+      "mac171_disposition": "false_positive",
+      "mac171_rationale": "Excerpt describes COMPETITORS' data-sharing practices, not SSTI's own customer relationship with ICE.",
+      "manufacturer_id": 26,
+      "matched_agency": "Immigration and Customs Enforcement",
+      "section_ref": "Item 1",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1351636/000119312526132104/ssti-20251231.htm",
+      "vendor": "SoundThinking"
+    },
+    {
+      "context_excerpt_30w": "otests against police brutality have increased in past years. In addition, four members of Congress previously requested the Inspector General of the Department of Homeland Security to investigate the appropriateness",
+      "mac171_disposition": "false_positive",
+      "mac171_rationale": "Excerpt describes Congressional IG-investigation request, not a customer relationship between SSTI and DHS.",
+      "manufacturer_id": 26,
+      "matched_agency": "Department of Homeland Security",
+      "section_ref": "Item 1A",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1351636/000119312526132104/ssti-20251231.htm",
+      "vendor": "SoundThinking"
+    },
+    {
+      "context_excerpt_30w": "alerts using plate matches from custom and connected hotlists. With on-device encrypted lists and data, the mobile application is compliant with the Federal Bureau of Investigation\u2019s Criminal Justice Information System",
+      "mac171_disposition": "false_positive",
+      "mac171_rationale": "Excerpt describes Rekor mobile-app compliance with FBI CJIS standards, not a customer relationship.",
+      "manufacturer_id": 5,
+      "matched_agency": "Federal Bureau of Investigation",
+      "section_ref": "Item 1",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1697851/000143774926010647/rekr20251231_10k.htm",
+      "vendor": "Rekor Systems"
+    }
+  ],
+  "session": "sec_edgar_admission",
+  "staged_at_utc": "2026-05-17T06:27:10Z"
+}
