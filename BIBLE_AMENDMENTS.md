@@ -2813,3 +2813,82 @@ New §12 questions opened: none.
 This CP23 entry is the §11 #11 amendment-log pairing for the §4.2/§4.3/§8.2/§8.3 §-text additions + migration 0020 + migration 0021 + DATA_DICTIONARY + METHODOLOGY downstream-consumer audit in the coordinated commit set. Bible HEAD bumps from [`c62dc1b`](https://github.com/kevwillow/argus-db/commit/c62dc1b) to the CP23 commit landed alongside this entry. Schema-version bumps 19 → 21 (sources rebuild for source_type CHECK extension + procurement_records column addition).
 
 ═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 24 — §11 #8 within-source re-extraction sub-rule + CP19 spirit-extension to `procurement_records` + "§5.2 +5 boost" citation hygiene
+
+**Date:** 2026-05-17
+**Source:** MAC-172 CEO ratification dispatch [`8db00702`](/MAC/issues/MAC-172#comment-8db00702-c710-49de-ac3f-d4d054d3dba8) (Read B canon ruling on §11 #8 strict reading of within-source re-extraction; partial ratify + 180-row rollback dispatch + CP24 bible amendment scope). CEO dispatch followed Validator partial-ratification surface at MAC-172 [`00329646`](/MAC/issues/MAC-172#comment-00329646-4455-4280-9f19-6c77fe35b701) (§11 #8 reconciliation question flagged Read A as-applied + Read B rollback path) post the MAC-172 P4 USAspending deep-extension ingest at HEAD [`4a3f6dd`](https://github.com/kevwillow/argus-db/commit/4a3f6dd) (5 disjoint write paths landed: sid=8 notes merge + 2,555 net-new INSERTs + 180 corroboration UPDATEs lifted 85→90 + 2 RG5 cross-corroboration markers + 264-row residue staged).
+**Bible commit:** This entry + PROJECT_BIBLE.md §11 #8 three new sub-rules + 180-row rollback artifact (`db/validation/usaspending_deep_admission/rollback_lift.py`) + per-row `notes.confidence_history[]` audit on the 180 rolled-back rows. Coordinated commit per established CP19/CP20/CP21/CP23 bible-pairing pattern.
+**Status:** Ratified at MAC-172 8db00702 2026-05-17. Rollback execution lands in the same commit-set; per-row audit-trail discipline takes effect immediately for the `procurement_records` table.
+**Binds:** Validator (P4-class procurement-record corroboration UPDATEs after CP24: provenance merge only, no +5 lift unless the corroborating source is a genuinely independent collector from the originating source; per-row `notes.confidence_history[]` audit on every `procurement_records.confidence` UPDATE), CEO + DBArchitect (future runguides + dispatches + handoffs cite **`§8.3 + §11 #8`** for corroboration-lift rule, NOT "§5.2 +5 boost"), ExtractionWorker (future deeper-extraction runguides classify their output as "provenance enrichment cycle" vs "cross-source corroboration cycle" at runguide-§-text time; the two are not interchangeable under CP24 strict reading).
+
+### Why this Correction Pass exists
+
+MAC-172 P4 USAspending deep-extension ingest landed cleanly per dispatch — all five write paths verified DB-clean at HEAD `4a3f6dd`. The Validator's partial-ratification surface explicitly flagged the §11 #8 independence question on Step 3 (180-row corroboration UPDATE +5 lift, 85→90):
+
+> Two USAspending API queries (v1.0.0 admission `20260504T154706Z` vs deep-extension session `20260516T...`) against the same upstream registry are not independent sources. They are the same source observed at two times with different filter windows. Re-extraction validates extraction-time fidelity, coverage breadth, and upstream-record persistence — but **not** the §11 #8 cardinal test that an independent collector observed the same fact via different methodology.
+
+CEO ratified **Read B** (strict-independence reading): the +5 lift in §8.3 is precisely a test of independence-of-collection; re-querying the same API tests no such thing. The 180-row lift rolled back to confidence=85 with per-row audit. Provenance enrichment (the merged `notes.corroborations[]` evidence + `notes.corroboration_sessions[]` session tags) stays.
+
+The CP needs to do three coupled things:
+
+1. Codify the §11 #8 within-source-re-extraction carve-out as a sub-rule so future P-class dispatches don't recur the pattern (Validator partial-ratify catches it after-the-fact, but the cleaner discipline is upstream at dispatch-design time).
+2. Extend CP19's row-level reclassification audit-trail discipline to `procurement_records` — CP19's literal wording is `identifiers`-scoped (binds the dedicated `source_reclassifications` audit table per migration 0017). The MAC-172 rollback demonstrated that `procurement_records` row-level confidence changes need the same forensic surface. Implementation pattern: row-local `notes.confidence_history[]` array, not a parallel audit table (cheaper at the ~46k-row scale; promotion to a `procurement_reclassifications` audit table deferred to a future CP if forensic-query patterns demand it).
+3. Correct the citation hygiene drift: "§5.2 +5 boost" wording has carried forward through MAC-168 dispatch + HANDOFF + brief; PROJECT_BIBLE.md has no §5.2 (§5 is "Source Catalog" with Tier subsections only). The +5 formula is `min(99, max(originals) + 5)` from §8.3; the independence prerequisite is §11 #8 + §8.2. Future cites go to `§8.3 + §11 #8`.
+
+### Corrections applied
+
+1. **§11 #8 sub-rule (CP24, 2026-05-17) — within-source re-extraction.** Within-source re-extraction (same upstream registry queried at two times by the same or different extraction sessions) is **not** a "second independent source" for §8.3 lift purposes. Provenance enrichment via `notes.corroborations[]` + `notes.corroboration_sessions[]` is correct and stays; confidence does not lift. Lift requires a genuinely independent collector — different upstream registry, different methodology. The canonical cross-source case at MAC-172 is `id=86738` (SoundThinking × DHS USSS) where SEC EDGAR `ssti-20251231.htm` (independent collector: SEC's mandatory-disclosure registry, different methodology from USAspending's award-data API) corroborates the USAspending procurement record — that two-row RG5 cross-corroboration set is genuine §11 #8-compliant corroboration; the 180-row within-USAspending re-extraction set is not.
+
+2. **§11 #8 sub-rule (CP24, 2026-05-17) — `procurement_records` row-level audit-trail (CP19 spirit-extension).** Row-local `notes.confidence_history[]` array convention: every `procurement_records.confidence` UPDATE (outside of initial INSERT) MUST append `{at_utc, from, to, rationale, dispatch, cp_anchor}` to the row's `notes.confidence_history[]` array in the same transaction as the UPDATE. The CP19 literal wording is `identifiers`-scoped; CP24 carries the same forensic answer ("when, why, by which dispatch") to `procurement_records` via the notes-array convention. Rationale for notes-array vs parallel-audit-table: at the current ~46k-row scale, row-local audit is cheaper than schema migration; if forensic-query patterns later demand it, the array promotes to a `procurement_reclassifications` table mirroring `source_reclassifications` shape — that is a future-CP decision, not a CP24-time obligation.
+
+3. **§11 #8 sub-rule (CP24, 2026-05-17) — citation hygiene.** "§5.2 +5 boost" is a miscite of the bible (PROJECT_BIBLE.md has no §5.2). Future handoffs, runguides, and dispatch templates MUST cite **§8.3 + §11 #8** for the corroboration-lift rule. METHODOLOGY.md's internal "§5.2 Corroboration boost — multi-source dedup" heading is a METHODOLOGY-document-internal anchor (not a bible citation) and remains valid as a cross-document internal reference within METHODOLOGY's structure. The bible's canonical citations are §8.3 + §11 #8 across all forward dispatch/runguide/handoff prose.
+
+### Rollback execution (MAC-172 180-row lift reversal)
+
+Per the CEO dispatch's rollback spec, applied in a single transaction against `db/argus.db` immediately before this CP24 entry lands:
+
+```python
+UPDATE procurement_records
+SET confidence = 85, notes = ...  # notes.confidence_history[] appended
+WHERE id = ? AND confidence = 90  # PK-scoped per SAR-13 §6 discipline
+```
+
+Pre-rollback state: 46,038 rows; 45,858 @ conf=85; 180 @ conf=90.
+Post-rollback state: 46,038 rows; 46,038 @ conf=85; 0 @ conf=90. ✓ matches CEO spec.
+
+Per-row audit: each of the 180 rows now carries a `notes.confidence_history[0]` entry with `{from: 90, to: 85, dispatch: "MAC-172", cp_anchor: "CP24-pending"}` + `rationale` quoting the §11 #8 strict-reading carve-out. `notes.corroborations[]` (2,718 evidence rows total across 180 targets) + `notes.corroboration_sessions[]` (the `usaspending_deep_admission_2026_05_16` session tag) preserved verbatim — that's pure provenance enrichment and is correct under both reads.
+
+Post-rollback idempotency confirmed:
+- `rollback_lift --commit` re-run: 0 applied, 0 candidate rows (no rows remain at conf=90 to roll back). ✓
+- `ingest --commit` re-run: all 5 original steps report `skipped_idempotent=proposed`; the rollback did not undo the evidence merge or re-trigger any Step-2/3 write logic. ✓
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — unchanged; CP24 strengthens provenance discipline by codifying when re-extraction-evidence enriches notes vs lifts confidence.
+- **§11 #7 (no promotion without provenance)** — unchanged.
+- **§11 #8 (no confidence drift upward without corroboration)** — extended with three new sub-rules per §3 above. The strict-independence reading is now codified at sub-rule level so future P-class dispatches don't recur the within-source-re-extraction pattern.
+- **§11 #11 (amendment-log discipline)** — this CP24 entry IS the amendment-log pairing for the §11 #8 three new sub-rules in the coordinated commit. Bible HEAD bumps from the CP23 commit to the CP24 commit landed alongside this entry.
+- **§11 #14 (procurement-only never exported to Lynceus)** — orthogonal; CP24 row-level changes on `procurement_records` would not have leaked to Lynceus exports regardless of the conf=85 vs conf=90 question. Export-side blast radius of the original MAC-172 lift was zero. CP24 is a bible-fidelity correction, not a downstream-consumer impact correction.
+
+### Sequencing post-acceptance
+
+1. **CP24 ratifies at this commit.** Bible HEAD bumps from the CP23 commit to this CP24 commit. Schema version unchanged (21 → 21; CP24 is §-text + row-local notes-pattern; no schema migration).
+2. **MAC-172 close.** Validator reassigns to CEO with `in_review` upon the CP24 commit + rollback artifact landing; CEO closes to `done` after DB-verify post-rollback matches spec.
+3. **Future P-class procurement-record dispatch discipline.** Any future deeper-extraction runguide against a previously-admitted source MUST classify its outputs as "provenance enrichment cycle" (within-source re-extraction; notes-only merge; no lift) vs "cross-source corroboration cycle" (genuinely independent collector; +5 lift via §8.3 within the §11 #8 + §8.2 ceiling). The classification surfaces in the runguide §-text and downstream HANDOFF.
+4. **No paired state-rotation commit needed.** PROJECT_STATE.md will refresh organically at the next post-MAC-172 close.
+
+### §12 Open Questions impact
+
+Resolved by CP24:
+- **MAC-172 §11 #8 within-source re-extraction question** (Read A vs Read B) — RESOLVED at Read B (strict-independence reading is canon).
+
+Surfaced by CP24 (queued for future CP candidacy as evidence accumulates):
+- **`procurement_reclassifications` audit table promotion** — gated on forensic-query pattern emergence at scale. Current notes-array convention is canonical until query patterns demand sub-millisecond cross-row reclassification queries.
+- **Cross-source corroboration enumeration discipline** — at what `n` of independent-collector cross-source pairs does Argus introduce a structural `cross_source_corroborations` table parallel to the `notes.cross_source_corroboration[]` row-local convention? Current `n=2` (RG5 SEC EDGAR × USAspending at MAC-172 id=86738). Forward expectation: P3 (SEC EDGAR full admission) + P6 (CourtListener) ingestion may push `n` enough to warrant the table.
+
+### §11 #11 self-binding satisfied
+
+This CP24 entry is the §11 #11 amendment-log pairing for the §11 #8 three new sub-rules in the coordinated commit set. Bible HEAD bumps from the CP23 commit to the CP24 commit landed alongside this entry. Schema version unchanged (CP24 is §-text + row-local notes-pattern; no migration).
+
+═══════════════════════════════════════════════════════════════════════

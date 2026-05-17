@@ -1,5 +1,5 @@
 {
-  "run_at_utc": "2026-05-17T05:29:25Z",
+  "run_at_utc": "2026-05-17T05:44:11Z",
   "session_tag": "usaspending_deep_admission_2026_05_16",
   "mode": "commit",
   "pre_state": {
@@ -11,8 +11,7 @@
     "procurement_records_count": 46038,
     "procurement_records_max_id": 89521,
     "procurement_confidence_distribution": {
-      "85": 45858,
-      "90": 180
+      "85": 46038
     }
   },
   "steps": [
