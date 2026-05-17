@@ -2977,3 +2977,99 @@ Surfaced by CP25 (queued for future CP candidacy as evidence accumulates):
 This CP25 entry is the §11 #11 amendment-log pairing for the §11 #8 sub-rule + §12 Open Questions supersession + carry-forward observation in the coordinated commit set. Bible HEAD bumps from the CP24 commit to the CP25 commit landed alongside this entry. Schema version unchanged (CP25 is §-text + row-local notes-pattern; no migration).
 
 ═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 26 — SAM.gov cycle-5 day-0 partial fold + `cycle_completion_state` notes_json convention + within-source-FP discipline n=4 codification
+
+**Date:** 2026-05-17
+**Source:** SAM.gov cycle-5 day-0 partial extraction halt at 2026-05-17T14:10:40Z per `~/argus-internal/extraction_outputs/sam_gov_admission/STOP_THE_LINE_rate_ceiling.md`. Seven patch findings accumulated against the v1.1.0 runguide narrative + the CEO-additive §11 carry-forward n-recount surfacing two NEW within-source FP classes at MAC-174 P6 (CourtListener) ratification (BRINC `rico_co_defendant_not_customer_relationship` + BRINC `court_filing_fee_not_contract_value`), bringing cumulative within-source-FP-identification instance count to n=4 ≥ the CP25 §3 carry-forward threshold (n=3 for "dedicated §11 sub-rule codification"). MAC-175 dispatch authorized this CP as the fold target before the SAM.gov sid=50 ingest commit per §S.8 ordered-commit-pair precedent (CP25 + MAC-171 P3, CP24 + MAC-172 rollback).
+**Bible commit:** This entry only. Schema version unchanged (CP26 is §-text + row-local notes-pattern; no schema migration). DB writes that consume CP26 — the SAM.gov sid=50 admission with `cycle_completion_state="partial_pre_day1"` (the first consumer of the new convention) + the 9,623-row cross-source corroboration UPDATE batch (Vigilant 56 + Motorola 9,545 + Genetec 22) + the Genetec manufacturer-enrichment merge — land in the immediately-following MAC-175 ingest commit.
+**Status:** Ratified at MAC-175 dispatch 2026-05-17. CP26 §3 (`cycle_completion_state` vocabulary) is the contract that the SAM.gov sid=50 INSERT writes against; CP26 §1–§7 capture the seven cycle-5 runguide-correction findings; CP26 §8 codifies the within-source-FP discipline as a dedicated §11 sub-rule per n=4 ≥ threshold supersession of CP25 §3 open-status.
+**Binds:** Validator (any future source-admission INSERT whose extraction halted mid-cycle MUST carry `notes.cycle_completion_state` + companion fields per §3 vocabulary; any cross-source corroboration UPDATE batch MUST honor the per-row scoping discipline + audit-trail in `procurement_records.notes` per CP24 sub-rule (b) + CP25 §1 composition); CEO + ExtractionWorker (any future SAM.gov-class API source runguide MUST acknowledge the §2 empirical-ceiling + §3 no-rate-limit-headers + §6 single-token-alias-fanout brittleness as default extraction-runguide §-text discipline anchors); DBArchitect (any future schema-evolution discussion of a structural `cycle_state` column on `sources` is deferred until value-set stabilizes per §3 backward-compat precedent matching CP23 access_mode).
+
+### Why this Correction Pass exists
+
+SAM.gov cycle-5 launched against the v1.1.0 runguide narrative on 2026-05-17 with seven hidden assumptions whose violation halted the run at day-0 after 11 API calls (5 §2.6 endpoint-shape probes + 5 §4 successful vendor queries + 1 §4 429 halt). Five surfaced via mid-run extraction failures; one (single-token alias fanout brittleness) surfaced via the `weak_matches.json` Flock Safety → "Funny Flock Farms LLC" surprise hit; one (snapshot-freshness pre-flight) is a forward-looking discipline anchor for cycle-N≥6 kickoffs already informally agreed but not yet bible-canon. The seven findings need amendment-log codification per §11 #11 so v1.1.0 doc-sweep narrative can reference them by canonical CP citation rather than transient STOP_THE_LINE-doc citations.
+
+In parallel, MAC-174 P6 (CourtListener V4 source admission) ratification surfaced two NEW within-source FP classes at sources.id=48 (BRINC `rico_co_defendant_not_customer_relationship` — 57-co-defendant RICO pro-se suit pattern where vendor co-presence ≠ vendor-customer relationship; BRINC `court_filing_fee_not_contract_value` — $405 amount = 28 USC §1914 filing fee, not vendor contract amount). These compose with the prior CP25 §3 instances (MAC-172 RG5 §3.5 implicit + MAC-171 §C explicit) to push the cumulative within-source FP-identification instance count to n=4. CP25 §3 set the codification threshold at n=3 for "dedicated §11 sub-rule codifying text-pattern match + semantic-relationship validation as a §4 match-scoring default." With n=4 ≥ 3, the threshold is satisfied and CP26 §8 codifies the sub-rule directly per the CP25 §3 prose's stated evolution path.
+
+CP26 also introduces the `cycle_completion_state` notes_json convention as a new discipline anchor: partial-cycle source admissions are first-class explicit states rather than implicit "ingested but incomplete" surfaces. The SAM.gov sid=50 admission is the first consumer (`partial_pre_day1`) and exercises the full companion-field shape (`next_cycle_dispatch_scheduled_for_utc`, `next_cycle_dispatch_runguide_path`, `partial_yield_metrics_at_admission`).
+
+### Corrections applied
+
+1. **UEI correction discipline (CP26 §1, 2026-05-17) — runguide §2.6 probe-template UEI freshness.** v1.1.0 runguide §2.6 cited `ZQ4FBV4F1J88` as the Lockheed Martin probe-template UEI. Empirical SAM.gov query returned 0 records; Lockheed's current registration-resolved UEI is `KM99JJBNQ9M5` (registered 2025-10-23). Forward discipline: §2.6 probe templates MUST cite registration-resolved-as-of-runguide-authoring UEIs, and the runguide §-text MUST carry a freshness disclaimer noting that UEI values can rotate at re-registration. Snapshot freshness pre-flight (§7 below) should refresh the probe UEI before script kickoff for cycle-N≥6.
+
+2. **SAM.gov rate ceiling (CP26 §2, 2026-05-17) — non-Federal individual account class ceiling.** Empirical observation at cycle-5: 5 §2.6 probes + 5 §4 successful queries + 1 §4 429 = 11 requests at first 429. Reset header was `Retry-After: <next UTC-midnight HTTP-date>`, not a delta-seconds value. The likely ceiling is **10 requests per UTC day for non-Federal individual accounts** — matching the lower-bound the operator pre-flagged ("10 requests/day non-Federal vs 1,000/day Federal" caveat). The v1.1.0 runguide's "1,000 req/hour authenticated" assumption is wrong for this account class by ~100×. Forward discipline: any SAM.gov-class API runguide MUST (a) carry the per-account-class empirical ceiling explicitly in §-text, (b) prefer a multi-day-pacing extraction shape over single-session for non-Federal accounts, (c) name the operator-tier-upgrade alternative explicitly so the operator can choose pacing vs key-tier-upgrade before dispatch.
+
+3. **No proactive rate-limit headers (CP26 §3, 2026-05-17) — empirical-ceiling discovery discipline.** SAM.gov v3/entities responses expose `Retry-After` only on 429; no `X-RateLimit-Remaining` / `X-RateLimit-Limit` headers on 200 responses. Forward discipline: any extraction runguide for an API source MUST treat "no rate-limit-introspection headers" as a default-assume rather than default-trust; probe-to-discover ceiling is the safe pattern; documented-ceiling-trust requires explicit empirical validation in a low-stakes probe run before a real extraction.
+
+4. **Operator-manual-queue file format clarification (CP26 §4, 2026-05-17) — consolidated-file convention.** v1.1.0 runguide §3.2 cited per-state breakdown files (`de_candidates.json` / `ca_candidates.json` / `tx_candidates.json`) at `extraction_outputs/us_state_sos_admission/operator_manual_queue/`. The actual on-disk shape from MAC-173 P5 (state SoS admission) is a single consolidated file `extraction_outputs/us_state_sos_admission/operator_manual_queue.json` with a top-level `queue` key. Forward discipline: operator-manual queues are CONSOLIDATED (one file per source admission, not per-jurisdiction breakdown); the consolidated convention composes with the `notes.access_mode="operator_manual_only"` CP23 access-mode value for source-tier surfacing.
+
+5. **NAICS code revision drift (CP26 §5, 2026-05-17) — surveillance-adjacent NAICS list freshness.** The 2022 NAICS revision renumbered Software Publishers from `511210` → `513210`. Genetec's primary NAICS at SAM.gov is `513210`. v1.1.0 runguide §4.5 surveillance-adjacent NAICS list cited the pre-2022 `511210`. Forward discipline: surveillance-adjacent NAICS lists MUST cite the current code-revision; cycle-N runguides citing NAICS codes MUST carry a "live as of NAICS-revision YYYY" disclaimer. SAM.gov NAICS-list adjacency-flagging (`naics_surveillance_adjacency_flagged`) should compose code revisions across versions (e.g., flag both `511210` AND `513210` until pre-2022 references are fully aged out).
+
+6. **Single-token alias fanout brittleness (CP26 §6, 2026-05-17) — alias-as-whole-word match discipline.** Cycle-5 ran a single-token alias fanout for Flock Safety (`aliases[0]='Flock'`) and matched *"Funny Flock Farms LLC"* — a substring-token-match that the operator surfaced as a normalization disagreement (input_normalized="flock safety" vs sam_gov_normalized="funny flock farms"). The match was correctly graded WEAK but exposed a structural brittleness. Forward discipline: alias-fanout for STRONG promotion MUST require either (a) alias-length ≥4 characters with whole-word containment in the candidate's normalized legal name, or (b) full canonical-name match (no fanout). Single-token short-alias fanouts (e.g., 4-letter or less) are permitted only for WEAK staging — never STRONG. The Flock Safety WEAK match is staged to operator-review-queue with `notes.brittle_alias_match=true` carrying this discipline forward.
+
+7. **Snapshot-freshness pre-flight (CP26 §7, 2026-05-17) — cycle-N≥6 kickoff discipline.** Cycle-5's preconditions were partly stale (§3.2 path drift) without the runguide-defined pre-flight catching it; the validator caught it mid-run by inspecting `n=0` for the holds loop. Forward discipline: cycle-N≥6 kickoff templates MUST include a snapshot-freshness pre-flight step that refreshes held-input snapshots (per-state breakdown files, vendor-fanout target lists, probe-template UEIs) against the on-disk consolidated source before script invocation. The pre-flight surfaces as a §0 read-only verification phase in the runguide §-text and emits a "snapshot freshness verified at <UTC-timestamp>" emit-line at kickoff.
+
+8. **§11 #8 sub-rule (CP26 §8, 2026-05-17) — text-pattern match + semantic-relationship validation as default §4 match-scoring step.** Per CP25 §3 carry-forward threshold (n=3 for dedicated §11 sub-rule codification): cumulative within-source FP-identification instance count is now n=4 with MAC-174 P6 surfacing TWO new FP-classes at `sources.id=48.notes.candidate_findings_for_future_cp_or_sar[]`:
+   - `rico_co_defendant_not_customer_relationship` (BRINC pattern — 57+ co-defendants in pro-se RICO suit; vendor co-presence ≠ vendor-customer relationship)
+   - `court_filing_fee_not_contract_value` (BRINC $405 = 28 USC §1914 statutory filing fee, not vendor contract value)
+
+   Combined with prior CP25 §3 instances (MAC-172 RG5 §3.5 implicit cohort + MAC-171 §C explicit walk-through), cumulative n=4 ≥ codification threshold. Per CP25 §3 stated evolution path ("dedicated §11 sub-rule codifying 'text-pattern match + semantic-relationship validation as a §4 match-scoring default' becomes the appropriate codification"), CP26 §8 codifies the sub-rule directly:
+
+   **Sub-rule text (CP26 §8):** Any match-scoring §4 step against a textual source (regulatory filings, judicial filings, news/forum, FOIA documents) MUST validate semantic relationship between the vendor-token and the surrounding-context anchor (customer, contractor, vendor, etc.) BEFORE promoting the match. Text-pattern match (vendor-token co-occurs with agency-token within N-word context) is necessary but NOT sufficient for STRONG promotion. The semantic-validation step MUST be a default §4 sub-step in the runguide §-text — punting to validator-time review is no longer the canonical pattern. Documented FP classes at codification (non-exhaustive; for runguide §-text hints):
+   - Risk-factor-narrative co-occurrence (SSTI×DHS Item 1A: "Members of Congress requested IG investigation" — Congressional reference, not customer)
+   - Compliance-attestation co-occurrence (Rekor×FBI CJIS-compliance certification — regulatory compliance reference, not customer)
+   - Competitor-data-sharing co-occurrence (SSTI×ICE: about competitors' data-sharing practices, not own customer relationship)
+   - Co-defendant co-presence (BRINC pattern: 57-co-defendant pro-se RICO suit — vendor named as defendant, not customer)
+   - Statutory-amount co-occurrence (BRINC $405 = 28 USC §1914 statutory filing fee, not vendor contract value)
+
+   The runguide §-text contract for any future textual-source extraction MUST cite CP26 §8 as the semantic-validation discipline anchor.
+
+9. **`cycle_completion_state` notes_json convention (CP26 §9, 2026-05-17) — partial-cycle source admission explicit state.** New `sources.notes.cycle_completion_state` field with controlled vocabulary:
+
+   | Value | Meaning |
+   |---|---|
+   | (field absent) | source is complete; canonical state (default backward-compat reading) |
+   | `partial_pre_day1` | source admission landed before its first full data sweep completed; explicit incomplete-state flag pending next-cycle dispatch |
+   | `partial_pacing_in_flight` | source is mid-multi-day pacing run; additional data expected in subsequent cycles |
+   | `partial_pacing_exhausted` | source's multi-day pacing terminated short of completion; deferred to future cycle |
+
+   Composition with CP23 `access_mode`: orthogonal — partial completion is a temporal state, access_mode is a mechanism state. The SAM.gov sid=50 case is `access_mode="automated_api"` + `cycle_completion_state="partial_pre_day1"`.
+
+   Companion notes_json fields REQUIRED when `cycle_completion_state` is non-absent:
+   - `next_cycle_dispatch_scheduled_for_utc` — ISO-8601 UTC timestamp of next planned dispatch
+   - `next_cycle_dispatch_runguide_path` — relative path to the dispatch artifact
+   - `partial_yield_metrics_at_admission` — JSON snapshot of yield-at-admission for audit comparison post-completion
+
+   First-class column promotion deferred to a future CP once the value-set stabilizes (per cycle-3 addendum §6 default recommendation matching CP23 `access_mode` precedent). Absent-`cycle_completion_state` is equivalent to "complete" per backward compat — no migration of pre-CP26 sources required.
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — strengthened. CP26 §8 codifies the semantic-validation default that catches text-pattern-match FP-attribution at extraction time rather than validator time; reduces validator-time FP-catching dependency over time.
+- **§11 #7 (no promotion without provenance)** — unchanged; CP26 §3+§4+§9 are provenance-discipline strengthening (forensic-recoverability of partial-cycle state + access-mode + per-row admission shape), not provenance-relaxation.
+- **§11 #8 (no confidence drift upward without corroboration)** — composed with CP24 sub-rules (a)+(b)+(c) and CP25 §1. CP26 §8 is the extraction-time pre-promotion discipline complement to CP24 sub-rule (b)'s lift-audit + CP25 §1's retraction-audit patterns. Same forensic shape (text-pattern vs semantic-relationship): different lifecycle stage (extraction vs validator vs post-validator).
+- **§11 #11 (amendment-log discipline)** — this CP26 entry IS the amendment-log pairing for the §11 #8 sub-rule (CP26 §8) + the seven cycle-5 runguide corrections (CP26 §1-§7) + the `cycle_completion_state` convention (CP26 §9) in the coordinated commit set. Bible HEAD bumps from the CP25 commit to the CP26 commit landed alongside this entry. The MAC-175 SAM.gov ingest commit immediately follows.
+- **§11 #14 (procurement-only never exported to Lynceus)** — orthogonal; CP26 row-local changes on `procurement_records` (corroboration UPDATEs) would not leak to Lynceus exports regardless. CP26 is a bible-fidelity + extraction-discipline correction, not a downstream-consumer impact correction.
+
+### Sequencing post-acceptance
+
+1. **CP26 ratifies at this commit.** Bible HEAD bumps from the CP25 commit to this CP26 commit. Schema version unchanged (21 → 21; CP26 is §-text + row-local notes-pattern; no schema migration).
+2. **MAC-175 ingest commit lands next.** The sid=50 SAM.gov INSERT consumes CP26 §9 as its `cycle_completion_state` write contract. Same commit also carries the 1 manufacturer enrichment merge (Genetec mfg_id=4) + 3 cross-source corroboration UPDATE batches (Vigilant 56 + Motorola 9,545 + Genetec 22, +5 lift each per §8.3 cross-source-not-within-source per CP24 §11 #8) + 2 WEAK + 1 PROBE staged to operator-review-queue + 1 normalization-disagreement audit-append per the dispatch §5 write actions.
+3. **MAC-175 close.** Validator reassigns to CEO with `in_review` after the CP26 commit + MAC-175 ingest commit land; close comment carries the paste-not-cite state-row preamble per §S.7 dispatch-preamble live-state verification.
+4. **Downstream-consumer absorption.** Sibling commits to PROJECT_BIBLE §4 (notes_json conventions block adds `cycle_completion_state` + companion fields) + DATA_DICTIONARY §4.3 (sources.notes vocabulary expansion to include the new `cycle_completion_state` controlled-vocabulary) per S.6.1 worker-autonomous absorption discipline. Both sibling commits land in the same coordinated commit set with the CP26 bible commit (Validator owns the sibling absorption for §-text-only CPs per DBArchitect-style discipline analogue).
+5. **No paired state-rotation commit needed.** PROJECT_STATE.md will refresh organically at the next post-MAC-175 close.
+
+### §12 Open Questions impact
+
+Resolved by CP26:
+- **Within-source FP identification as a dedicated §11 sub-rule** (CP25 §3 carry-forward) — RESOLVED at CP26 §8; n=4 ≥ threshold n=3 satisfies the codification trigger per CP25 §3 stated evolution path. Future textual-source runguides cite CP26 §8 as the semantic-validation discipline anchor.
+
+Surfaced by CP26 (queued for future CP candidacy as evidence accumulates):
+- **Partial-cycle source-admission discipline first-class-column promotion** — gated on `cycle_completion_state` value-set stabilization. Current vocabulary (3 controlled values + absent) is `notes_json`-only per backward-compat precedent matching CP23 `access_mode`. First-class column promotion deferred until at least 2 distinct sources have used non-absent `cycle_completion_state` (precedent: CP23 access_mode promotion is similarly deferred until value-set stabilizes). The SAM.gov sid=50 admission is the first consumer.
+- **Empirical-ceiling-probe runguide template** — CP26 §3's "probe-to-discover ceiling" forward discipline may warrant a dedicated runguide-template §-text fragment that every API-source admission runguide inherits. Discipline-evolution candidate; not codified at CP26.
+
+### §11 #11 self-binding satisfied
+
+This CP26 entry is the §11 #11 amendment-log pairing for the §11 #8 sub-rule (CP26 §8) + the seven cycle-5 runguide corrections (CP26 §1-§7) + the `cycle_completion_state` convention (CP26 §9) in the coordinated commit set. Bible HEAD bumps from the CP25 commit to the CP26 commit landed alongside this entry. Schema version unchanged (CP26 is §-text + row-local notes-pattern; no migration).
+
+═══════════════════════════════════════════════════════════════════════

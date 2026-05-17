@@ -163,6 +163,10 @@ Future runguides MUST consult this CP23 table for the canonical per-table cap. C
 - `notes.session_admission`    — admission session identifier
 - `notes.admission_date_utc`   — admission timestamp
 - `notes.runguide_path`        — path to the authoring runguide
+- `notes.cycle_completion_state` — partial-cycle admission state (CP26 vocabulary below; absent = complete)
+- `notes.next_cycle_dispatch_scheduled_for_utc` — ISO-8601 UTC timestamp of next planned dispatch (required when `cycle_completion_state` is non-absent)
+- `notes.next_cycle_dispatch_runguide_path` — relative path to the dispatch artifact (required when `cycle_completion_state` is non-absent)
+- `notes.partial_yield_metrics_at_admission` — JSON snapshot of yield-at-admission for audit comparison post-completion (required when `cycle_completion_state` is non-absent)
 - per-admission audit fields per the specific runguide's §9 contract
 
 **Registered `notes.license` vocabulary (Correction Pass 23 — initial set; open for future extension):**
@@ -188,6 +192,17 @@ These compose with the per-promoted-identifier canonical sentinel key `notes.ups
 | `operator_manual_only` | All access is operator-manual via browser; automation structurally blocked (CAPTCHA, anti-bot wall, session gates) |
 
 **Discipline guarantees (uniform across access_modes):** per-row provenance discipline + promotion-gate confidence band are IDENTICAL regardless of access_mode. The `access_mode` field is informational/operational only, NOT a confidence modifier. Operator-manual findings carry `notes.fetch_mechanism="operator_manual_browser"` per-row (row-level, complementing the source-level access_mode). Sources admitted prior to CP23 do NOT require backfill — absent-access_mode is equivalent to `automated_api` per backward compat. First-class column promotion deferred to a future CP once the value-set stabilizes (per cycle-3 addendum §6 default recommendation).
+
+**`notes.cycle_completion_state` vocabulary (Correction Pass 26 — SAM.gov cycle-5 day-0 partial fold):**
+
+| Value | Meaning |
+|---|---|
+| (field absent) | Source is complete; canonical state (default backward-compat reading) |
+| `partial_pre_day1` | Source admission landed before its first full data sweep completed; explicit incomplete-state flag pending next-cycle dispatch |
+| `partial_pacing_in_flight` | Source is mid-multi-day pacing run; additional data expected in subsequent cycles |
+| `partial_pacing_exhausted` | Source's multi-day pacing terminated short of completion; deferred to future cycle |
+
+**Composition with `access_mode` (CP26):** orthogonal — partial completion is a temporal state, access_mode is a mechanism state. SAM.gov sid=50 cycle-5 day-0 case is `access_mode="automated_api"` + `cycle_completion_state="partial_pre_day1"`. When `cycle_completion_state` is non-absent, three companion `notes_json` fields are REQUIRED: `next_cycle_dispatch_scheduled_for_utc` (ISO-8601 UTC), `next_cycle_dispatch_runguide_path` (relative path), `partial_yield_metrics_at_admission` (JSON snapshot of yield-at-admission). Absent-`cycle_completion_state` is equivalent to "complete" per backward compat — no migration of pre-CP26 sources required. First-class column promotion deferred until value-set stabilizes per the CP23 `access_mode` precedent (≥2 distinct sources consuming non-absent state).
 
 ### 4.4 Lynceus export mapping
 
