@@ -87,18 +87,39 @@ def polite_get(session: requests.Session, url: str, sleep_sec: float = FCCID_RAT
 
     §6 #4 enforcement: on 429 / 503 with Retry-After, sleep the indicated duration (capped at 60s)
     and retry once before returning the response to caller.
+
+    PC1.8.A: ReadTimeout / ConnectionError now trigger capped exponential backoff (5s, 15s, 45s).
+    If all 3 attempts fail, raise the final exception for the caller to handle (typically
+    treated as a documented_absence at the grantee level rather than a run-wide halt).
     """
     time.sleep(sleep_sec)
-    r = session.get(url, headers={'User-Agent': UA}, timeout=timeout)
-    if r.status_code in (429, 503):
-        retry_after = r.headers.get('Retry-After', '').strip()
-        backoff = 5.0
-        if retry_after.isdigit():
-            backoff = min(float(retry_after), 60.0)
-        logging.warning(f'§6 #4 backoff: http={r.status_code} Retry-After={retry_after!r} sleep={backoff}s url={url}')
-        time.sleep(backoff)
-        r = session.get(url, headers={'User-Agent': UA}, timeout=timeout)
-    return r
+    backoffs = [5.0, 15.0, 45.0]
+    last_exc: Exception | None = None
+    for attempt in range(len(backoffs) + 1):  # 1 initial + 3 retries
+        try:
+            r = session.get(url, headers={'User-Agent': UA}, timeout=timeout)
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError,
+                requests.exceptions.ChunkedEncodingError) as e:
+            last_exc = e
+            if attempt >= len(backoffs):
+                logging.error(f'polite_get final failure for {url}: {type(e).__name__}: {e}')
+                raise
+            sleep_for = backoffs[attempt]
+            logging.warning(f'polite_get {type(e).__name__} on {url} (attempt {attempt+1}/{len(backoffs)+1}); backoff {sleep_for}s')
+            time.sleep(sleep_for)
+            continue
+        # 429 / 503 Retry-After path
+        if r.status_code in (429, 503):
+            retry_after = r.headers.get('Retry-After', '').strip()
+            backoff = 5.0
+            if retry_after.isdigit():
+                backoff = min(float(retry_after), 60.0)
+            logging.warning(f'§6 #4 backoff: http={r.status_code} Retry-After={retry_after!r} sleep={backoff}s url={url}')
+            time.sleep(backoff)
+            r = session.get(url, headers={'User-Agent': UA}, timeout=timeout)
+        return r
+    # Should not reach here (loop either returns or raises)
+    raise last_exc if last_exc else RuntimeError(f'polite_get exhausted retries for {url}')
 
 
 # §6 #8 PII surfacing detector — runs on fccid.io HTML index pages we capture.
@@ -207,13 +228,22 @@ def enumerate_grantee_filings(session: requests.Session, grantee_code: str) -> l
         href = a['href']
         # Match /{GRANTEE}-{PRODUCT} but only for this grantee
         # Patterns observed: href="/{GRANTEE}-{PRODUCT}" or absolute URL
-        m = re.match(rf'^(?:https?://fccid\.io)?/({re.escape(grantee_code)}-[A-Za-z0-9\-_]+)/?$', href, re.IGNORECASE)
+        # PC1.8.A: accept BOTH hyphenated (UXX-S1A415A, 2AO3N-TH39P6ERPI, WLI-L3ALV900)
+        # AND no-hyphen (JAAPW1008, JAA8401-800, JAA2074800 — Motorola Solutions Canada-style)
+        # FCC ID formats. First char after grantee must be hyphen OR alphanumeric (excludes
+        # period to skip .rss, excludes slash to skip /JAA/Internal-Photos/file attachment paths).
+        m = re.match(
+            rf'^(?:https?://fccid\.io)?/({re.escape(grantee_code)}(?:-|[A-Za-z0-9])[A-Za-z0-9\-_]*)/?$',
+            href, re.IGNORECASE,
+        )
         if m:
             full_code = m.group(1).upper()
             if full_code in seen_codes:
                 continue
             seen_codes.add(full_code)
-            product_code = full_code[len(grantee_code) + 1:]
+            # Strip optional leading hyphen from the product code portion
+            after_grantee = full_code[len(grantee_code):]
+            product_code = after_grantee[1:] if after_grantee.startswith('-') else after_grantee
             description = a.get_text(strip=True)[:200]
             filings.append({
                 'fcc_id': full_code,
@@ -1015,6 +1045,23 @@ def run_bulk():
         write_stop_the_line('KeyboardInterrupt', processed_count, expected_total,
                             in_flight_grantee, last_completed_fcc_id, deferred_queue)
         return 5
+
+    except Exception as e:
+        # PC1.8.A: catch-all to preserve state on unhandled crashes (e.g. uncaught network
+        # exception that bypassed polite_get retry chain). Without this, the script dies
+        # with traceback and the operator never gets a BULK_STOP_THE_LINE.md.
+        elapsed_min = (time.time() - start_ts) / 60.0
+        reason = f'unhandled {type(e).__name__}: {e}'
+        logging.exception(f'BULK RUN unhandled exception at {elapsed_min:.1f}min: {reason}')
+        try:
+            persist_deferred_queue(deferred_queue)
+            write_progress(progress_path, processed_count, expected_total, in_flight_grantee,
+                           last_completed_fcc_id, start_ts, manifest, len(deferred_queue))
+            write_stop_the_line(reason, processed_count, expected_total,
+                                in_flight_grantee, last_completed_fcc_id, deferred_queue)
+        except Exception as inner:
+            logging.error(f'state-preservation also failed: {type(inner).__name__}: {inner}')
+        return 6
 
 
 def main():
