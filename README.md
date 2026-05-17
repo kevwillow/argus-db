@@ -29,26 +29,30 @@ python3 argus_cli.py query e4:aa:ea:80:a1:9b       # lookup a Flock Safety ALPR 
 
 The repo ships with `db/argus.db` and the four canonical exports under `exports/` already populated; the read-path needs no `pip install`. See [SETUP.md](SETUP.md) for fresh-DB-init from migrations, source-ingest pipeline dependencies (per-domain pinned in `requirements-vendor-docs.txt` and `requirements-wigle.txt`), optional API keys, and WiGLE-grant gating.
 
-## Status (v1.0.0)
+## Status (v1.1.0)
 
-Argus **v1.0.0** ships at schema_version=19 with:
+Argus **v1.1.0** ships at schema_version=21 with:
 
-- **22,532 active canonical identifiers** + 80 superseded (kept for audit-trail) across 14 user tables
+- **22,533 active canonical identifiers** + 80 superseded (kept for audit-trail) across 14 user tables (net +1 in v1.1.0 from the Johnson Matthey PLC cross-registry promotion)
 - **131 behavioral_signatures** (IMSI-catcher detection heuristics + community-research detector-internal patterns)
 - **133,134 raw observations** with per-row source provenance (every active identifier traceable to at least one source citation)
 - **116,668 deployment_observations** from EFF Atlas of Surveillance + DeFlock with per-row LICENSE column for downstream license-aware filtering
-- **43 upstream sources** across canonical registries, procurement data, academic research, manufacturer documentation, and community-OSINT GitHub repositories
-- **34 surveillance-tech vendors** in the canonical lexicon
+- **50 upstream sources** across canonical registries, procurement data, academic research, manufacturer documentation, community-OSINT GitHub repositories, and (new in v1.1.0) corporate registries, judicial filings, and federal disclosure / entity-registration sources
+- **35 surveillance-tech vendors** in the canonical lexicon
 
 **Coverage is intentionally narrow at this baseline** — do not assume comprehensive coverage of any specific surveillance equipment category. Expansion comes via community contributions and future research waves (see [Known held items](#known-held-items-contribution-welcome) below).
 
 Release cadence: tagged releases when substantive new data, new source families, or schema-impacting changes land. See [CHANGELOG.md](CHANGELOG.md) for the v1.0.0 ledger including the full amendment history and migration ledger 1 → 19.
 
+## What's new in v1.1.0
+
+v1.1.0 adds seven new authoritative data sources — UK Companies House, Delaware / California / Texas Secretary of State, CourtListener, SEC EDGAR, and SAM.gov — expands federal procurement coverage by 2,560 records, and closes the project's first previously-held identifier (Johnson Matthey PLC) by cross-checking against an international corporate-registry source. See [CHANGELOG.md](CHANGELOG.md) for the full v1.1.0 ledger.
+
 ## Twelve device categories
 
 Argus categorizes identifiers per the canonical 12-value vocabulary (enum on the `identifiers.device_category` column):
 
-| Category | What it covers | Example v1.0.0 vendors |
+| Category | What it covers | Example vendors |
 |---|---|---|
 | `alpr` | Automated License Plate Reader systems | Flock Safety, Genetec, Rekor, Vigilant Solutions, Avigilon, Axis Communications |
 | `imsi_catcher` | Cellular IMSI / IMEI / TMSI collection devices | Harris, Digital Receiver Technology, Engility, KeyW, Jacobs, Septier |
@@ -67,7 +71,7 @@ The 12-value enum and per-vendor categorization rationale are documented in [PRO
 
 ## Data sources
 
-Argus integrates data from 43 upstream sources organized across five tiers. Full per-source attribution + upstream-license chain at [CREDITS.md](CREDITS.md).
+Argus integrates data from 50 upstream sources organized across five tiers, including (v1.1.0) UK Companies House, three US-state Secretary-of-State registries (Delaware / California / Texas), CourtListener / RECAP, SEC EDGAR, and SAM.gov Entity Registration. Full per-source attribution + upstream-license chain at [CREDITS.md](CREDITS.md).
 
 **Tier 1 — Canonical allocation registries** (`source_type='primary_registry'`):
 
@@ -80,7 +84,7 @@ Argus integrates data from 43 upstream sources organized across five tiers. Full
 
 - **EFF Atlas of Surveillance** (CC-BY-NC-SA-4.0; NC clause carries forward) — 15,071 deployment_observations
 - **DeFlock** (ODbL-1.0; license-compatible with compilation license) — 101,597 ALPR camera deployment_observations
-- **USAspending.gov + Granicus Legistar** — federal/state/municipal procurement records (43,483 + 3)
+- **USAspending.gov + Granicus Legistar** — federal/state/municipal procurement records (46,040 + 3); v1.1.0 expanded federal coverage by 2,560 records via a deep-extension cycle against USAspending.gov
 - **Wireshark `manuf` file** — community-maintained OUI vendor-name cross-reference
 - **WiGLE.net** — disabled by default in v1.0.0 (gated on user's WiGLE-grant quota; see [SETUP.md](SETUP.md))
 
@@ -98,13 +102,29 @@ Argus integrates data from 43 upstream sources organized across five tiers. Full
 
 22 canonical + 5 secondary-batch GitHub repositories contributing corroborating identifier observations across drone Remote ID, BLE tracker catalogs, IMSI-catcher detection, ALPR-camera profiles, and flock-detection cohorts. Two sources (GainSec anti-crime-ecosystem + GainSec falcon-sparrow-alpr-edl-firehose firmware) operate under the Feist facts-only promotion regime (NO_LICENSE_DECLARED public-but-unlicensed; factual extraction permitted per *Feist v. Rural Telephone Service* 499 U.S. 340 (1991); compilation arrangement NOT republished). Per-row sentinel `notes.upstream_license_posture='NO_LICENSE_DECLARED'` on these promoted rows.
 
+**Tier 1 — Corporate registries** (`source_type='primary_registry'`; v1.1.0):
+
+- **UK Companies House** (OGL-3.0; automated API) — international corporate-entity registry; first non-US primary registry. Used to close the Johnson Matthey PLC #00033774 Class B hold via international cross-check.
+- **Delaware Division of Corporations** (operator_manual_only — CAPTCHA-gated) — US-shaped state registry; documented bounded operator path.
+- **California Secretary of State — Bizfile** (operator_manual_only — Incapsula-gated) — US-shaped state registry; documented bounded operator path.
+- **Texas Secretary of State SOSDirect** (operator_manual_only — paid-tier authentication) — US-shaped state registry; documented bounded operator path.
+
+**Tier 1 — Judicial filings** (`source_type='judicial_filing'`; v1.1.0):
+
+- **CourtListener / RECAP** (Free Law Project; CC0; automated with auth) — judicial-filing corpus for surveillance-procurement and challenge-case enrichment.
+
+**Tier 1 — Federal disclosures** (`source_type='disclosure_filing'` + `'procurement_disclosure'`; v1.1.0):
+
+- **SEC EDGAR** (PUBLIC_DOMAIN; automated HTML parse) — public-company disclosure filings.
+- **SAM.gov Entity Registration** (PUBLIC_DOMAIN; automated API; cycle_completion_state=partial_pre_day1) — federal-procurement entity registry; first cycle landed 9,623 cross-source corroboration updates against existing rows (MAC-175).
+
 ## Output shape
 
-Argus produces five canonical artifacts at v1.0.0:
+Argus produces five canonical artifacts at v1.1.0:
 
 | Artifact | Format | Content | Consumer |
 |---|---|---|---|
-| `db/argus.db` | SQLite | Canonical database (14 user tables; schema_version=19) | direct query / re-derivation |
+| `db/argus.db` | SQLite | Canonical database (14 user tables; schema_version=21) | direct query / re-derivation |
 | `exports/argus_export.json` | JSON | Standard Lynceus export (`{pattern, pattern_type, description, argus_record_id}` per row) | scanner-side watchlist (confidence ≥30) |
 | `exports/argus_export_high_confidence.json` | JSON | High-confidence Lynceus export (same shape, confidence ≥70, `source_type` excludes `crowdsourced`+`inferred`) | scanner-side watchlist (operator-strict) |
 | `exports/argus_export_behavioral_signatures.json` | JSON | Rayhunter-bound sibling export (`{signature_name, cellular_generation, threshold_json, confidence, argus_record_id}` per row) | RF-detection scanners |
@@ -146,7 +166,7 @@ Argus is designed as a producer of detection data for downstream RF-scanner cons
 Argus's v1.0.0 baseline includes several explicitly-documented held items where data is known to exist but is intentionally not yet promoted to canonical state. **These are NOT incomplete data; they are known held items pending the right additional evidence to admit them.** Future contributors may be exactly the right people to help unlock them.
 
 - **31 behavioral_signatures pending second-source corroboration.** IMSI-catcher behavioral patterns surfaced during initial extraction (AIMSICD, eylonK14 IMSI Catcher Detector, and adjacent community-research sources) that have single-source provenance and require independent second-source per the corroboration math. Contribution path: surface a second independent academic/regulatory source citing the same behavioral pattern.
-- **62 Class B sustained holds** (IEEE-derived `raw_observations` with `notes.pii_review_disposition='individual_attributed_pii_sustain'` AND `notes.registry_xcheck_attempted=true`). Under the PII default-to-HOLD rule, individual-shaped names without corporate-entity confirmation stay held. Predominantly: Lumiplan Duhamel ×9 (French digital-signage corporate; no FCC registration), individual-shaped names (Yuval Fichman, Rudy Tellert, Walter Grotkasten, etc.), ~50 unique singletons with no surveillance-tech-vendor or FCC-grantee evidence. Contribution path: surface alternate corporate-entity registry (international corporate registries beyond US FCC) that confirms the entity-class.
+- **61 Class B sustained holds remaining** (down from 62 at v1.0.0; IEEE-derived `raw_observations` with `notes.pii_review_disposition='individual_attributed_pii_sustain'` AND `notes.registry_xcheck_attempted=true`). Under the PII default-to-HOLD rule, individual-shaped names without corporate-entity confirmation stay held. Predominantly: Lumiplan Duhamel ×9 (French digital-signage corporate; no FCC registration), individual-shaped names (Yuval Fichman, Rudy Tellert, Walter Grotkasten, etc.), ~50 unique singletons with no surveillance-tech-vendor or FCC-grantee evidence. **v1.1.0 closed the first of these** (Johnson Matthey PLC #00033774) by cross-checking against UK Companies House — the first international corporate registry integrated into Argus — and promoting the entity-class confirmation. Contribution path: surface alternate corporate-entity registry (international corporate registries beyond US FCC, or US-shaped state Secretary-of-State registries) that confirms the entity-class. Forward-looking on the 61 remaining: 11 carry a US-shaped state Secretary-of-State signal and route to the bounded-operator-path admissions for Delaware / California / Texas SoS (manual lookup; documented in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md)). 3 additional candidates (Vigilant Inactive / Flock Safety brittle / Motorola multi-entity probe) are queued for operator-side SAM.gov review against the v1.1.0 SAM.gov cycle output. Both are bounded operator-side follow-on with documented contribution paths rather than open-ended research; community-contributed alternate-registry citations are welcome regardless.
 - **133 IEEE Private permanent holds** (`pii_review_disposition='ieee_private_registrant_permanent_hold'`). IEEE OUI registrations declared as private at the registry source; cannot confirm ownership. Permanent HOLD by the PII discipline + IEEE-Private rule.
 - **142 round-2 held rows** (107 vocabulary-extension candidates pending future enum extension + 19 behavioral-signature deferred + 15 CVE false-positive entries filed to the conflicts table + 1 attribution-pending Motorola/Vigilant). Contribution path varies per sub-class: vocabulary-extension candidates need a future `identifier_type` enum extension (canonical-bible amendment); deferred behavioral-signature candidates need additional research; Motorola/Vigilant attribution-conflict needs manufacturer-aliasing verification.
 - **Known sources-row metadata discrepancy** — sources 1/2/3/7 carry historic `source_type='regulatory'` metadata pre-dating the source-type taxonomy refinement; identifier-row data is correctly labeled `primary_registry`. Cleanup queued post-ship. Downstream consumers filtering on `sources.source_type='primary_registry'` should also include `sources.id IN (1,2,3,7)` until the cleanup lands.
@@ -176,8 +196,8 @@ External contribution is welcome under the discipline framework codified in [PRO
 - [METHODOLOGY.md](METHODOLOGY.md) — methodology, provenance discipline, source-tier hierarchy, agent-orchestrated build process
 - [DATA_DICTIONARY.md](DATA_DICTIONARY.md) — schema reference for every table, column, and enum value
 - [SETUP.md](SETUP.md) — local install, dependencies, optional API keys
-- [CREDITS.md](CREDITS.md) — upstream attribution + 43 data-source credits + 34-entry surveillance-tech vendor lexicon
-- [CHANGELOG.md](CHANGELOG.md) — version history from v1.0.0 including the full amendment ledger, migration ledger 1 → 19, and pre-v1.0.0 history timeline
+- [CREDITS.md](CREDITS.md) — upstream attribution + 50 data-source credits + 35-entry surveillance-tech vendor lexicon
+- [CHANGELOG.md](CHANGELOG.md) — version history from v1.0.0 → v1.1.0 including the full amendment ledger, migration ledger 1 → 21, and pre-v1.0.0 history timeline
 - [PROJECT_BIBLE.md](PROJECT_BIBLE.md) — discipline architecture (hard rules, device_category vocabulary, Lynceus mapping, export shape)
 - [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) — append-only amendment log with full case-study anchors
 - [LICENSE](LICENSE) / [LICENSE-DATA](LICENSE-DATA) / [LICENSE-DOCS](LICENSE-DOCS) — three license texts (AGPL-3.0-or-later / ODbL-1.0 / CC-BY-SA-4.0) + Argus-specific preambles documenting scope-of-coverage + 3-layer per-row license-posture composition

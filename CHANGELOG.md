@@ -2,6 +2,145 @@
 
 All notable changes to Argus are documented in this file. The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project does not yet adopt semantic-versioning for the dataset shape itself — see "Schema versioning" below for the migration-ledger discipline.
 
+## [v1.1.0] — 2026-05-17
+
+### What's new in v1.1.0
+
+Argus v1.1.0 broadens the project beyond pure equipment-identifier registries and into the corporate, judicial, and procurement records that anchor surveillance vendors to real-world entities. We added **seven new authoritative data sources** (taking the project from 43 sources to 50), **expanded our federal procurement coverage** by 2,560 net-new contract records, and **closed our first held entity** — Johnson Matthey PLC — by cross-checking it against the UK's official corporate registry.
+
+Along the way we found and fixed seven small inconsistencies between our documentation and the actual database schema. These are codified in the amendment ledger so the next round of contributors doesn't trip over the same edges. We also introduced two new operating conventions: an explicit `access_mode` tag for sources we can't auto-scrape in one session (CAPTCHA-walled state corporate registries, paid-tier government databases), and a `cycle_completion_state` tag for sources that take multiple days to fully ingest. Both are described in plain language below.
+
+The headline outcomes for downstream consumers: **22,533 active identifiers** (up from 22,532), **46,043 procurement records** (up from 43,483), **35 manufacturers** in the canonical vendor lexicon (Johnson Matthey is new), and a schema bumped from version 19 to **version 21** via two forward-only migrations.
+
+### New data sources
+
+Seven sources joined Argus in this release, bringing the source count from 43 to 50:
+
+- **UK Companies House** (sid=44) — the United Kingdom's official corporate registry, released under the Open Government Licence v3.0. We use it to confirm the corporate identity of UK-incorporated surveillance vendors against a primary government record. **This source enabled our first Class B hold closure: Johnson Matthey PLC (UK company #00033774), a London-headquartered chemistry and precious-metals firm**, was confirmed via Companies House cross-check and admitted to the canonical 35-entry manufacturer lexicon. Access is fully automated via the Companies House API.
+
+- **Delaware Division of Corporations** (sid=45) — Delaware is the registration state of record for a disproportionate share of US technology companies, so the Delaware corporate registry is a high-leverage source for vendor verification. The state's NameSearch web form is CAPTCHA-gated, so this source is recorded under the new `operator_manual_only` access convention: lookups happen via human-operated browser sessions rather than scripts.
+
+- **California Secretary of State — Bizfile** (sid=46) — California's corporate registry, the second-most-relevant US state for surveillance vendor lookups after Delaware. The Bizfile portal is gated by an Incapsula bot-challenge wall, so this is also an `operator_manual_only` source.
+
+- **Texas Secretary of State SOSDirect** (sid=47) — the Texas corporate registry. Useful for Texas-headquartered surveillance vendors. Access requires paid-tier authentication, so this is again `operator_manual_only`.
+
+- **CourtListener / RECAP (Free Law Project)** (sid=48) — a free, comprehensive judicial filings database covering US federal and state courts. CourtListener surfaces lawsuits, contract disputes, and federal court records that name surveillance vendors as parties. Metadata is dedicated to the public domain under CC0; full-text search requires an authenticated Bearer token.
+
+- **SEC EDGAR** (sid=49) — the US Securities and Exchange Commission's corporate-disclosure filings database. Public companies routinely name their major customers in 10-K annual reports and Item 1A risk-factor narratives; for surveillance vendors that file with the SEC, this lets us corroborate vendor-customer relationships against a primary public-domain regulatory source. EDGAR is automated via HTML parsing.
+
+- **SAM.gov Entity Registration** (sid=50) — the US federal procurement contractor-registration database. SAM.gov is the authoritative source for "is this vendor an active US federal contractor and what are their registered NAICS codes?" — exactly the question that determines whether procurement evidence is admissible. Access is automated via the SAM.gov API. This source is recorded under the new `partial_pre_day1` cycle-completion convention because we hit the SAM.gov non-Federal-individual-account daily rate ceiling (~10 requests/day) before the first full sweep finished. Remaining queries continue across subsequent days; the source row was admitted at first-batch completion.
+
+### Expanded federal procurement coverage
+
+Federal procurement records grew by **2,560 net-new entries** (from 43,483 to 46,043) via a deep-extension pass against USAspending.gov, the canonical federal contract-award database. This nearly closes the previously-known gap between Argus's surveillance-vendor coverage and USAspending's actual surface area for those vendors.
+
+Alongside the new rows, we landed **9,623 cross-source corroborations** from the SAM.gov ingestion cycle. **A corroboration here means: a fact we already had (a vendor's federal contract record) is now independently confirmed against a second, structurally different source (SAM.gov's contractor registration database).** When two independent sources agree on a fact, our confidence in that fact increases, and the corroboration is recorded in a per-row audit trail so downstream consumers can see the evidence chain.
+
+Note for downstream consumers: alongside the +2,560 net-new procurement records, we **rolled 180 procurement_record confidence values back from 90 to 85**. These rows had been corroborated by a second pass against USAspending itself — but that's the same source observed twice, not two independent sources, so the confidence boost wasn't earned. The full audit trail is preserved per row in `notes.confidence_history[]`. This is exactly the kind of self-correction the audit trail is designed to surface.
+
+### Schema changes
+
+Two new migrations landed this release (schema version 19 → 21):
+
+- **Migration 0020 (`source_type_enum_extension`)** — extends the `sources.source_type` enum with three new values (`judicial_filing`, `disclosure_filing`, `procurement_disclosure`) to properly classify the new judicial, SEC, and SAM.gov sources. Previously these would have fallen back silently to the generic `regulatory` bucket; now each source class has its own named tier.
+
+- **Migration 0021 (`procurement_vendor_canonical_normalized`)** — adds a new `procurement_records.vendor_canonical_normalized` column. This is a deterministic, query-friendly normalization of each procurement record's vendor name: lowercased, punctuation stripped, corporate suffixes (`INC`, `CORP`, `LLC`, `LTD`, `PLC`) removed. For example, `'AXON ENTERPRISE, INC.'`, `'Axon Enterprise, Inc.'`, and `'AXON ENT INC'` now all collapse to `axon enterprise`, making cross-validation joins against the manufacturer lexicon dramatically more reliable. The column was backfilled across all 46,043 procurement records.
+
+**What this means for downstream consumers:** check `MAX(version) FROM schema_version` at runtime; it should now read 21. If you query the `sources` table by `source_type`, you may now see three additional enum values. If you join against `procurement_records.vendor_canonical_name`, prefer the new `vendor_canonical_normalized` column instead — same data, dramatically better join semantics across 46k rows.
+
+### New discipline conventions
+
+Two new operating conventions were introduced. Both live in the `sources.notes` JSON field today and are described below in user terms; they may be promoted to first-class schema columns in a future release once the vocabulary stabilizes.
+
+- **`access_mode`** — describes how Argus fetches a given source. Values: `automated_api` (queried via documented API), `automated_html_parse` (scraped from HTML without an anti-bot wall), `automated_with_auth` (automated but requires a token), `mixed_automated_manual` (some candidates automated, some manual), and `operator_manual_only` (all access is via a human-operated browser session, because the source is CAPTCHA-walled, bot-challenged, or otherwise structurally hostile to automation). **Important: the access mode is a mechanism descriptor, not a quality signal.** Operator-manual sources carry identical confidence bands and provenance discipline to automated sources. The four state-registry sources added this release (DE / CA / TX) and three secondary state holds are flagged `operator_manual_only`.
+
+- **`cycle_completion_state`** — describes whether a source's data has been fully ingested or whether ingestion is paced across multiple days. Values: absent (source is complete; default reading), `partial_pre_day1` (admission landed before the first sweep finished), `partial_pacing_in_flight` (multi-day pacing run still active), `partial_pacing_exhausted` (multi-day pacing terminated short of completion). When this field is set, the source row also carries `next_cycle_dispatch_scheduled_for_utc`, `next_cycle_dispatch_runguide_path`, and `partial_yield_metrics_at_admission` so downstream consumers can see exactly where the partial state sits and when the next cycle is scheduled. **SAM.gov (sid=50) is the first consumer**, recorded as `partial_pre_day1`.
+
+### Known limitations + what's coming
+
+Argus's coverage is still **intentionally narrow at this baseline** — broader categories of surveillance equipment remain out of scope. The roadmap below frames what's queued.
+
+**Currently held items:**
+
+- **11 US state Secretary-of-State corporate holds** remain queued for operator-manual review against the DE / CA / TX registries.
+- **Approximately 22 international corporate holds** remain queued. Bounded paths to closure are documented per jurisdiction.
+- **3 operator-review items** surfaced from the SAM.gov ingestion cycle: a Vigilant Solutions inactive-registration probe, a Flock Safety brittle-alias normalization disagreement (Flock Safety vs "Funny Flock Farms LLC"), and a Motorola multi-entity disambiguation probe. All three are staged to the operator-review queue with full audit context.
+
+**Carry-forward from v1.0.0:** the previously-documented v1.0.0 held items (31 behavioral_signatures pending second-source corroboration, 62 Class B sustained holds, 133 IEEE Private permanent holds, 142 round-2 vocabulary candidates) remain held under the same rationale, less the one Johnson Matthey closure this release. The v1.0.0 documented sources-row metadata discrepancy on sources 1/2/3/7 is unchanged.
+
+**Note: a small number of `identifiers.notes` rows contain malformed JSON; downstream consumers using `json_extract()` against this column should fall back to JSON-text-LIKE patterns. Tracked for future fix.**
+
+**Coming next:**
+
+- Continued multi-day SAM.gov ingestion (cycle-6 dispatch scheduled).
+- Continued operator-manual review against state corporate registries to close the 11 remaining US state holds and ~22 international holds.
+- Additional community-source-acquisition waves, deferred from v1.0.0.
+- iOS vendor companion-app coverage, deferred from v1.0.0.
+- Skydio Enterprise alt-channel scope, deferred from v1.0.0.
+
+### Internal architecture notes
+
+This section preserves the discipline-architecture audit trail for the v1.1.0 release in the project's canonical idiom. The narrative is the body above; the ledger below is the binding contract.
+
+**Bible amendment ledger (this release):**
+
+- **CP23** @ bible HEAD ratification — coordinated amendment: wide-net cycle-{1,3,4} schema-contract patches + migrations 0020 + 0021 + downstream-consumer audit. Folds seven schema-contract drift findings (PROJECT_BIBLE.md §4.2 / §4.3 / §8.2 / §8.3 §-text additions; `manufacturers.aliases` comma-string clarification; source_excerpt per-table CHECK constraint cap table; `notes.access_mode` notes_json convention; license-into-notes folding contract; cross-validation column-name normalizations) and the two migrations into a single bible commit per the §11 #11 amendment-log discipline. Source patches: `new data 5.16/schema_contract_patch_cycle3.md`, `new data 5.16/schema_contract_patch_cycle4.md`, `new data 5.16/schema_contract_patch_notes_license.md`.
+- **CP24** @ bible HEAD — §11 #8 within-source-re-extraction sub-rule + CP19 spirit-extension to `procurement_records` row-level audit-trail (`notes.confidence_history[]` convention) + "§5.2 +5 boost" citation hygiene correction. Within-source re-extraction (same upstream registry queried at two times by the same or different extraction sessions) is **not** a "second independent source" for §8.3 lift purposes. Provenance enrichment via `notes.corroborations[]` + `notes.corroboration_sessions[]` stays; confidence does not lift. The 180-row MAC-172 P4 USAspending deep-extension lift rollback (85 → 90 → 85) is the first consumer with full per-row audit-trail.
+- **CP25** @ bible HEAD `2803ae1` — `cross_source_corroboration_reversals[]` audit-trail convention + CP24 §12 `n` recount supersession (SEC EDGAR × USAspending drops 2 → 0 after §11 #1 semantic review of MAC-171 P3 RG5 findings) + within-source-FP discipline-evolution carry-forward. First consumer is the MAC-171 id=86738 reversal UPDATE.
+- **CP26** @ bible HEAD `64f381c` — SAM.gov cycle-5 day-0 partial fold (seven runguide-correction findings: probe-template UEI freshness, empirical rate ceiling, no-proactive-rate-limit-headers extraction discipline, operator-manual-queue file-format clarification, NAICS code revision drift, single-token alias fanout brittleness, snapshot-freshness pre-flight) + `cycle_completion_state` notes_json convention codification + within-source-FP discipline n=4 codification (text-pattern match + semantic-relationship validation as a default §4 match-scoring step). Source patch: `extraction_outputs/sam_gov_admission/STOP_THE_LINE_rate_ceiling.md`.
+
+**Migration ledger entries (cumulative 1 → 21):**
+
+- **0020 `source_type_enum_extension`** (applied 2026-05-17 05:07:17) — `sources.source_type` CHECK enum 10 → 13 values: net-new `judicial_filing`, `disclosure_filing`, `procurement_disclosure`. Per CP23 / cycle-3 §1 finding #2. Table-rebuild per the 0009 / 0015 / 0018 / 0019 precedent. The 3 new bands are sources-tier taxonomy only; identifier-row promotion-pipeline confidence bands (§8.2) are unchanged.
+- **0021 `procurement_vendor_canonical_normalized`** (applied 2026-05-17 05:07:32) — `procurement_records.vendor_canonical_normalized TEXT NOT NULL DEFAULT ''` column + supporting B-tree index. Per CP23 / cycle-3 §1 finding #4 + CEO Path B ruling. Backfill populated all 46,043 rows; collapse ratio 0.9862 (1,157 distinct raw vendor_canonical_name values collapse to 1,141 distinct normalized values). Normalization algorithm canonical reference: `db/normalize_vendor.py::normalize_vendor_name` (pure function).
+
+**MAC issue dispatch references:**
+
+- **MAC-101** — baseline aggregate state (v1.0.0 reference).
+- **MAC-168** — paperclip integration of CP23 (wide-net cycle-{1,3,4} schema-contract patches).
+- **MAC-169 through MAC-174** — admission cycle dispatches (UK Companies House P2; SEC EDGAR P3; USAspending deep-extension P4; state SoS P5; CourtListener V4 P6).
+- **MAC-172** — USAspending deep-extension P4 ingest (+2,560 net-new procurement_records; partial-ratify rollback of the 180-row lift; CP24 codification).
+- **MAC-175** — SAM.gov cycle-5 admission close (sid=50 INSERT + 9,623-row cross-source corroboration UPDATE batch: Vigilant 56 + Motorola 9,545 + Genetec 22; CP26 codification).
+
+**Source-tier license-posture vocabulary additions (CP23):**
+
+- `OGL-3.0` — UK Companies House (sid=44).
+- `PUBLIC_DOMAIN` — SEC EDGAR (sid=49), SAM.gov (sid=50).
+- `US_STATE_PUBLIC_RECORDS` — Delaware / California / Texas SoS (sid=45 / 46 / 47).
+- `CC0` — CourtListener / Free Law Project (sid=48).
+
+All four compose with the pre-existing CP21 `notes.upstream_license_posture` canonical sentinel-key for per-row license-aware downstream consumer filtering. License lives inside `notes_json.license` (the contract refers to this as `notes_json`; the underlying column is `sources.notes` TEXT containing JSON), NOT as a top-level column — codified per the cycle-1 patch finding #1.
+
+**Live-state verification (paste-not-cite per S.7):**
+
+Verified 2026-05-17 against `db/argus.db`:
+
+```
+schema_version              = 21   (0021_procurement_vendor_canonical_normalized,  2026-05-17 05:07:32)
+                                   (0020_source_type_enum_extension,               2026-05-17 05:07:17)
+sources                     = 50   (was 43 in v1.0.0; +7 this release)
+identifiers active          = 22,533  (superseded_by IS NULL; total rows 22,613 incl. 80 superseded)
+procurement_records         = 46,043  (+2,560 net-new this release)
+manufacturers               = 35   (+1: Johnson Matthey PLC, UK CH #00033774)
+behavioral_signatures       = 131  (unchanged)
+source_reclassifications    = 809  (unchanged this MAC-175 close)
+PRAGMA integrity_check      = ok
+```
+
+**Cross-source corroboration accounting (this release):**
+
+- **9,623 cross-source corroboration UPDATEs** landed from the SAM.gov cycle-5 admission (Vigilant 56 + Motorola 9,545 + Genetec 22). All UPDATEs honor CP24 sub-rule (b)'s `notes.confidence_history[]` per-row audit-trail.
+- **180 within-source-reextraction rollbacks** (90 → 85) applied per CP24 §11 #8 sub-rule #1 (the USAspending deep-extension is the same source observed at two times, not a genuinely independent collector). Full per-row audit per CP24 sub-rule (b).
+- **2 RG5 cross-corroboration markers** flagged at MAC-172 P4 ingest; 1 reversed at MAC-171 P3 ratification per CP25 §1 (id=86738; SEC × USAspending pair recount drops 2 → 0). The remaining marker is deferred to operator review pending fuller filing context.
+
+**Open §12 questions surfaced this release (queued for future CP candidacy):**
+
+- `access_mode` first-class column migration — gated on value-set stabilization (~1-2 more cycles of new-source evidence).
+- Partial-cycle source-admission discipline first-class-column promotion (`cycle_completion_state`) — gated on at least 2 distinct sources using non-absent values.
+- Empirical-ceiling-probe runguide template — CP26 §3 candidate.
+- `procurement_reclassifications` audit table promotion — gated on forensic-query pattern emergence at scale (current row-local `notes.confidence_history[]` convention is canonical).
+
+---
 ## [v1.0.0] — TBD release date
 
 ### What's included

@@ -59,16 +59,16 @@ The v1.0.0 schema carries **14 tables** at `schema_version=21`. They group into 
 
 ### §3.4.1 Live row counts
 
-Verified against `db/argus.db` at 2026-05-15T01:57:18Z (`SELECT COUNT(*)` over each table):
+Verified against `db/argus.db` at 2026-05-17 (post-MAC-175 close; `SELECT COUNT(*)` over each table):
 
 | Table | Row count | Notes |
 |---|---:|---|
-| `identifiers` | **22,612** total = **22,532 active** + **80 superseded** | active = `superseded_by IS NULL` |
+| `identifiers` | **22,613** total = **22,533 active** + **80 superseded** | active = `superseded_by IS NULL`; +1 active in v1.1.0 (Johnson Matthey PLC via UK CH) |
 | `raw_observations` | **133,134** | append-only provenance source-of-truth |
-| `sources` | **43** | source registry |
-| `manufacturers` | **34** | vendor metadata lookup |
+| `sources` | **50** | source registry (+7 in v1.1.0: UK CH sid=44; DE/CA/TX SoS sid=45-47; CourtListener sid=48; SEC EDGAR sid=49; SAM.gov sid=50) |
+| `manufacturers` | **35** | vendor metadata lookup (+1 in v1.1.0: Johnson Matthey PLC) |
 | `deployment_observations` | **116,668** | Layer 2 deployment-location records |
-| `procurement_records` | **43,483** | analytical-only (never exported to Lynceus per §11 #14) |
+| `procurement_records` | **46,043** | analytical-only (never exported to Lynceus per §11 #14); +2,560 net-new in v1.1.0 via the MAC-172 USAspending deep-extension |
 | `fcc_grantees` | **50,153** | FCC EAS bulk-load |
 | `council_minutes_matters` | **3** | low-volume per format-fit cap discipline |
 | `wigle_anchor_priority` | **80,697** | pre-computed query priority; WiGLE API integration itself disabled in v1.0.0 pending operator quota grant |
@@ -105,7 +105,7 @@ conflicts.raw_observation_id            → raw_observations.id (CASCADE)
 
 ### §4.1. `identifiers` (Layer 1 canonical)
 
-The canonical Argus identifier table. Every row represents one identifier-to-attribution binding. Row count verified live 2026-05-15T01:57:18Z: **22,532 active** (`superseded_by IS NULL`) + **80 superseded** = **22,612 total**.
+The canonical Argus identifier table. Every row represents one identifier-to-attribution binding. Row count verified live 2026-05-17 (post-MAC-175): **22,533 active** (`superseded_by IS NULL`) + **80 superseded** = **22,613 total** (+1 active in v1.1.0: Johnson Matthey PLC via UK CH cross-registry closure).
 
 #### Columns
 
@@ -124,7 +124,7 @@ The canonical Argus identifier table. Every row represents one identifier-to-att
 | `geographic_scope` | TEXT | no | NULL | Country-level scope: `US`, `EU`, `UK`, `global`, `unknown`, or specific ISO-3166 country code. Default export-time filter: `['US']`. |
 | `first_seen` | DATETIME | no | NULL | UTC timestamp of first ingest. |
 | `last_verified` | DATETIME | no | NULL | UTC timestamp of most-recent re-verification. |
-| `notes` | TEXT | no | NULL | JSON blob carrying per-row metadata. |
+| `notes` | TEXT | no | NULL | JSON blob carrying per-row metadata. **CP24 sub-rule (b) audit-trail conventions:** `notes.confidence_history[]` — required append-only audit-trail when `confidence` is UPDATED post-INSERT; each entry shape `{at_utc, from, to, rationale, dispatch, cp_anchor}`. `notes.corroborations[]` + `notes.corroboration_sessions[]` — provenance enrichment for within-source re-extraction (breadth-not-strength signal; does NOT lift confidence per §11 #8 sub-rule). `notes.cross_source_corroboration[]` — per-row cross-source corroboration markers from genuinely independent collectors (qualifies for §5.2 +5 lift). **CP25 §1 audit-trail convention:** `notes.cross_source_corroboration_reversals[]` — required append-only audit-trail when a `cross_source_corroboration[]` marker is retracted under §11 #1 or §11 #8 review; each entry shape `{at_utc, marker_key, rationale, dispatch, cp_anchor}`. The original corroboration-array entry is REMOVED (not soft-deleted); the reversal-array IS the audit-trail. First consumer: MAC-171 id=86738 SEC×USAspending recount drop. |
 | `superseded_by` | INTEGER | no | NULL | Self-reference FK: if non-NULL, this row was superseded per METHODOLOGY §6.4. Exports filter on `superseded_by IS NULL`. |
 | `paired_identifier_id` | INTEGER | no | NULL | Self-reference FK to a paired identifier per `pair_kind`. |
 | `pair_kind` | TEXT | no | NULL | Enum (4 non-NULL values + NULL per on-disk CHECK constraint): `la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation`. Pairing-discipline values from migration 0012. `static_mac_tracker` is a deferred item (queued for future canonical-bible §-text codification) and is NOT currently in the enum. |
@@ -141,7 +141,7 @@ Indexes follow the standard `idx_<table>_<column>` naming convention; primary lo
 
 ### §4.2. `raw_observations` (provenance source-of-truth)
 
-Provenance layer per METHODOLOGY §7.1. Every promoted `identifiers` row is anchored to one or more `raw_observations` rows. Row count verified live 2026-05-15T01:57:18Z: **133,134**. Append-only invariant: rows do not mutate post-ingest (validator processing updates `processed_at` + `promoted_identifier_id` + `notes` only; never the source-evidence fields).
+Provenance layer per METHODOLOGY §7.1. Every promoted `identifiers` row is anchored to one or more `raw_observations` rows. Row count verified live 2026-05-17 (post-MAC-175): **133,134**. Append-only invariant: rows do not mutate post-ingest (validator processing updates `processed_at` + `promoted_identifier_id` + `notes` only; never the source-evidence fields).
 
 #### Columns
 
@@ -176,7 +176,7 @@ Primary on `(id)`. Additional indexes on `(source_id, source_row_key)` for idemp
 
 ### §4.3. `sources` (upstream source registry)
 
-Source registry. FK target for `raw_observations.source_id`. Row count verified live 2026-05-15T01:57:18Z: **43**.
+Source registry. FK target for `raw_observations.source_id`. Row count verified live 2026-05-17 (post-MAC-175): **50** (+7 in v1.1.0).
 
 #### Columns
 
@@ -189,7 +189,7 @@ Source registry. FK target for `raw_observations.source_id`. Row count verified 
 | `tier` | INTEGER | no | NULL | Tier classification per the canonical-bible source-tier hierarchy. |
 | `last_fetched_at` | DATETIME | no | NULL | UTC timestamp of most-recent fetch. |
 | `last_status` | TEXT | no | NULL | Status of most-recent fetch. |
-| `notes` | TEXT | no | NULL | JSON blob: per-source metadata + license fields. **CP23 license-into-notes folding contract:** `notes.license` + `notes.license_attribution` + `notes.license_posture` + `notes.access_mode` + per-admission audit fields live INSIDE `notes`, NOT as top-level columns. Registered `notes.license` vocabulary (CP23 initial set; not a CHECK constraint, free-form for future extension): `OGL-3.0` (UK Companies House), `PUBLIC_DOMAIN` (US federal-gov per 17 USC §105), `US_STATE_PUBLIC_RECORDS` (DE/CA/TX SoS), `CC0` (CourtListener / Free Law Project), plus per-source declared postures (`MIT`, `AGPL-3.0_declared`, `CC-BY-NC-SA-4.0`, `ODbL-1.0`, `NO_LICENSE_DECLARED`, …). Registered `notes.access_mode` vocabulary (CP23): `automated_api`, `automated_html_parse`, `automated_with_auth`, `mixed_automated_manual`, `operator_manual_only`. Absent-access_mode is equivalent to `automated_api` per backward-compat. **CP26 partial-cycle admission contract:** `notes.cycle_completion_state` controlled vocabulary — `(absent)` (complete; backward-compat default), `partial_pre_day1` (admission before first full sweep — SAM.gov sid=50 cycle-5 day-0 first consumer), `partial_pacing_in_flight` (mid-multi-day pacing), `partial_pacing_exhausted` (pacing terminated short of completion). When non-absent, three companion fields REQUIRED: `next_cycle_dispatch_scheduled_for_utc` (ISO-8601 UTC), `next_cycle_dispatch_runguide_path` (relative path to dispatch artifact), `partial_yield_metrics_at_admission` (JSON snapshot of yield-at-admission). Orthogonal to `access_mode` (temporal-vs-mechanism). First-class column promotion deferred until value-set stabilizes per CP23 `access_mode` precedent. |
+| `notes` | TEXT | no | NULL | JSON blob: per-source metadata + license fields. **CP23 license-into-notes folding contract:** `notes.license` + `notes.license_attribution` + `notes.license_posture` + `notes.access_mode` + per-admission audit fields live INSIDE `notes`, NOT as top-level columns. Registered `notes.license` vocabulary (CP23 initial set; not a CHECK constraint, free-form for future extension): `OGL-3.0` (UK Companies House), `PUBLIC_DOMAIN` (US federal-gov per 17 USC §105), `US_STATE_PUBLIC_RECORDS` (DE/CA/TX SoS), `CC0` (CourtListener / Free Law Project), plus per-source declared postures (`MIT`, `AGPL-3.0_declared`, `CC-BY-NC-SA-4.0`, `ODbL-1.0`, `NO_LICENSE_DECLARED`, …). Registered `notes.access_mode` vocabulary (CP23): `automated_api`, `automated_html_parse`, `automated_with_auth`, `mixed_automated_manual`, `operator_manual_only`. Absent-access_mode is equivalent to `automated_api` per backward-compat. **CP26 partial-cycle admission contract:** `notes.cycle_completion_state` controlled vocabulary — `(absent)` (complete; backward-compat default), `partial_pre_day1` (admission before first full sweep — SAM.gov sid=50 cycle-5 day-0 first consumer), `partial_pacing_in_flight` (mid-multi-day pacing), `partial_pacing_exhausted` (pacing terminated short of completion). When non-absent, three companion fields REQUIRED: `next_cycle_dispatch_scheduled_for_utc` (ISO-8601 UTC), `next_cycle_dispatch_runguide_path` (relative path to dispatch artifact), `partial_yield_metrics_at_admission` (JSON snapshot of yield-at-admission). Orthogonal to `access_mode` (temporal-vs-mechanism). First-class column promotion deferred until value-set stabilizes per CP23 `access_mode` precedent. **`notes.candidate_findings_for_future_cp_or_sar[]` convention (CP25 §3 + CP26 §8):** array-of-objects describing held FP-classes where n<3 occurrences have been observed; held in this field until n≥3 occurrences elevate to a recognized §11 sub-rule. Per-entry shape: `{finding_id, observed_occurrences, first_seen_utc, sources_observed[], note}`. Promotion trail: BRINC `rico_co_defendant_not_customer_relationship` + `court_filing_fee_not_contract_value` entries staged on `sources[sid=48].notes` at MAC-174 P6 pushed the cumulative count to n=4, triggering CP26 §8 codification of "text-pattern match + semantic-relationship validation as default §4 match-scoring step"; held entries remain in the array as the historical audit-trail anchor (append-don't-mutate per source_reclassifications precedent). |
 
 #### Indexes
 
@@ -202,7 +202,7 @@ Primary on `(id)`. Unique on `(name)`.
 
 ### §4.4. `manufacturers` (vendor metadata lookup)
 
-Vendor metadata + alias canonicalization. Row count at v1.0.0: **34**.
+Vendor metadata + alias canonicalization. Row count at v1.1.0: **35** (+1 from v1.0.0: Johnson Matthey PLC, admitted 2026-05-17 via UK Companies House cross-registry closure).
 
 #### Columns
 
@@ -270,7 +270,7 @@ Primary on `(id)`. Unique on `(source_id, source_row_key)` (idempotency). Additi
 
 ### §4.6. `procurement_records` (vendor-agency procurement records)
 
-Vendor-to-agency purchase records. Row count at v1.0.0: **43,483**. Procurement records prove *purchase*, NOT *deployment*; procurement-only records are excluded from the Lynceus export (canonical-only).
+Vendor-to-agency purchase records. Row count at v1.1.0: **46,043** (+2,560 net-new from v1.0.0's 43,483 via the MAC-172 USAspending deep-extension cycle). Procurement records prove *purchase*, NOT *deployment*; procurement-only records are excluded from the Lynceus export (canonical-only).
 
 #### Columns
 
@@ -290,7 +290,7 @@ Vendor-to-agency purchase records. Row count at v1.0.0: **43,483**. Procurement 
 | `confidence` | INTEGER | no | NULL | Integer 0–100 per **CHECK constraint** (`confidence BETWEEN 0 AND 100`). Note: range diverges from `identifiers.confidence` operational cap (99) — procurement records are not subject to the METHODOLOGY §5 humility-margin invariant (identifier-attribution requires the residual-1-of-fabrication-risk margin; procurement records are about contract execution, a discrete event). See §6 confidence-shape divergence sub-section for the cross-table synthesis. |
 | `captured_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of ingest. |
 | `linked_identifier_id` | INTEGER | no | NULL | FK → `identifiers.id` (`ON DELETE SET NULL`). |
-| `notes` | TEXT | no | NULL | JSON blob. |
+| `notes` | TEXT | no | NULL | JSON blob. **CP24 sub-rule (b) audit-trail conventions (spirit-extension to procurement rows):** `notes.confidence_history[]` — required append-only audit-trail when `confidence` is UPDATED post-INSERT; shape `{at_utc, from, to, rationale, dispatch, cp_anchor}`. Live consumer: 180 rows rolled back 90→85 per CP24 strict-independence reading of §11 #8 (the MAC-172 USAspending deep-extension was within-source re-extraction, not cross-source corroboration). `notes.corroborations[]` + `notes.corroboration_sessions[]` — within-source re-extraction provenance enrichment (no confidence lift). `notes.cross_source_corroboration[]` — per-row cross-source corroboration markers from genuinely independent collectors (qualifies for §5.2 +5 lift); 9,623 UPDATEs landed in v1.1.0 from the MAC-175 SAM.gov cycle (Vigilant 56 + Motorola 9,545 + Genetec 22). `notes.cross_source_corroboration_reversals[]` — required audit-trail when a corroboration marker is retracted under §11 #1 or §11 #8 review (CP25 §1). |
 
 #### Indexes
 

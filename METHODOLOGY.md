@@ -32,6 +32,11 @@ Argus organizes sources by **`source_type`**, a schema-level enum that determine
 - **`procurement`** — federal/state/local procurement records: USAspending.gov contract awards, municipal purchase orders, vendor-agency contracts. Confidence band: **70–85** (proves *purchase*, not *deployment*). *v1.0.0 sources: 2 (USAspending.gov spending_by_award API; Granicus Legistar council/legislative-matters API). No active identifiers promoted at v1.0.0.*
 - **`academic`** — peer-reviewed or conference-published research artifacts. Confidence band: **70–90**. *No v1.0.0 sources. Reserved for future ingest of academic-conference papers, thesis artifacts, peer-reviewed catalog publications.*
 - **`foia`** — FOIA-released documents from federal/state/local FOIA requests. Confidence band: **65–85**. *No v1.0.0 sources. Reserved for future ingest of FOIA-released equipment manifests, contract records, and operational documents.*
+- **`judicial_filing`** *(added migration 0020 — CP23, 2026-05-17)* — court records and RECAP-class judicial artifacts (CourtListener V4 admissions). Confidence sub-banding inherits from the `regulatory` band: **80–95**, for promotion-pipeline purposes per CP23's reading that the new bands are source-tier taxonomy only and do not lift any confidence ceiling. *v1.1.0 sources: 1 (sid=48 CourtListener / RECAP via Free Law Project).*
+- **`disclosure_filing`** *(added migration 0020 — CP23, 2026-05-17)* — SEC EDGAR + analogous corporate-disclosure filings (wide-net cycle-1 RG5 admission). Confidence sub-banding inherits from the `regulatory` band: **80–95**. Distinguishes corporate-self-disclosure from equipment-authorization regulatory records (FCC EAS, FAA enforcement orders) which remain under `regulatory` / `official` per their pre-existing classification. *v1.1.0 sources: 1 (sid=49 SEC EDGAR).*
+- **`procurement_disclosure`** *(added migration 0020 — CP23, 2026-05-17)* — supplier-self-disclosure / vendor-side procurement artifacts (SAM.gov). Explicit confidence band: **80–95**. Distinguishes vendor-disclosed contracts (entity-registration self-attestations) from the agency-side bid/award records that the existing `procurement` band covers; the band is lifted above `procurement`'s 70–85 single-source band, but not to `regulatory`'s ceiling, because the disclosure is self-attestation rather than third-party verification. *v1.1.0 sources: 1 (sid=50 SAM.gov Entity Registration).*
+
+**Rationale for the v1.1.0 enum extension** (per CP23 cycle-3 §1 finding #2): these three document-classes did not fit the v1.0.0 ten-value enum cleanly. Routing CourtListener judicial filings or SEC EDGAR corporate disclosures to `regulatory` collapsed taxonomic distinctions that are load-bearing at confidence-band differentiation time — the equipment-authorization registries (FCC EAS, FAA enforcement orders) that anchor the `regulatory` band's 80–95 ceiling should not share their confidence headroom with judicial discovery filings whose evidentiary weight is materially different. Similarly, vendor self-disclosure on SAM.gov needed a distinct band from the generic `procurement` band, which is reserved for agency-side bid/award records; the two source-classes differ in evidentiary footing (self-attestation vs third-party transaction record) and corroboration profile (single-vendor-controlled vs multi-agency-witnessed). The 13-value enum is the post-CP23 canonical state; the new bands are source-tier taxonomy only — the `identifiers.source_type` enum is unchanged at CP23 and identifier rows promoted from sources of these classes still land under the existing §5.1 confidence-band ceilings.
 
 ¹ *IEEE OUI sources are classified as `regulatory` at v1.0.0 ship. The internal project bible specifies `primary_registry` as the canonical destination band; reclassification of the IEEE OUI source rows is a documented post-v1.0.0 batch task.*
 
@@ -102,6 +107,28 @@ The three-category split makes the export contract explicit: a wire-observable r
 
 Consumers building integrations should anchor on the `identifier_type` column when deciding match logic. A row with `identifier_type='product_family_codename'` is a vendor-internal taxonomy label; matching against device traffic is structurally undefined. A row with `identifier_type='mac_range'` requires range-expansion logic on the consumer side or use of the pre-expanded Lynceus shape.
 
+### §4.4 Match-scoring discipline for short-name vendors against text-pattern sources (CP26 — 2026-05-17)
+
+Match-scoring against textual sources (regulatory filings, judicial filings, news/forum, FOIA documents, vendor-disclosure narratives) is structurally different from match-scoring against structured-API sources. Text-pattern match — vendor-token co-occurs with agency-token within an N-word window — is necessary but NOT sufficient for STRONG promotion when the vendor name is short (≤6 characters or single-word) or shares vocabulary with non-vendor surface forms (given names, common adjectives, statutory-amount idioms).
+
+**Per CP26 §8** (n=4 codification, 2026-05-17): any match-scoring §4 step against a textual source MUST validate the semantic relationship between the vendor-token and the surrounding-context anchor (customer, contractor, vendor, defendant, etc.) BEFORE promoting the match. The semantic-validation step is a default §4 sub-step — punting to validator-time review is no longer the canonical pattern.
+
+**Anchored case studies:**
+
+- **Berla collision** (cycle-3 RG3 CourtListener): the vendor token `Berla` (5 chars, single-word) STRONG-matched against CourtListener's `"Berla Kay Strong v. Thomas Wesley Strong"` — a family-court matter where "Berla" is a given name, not the digital-forensics vendor. Three cases STRONG-matched on text-pattern; zero survived semantic-relationship validation.
+- **Flock single-token-alias fanout** (SAM.gov cycle-5, the finding that surfaced the n=4 threshold): the alias fanout for Flock Safety (`aliases[0]='Flock'`, 5 chars) matched `"Funny Flock Farms LLC"` on whole-word substring containment in the candidate's normalized legal name. The match was correctly graded WEAK at staging — surfacing the structural brittleness — but exposed that single-token short-alias fanouts are not safe for STRONG promotion without additional semantic-relationship triangulation (vendor ↔ product-family ↔ NAICS adjacency, or vendor ↔ contracting-agency ↔ contract-value coherence).
+
+**Disambiguation options** (in declining preference, per §6.7 + CP26 §8 composition):
+
+1. **Co-occurrence filter** — require the matched query token to appear alongside another vendor-specific token (product-family name, industry-anchor term, NAICS-adjacent vocabulary) within N words. Cheapest at extraction time; runs against the source's own returned snippet/description.
+2. **Entity-type tagging** — if the source exposes party-role metadata (defendant vs plaintiff, corporate vs natural-person, contractor vs co-defendant), filter to corporate-party-only or contractor-party-only matches. Source-dependent; CourtListener V4 exposes `party[]` at the docket level; SAM.gov exposes entity-type at the registration level.
+3. **Semantic-relationship triangulation** — vendor ↔ product-family ↔ NAICS coherence check (e.g., a short-name vendor matched against an agency without surveillance-adjacent NAICS overlap fails the triangulation regardless of text-pattern co-occurrence; alias-length ≥4 chars with whole-word containment is necessary but not sufficient for STRONG promotion per CP26 §6).
+4. **Operator review of WEAK/STRONG candidates** for short vendor names (≤6 chars or single-word) before promotion — manual fallback when (1)–(3) are not available.
+
+**Documented FP classes at codification** (CP26 §8; non-exhaustive, for runguide §-text hints): risk-factor-narrative co-occurrence, compliance-attestation co-occurrence, competitor-data-sharing co-occurrence, co-defendant co-presence (BRINC 57-co-defendant pro-se RICO pattern), statutory-amount co-occurrence (BRINC $405 = 28 USC §1914 filing fee, not vendor contract value).
+
+The discipline composes with §6.7 (short-vendor-name disambiguation at the dedup-pass layer): §4.4 catches short-name FPs at extraction time; §6.7 catches them at dedup time when the extraction-side filter has already passed. Both gate against premature confidence-band assignment.
+
 ## §5. Confidence model
 
 Argus assigns a numeric `confidence` to every row in the `identifiers` table — an integer representing the strength of the evidence binding the identifier to its claimed attribution (manufacturer, device category, operator, deployment-locality fact). Downstream consumers use this value to threshold what enters scanner watchlists, what enters the analytical export only, and what stays staged for review.
@@ -117,6 +144,9 @@ Each row's default confidence sits within the source-type's band, per the table 
 | `official` (court-verifiable government filings — FCC EAS, FAA enforcement orders, court-ordered disclosures) | 90–100¹ |
 | `primary_registry` (authoritative numerical-allocation registries — see §5.3 sub-banding) | 70–85 single-source; up to 95 with cross-band corroboration |
 | `regulatory` (gov't filings + court order text — non-`official`-tier regulatory provenance) | 80–95 |
+| `judicial_filing` (CourtListener / RECAP-class judicial records — CP23, added 2026-05-17) | Inherits `regulatory` sub-banding: 80–95 |
+| `disclosure_filing` (SEC EDGAR + corporate-disclosure filings — CP23, added 2026-05-17) | Inherits `regulatory` sub-banding: 80–95 |
+| `procurement_disclosure` (SAM.gov + vendor-side procurement self-disclosure — CP23, added 2026-05-17) | 80–95 (distinct from generic `procurement` band per §3 rationale) |
 | `manufacturer_doc` (vendor spec sheet, datasheet, integration guide) | 75–90 |
 | `manufacturer_app` (vendor companion APK/IPA static-analysis extract — see §5.4 sub-banding) | 60–95, sub-banded by identifier class |
 | `procurement` (SAM.gov, USAspending.gov, state portals) | 70–85 (proves *purchase*, not *deployment*) |
@@ -136,6 +166,14 @@ When two independent sources independently attest the same identifier-to-attribu
 Two independent `crowdsourced` sources at 70 each corroborate to a single canonical row at 75. A `crowdsourced` at 70 plus a `regulatory` at 90: the boost formula yields `min(99, max(70,90)+5) = 95`, but §5.6's ceiling rule caps confidence at the lowest contributing band ceiling — `crowdsourced`'s 75. Final canonical confidence: **75**. See §5.6 for the ceiling-rule rationale.
 
 The +5 boost is a single bonus per dedup pass, not compounding per additional source; a row corroborated by five sources gets +5 once, not +25. The corroboration boost composes within the §5.6 ceiling rule, never over it.
+
+**Within-source re-extraction is NOT cross-source corroboration (CP24 §11 #8 sub-rule, 2026-05-17).** Re-querying the same upstream registry at two different times — whether under the same extraction session or a deeper-extension session against the same API — does NOT satisfy the §5.2 / §6.3 independence test for the +5 corroboration boost. Re-extraction validates extraction-time fidelity, coverage breadth, and upstream-record persistence; it does NOT independently confirm the underlying fact. The +5 lift requires a genuinely independent collector — different upstream registry, different methodology. Within-source re-extraction merges provenance into `notes.corroborations[]` (a breadth-not-strength signal); confidence does not lift. The canonical evidence at codification: the MAC-172 USAspending deep-extension session lifted 180 procurement_records rows 85→90 under a misreading of §11 #8; CEO ratification (Read B) rolled all 180 rows back to confidence=85, preserving the provenance merge and the `notes.corroboration_sessions[]` session-tag audit-trail. Future deeper-extraction runguides MUST classify their outputs as "provenance enrichment cycle" (within-source re-extraction; notes-only merge; no lift) vs "cross-source corroboration cycle" (genuinely independent collector; +5 lift via §5.2 within the §5.6 ceiling) at runguide §-text time.
+
+**Citation hygiene (CP24, 2026-05-17):** the "+5 boost" formula `confidence_canonical = min(99, max(confidence_originals) + 5)` is anchored in METHODOLOGY §5.2 (this document's internal heading); the bible-side canonical anchor is PROJECT_BIBLE.md §8.3 + §11 #8. Forward-looking handoffs, runguides, and dispatch templates cite "§8.3 + §11 #8" for the corroboration-lift rule; the METHODOLOGY-internal "§5.2" heading remains valid as a cross-document reference within this document's structure.
+
+**N-occurrence promotion threshold (CP25, 2026-05-17):** a false-positive class (FP-class) surfaced during validator-time review is eligible for promotion to a recognized confidence-band-affecting discipline after n=2 independent corroborations (was implicit prior to CP25; now explicit). The threshold composes with the §11 sub-rule codification path codified at CP25 §3: at n=2 the FP-class is captured at `sources.notes.candidate_findings_for_future_cp_or_sar[]`; at n=3 the FP-class is eligible for dedicated §11 sub-rule codification; at n≥4 the codification trigger is mandatory (CP26 §8 codification path).
+
+**Text-pattern n=4 codification (CP26 §8, 2026-05-17):** a text-pattern match against any §3 source-type becomes a default-strength corroboration ONLY after n=4 independent occurrences combined with semantic-relationship validation per §4.4. Below n=4, text-pattern matches against textual sources stage to operator-review-queue rather than promoting at default strength; the codification follows the CP25 §3 stated evolution path from "carve-out observed in one dispatch" (n=1) → "candidate sub-rule queued at `notes.candidate_findings_for_future_cp_or_sar[]`" (n≥2) → "dedicated §11 sub-rule codified" (n≥3, mandatory at n≥4).
 
 ### §5.3 `primary_registry` — single-source-sufficient with sub-band
 
@@ -185,6 +223,24 @@ A `regulatory` (ceiling 95) row corroborated by a `crowdsourced` (ceiling 75) ro
 Argus does not run a Bayesian update over heterogeneous evidence sources. The confidence model is a deliberately simple calibration scheme — source-type band + corroboration boost + per-class sub-bands + ceiling rule — chosen for auditability over expressiveness. A reader of the database can reproduce any row's confidence from its `source_type`, its corroboration count, and the §5.2/§5.4/§5.6 rules, without consulting opaque internal weights. The trade-off is real: the scheme cannot represent fine-grained per-source reliability differences within a band, and corroboration is treated as a single +5 boost rather than a more nuanced per-pair weighting.
 
 Future-version refinements (per-source-class reliability priors, identifier-class-specific corroboration boosts, decay-over-time models) are out of scope for v1.0.0. The auditable simple-calibration model ships first; refinements gate on a documented operator-class need.
+
+### §5.8 Cross-source corroboration audit-trail discipline (CP25 — 2026-05-17)
+
+Per CP25 §1, any retraction of a previously-recorded cross-source corroboration marker MUST leave a parallel forensic-trail entry. The convention applies to both the `identifiers.notes` JSON (for promoted-row corroboration markers) and the `procurement_records.notes` JSON (for procurement-record corroboration markers per CP24 sub-rule (b) spirit-extension).
+
+**`cross_source_corroboration_reversals[]` array convention:** when a `notes.cross_source_corroboration[]` marker is retracted post-validation under §11 #1 or §11 #8 review, the retraction MUST append a parallel `notes.cross_source_corroboration_reversals[]` array entry in the same transaction as the corroboration-array UPDATE. Each reversal entry carries five required keys:
+
+- `at_utc` — ISO-8601 timestamp of the reversal UPDATE
+- `marker_key` — the original `cross_source_corroboration[]` entry's `marker_key`, copied verbatim (preserves forensic recoverability without scanning the live corroboration-array)
+- `rationale` — short prose citing the §11 hard rule that triggered the retraction + the §-anchor evidence
+- `dispatch` — the MAC-NNN issue identifier of the retracting dispatch
+- `cp_anchor` — canonical CP citation (e.g., `"CP25 §1"`)
+
+The original `notes.cross_source_corroboration[]` entry is REMOVED from the array (not soft-deleted; the reversal-array IS the audit-trail). For forensic-grade traceability, any historical 85→90→85 confidence transition that traces to a now-retracted cross-source corroboration is reconstructable by joining the reversal-array entry's `marker_key` to the row's separate `notes.confidence_history[]` audit-trail (CP24 sub-rule (b) — every `procurement_records.confidence` UPDATE outside of initial INSERT appends a `{at_utc, from, to, rationale, dispatch, cp_anchor}` entry).
+
+**Composition:** §5.8 (retraction-audit) is the complement to CP24 sub-rule (b)'s lift-audit pattern. The two are parallel: lift-audit answers "when did confidence go up and why?"; retraction-audit answers "when was a corroboration marker pulled and why?". Same forensic shape, different trigger.
+
+**Live discipline applied this release:** the 90→85 confidence rollback discipline (CP24 strict-independence reading of §11 #8) was applied to 180 `procurement_records` rows that had been lifted by a within-USAspending re-extraction misread; each rolled-back row carries a `notes.confidence_history[0]` audit entry citing CP24. The MAC-171 id=86738 cross-source corroboration retraction (Congressional IG-investigation reference erroneously read as a customer-relationship attestation) is the first consumer of the §5.8 reversal-array convention.
 
 ## §6. Dedup logic
 
@@ -297,6 +353,16 @@ Every active `identifiers` row in Argus is anchored to one or more rows in `raw_
 
 The `identifiers` table is *derived* from `raw_observations` via the dedup pass (§6) and the promotion pass. A row in `identifiers` can always be reconstructed from its `raw_observations` lineage; the inverse is not true. When provenance reconciliation surfaces a discrepancy (a canonical row's claimed source no longer matches the underlying `raw_observations` excerpt), the canonical row is treated as drifted and routed to the `conflicts` table for re-evaluation — `raw_observations` is the source of truth, not `identifiers`.
 
+**Per-table source_excerpt CHECK constraint actuals** (CP23 — 2026-05-17, DB-verified against `db/argus.db` post-migration 0020). The cycle-3 patch §1 finding #3 source_excerpt cap claims have been superseded by DB-verified actuals; the CP23 table below is the canonical reference:
+
+- `identifiers.source_excerpt` — `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)`. The cap is the live state post-0001 initial schema + the CP14 batch rebuilds (each rebuild preserved the 200-char ceiling).
+- `procurement_records.source_excerpt` — `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)`.
+- `council_minutes_matters.source_excerpt` — `CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200)` (verified at CP23; cycle-3 finding #3 had this as TBD-verify).
+- `raw_observations.source_excerpt` — **NO CHECK constraint** (plain TEXT). App-level enforcement at 200 chars via the `db/sources/vendor_docs.py::raise_on_overflow` path; the column itself does not carry a length CHECK at the schema level. This is DB-truth at CP23; cycle-3 finding #3 had claimed ≤500.
+- `behavioral_signatures` — **the `source_excerpt` column does not exist**. Provenance for behavioral signatures is captured via `source_id` + `source_file_relative` + `source_line` + `evidence_json` per the migration 0010 schema. This is DB-truth at CP23; cycle-3 finding #3 had this as TBD-verify.
+
+Future runguide §-text MUST consult the CP23 BIBLE_AMENDMENTS.md cap table for the canonical per-table cap; the cycle-3 patch document is legacy schema-truth-as-of-2026-05-16-with-known-drift on this single sub-item.
+
 ### §7.2 `source_url` must be working at ingest time and preserved verbatim
 
 Every `raw_observations` row must carry a `source_url` that:
@@ -350,6 +416,39 @@ Operational mechanics:
 - The `BIBLE_AMENDMENTS.md` log is append-only in practice (entries are never rewritten); historical entries preserve the project's evidentiary trail even as the live bible text evolves.
 
 The discipline composes with §7.1 (`raw_observations` as source-of-truth): the bible amendment log is to the bible what `raw_observations` is to `identifiers` — the immutable evidence record from which the live document is derived.
+
+### §7.7 `sources.notes` is JSON; controlled-vocabulary conventions (CP23 + CP26 — 2026-05-17)
+
+The `sources.notes` column holds free-form TEXT that the runguide-validator contract treats as JSON. Per the cycle-1 wide-net finding #1 formalized at CP23 §11, **license metadata lives inside `notes_json.license`, not as a top-level column on `sources`**; the canonical sources-row JSON contract carries top-level keys `name`, `url`, `source_type`, `tier`, `notes_json`, `last_fetched_at`, `last_status`. The translator script `extraction_outputs/_tooling/translate_license_to_notes.py` (cycle-1 patch §2) covers retroactive translation of any already-staged outputs authored before CP23.
+
+**`notes_json.access_mode` convention (CP23, 2026-05-17).** Controlled vocabulary for how a source is fetched at extraction time. Initial set (open for future extension; first-class-column promotion deferred until value-set stabilizes per the cycle-3 addendum §6 default recommendation):
+
+- `automated_api` — source queried via documented API; end-to-end automated
+- `automated_html_parse` — source queried via automated HTML scraping; no anti-bot wall
+- `automated_with_auth` — automated, but requires API key / token / user-agent
+- `mixed_automated_manual` — some candidates automated, some operator-manual (e.g., the intl_registries cycle-2 mix)
+- `operator_manual_only` — all access is operator-manual via browser; automation structurally blocked (CAPTCHA, anti-bot wall, session gates)
+
+Discipline guarantees (uniform across access modes): per-row provenance discipline + promotion-gate confidence band are IDENTICAL regardless of `access_mode`. The field is informational/operational only, NOT a confidence modifier. Operator-manual findings carry `notes.fetch_mechanism="operator_manual_browser"` per-row (row-level, complementing the source-level `access_mode`). Sources admitted prior to CP23 do NOT require backfill — absent-`access_mode` is equivalent to `automated_api` per backward-compat.
+
+**`notes_json.cycle_completion_state` convention (CP26, 2026-05-17).** Controlled vocabulary for whether a source admission landed mid-cycle vs at canonical completion. The field is absent for the canonical-complete state (the default backward-compat reading); non-absent values are explicit incomplete-state flags:
+
+- (field absent) — source is complete; canonical state (default backward-compat reading)
+- `partial_pre_day1` — source admission landed before its first full data sweep completed; explicit incomplete-state flag pending next-cycle dispatch
+- `partial_pacing_in_flight` — source is mid-multi-day pacing run; additional data expected in subsequent cycles
+- `partial_pacing_exhausted` — source's multi-day pacing terminated short of completion; deferred to future cycle
+
+Composition with `access_mode`: orthogonal — `cycle_completion_state` is a temporal state, `access_mode` is a mechanism state. The first consumer (CP26 §3 reference): the SAM.gov sid=50 admission carries `access_mode="automated_api"` + `cycle_completion_state="partial_pre_day1"` per the cycle-5 day-0 rate-ceiling halt.
+
+**Companion fields REQUIRED when `cycle_completion_state` is non-absent** (per CP26 §9):
+
+- `next_cycle_dispatch_scheduled_for_utc` — ISO-8601 UTC timestamp of the next planned dispatch
+- `next_cycle_dispatch_runguide_path` — relative path to the dispatch artifact
+- `partial_yield_metrics_at_admission` — JSON snapshot of yield-at-admission for post-completion audit comparison
+
+First-class column promotion deferred to a future CP once the `cycle_completion_state` value-set stabilizes (per CP23 `access_mode` precedent: deferred until at least 2 distinct sources have exercised non-absent values).
+
+**`notes_json.candidate_findings_for_future_cp_or_sar[]` convention (CP25 §3 + CP26 §8 composition).** For n<3 held FP-classes — false-positive classes surfaced at validator-time but below the n=3 threshold for dedicated §11 sub-rule codification — the per-source `notes.candidate_findings_for_future_cp_or_sar[]` array carries the held instances pending threshold-met carry-forward. The convention preserves the discipline-evolution audit-trail across CPs without prematurely codifying a sub-rule that lacks recurrence evidence. CP25 §3 originating evidence (cumulative n=2) was held in this array until CP26 §8 codification at n=4. The array is the canonical placement for between-codification-cycles FP-class staging.
 
 ## §8. Build process and agent-orchestrated disclosure
 
