@@ -122,8 +122,14 @@ def polite_get(session: requests.Session, url: str, sleep_sec: float = FCCID_RAT
     raise last_exc if last_exc else RuntimeError(f'polite_get exhausted retries for {url}')
 
 
-# §6 #8 PII surfacing detector — runs on fccid.io HTML index pages we capture.
-# Attachment PDFs are NOT scanned in §3 (they stay raw; §4 does extract+PII-strip).
+# §6 #8 PII surfacing detector — applies to PDF documents fetched in §3.3 (test
+# reports, internal photos with embedded text). Per PC1.8.B framing fix, HTML
+# index pages are EXPLICITLY out of §6 #8 scope: fccid.io renders the FCC EAS
+# compliance-contact block (corporate compliance officer email + phone + fax)
+# on every filing by regulator design — structural PII, not exceptional. The
+# §3-prep summary's earlier extension to HTML pages would halt on essentially
+# every grantee; PC1.8.B drops the HTML scan and relies on §4.5 source_excerpt
+# PII-strip for the staging-JSON persistence boundary.
 PII_REGEXES = {
     'email': re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),
     'us_phone': re.compile(r'\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b'),
@@ -138,6 +144,44 @@ PII_ALLOWLIST = {
     'argus-research@example.com',
     'argus-research/1.0',
 }
+
+
+# §4.5 source_excerpt PII-strip pass (PC1.8.B.2). Silently strips structural-PII
+# patterns at the staging-JSON persistence boundary before any raw_observations
+# row's source_excerpt is written. Distinct from §6 #8 (which halts on
+# exceptional PDF-cover-page surfaces). Both layers stay active in §4.
+PII_STRIP_PATTERNS = {
+    'email':      re.compile(r'[\w\.-]+@[\w\.-]+\.\w+'),
+    'phone_us':   re.compile(r'\b\(?(?:[2-9][0-8][0-9])\)?[-.\s]?(?:[2-9][0-9]{2})[-.\s]?(?:[0-9]{4})\b'),
+    'phone_intl': re.compile(r'\+\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}'),
+    'badge_id':   re.compile(r'\b(?:Badge|Star|ID)\s*#?\s*\d{1,6}\b', re.IGNORECASE),
+}
+PII_STRIP_TOKENS = {
+    'email':      '<REDACTED_EMAIL>',
+    'phone_us':   '<REDACTED_PHONE>',
+    'phone_intl': '<REDACTED_PHONE>',
+    'badge_id':   '<REDACTED_BADGE>',
+}
+
+
+def pii_strip_excerpt(excerpt: str) -> tuple[str, dict]:
+    """§4.5 strip-pass: replace PII patterns with placeholders; return (redacted, counts).
+
+    counts dict: {email, phone_us, phone_intl, badge_id, total}. The total is for the
+    notes.pii_redactions_applied_to_excerpt field; >10 should set
+    notes.pii_dense_excerpt_warning=true.
+    """
+    counts = {'email': 0, 'phone_us': 0, 'phone_intl': 0, 'badge_id': 0, 'total': 0}
+    out = excerpt
+    for kind, rx in PII_STRIP_PATTERNS.items():
+        token = PII_STRIP_TOKENS[kind]
+        # Count matches first, then substitute (so count reflects pre-substitution state)
+        n = len(rx.findall(out))
+        if n:
+            counts[kind] = n
+            counts['total'] += n
+            out = rx.sub(token, out)
+    return out, counts
 
 
 def scan_for_pii(text: str, context: str) -> list[dict]:
@@ -838,13 +882,13 @@ def process_one_filing(session: requests.Session, filing: dict, manifest: dict,
         # Surface but don't halt unilaterally; let CEO surface_at_handoff catch
         am['high_attachment_count_flag'] = True
 
-    # §6 #8 PII scan on fccid.io HTML
+    # PC1.8.B: HTML PII scan REMOVED from this loop. fccid.io filing pages
+    # render the FCC EAS compliance-contact block structurally on every filing;
+    # halting on each would prevent the run. §6 #8 (PDF-only post-PC1.8.B)
+    # remains armed for §4 extraction's pdftotext-converted text. Staging-JSON
+    # source_excerpt PII is handled by §4.5's pii_strip_excerpt at write time.
     fccid_html_path = RAW_FCCID / fcc_id / 'index.html'
     fccid_html = fccid_html_path.read_bytes()
-    pii_hits = scan_for_pii(fccid_html.decode('utf-8', errors='ignore'), context=f'fccid_io_html:{fcc_id}')
-    if pii_hits:
-        append_pii_finding(pii_hits)
-        raise HaltError(f'§6 #8 PII surfaced on fccid.io HTML for {fcc_id}: {len(pii_hits)} hit(s); see pii_surface_audit.json')
 
     # §3.3 — fetch attachments up to per-FCC-ID cap
     fetched_count = 0
@@ -906,68 +950,111 @@ def run_bulk():
     processed_count = 0
     expected_total = 0  # known after enumeration
 
+    enumeration_state_path = WORK_DIR / 'enumeration_state.json'
+    stream_b_documented_absences: list[str] = []
+    stream_b_oversize_halts: list[tuple[str, int]] = []
+    stream_b_unique: list[str] = []
+
     try:
         # ============================================================
-        # Phase 1: Stream A grantee enumeration → FCC ID collection
+        # PC1.8.B resume: skip Phase 1+2 if enumeration_state.json exists
         # ============================================================
-        stream_a_codes = load_stream_a_targets()
-        logging.info(f'Phase 1: Stream A enumeration ({len(stream_a_codes)} grantees)')
-        for gc in stream_a_codes:
-            in_flight_grantee = gc
-            check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
-            filings = enumerate_grantee_filings(session, gc)
-            all_filings.extend(filings)
-            logging.info(f'  Stream A {gc}: +{len(filings)} FCC IDs (cumulative {len(all_filings)})')
+        if enumeration_state_path.exists():
+            cached = json.loads(enumeration_state_path.read_text())
+            all_filings = cached['all_filings']
+            stream_b_documented_absences = cached.get('stream_b_documented_absences', [])
+            stream_b_oversize_halts = [tuple(x) for x in cached.get('stream_b_oversize_halts', [])]
+            stream_b_unique = cached.get('stream_b_unique', [])
+            expected_total = len(all_filings)
+            logging.info(f'Phase 1+2 SKIPPED: loaded cached enumeration state '
+                         f'(all_filings={expected_total}, cached_at={cached.get("cached_at_utc")}, '
+                         f'stream_b_zero_yield={len(stream_b_documented_absences)==len(STREAM_B_VENDORS)})')
+            write_progress(progress_path, processed_count, expected_total, in_flight_grantee,
+                           last_completed_fcc_id, start_ts, manifest, len(deferred_queue))
+            stream_b_grantees_resolved = stream_b_unique  # for stream_b_audit.json downstream
+            # Skip directly to Phase 3 via 'goto'-equivalent: jump past Phase 1+2 block
+            goto_phase_3 = True
+        else:
+            goto_phase_3 = False
 
-        # ============================================================
-        # Phase 2: Stream B grantee-name search → grantee codes → FCC IDs
-        # ============================================================
-        stream_b_grantees_resolved: list[str] = []
-        stream_b_documented_absences: list[str] = []
-        stream_b_oversize_halts: list[tuple[str, int]] = []
-        logging.info(f'Phase 2: Stream B fan-out ({len(STREAM_B_VENDORS)} vendors)')
-        for vendor in STREAM_B_VENDORS:
-            in_flight_grantee = f'stream_b:{vendor}'
-            check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
-            codes = search_fccid_grantee_name(session, vendor)
-            if not codes:
-                stream_b_documented_absences.append(vendor)
-                continue
-            if len(codes) > STREAM_B_PER_VENDOR_HALT:
-                logging.warning(f'  Stream B {vendor}: {len(codes)} > {STREAM_B_PER_VENDOR_HALT} '
-                                f'— skipping per §2.7.1 (defensive: needs disambig before include)')
-                stream_b_oversize_halts.append((vendor, len(codes)))
-                continue
-            stream_b_grantees_resolved.extend(codes)
-        # Dedupe Stream B codes (some vendors may share grantees with Stream A)
-        stream_a_set = set(stream_a_codes)
-        stream_b_unique = [c for c in stream_b_grantees_resolved if c not in stream_a_set]
-        seen_b = set()
-        stream_b_unique = [c for c in stream_b_unique if not (c in seen_b or seen_b.add(c))]
-        logging.info(f'  Stream B resolved: {len(stream_b_grantees_resolved)} raw → {len(stream_b_unique)} unique '
-                     f'(excluding Stream A overlap)')
+        if not goto_phase_3:
+            # ============================================================
+            # Phase 1: Stream A grantee enumeration → FCC ID collection
+            # ============================================================
+            stream_a_codes = load_stream_a_targets()
+            logging.info(f'Phase 1: Stream A enumeration ({len(stream_a_codes)} grantees)')
+            for gc in stream_a_codes:
+                in_flight_grantee = gc
+                check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
+                filings = enumerate_grantee_filings(session, gc)
+                all_filings.extend(filings)
+                logging.info(f'  Stream A {gc}: +{len(filings)} FCC IDs (cumulative {len(all_filings)})')
 
-        for gc in stream_b_unique:
-            in_flight_grantee = gc
-            check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
-            filings = enumerate_grantee_filings(session, gc)
-            all_filings.extend(filings)
-            logging.info(f'  Stream B {gc}: +{len(filings)} FCC IDs (cumulative {len(all_filings)})')
+            # ============================================================
+            # Phase 2: Stream B grantee-name search → grantee codes → FCC IDs
+            # ============================================================
+            stream_b_grantees_resolved: list[str] = []
+            logging.info(f'Phase 2: Stream B fan-out ({len(STREAM_B_VENDORS)} vendors)')
+            for vendor in STREAM_B_VENDORS:
+                in_flight_grantee = f'stream_b:{vendor}'
+                check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
+                codes = search_fccid_grantee_name(session, vendor)
+                if not codes:
+                    stream_b_documented_absences.append(vendor)
+                    continue
+                if len(codes) > STREAM_B_PER_VENDOR_HALT:
+                    logging.warning(f'  Stream B {vendor}: {len(codes)} > {STREAM_B_PER_VENDOR_HALT} '
+                                    f'— skipping per §2.7.1 (defensive: needs disambig before include)')
+                    stream_b_oversize_halts.append((vendor, len(codes)))
+                    continue
+                stream_b_grantees_resolved.extend(codes)
+            # Dedupe Stream B codes (some vendors may share grantees with Stream A)
+            stream_a_set = set(stream_a_codes)
+            stream_b_unique = [c for c in stream_b_grantees_resolved if c not in stream_a_set]
+            seen_b = set()
+            stream_b_unique = [c for c in stream_b_unique if not (c in seen_b or seen_b.add(c))]
+            logging.info(f'  Stream B resolved: {len(stream_b_grantees_resolved)} raw → {len(stream_b_unique)} unique '
+                         f'(excluding Stream A overlap)')
 
-        # Deduplicate filings by fcc_id (some grantee enumerations can collide)
-        seen_fcc = set()
-        deduped_filings = []
-        for f in all_filings:
-            if f['fcc_id'] in seen_fcc:
-                continue
-            seen_fcc.add(f['fcc_id'])
-            deduped_filings.append(f)
-        all_filings = deduped_filings
-        expected_total = len(all_filings)
-        logging.info(f'Phase 1+2 complete: {expected_total} unique FCC IDs in scope')
+            for gc in stream_b_unique:
+                in_flight_grantee = gc
+                check_halt_criteria(start_ts, manifest, processed_count, expected_total, deferred_queue, progress_path)
+                filings = enumerate_grantee_filings(session, gc)
+                all_filings.extend(filings)
+                logging.info(f'  Stream B {gc}: +{len(filings)} FCC IDs (cumulative {len(all_filings)})')
 
-        write_progress(progress_path, processed_count, expected_total, in_flight_grantee,
-                       last_completed_fcc_id, start_ts, manifest, len(deferred_queue))
+            # Deduplicate filings by fcc_id (some grantee enumerations can collide)
+            seen_fcc = set()
+            deduped_filings = []
+            for f in all_filings:
+                if f['fcc_id'] in seen_fcc:
+                    continue
+                seen_fcc.add(f['fcc_id'])
+                deduped_filings.append(f)
+            all_filings = deduped_filings
+            expected_total = len(all_filings)
+            logging.info(f'Phase 1+2 complete: {expected_total} unique FCC IDs in scope')
+
+            # PC1.8.B: persist enumeration state so resume skips Phase 1+2's wall-clock cost
+            enumeration_state_path.write_text(json.dumps({
+                'cached_at_utc': utc_now(),
+                'all_filings': all_filings,
+                'stream_b_documented_absences': stream_b_documented_absences,
+                'stream_b_oversize_halts': stream_b_oversize_halts,
+                'stream_b_unique': stream_b_unique,
+                'stream_b_zero_yield': len(stream_b_documented_absences) == len(STREAM_B_VENDORS),
+            }, indent=2, default=str))
+            logging.info(f'enumeration_state cached: {enumeration_state_path.name}')
+
+            # PC1.8.B.5: Stream B zero-yield flag → manifest for wave-level aggregation
+            if len(stream_b_documented_absences) == len(STREAM_B_VENDORS):
+                manifest['bulk_run_stream_b_zero_yield'] = True
+                manifest['bulk_run_stream_b_zero_yield_evidence'] = [f'{v}: 0' for v in stream_b_documented_absences]
+                save_manifest(manifest)
+                logging.info(f'PC1.8.B.5: stream_b_zero_yield flag stamped to manifest ({len(stream_b_documented_absences)} vendors confirmed 0-hit)')
+
+            write_progress(progress_path, processed_count, expected_total, in_flight_grantee,
+                           last_completed_fcc_id, start_ts, manifest, len(deferred_queue))
 
         # ============================================================
         # Phase 3: per-FCC-ID §3.2 → §3.3 → §3.4.1 loop
