@@ -1,0 +1,71 @@
+{
+  "run_at_utc": "2026-05-17T05:29:25Z",
+  "session_tag": "usaspending_deep_admission_2026_05_16",
+  "mode": "commit",
+  "pre_state": {
+    "procurement_records_count": 46038,
+    "procurement_records_max_id": 89521,
+    "schema_version_max": 21
+  },
+  "post_state": {
+    "procurement_records_count": 46038,
+    "procurement_records_max_id": 89521,
+    "procurement_confidence_distribution": {
+      "85": 45858,
+      "90": 180
+    }
+  },
+  "steps": [
+    {
+      "step": "step_1_update_sources_sid8",
+      "proposed": 1,
+      "applied": 0,
+      "skipped_idempotent": 1,
+      "notes": [
+        "sid=8 already carries deeper_extraction_session marker"
+      ]
+    },
+    {
+      "step": "step_2_insert_net_new",
+      "proposed": 2555,
+      "applied": 0,
+      "skipped_idempotent": 2555,
+      "notes": [
+        "net-new rows applied=0 skipped_idempotent=2555",
+        "band-cap-on-insert events: 0"
+      ]
+    },
+    {
+      "step": "step_3_update_corroborations",
+      "proposed": 2718,
+      "applied": 0,
+      "skipped_idempotent": 2718,
+      "notes": [
+        "target rows updated=0 skipped_idempotent=180",
+        "evidence rows merged=0 already_present=2718",
+        "confidence lifts: 0 rows (e.g. [])",
+        "unique target eids: 180"
+      ]
+    },
+    {
+      "step": "step_4_rg5_cross_corroborations",
+      "proposed": 2,
+      "applied": 0,
+      "skipped_idempotent": 2,
+      "notes": [
+        "RG5 markers applied=0 skipped_idempotent=2"
+      ]
+    },
+    {
+      "step": "step_5_stage_off_target_residue",
+      "proposed": 264,
+      "applied": 0,
+      "skipped_idempotent": 264,
+      "notes": [
+        "target: /home/kev/argus/operator_review/usaspending_deep_admission/off_target_residue.json",
+        "residue rows: 264",
+        "already_staged=True"
+      ]
+    }
+  ]
+}
