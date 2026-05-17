@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 22532,
+  "pre_active_count": 22533,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -3760,14 +3760,14 @@
     {
       "device_category": "unknown",
       "identifier_type": "mac_range",
-      "n": 17794,
+      "n": 17795,
       "n_by_source_type": {
         "inferred": 4,
-        "primary_registry": 17790
+        "primary_registry": 17791
       },
       "min_conf": 50,
       "max_conf": 85,
-      "median_conf": 85.0,
+      "median_conf": 85,
       "row_ids": [
         467,
         468,
@@ -21562,7 +21562,8 @@
         22745,
         22746,
         22747,
-        22748
+        22748,
+        23042
       ]
     },
     {
@@ -27357,7 +27358,7 @@
         "ABB"
       ],
       "fcc_grantees_count": 40,
-      "procurement_records_count": 3,
+      "procurement_records_count": 5,
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -28077,7 +28078,7 @@
         "ACT"
       ],
       "fcc_grantees_count": 997,
-      "procurement_records_count": 49,
+      "procurement_records_count": 51,
       "deployment_observations_count": 12,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -30861,7 +30862,7 @@
         "ARD"
       ],
       "fcc_grantees_count": 465,
-      "procurement_records_count": 542,
+      "procurement_records_count": 543,
       "deployment_observations_count": 930,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -31905,7 +31906,7 @@
         "ATI"
       ],
       "fcc_grantees_count": 7557,
-      "procurement_records_count": 5394,
+      "procurement_records_count": 5468,
       "deployment_observations_count": 482,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -41013,7 +41014,7 @@
         "Arris"
       ],
       "fcc_grantees_count": 36,
-      "procurement_records_count": 11927,
+      "procurement_records_count": 11933,
       "deployment_observations_count": 22,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -43738,10 +43739,10 @@
         "Axis"
       ],
       "fcc_grantees_count": 14,
-      "procurement_records_count": 3,
+      "procurement_records_count": 499,
       "deployment_observations_count": 497,
       "council_minutes_matters_count": 0,
-      "high_corroboration": false,
+      "high_corroboration": true,
       "active_identifier_count": 5
     },
     {
@@ -43811,7 +43812,7 @@
         "TASER International (legacy)"
       ],
       "fcc_grantees_count": 23,
-      "procurement_records_count": 687,
+      "procurement_records_count": 1176,
       "deployment_observations_count": 991,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -70311,7 +70312,7 @@
         "Da-Jiang Innovations"
       ],
       "fcc_grantees_count": 9,
-      "procurement_records_count": 1723,
+      "procurement_records_count": 1834,
       "deployment_observations_count": 750,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -74766,7 +74767,7 @@
         "DRT Inc."
       ],
       "fcc_grantees_count": 2,
-      "procurement_records_count": 625,
+      "procurement_records_count": 761,
       "deployment_observations_count": 2,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -80766,7 +80767,7 @@
         "ETI"
       ],
       "fcc_grantees_count": 213,
-      "procurement_records_count": 14,
+      "procurement_records_count": 507,
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -85470,7 +85471,7 @@
         "Eon"
       ],
       "fcc_grantees_count": 127,
-      "procurement_records_count": 2,
+      "procurement_records_count": 4,
       "deployment_observations_count": 749,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -87606,10 +87607,10 @@
         "FAST"
       ],
       "fcc_grantees_count": 19,
-      "procurement_records_count": 0,
+      "procurement_records_count": 11,
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
-      "high_corroboration": false,
+      "high_corroboration": true,
       "active_identifier_count": 1
     },
     {
@@ -91279,7 +91280,7 @@
         "Flock"
       ],
       "fcc_grantees_count": 0,
-      "procurement_records_count": 2,
+      "procurement_records_count": 6,
       "deployment_observations_count": 80753,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -105116,7 +105117,7 @@
         "Harris Corporation"
       ],
       "fcc_grantees_count": 24,
-      "procurement_records_count": 11927,
+      "procurement_records_count": 11933,
       "deployment_observations_count": 22,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -109796,7 +109797,7 @@
         "IDA"
       ],
       "fcc_grantees_count": 153,
-      "procurement_records_count": 13,
+      "procurement_records_count": 16,
       "deployment_observations_count": 1,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -119409,7 +119410,7 @@
         "Jacobs Engineering"
       ],
       "fcc_grantees_count": 4,
-      "procurement_records_count": 2540,
+      "procurement_records_count": 2687,
       "deployment_observations_count": 14,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -120595,6 +120596,19 @@
       "canonical_name": "Johnson Health Tech. (Shanghai) Co.,Ltd.",
       "aliases_used": [
         "Johnson Health Tech. (Shanghai) Co.,Ltd."
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Johnson Matthey PLC",
+      "aliases_used": [
+        "Johnson Matthey PLC",
+        "Johnson Matthey"
       ],
       "fcc_grantees_count": 0,
       "procurement_records_count": 0,
@@ -123418,7 +123432,7 @@
         "KeyW Corporation"
       ],
       "fcc_grantees_count": 6,
-      "procurement_records_count": 399,
+      "procurement_records_count": 416,
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -135730,7 +135744,7 @@
         "Mach"
       ],
       "fcc_grantees_count": 101,
-      "procurement_records_count": 0,
+      "procurement_records_count": 4,
       "deployment_observations_count": 1,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -145454,7 +145468,7 @@
         "NT"
       ],
       "fcc_grantees_count": 6871,
-      "procurement_records_count": 4007,
+      "procurement_records_count": 4440,
       "deployment_observations_count": 266,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -176378,7 +176392,7 @@
         "SES"
       ],
       "fcc_grantees_count": 312,
-      "procurement_records_count": 66,
+      "procurement_records_count": 75,
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -199409,7 +199423,7 @@
         "ShotSpotter"
       ],
       "fcc_grantees_count": 1,
-      "procurement_records_count": 19,
+      "procurement_records_count": 24,
       "deployment_observations_count": 935,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
@@ -242622,7 +242636,7 @@
         "yst"
       ],
       "fcc_grantees_count": 2561,
-      "procurement_records_count": 2245,
+      "procurement_records_count": 2273,
       "deployment_observations_count": 84,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
@@ -242838,7 +242852,7 @@
     "confidence_floor": 30,
     "drop_pi_self_exclude": false,
     "bins": {
-      "unknown_category": 21878,
+      "unknown_category": 21879,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
@@ -242884,7 +242898,7 @@
       "excluded_source_type": 0
     },
     "survivors": 494,
-    "reconciles": 22532,
+    "reconciles": 22533,
     "drop_assignments": {
       "413": "unknown_category",
       "414": "unknown_category",
@@ -264923,7 +264937,8 @@
       "23038": "unknown_category",
       "23039": "firmware_build_string",
       "23040": "firmware_build_string",
-      "23041": "firmware_build_uuid"
+      "23041": "firmware_build_uuid",
+      "23042": "unknown_category"
     }
   },
   "drop_tally_high_confidence": {
@@ -264931,7 +264946,7 @@
     "confidence_floor": 70,
     "drop_pi_self_exclude": true,
     "bins": {
-      "unknown_category": 21878,
+      "unknown_category": 21879,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 39,
@@ -264977,7 +264992,7 @@
       "excluded_source_type": 342
     },
     "survivors": 113,
-    "reconciles": 22532,
+    "reconciles": 22533,
     "drop_assignments": {
       "1": "excluded_source_type",
       "413": "unknown_category",
@@ -287397,7 +287412,8 @@
       "23038": "unknown_category",
       "23039": "firmware_build_string",
       "23040": "firmware_build_string",
-      "23041": "firmware_build_uuid"
+      "23041": "firmware_build_uuid",
+      "23042": "unknown_category"
     }
   },
   "halts": []
