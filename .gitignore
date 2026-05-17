@@ -42,6 +42,12 @@ wigle/pacer.json
 # Validator review; CEO commits selectively after promotion. Per runbook §4.
 extraction_outputs/flock_back_admission/
 
+# fccid.io + FCC EAS Filings admission session deliverables (MAC-101). Same
+# posture as flock_back_admission above — staged for validator; CEO commits
+# selectively post-promotion. Includes raw OCR text dumps + per-FCC-ID
+# extraction JSON. Added Patch Cycle 1 Step 3 (2026-05-17).
+extraction_outputs/fccid_io_admission/
+
 # Wave G sandbox — vendor-derived artifacts per bible §11 #15 decompile-source carveout.
 # NOT gitignored: android_test/WAVE_G_RUNBOOK.md (workflow document) +
 # android_test/tools/extraction/wave_g_extractor.py (workflow code).
