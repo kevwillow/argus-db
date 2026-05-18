@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 22533,
+  "pre_active_count": 22549,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -1067,12 +1067,17 @@
     {
       "device_category": "police_radio",
       "identifier_type": "ble_characteristic",
-      "n": 0,
-      "n_by_source_type": {},
-      "min_conf": null,
-      "max_conf": null,
-      "median_conf": null,
-      "row_ids": []
+      "n": 2,
+      "n_by_source_type": {
+        "manufacturer_app": 2
+      },
+      "min_conf": 87,
+      "max_conf": 87,
+      "median_conf": 87.0,
+      "row_ids": [
+        23049,
+        23050
+      ]
     },
     {
       "device_category": "police_radio",
@@ -1912,13 +1917,14 @@
     {
       "device_category": "drone",
       "identifier_type": "device_class_id",
-      "n": 49,
+      "n": 50,
       "n_by_source_type": {
-        "crowdsourced": 49
+        "crowdsourced": 49,
+        "manufacturer_app": 1
       },
       "min_conf": 65,
-      "max_conf": 65,
-      "median_conf": 65,
+      "max_conf": 85,
+      "median_conf": 65.0,
       "row_ids": [
         22925,
         22926,
@@ -1968,7 +1974,8 @@
         22970,
         22971,
         22972,
-        22973
+        22973,
+        23057
       ]
     },
     {
@@ -1988,18 +1995,20 @@
     {
       "device_category": "drone",
       "identifier_type": "rf_protocol_constant",
-      "n": 4,
+      "n": 5,
       "n_by_source_type": {
-        "crowdsourced": 4
+        "crowdsourced": 4,
+        "manufacturer_app": 1
       },
       "min_conf": 65,
-      "max_conf": 65,
-      "median_conf": 65.0,
+      "max_conf": 85,
+      "median_conf": 65,
       "row_ids": [
         22921,
         22922,
         22923,
-        22924
+        22924,
+        23058
       ]
     },
     {
@@ -21639,12 +21648,18 @@
     {
       "device_category": "unknown",
       "identifier_type": "ble_characteristic",
-      "n": 0,
-      "n_by_source_type": {},
-      "min_conf": null,
-      "max_conf": null,
-      "median_conf": null,
-      "row_ids": []
+      "n": 3,
+      "n_by_source_type": {
+        "manufacturer_app": 3
+      },
+      "min_conf": 87,
+      "max_conf": 87,
+      "median_conf": 87,
+      "row_ids": [
+        23044,
+        23045,
+        23047
+      ]
     },
     {
       "device_category": "unknown",
@@ -42595,11 +42610,12 @@
     {
       "canonical_name": "Autel Robotics",
       "aliases_used": [
-        "Autel Robotics"
+        "Autel Robotics",
+        "Autel"
       ],
-      "fcc_grantees_count": 1,
+      "fcc_grantees_count": 6,
       "procurement_records_count": 0,
-      "deployment_observations_count": 28,
+      "deployment_observations_count": 53,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 23
@@ -71613,6 +71629,20 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Dahua",
+      "aliases_used": [
+        "Dahua",
+        "Zhejiang Dahua Technology",
+        "Dahua Technology"
+      ],
+      "fcc_grantees_count": 2,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 121,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
     },
     {
       "canonical_name": "Dai Nippon Printing Co., Ltd.",
@@ -106768,6 +106798,21 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Hikvision",
+      "aliases_used": [
+        "Hikvision",
+        "Hangzhou Hikvision Digital Technology",
+        "HikCentral",
+        "HikConnect"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 251,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
       "canonical_name": "Hildebrand Technology Limited",
       "aliases_used": [
         "Hildebrand Technology Limited"
@@ -107502,7 +107547,10 @@
     {
       "canonical_name": "Honeywell",
       "aliases_used": [
-        "Honeywell"
+        "Honeywell",
+        "Honeywell Pro-Watch",
+        "Honeywell International",
+        "Honeywell Building Technologies"
       ],
       "fcc_grantees_count": 50,
       "procurement_records_count": 0,
@@ -142628,7 +142676,7 @@
       "deployment_observations_count": 4576,
       "council_minutes_matters_count": 1,
       "high_corroboration": false,
-      "active_identifier_count": 11
+      "active_identifier_count": 15
     },
     {
       "canonical_name": "Motsai Research",
@@ -159380,7 +159428,7 @@
       "deployment_observations_count": 14,
       "council_minutes_matters_count": 2,
       "high_corroboration": false,
-      "active_identifier_count": 5
+      "active_identifier_count": 12
     },
     {
       "canonical_name": "Parsyl Inc",
@@ -225413,7 +225461,8 @@
       "canonical_name": "WatchGuard",
       "aliases_used": [
         "WatchGuard",
-        "WatchGuard Video"
+        "WatchGuard Video",
+        "WatchGuard Video (legacy)"
       ],
       "fcc_grantees_count": 2,
       "procurement_records_count": 69,
@@ -242852,7 +242901,7 @@
     "confidence_floor": 30,
     "drop_pi_self_exclude": false,
     "bins": {
-      "unknown_category": 21879,
+      "unknown_category": 21884,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
@@ -242860,23 +242909,23 @@
       "ssid_pattern": 5,
       "device_fingerprint": 0,
       "ble_local_name": 3,
-      "ble_characteristic": 3,
+      "ble_characteristic": 5,
       "product_family_codename": 20,
       "icao_24bit_address": 0,
       "rf_channel": 16,
       "burst_cadence_ms": 0,
       "bandwidth_mhz": 1,
-      "device_class_id": 49,
+      "device_class_id": 50,
       "rf_burst_duration": 1,
-      "rf_protocol_constant": 4,
+      "rf_protocol_constant": 5,
       "wifi_ie_element_id": 0,
       "bluetooth_le_pdu_type": 0,
       "wifi_frame_control_subtype": 0,
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_service_uuid": 0,
-      "ble_company_id": 0,
+      "ble_service_uuid": 2,
+      "ble_company_id": 1,
       "frequency_band": 4,
       "ble_protocol_byte": 0,
       "operator_profile": 3,
@@ -242889,7 +242938,7 @@
       "qualcomm_chip_format_id": 1,
       "firmware_branded_string": 1,
       "asdstan_message_type": 7,
-      "asdstan_enum_value": 14,
+      "asdstan_enum_value": 18,
       "dji_protocol_struct_format": 2,
       "gpt_partition_uuid": 3,
       "chipset_codename": 0,
@@ -242898,7 +242947,7 @@
       "excluded_source_type": 0
     },
     "survivors": 494,
-    "reconciles": 22533,
+    "reconciles": 22549,
     "drop_assignments": {
       "413": "unknown_category",
       "414": "unknown_category",
@@ -264938,7 +264987,23 @@
       "23039": "firmware_build_string",
       "23040": "firmware_build_string",
       "23041": "firmware_build_uuid",
-      "23042": "unknown_category"
+      "23042": "unknown_category",
+      "23043": "unknown_category",
+      "23044": "unknown_category",
+      "23045": "unknown_category",
+      "23046": "unknown_category",
+      "23047": "unknown_category",
+      "23048": "ble_service_uuid",
+      "23049": "ble_characteristic",
+      "23050": "ble_characteristic",
+      "23051": "ble_service_uuid",
+      "23052": "ble_company_id",
+      "23053": "asdstan_enum_value",
+      "23054": "asdstan_enum_value",
+      "23055": "asdstan_enum_value",
+      "23056": "asdstan_enum_value",
+      "23057": "device_class_id",
+      "23058": "rf_protocol_constant"
     }
   },
   "drop_tally_high_confidence": {
@@ -264946,7 +265011,7 @@
     "confidence_floor": 70,
     "drop_pi_self_exclude": true,
     "bins": {
-      "unknown_category": 21879,
+      "unknown_category": 21884,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 39,
@@ -264954,23 +265019,23 @@
       "ssid_pattern": 5,
       "device_fingerprint": 0,
       "ble_local_name": 3,
-      "ble_characteristic": 3,
+      "ble_characteristic": 5,
       "product_family_codename": 20,
       "icao_24bit_address": 0,
       "rf_channel": 16,
       "burst_cadence_ms": 0,
       "bandwidth_mhz": 1,
-      "device_class_id": 49,
+      "device_class_id": 50,
       "rf_burst_duration": 1,
-      "rf_protocol_constant": 4,
+      "rf_protocol_constant": 5,
       "wifi_ie_element_id": 0,
       "bluetooth_le_pdu_type": 0,
       "wifi_frame_control_subtype": 0,
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_service_uuid": 0,
-      "ble_company_id": 0,
+      "ble_service_uuid": 2,
+      "ble_company_id": 1,
       "frequency_band": 4,
       "ble_protocol_byte": 0,
       "operator_profile": 3,
@@ -264983,7 +265048,7 @@
       "qualcomm_chip_format_id": 1,
       "firmware_branded_string": 1,
       "asdstan_message_type": 7,
-      "asdstan_enum_value": 14,
+      "asdstan_enum_value": 18,
       "dji_protocol_struct_format": 2,
       "gpt_partition_uuid": 3,
       "chipset_codename": 0,
@@ -264992,7 +265057,7 @@
       "excluded_source_type": 342
     },
     "survivors": 113,
-    "reconciles": 22533,
+    "reconciles": 22549,
     "drop_assignments": {
       "1": "excluded_source_type",
       "413": "unknown_category",
@@ -287413,7 +287478,23 @@
       "23039": "firmware_build_string",
       "23040": "firmware_build_string",
       "23041": "firmware_build_uuid",
-      "23042": "unknown_category"
+      "23042": "unknown_category",
+      "23043": "unknown_category",
+      "23044": "unknown_category",
+      "23045": "unknown_category",
+      "23046": "unknown_category",
+      "23047": "unknown_category",
+      "23048": "ble_service_uuid",
+      "23049": "ble_characteristic",
+      "23050": "ble_characteristic",
+      "23051": "ble_service_uuid",
+      "23052": "ble_company_id",
+      "23053": "asdstan_enum_value",
+      "23054": "asdstan_enum_value",
+      "23055": "asdstan_enum_value",
+      "23056": "asdstan_enum_value",
+      "23057": "device_class_id",
+      "23058": "rf_protocol_constant"
     }
   },
   "halts": []

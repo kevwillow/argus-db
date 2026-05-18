@@ -501,8 +501,8 @@ def main() -> int:
                 INSERT INTO identifiers (
                     identifier, identifier_type, device_category, manufacturer,
                     model, confidence, source_url, source_type, source_excerpt,
-                    notes, first_seen, last_verified
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'manufacturer_app', ?, ?,
+                    geographic_scope, notes, first_seen, last_verified
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'manufacturer_app', ?, 'US', ?,
                           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 """,
                 (
