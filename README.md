@@ -29,24 +29,24 @@ python3 argus_cli.py query e4:aa:ea:80:a1:9b       # lookup a Flock Safety ALPR 
 
 The repo ships with `db/argus.db` and the four canonical exports under `exports/` already populated; the read-path needs no `pip install`. See [SETUP.md](SETUP.md) for fresh-DB-init from migrations, source-ingest pipeline dependencies (per-domain pinned in `requirements-vendor-docs.txt` and `requirements-wigle.txt`), optional API keys, and WiGLE-grant gating.
 
-## Status (v1.1.0)
+## Status (v1.2.0)
 
-Argus **v1.1.0** ships at schema_version=21 with:
+Argus **v1.2.0** ships at schema_version=22 with:
 
-- **22,533 active canonical identifiers** + 80 superseded (kept for audit-trail) across 14 user tables (net +1 in v1.1.0 from the Johnson Matthey PLC cross-registry promotion)
-- **131 behavioral_signatures** (IMSI-catcher detection heuristics + community-research detector-internal patterns)
-- **133,134 raw observations** with per-row source provenance (every active identifier traceable to at least one source citation)
+- **22,549 active canonical identifiers** + 80 superseded (kept for audit-trail) across 15 user tables (net +16 in v1.2.0 from the MAC-104 Wave-G v2 PlayStore companion-app extraction pass)
+- **131 behavioral_signatures** (IMSI-catcher detection heuristics + community-research detector-internal patterns; unchanged this release)
+- **133,825 raw observations** with per-row source provenance (every active identifier traceable to at least one source citation; +691 in v1.2.0 = 671 fccid.io discovery rows + 20 MAC-104 wave-G v2 candidates)
 - **116,668 deployment_observations** from EFF Atlas of Surveillance + DeFlock with per-row LICENSE column for downstream license-aware filtering
-- **50 upstream sources** across canonical registries, procurement data, academic research, manufacturer documentation, community-OSINT GitHub repositories, and (new in v1.1.0) corporate registries, judicial filings, and federal disclosure / entity-registration sources
-- **35 surveillance-tech vendors** in the canonical lexicon
+- **52 upstream sources** across canonical registries, procurement data, academic research, manufacturer documentation, community-OSINT GitHub repositories, corporate registries, judicial filings, federal disclosure / entity-registration sources, and (new in v1.2.0) the fccid.io community aggregator + the official FCC EAS Filings UI as a distinct primary surface
+- **49 surveillance-tech vendors** in the canonical lexicon (+14 in v1.2.0: 4 positive-extraction admissions + 10 stub admissions for absence-investigated vendors)
 
 **Coverage is intentionally narrow at this baseline** — do not assume comprehensive coverage of any specific surveillance equipment category. Expansion comes via community contributions and future research waves (see [Known held items](#known-held-items-contribution-welcome) below).
 
-Release cadence: tagged releases when substantive new data, new source families, or schema-impacting changes land. See [CHANGELOG.md](CHANGELOG.md) for the v1.0.0 ledger including the full amendment history and migration ledger 1 → 19.
+Release cadence: tagged releases when substantive new data, new source families, or schema-impacting changes land. See [CHANGELOG.md](CHANGELOG.md) for the v1.2.0 ledger and migration history.
 
-## What's new in v1.1.0
+## What's new in v1.2.0
 
-v1.1.0 adds seven new authoritative data sources — UK Companies House, Delaware / California / Texas Secretary of State, CourtListener, SEC EDGAR, and SAM.gov — expands federal procurement coverage by 2,560 records, and closes the project's first previously-held identifier (Johnson Matthey PLC) by cross-checking against an international corporate-registry source. See [CHANGELOG.md](CHANGELOG.md) for the full v1.1.0 ledger.
+v1.2.0 lands the cycle-7 autonomous-overnight-wave integration: two new FCC equipment-authorization sources (fccid.io aggregator + the official FCC EAS Filings UI as a distinct primary surface), 671 dual-citation-pair discovery rows from the MAC-101 partial deliverable (citation half deferred to an async re-citation pass), 16 net-new identifiers from a static-analysis pass against four LE-adjacency vendor companion apps (Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6), 14 new manufacturer rows (4 positive + 10 documented-absence stubs), 22 documented_absence intelligence entries, and 19 SAR-11 FP-class additions to the calibration registry. A bible amendment codifying empirical-premise verification as a runguide precondition was drafted and is held pending CEO+operator ratification on the MAC-178 issue thread. See [CHANGELOG.md](CHANGELOG.md) for the full v1.2.0 ledger.
 
 ## Twelve device categories
 

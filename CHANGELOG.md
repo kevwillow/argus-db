@@ -8,6 +8,89 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 - **Staging-JSON-vs-schema-column naming convention codified** (2026-05-17, patch cycle 1.6.C): staging JSON shapes emitted under `extraction_outputs/{runguide_slug}/` use `candidate_value` for human readability during validator review; the promoted `raw_observations` schema column is `candidate_identifier`. Validator handles the rename at promotion (one-to-one, no transformation). Documented in patch cycle 1 against the source-admission wave (10 runguides, MAC-101 through MAC-110). Re-evaluation trigger: if validator pushback at handoff makes the rename-at-promotion step error-prone, Patch 2.x can align the staging shape to the schema; default-if-silent is to hold the convention.
 
+## [v1.2.0] — 2026-05-18
+
+### What's new in v1.2.0
+
+Argus v1.2.0 lands the cycle-7 autonomous-overnight-wave integration. The wave brought **two new authoritative data sources** for the US FCC equipment-authorization ecosystem (fccid.io as a community aggregator + the official FCC EAS Filings UI as a distinct primary-registry source), **671 FCC ID discovery rows** staged under a new dual-citation-pair convention (the citation half awaits a separate async re-citation pass when FCC.gov egress is restored), and **16 net-new identifiers** from a static-analysis pass against four LE-adjacency vendor companion apps (Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6). We also admitted **fourteen new manufacturer rows** — four for vendors whose identifiers we positively extracted (Hikvision, Dahua, Autel Robotics, Cisco Meraki) and ten stub rows for vendors whose identity we confirmed via absence-investigation (Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome).
+
+Alongside the data lands, the wave produced a **bible-amendment proposal codifying empirical-premise verification as a runguide precondition** — five separate web-scrape runguides (MAC-102 ISED, MAC-103 BT SIG, MAC-105 USPTO Patents, MAC-107 GitHub Code Search, MAC-110 Ofcom) plus one internal extraction pass (MAC-101 PC1.7's `application_id`-vs-`grant_id` discovery) all surfaced load-bearing-premise failures during the same 8-hour autonomous window. The amendment proposes a new `§2.4 Empirical-Premise Verification Precondition` requiring runguides to ship a `§3.0` verification-probe section that completes CLEAN before any `§3.1` bulk dispatch fires. **The amendment was drafted in this release but is held pending CEO + operator ratification** on the [MAC-178](/MAC/issues/MAC-178) issue thread; it will land in a follow-on commit once ratified.
+
+The headline outcomes for downstream consumers: **22,549 active identifiers** (up from 22,533, +16 from MAC-104 wave-G v2 promotion), **52 sources** (up from 50; +1 crowdsourced fccid.io + 1 regulatory FCC EAS Filings), **49 manufacturers** in the canonical vendor lexicon (up from 35), **133,825 raw_observations** rows (up from 133,134), and a schema bumped from version 21 to **version 22** via one forward-only migration (the new `fcc_citation_deferred_queue` staging table for the dual-citation pair pattern).
+
+### New data sources
+
+Two sources joined Argus in this release, bringing the source count from 50 to 52:
+
+- **fccid.io** (sid=51, `crowdsourced` tier 2) — a third-party aggregator of US FCC Equipment Authorization System filings. fccid.io mirrors the FCC's public filings catalog with a more navigable surface than the official `apps.fcc.gov` UI, but the upstream license is `NO_LICENSE_DECLARED` — Argus extracts facts under the Feist v. Rural Telephone facts-not-copyrightable doctrine, not via license inheritance. Compilation arrangement is not republished. This source feeds the new dual-citation-pair pattern (see below).
+
+- **FCC Equipment Authorization System — Filings** (sid=52, `regulatory` tier 1) — the official FCC EAS Filings UI at `apps.fcc.gov/oetcf/eas/reports/GenericSearch.cfm`. Distinct from the existing FCC EAS grantee-registration data file (source 7); the Filings UI gives per-FCC-ID filing surfaces (test reports, internal photos, RF exposure data) that the grantee CSV doesn't expose. **The source was admitted under a degraded-mode posture**: at extraction time FCC.gov egress was unreachable from the runtime host (Akamai-edge HTTP/2 INTERNAL_ERROR across `apps.fcc.gov`), so the 671 fccid.io discovery rows were staged with their FCC citation half deferred to an asynchronous re-citation pass. The source exists; the citation rows accumulate when egress is restored.
+
+### Dual-citation deferred queue (new staging convention)
+
+The cycle-7 wave introduces a **dual-citation pair pattern** for sources where the discovery surface (an aggregator) is distinct from the primary surface (the regulator). Each FCC ID observed at fccid.io carries a `notes.dual_citation_pair_id` field pointing to a row in the new `fcc_citation_deferred_queue` table. The queue row holds the discovery anchor (`fccid_io_source_url` + SHA-256 of the served HTML) and an opportunistic enrichment field (`fcc_grant_ids[]` — 564 of 671 queue rows carry these, extracted from the fccid.io page's grant-bold-content block; this lets a future async re-citation pass shortcut FCC.gov navigation from 5-step lookup to 1-step). When FCC.gov egress is restored, the validator's async re-citation pass drains the queue and emits paired regulatory-band citation rows. Until then, the discovery rows stay at the `crowdsourced` 50-75 confidence band; no confidence drift on the discovery anchor alone.
+
+### MAC-104 Wave-G v2 net-new identifiers
+
+The wave ran a static-analysis extraction pass against four LE-adjacency vendor companion apps (downloaded from apk-pure; decompiled with jadx + apktool; structured field extractions only — no decompiled source ever enters the DB per §11 #15). Net-new identifier yield:
+
+- **Hikvision Hik-Connect** (`com.hikvision.hikconnect`) — 1 BLE service UUID + 2 BLE characteristics, all anchored in the app's `HcpBluetoothServer` class. The Hik-Connect app is operator-cohort (cloud VMS / video doorbell), but the BLE pairing code path is installer-quality — vendor-named classes, paired `BluetoothGattService.equals(...)` / `getCharacteristic(...)` confirmations across multiple files.
+- **Dahua DMSS** (`com.mm.android.DMSS`) — 1 BLE service UUID + 1 BLE characteristic, paired in obfuscated class `sources/en/f.java`. Dahua DMSS substituted for the legacy `com.mm.android.direct.gdmsphone` (gDMSS Plus) which is documented-absent on both apk-pure and apk-mirror.
+- **Motorola WAVE PTT** (`com.motorolasolutions.wave`) — 2 BLE service UUIDs (one custom 128-bit, one 16-bit SIG-template) + 2 BLE characteristics, all anchored in `BluetoothLowEnergyPttValues` for the Milicom PTT Button accessory.
+- **Parrot FreeFlight 6** (`com.parrot.freeflight6`) — 1 BT SIG company-ID (67 / 0x0043 = Parrot SA) + 4 ASD-STAN drone-RID enums (`FR_30_OCTETS`, `ANSI_CTA_2063`, `FRENCH`, `EN4709_002`) + 1 ARSDK DRI feature class ID (41984 / 0xA400) + 1 ARSDK DRI command UID set. All anchored in `com/parrot/drone/sdkcore/arsdk/ArsdkFeatureDri.java` — clear-text Java, 262 lines; Parrot is the canonical drone vendor for which the entire ARSDK protocol + Drone-RID code path surfaces under Java decompilation.
+
+All 16 promoted identifiers carry `confidence ∈ {75, 85, 87}` per CP17 manufacturer_app sub-banding (installer-cohort 80-95 → 87; CP14 drone-RID class hits → 85; 16-bit SIG-template lower anchor → 75). All single-source at promotion (`notes.single_source_at_promotion=true`); no §5.6 cross-source uplift applied (verified: no pre-existing rows match any candidate identifier).
+
+**Four additional candidates held for SAR-12 schema-extension review:**
+- 2 default credentials (`lc2014` LeChange SDK default password, `terminal` DMSS OAuth client_secret) — no `default_credential` enum slot at v22 schema
+- 1 vendor namespace UUID (Parrot Skyward UTM `0045b822-...`) — handoff explicitly flags as NOT-a-BLE-service-UUID; no clean enum fit
+- 1 DJI RTK serial-number template (`1APDF7Q0010001` from DJI Pilot NRTK setup default) — handoff explicitly not-promoted-flagged; no `serial_number_template` enum slot
+
+Each held row stages in `raw_observations` with `notes.hold_reason` + `notes.validator_review_recommendation`.
+
+### Manufacturer enrichments
+
+Fourteen new manufacturer rows joined the canonical lexicon (from 35 to 49):
+
+- **Hikvision** (id=209) and **Dahua** (id=208) — both admitted with NDAA Section 889 note (state/local LE deployments persist outside the federal-procurement bar; runguide §0 scope).
+- **Autel Robotics** (id=206, primary_category=drone) and **Cisco Meraki** (id=207) — positive-extraction admissions from MAC-104b/d.
+- **Stub admissions** (10 vendors, primary_category set where the vendor's product line is unambiguous): Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome. Each carries `notes.admission_basis='documented_absence_only'` — the manufacturer identity was verified via absence-investigation (apk-pure 404 + apk-mirror "no results" + cohort-prediction reasoning) but no positive identifier extraction this wave.
+
+**34 product-family taxonomy entries** added to seven manufacturers' `notes.product_family_taxonomy[]` arrays (additive; cross-APK observations of the same string are corroborating mentions and get separate entries — e.g. DJI "Mavic" appears once for DJI Fly + once for DJI Pilot = 2 entries, 1 distinct value). Distinct values: DJI (10), Hikvision (5), Motorola Solutions (4), Dahua (4), Parrot (3), Autel Robotics (2), Cisco Meraki (1).
+
+**22 `documented_absence` JSON entries** applied to `manufacturers.notes.documented_absence[]` across 21 distinct vendor rows (DJI gets two entries: legacy `com.dji.go` + standalone `com.dji.mavicmini` folded into DJI Fly). Each entry carries `investigation_date_utc`, `investigation_dispatch_ref`, `channels_probed`, `outcome=categorical_absent`, `rationale` (one of `LE_only_distribution` / `federal_enterprise_managed` / `vendor_direct_NDA` / `controlled_distribution`), and the staging vendor_canonical for alias-trace continuity. Distribution: LE-only-distribution 9, federal-enterprise-managed 9, vendor-direct-NDA 3, controlled-distribution 1 (DroneShield RfPatrol — C-UAS / ITAR-adjacent; flagged for operator legal review before alt-channel pursuit).
+
+### SAR-11 FP-class registry additions
+
+Nineteen new SAR-11 FP-class proposals were baked into the canonical `proposed_fp_classes.json` registry per CEO §3 #5 ratification: **14 clean bulk-adds** (Docker/Jenkins build-host UUIDs, APK test fixtures, Motorola WAVE license GUID, Microsoft AppCenter / PDFBox / RN-Keychain library labels, NASA WorldWind constants, Autel password regex templates, Apache HttpClient context keys, RxJava build-host UUIDs, AndroidAnnotations cacerts default, XML layout TextView labels, Adobe XMP image metadata UUIDs) + **5 selective adds with `operator_review_note: "Hikvision/Dahua/drone-cohort overlap; flagged at MAC-104 cycle-7"`** (Alibaba Taobao security cipher key, Microsoft XML namespace UUID, Hikvision HTML doc-routing GUID, AMap location-SDK placeholder MACs, DJI api_debug.txt key). Each edge entry carries explicit `overlap_risk` prose so v3 extractor calibration applies exact-value-match-only, not generalization.
+
+### Bible amendment (DRAFTED pending ratification)
+
+The wave's six concrete failure-mode anchors (5 external runguides + 1 internal extraction pass) produced a proposal for **`§2.4 Empirical-Premise Verification Precondition`** — a new bible subsection requiring runguides to ship a `§3.0` verification-probe section that completes CLEAN POSITIVE or CLEAN NEGATIVE before any `§3.1` bulk dispatch fires. INCONCLUSIVE outcomes halt the runguide; CEO disposition required. The amendment also defines retroactive binding rules for runguides drafted-but-not-dispatched and runguides being re-dispatched.
+
+The amendment text + downstream-consumer audit (10 runguides identified for retroactive `§3.0` adoption) was posted on [MAC-178](/MAC/issues/MAC-178) for CEO + operator ratification. **It is NOT landed in this release.** Once ratified, it will land as `Correction Pass 27` (or whatever slot the CEO assigns) in a follow-on commit + a `§2.4` insert into `PROJECT_BIBLE.md`. The CHANGELOG will be updated to add the final commit hash at ratification time.
+
+### Schema changes
+
+One new migration landed this release (schema version 21 → 22):
+
+- **0022 — `fcc_citation_deferred_queue` staging table.** New table holds the discovery-row half of the dual-citation pair pattern (one row per FCC ID; `fcc_id` UNIQUE; `promoted_at NULL` = pending drain by the validator's async re-citation pass; index on `(promoted_at)` partial WHERE NULL for drain queries; index on `fcc_grant_ids_csv` for grant-ID-shortcut lookup). 671 rows seeded from the MAC-101 partial-deliverable wave.
+
+### Refreshed exports
+
+All four canonical exports were regenerated against the post-cycle-7 active set:
+
+| Export | Pre-cycle-7 | Post-cycle-7 | Delta |
+|---|---|---|---|
+| `argus_export.csv` (rich-import, all canonical rows) | 22,533 | **22,549** | +16 |
+| `argus_export.json` (Lynceus, ≥30 confidence + §4.4 mapping) | 494 | 494 | +0 |
+| `argus_export_high_confidence.json` (Lynceus, ≥70 + non-{crowdsourced, inferred}) | 113 | 113 | +0 |
+| `argus_export_behavioral_signatures.json` (Rayhunter; unchanged this wave) | 55 | 55 | unchanged |
+
+**Note on the JSON-export +0 delta:** the 16 MAC-104-promoted identifier_types (`ble_service_uuid`, `ble_characteristic`, `ble_company_id`, `asdstan_enum_value`, `device_class_id`, `rf_protocol_constant`) are all `§4.4 DROPPED-class` per CP16 / CP19 (mig-0018 cluster) / MAC-117 (mig-0019 round-2). Per the bible, DROPPED-class identifier_types are carried in the canonical DB (and the CSV rich-import feed) but NOT in the Lynceus pattern-table JSON exports — by design. The brief author's forecast of +20 standard-export rows + +6 to +14 high-confidence rows didn't account for this disposition. Whether to MAP some/all of these types into Lynceus is a separate `§4.4` amendment surface for a future CP cycle.
+
+Also new: `exports/_export_manifest.json` ships the per-file size + SHA-256 + entry-count manifest with a delta-vs-forecast block, generation timestamp, and the §4.4 reasoning surfaced for downstream consumers.
+
 ## [v1.1.0] — 2026-05-17
 
 ### What's new in v1.1.0
