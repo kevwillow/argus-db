@@ -71,7 +71,7 @@ The 12-value enum and per-vendor categorization rationale are documented in [PRO
 
 ## Data sources
 
-Argus integrates data from 50 upstream sources organized across five tiers, including (v1.1.0) UK Companies House, three US-state Secretary-of-State registries (Delaware / California / Texas), CourtListener / RECAP, SEC EDGAR, and SAM.gov Entity Registration. Full per-source attribution + upstream-license chain at [CREDITS.md](CREDITS.md).
+Argus integrates data from 52 upstream sources organized across five tiers, including (v1.1.0) UK Companies House, three US-state Secretary-of-State registries (Delaware / California / Texas), CourtListener / RECAP, SEC EDGAR, and SAM.gov Entity Registration, plus (new in v1.2.0) the fccid.io community aggregator and the official FCC Equipment Authorization System Filings UI as a distinct primary surface. Full per-source attribution + upstream-license chain at [CREDITS.md](CREDITS.md).
 
 **Tier 1 — Canonical allocation registries** (`source_type='primary_registry'`):
 
@@ -118,13 +118,18 @@ Argus integrates data from 50 upstream sources organized across five tiers, incl
 - **SEC EDGAR** (PUBLIC_DOMAIN; automated HTML parse) — public-company disclosure filings.
 - **SAM.gov Entity Registration** (PUBLIC_DOMAIN; automated API; cycle_completion_state=partial_pre_day1) — federal-procurement entity registry; first cycle landed 9,623 cross-source corroboration updates against existing rows (MAC-175).
 
+**Tier 1/2 — FCC equipment-authorization expansion** (`source_type='regulatory'` + `'crowdsourced'`; v1.2.0):
+
+- **fccid.io** (NO_LICENSE_DECLARED; automated HTML parse) — community aggregator of US FCC EAS filings; admitted under the Feist facts-only regime. 671 raw_observations staged under the new dual-citation-pair pattern; promotion deferred to the async FCC.gov re-citation pass.
+- **FCC Equipment Authorization System — Filings** (PUBLIC_DOMAIN; automated HTML parse) — the official `apps.fcc.gov` Filings UI; distinct from the existing FCC EAS Grantee Registrations source. Admitted under a degraded-mode posture (Akamai-edge HTTP/2 INTERNAL_ERROR at extraction time); citation half of the 671-row deferred queue accumulates when egress is restored.
+
 ## Output shape
 
-Argus produces five canonical artifacts at v1.1.0:
+Argus produces five canonical artifacts at v1.2.0:
 
 | Artifact | Format | Content | Consumer |
 |---|---|---|---|
-| `db/argus.db` | SQLite | Canonical database (14 user tables; schema_version=21) | direct query / re-derivation |
+| `db/argus.db` | SQLite | Canonical database (15 user tables; schema_version=22) | direct query / re-derivation |
 | `exports/argus_export.json` | JSON | Standard Lynceus export (`{pattern, pattern_type, description, argus_record_id}` per row) | scanner-side watchlist (confidence ≥30) |
 | `exports/argus_export_high_confidence.json` | JSON | High-confidence Lynceus export (same shape, confidence ≥70, `source_type` excludes `crowdsourced`+`inferred`) | scanner-side watchlist (operator-strict) |
 | `exports/argus_export_behavioral_signatures.json` | JSON | Rayhunter-bound sibling export (`{signature_name, cellular_generation, threshold_json, confidence, argus_record_id}` per row) | RF-detection scanners |
@@ -196,8 +201,8 @@ External contribution is welcome under the discipline framework codified in [PRO
 - [METHODOLOGY.md](METHODOLOGY.md) — methodology, provenance discipline, source-tier hierarchy, agent-orchestrated build process
 - [DATA_DICTIONARY.md](DATA_DICTIONARY.md) — schema reference for every table, column, and enum value
 - [SETUP.md](SETUP.md) — local install, dependencies, optional API keys
-- [CREDITS.md](CREDITS.md) — upstream attribution + 50 data-source credits + 35-entry surveillance-tech vendor lexicon
-- [CHANGELOG.md](CHANGELOG.md) — version history from v1.0.0 → v1.1.0 including the full amendment ledger, migration ledger 1 → 21, and pre-v1.0.0 history timeline
+- [CREDITS.md](CREDITS.md) — upstream attribution + 52 data-source credits + 49-entry surveillance-tech vendor lexicon
+- [CHANGELOG.md](CHANGELOG.md) — version history from v1.0.0 → v1.2.0 including the full amendment ledger, migration ledger 1 → 22, and pre-v1.0.0 history timeline
 - [PROJECT_BIBLE.md](PROJECT_BIBLE.md) — discipline architecture (hard rules, device_category vocabulary, Lynceus mapping, export shape)
 - [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) — append-only amendment log with full case-study anchors
 - [LICENSE](LICENSE) / [LICENSE-DATA](LICENSE-DATA) / [LICENSE-DOCS](LICENSE-DOCS) — three license texts (AGPL-3.0-or-later / ODbL-1.0 / CC-BY-SA-4.0) + Argus-specific preambles documenting scope-of-coverage + 3-layer per-row license-posture composition
@@ -258,7 +263,7 @@ I plan and orchestrate this project myself, using Claude chat as a strategic-pla
 
 The AI agents are highly capable executors with substantial scoping autonomy inside the constraints I set. They surface findings, propose decompositions, escalate when something needs ratification, and run extensive verification work I couldn't do at scale manually. But they don't decide canonical contract. I do.
 
-This was not vibe-coded. Argus has 21 documented amendments to its canonical contract and 14 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough — provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
+This was not vibe-coded. Argus has 27 documented amendments to its canonical contract and 14 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough — provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
 
 ### Notable technical work
 

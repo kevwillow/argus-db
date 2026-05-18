@@ -4,9 +4,7 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-### Conventions
-
-- **Staging-JSON-vs-schema-column naming convention codified** (2026-05-17, patch cycle 1.6.C): staging JSON shapes emitted under `extraction_outputs/{runguide_slug}/` use `candidate_value` for human readability during validator review; the promoted `raw_observations` schema column is `candidate_identifier`. Validator handles the rename at promotion (one-to-one, no transformation). Documented in patch cycle 1 against the source-admission wave (10 runguides, MAC-101 through MAC-110). Re-evaluation trigger: if validator pushback at handoff makes the rename-at-promotion step error-prone, Patch 2.x can align the staging shape to the schema; default-if-silent is to hold the convention.
+(No unreleased changes since v1.2.0.)
 
 ## [v1.2.0] — 2026-05-18
 
@@ -76,6 +74,10 @@ One new migration landed this release (schema version 21 → 22):
 
 - **0022 — `fcc_citation_deferred_queue` staging table.** New table holds the discovery-row half of the dual-citation pair pattern (one row per FCC ID; `fcc_id` UNIQUE; `promoted_at NULL` = pending drain by the validator's async re-citation pass; index on `(promoted_at)` partial WHERE NULL for drain queries; index on `fcc_grant_ids_csv` for grant-ID-shortcut lookup). 671 rows seeded from the MAC-101 partial-deliverable wave.
 
+### Conventions
+
+- **Staging-JSON-vs-schema-column naming convention codified** (2026-05-17, patch cycle 1.6.C): staging JSON shapes emitted under `extraction_outputs/{runguide_slug}/` use `candidate_value` for human readability during validator review; the promoted `raw_observations` schema column is `candidate_identifier`. Validator handles the rename at promotion (one-to-one, no transformation). Documented in patch cycle 1 against the source-admission wave (10 runguides, MAC-101 through MAC-110). The patch cycle 2 wave (PC2.A through PC2.D) did not surface rename-at-promotion error pressure; the convention holds as written.
+
 ### Refreshed exports
 
 All four canonical exports were regenerated against the post-cycle-7 active set:
@@ -90,6 +92,17 @@ All four canonical exports were regenerated against the post-cycle-7 active set:
 **Note on the JSON-export +0 delta:** the 16 MAC-104-promoted identifier_types (`ble_service_uuid`, `ble_characteristic`, `ble_company_id`, `asdstan_enum_value`, `device_class_id`, `rf_protocol_constant`) are all `§4.4 DROPPED-class` per CP16 / CP19 (mig-0018 cluster) / MAC-117 (mig-0019 round-2). Per the bible, DROPPED-class identifier_types are carried in the canonical DB (and the CSV rich-import feed) but NOT in the Lynceus pattern-table JSON exports — by design. The brief author's forecast of +20 standard-export rows + +6 to +14 high-confidence rows didn't account for this disposition. Whether to MAP some/all of these types into Lynceus is a separate `§4.4` amendment surface for a future CP cycle.
 
 Also new: `exports/_export_manifest.json` ships the per-file size + SHA-256 + entry-count manifest with a delta-vs-forecast block, generation timestamp, and the §4.4 reasoning surfaced for downstream consumers.
+
+### Post-CP27 runguide migrations (Patch Cycle 2)
+
+Following the CP27 ratification, four web-scrape runguides identified at the CP27 §2.4 audit were migrated through Patch Cycle 2 (PC2.A through PC2.D) as in-repo summary commits accompanying out-of-tree runguide-file edits. All four are docs/runguide-internal only — no sources, identifiers, manufacturers, raw_observations, schema, or license posture changed. Each landed a `§3.0` empirical-premise verification block (CP27 §2.4 compliance) alongside the upstream-surface migration:
+
+- **PC2.A — MAC-105 USPTO Patent Public Search migration** (`348f514`) — legacy `patft.uspto.gov` decommissioned; runguide migrated to `ppubs.uspto.gov/pubwebapp/` + the authenticated `data.uspto.gov/api/manage` ODP endpoint (`USPTO_ODP_API_KEY` env-var convention). 4-probe `§3.0` verification block (Google Patents + PPubs JS-shell + USPTO ODP authenticated + Espacenet rate-block detection).
+- **PC2.B — MAC-107 GitHub Code Search auth-required correction** (`fa967b1`) — runguide corrected to reflect mandatory authentication for all `/search/*` queries since GitHub's 2022 GA change; rate limit clarified as 30 req/min on `/search/*`; 4-row SQL column-drift fix (`identifier_value → identifier`, `manufacturer_canonical_name → manufacturer`); 4-probe `§3.0` verification block with PAT scope sanity + account-identity capture for §11 #3 audit-log provenance.
+- **PC2.C — MAC-102 ISED REL Spring Web Flow migration** (`164ceb2`) — legacy `apc-cap.ic.gc.ca` Oracle PL/SQL endpoint decommissioned; runguide migrated to `sms-sgs.ic.gc.ca/equipmentSearch/searchRadioEquipments` Spring Web Flow surface; per-row + bulk-data URL templates deferred to v2 runguide (continuation-token discovery + POST-flow advance not yet captured); 4-probe `§3.0` verification block. OGL-Canada-2.0 license posture unchanged.
+- **PC2.D — MAC-103 BT SIG Qualified Designs narrow-to-shallow** (`d66f986`) — runguide narrowed from full-Wave-G companion-app linkage to shallow-surface QDID capture (`QDID + product_name + owner_company + reference_QDID`); cross-source linkage to `ble_manufacturer_id` preserved; Cloudflare WAF UA-shape rejection documented (browser-shape UA required; `argus-research/*` UA rejected); public POST search at `qualificationapi.bluetooth.com/api/Platform/Listings/Search`; SIG member gate noted for deeper surfaces.
+
+The four-instance pattern (PC2.A through PC2.D, covering decommission / host-migration / auth-gating / Cloudflare-WAF failure modes) is documented at `extraction_outputs/_patch_cycle_2/pc2_d_summary.md` as empirical evidence supporting CP27 §2.4's halt-before-fire contract.
 
 ## [v1.1.0] — 2026-05-17
 

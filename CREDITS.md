@@ -1,6 +1,6 @@
 # Argus — Upstream Attribution and Credits
 
-Argus integrates data derived from 50 upstream sources (canonical registries, procurement data, public-records databases, academic research, community-research repositories, vendor-published documentation, and — new in v1.1.0 — international corporate registries, US state Secretary-of-State registries, judicial filings, and federal disclosure / entity-registration sources) plus a canonical lexicon of 35 surveillance-technology vendors. This document attributes every upstream contribution, names the integration shape, and records license-carry-forward obligations downstream consumers must honor.
+Argus integrates data derived from 52 upstream sources (canonical registries, procurement data, public-records databases, academic research, community-research repositories, vendor-published documentation, international corporate registries, US state Secretary-of-State registries, judicial filings, federal disclosure / entity-registration sources, and — new in v1.2.0 — the fccid.io community aggregator + the official FCC Equipment Authorization System Filings UI as a distinct primary surface) plus a canonical lexicon of 49 surveillance-technology vendors. This document attributes every upstream contribution, names the integration shape, and records license-carry-forward obligations downstream consumers must honor.
 
 For the binding license terms, see [LICENSE](LICENSE) (AGPL-3.0-or-later — code), [LICENSE-DATA](LICENSE-DATA) (ODbL-1.0 — database), and [LICENSE-DOCS](LICENSE-DOCS) (CC-BY-SA-4.0 — documentation). The LICENSE-DATA §2.1 per-source license-posture taxonomy is the structural anchor for the source enumerations below.
 
@@ -50,6 +50,22 @@ Three new `source_type` enum values were admitted in v1.1.0 via migration 0020 (
 | 48 | CourtListener / RECAP (Free Law Project) | judicial_filing | CC0-1.0 | automated_with_auth | 2026-05-17T03:55:52Z |
 | 49 | SEC EDGAR | disclosure_filing | PUBLIC_DOMAIN | automated_html_parse | 2026-05-16T20:32:53Z |
 | 50 | SAM.gov Entity Registration | procurement_disclosure | PUBLIC_DOMAIN | automated_api (cycle_completion_state=`partial_pre_day1`) | 2026-05-17T14:10:40Z |
+
+### v1.2.0 additions — FCC Equipment Authorization aggregator + primary surface (crowdsourced + regulatory)
+
+Two FCC-ecosystem sources were admitted in v1.2.0 via the MAC-101 / MAC-178 wave: a community aggregator surfacing FCC ID filings under a NO_LICENSE_DECLARED Feist regime, paired with the official FCC EAS Filings UI as a distinct primary surface from the existing FCC EAS Grantee Registrations source (sid=7). The pair introduces a new dual-citation-pair convention (the discovery surface is the aggregator; the citation surface is the regulator) recorded via the new `fcc_citation_deferred_queue` staging table (migration 0022; 671 rows seeded). When FCC.gov egress is restored, the async re-citation pass will drain the queue and emit paired regulatory-band citation rows.
+
+- **[fccid.io](https://fccid.io/)** (sources.id=51) — a third-party aggregator of US FCC Equipment Authorization System filings. fccid.io mirrors the FCC's public filings catalog with a more navigable surface than the official `apps.fcc.gov` UI. `source_type='crowdsourced'` (tier 2); `access_mode='automated_html_parse'`. Per-row URL template: `https://fccid.io/{grantee_code}-{product_code}`. **License: NO_LICENSE_DECLARED** — the upstream aggregator carries no declared license. Argus extracts identifier facts (FCC ID values, grantee-code linkages, product-code linkages) under the *Feist v. Rural Telephone Service* (499 U.S. 340 (1991)) facts-not-copyrightable doctrine; compilation arrangement (the aggregator's per-page layout, navigation structure, selection-and-organization) is NOT republished. Per-promoted-row sentinel: `identifiers.notes.upstream_license_posture='NO_LICENSE_DECLARED'` (canonical sentinel-key). Yield this cycle: 671 raw_observations staged as discovery rows under the dual-citation-pair pattern; promotion deferred to the async FCC.gov re-citation pass (citation half pending). Admitted via session `fccid_io_admission` (dispatch MAC-101; admission_date_utc `2026-05-18T04:27:14Z`). **Why included:** fccid.io is the dominant community surface for navigating FCC EAS filings; its discovery shape (one URL per `{grantee_code}-{product_code}`) lets the validator's async re-citation pass shortcut FCC.gov navigation from a 5-step lookup to a 1-step lookup when the discovery row carries the opportunistic `fcc_grant_ids[]` enrichment field (564 of 671 queue rows do).
+- **[FCC Equipment Authorization System — Filings](https://apps.fcc.gov/oetcf/eas/reports/GenericSearch.cfm)** (sources.id=52) — the official FCC EAS Filings UI. Distinct from the existing FCC EAS Grantee Registrations data file (sid=7); the Filings UI gives per-FCC-ID filing surfaces (test reports, internal photos, RF exposure data) that the grantee CSV doesn't expose. `source_type='regulatory'` (tier 1); `access_mode='automated_html_parse'`. **License: PUBLIC_DOMAIN** (US government work product per 17 USC §105). Attribution string: *"FCC Equipment Authorization System filings are US government records and are not copyrightable per 17 USC §105."* Admitted under a degraded-mode posture: at MAC-101 extraction time, FCC.gov egress was unreachable from the runtime host (Akamai-edge HTTP/2 INTERNAL_ERROR across `apps.fcc.gov`), so the source row was admitted (the source EXISTS) but the citation-half of the 671 discovery rows was deferred to an asynchronous re-citation pass. The source exists; the citation rows accumulate when egress is restored. Admitted via session `fccid_io_admission` (dispatch MAC-101; admission_date_utc `2026-05-18T04:27:14Z`). **Why included:** the official primary surface for FCC ID filing material (test reports, photos, RF exposure data) — distinct from the grantee-registration CSV; the dual-citation-pair pattern (sid=51 discovery → sid=52 citation) is the bible-canon shape for aggregator-paired-with-regulator source admissions.
+
+**License-attribution carry-forward summary (v1.2.0 additions):** NO_LICENSE_DECLARED (sid 51 fccid.io) inherits the Feist facts-only regime per §6 below — `identifiers.notes.upstream_license_posture='NO_LICENSE_DECLARED'` on every promoted row; downstream consumers redistributing Argus's database content inherit the same facts-only posture. PUBLIC_DOMAIN (sid 52 FCC EAS Filings) carries no attribution-required obligation per 17 USC §105; per-row `apps.fcc.gov` source_url citation discipline applies once the async re-citation pass drains the deferred queue.
+
+### v1.2.0 admission ledger summary
+
+| sid | Name | source_type | License | access_mode | admission_date_utc |
+|---|---|---|---|---|---|
+| 51 | fccid.io | crowdsourced | NO_LICENSE_DECLARED | automated_html_parse | 2026-05-18T04:27:14Z |
+| 52 | FCC Equipment Authorization System — Filings | regulatory | PUBLIC_DOMAIN | automated_html_parse (degraded_mode_admission) | 2026-05-18T04:27:14Z |
 
 ---
 
@@ -125,10 +141,11 @@ The community-research corpus (~24 repos) contributed corroborating identifier o
 
 ## 6 — NO_LICENSE_DECLARED Feist-defensible sources
 
-Two sources (`sources.id` 39 + 42) publish material publicly on GitHub without a LICENSE file or explicit license declaration. Argus's promotion regime under these sources operates under the [Feist v. Rural Telephone Service (499 U.S. 340 (1991))](https://supreme.justia.com/cases/federal/us/499/340/) facts-not-copyrightable doctrine, with the canonical composition discipline defined in `PROJECT_BIBLE.md` (see Canonical sources at end of this document).
+Three sources (`sources.id` 39, 42, and — new in v1.2.0 — 51) publish material publicly without a LICENSE file or explicit license declaration. Argus's promotion regime under these sources operates under the [Feist v. Rural Telephone Service (499 U.S. 340 (1991))](https://supreme.justia.com/cases/federal/us/499/340/) facts-not-copyrightable doctrine, with the canonical composition discipline defined in `PROJECT_BIBLE.md` (see Canonical sources at end of this document).
 
 - **sources.id=39 EthanThePhoenix38/flock-you-camera-detector** — 20 raw observations contribute 19 promoted identifiers. 1 row rejected as a known-fake (cc:cc:cc all-identical-octet OUI).
 - **sources.id=42 GainSec/flock-safety-falcon-sparrow-alpr-edl-firehose** — 50 raw observations contribute 8 promoted identifiers (firmware-binary mining).
+- **sources.id=51 fccid.io** (new in v1.2.0) — 671 raw_observations staged as dual-citation-pair discovery rows; promotion deferred to the async FCC.gov re-citation pass under the MAC-101 partial-deliverable admission posture. No identifier promotions this release; the rows hold at `crowdsourced` 50-75 confidence band until paired with their sid=52 regulatory citation half.
 
 **What Argus extracts** (facts; not copyrighted): identifier values, manufacturer attributions, pinned source URL citations.
 
@@ -140,24 +157,31 @@ Downstream consumers redistributing Argus's database content inherit the same fa
 
 ---
 
-## 7 — Surveillance-technology vendor lexicon (manufacturers table; 35 canonical entries)
+## 7 — Surveillance-technology vendor lexicon (manufacturers table; 49 canonical entries)
 
 The `manufacturers` table is the canonical lexicon of surveillance-technology vendors used as the Tier-2/3 device_category inference allowlist. Each entry contributes vendor attribution to identifier rows. This is NOT a data source in the registry sense above; it's an internal curated lexicon used at promotion time. Listed alphabetically:
 
 | Vendor | Canonical category |
 |---|---|
+| Aerodome | drone |
+| Autel Robotics | drone |
 | Avigilon | alpr |
 | Axis Communications | alpr |
 | Axon | body_cam |
-| BRINC | drone |
 | Berla | hacking_tool |
+| BluePoint Alert | (uncategorized — documented_absence stub admission, v1.2.0) |
 | BriefCam | face_recog |
+| BRINC | drone |
 | Cellebrite | hacking_tool |
+| Cisco Meraki | (uncategorized — positive-extraction admission, v1.2.0) |
 | Clearview AI | face_recog |
+| Coban Technologies | body_cam |
 | Cradlepoint | (uncategorized — multi-purpose-vendor carveout) |
-| DJI | drone |
+| Dahua | (uncategorized — positive-extraction admission with NDAA §889 note, v1.2.0) |
 | Dedrone | drone_detect |
+| Digital Ally | body_cam |
 | Digital Receiver Technology | imsi_catcher |
+| DJI | drone |
 | DroneShield | drone_detect |
 | Engility | imsi_catcher |
 | Flock Safety | alpr |
@@ -165,22 +189,31 @@ The `manufacturers` table is the canonical lexicon of surveillance-technology ve
 | Getac | body_cam |
 | Hak5 | hacking_tool |
 | Harris | imsi_catcher |
+| Hikvision | (uncategorized — positive-extraction admission with NDAA §889 note, v1.2.0) |
+| Honeywell | (uncategorized — documented_absence stub admission, v1.2.0) |
 | Jacobs | imsi_catcher |
 | Johnson Matthey PLC | (uncategorized — v1.1.0 closed Class B hold via UK Companies House #00033774; chemistry/precious-metals; no surveillance-adjacency) |
 | Kenwood | police_radio |
 | KeyW | imsi_catcher |
 | L3Harris | (uncategorized — multi-purpose-vendor) |
+| Lenel | (uncategorized — documented_absence stub admission, v1.2.0) |
 | Magnet Forensics | hacking_tool |
 | Motorola Solutions | (uncategorized — multi-purpose-vendor carveout) |
 | Parrot | drone |
+| PIPS Technology | alpr |
 | Rekor | alpr |
 | Reveal | body_cam |
 | Septier | imsi_catcher |
 | Sierra Wireless | (uncategorized — multi-purpose-vendor) |
 | Skydio | drone |
 | SoundThinking (ShotSpotter) | gunshot_detect |
+| Utility Inc | body_cam |
+| Verkada | (uncategorized — documented_absence stub admission, v1.2.0) |
 | Vigilant Solutions | alpr |
 | WatchGuard | body_cam |
+| Wolfcom | body_cam |
+
+**v1.2.0 lexicon additions (14 vendors, from 35 to 49):** 4 positive-extraction admissions from the MAC-104 Wave-G v2 PlayStore companion-app extraction pass — **Hikvision** and **Dahua** (both admitted with NDAA Section 889 note: state/local LE deployments persist outside the federal-procurement bar), **Autel Robotics**, and **Cisco Meraki**. 10 stub admissions from absence-investigation cycles (apk-pure 404 + apk-mirror "no results" + cohort-prediction reasoning) — **Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome** — each carries `notes.admission_basis='documented_absence_only'`.
 
 Lexicon evolution is documented in the amendment ledger at [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md). Aliases tracked per-vendor in `manufacturers.aliases`; multi-purpose-vendor carveouts are documented in `PROJECT_BIBLE.md` (see Canonical sources).
 
@@ -204,7 +237,7 @@ When producing derived datasets from Argus, honor the upstream license carry-for
 - **Per-row LICENSE column** (`deployment_observations.LICENSE`): downstream consumers MUST honor per-row license tag.
   - Atlas-derived rows (`LICENSE='CC-BY-NC-SA-4.0'`, sid=5, 15,071 rows): **exclude from commercial derivative datasets** per upstream NC clause; non-commercial / research / journalist use is licensed.
   - DeFlock-derived rows (`LICENSE='ODbL-1.0'`, sid=6, 101,597 rows): compatible with ODbL-1.0 compilation license; standard ShareAlike applies.
-- **Per-identifier `notes.upstream_license_posture`**: NO_LICENSE_DECLARED facts-only sources (`sources.id` 39, 42; 27 promoted rows total) inherit the Feist regime — derivatives operate under Feist facts-not-copyrightable; no upstream license obligation.
+- **Per-identifier `notes.upstream_license_posture`**: NO_LICENSE_DECLARED facts-only sources (`sources.id` 39, 42; 27 promoted rows total; plus sid 51 fccid.io v1.2.0 admission carrying 671 raw_observations staged but not yet promoted pending the async FCC.gov re-citation pass) inherit the Feist regime — derivatives operate under Feist facts-not-copyrightable; no upstream license obligation.
 - **AGPL-3.0 source attribution** (`sources.id` 38, 40, 43, plus the implicit AGPL inheritance pattern in Argus's own code per LICENSE): research-derived factual claims do NOT trigger AGPL-3.0 copyleft; redistribution of the upstream compilation arrangement WOULD trigger it (and Argus does NOT republish such arrangements).
 - **CC-BY-NC-ND-4.0 source attribution** (`sources.id=41` GainSec anti-crime-ecosystem-research): derivative-modification restricted per the ND clause; research-use clause permits Argus's factual extraction; downstream derivative-modification consumers must evaluate the ND clause separately.
 
