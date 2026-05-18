@@ -3073,3 +3073,102 @@ Surfaced by CP26 (queued for future CP candidacy as evidence accumulates):
 This CP26 entry is the §11 #11 amendment-log pairing for the §11 #8 sub-rule (CP26 §8) + the seven cycle-5 runguide corrections (CP26 §1-§7) + the `cycle_completion_state` convention (CP26 §9) in the coordinated commit set. Bible HEAD bumps from the CP25 commit to the CP26 commit landed alongside this entry. Schema version unchanged (CP26 is §-text + row-local notes-pattern; no migration).
 
 ═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 27 — §2.4 Empirical-Premise Verification Precondition
+
+**Date:** 2026-05-18
+**Source:** Cycle-7 autonomous overnight wave (2026-05-17→2026-05-18) per [MAC-177](/MAC/issues/MAC-177) parent + [MAC-178](/MAC/issues/MAC-178) integration. Six concrete failure-mode anchors surfaced inside a single 8-hour window — 5 external web-scrape runguides ([MAC-102](/MAC/issues/MAC-102) ISED Canada REL, [MAC-103](/MAC/issues/MAC-103) BT SIG Qualified Designs, [MAC-105](/MAC/issues/MAC-105) USPTO Patent Text Mining, [MAC-107](/MAC/issues/MAC-107) GitHub Code Search, [MAC-110](/MAC/issues/MAC-110) Ofcom UK) all halted at empirically-falsified load-bearing premises, and 1 internal extraction patch ([MAC-101](/MAC/issues/MAC-101) PC1.7 `application_id`-vs-`grant_id` identifier-field-name miscall) caught the same class of failure mid-flight. The empirical density alone is the codification trigger.
+**Bible commit:** This entry + the §2.4 insert into `PROJECT_BIBLE.md` (placed after §2.3 A Note on Ambition; before §3 Architecture). Schema version unchanged (22 → 22; CP27 is §-text only — process amendment, no migration, no notes_json convention).
+**Status:** Ratified at MAC-178 dispatch 2026-05-18 per CEO disposition [3029e567](/MAC/issues/MAC-178#comment-3029e567-c4e7-4dac-aff8-cd03b8c9a48a) (response to Validator draft [60301e62](/MAC/issues/MAC-178#comment-60301e62-da2e-4007-b975-b40caaf2c923)). Draft ratified verbatim — no refinements applied to the §2.4 text or the 10-runguide downstream-consumer audit. The §4.4 DROPPED-class disposition surface raised at MAC-178 Priority 8 is **explicitly deferred** to a separate future CP cycle (candidate slot: CP28); it is NOT part of CP27.
+**Binds:** CEO (any future runguide dispatch authorization MUST verify §3.0 verification-probe completion CLEAN POSITIVE before signing off on §3.1 bulk-extraction fire); Validator + ExtractionWorker (any pre-existing runguide being re-dispatched MUST re-run §3.0 probes at re-dispatch time regardless of prior calibration); Researcher (any new runguide drafted post-CP27 MUST ship a §3.0 verification-probe section as a published structural slot before any §3.1 dispatch fires).
+
+### Why this Correction Pass exists
+
+The cycle-7 autonomous wave (2026-05-17→2026-05-18, ~8 hours of autonomous extraction firing) hit six load-bearing-premise failures across five separate web-scrape runguides and one internal extraction pass. Each failure mode is independently structural — none are coincidental drift; each represents a class of premise that any runguide can carry. The clustering is the codification signal:
+
+| Runguide / pass | Failure mode | Falsified load-bearing premise |
+|---|---|---|
+| [MAC-102](/MAC/issues/MAC-102) ISED Canada REL | Oracle PL/SQL gateway → Spring Web Flow migration | URL template + HTTP method + session model (form-flow `execution=...` token) |
+| [MAC-103](/MAC/issues/MAC-103) BT SIG Qualified Designs | Launch Studio domain rename + auth-gate added | URL domain (`qualification.bluetooth.com` 301) + auth posture (`Layers` endpoint 401) + response-shape (Vue SPA vs server-rendered) |
+| [MAC-105](/MAC/issues/MAC-105) USPTO PatFT | PatFT decommissioned ~2022; NXDOMAIN | endpoint existence (URL host no longer resolves) |
+| [MAC-107](/MAC/issues/MAC-107) GitHub Code Search | Auth-required for ALL queries since 2022 GA | auth posture (unauthenticated 401, was 200) |
+| [MAC-110](/MAC/issues/MAC-110) Ofcom UK | Cloudflare managed challenge JS gate added | request-shape (curl-able → JS-required) |
+| [MAC-101](/MAC/issues/MAC-101) PC1.7 (fccid.io) | `application_id` field assumption empirically wrong | identifier-field name (Grant ID is the actual identifier, not Application ID) |
+
+5 separate external runguides + 1 internal patch = 6 concrete failure-mode anchors across 5 organizations in a single autonomous-wave window. The discipline the wave kept evolving in real-time — runguide patch cycles + a mid-flight extraction-script fix — is the canonical bible expression of the discipline going forward. CP27 codifies it as a precondition on §3.1 dispatch.
+
+### Corrections applied
+
+1. **§2.4 (new) — Empirical-Premise Verification Precondition.** New subsection in `PROJECT_BIBLE.md` after §2.3 A Note on Ambition, before §3 Architecture. Verbatim §2.4 text:
+
+   > **§2.4 — Empirical-Premise Verification Precondition (CP27).** Before any runguide's §3.1 bulk dispatch fires, the runguide's load-bearing premises MUST be empirically verified against the live source within the same calendar day as dispatch (24-hour staleness ceiling). Load-bearing premises include: URL templates, HTML/JSON response structure assumptions, authentication posture, rate-limit posture, identifier-pattern presence in the response surface, response-shape stability under documented filter / search parameter combinations, and the canonical identifier-field name (e.g. `application_id` vs `grant_id`) the §4 extraction expects.
+   >
+   > Verification probes are documented in **§3.0 of the runguide** (per the MAC-101 PC1.7 pattern, which was the first canonical instance of a §3.0 verification probe section). §3.0 probes must complete with one of two clean outcomes before §3.1 fires:
+   > - **CLEAN POSITIVE** — every load-bearing premise holds; §3.1 dispatch authorized.
+   > - **CLEAN NEGATIVE** — at least one load-bearing premise is empirically false; §3.1 dispatch **halted** under §6 #5; runguide returns to drafting per the patch-cycle convention; **CEO disposition required** before re-fire.
+   >
+   > **INCONCLUSIVE** outcomes (probe completed but result is ambiguous — e.g. partial reachability, response shape detected but not the expected schema, auth challenge surfaced but not fully diagnosed) **also halt** the runguide; CEO disposition required as for CLEAN NEGATIVE.
+   >
+   > **Retroactive binding:**
+   > - Runguides **drafted but not yet dispatched** are subject to §2.4 retroactively; add §3.0 verification-probe section to their published structure before any future dispatch fires.
+   > - Pre-existing runguides being **re-dispatched** (after a halt + patch cycle) are subject to §2.4 at re-dispatch time; the verification probe is mandatory regardless of any prior calibration the runguide may carry.
+   > - Runguides that have **completed successfully** (e.g. MAC-101 fccid.io) are not retroactively halted, but should have §3.0 formalized post-hoc to preserve the verification-probe lineage for future Wave-N' re-dispatches of the same source.
+
+2. **§3.0 runguide-template slot — `verification-probe` published structural slot.** Any new runguide drafted post-CP27 MUST include a §3.0 verification-probe section as a first-class structural slot ahead of §3.1 bulk dispatch. The slot's contract: a per-premise probe list, expected probe outcomes (CLEAN POSITIVE / CLEAN NEGATIVE / INCONCLUSIVE), and the halt-or-proceed decision rule. The slot composes with §6 #5 halt criteria (CLEAN NEGATIVE / INCONCLUSIVE both halt §3.1).
+
+3. **§6 #5 halt-criteria composition.** §2.4 §3.0 probe outcomes integrate cleanly with the existing §6 #5 halt-criteria framework. CLEAN NEGATIVE and INCONCLUSIVE outcomes are first-class halt triggers; the runguide returns to drafting per the patch-cycle convention; CEO disposition is required before any re-fire of §3.1. No additional §6 amendment is needed — §6 #5 is the existing halt-criteria contract; §2.4 §3.0 just generates new triggers under it.
+
+### Downstream-consumer audit (per [feedback_bible_amendment_downstream_consumer_audit](/MAC/issues/MAC-178#comment-3029e567-c4e7-4dac-aff8-cd03b8c9a48a) standing rule)
+
+CP27 is a process amendment. No schema migration sibling. No code-path sibling (`export_lynceus.py` / `coverage_matrix.py` / `IDENTIFIER_TYPE_TO_PATTERN_TYPE` unaffected — discipline, not enum). No test-fixture sibling. **Consumer surface is runguides only.**
+
+Ten runguides need retroactive §3.0 verification-probe sections — the 5 halted at minimum per the dispatch directive, plus the 5 drafted/completed for future-re-dispatch consistency:
+
+| Runguide | MAC | Status | §3.0 priority | Suggested §3.0 probes |
+|---|---|---|---|---|
+| `ised_rel_admission_runguide.md` | [MAC-102](/MAC/issues/MAC-102) | halted | **Must, before v2 re-fire** | Spring-Web-Flow URL probe + form-field exfil + `execution=...` token shape |
+| `bt_sig_qualified_designs_admission_runguide.md` | [MAC-103](/MAC/issues/MAC-103) | halted | **Must, before v2 re-fire** | `qualification.bluetooth.com` 301 chase + `Platform/Listings/Submission/{id}/Layers` 401 auth probe |
+| `patent_text_mining_admission_runguide.md` | [MAC-105](/MAC/issues/MAC-105) | halted | **Must, before v2 re-fire** | NXDOMAIN check on USPTO PatFT; EPO Espacenet 403 vs OPS 200 probe; Google Patents JS-vs-XHR probe |
+| `github_mass_search_admission_runguide.md` | [MAC-107](/MAC/issues/MAC-107) | halted | **Must, before v2 re-fire** | Unauthenticated Code Search probe (expect 401) + auth-tier probe with PAT |
+| `ofcom_acma_admission_runguide.md` | [MAC-110](/MAC/issues/MAC-110) | halted | **Must, before v2 re-fire** | Cloudflare-challenge JS probe + Azure APIM vs public-API probe + ACMA RRL-vs-equipment-register schema probe |
+| `fccid_io_admission_runguide.md` | [MAC-101](/MAC/issues/MAC-101) | completed (PC1.7 mid-flight patch) | **Should, post-hoc** | Formalize PC1.7's `application_id`-vs-`grant_id` probe as §3.0 |
+| `wave_g_v2_playstore_expansion_runguide.md` | [MAC-104](/MAC/issues/MAC-104) | completed | **Should, post-hoc** | Codify apk-pure vs apk-mirror reachability + manifest BLE-permissions probe |
+| `conference_proceedings_admission_runguide.md` | [MAC-108](/MAC/issues/MAC-108) | drafted, never dispatched | **Must, before first dispatch** | tesseract availability probe; PDF-archive reachability probe; OCR-grade self-test |
+| `muckrock_foia_admission_runguide.md` | [MAC-109](/MAC/issues/MAC-109) | drafted, deferred (PII pre-pass safety) | **Must, before first dispatch** | MuckRock public-feed probe; PII-pre-pass tooling probe; FOIA-document schema probe |
+| `wave_g_prime_ios_admission_runguide.md` | Wave-G' iOS | drafted, deferred (Apple ID) | **Must, before first dispatch** | Apple App Store reachability probe; IPA-fetch tooling probe; iOS-decompilation-framework probe |
+
+**8 "Must" cases + 2 "Should" cases = 10 downstream consumers.** Per CEO disposition: the 8 "Must" cases enforce naturally at each runguide's next dispatch-firing gate — no separate tracking issue needed because the §2.4 contract halts §3.1 before fire (structurally self-enforcing). The 2 "Should" cases (MAC-101 + MAC-104, completed runguides) fire lazily next time those runguides are touched (e.g., MAC-101.v2 dispatch or Wave-G' v3 dispatch). Not gating MAC-178 close.
+
+### Composition with §11 hard rules
+
+- **§11 #1 (no fabrication)** — strengthened. §2.4 catches runguide premises that would otherwise produce empty/fabricated extraction yields when the live source no longer matches the assumed schema. The MAC-101 PC1.7 `application_id`-vs-`grant_id` instance is the canonical example: an extraction script writing to the wrong field name does not fabricate, but it produces yield-shape divergence that downstream consumers cannot diagnose without the §3.0 probe trail.
+- **§11 #7 (no promotion without provenance)** — orthogonal-strengthening. §2.4 §3.0 probe artifacts (probe-script + observed-response snapshot + outcome classification) are provenance for the runguide-authoring step itself, not for any single row. Future audit of "why was this dispatch fired?" has a structured §3.0 anchor.
+- **§11 #8 (no confidence drift upward without corroboration)** — orthogonal. §2.4 is pre-extraction; §11 #8 is mid- and post-extraction. CP27 does not modify §11 #8 sub-rule composition (CP24 / CP25 §1 / CP26 §8).
+- **§11 #11 (amendment-log discipline)** — this CP27 entry IS the amendment-log pairing for the new §2.4 + the new §3.0 runguide-template slot. Bible HEAD bumps from the CP26 commit to the CP27 commit landed alongside this entry.
+- **§11 #14 (procurement-only never exported to Lynceus)** — orthogonal; CP27 has no downstream-consumer impact on the procurement/Lynceus boundary.
+- **§11 #15 (decompiled-output non-redistribution)** — orthogonal; CP27 is runguide-authoring discipline, not data-handling discipline.
+- **§11 #16 (Feist facts-only)** — orthogonal; CP27 does not touch the Feist facts-only contract.
+
+### Sequencing post-acceptance
+
+1. **CP27 ratifies at this commit.** Bible HEAD bumps from the CP26 commit to this CP27 commit. Schema version unchanged (22 → 22; CP27 is §-text only — no schema migration, no notes_json convention).
+2. **§2.4 insert into `PROJECT_BIBLE.md`** lands in the same commit (placed after §2.3 A Note on Ambition; before §3 Architecture).
+3. **CHANGELOG.md v1.2.0 ledger updated** in the same commit — the "DRAFTED pending ratification" prose at the v1.2.0 narrative replaced with the "ratified as CP27" prose; the schema-version-unchanged status preserved.
+4. **No downstream-consumer-runguide commits in this CP27 commit.** The 10-runguide retroactive §3.0 retrofits fire lazily at each runguide's next dispatch — naturally enforced by §2.4 halting §3.1 before fire. No separate tracking issue is created; structurally self-enforcing.
+5. **No paired state-rotation commit needed.** PROJECT_STATE.md will refresh organically at the next post-MAC-178 close (MAC-178 itself is the close-out moment for the cycle-7 wave).
+6. **Operator pushes after final review** per standing constraint at MAC-178 dispatch — all wave-integration commits including this CP27 commit are local-only through completion.
+
+### §12 Open Questions impact
+
+Resolved by CP27:
+- **Runguide load-bearing-premise verification as a structural slot vs ad-hoc discipline** — RESOLVED at CP27 §2.4. The §3.0 verification-probe slot is now a published structural slot ahead of §3.1; INCONCLUSIVE and CLEAN NEGATIVE outcomes both halt under §6 #5 with CEO disposition required.
+
+Surfaced by CP27 (queued for future CP candidacy):
+- **§4.4 DROPPED-class MAP-vs-DROPPED routing amendment** — surfaced at MAC-178 Priority 8 disposition. The 6 identifier_types promoted in MAC-104 Wave-G v2 (`ble_service_uuid`, `ble_characteristic`, `ble_company_id`, `asdstan_enum_value`, `device_class_id`, `rf_protocol_constant`) are all §4.4 DROPPED-class per CP16/CP19/MAC-117. Candidates for future MAP promotion: `ble_service_uuid` → `ble_uuid` alias and `ble_company_id` → `ble_manufacturer_id` alias (Lynceus consumes these operationally). The remaining 4 carry explicit DROPPED rationale and probably stay DROPPED. **Deferred to a separate future CP cycle (candidate slot: CP28); explicitly NOT part of CP27.**
+- **`documented_absence` first-class table promotion** — held at MAC-178 Priority 5 disposition. Cumulative count is ~22 entries; still below the §3 #6 ≥30 wave-cumulative threshold for table-promotion discussion. Revisit when cumulative count crosses the threshold.
+
+### §11 #11 self-binding satisfied
+
+This CP27 entry is the §11 #11 amendment-log pairing for the new §2.4 Empirical-Premise Verification Precondition + the new §3.0 runguide-template structural slot. Bible HEAD bumps from the CP26 commit to the CP27 commit landed alongside this entry. Schema version unchanged (CP27 is §-text only; no schema migration, no notes_json convention, no code-path sibling).
+
+═══════════════════════════════════════════════════════════════════════

@@ -63,6 +63,25 @@ The database must aim to cover, in priority order:
 
 The human chose "everything in one shot" for v1. Honor that, but be honest in progress reports about coverage. It is better to have 200 high-confidence Flock records than 5,000 low-confidence guesses across 15 categories. If a category has no good public sources, document that and move on rather than fabricating coverage.
 
+### 2.4 Empirical-Premise Verification Precondition
+
+Before any runguide's §3.1 bulk dispatch fires, the runguide's load-bearing premises MUST be empirically verified against the live source within the same calendar day as dispatch (24-hour staleness ceiling). Load-bearing premises include: URL templates, HTML/JSON response structure assumptions, authentication posture, rate-limit posture, identifier-pattern presence in the response surface, response-shape stability under documented filter / search parameter combinations, and the canonical identifier-field name (e.g. `application_id` vs `grant_id`) the §4 extraction expects.
+
+Verification probes are documented in **§3.0 of the runguide** (per the MAC-101 PC1.7 pattern, which was the first canonical instance of a §3.0 verification probe section). §3.0 probes must complete with one of two clean outcomes before §3.1 fires:
+
+- **CLEAN POSITIVE** — every load-bearing premise holds; §3.1 dispatch authorized.
+- **CLEAN NEGATIVE** — at least one load-bearing premise is empirically false; §3.1 dispatch **halted** under §6 #5; runguide returns to drafting per the patch-cycle convention; **CEO disposition required** before re-fire.
+
+**INCONCLUSIVE** outcomes (probe completed but result is ambiguous — e.g. partial reachability, response shape detected but not the expected schema, auth challenge surfaced but not fully diagnosed) **also halt** the runguide; CEO disposition required as for CLEAN NEGATIVE.
+
+**Retroactive binding:**
+
+- Runguides **drafted but not yet dispatched** are subject to §2.4 retroactively; add §3.0 verification-probe section to their published structure before any future dispatch fires.
+- Pre-existing runguides being **re-dispatched** (after a halt + patch cycle) are subject to §2.4 at re-dispatch time; the verification probe is mandatory regardless of any prior calibration the runguide may carry.
+- Runguides that have **completed successfully** (e.g. MAC-101 fccid.io) are not retroactively halted, but should have §3.0 formalized post-hoc to preserve the verification-probe lineage for future Wave-N' re-dispatches of the same source.
+
+Codified at CP27 (`BIBLE_AMENDMENTS.md`) after the 2026-05-17→05-18 cycle-7 autonomous wave surfaced six concrete failure-mode anchors in a single 8-hour window (5 external runguides + 1 internal extraction pass — MAC-102 ISED, MAC-103 BT SIG, MAC-105 USPTO PatFT, MAC-107 GitHub Code Search, MAC-110 Ofcom, plus MAC-101 PC1.7).
+
 ---
 
 ## 3. Architecture
