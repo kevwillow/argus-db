@@ -942,8 +942,19 @@ def run_bulk():
 
     progress_path = WORK_DIR / 'progress.json'
     deferred_queue: list = []
+    # D1 cycle preservation: load existing deferred queue if present (preserves prior cycles'
+    # partial work like the 328 ABZ entries from the canary-halted full bulk).
+    existing_queue_path = WORK_DIR / 'fcc_citation_deferred_queue.json'
+    if existing_queue_path.exists():
+        try:
+            existing = json.loads(existing_queue_path.read_text())
+            deferred_queue = list(existing.get('entries', []))
+            logging.info(f'D1-cycle preservation: preloaded {len(deferred_queue)} entries from existing deferred queue')
+        except Exception as e:
+            logging.warning(f'could not preload deferred queue (continuing fresh): {e}')
     borderline_log: list = []
-    provisional_id_counter = [10000]  # placeholder IDs; validator re-IDs at promotion
+    # Start provisional_id counter past existing queue length to avoid ID collisions across cycles
+    provisional_id_counter = [10000 + len(deferred_queue)]
     all_filings: list = []
     last_completed_fcc_id: str | None = None
     in_flight_grantee: str | None = None
