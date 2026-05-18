@@ -6,9 +6,9 @@ This document is the canonical schema reference for the Argus SQLite database (`
 
 **Audience:** downstream operators integrating Argus's exports, external researchers auditing the dataset, contributors adding new identifier candidates or methodology refinements, vendors reviewing how their equipment is represented.
 
-**Scope:** v1.0.0 schema (`schema_version=21` as of 2026-05-17; live verification timestamp 2026-05-17T05:07:32Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
+**Scope:** v1.0.0 schema (`schema_version=22` as of 2026-05-18; live verification timestamp 2026-05-18T20:42:55Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
 
-**Last refresh:** Correction Pass 23 (2026-05-17) — migrations 0020 (sources.source_type CHECK extension; 10 → 13 values) + 0021 (procurement_records.vendor_canonical_normalized column + index + backfill).
+**Last refresh:** Correction Pass 27 (2026-05-18) — migration 0022 (`fcc_citation_deferred_queue` staging table, MAC-178 cycle-7 wave Priority 1 deliverable; persists the 671-row deferred FCC.gov re-citation backlog under the dual-citation-pair convention from CP26 + MAC-178 P1+P2). MAC-178 P7 ratified CP27 §2.4 (Empirical-Premise Verification Precondition). Prior refresh Correction Pass 23 (2026-05-17) — migrations 0020 (`sources.source_type` CHECK extension; 10 → 13 values) + 0021 (`procurement_records.vendor_canonical_normalized` column + index + backfill).
 
 **Conventions:**
 - Column shape: `name TYPE NOT NULL DEFAULT … CHECK(…)` notation matches the migration source-of-truth at `db/migrations/*.sql`.
@@ -29,7 +29,7 @@ Throughout this document and the Argus project:
 
 ## §3. Schema overview
 
-The v1.0.0 schema carries **14 tables** at `schema_version=21`. They group into four functional categories:
+The v1.0.0 schema carries **15 tables** at `schema_version=22`. They group into four functional categories:
 
 ### §3.1 Canonical-state tables (Layer 1)
 
@@ -56,17 +56,18 @@ The v1.0.0 schema carries **14 tables** at `schema_version=21`. They group into 
 - **`extraction_runs`** — per-run telemetry. 10 columns; see §4.12.
 - **`schema_version`** — migration ledger. 3 columns; see §4.13.
 - **`source_reclassifications`** — per-row source-band reclassification audit (added migration 0017 for the post-CP15 `primary_registry` band-correction sweeps). 13 columns; see §4.14.
+- **`fcc_citation_deferred_queue`** — fccid.io discovery-row dual-citation-pair queue (added migration 0022 for the MAC-178 cycle-7 wave Priority 1 deliverable). 14 columns; see §4.15.
 
 ### §3.4.1 Live row counts
 
-Verified against `db/argus.db` at 2026-05-17 (post-MAC-175 close; `SELECT COUNT(*)` over each table):
+Verified against `db/argus.db` at 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wave + post-CP27 ratification; `SELECT COUNT(*)` over each table):
 
 | Table | Row count | Notes |
 |---|---:|---|
-| `identifiers` | **22,613** total = **22,533 active** + **80 superseded** | active = `superseded_by IS NULL`; +1 active in v1.1.0 (Johnson Matthey PLC via UK CH) |
-| `raw_observations` | **133,134** | append-only provenance source-of-truth |
-| `sources` | **50** | source registry (+7 in v1.1.0: UK CH sid=44; DE/CA/TX SoS sid=45-47; CourtListener sid=48; SEC EDGAR sid=49; SAM.gov sid=50) |
-| `manufacturers` | **35** | vendor metadata lookup (+1 in v1.1.0: Johnson Matthey PLC) |
+| `identifiers` | **22,629** total = **22,549 active** + **80 superseded** | active = `superseded_by IS NULL`; +1 active in v1.1.0 (Johnson Matthey PLC via UK CH); +16 active in v1.2.0 (MAC-178 P3 — 16 MAC-104 candidates promoted, 4 held) |
+| `raw_observations` | **133,825** | append-only provenance source-of-truth; +691 in v1.2.0 (MAC-178 P2 fccid.io discovery-row admission, of which 671 are deferred-queue-paired) |
+| `sources` | **52** | source registry (+7 in v1.1.0: UK CH sid=44; DE/CA/TX SoS sid=45-47; CourtListener sid=48; SEC EDGAR sid=49; SAM.gov sid=50; +2 in v1.2.0: fccid.io sid=51, FCC Equipment Authorization System — Filings sid=52, both via MAC-178 P1) |
+| `manufacturers` | **49** | vendor metadata lookup (+1 in v1.1.0: Johnson Matthey PLC; +14 in v1.2.0 via the MAC-178 P4 + P5 autonomous overnight wave admissions) |
 | `deployment_observations` | **116,668** | Layer 2 deployment-location records |
 | `procurement_records` | **46,043** | analytical-only (never exported to Lynceus per §11 #14); +2,560 net-new in v1.1.0 via the MAC-172 USAspending deep-extension |
 | `fcc_grantees` | **50,153** | FCC EAS bulk-load |
@@ -76,7 +77,8 @@ Verified against `db/argus.db` at 2026-05-17 (post-MAC-175 close; `SELECT COUNT(
 | `conflicts` | **20** | validator-side disputed rows |
 | `extraction_runs` | **106** | per-run telemetry |
 | `source_reclassifications` | **809** | per-row band-correction audit (added migration 0017) |
-| `schema_version` | **21** | migration ledger; one row per applied migration |
+| `fcc_citation_deferred_queue` | **671** | dual-citation-pair queue, fccid.io discovery-half (added migration 0022); 0 promoted, 671 awaiting async FCC.gov re-citation pass |
+| `schema_version` | **22** | migration ledger; one row per applied migration |
 
 ### §3.5 Relationship summary
 
@@ -97,6 +99,7 @@ behavioral_signatures.source_id         → sources.id (RESTRICT)
 conflicts.identifier_a_id               → identifiers.id (CASCADE)
 conflicts.identifier_b_id               → identifiers.id (CASCADE)
 conflicts.raw_observation_id            → raw_observations.id (CASCADE)
+fcc_citation_deferred_queue.promoted_raw_observation_id → raw_observations.id (SET NULL)
 ```
 
 `identifiers.manufacturer` is matched by string equality to `manufacturers.canonical_name` (or the JSON-array `aliases` column); logical FK, not enforced.
@@ -105,7 +108,7 @@ conflicts.raw_observation_id            → raw_observations.id (CASCADE)
 
 ### §4.1. `identifiers` (Layer 1 canonical)
 
-The canonical Argus identifier table. Every row represents one identifier-to-attribution binding. Row count verified live 2026-05-17 (post-MAC-175): **22,533 active** (`superseded_by IS NULL`) + **80 superseded** = **22,613 total** (+1 active in v1.1.0: Johnson Matthey PLC via UK CH cross-registry closure).
+The canonical Argus identifier table. Every row represents one identifier-to-attribution binding. Row count verified live 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wave + post-CP27): **22,549 active** (`superseded_by IS NULL`) + **80 superseded** = **22,629 total** (+1 active in v1.1.0: Johnson Matthey PLC via UK CH cross-registry closure; +16 active in v1.2.0 via MAC-178 P3 MAC-104 candidate promotion).
 
 #### Columns
 
@@ -141,7 +144,7 @@ Indexes follow the standard `idx_<table>_<column>` naming convention; primary lo
 
 ### §4.2. `raw_observations` (provenance source-of-truth)
 
-Provenance layer per METHODOLOGY §7.1. Every promoted `identifiers` row is anchored to one or more `raw_observations` rows. Row count verified live 2026-05-17 (post-MAC-175): **133,134**. Append-only invariant: rows do not mutate post-ingest (validator processing updates `processed_at` + `promoted_identifier_id` + `notes` only; never the source-evidence fields).
+Provenance layer per METHODOLOGY §7.1. Every promoted `identifiers` row is anchored to one or more `raw_observations` rows. Row count verified live 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wave): **133,825** (+691 in v1.2.0 via MAC-178 P2 fccid.io discovery-row admission, of which 671 are paired to `fcc_citation_deferred_queue` per the dual-citation-pair convention; citation-half emission deferred to async re-citation pass). Append-only invariant: rows do not mutate post-ingest (validator processing updates `processed_at` + `promoted_identifier_id` + `notes` only; never the source-evidence fields).
 
 #### Columns
 
@@ -176,7 +179,7 @@ Primary on `(id)`. Additional indexes on `(source_id, source_row_key)` for idemp
 
 ### §4.3. `sources` (upstream source registry)
 
-Source registry. FK target for `raw_observations.source_id`. Row count verified live 2026-05-17 (post-MAC-175): **50** (+7 in v1.1.0).
+Source registry. FK target for `raw_observations.source_id`. Row count verified live 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wave): **52** (+7 in v1.1.0; +2 in v1.2.0: fccid.io sid=51 (`crowdsourced`, tier 2) + FCC Equipment Authorization System — Filings sid=52 (`regulatory`, tier 1), both via MAC-178 P1).
 
 #### Columns
 
@@ -202,7 +205,7 @@ Primary on `(id)`. Unique on `(name)`.
 
 ### §4.4. `manufacturers` (vendor metadata lookup)
 
-Vendor metadata + alias canonicalization. Row count at v1.1.0: **35** (+1 from v1.0.0: Johnson Matthey PLC, admitted 2026-05-17 via UK Companies House cross-registry closure).
+Vendor metadata + alias canonicalization. Row count verified live 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wave): **49** (+1 in v1.1.0: Johnson Matthey PLC, admitted 2026-05-17 via UK Companies House cross-registry closure; +14 in v1.2.0 via MAC-178 P4 + P5 autonomous overnight wave admissions).
 
 #### Columns
 
@@ -536,11 +539,11 @@ Migration ledger: every applied migration has one row.
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=21` at the post-CP23 v1.0.0 state, verified live 2026-05-17T05:07:32Z). |
-| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0021_procurement_vendor_canonical_normalized'`, `'0020_source_type_enum_extension'`, `'0019_identifier_types_round2'`, `'0017_source_reclassifications'`, `'0016_license_column'`). Full ledger 0001–0021 enumerated below. |
+| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=22` at the post-CP27 v1.0.0 state, verified live 2026-05-18T20:42:55Z). |
+| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0022_fcc_citation_deferred_queue'`, `'0021_procurement_vendor_canonical_normalized'`, `'0020_source_type_enum_extension'`, `'0019_identifier_types_round2'`, `'0017_source_reclassifications'`, `'0016_license_column'`). Full ledger 0001–0022 enumerated below. |
 | `applied_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of migration application. |
 
-Live migration ledger at `schema_version=21` (verified live 2026-05-17T05:07:32Z):
+Live migration ledger at `schema_version=22` (verified live 2026-05-18T20:42:55Z):
 
 | version | name | applied_at |
 |---:|---|---|
@@ -565,6 +568,7 @@ Live migration ledger at `schema_version=21` (verified live 2026-05-17T05:07:32Z
 | 19 | `0019_identifier_types_round2` | 2026-05-14T17:24:59Z |
 | 20 | `0020_source_type_enum_extension` | 2026-05-17T05:07:17Z |
 | 21 | `0021_procurement_vendor_canonical_normalized` | 2026-05-17T05:07:32Z |
+| 22 | `0022_fcc_citation_deferred_queue` | 2026-05-18T14:58:12Z |
 
 #### Indexes (1 index per current schema)
 
@@ -602,9 +606,53 @@ Per-row source-band reclassification audit, added by migration 0017 to support t
 - **§11 #8 (no confidence drift) audit composition**: every confidence/source-band correction lands one row per affected identifier; the audit record proves the correction was deliberate + substantively justified rather than confidence drift.
 - **Append-don't-mutate sub-rule**: corrective sub-sweeps (when a CEO refinement comment races a worker commit) MUST use a distinct `sweep_event_id` and append new rows rather than mutating parent-sweep audit rows. Codified at MAC-96→MAC-98 c121bec→c12bedd. See `BIBLE_AMENDMENTS.md` SAR-13 §S.3 for the per-shape mapper precedent.
 
+### §4.15. `fcc_citation_deferred_queue` (dual-citation-pair staging queue)
+
+Persists the discovery-half of the dual-citation pair for FCC IDs surfaced from fccid.io (sid=51) when FCC.gov egress (apps.fcc.gov / Akamai-edge HTTP/2 INTERNAL_ERROR class) is blocked from the extraction host. Each row holds the fccid.io anchor + queue metadata the validator's async re-citation pass needs to emit the paired regulatory-band raw_observations row when FCC.gov egress is restored. Added by migration 0022 (MAC-178 cycle-7 wave Priority 1 deliverable, applied 2026-05-18T14:58:12Z). Row count verified live 2026-05-18T20:42:55Z: **671** (all unpromoted; 0 paired-citation emissions to date).
+
+The dual-citation-pair convention itself was codified at CP26 (within-source corroboration sub-rule + MAC-174 P6 audit-trail precedent) and operationalized at MAC-178 P1+P2 (this table + the 671-row P2 admission of fccid.io discovery rows into `raw_observations`).
+
+#### Columns
+
+| Column | Type | NOT NULL | Default | Description |
+|---|---|---|---|---|
+| `id` | INTEGER | yes (PK) | autoincrement | Primary key. |
+| `fcc_id` | TEXT | yes (UNIQUE) | — | FCC equipment ID (e.g., `'2AG6IMPPU2'`). UNIQUE constraint enforces one queue entry per FCC ID. |
+| `fccid_io_source_url` | TEXT | yes | — | fccid.io discovery-row URL (e.g., `'https://fccid.io/2AG6IMPPU2'`). The discovery-half anchor of the dual-citation pair per the CP26 within-source corroboration sub-rule. |
+| `fccid_io_html_sha256` | TEXT | yes | — | SHA-256 of the fetched fccid.io HTML at discovery-time. Provenance integrity anchor per §11 #7. |
+| `fcc_gov_unreachable_reason` | TEXT | yes | — | Verbatim failure mode prose explaining why FCC.gov was unreachable from the extraction host at discovery-time (e.g., `'http_code=000 + curl exit 92 (HTTP/2 INTERNAL_ERROR). Same failure mode observed in pre-flight; Akamai-edge access to apps.fcc.gov properties blocked from this host…'`). Per §11 #1 no-fabrication: the deferred-queue path exists precisely because the citation-half is unreachable; this column documents that condition rather than fabricating a citation. |
+| `deferred_at_utc` | DATETIME | yes | — | UTC timestamp when the row was deferred (i.e., when the discovery row was emitted to `raw_observations` and the citation-half deferred to this queue). |
+| `discovery_row_provisional_ids` | TEXT | no | NULL | JSON array of `raw_observations.id` values for the discovery rows this queue entry is paired with. Populated at MAC-178 P2 admission time. |
+| `expected_citation_row_emission` | TEXT | no | NULL | Predicate prose describing what the async re-citation pass is expected to emit when FCC.gov egress is restored. Forward-documented at queue-load time so the async pass can verify it produced the expected shape. |
+| `opportunistic_enrichment` | TEXT | no | NULL | JSON blob carrying queue-time-derivable metadata (e.g., `{"fcc_grant_ids": [...], "extraction_method": "fccid_io_html_v1", …}`). Opportunistic per the "discovery-row half does not mint identifier values" discipline — these enrichments stage to companion `raw_observations` rows, not derived identifier values. |
+| `fcc_grant_ids_csv` | TEXT | no | NULL | Denormalized CSV of FCC grant IDs from `opportunistic_enrichment.fcc_grant_ids[]`. Indexed for grant-ID lookup. |
+| `created_at` | DATETIME | no | `CURRENT_TIMESTAMP` | UTC timestamp of row insert. |
+| `promoted_at` | DATETIME | no | NULL | UTC timestamp of paired-citation-emission. Non-NULL after the async re-citation pass emits the citation-half `raw_observations` row. NULL = still queued. |
+| `promoted_raw_observation_id` | INTEGER | no | NULL | FK → `raw_observations.id` (`ON DELETE SET NULL`). The citation-half `raw_observations` row emitted by the async re-citation pass. Non-NULL paired with non-NULL `promoted_at`. |
+| `notes` | TEXT | no | NULL | JSON or free-text — extraction-method-version anchors, post-promotion audit notes, etc. |
+
+#### Constraints
+
+`UNIQUE (fcc_id)` — implicit unique index `sqlite_autoindex_fcc_citation_deferred_queue_1`.
+
+#### Indexes (3 indexes per current schema)
+
+- Primary on `(id)`.
+- `idx_fcc_citation_deferred_queue_pending` — partial index on `(promoted_at)` `WHERE promoted_at IS NULL`. Optimizes the drain-queue access pattern (the async re-citation pass iterates unpromoted rows).
+- `idx_fcc_citation_deferred_queue_fcc_grant_ids` — on `(fcc_grant_ids_csv)` for grant-ID lookup joins.
+
+#### Composition with METHODOLOGY + bible rules
+
+- **§11 #1 no-fabrication**: queue holds verbatim discovery-row anchors + queue metadata; no derived identifier values are minted at queue-load time. Citation-half emission awaits the async pass against the actual FCC.gov source.
+- **§11 #7 provenance**: `fccid_io_source_url` + `fccid_io_html_sha256` form the discovery-half anchors of the dual-citation pair. The citation-half (FCC.gov URL + content hash) is what the async pass adds via the paired `raw_observations` row. Provenance integrity is preserved across the deferred-emission boundary by the SHA-256 anchor.
+- **§11 #8 no confidence drift**: staging-only — the queue table has no `confidence` column. Drained rows become regulatory-band `raw_observations` only when the async re-citation pass emits the paired citation row; confidence assignment happens at that promotion-time, not at queue-load.
+- **CP26 within-source corroboration sub-rule (dual-citation-pair convention)**: the queue is the operationalization of CP26's "discovery + citation pair from the same source-class but distinct URLs" requirement. fccid.io is the discovery surface (community-aggregated); FCC.gov is the citation surface (regulatory-of-record). Both are required for promotion; this queue persists the gap.
+- **CP27 §2.4 Empirical-Premise Verification Precondition (MAC-178 P7)**: the `fcc_gov_unreachable_reason` column carries the verbatim premise-verification artifact that justifies routing through the deferred queue rather than emitting a single citation directly.
+- **No promotion sourced from queue rows alone**: the queue is operational state, not a source-of-truth for identifier promotion. Per §11 #8 strict reading, identifier rows promoted from the dual-citation pair derive their confidence from the citation-half `raw_observations` band, not from queue presence.
+
 ## §5. Enum reference (consolidated)
 
-Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP23 v1.0.0 state (`schema_version=21`, verified live 2026-05-17T05:07:32Z).
+Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP27 v1.0.0 state (`schema_version=22`, verified live 2026-05-18T20:42:55Z). Migration 0022 (the v22 schema-shape addition) introduces no new CHECK enums — `fcc_citation_deferred_queue` columns are NOT NULL / FK / shape-typed but not enum-constrained.
 
 ### §5.1. `identifiers.identifier_type` — 48 values
 
