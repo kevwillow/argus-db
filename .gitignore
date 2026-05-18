@@ -48,6 +48,17 @@ extraction_outputs/flock_back_admission/
 # extraction JSON. Added Patch Cycle 1 Step 3 (2026-05-17).
 extraction_outputs/fccid_io_admission/
 
+# Autonomous overnight wave (2026-05-17) — 6 parallel sub-agents on remaining
+# runguides. Same staging-only posture; raw artifacts under raw/; structured
+# extractions under extraction_outputs/{slug}/. Validator promotes selectively.
+extraction_outputs/_autonomous_overnight/
+extraction_outputs/ised_rel_admission/
+extraction_outputs/bt_sig_qualified_designs_admission/
+extraction_outputs/ofcom_acma_admission/
+extraction_outputs/wave_g_v2_admission/
+extraction_outputs/patent_text_mining_admission/
+extraction_outputs/github_mass_search_admission/
+
 # Wave G sandbox — vendor-derived artifacts per bible §11 #15 decompile-source carveout.
 # NOT gitignored: android_test/WAVE_G_RUNBOOK.md (workflow document) +
 # android_test/tools/extraction/wave_g_extractor.py (workflow code).
