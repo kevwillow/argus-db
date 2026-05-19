@@ -1,0 +1,7 @@
+value: Mavic
+value_class: product_family
+cohort_label: D_drone_firmware_tooling
+source_file_relative: app_DJIEngine_DJIDevice.dll.txt
+source_line: 5
+---source_excerpt (<=200 chars verbatim)---
+DJI Assistant 2\Mavic

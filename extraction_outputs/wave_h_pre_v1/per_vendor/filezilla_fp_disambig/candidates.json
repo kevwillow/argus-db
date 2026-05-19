@@ -1,0 +1,11 @@
+{
+  "vendor": "FileZilla",
+  "binary_sha256": "8a0c4e23f4c2f130d9651afbc7c265e5a1ce6e106ac60f4d876763971a84b7f6",
+  "product": "FileZilla_FP_disambig",
+  "version": "3.70.5_win64",
+  "cohort_label": "H_forensics_acoustic_drone_detection",
+  "extraction_timestamp_utc": "2026-05-18T23:50:41Z",
+  "extraction_finished_utc": "2026-05-18T23:50:41Z",
+  "extractor": "wave_h_wrapper.py over wave_g_extractor.py v4",
+  "candidates": []
+}

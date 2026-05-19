@@ -1,0 +1,182 @@
+{
+  "vendor": "Hikvision",
+  "binary_sha256": "f78b7de7532426391c5b6b53ccfb8144de99e01ab7501fe0e999b241605da7cd",
+  "product": "iVMS-4200",
+  "version": "3.13.0.5_Multilingual",
+  "cohort_label": "F_sanctioned_vendor",
+  "extraction_timestamp_utc": "2026-05-18T23:48:05Z",
+  "extraction_finished_utc": "2026-05-18T23:48:05Z",
+  "extractor": "wave_h_wrapper.py over wave_g_extractor.py v4",
+  "candidates": [
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1168,
+      "source_excerpt": "\\iVMS-4200 Client\\Client\\maintain\\Setup.xml.benchmark",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_b14fb71ce6",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1169,
+      "source_excerpt": "\\iVMS-4200 AC Client\\Client\\maintain\\Setup.xml.benchmark",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_f2ced29e91",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1170,
+      "source_excerpt": "\\iVMS-4200 VS Client\\Client\\maintain\\Setup.xml.benchmark",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_94be493a07",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1179,
+      "source_excerpt": "\\iVMS-4200 Site",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_0bd7b81a02",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1180,
+      "source_excerpt": "\\iVMS-4200 Client\\",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_6c530c9fc6",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1181,
+      "source_excerpt": "\\iVMS-4200 AC",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_6671930d37",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1182,
+      "source_excerpt": "\\iVMS-4200 AC Client\\",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_0170820fdf",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1183,
+      "source_excerpt": "\\iVMS-4200 VS",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_395fa61e57",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1184,
+      "source_excerpt": "\\iVMS-4200 VS Client\\",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_a70a367bf9",
+      "cohort_label": "F_sanctioned_vendor"
+    },
+    {
+      "value": "iVMS",
+      "value_class": "product_family",
+      "source_root": "strings_dump",
+      "source_file_relative": "full_installer_strings.txt",
+      "source_line": 1185,
+      "source_excerpt": "iVMS-4200 ",
+      "proposed_confidence_band": "90-95",
+      "fp_filters_applied": [
+        "third_party_sdk_path_drop",
+        "bundled_fork_path_drop",
+        "test_or_build_artifact_drop"
+      ],
+      "vendor_proximity_signals": [],
+      "candidate_id": "hikvision_product_family_2bd6fe1699",
+      "cohort_label": "F_sanctioned_vendor"
+    }
+  ]
+}

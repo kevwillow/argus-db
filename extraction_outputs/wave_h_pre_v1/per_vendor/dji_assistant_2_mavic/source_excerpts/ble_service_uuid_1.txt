@@ -1,0 +1,7 @@
+value: f4d4dbf5-ba4b-40db-9a44-f8395f3728cf
+value_class: ble_service_uuid
+cohort_label: D_drone_firmware_tooling
+source_file_relative: app_DJIEngine_DJIServices_DJIGlsService.dll.txt
+source_line: 953
+---source_excerpt (<=200 chars verbatim)---
+https://duss.djicorp.com/functional-document/f4d4dbf5-ba4b-40db-9a44-f8395f3728cf

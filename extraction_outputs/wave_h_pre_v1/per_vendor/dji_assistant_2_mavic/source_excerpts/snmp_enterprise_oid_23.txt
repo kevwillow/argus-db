@@ -1,0 +1,7 @@
+value: 1.3.6.1.4.1.4146.1.1
+value_class: snmp_enterprise_oid
+cohort_label: D_drone_firmware_tooling
+source_file_relative: app_DJIEngine_DJIBrowser_DJIBrowser.exe.txt
+source_line: 27627
+---source_excerpt (<=200 chars verbatim)---
+1.3.6.1.4.1.4146.1.1

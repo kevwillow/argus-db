@@ -1,0 +1,46 @@
+{
+  "extraction_started_utc": "2026-05-18T23:50:41Z",
+  "extraction_finished_utc": "2026-05-18T23:50:41Z",
+  "cohort_label": "H_forensics_acoustic_drone_detection",
+  "candidates_total": 0,
+  "fp_findings_total": 0,
+  "source_excerpt_overflow_dropped_total": 5,
+  "by_class": {
+    "ble_service_uuid": {
+      "candidates": 0,
+      "fp_findings": 0
+    },
+    "ssid": {
+      "candidates": 0,
+      "fp_findings": 0
+    },
+    "credential": {
+      "candidates": 0,
+      "fp_findings": 0
+    },
+    "oui": {
+      "candidates": 0,
+      "fp_findings": 0
+    },
+    "product_family": {
+      "candidates": 0,
+      "fp_findings": 0
+    },
+    "onvif_capability_string": {
+      "candidates": 0,
+      "fp_findings": 0
+    },
+    "snmp_enterprise_oid": {
+      "candidates": 0,
+      "fp_findings": 0
+    },
+    "mdns_service_type": {
+      "candidates": 0,
+      "fp_findings": 0
+    },
+    "update_endpoint_url": {
+      "candidates": 0,
+      "fp_findings": 0
+    }
+  }
+}

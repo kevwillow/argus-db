@@ -1,0 +1,59 @@
+{
+  "cohort_label": "A_electron",
+  "session_admission": "wave_h_pre_v1",
+  "emit_timestamp_utc": "2026-05-18T00:00:00Z",
+  "cohort_disposition": "descoped_per_substantive_finding",
+  "cohort_disposition_reason": "5 of 6 runguide Cohort A targets are web-only products with no desktop installer; 1 is Microsoft-Store-distributed UWP (not Electron). No Cohort A binary actionable as written.",
+  "per_vendor_absence_rows": [
+    {
+      "vendor": "Verkada",
+      "product_intended": "Command (desktop)",
+      "absence_reason": "web_app_only_no_desktop_client_2026_05",
+      "verification": "Vendor documentation explicitly states users access Command via web browser; no desktop client distributed.",
+      "verification_source_url": "https://www.verkada.com/command/"
+    },
+    {
+      "vendor": "Eagle Eye Networks",
+      "product_intended": "EEN Viewer",
+      "absence_reason": "microsoft_store_uwp_msix_not_electron_2026_05",
+      "verification": "Eagle Eye Viewer is distributed via Microsoft Store as a UWP (.msix), not as an Electron .exe. Distribution model mismatches Cohort A Electron tooling. Could be re-scoped to a separate UWP cohort in a follow-on wave.",
+      "verification_source_url": "https://www.een.com/docs/app-notes/an069/"
+    },
+    {
+      "vendor": "Rhombus Systems",
+      "product_intended": "Console",
+      "absence_reason": "web_app_only_no_desktop_client_2026_05",
+      "verification": "Rhombus Console is cloud-only at console.rhombussystems.com; no desktop installer distributed. WebCatalog/BlueStacks third-party wrappers exist but are not vendor-distributed.",
+      "verification_source_url": "https://www.rhombus.com/console/"
+    },
+    {
+      "vendor": "Avigilon (Motorola)",
+      "product_intended": "Alta Aware",
+      "absence_reason": "cloud_first_no_alta_aware_desktop_client_2026_05",
+      "verification": "Avigilon Alta product line is cloud-based; Alta Aware analytics surfaces via web. The 'Avigilon ACC Client' that does have a desktop installer is the legacy on-prem VMS (Cohort C native, not Cohort A Electron — already separately listed in runguide §3.1 Cohort C).",
+      "verification_source_url": "https://www.avigilon.com/alta"
+    },
+    {
+      "vendor": "Skydio",
+      "product_intended": "Pilot (Electron variant)",
+      "absence_reason": "no_electron_desktop_variant_2026_05",
+      "verification": "Skydio Pilot is iOS/Android mobile app + web portal. No Electron desktop client distributed despite runguide's '(web bundle, downloadable as Electron)' framing. Runguide author acknowledged uncertainty at framing-time; substantive premise verifies as absent.",
+      "verification_source_url": "https://www.skydio.com/"
+    },
+    {
+      "vendor": "Verkada",
+      "product_intended": "Command Connector (Electron-class binary)",
+      "absence_reason": "hardware_appliance_not_software_distribution_2026_05",
+      "verification": "Verkada Command Connector is a hardware appliance product (gateway/bridge); not distributed as desktop software. May ship firmware images potentially fitting Cohort E if Verkada distributes them publicly, but that is a Cohort E rescope.",
+      "verification_source_url": "https://www.verkada.com/command/"
+    }
+  ],
+  "cp17_cohort_thesis_finding": {
+    "thesis_under_test": "Wave G mobile operator-vs-installer cohort thesis (CP17 §8.2 vendor-app identifier sub-band ladder) generalizes from mobile to desktop.",
+    "preliminary_finding_from_cohort_a_probe": "The 'operator-cohort desktop' class is largely absent in the modern VMS landscape. Vendors have moved operator workflows to web-first / mobile-first architectures, eliminating the standalone desktop client for operator use cases. The 'installer-cohort desktop' class persists (Cohorts B .NET, C native C++) because installer/admin workflows need rich UI surface that web cannot match.",
+    "thesis_disposition": "Partial generalization. Installer-cohort half of CP17 carries from mobile to desktop. Operator-cohort half does NOT generalize — operator-cohort dissolves into web/mobile rather than appearing as a separate desktop class. This is a one-sided generalization, not a clean carry-over.",
+    "policy_implication": "Lynceus / Talos consumers should treat Wave H findings as installer-cohort-weighted (Cohorts B/C/D/F). Lack of operator-cohort desktop class is itself a finding worth codifying — it suggests vendor architectural shift in the 2020-2026 window away from desktop operator clients.",
+    "cp28_candidate_note": "If Lynceus needs to filter operator-cohort findings, the absence of an operator-cohort desktop class means the Wave G mobile operator-cohort remains the primary surface. No CP28 follow-up needed on this axis until cross-vendor sample is larger."
+  },
+  "next_cohort_dispatch": "Cohort B (.NET / WPF VMS clients) — highest expected yield with confirmed public-download targets (Milestone via self-issue, plus Genetec / Lenel / Honeywell / Tyco / Gallagher trials)."
+}

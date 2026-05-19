@@ -1,0 +1,69 @@
+{
+  "schema": "cross_vendor_attestations_per_cp24_11_8_wave_h_extension",
+  "discipline_anchor": "CP24 §11 #8 within-source re-extraction sub-rule + Wave H extension: same-vendor-different-product is the same epistemic class. Stage as provenance enrichment, NOT as §8.3 corroboration lift.",
+  "session_admission": "wave_h_pre_v1",
+  "emit_timestamp_utc": "2026-05-18T23:55:00Z",
+  "version": "v3_post_innoextract_with_wave_h_supplemental_fp_filter_v3",
+  "attestations": [
+    {
+      "vendor": "DJI",
+      "value_class_emitted": "ble_service_uuid",
+      "value_class_corrected_per_semantic_validation": "varies (see per_uuid notes)",
+      "shared_uuids_across_products": [
+        "054aae20-4bea-4347-8a35-64a533254a9d",
+        "f4d4dbf5-ba4b-40db-9a44-f8395f3728cf"
+      ],
+      "per_uuid_disposition": [
+        {
+          "uuid": "054aae20-4bea-4347-8a35-64a533254a9d",
+          "actual_class": "windows_com_clsid_vendor_registered",
+          "vendor_specific": true,
+          "source_context": "Software\\Classes\\CLSID\\{054AAE20-4BEA-4347-8A35-64A533254A9D}\\LocalServer32",
+          "interpretation": "DJI-registered COM CLSID for the DJIBrowser LocalServer32 component. Vendor-specific identifier (DJI controls this CLSID); not a BLE service UUID. Validator should re-class as `windows_com_clsid_vendor_registered` per CP26 §8 semantic-validation."
+        },
+        {
+          "uuid": "f4d4dbf5-ba4b-40db-9a44-f8395f3728cf",
+          "actual_class": "vendor_document_uuid_cloud_reference",
+          "vendor_specific": true,
+          "source_context": "https://duss.djicorp.com/functional-document/f4d4dbf5-ba4b-40db-9a44-f8395f3728cf",
+          "interpretation": "DJI internal document UUID referenced as a URL path component on DJI's corporate documentation/distribution server (duss.djicorp.com). Vendor-specific identifier; provides DJI cloud-endpoint anchor for cross-source corroboration (Wave H finding: confirms `duss.djicorp.com` as a DJI-controlled hostname)."
+        }
+      ],
+      "products_attesting": [
+        {
+          "product": "DJI Assistant 2 For Mavic",
+          "version": "2.0.14",
+          "binary_sha256": "d5df2d8ea45e881670a9b723a495363fb198700a60b47cba5507bf1164e14698",
+          "extraction_method": "innoextract + per-binary strings -n 8 across DJIEngine DLLs/EXEs"
+        },
+        {
+          "product": "DJI Assistant 2 (DJI FPV series)",
+          "version": "2.1.2",
+          "binary_sha256": "5a8e76972fab995d8c1f513a268fcd8b6aea028e2105b3deadcfa8c45d323cad",
+          "extraction_method": "innoextract + per-binary strings -n 8 across DJIEngine DLLs/EXEs"
+        }
+      ],
+      "overlap_metric": {
+        "mavic_unique_uuids_post_filter": 2,
+        "fpv_unique_uuids_post_filter": 2,
+        "intersection_size": 2,
+        "intersection_percent": 100.0
+      },
+      "cp24_classification": "vendor_internal_reextraction (same vendor, different product-family variants of same product line). Stage as provenance enrichment. NOT a §8.3 cross-source corroboration."
+    }
+  ],
+  "filter_calibration_journey": {
+    "pre_innoextract_pre_filter": "Mavic 8 cands + FPV 8 cands; 100% overlap on 5 UUIDs — but all 5 were Windows <supportedOS> manifest GUIDs (FP)",
+    "post_innoextract_pre_filter": "Mavic 227 + FPV 136; 100% overlap on 17 UUIDs",
+    "post_innoextract_post_v3_filter": "Mavic 65 + FPV 60; 100% overlap on 2 UUIDs (both vendor-specific DJI identifiers, but neither is actually a BLE UUID — one is COM CLSID, one is document-UUID in cloud URL)",
+    "wave_h_supplemental_fp_classes_added_during_calibration": [
+      "WINDOWS_SUPPORTEDOS_MANIFEST_GUIDS (5 entries)",
+      "WINDOWS_COM_INTERFACE_GUIDS (1 entry, seed)",
+      "WINDOWS_SXS_PUBLICKEYTOKEN (3 entries)",
+      "WINDOWS_DEVCLASS_SETUP_GUIDS (11 entries)",
+      "LIBUSB_ASCII_IDENTIFIERS (1 entry)",
+      "THIRD_PARTY_DLL_PATH_PREFIXES (~26 prefixes covering Qt, OpenSSL, MSVC, libusb, ICU, libxml2, etc.)"
+    ]
+  },
+  "calibration_window_finding": "Wave H native Windows binaries surface ~85% FP candidates per the v4 Pattern A regex without Wave H supplemental disambig. Calibration window iterations: 17 candidate UUIDs → 11 filtered as Windows DEVCLASS GUIDs → 2 final candidates (both vendor-specific but neither is actually a BLE UUID per CP26 §8 semantic-validation). The pre-filter discipline saves the validator from triaging hundreds of framework-noise candidates per vendor."
+}
