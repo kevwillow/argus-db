@@ -113,6 +113,9 @@ IDENTIFIER_TYPE_TO_PATTERN_TYPE: dict[str, str | None] = {
     "ble_manufacturer_id": "ble_manufacturer_id",  # MAP — new pattern_type; BLE adv manuf_data[0:2] match
     "drone_id_prefix": "drone_id_prefix",  # MAP — new pattern_type; Remote ID prefix string match (WiFi NAN/Beacon/BLE Legacy 4.x); BLE5 LE Coded PHY is a current-hardware boundary
     "wifi_aware_service_name": "wifi_aware_service_name",  # MAP — new pattern_type; WiFi NAN service-name UTF-8 match; capability-gated by Lynceus-side NAN support (consumer-carries-state)
+    # CP28 (§4.4) — Wave H desktop-axis vendor-registered non-BLE cluster MAP case (1 entry).
+    # Two sibling DROPPED-class types live in DROPPED_REASONS below.
+    "vendor_document_uuid_cloud_reference": "vendor_document_uuid_cloud_reference",  # MAP — vendor-controlled cloud-hostname half lifts into Lynceus relevance window (e.g. duss.djicorp.com); Lynceus-side scanner work item to add a cloud-hostname pattern_type
 }
 
 
@@ -169,6 +172,12 @@ DROPPED_REASONS: dict[str, str] = {
     "chipset_codename": "chipset_codename",  # Firmware-anchored device model class — not wire-pattern
     "firmware_build_string": "firmware_build_string",  # Firmware build version string — not RF-broadcast
     "firmware_build_uuid": "firmware_build_uuid",  # Firmware build GUID — not RF-broadcast
+    # MAC-181 / migration 0023 — CP28(c) Wave H desktop-axis vendor-registered
+    # non-BLE cluster DROPPED cases (2 entries). The sibling MAP case
+    # (`vendor_document_uuid_cloud_reference`) lives in
+    # IDENTIFIER_TYPE_TO_PATTERN_TYPE above per CP28(c) §4.4 posture.
+    "windows_installer_productcode_vendor_registered": "windows_installer_productcode_vendor_registered",  # Install/registry context only; low passive-scan utility
+    "windows_com_clsid_vendor_registered": "windows_com_clsid_vendor_registered",  # Install/registry context only; low passive-scan utility
 }
 
 # §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
@@ -798,6 +807,12 @@ def _build_export(
         "chipset_codename": 0,
         "firmware_build_string": 0,
         "firmware_build_uuid": 0,
+        # MAC-181 / migration 0023 — CP28(c) Wave H desktop-axis vendor-registered
+        # non-BLE cluster DROPPED-class types (2). See DROPPED_REASONS for rationale.
+        # The sibling MAP case (`vendor_document_uuid_cloud_reference`) lives in
+        # IDENTIFIER_TYPE_TO_PATTERN_TYPE; it doesn't need a bin here.
+        "windows_installer_productcode_vendor_registered": 0,
+        "windows_com_clsid_vendor_registered": 0,
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,

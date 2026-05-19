@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 22549,
+  "pre_active_count": 22553,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -70332,7 +70332,7 @@
       "deployment_observations_count": 750,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 138
+      "active_identifier_count": 140
     },
     {
       "canonical_name": "DJO Global",
@@ -106810,7 +106810,7 @@
       "deployment_observations_count": 251,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 3
+      "active_identifier_count": 5
     },
     {
       "canonical_name": "Hildebrand Technology Limited",
@@ -242901,7 +242901,7 @@
     "confidence_floor": 30,
     "drop_pi_self_exclude": false,
     "bins": {
-      "unknown_category": 21884,
+      "unknown_category": 21886,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
@@ -242944,10 +242944,12 @@
       "chipset_codename": 0,
       "firmware_build_string": 2,
       "firmware_build_uuid": 1,
+      "windows_installer_productcode_vendor_registered": 0,
+      "windows_com_clsid_vendor_registered": 1,
       "excluded_source_type": 0
     },
-    "survivors": 494,
-    "reconciles": 22549,
+    "survivors": 495,
+    "reconciles": 22553,
     "drop_assignments": {
       "413": "unknown_category",
       "414": "unknown_category",
@@ -265003,7 +265005,10 @@
       "23055": "asdstan_enum_value",
       "23056": "asdstan_enum_value",
       "23057": "device_class_id",
-      "23058": "rf_protocol_constant"
+      "23058": "rf_protocol_constant",
+      "23060": "windows_com_clsid_vendor_registered",
+      "23061": "unknown_category",
+      "23062": "unknown_category"
     }
   },
   "drop_tally_high_confidence": {
@@ -265011,7 +265016,7 @@
     "confidence_floor": 70,
     "drop_pi_self_exclude": true,
     "bins": {
-      "unknown_category": 21884,
+      "unknown_category": 21886,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 39,
@@ -265054,10 +265059,12 @@
       "chipset_codename": 0,
       "firmware_build_string": 2,
       "firmware_build_uuid": 1,
+      "windows_installer_productcode_vendor_registered": 0,
+      "windows_com_clsid_vendor_registered": 1,
       "excluded_source_type": 342
     },
-    "survivors": 113,
-    "reconciles": 22549,
+    "survivors": 114,
+    "reconciles": 22553,
     "drop_assignments": {
       "1": "excluded_source_type",
       "413": "unknown_category",
@@ -287494,7 +287501,10 @@
       "23055": "asdstan_enum_value",
       "23056": "asdstan_enum_value",
       "23057": "device_class_id",
-      "23058": "rf_protocol_constant"
+      "23058": "rf_protocol_constant",
+      "23060": "windows_com_clsid_vendor_registered",
+      "23061": "unknown_category",
+      "23062": "unknown_category"
     }
   },
   "halts": []

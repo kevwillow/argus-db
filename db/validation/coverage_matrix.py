@@ -172,6 +172,14 @@ DROPPED_REASONS: dict[str, str] = {
     "chipset_codename": "chipset_codename",
     "firmware_build_string": "firmware_build_string",
     "firmware_build_uuid": "firmware_build_uuid",
+    # MAC-181 / migration 0023 — CP28(c) Wave H desktop-axis vendor-registered
+    # non-BLE cluster DROPPED cases (2 entries). The sibling MAP case
+    # (`vendor_document_uuid_cloud_reference`) lives in
+    # export_lynceus.py::IDENTIFIER_TYPE_TO_PATTERN_TYPE per CP28(c) §4.4 posture.
+    # Mirrors export_lynceus.py::DROPPED_REASONS verbatim — the reconcile
+    # gate at export_lynceus.py::_reconcile requires byte-identical parity.
+    "windows_installer_productcode_vendor_registered": "windows_installer_productcode_vendor_registered",
+    "windows_com_clsid_vendor_registered": "windows_com_clsid_vendor_registered",
 }
 
 # §8.2 confidence-band ceilings — annotation reference only (no mutations).

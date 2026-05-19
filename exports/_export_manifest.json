@@ -1,73 +1,98 @@
 {
-  "generated_at_utc": "2026-05-18T15:49:09Z",
-  "generation_dispatch": "MAC-178",
-  "argus_version_pre_bump": "v1.1.0",
-  "argus_version_post_bump_recommended": "v1.2.0",
-  "integration_brief_ref": "argus-internal/new data 5.17/paperclip_overnight_wave_integration_brief.md",
-  "wave_summary_ref": "extraction_outputs/_autonomous_overnight/_wave_summary.md",
-  "baseline_canonical_count_pre_mac178": 22533,
-  "canonical_count_post_mac178": 22549,
-  "canonical_count_delta": 16,
-  "sources_pre_mac178": 50,
-  "sources_post_mac178": 52,
-  "manufacturers_pre_mac178": 35,
-  "manufacturers_post_mac178": 49,
+  "generated_at_utc": "2026-05-19T01:05:48Z",
+  "generation_dispatch": "MAC-181",
+  "argus_version_pre_bump": "v1.2.0",
+  "argus_version_post_bump_recommended": "v1.3.0",
+  "release_narrative": "Wave H pre-v1 desktop-axis static-analysis integration. The first release in which the vendor-companion-app extraction methodology generalizes from the Wave G Android mobile axis to Windows / macOS / Linux desktop application binaries. 3 real-vendor binaries + 1 FP-control binary processed (Hikvision iVMS-4200 + DJI Assistant 2 Mavic + DJI Assistant 2 FPV + FileZilla H2-disambig control). Net BLE = 0 after CP26 §8 semantic-validation audit; the 4 surviving UUID-shaped values all re-class to one of three new CP28(c) identifier_type values. Migration 0023 extends the identifier_type CHECK enum 48 → 51.",
+  "wave_summary_ref": "extraction_outputs/wave_h_pre_v1/HANDOFF_TO_VALIDATOR.md",
+  "runguide_canonical_path": "android_test/WAVE_H_RUNGUIDE.md",
+  "wrapper_canonical_path": "android_test/tools/extraction/wave_h_wrapper.py",
+  "baseline_canonical_count_pre_mac181": 22549,
+  "canonical_count_post_mac181": 22553,
+  "canonical_count_delta": 4,
+  "sources_pre_mac181": 52,
+  "sources_post_mac181": 53,
+  "sources_delta": 1,
+  "manufacturers_pre_mac181": 49,
+  "manufacturers_post_mac181": 51,
+  "manufacturers_delta": 2,
+  "raw_observations_pre_mac181": 133825,
+  "raw_observations_post_mac181": 133830,
+  "raw_observations_delta": 5,
   "behavioral_signatures_unchanged": 131,
+  "schema_version_pre_mac181": 22,
+  "schema_version_post_mac181": 23,
+  "schema_migrations_applied": ["0023_identifier_type_check_extension_cp28"],
+  "bible_amendments_applied": ["CP28"],
+  "cp28_resolution": {
+    "cp28_c_ratified_identifier_types": [
+      "windows_installer_productcode_vendor_registered",
+      "windows_com_clsid_vendor_registered",
+      "vendor_document_uuid_cloud_reference"
+    ],
+    "cp28_a_deferred_source_type": "vendor_application_static_analysis",
+    "cp28_b_deferred_license_posture_sentinel": "sanctioned_vendor_public_distribution_facts_only"
+  },
   "files": {
     "argus_export.json": {
       "path": "exports/argus_export.json",
-      "size_bytes": 85451,
-      "sha256": "49c1493bfde7b89cf5bd6f335da8c432eaa5f042b5fc1b2a7bed3fb2cf70ca5b",
+      "size_bytes": 85769,
+      "sha256": "304494bb98fb15d911eab218fc27451e54557c8cdaf6f549a85054b0818a0951",
       "description": "Lynceus JSON — confidence ≥30 floor; §4.4 mapping + CP7 geographic_scope filter (default US); operational alert feed",
-      "entry_count": 494
+      "entry_count": 495
     },
     "argus_export_high_confidence.json": {
       "path": "exports/argus_export_high_confidence.json",
-      "size_bytes": 20630,
-      "sha256": "7ae1057aab5cd8ce9c25006fd2c4627e43de91382bf26a0cc2f8cada665fbc09",
+      "size_bytes": 20948,
+      "sha256": "b4238522e409d4842fdefc38f736b56c552faedc3262288ed5f6ed22377232dd",
       "description": "Lynceus JSON — confidence ≥70 floor + source_type ∉ {crowdsourced, inferred} + CP7 strict; recommended default for Lynceus scanner",
-      "entry_count": 113
+      "entry_count": 114
     },
     "argus_export_behavioral_signatures.json": {
       "path": "exports/argus_export_behavioral_signatures.json",
       "size_bytes": 55065,
-      "sha256": "57a21e8eef7159ff8631c35056add81bb3c98c3e602f494e24ca2a2827e13147",
+      "sha256": "90a2238a01cb7d0b6e0c0603dc1cbd5c1e50cf45108adffc56049745fe5fd5f4",
       "description": "Rayhunter JSON — all 131 active behavioral_signatures rows",
       "entry_count": 55
     },
     "argus_export.csv": {
       "path": "exports/argus_export.csv",
-      "size_bytes": 12532444,
-      "sha256": "c1e0c32dba1f4a9908f950df88f7437688f845947a052696848ed6820ae7a77e",
-      "description": "Human-readable rich-import CSV — all 22549 canonical rows (no Lynceus filtering)"
+      "size_bytes": 12536239,
+      "sha256": "61e6cf41849f289a9e93dabe5100eebdb17295d3bf3e7832c6ab1522091c044f",
+      "description": "Human-readable rich-import CSV — all 22553 canonical rows (no Lynceus filtering)"
     },
     "coverage_report.md": {
       "path": "exports/coverage_report.md",
-      "size_bytes": 1518057,
-      "sha256": "7151efabb97c08804343283670394395c1aa604b2e0b509a28defad44cfb98cd",
+      "size_bytes": 1518876,
+      "sha256": "85131fefc752e40e3c45013b349db05f3a11f10d23b47fc9d3f433b102e89a3e",
       "description": "Coverage matrix + gap analysis + §9 item 9 dropped-from-export tally reconciliation"
     }
   },
   "delta_vs_forecast": {
     "argus_export.json": {
-      "forecast": "+20 rows (per brief §4 step 4)",
-      "actual": "+0 rows",
-      "reason": "16 promoted identifier_types (ble_service_uuid, ble_characteristic, ble_company_id, asdstan_enum_value, device_class_id, rf_protocol_constant) are all §4.4 DROPPED-class per CP16/CP19/MAC-117 mapping — carried in canonical DB + CSV but not in Lynceus pattern table. NOT a data integrity issue; export filtering working as bible specifies. CEO surface: if §4.4 MAP additions are desired for these types, that is a CP-grade bible amendment (separate from CP27 empirical-premise-verification)."
+      "forecast": "0-1 new entries (vendor_document_uuid_cloud_reference is MAP-class)",
+      "actual": "+1 row (DJI f4d4dbf5-... vendor_document_uuid_cloud_reference @ confidence 90; geographic_scope='global' passes CP7 unconditionally)",
+      "reason": "matches forecast upper bound. The 2 Hikvision MSI ProductCodes have device_category='unknown' (per Hikvision manufacturers.primary_category=NULL) so they are dropped to `unknown_category` bin per §11 #13 before reaching the §4.4 DROPPED gate. The DJI windows_com_clsid_vendor_registered row reaches the §4.4 gate and drops to `windows_com_clsid_vendor_registered=1` per CP28(c) DROPPED posture."
     },
     "argus_export_high_confidence.json": {
-      "forecast": "+6 to +14 rows",
-      "actual": "+0 rows",
-      "reason": "same as standard export — §4.4 DROPPED-class for all promoted identifier_types"
+      "forecast": "0 new entries (band 80-95 makes threshold but geographic_scope filter check)",
+      "actual": "+1 row (DJI f4d4dbf5-... at confidence 90; geographic_scope='global' passes both CP7 strict + §4.4 MAP)",
+      "reason": "delta vs forecast: forecast assumed geographic_scope might be 'unknown' (which fails CP7 strict). The promotion-time geographic_scope set to 'global' (cloud-document UUIDs are global by nature) lets the row pass the high-conf gate. Surfaces 1 new row vs the conservative 0 forecast — not a violation, just a tighter geographic_scope assignment than the forecast assumed."
     },
     "argus_export.csv": {
-      "forecast": "+20 rows + ~917 taxonomy enrichments visible in metadata",
-      "actual": "+16 rows (4 held in raw_observations); product_family_taxonomy[] additions visible in CSV notes column for the 7 enriched manufacturers",
-      "reason": "matches forecast direction; 4-row gap = HOLD candidates (2 credentials, 1 vendor template UUID, 1 RTK template) flagged schema-gap"
+      "forecast": "+4 new rows (all 4 promoted identifiers)",
+      "actual": "+4 rows (all 4 Wave H promoted identifiers; no Lynceus filtering applied — CSV is the full canonical state)",
+      "reason": "matches forecast exactly ✓"
     },
     "argus_export_behavioral_signatures.json": {
-      "forecast": "unchanged",
+      "forecast": "unchanged (DB total = 131; Wave H adds zero behavioral_signatures)",
       "actual": "unchanged (131 source rows; 55 emitted)",
-      "reason": "no new behavioral_signatures in MAC-178 wave; matches forecast ✓"
+      "reason": "matches forecast exactly ✓"
+    },
+    "manufacturers": {
+      "forecast": "+0 (no new vendors; Wave H processed existing vendors)",
+      "actual": "+2 (Eagle Eye Networks id=220 + Rhombus Systems id=221; stub admissions per MAC-178 P5 precedent for Cohort A absence-investigation findings)",
+      "reason": "delta vs forecast: surfaced 2 new vendors via Cohort A absence-investigation (EEN Viewer = Microsoft Store UWP MSIX, not Electron; Rhombus Console = web-only) that were not yet in the canonical manufacturers lexicon. MAC-178 P5 precedent admits absence-only vendors as stub rows with `notes.admission_basis='documented_absence_only'`. Eagle Eye + Rhombus follow that pattern."
     }
   }
 }
