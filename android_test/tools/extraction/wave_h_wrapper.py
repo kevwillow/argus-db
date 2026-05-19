@@ -251,13 +251,46 @@ UPDATE_CONTEXT_TOKENS = ('update', 'upgrade', 'ota', 'firmware', 'download',
 # -------------------------- Wave H extractors --------------------------
 
 def _truncate_excerpt(line, v4):
-    """Delegate to v4's truncate_excerpt for byte-perfect parity."""
+    """Whole-line clipping with overflow signal (legacy v4 parity).
+
+    Retained for callers that pre-date the CP28 wrapper §-fragment fix; new
+    Wave H extractors below use `_windowed_excerpt()` per-match clipping.
+    """
     if hasattr(v4, 'truncate_excerpt'):
         return v4.truncate_excerpt(line)
     line = line.rstrip('\n')
     if len(line) <= 200:
         return line, False
     return line[:200], True
+
+
+def _windowed_excerpt(line, match_start, match_end):
+    """CP28 wrapper §-fragment — ±90-char per-match windowed clipping.
+
+    For each regex match at span [match_start, match_end), return the
+    surrounding ±90-char window of `line`, bounded by line edges and the
+    §11 #7 200-char hard cap. The window guarantees that the matched
+    candidate value itself plus immediate context lands in `source_excerpt`
+    even when the full source line exceeds 200 chars. Replaces the legacy
+    whole-line-with-overflow_dropped behavior demonstrated as lossy by the
+    FileZilla H2 disambig run (4 supportedOS UUIDs hit overflow_dropped
+    before reaching the FP filter because the manifest XML lines exceed
+    200 chars).
+
+    Composition with §11 #7 (200-char hard cap): the returned excerpt is
+    truncated to 200 chars if the ±90-char window itself overflows
+    (rare; only when the match itself is >20 chars + both flanks reach
+    the 90-char ceiling).
+    """
+    line = line.rstrip('\n')
+    if len(line) <= 200:
+        return line
+    start = max(0, match_start - 90)
+    end = min(len(line), match_end + 90)
+    excerpt = line[start:end]
+    if len(excerpt) > 200:
+        excerpt = excerpt[:200]
+    return excerpt
 
 
 def extract_onvif(input_tree: Path, v4) -> tuple[list[dict], list[dict], int]:
@@ -274,12 +307,18 @@ def extract_onvif(input_tree: Path, v4) -> tuple[list[dict], list[dict], int]:
                         matches.append(('namespace', m.group(1)))
                     if not matches:
                         continue
-                    excerpt, truncated = _truncate_excerpt(line, v4)
-                    if truncated:
-                        overflow_dropped += 1
-                        continue
                     rel = str(path.relative_to(root))
+                    # CP28 wrapper §-fragment: per-match windowed clipping.
+                    # Use the first match's span to anchor the excerpt for
+                    # the line; subsequent same-line matches share the
+                    # excerpt (acceptable since dedup happens on (val, rel,
+                    # lineno) below — same-line matches are different vals).
                     for kind, val in matches:
+                        m = (RE_ONVIF_PROFILE.search(line) if kind == 'profile'
+                             else RE_ONVIF_NAMESPACE.search(line))
+                        if m is None:
+                            continue
+                        excerpt = _windowed_excerpt(line, m.start(), m.end())
                         key = (val, rel, lineno)
                         if key in seen:
                             continue
@@ -308,10 +347,8 @@ def extract_snmp_oids(input_tree: Path, v4) -> tuple[list[dict], list[dict], int
                     for m in RE_SNMP_ENTERPRISE_OID.finditer(line):
                         val = m.group(1)
                         enterprise_num = int(m.group(2))
-                        excerpt, truncated = _truncate_excerpt(line, v4)
-                        if truncated:
-                            overflow_dropped += 1
-                            continue
+                        # CP28 wrapper §-fragment: per-match windowed clipping.
+                        excerpt = _windowed_excerpt(line, m.start(), m.end())
                         rel = str(path.relative_to(root))
                         key = (val, rel, lineno)
                         if key in seen:
@@ -340,10 +377,8 @@ def extract_mdns(input_tree: Path, v4) -> tuple[list[dict], list[dict], int]:
                 for lineno, line in enumerate(fh, start=1):
                     for m in RE_MDNS_SERVICE_TYPE.finditer(line):
                         val = m.group(0)
-                        excerpt, truncated = _truncate_excerpt(line, v4)
-                        if truncated:
-                            overflow_dropped += 1
-                            continue
+                        # CP28 wrapper §-fragment: per-match windowed clipping.
+                        excerpt = _windowed_excerpt(line, m.start(), m.end())
                         rel = str(path.relative_to(root))
                         key = (val, rel, lineno)
                         if key in seen:
@@ -374,10 +409,8 @@ def extract_update_endpoints(input_tree: Path, v4) -> tuple[list[dict], list[dic
                         continue
                     for m in RE_URL_ANY.finditer(line):
                         url = m.group(1).rstrip('\'",;)]}')
-                        excerpt, truncated = _truncate_excerpt(line, v4)
-                        if truncated:
-                            overflow_dropped += 1
-                            continue
+                        # CP28 wrapper §-fragment: per-match windowed clipping.
+                        excerpt = _windowed_excerpt(line, m.start(), m.end())
                         rel = str(path.relative_to(root))
                         key = (url, rel, lineno)
                         if key in seen:
