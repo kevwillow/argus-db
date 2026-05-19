@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-05-19T01:05:48Z",
+  "generated_at_utc": "2026-05-19T02:40:09Z",
   "generation_dispatch": "MAC-181",
   "argus_version_pre_bump": "v1.2.0",
   "argus_version_post_bump_recommended": "v1.3.0",
@@ -22,8 +22,12 @@
   "behavioral_signatures_unchanged": 131,
   "schema_version_pre_mac181": 22,
   "schema_version_post_mac181": 23,
-  "schema_migrations_applied": ["0023_identifier_type_check_extension_cp28"],
-  "bible_amendments_applied": ["CP28"],
+  "schema_migrations_applied": [
+    "0023_identifier_type_check_extension_cp28"
+  ],
+  "bible_amendments_applied": [
+    "CP28"
+  ],
   "cp28_resolution": {
     "cp28_c_ratified_identifier_types": [
       "windows_installer_productcode_vendor_registered",
@@ -37,34 +41,34 @@
     "argus_export.json": {
       "path": "exports/argus_export.json",
       "size_bytes": 85769,
-      "sha256": "304494bb98fb15d911eab218fc27451e54557c8cdaf6f549a85054b0818a0951",
+      "sha256": "6eabb2b792be3d62d68832f71440548a220e8e99c0dd8aa77f3162bdf643e2ee",
       "description": "Lynceus JSON — confidence ≥30 floor; §4.4 mapping + CP7 geographic_scope filter (default US); operational alert feed",
       "entry_count": 495
     },
     "argus_export_high_confidence.json": {
       "path": "exports/argus_export_high_confidence.json",
       "size_bytes": 20948,
-      "sha256": "b4238522e409d4842fdefc38f736b56c552faedc3262288ed5f6ed22377232dd",
+      "sha256": "0a9457cc060caf5f7cc515817b1554310a0b804f35223e1a2ddfd5e0ad05a2eb",
       "description": "Lynceus JSON — confidence ≥70 floor + source_type ∉ {crowdsourced, inferred} + CP7 strict; recommended default for Lynceus scanner",
       "entry_count": 114
     },
     "argus_export_behavioral_signatures.json": {
       "path": "exports/argus_export_behavioral_signatures.json",
       "size_bytes": 55065,
-      "sha256": "90a2238a01cb7d0b6e0c0603dc1cbd5c1e50cf45108adffc56049745fe5fd5f4",
+      "sha256": "2e4b67b84c782661b6587233a3473ac247a66e3118b2167f1423ec68efc10d9e",
       "description": "Rayhunter JSON — all 131 active behavioral_signatures rows",
       "entry_count": 55
     },
     "argus_export.csv": {
       "path": "exports/argus_export.csv",
-      "size_bytes": 12536239,
-      "sha256": "61e6cf41849f289a9e93dabe5100eebdb17295d3bf3e7832c6ab1522091c044f",
+      "size_bytes": 12536268,
+      "sha256": "0a4f1110806ecb3129889c32b516d107d4b43310822ecec158e997f21f12b8f4",
       "description": "Human-readable rich-import CSV — all 22553 canonical rows (no Lynceus filtering)"
     },
     "coverage_report.md": {
       "path": "exports/coverage_report.md",
-      "size_bytes": 1518876,
-      "sha256": "85131fefc752e40e3c45013b349db05f3a11f10d23b47fc9d3f433b102e89a3e",
+      "size_bytes": 1518134,
+      "sha256": "a6add4138ed16015a59a99e0fb18bc2ba6fc1fc99976029876a63961540bab80",
       "description": "Coverage matrix + gap analysis + §9 item 9 dropped-from-export tally reconciliation"
     }
   },
@@ -94,5 +98,12 @@
       "actual": "+2 (Eagle Eye Networks id=220 + Rhombus Systems id=221; stub admissions per MAC-178 P5 precedent for Cohort A absence-investigation findings)",
       "reason": "delta vs forecast: surfaced 2 new vendors via Cohort A absence-investigation (EEN Viewer = Microsoft Store UWP MSIX, not Electron; Rhombus Console = web-only) that were not yet in the canonical manufacturers lexicon. MAC-178 P5 precedent admits absence-only vendors as stub rows with `notes.admission_basis='documented_absence_only'`. Eagle Eye + Rhombus follow that pattern."
     }
+  },
+  "post_mac181_section_8_10_backfill": {
+    "dispatch_ref": "MAC-181 §8.10 (D1.a per [MAC-182](/MAC/issues/MAC-182) operator directive 2026-05-19T02:27:53Z)",
+    "description": "Single-row UPDATE on id=23059 setting notes.cloud_url_hostname='duss.djicorp.com'; CP28 §4.1 third bullet half-sentence codifies the metadata-key convention prospectively for all future vendor_document_uuid_cloud_reference promotions.",
+    "rows_modified": 1,
+    "identifier_count_delta_post_§8_9": 0,
+    "export_regen_triggered": true
   }
 }

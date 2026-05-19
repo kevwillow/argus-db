@@ -18985,25 +18985,3 @@ These items were flagged by the MAC-45 coverage matrix as CP5 board-class but ar
 | CSV (full canonical) | `argus/exports/argus_export.csv` | 22553 | 22553 |
 | Coverage matrix (MAC-45) | `extraction_outputs/mac45/coverage_matrix.md` | (matrix) | 22553 |
 
-<!-- BEGIN behavioral_signatures section (CP18) -->
-
-## Behavioral-signatures export reconciliation (§9 item 9, CP18)
-
-Sibling export `argus_export_behavioral_signatures.json` per §7.5 CP18.
-`argus_run_id`: `ad6aacfa-5980-555b-b11b-5d0e5d894771` (deterministic UUID5; stable across re-runs).
-
-- Source record count: **131** (rows in `behavioral_signatures` table)
-- Confidence threshold: **≥ 70**
-- Exported entries: **55** (in `argus_export_behavioral_signatures.json`)
-
-### Dropped from sibling export
-
-| Bin | Count |
-|---|---|
-| `below_confidence_threshold` | 76 |
-| `unknown_category` | 0 |
-| **TOTAL DROPPED** | **76** |
-
-Reconciliation: 131 source − 76 dropped = 55 entries ✓
-
-<!-- END behavioral_signatures section (CP18) -->
