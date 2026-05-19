@@ -1,6 +1,6 @@
 # Argus — Upstream Attribution and Credits
 
-Argus integrates data derived from 53 upstream sources (canonical registries, procurement data, public-records databases, academic research, community-research repositories, vendor-published documentation, international corporate registries, US state Secretary-of-State registries, judicial filings, federal disclosure / entity-registration sources, FCC Equipment Authorization aggregators and primary surfaces, and — new in v1.3.0 — a Wave H desktop-axis vendor-application static-analysis methodology source surfacing Cohort D drone tooling + Cohort F sanctioned-vendor v1 vendor-registered non-BLE identifiers) plus a canonical lexicon of 49 surveillance-technology vendors. This document attributes every upstream contribution, names the integration shape, and records license-carry-forward obligations downstream consumers must honor.
+Argus integrates data derived from 53 upstream sources (canonical registries, procurement data, public-records databases, academic research, community-research repositories, vendor-published documentation, international corporate registries, US state Secretary-of-State registries, judicial filings, federal disclosure / entity-registration sources, FCC Equipment Authorization aggregators and primary surfaces, and — new in v1.3.0 — a Wave H desktop-axis vendor-application static-analysis methodology source surfacing Cohort D drone tooling + Cohort F sanctioned-vendor v1 vendor-registered non-BLE identifiers) plus a canonical lexicon of 51 surveillance-technology vendors. This document attributes every upstream contribution, names the integration shape, and records license-carry-forward obligations downstream consumers must honor.
 
 For the binding license terms, see [LICENSE](LICENSE) (AGPL-3.0-or-later — code), [LICENSE-DATA](LICENSE-DATA) (ODbL-1.0 — database), and [LICENSE-DOCS](LICENSE-DOCS) (CC-BY-SA-4.0 — documentation). The LICENSE-DATA §2.1 per-source license-posture taxonomy is the structural anchor for the source enumerations below.
 
@@ -197,6 +197,7 @@ The `manufacturers` table is the canonical lexicon of surveillance-technology ve
 | Digital Receiver Technology | imsi_catcher |
 | DJI | drone |
 | DroneShield | drone_detect |
+| Eagle Eye Networks | (uncategorized — documented_absence stub admission, v1.3.0) |
 | Engility | imsi_catcher |
 | Flock Safety | alpr |
 | Genetec | alpr |
@@ -217,6 +218,7 @@ The `manufacturers` table is the canonical lexicon of surveillance-technology ve
 | PIPS Technology | alpr |
 | Rekor | alpr |
 | Reveal | body_cam |
+| Rhombus Systems | (uncategorized — documented_absence stub admission, v1.3.0) |
 | Septier | imsi_catcher |
 | Sierra Wireless | (uncategorized — multi-purpose-vendor) |
 | Skydio | drone |
@@ -228,6 +230,8 @@ The `manufacturers` table is the canonical lexicon of surveillance-technology ve
 | Wolfcom | body_cam |
 
 **v1.2.0 lexicon additions (14 vendors, from 35 to 49):** 4 positive-extraction admissions from the MAC-104 Wave-G v2 PlayStore companion-app extraction pass — **Hikvision** and **Dahua** (both admitted with NDAA Section 889 note: state/local LE deployments persist outside the federal-procurement bar), **Autel Robotics**, and **Cisco Meraki**. 10 stub admissions from absence-investigation cycles (apk-pure 404 + apk-mirror "no results" + cohort-prediction reasoning) — **Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome** — each carries `notes.admission_basis='documented_absence_only'`.
+
+**v1.3.0 lexicon additions (2 vendors, from 49 to 51):** 2 Cohort A stub admissions from Wave H pre-v1 desktop-axis absence-investigation — **Eagle Eye Networks** (Cohort A descope: EEN Viewer ships as a UWP MSIX package via Microsoft Store, not an Electron-class desktop client) and **Rhombus Systems** (Cohort A descope: Rhombus Console is a web app only; no desktop client distributed). Each carries `notes.documented_absence[]` with the absence-investigation findings; both are cloud-VMS / cloud-camera surveillance-tech vendors with structurally-absent desktop-axis client surface in 2026, anchoring the CP17 desktop-axis bifurcation thesis (cohort-presence dissolution dimension). Methodology source-of-truth: the Wave H wrapper at [`android_test/tools/extraction/wave_h_wrapper.py`](android_test/tools/extraction/wave_h_wrapper.py) (sibling to `wave_g_extractor.py`) carries the SAR-12 7-FP-class roster + the ±90-char windowed-clipping discipline.
 
 Lexicon evolution is documented in the amendment ledger at [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md). Aliases tracked per-vendor in `manufacturers.aliases`; multi-purpose-vendor carveouts are documented in `PROJECT_BIBLE.md` (see Canonical sources).
 
