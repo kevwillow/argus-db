@@ -6,9 +6,9 @@ This document is the canonical schema reference for the Argus SQLite database (`
 
 **Audience:** downstream operators integrating Argus's exports, external researchers auditing the dataset, contributors adding new identifier candidates or methodology refinements, vendors reviewing how their equipment is represented.
 
-**Scope:** v1.0.0 schema (`schema_version=22` as of 2026-05-18; live verification timestamp 2026-05-18T20:42:55Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
+**Scope:** v1.0.0 schema (`schema_version=23` as of 2026-05-18; live verification timestamp 2026-05-19T00:41:07Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
 
-**Last refresh:** Correction Pass 27 (2026-05-18) — migration 0022 (`fcc_citation_deferred_queue` staging table, MAC-178 cycle-7 wave Priority 1 deliverable; persists the 671-row deferred FCC.gov re-citation backlog under the dual-citation-pair convention from CP26 + MAC-178 P1+P2). MAC-178 P7 ratified CP27 §2.4 (Empirical-Premise Verification Precondition). Prior refresh Correction Pass 23 (2026-05-17) — migrations 0020 (`sources.source_type` CHECK extension; 10 → 13 values) + 0021 (`procurement_records.vendor_canonical_normalized` column + index + backfill).
+**Last refresh:** Correction Pass 28 (2026-05-18) — migration 0023 (`identifiers.identifier_type` CHECK enum extension 48 → 51 values; Wave H desktop-axis vendor-registered non-BLE cluster — `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`; MAC-181 v1.3.0 release sweep / Wave H pre-v1 promotion). Prior refresh Correction Pass 27 (2026-05-18) — migration 0022 (`fcc_citation_deferred_queue` staging table, MAC-178 cycle-7 wave Priority 1 deliverable; persists the 671-row deferred FCC.gov re-citation backlog under the dual-citation-pair convention from CP26 + MAC-178 P1+P2). MAC-178 P7 ratified CP27 §2.4 (Empirical-Premise Verification Precondition). Prior refresh Correction Pass 23 (2026-05-17) — migrations 0020 (`sources.source_type` CHECK extension; 10 → 13 values) + 0021 (`procurement_records.vendor_canonical_normalized` column + index + backfill).
 
 **Conventions:**
 - Column shape: `name TYPE NOT NULL DEFAULT … CHECK(…)` notation matches the migration source-of-truth at `db/migrations/*.sql`.
@@ -29,7 +29,7 @@ Throughout this document and the Argus project:
 
 ## §3. Schema overview
 
-The v1.0.0 schema carries **15 tables** at `schema_version=22`. They group into four functional categories:
+The v1.0.0 schema carries **15 tables** at `schema_version=23`. They group into four functional categories:
 
 ### §3.1 Canonical-state tables (Layer 1)
 
@@ -78,7 +78,7 @@ Verified against `db/argus.db` at 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wav
 | `extraction_runs` | **106** | per-run telemetry |
 | `source_reclassifications` | **809** | per-row band-correction audit (added migration 0017) |
 | `fcc_citation_deferred_queue` | **671** | dual-citation-pair queue, fccid.io discovery-half (added migration 0022); 0 promoted, 671 awaiting async FCC.gov re-citation pass |
-| `schema_version` | **22** | migration ledger; one row per applied migration |
+| `schema_version` | **23** | migration ledger; one row per applied migration |
 
 ### §3.5 Relationship summary
 
@@ -116,7 +116,7 @@ The canonical Argus identifier table. Every row represents one identifier-to-att
 |---|---|---|---|---|
 | `id` | INTEGER | yes (PK) | autoincrement | Primary key. Stable per row; not directly exported to downstream consumers (consumer-facing stable identifier is `argus_record_id`, a 16-hex-char SHA-256 prefix; algorithm documented in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) — see Canonical sources at end). |
 | `identifier` | TEXT | yes | — | The identifier value itself (e.g., `aa:bb:cc:dd:ee:ff` MAC, `aa:bb:cc` OUI, `1581Fxxx` FAA RID drone prefix, `0x004C` BLE manufacturer ID, BLE service UUID, vendor SSID pattern). Normalization rules per identifier_type documented in METHODOLOGY §6.1 dedup-key normalization. |
-| `identifier_type` | TEXT | yes | — | Enum extended cumulatively across migrations 0001–0019 (full roster in §5.1; 48 canonical values at `schema_version=19`). Baseline migration 0001: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`. Migration 0009: `ble_local_name`, `ble_characteristic`, `product_family_codename`. Migration 0011: `ble_manufacturer_id`. Migration 0013: `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`. Migration 0014: `alpr_model`. Migration 0018: `ble_protocol_byte_table`, `ble_service_uuid`, `ble_company_id`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`. Migration 0019 (CP21 round-2 vocab): `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`. The forward-codified `vendor_template_namespace_uuid` value (per the vendor-companion-app sub-banding amendment) is not in the current CHECK; it lands at first-promotion-time per the forward-looking-codification caveat. |
+| `identifier_type` | TEXT | yes | — | Enum extended cumulatively across migrations 0001–0023 (full roster in §5.1; 51 canonical values at `schema_version=23`). Baseline migration 0001: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`. Migration 0009: `ble_local_name`, `ble_characteristic`, `product_family_codename`. Migration 0011: `ble_manufacturer_id`. Migration 0013: `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`. Migration 0014: `alpr_model`. Migration 0018: `ble_protocol_byte_table`, `ble_service_uuid`, `ble_company_id`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`. Migration 0019 (CP21 round-2 vocab): `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`. Migration 0023 (CP28 Wave H desktop-axis): `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`. The forward-codified `vendor_template_namespace_uuid` value (per the vendor-companion-app sub-banding amendment) is not in the current CHECK; it lands at first-promotion-time per the forward-looking-codification caveat. |
 | `device_category` | TEXT | yes | — | Enum (12 values per on-disk CHECK constraint): `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`. `unknown` rows are excluded from the Lynceus export per the multi-purpose-vendor discipline (canonical-only). |
 | `manufacturer` | TEXT | no | NULL | Vendor name in canonical form. Logical FK to `manufacturers.canonical_name` (not enforced). |
 | `model` | TEXT | no | NULL | Vendor's product name in marketing or internal form. Composes with METHODOLOGY §5.4 product-family taxonomy. |
@@ -539,11 +539,11 @@ Migration ledger: every applied migration has one row.
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=22` at the post-CP27 v1.0.0 state, verified live 2026-05-18T20:42:55Z). |
-| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0022_fcc_citation_deferred_queue'`, `'0021_procurement_vendor_canonical_normalized'`, `'0020_source_type_enum_extension'`, `'0019_identifier_types_round2'`, `'0017_source_reclassifications'`, `'0016_license_column'`). Full ledger 0001–0022 enumerated below. |
+| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=23` at the post-CP28 v1.0.0 state, verified live 2026-05-19T00:41:07Z). |
+| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0023_identifier_type_check_extension_cp28'`, `'0022_fcc_citation_deferred_queue'`, `'0021_procurement_vendor_canonical_normalized'`, `'0020_source_type_enum_extension'`, `'0019_identifier_types_round2'`, `'0017_source_reclassifications'`, `'0016_license_column'`). Full ledger 0001–0023 enumerated below. |
 | `applied_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of migration application. |
 
-Live migration ledger at `schema_version=22` (verified live 2026-05-18T20:42:55Z):
+Live migration ledger at `schema_version=23` (verified live 2026-05-19T00:41:07Z):
 
 | version | name | applied_at |
 |---:|---|---|
@@ -569,6 +569,7 @@ Live migration ledger at `schema_version=22` (verified live 2026-05-18T20:42:55Z
 | 20 | `0020_source_type_enum_extension` | 2026-05-17T05:07:17Z |
 | 21 | `0021_procurement_vendor_canonical_normalized` | 2026-05-17T05:07:32Z |
 | 22 | `0022_fcc_citation_deferred_queue` | 2026-05-18T14:58:12Z |
+| 23 | `0023_identifier_type_check_extension_cp28` | 2026-05-19T00:35:33Z |
 
 #### Indexes (1 index per current schema)
 
@@ -652,11 +653,11 @@ The dual-citation-pair convention itself was codified at CP26 (within-source cor
 
 ## §5. Enum reference (consolidated)
 
-Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP27 v1.0.0 state (`schema_version=22`, verified live 2026-05-18T20:42:55Z). Migration 0022 (the v22 schema-shape addition) introduces no new CHECK enums — `fcc_citation_deferred_queue` columns are NOT NULL / FK / shape-typed but not enum-constrained.
+Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP28 v1.0.0 state (`schema_version=23`, verified live 2026-05-19T00:41:07Z). Migration 0022 (the v22 schema-shape addition) introduces no new CHECK enums — `fcc_citation_deferred_queue` columns are NOT NULL / FK / shape-typed but not enum-constrained. Migration 0023 (the v23 schema-shape addition) extends `identifiers.identifier_type` CHECK from 48 → 51 values; see §5.1 for the 3 net-new CP28(c) entries.
 
-### §5.1. `identifiers.identifier_type` — 48 values
+### §5.1. `identifiers.identifier_type` — 51 values
 
-The cumulative roster across migrations 0001–0019 (matches the bible §4.4 Lynceus mapping table at CP21 close — 48 entries). Distinct values currently present in `identifiers` (post-promotion): 38 of the 48 (the remaining 10 are codified at the schema layer but have not yet promoted any rows; CP14/CP16/CP21 architectural-separation posture lets the enum extend ahead of first-promotion).
+The cumulative roster across migrations 0001–0023 (matches the bible §4.4 Lynceus mapping table at CP28 close — 51 entries). Distinct values currently present in `identifiers` (post-promotion at v23): 39 of the 51 — 38 carry-forward from CP21 close plus 3 net-new CP28(c) values, of which 3 have first-row promotion at the MAC-181 Wave H landing (`windows_installer_productcode_vendor_registered` × 2 rows, `windows_com_clsid_vendor_registered` × 1 row, `vendor_document_uuid_cloud_reference` × 1 row); the remaining 12 are codified at the schema layer but have not yet promoted any rows (CP14/CP16/CP21 architectural-separation posture lets the enum extend ahead of first-promotion).
 
 Baseline (migration 0001): `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`.
 
@@ -671,6 +672,8 @@ Migration 0014: `alpr_model`.
 Migration 0018 (CP21 round-1): `ble_protocol_byte_table`, `ble_service_uuid`, `ble_company_id`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`.
 
 Migration 0019 (CP21 round-2): `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`.
+
+Migration 0023 (CP28 Wave H desktop-axis vendor-registered non-BLE cluster — §8.2 sub-band ladder 75–90 / 75–90 / 80–95 per BIBLE_AMENDMENTS CP28(c); §4.4 posture DROPPED / DROPPED / MAP respectively): `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`.
 
 Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per the forward-looking-codification caveat in the vendor-companion-app sub-banding amendment; lands at first-promotion-time.
 

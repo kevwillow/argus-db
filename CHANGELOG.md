@@ -4,7 +4,95 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.2.0.)
+(No unreleased changes since v1.3.0.)
+
+## [v1.3.0] — 2026-05-18
+
+### What's new in v1.3.0
+
+Argus v1.3.0 lands the **Wave H pre-v1 desktop-axis static-analysis integration** — the first release in which the vendor-companion-app extraction methodology generalizes from the Wave G Android mobile axis to Windows / macOS / Linux desktop application binaries. Three vendor desktop applications + one FP-control binary (519 MB acquired total) ran through a thin `wave_h_wrapper.py` adapter over the unmodified Wave G regex-extraction core (per the CP27 §3.0 P4 disposition — v4 untouched), with extraction outputs surfaced as a partial-cohort wave covering Cohort D (drone tooling: DJI Assistant 2 Mavic + DJI Assistant 2 FPV; Skydio P11 CLEAN NEGATIVE = documented_absence) + Cohort F (sanctioned-vendor v1: Hikvision iVMS-4200) + an H2-disambig FP-control (FileZilla 3.70.5).
+
+The headline empirical finding is **Wave H's identifier-class surface differs from Wave G's** even within installer-cohort vendors that DO have desktop binaries. After the CP26 §8 semantic-validation audit pass, **net genuine `ble_service_uuid` candidates = 0** across all three real-vendor binaries. The 4 unique surviving UUID-shaped values all re-class as different identifier classes: 2× MSI ProductCodes (Hikvision iVMS-4200 main package + Multilingual Wizard sub-package), 1× COM CLSID (DJI Assistant 2 DJIBrowser LocalServer32), 1× cloud-document UUID (DJI Mavic + FPV cross-product attested in `https://duss.djicorp.com/functional-document/<UUID>`). These are vendor-controlled identifiers with empirical density worth promoting — they would be lost if the wrapper continued to filter them as "not genuine BLE UUIDs". CP28 codifies the three identifier-classes as first-class `identifier_type` enum values + migration 0023 extends the CHECK enum 48 → 51 to receive them.
+
+The headline outcomes for downstream consumers: **22,553 active identifiers** (up from 22,549, +4 from Wave H promotion), **53 sources** (up from 52; +1 vendor_documentation Wave H Vendor Desktop Application Static Analysis admission), **49 manufacturers** unchanged (DJI + Hikvision both already canonical from MAC-178 cycle-7 wave; FileZilla intentionally not admitted — FP-control only), and a schema bumped from version 22 to **version 23** via one forward-only migration (the new `identifier_type` CHECK enum extension for the CP28 Wave H non-BLE cluster).
+
+### Wave H methodology — Vendor Desktop Application Static Analysis
+
+Wave H extends the Wave G APK static-analysis methodology to publicly downloadable desktop vendor applications across Windows / macOS / Linux. The methodology probes vendor binaries for: BLE service UUIDs, default SSID patterns, MAC OUI validation patterns, product-family taxonomy, ONVIF capability strings, SNMP enterprise OIDs, mDNS service types, and network-protocol magic bytes. The wrapper applies 7 supplemental SAR-12 FP-class filters codified across sessions 1 + 2 to suppress 188 desktop-platform-wide false positives that the v4 core alone would have promoted:
+
+| # | SAR-12 FP class | Scope |
+|---|---|---|
+| 1 | `WINDOWS_SUPPORTEDOS_MANIFEST_GUIDS` | Microsoft application-manifest compatibility GUIDs (Vista / 7 / 8 / 8.1 / 10) — every Windows installer embeds. |
+| 2 | `WINDOWS_COM_INTERFACE_GUIDS` | Microsoft Windows SDK COM IIDs (`IID_IShellLinkA` + bulk-seeded from `combase.h`, `shobjidl.h`, `objidl.h`, `oaidl.h`, `unknwn.h`). |
+| 3 | `WINDOWS_DEVCLASS_SETUP_GUIDS` | SetupAPI device-class GUIDs (USB / Media / Modem / Net / HID / 1394 / Image / MTP / etc.). |
+| 4 | `LIBUSB_ASCII_IDENTIFIERS` | UUID-shaped ASCII strings inside libusb-win32-WDF library binary. |
+| 5 | `THIRD_PARTY_DLL_PATH_PREFIXES` | UUID-class candidates whose `source_file_relative` path leaf starts with 3rd-party library prefixes (Qt5*, libcrypto-*, libssl-*, libeay32, msvcp*, msvcr*, vcruntime, libusb0, libusb-1.0, d3dcompiler_*, libegl, libglesv2, sqlite3, icu*, iconv, libffi, libxml2, zlib). |
+| 6 | `WINDOWS_SXS_PUBLICKEYTOKEN` | 16-char hex publicKeyTokens in `<assemblyIdentity>` XML manifests. |
+| 7 | `windows_installer_productcode_in_msi_context` | MSI/InstallShield ProductCode GUIDs in Windows Installer registry contexts (8 context markers incl. `\{`, `\Uninstall\{`, `InstallShield Wizard`). Codified post-Hikvision-CP26-§8-audit. |
+
+The wrapper canonical path is `android_test/tools/extraction/wave_h_wrapper.py` (sibling to `wave_g_extractor.py`); the Wave H runguide is `android_test/WAVE_H_RUNGUIDE.md` (sibling to `WAVE_G_RUNBOOK.md`). Wave H pre-v1 extraction outputs are staged at `extraction_outputs/wave_h_pre_v1/` (HANDOFF + per-vendor candidates/fp_findings + cohort-absence rows + calibration findings).
+
+### CP17 desktop-axis thesis bifurcation finding (marquee policy output)
+
+The original CP17 cohort thesis (Wave G mobile origin) predicted that the operator-vs-installer cohort split would generalize from mobile to desktop. Wave H sessions 1 + 2 empirically refine this finding in two distinct dimensions:
+
+**Dimension 1 — cohort presence.** The operator-cohort desktop class has structurally dissolved into web/mobile across modern VMS + drone-tooling vendors. Session 1 confirmed this for VMS (5 of 6 Cohort A targets were web-only or UWP-MSIX, not Electron desktop — Cohort A descoped). Session 2 §3 confirms this for drone tooling (Skydio Pilot does not exist as a desktop application — Skydio's distribution is mobile + hardware-controller + cloud; documented_absence emitted). The installer-cohort desktop class persists (DJI Assistant 2 ships a desktop installer; Hikvision iVMS-4200 ships a desktop installer) but the operator-cohort class is empirically absent at the desktop axis in 2026.
+
+**Dimension 2 — identifier-class surface.** This is the NEW Wave H finding the runguide did not predict. Even within installer-cohort desktop binaries that DO exist, the identifier-class surface differs from what Wave G mobile-axis extraction surfaced:
+
+- **Wave G mobile binaries yield genuine BLE service UUIDs** because the mobile companion is the BLE peripheral pairing endpoint. The phone IS the BLE central; the vendor app contains BLE service/characteristic UUIDs in code.
+- **Wave H desktop binaries yield MSI ProductCodes + COM CLSIDs + cloud-document UUIDs + vendor-cloud-endpoint hostnames** — not BLE protocol identifiers. The desktop client is for camera/drone management; the BLE pairing surface is in the camera/drone firmware (Cohort E) or in the mobile app (Wave G), not in the desktop client.
+
+**Policy implication for Lynceus + Talos:** Wave H desktop findings should be consumed as a different identifier-class surface than Wave G mobile findings. A "BLE UUID + SSID" yield expectation that worked for Wave G mobile does NOT apply to Wave H desktop. Wave H desktop's value-add is in the **vendor cloud-endpoint discovery** layer (e.g., the `duss.djicorp.com` hostname surfaced from DJI Assistant 2 binaries), the **installer-time configuration surface** (MSI ProductCode + COM CLSID = vendor-controlled OS-integration identifiers), and **the absence-as-finding** (CP17 operator-cohort dissolution itself is a vendor-architectural-shift observation worth codifying). Future Wave I desktop-axis runguides should re-scope to vendor cloud-endpoint discovery + installer-config surface as headline metrics, not BLE UUIDs.
+
+### Net new identifiers — the four CP28(c) Wave H promotions
+
+The 4 vendor-attested non-BLE UUIDs that CP26 §8 audit re-classed promote at the §8.2 sub-band ladder per CP28(c):
+
+- **DJI `f4d4dbf5-ba4b-40db-9a44-f8395f3728cf`** (`vendor_document_uuid_cloud_reference`) — cloud-document UUID embedded in DJI's `https://duss.djicorp.com/functional-document/f4d4dbf5-...` URL. Cross-product attested across DJI Assistant 2 Mavic 2.0.14 + DJI Assistant 2 FPV 2.1.2 (CP24 within-vendor-cross-product). Confidence 90 per the 80-95 sub-band ladder. §4.4 posture: **MAP** — the cloud-hostname half lifts into Lynceus's relevance window as a passively-scannable vendor cloud endpoint signature.
+
+- **DJI `054aae20-4bea-4347-8a35-64a533254a9d`** (`windows_com_clsid_vendor_registered`) — Windows COM Class ID for the DJIBrowser LocalServer32, surfaced from `Software\Classes\CLSID\{054AAE20-...}\LocalServer32` registry context in DJI Assistant 2 Mavic 2.0.14. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED** — install/registry context only; low passive-scan utility.
+
+- **Hikvision `9a25302d-30c0-39d9-bd6f-21e6ec160475`** (`windows_installer_productcode_vendor_registered`) — MSI ProductCode for iVMS-4200 v3.13.0.5_Multilingual main package, surfaced from `SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9A25302D-...}` registry context. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED**.
+
+- **Hikvision `ce2f96d0-63d2-4b9c-a8d6-0d1a60840bd8`** (`windows_installer_productcode_vendor_registered`) — MSI ProductCode for iVMS-4200 Multilingual Wizard sub-package, surfaced from `\{CE2F96D0-...}` registry context. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED**.
+
+All 4 promoted identifiers carry single-source-at-promotion provenance (no §8.3 lift triggers fire — Cohort D's only independent vendor 2 was Skydio, which is P11 CLEAN NEGATIVE / documented_absence; no cross-vendor independent-source overlap to test). Per §11 #8, confidence stays at the §8.2 sub-band's empirical anchor; no drift.
+
+### Documented absences — Wave H Cohort A + Skydio Cohort D
+
+Wave H session 1's Cohort A descope yielded **6 documented_absence rows** (Verkada Command, Genetec Citilog, Avigilon ACC Client, Axis Camera Station, Milestone XProtect, Honeywell Pro-Watch) anchored on the empirical observation that these vendors' "operator" client class has structurally dissolved into web/mobile distribution in 2026. Session 2 §3 added **1 Cohort D documented_absence row** (Skydio Pilot — P11 CLEAN NEGATIVE; Skydio's distribution is mobile + hardware-controller + cloud only; no desktop application). All 7 documented_absence rows are staged at `extraction_outputs/wave_h_pre_v1/per_vendor/_cohort_a_documented_absence.json` and `.../skydio_pilot_documented_absence.json`; they land in the appropriate canonical-state surface per current schema convention (the `documented_absence` first-class-table promotion remains held below the §3 #6 ≥30 cumulative-wave threshold per the CP27 surfacing).
+
+### New data source
+
+One source joined Argus in this release, bringing the source count from 52 to 53:
+
+- **Vendor Desktop Application Static Analysis — Wave H** (sid=53, `source_type='vendor_documentation'`, tier 1) — the methodology covers publicly-downloadable vendor desktop applications across Windows / macOS / Linux. Admitted under CP15 source-type ceiling (CP28(a) `vendor_application_static_analysis` enum value DEFERRED per CEO disposition — the operational band-distinction is encoded via the §8.2 sub-band ladder + `notes.session_admission='wave_h_pre_v1'`). License posture: `per_vendor` + `upstream_license_posture='no_license_declared_facts_only'` defaults per CP21. Session 1 + 2 EULA disposition counts: category_a 0, category_b 0, category_c 3, category_d 0 (Hikvision iVMS-4200 download-agreement modal + DJI EULA + FileZilla GPLv2 all §3.6 (c) include).
+
+### Bible amendment — Correction Pass 28 (CP28(c) identifier_type cluster + CP28(a)/(b) deferrals + SAR-12 7-FP-class codification + wrapper §-fragment)
+
+The Wave H pre-v1 wave's three CP28 candidate flags ratified as **`Correction Pass 28`**:
+
+- **CP28(c)** — three new `identifier_type` CHECK enum values: `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`. §8.2 sub-band ladder 75-90 / 75-90 / 80-95; §4.4 posture DROPPED / DROPPED / MAP respectively. Schema landed via migration 0023.
+- **CP28(a)** `vendor_application_static_analysis` source_type enum — **DEFERRED** per CEO disposition; band-distinction encoded via §8.2 sub-band ladder + `notes.session_admission`. Re-fire candidate post-Wave-H-Continuation + Wave-I close.
+- **CP28(b)** `sanctioned_vendor_public_distribution_facts_only` license-posture sentinel — **DEFERRED** per CEO disposition; empirical anchor weakened post-CP26 §8 audit. Re-fire candidate post-Cohort-F completion as CP-of-its-own (currently Dahua + Uniview acquisition blocked at Cloudflare).
+- **Wrapper §-fragment** — ±90-char per-match windowed clipping discipline at the candidate-walk layer codified for next-runguide-template fold-in. Whole-line-with-overflow_dropped behavior deprecated for candidate-walk extraction.
+- **SAR-12 7-FP-class roster codification** — the wrapper's final 7-class roster (listed above in the methodology section) is canonized for cross-wave consumption (source-of-truth remains the wrapper).
+
+CP28 lands as the bible-amendment sibling of migration 0023 in the MAC-181 v1.3.0 release sweep cycle. CP-anchor: migration commit `2795ebba7866ad164121668321e213308aa87936` + [MAC-181](/MAC/issues/MAC-181) child issue ID. Bible HEAD bumps from the CP27 commit to the CP28 commit landed alongside this entry. Ratification surface: [MAC-177 disposition `comment-0d15de7b`](/MAC/issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §7 "approve full path".
+
+### Schema changes
+
+One new migration landed this release (schema version 22 → 23):
+
+- **0023 — `identifier_type` CHECK enum extension CP28.** Pure additive enum extension (48 → 51 values) using the SQLite table-rebuild pattern from 0009 / 0011 / 0013 / 0014 / 0018 / 0019. Cumulative-CHECK discipline carries forward all 48 prior values verbatim + adds the 3 net-new CP28(c) values. PRAGMA integrity_check + quick_check both ok at apply time; 22,549 active rows preserved via INSERT SELECT *.
+
+### Tracked follow-ons (post-v1.3.0)
+
+- **Cohort F post-CP28 re-fire** (Dahua + Uniview; option 2 per [MAC-177 disposition](/MAC/issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §5) — queued as a separate child issue.
+- **Wave I scope discussion** — hostname corpus → web SPA → iOS ranking ratified; separate child issue after v1.3.0 ships.
+- **CP28(b) sentinel re-anchor** at Cohort F completion as CP-of-its-own.
+- **CP28(a) re-fire** if Lynceus operationally requests filterable `vendor_application_static_analysis` source_type class post-Wave-I.
 
 ## [v1.2.0] — 2026-05-18
 
