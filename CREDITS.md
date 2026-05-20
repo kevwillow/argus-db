@@ -309,3 +309,47 @@ specification; this document is the public-facing summary.
 | migration 0011 introduction of `ble_manufacturer_id` identifier type | `BIBLE_AMENDMENTS.md` CP14 |
 | hard-rule set (§11) — source-url-direct provenance, PII discipline, promotion-gate provenance, confidence-band ceilings, Feist facts-only doctrine | `PROJECT_BIBLE.md` §11 |
 | manufacturers-lexicon evolution amendments | `BIBLE_AMENDMENTS.md` CP3, CP4, CP10, SAR-9 |
+
+---
+
+## v1.4.0 — Wave I/I.5/I.6/I.7 cumulative attribution
+
+This release integrates the vendor cloud-infrastructure hostname corpus extracted across four autonomous sub-passes (Wave I main + I.5 deep extension + I.6 continuation + I.7 continuation). The following sources are admitted into the canonical lexicon for the first time at v1.4.0:
+
+### Public certificate transparency
+
+- **crt.sh** — public Certificate Transparency log aggregator (Sectigo). 11,551 hostname attestations across 51 canonical vendors via RFC 6962 public CT log observation. https://crt.sh/
+
+### Public archive
+
+- **Internet Archive Wayback Machine — CDX** — temporal hostname-historical attestation. https://web.archive.org/cdx/
+
+### Vendor first-party
+
+- **GitHub vendor-organization content** — raw README + source-file content from vendor-owned GitHub organizations per published LICENSE; 21 surviving Wave I hostname attestations post-scrub. https://github.com/
+
+### Regional Internet Registries (infrastructure admission)
+
+- **ARIN** — RDAP (North America). https://rdap.arin.net/registry/
+- **RIPE NCC** — RDAP (Europe/Middle East/Central Asia). https://rdap.db.ripe.net/
+- **APNIC** — RDAP (Asia-Pacific). https://rdap.apnic.net/
+- **LACNIC** — RDAP (Latin America/Caribbean). https://rdap.lacnic.net/
+- **AFRINIC** — RDAP (Africa). https://rdap.afrinic.net/
+
+(All 5 admitted with 0 observations this cycle — Wave I class G halted with `url_pattern_issue` carry-forward; admission provides infrastructure for Wave I-prime ASN-prefix observation.)
+
+### Public package registries
+
+- **npm Registry** — https://registry.npmjs.org/
+- **PyPI** — https://pypi.org/
+- **RubyGems** — https://rubygems.org/
+
+### Vendor public cloud-storage payload
+
+- **Honeywell firmware bucket (CT40 Android OTA)** — `honeywell-firmware` public S3-class bucket payload providing CT40-O / CT40-P firmware ZIPs containing `META-INF/com/android/otacert` Honeywell-signed OTA certificates. Subject DN `O=Honeywell International Inc., OU=ACS, CN=Honeywell CodeSign RSA CA`. Single confirmed bucket admission per SAR-13.5 attribution-gate-binding methodology.
+
+### Acknowledgements
+
+The 568 NXDOMAIN-verified deprecated hostnames (565 promoted into canonical at v1.4.0) are attribution anchors retained per CP29 §1's `vendor_controlled_hostname_deprecated` value class — these hostnames were once publicly resolvable vendor infrastructure and now stand as historical attribution + supersession-chain pivots. Source: Wave I.6 sub-pass 7 `deprecated_hostname_verified.json`.
+
+The §8.3 lift framework's 108 v1.4.0 applications (anchored against `wave_i_lift_candidates_synthesis.json` from Wave I.7 sub-pass 15) honor CP24 cross-source independence: lifts apply only when ≥2 distinct extraction source-classes from genuinely independent providers corroborate the hostname.

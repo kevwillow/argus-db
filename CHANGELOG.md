@@ -4,7 +4,88 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.3.0.)
+(No unreleased changes since v1.4.0.)
+
+## [v1.4.0] — 2026-05-20
+
+### What's new in v1.4.0
+
+Argus v1.4.0 lands the **vendor cloud-infrastructure hostname corpus** from the 4-wave Wave I/I.5/I.6/I.7 autonomous extraction effort. 12,590 cumulative unique hostnames flowed from 8 extraction source-classes through Phase 2 FP-scrub (97.21% survivor rate, flagged for manual top-50 GitHub-sourced calibration as carry-forward) into 12,239 net-new identifiers (11,674 `vendor_controlled_hostname` + 565 `vendor_controlled_hostname_deprecated`) across all 51 canonical vendors. Net active identifier count grows 22,553 → **34,792** (+54.3%); raw_observations 133,830 → 146,188 (+12,358 with full provenance lineage); sources 53 → 66 (+13: crt.sh CT logs + Wayback CDX + GitHub vendor first-party + 5 RIR RDAP endpoints + npm/PyPI/RubyGems + bucket payload class + Wave I extraction methodology umbrella).
+
+The headline marquee finding is **`hppki.honeywell.com` promoted at confidence=99** (firmware-cert ceiling) via 4-source independent corroboration: 2 Honeywell OTA signing certificates recovered from CT40 Android firmware META-INF/com/android/otacert (issuer `C=US, O=Honeywell International Inc., OU=ACS, CN=Honeywell CodeSign RSA CA`; sha256 `60a8cf8feeb33926366776b395d6c8d9334bd8b42038b85563622ce0a1d0745b`) + crt.sh CT log attestation + binary Class A extraction + bucket payload Class A_bucket_payload_firmware. This is the strongest possible attribution chain in the Argus framework — firmware-embedded cert + vendor-signed code-signing CA + multi-source-class corroboration.
+
+Migration 0024 extends the `identifier_type` CHECK enum 51 → 54 with three CP29 value classes (`vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`). Two candidate CP29 value classes deferred per conservative ≥1-evidence gate: `vendor_asn_prefix` (Wave I class G halted url_pattern_issue; 0 findings) and `vendor_controlled_ip` (cert IP-SAN sub-passes 0/0/0 across Wave I.5/I.6/I.7). Both reserved for CP30 / migration 0025 when empirical observation surfaces.
+
+### Source admissions (13 new)
+
+| sid | name | source_type | source_class |
+|---|---|---|---|
+| 54 | Certificate Transparency Logs — crt.sh aggregator | primary_registry | B (CT log aggregator) |
+| 55 | Internet Archive Wayback Machine — CDX | crowdsourced | K (public archive temporal) |
+| 56 | GitHub — vendor first-party content | manufacturer_app | I (vendor source/README) |
+| 57-61 | ARIN/RIPE/APNIC/LACNIC/AFRINIC RDAP | primary_registry | G (RIR; infrastructure-only admission for Wave I-prime) |
+| 62-64 | npm Registry / PyPI / RubyGems | manufacturer_app | J (public package registry) |
+| 65 | Vendor Public Cloud-Storage Bucket Payload (S3-class) | manufacturer_app | A_bucket_payload (SAR-13.5 attribution-gate-binding) |
+| 66 | Wave I — Vendor Cloud-Infrastructure Hostname Corpus Extraction | manufacturer_app | A/C/D/F umbrella (extraction methodology) |
+
+Each admission carries `ratification_band` + `source_class_full_name` + admission metadata in `sources.notes` JSON per CP14/CP16 pattern. Source_type CHECK enum maps to closest existing value (no source_type enum extension this release; CP30 candidate for 5 new enum values deferred to Wave I-prime).
+
+### Confidence-band ladder per CP29 §2
+
+- **`vendor_controlled_hostname`**: 75-90 single-source default; 85-95 cross-source (CP24 independence); 95-99 firmware-embedded cert chain
+- **`vendor_cloud_endpoint_url`**: 80-90 default; 90-97 with binary + CT log + sitemap multi-source corroboration
+- **`vendor_controlled_hostname_deprecated`**: 80-87 default (NXDOMAIN-verified at extraction time)
+
+### Phase 5 promotion empirical anchors (v1.4.0)
+
+```
+inserted identifiers:                  12,239
+  vendor_controlled_hostname:          11,674
+  vendor_controlled_hostname_deprecated:   565
+per confidence band:
+  conf=99 (firmware-cert ceiling):          1   (hppki.honeywell.com)
+  conf=97 (cross-source + §8.3 lift):     108   (lifted candidates per CP24 independence)
+  conf=87 (deprecated default high):      565   (NXDOMAIN-verified)
+  conf=85 (default high single-source): 11,565   (most common — single CT-log attestation)
+§8.3 lifts applied:                       108   (per wave_i_lift_candidates_synthesis.json)
+raw_observations FK-chained:           12,358
+```
+
+### Manufacturer alias enrichment
+
+5 novel Subject DN O observations appended to canonical manufacturers.aliases:
+
+- **Autel Robotics** (mfg_id=206): appended `Autel Intelligent Technology Corp.` (3 cert observations)
+- **Axis Communications** (mfg_id=7): appended `Axis Communications AB` (2 cert observations)
+- **Cisco Meraki** (mfg_id=207): appended `Meraki LLC` (2 cert observations)
+- **Getac** (mfg_id=18): appended `Getac Technology Corporation` (1 cert observation)
+- **Jacobs** (mfg_id=13): appended `Jacobs Solutions Inc.` (1 cert observation)
+
+**Honeywell International Inc.** observed in firmware-embedded code-signing cert but NOT yet in canonical 51-vendor lexicon — logged for v1.4.1+ operator-review admission decision.
+
+### Bible amendments
+
+- **CP29** — vendor hostname corpus value_classes (3 codified, 2 deferred)
+- **SAR-13** — runguide-schema-fabrication discipline (PRAGMA-verify all column names + types prior to any SQL drafting against canonical schema)
+- **SAR-13.5** — bucket attribution discipline (content-based attribution gate before any public-bucket-derived promotion; three-state classification: confirmed / rejected_slug_collision / ambiguous_operator_review_required)
+
+### Lynceus export disposition
+
+`argus_export.json` (Lynceus, conf floor 30) and `argus_export_high_confidence.json` (Lynceus, conf floor 70) sizes are unchanged vs v1.3.0. All 12,239 v1.4.0 cloud-infrastructure hostnames carry `device_category='unknown'` (these are vendor attribution anchors, not device-pairable identifiers per §11 #13 ban) and are correctly DROPPED from Lynceus export at the §11 #13 device-category-unknown gate. They appear in `argus_export.csv` (full unfiltered corpus, now 34,792 records / 21 MB).
+
+### Carry-forward queue (post-v1.4.0)
+
+- payload.bin Android A/B OTA extraction tool for Wave I-prime access to inner-filesystem certs (only OTA-update certs recovered this cycle)
+- GITHUB_TOKEN-authenticated rerun for higher rate posture on GitHub source mining
+- Wayback CDX connectivity remediation
+- `vendor_asn_prefix` + `vendor_controlled_ip` value-class observation (currently 0 empirical evidence; CP30/migration 0025 admission criteria)
+- Manual top-50 GitHub-sourced calibration FP-rate anchor (Phase 2 §2.5)
+- Honeywell International Inc. canonical-manufacturer admission decision (firmware-cert evidence in hand; operator ratification needed)
+- CP30 source_type enum extension (5 candidate values: certificate_transparency_log, public_archive, vendor_first_party_source_code, public_package_registry, vendor_cloud_storage_payload)
+
+### Schema migrations
+
+- **0024**: identifier_type CHECK enum 51 → 54 (CP29 cluster) — table-rebuild pattern per 0009/0011/0013/0014/0018/0019/0023 precedent; 22,633 rows preserved via INSERT SELECT *; 6 indexes recreated; FK integrity preserved.
 
 ## [v1.3.0] — 2026-05-18
 

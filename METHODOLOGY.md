@@ -478,3 +478,56 @@ distillation.
 | Feist facts-only / canonical sentinel-key | `PROJECT_BIBLE.md` §11 #16 |
 | bible's promotion-rule section (the hard-rule set) | `PROJECT_BIBLE.md` §11 |
 | framework-string sub-rule (extraction-time false-positive discipline) | `BIBLE_AMENDMENTS.md` SAR-11 |
+
+---
+
+## §11. Vendor cloud-infrastructure hostname corpus extraction (Wave I)
+
+Added in v1.4.0. This section documents the 4-wave Wave I/I.5/I.6/I.7 methodology that produced the vendor cloud-infrastructure hostname corpus (12,590 cumulative unique hostnames → 12,239 net-new canonical identifiers).
+
+### §11.1 — Extraction source-classes
+
+The Wave I cumulative extraction operated across 8 source-classes per the Wave I runguide (`~/argus-internal/wave_i_pre_v1/runguide.md`):
+
+- **B (crt.sh aggregator)** — RFC 6962 public CT log observation; vendor-apex subdomain queries via `crt.sh/?q=%25.<vendor_apex>`. 11,551 hostnames in cumulative output; 92% of corpus by volume.
+- **A (binary static analysis)** — extraction from vendor mobile + desktop binaries (Wave G + Wave H wrapper methodology pipeline). 587 hostnames cumulative (post Class-A 481 extraction-time FP-drop).
+- **I_github_readme + I_github_source** — vendor GitHub organization README + source file content (Wave I.6 sub-pass 8 + Wave I.7 sub-pass 14); ~24% retention rate estimated; manual top-50 calibration carry-forward.
+- **F (subdomain enumeration)** — passive DNS + subdomain wordlist probes against vendor-apex domains.
+- **D + D_bucket_enum_deep** — S3-class public bucket misconfiguration probes; SAR-13.5 bucket-attribution gate binds per-row promotion.
+- **C (cloud doc URL space)** — cloud-document URL-pattern enumeration (CP28 `vendor_document_uuid_cloud_reference` sibling methodology).
+- **A_bucket_payload_firmware** — payload extraction from confirmed vendor public buckets (Honeywell firmware OTA cert chain marquee).
+- **J (public package registries)** — npm + PyPI + RubyGems package metadata for vendor-published package surfaces.
+- **K (Wayback CDX)** — Internet Archive temporal hostname observation for deprecated-hostname enrichment + carry-forward.
+- **G (RDAP RIRs)** — Regional Internet Registry ASN/IP-block enumeration; halted in Wave I class G with `url_pattern_issue` carry-forward (0 findings cumulative).
+
+### §11.2 — CP29 confidence-band ladder
+
+Per BIBLE_AMENDMENTS.md CP29 §2:
+
+- **`vendor_controlled_hostname`**: 75-90 single-source default / 85-95 cross-source (CP24 independence) / 95-99 firmware-embedded cert ceiling
+- **`vendor_cloud_endpoint_url`**: 80-90 single-source / 90-97 binary + CT log + sitemap multi-source
+- **`vendor_controlled_hostname_deprecated`**: 80-87 NXDOMAIN-verified default
+
+### §11.3 — Phase 2 FP scrub disposition
+
+The dispatch §2 FP scrub applies 7 disambig classes (CDN / analytics / update-framework / license-auth / standards-IANA / OS-SDK-vendor / installer-wrapper) + SAR-13.5 bucket attribution gate + §4.2 cross-vendor demotion + GitHub-sourced calibration. v1.4.0 survivor rate: 97.21% (above 50% PROCEED-but-FLAG gate). The high survivor rate reflects Wave I's extraction-time pre-scrub (Class B 5% calibration FP rate; Class A 481 fp_dropped at extraction). Carry-forward: manual top-50 GitHub-sourced calibration review post-v1.4.0 to anchor empirical FP rate.
+
+### §11.4 — Marquee anchor: `hppki.honeywell.com`
+
+The strongest possible attribution chain in the framework — promoted at confidence=99 (firmware-cert ceiling) via 4-source independent corroboration:
+
+1. **Firmware OTA signing cert** (sha256 `60a8cf8feeb33926366776b395d6c8d9334bd8b42038b85563622ce0a1d0745b`) recovered from CT40 Android firmware `META-INF/com/android/otacert`; issuer DN `C=US, O=Honeywell International Inc., OU=ACS, CN=Honeywell CodeSign RSA CA`
+2. **crt.sh CT log** attestation
+3. **Class A binary** extraction
+4. **A_bucket_payload_firmware** Honeywell-firmware-bucket payload
+
+Per CP24 cross-source independence, these 4 source-classes are genuinely independent (different providers; different methodologies). Per CP29 §2's firmware-cert ceiling, the 95-99 ladder applies.
+
+### §11.5 — SAR-13 + SAR-13.5 sibling codification
+
+Wave I integration codified two SAR-class disciplines as bible-amendment siblings:
+
+- **SAR-13**: runguide-schema-fabrication discipline (PRAGMA-verify column names + types + CHECK enums against live `~/argus/db/argus.db` prior to any SQL drafting).
+- **SAR-13.5**: bucket attribution discipline (content-based attribution gate before promotion; three-state classification confirmed / rejected_slug_collision / ambiguous_operator_review_required; 57% misattribution observed in slug-discovery without content gate).
+
+See BIBLE_AMENDMENTS.md SAR-13 + SAR-13.5 entries for full discipline-evolution narrative and empirical anchors.

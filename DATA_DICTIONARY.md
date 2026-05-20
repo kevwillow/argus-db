@@ -8,7 +8,7 @@ This document is the canonical schema reference for the Argus SQLite database (`
 
 **Scope:** v1.0.0 schema (`schema_version=23` as of 2026-05-18; live verification timestamp 2026-05-19T00:41:07Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
 
-**Last refresh:** Correction Pass 28 (2026-05-18) — migration 0023 (`identifiers.identifier_type` CHECK enum extension 48 → 51 values; Wave H desktop-axis vendor-registered non-BLE cluster — `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`; MAC-181 v1.3.0 release sweep / Wave H pre-v1 promotion). Prior refresh Correction Pass 27 (2026-05-18) — migration 0022 (`fcc_citation_deferred_queue` staging table, MAC-178 cycle-7 wave Priority 1 deliverable; persists the 671-row deferred FCC.gov re-citation backlog under the dual-citation-pair convention from CP26 + MAC-178 P1+P2). MAC-178 P7 ratified CP27 §2.4 (Empirical-Premise Verification Precondition). Prior refresh Correction Pass 23 (2026-05-17) — migrations 0020 (`sources.source_type` CHECK extension; 10 → 13 values) + 0021 (`procurement_records.vendor_canonical_normalized` column + index + backfill).
+**Last refresh:** Correction Pass 29 (2026-05-20) — migration 0024 (`identifiers.identifier_type` CHECK enum extension 51 → 54 values; CP29 vendor cloud-infrastructure hostname corpus cluster — `vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`; MAC-183 v1.4.0 release sweep / Wave I/I.5/I.6/I.7 vendor cloud-infrastructure hostname corpus integration; SAR-13 + SAR-13.5 sibling-codified). Prior refresh Correction Pass 28 (2026-05-18) — migration 0023 (`identifiers.identifier_type` CHECK enum extension 48 → 51 values; Wave H desktop-axis vendor-registered non-BLE cluster — `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`; MAC-181 v1.3.0 release sweep / Wave H pre-v1 promotion). Prior refresh Correction Pass 27 (2026-05-18) — migration 0022 (`fcc_citation_deferred_queue` staging table, MAC-178 cycle-7 wave Priority 1 deliverable; persists the 671-row deferred FCC.gov re-citation backlog under the dual-citation-pair convention from CP26 + MAC-178 P1+P2). MAC-178 P7 ratified CP27 §2.4 (Empirical-Premise Verification Precondition). Prior refresh Correction Pass 23 (2026-05-17) — migrations 0020 (`sources.source_type` CHECK extension; 10 → 13 values) + 0021 (`procurement_records.vendor_canonical_normalized` column + index + backfill).
 
 **Conventions:**
 - Column shape: `name TYPE NOT NULL DEFAULT … CHECK(…)` notation matches the migration source-of-truth at `db/migrations/*.sql`.
@@ -653,11 +653,11 @@ The dual-citation-pair convention itself was codified at CP26 (within-source cor
 
 ## §5. Enum reference (consolidated)
 
-Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP28 v1.0.0 state (`schema_version=23`, verified live 2026-05-19T00:41:07Z). Migration 0022 (the v22 schema-shape addition) introduces no new CHECK enums — `fcc_citation_deferred_queue` columns are NOT NULL / FK / shape-typed but not enum-constrained. Migration 0023 (the v23 schema-shape addition) extends `identifiers.identifier_type` CHECK from 48 → 51 values; see §5.1 for the 3 net-new CP28(c) entries.
+Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP29 v1.4.0 state (`schema_version=24`, verified live 2026-05-20T00:22:56Z). Migration 0024 (the v24 schema-shape addition) extends `identifiers.identifier_type` CHECK from 51 → 54 values; see §5.1 for the 3 net-new CP29 entries.
 
-### §5.1. `identifiers.identifier_type` — 51 values
+### §5.1. `identifiers.identifier_type` — 54 values
 
-The cumulative roster across migrations 0001–0023 (matches the bible §4.4 Lynceus mapping table at CP28 close — 51 entries). Distinct values currently present in `identifiers` (post-promotion at v23): 39 of the 51 — 38 carry-forward from CP21 close plus 3 net-new CP28(c) values, of which 3 have first-row promotion at the MAC-181 Wave H landing (`windows_installer_productcode_vendor_registered` × 2 rows, `windows_com_clsid_vendor_registered` × 1 row, `vendor_document_uuid_cloud_reference` × 1 row); the remaining 12 are codified at the schema layer but have not yet promoted any rows (CP14/CP16/CP21 architectural-separation posture lets the enum extend ahead of first-promotion).
+The cumulative roster across migrations 0001–0024. Distinct values currently present in `identifiers` (post-promotion at v24): 40 of the 54 — 38 carry-forward from CP21 close + 3 net-new CP28(c) + 2 net-new CP29 with first-row promotion (`vendor_controlled_hostname` × 11,674 rows + `vendor_controlled_hostname_deprecated` × 565 rows; `vendor_cloud_endpoint_url` codified but populated as `value_class_alternates` on Wave I hosts, no primary-type-promoted rows in v1.4.0). The remaining 13 values are codified at the schema layer but have not yet promoted any rows.
 
 Baseline (migration 0001): `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`.
 
@@ -675,7 +675,9 @@ Migration 0019 (CP21 round-2): `asdstan_message_type`, `asdstan_enum_value`, `dj
 
 Migration 0023 (CP28 Wave H desktop-axis vendor-registered non-BLE cluster — §8.2 sub-band ladder 75–90 / 75–90 / 80–95 per BIBLE_AMENDMENTS CP28(c); §4.4 posture DROPPED / DROPPED / MAP respectively): `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`.
 
-Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per the forward-looking-codification caveat in the vendor-companion-app sub-banding amendment; lands at first-promotion-time.
+Migration 0024 (CP29 vendor cloud-infrastructure hostname corpus — Wave I/I.5/I.6/I.7 cumulative; CP29 §2 ladder 75-90 default / 85-95 cross-source / 95-99 firmware-cert ceiling for hostname; 80-90 / 90-97 for url; 80-87 for deprecated; §4.4 posture MAP / MAP / DROPPED-for-active-scan-MAP-for-historical-attribution respectively): `vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`.
+
+Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per the forward-looking-codification caveat in the vendor-companion-app sub-banding amendment; `vendor_asn_prefix` + `vendor_controlled_ip` per CP29 §3 deferral (0 empirical observations across Wave I cumulative; reserved for CP30 / migration 0025).
 
 ### §5.2. `identifiers.device_category` + `behavioral_signatures.device_category` — 12 values
 
