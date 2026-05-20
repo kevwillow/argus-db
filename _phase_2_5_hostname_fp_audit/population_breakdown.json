@@ -1,0 +1,969 @@
+{
+  "total_population_n": 12243,
+  "distinct_manufacturers": 52,
+  "manufacturers_with_n_gt_100": 21,
+  "per_manufacturer_total": [
+    {
+      "manufacturer": "axon",
+      "n": 2436
+    },
+    {
+      "manufacturer": "honeywell",
+      "n": 1742
+    },
+    {
+      "manufacturer": "jacobs",
+      "n": 1257
+    },
+    {
+      "manufacturer": "l3harris",
+      "n": 846
+    },
+    {
+      "manufacturer": "axis_communications",
+      "n": 815
+    },
+    {
+      "manufacturer": "harris",
+      "n": 700
+    },
+    {
+      "manufacturer": "motorola_solutions",
+      "n": 521
+    },
+    {
+      "manufacturer": "hikvision",
+      "n": 460
+    },
+    {
+      "manufacturer": "dji",
+      "n": 436
+    },
+    {
+      "manufacturer": "cellebrite",
+      "n": 386
+    },
+    {
+      "manufacturer": "cisco_meraki",
+      "n": 333
+    },
+    {
+      "manufacturer": "johnson_matthey",
+      "n": 252
+    },
+    {
+      "manufacturer": "skydio",
+      "n": 211
+    },
+    {
+      "manufacturer": "genetec",
+      "n": 192
+    },
+    {
+      "manufacturer": "soundthinking",
+      "n": 138
+    },
+    {
+      "manufacturer": "getac",
+      "n": 133
+    },
+    {
+      "manufacturer": "dedrone",
+      "n": 132
+    },
+    {
+      "manufacturer": "sierra_wireless",
+      "n": 126
+    },
+    {
+      "manufacturer": "kenwood",
+      "n": 118
+    },
+    {
+      "manufacturer": "cradlepoint",
+      "n": 103
+    },
+    {
+      "manufacturer": "dahua",
+      "n": 101
+    },
+    {
+      "manufacturer": "magnet_forensics",
+      "n": 81
+    },
+    {
+      "manufacturer": "brinc",
+      "n": 76
+    },
+    {
+      "manufacturer": "keyw",
+      "n": 76
+    },
+    {
+      "manufacturer": "parrot",
+      "n": 75
+    },
+    {
+      "manufacturer": "flock_safety",
+      "n": 67
+    },
+    {
+      "manufacturer": "autel_robotics",
+      "n": 61
+    },
+    {
+      "manufacturer": "hak5",
+      "n": 40
+    },
+    {
+      "manufacturer": "rhombus_systems",
+      "n": 39
+    },
+    {
+      "manufacturer": "rekor",
+      "n": 36
+    },
+    {
+      "manufacturer": "briefcam",
+      "n": 31
+    },
+    {
+      "manufacturer": "eagle_eye_networks",
+      "n": 24
+    },
+    {
+      "manufacturer": "clearview_ai",
+      "n": 24
+    },
+    {
+      "manufacturer": "watchguard",
+      "n": 19
+    },
+    {
+      "manufacturer": "septier",
+      "n": 17
+    },
+    {
+      "manufacturer": "vigilant_solutions",
+      "n": 16
+    },
+    {
+      "manufacturer": "utility_inc",
+      "n": 15
+    },
+    {
+      "manufacturer": "engility",
+      "n": 15
+    },
+    {
+      "manufacturer": "drt",
+      "n": 13
+    },
+    {
+      "manufacturer": "berla",
+      "n": 12
+    },
+    {
+      "manufacturer": "avigilon",
+      "n": 10
+    },
+    {
+      "manufacturer": "bluepoint_alert",
+      "n": 10
+    },
+    {
+      "manufacturer": "droneshield",
+      "n": 10
+    },
+    {
+      "manufacturer": "verkada",
+      "n": 9
+    },
+    {
+      "manufacturer": "digital_ally",
+      "n": 8
+    },
+    {
+      "manufacturer": "coban_technologies",
+      "n": 6
+    },
+    {
+      "manufacturer": "lenel",
+      "n": 4
+    },
+    {
+      "manufacturer": "reveal",
+      "n": 4
+    },
+    {
+      "manufacturer": "pips_technology",
+      "n": 2
+    },
+    {
+      "manufacturer": "sierrawireless",
+      "n": 2
+    },
+    {
+      "manufacturer": "wolfcom",
+      "n": 2
+    },
+    {
+      "manufacturer": "meraki",
+      "n": 1
+    }
+  ],
+  "per_manufacturer_identifier_type_breakdown": [
+    {
+      "manufacturer": "axon",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 2436,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "honeywell",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 1726,
+      "conf_min": 85,
+      "conf_max": 99,
+      "conf_avg": 85.01
+    },
+    {
+      "manufacturer": "jacobs",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 1249,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.03
+    },
+    {
+      "manufacturer": "l3harris",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 819,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.01
+    },
+    {
+      "manufacturer": "axis_communications",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 787,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.08
+    },
+    {
+      "manufacturer": "harris",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 672,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "motorola_solutions",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 515,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.07
+    },
+    {
+      "manufacturer": "hikvision",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 433,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.11
+    },
+    {
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 413,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.27
+    },
+    {
+      "manufacturer": "cellebrite",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 369,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.07
+    },
+    {
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 316,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.53
+    },
+    {
+      "manufacturer": "johnson_matthey",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 237,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "genetec",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 183,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.2
+    },
+    {
+      "manufacturer": "skydio",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 181,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.33
+    },
+    {
+      "manufacturer": "dedrone",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 123,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.29
+    },
+    {
+      "manufacturer": "soundthinking",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 115,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.1
+    },
+    {
+      "manufacturer": "sierra_wireless",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 111,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.54
+    },
+    {
+      "manufacturer": "getac",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 109,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.11
+    },
+    {
+      "manufacturer": "kenwood",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 106,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "cradlepoint",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 80,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.9
+    },
+    {
+      "manufacturer": "dahua",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 74,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "brinc",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 70,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "autel_robotics",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 55,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.65
+    },
+    {
+      "manufacturer": "magnet_forensics",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 55,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 86.31
+    },
+    {
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 55,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 86.31
+    },
+    {
+      "manufacturer": "keyw",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 52,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "flock_safety",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 41,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 86.76
+    },
+    {
+      "manufacturer": "rekor",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 34,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 86.76
+    },
+    {
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 31,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 87.71
+    },
+    {
+      "manufacturer": "rhombus_systems",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 30,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.8
+    },
+    {
+      "manufacturer": "skydio",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 30,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "axis_communications",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 28,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "harris",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 28,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "dahua",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 27,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "hikvision",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 27,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "l3harris",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 27,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "flock_safety",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 26,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "magnet_forensics",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 26,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "briefcam",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 24,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.5
+    },
+    {
+      "manufacturer": "getac",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 24,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "keyw",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 24,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "cradlepoint",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 23,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "soundthinking",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 23,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 22,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "eagle_eye_networks",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 20,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 86.8
+    },
+    {
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 20,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "cellebrite",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 17,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 17,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "honeywell",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 16,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "watchguard",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 16,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "clearview_ai",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 15,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 85.8
+    },
+    {
+      "manufacturer": "johnson_matthey",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 15,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "sierra_wireless",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 15,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "drt",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 13,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "berla",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 12,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 86.0
+    },
+    {
+      "manufacturer": "kenwood",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 12,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "utility_inc",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 12,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 86.0
+    },
+    {
+      "manufacturer": "vigilant_solutions",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 12,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "engility",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 11,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "avigilon",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 10,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "bluepoint_alert",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 10,
+      "conf_min": 85,
+      "conf_max": 97,
+      "conf_avg": 86.2
+    },
+    {
+      "manufacturer": "clearview_ai",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 9,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "dedrone",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 9,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "genetec",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 9,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 9,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "rhombus_systems",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 9,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "septier",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 9,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "verkada",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 9,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "jacobs",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 8,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "septier",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 8,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "briefcam",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 7,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "droneshield",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 7,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "autel_robotics",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 6,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "brinc",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 6,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "motorola_solutions",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 6,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "coban_technologies",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 4,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "digital_ally",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 4,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "digital_ally",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 4,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "eagle_eye_networks",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 4,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "engility",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 4,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "lenel",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 4,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "reveal",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 4,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "vigilant_solutions",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 4,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "droneshield",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 3,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "utility_inc",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 3,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "watchguard",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 3,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "coban_technologies",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 2,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "pips_technology",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 2,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "rekor",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 2,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    },
+    {
+      "manufacturer": "sierrawireless",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 2,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "dji",
+      "identifier_type": "vendor_cloud_endpoint_url",
+      "n": 1,
+      "conf_min": 90,
+      "conf_max": 90,
+      "conf_avg": 90.0
+    },
+    {
+      "manufacturer": "meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 1,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "wolfcom",
+      "identifier_type": "vendor_controlled_hostname",
+      "n": 1,
+      "conf_min": 85,
+      "conf_max": 85,
+      "conf_avg": 85.0
+    },
+    {
+      "manufacturer": "wolfcom",
+      "identifier_type": "vendor_controlled_hostname_deprecated",
+      "n": 1,
+      "conf_min": 87,
+      "conf_max": 87,
+      "conf_avg": 87.0
+    }
+  ]
+}

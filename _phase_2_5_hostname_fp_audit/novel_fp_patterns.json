@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "stage": "mac188_phase_2_5_hostname_fp_audit",
+  "anchor_ratification_pending": true,
+  "anchor_ratification_target": "CEO via MAC-188 halt + surface",
+  "fp_classes": {
+    "synthetic_vendor_tenant_pattern": {
+      "shape": "<vendor-token>-<common-suffix>.s3.amazonaws.com",
+      "common_suffix_set": [
+        "backup",
+        "config",
+        "dev",
+        "db",
+        "logs",
+        "media",
+        "production",
+        "prod",
+        "public",
+        "support",
+        "test",
+        "videos",
+        "uploads",
+        "assets",
+        "downloads",
+        "firmware",
+        "internal",
+        "storage",
+        "data"
+      ],
+      "rationale": "Same synthetic suffix set repeats across multiple vendors (reveal, drt, lenel, verkada, parrot, jacobs, honeywell, cisco_meraki, dji, harris, dahua) with no per-bucket verification that the bucket actually resolves under the vendor's AWS account. Pattern matches generative seeding rather than vendor-cloud-endpoint evidence. CP29 \u00a72 admits vendor-tenant-on-third-party-cloud ONLY when the hostname IS the endpoint signature with bucket-attestation; the synthetic-suffix shape fails that gate.",
+      "verdict": "FP",
+      "affected_manufacturers_observed": [
+        "reveal",
+        "drt",
+        "lenel",
+        "verkada",
+        "parrot",
+        "jacobs",
+        "honeywell",
+        "cisco_meraki",
+        "dji",
+        "harris",
+        "dahua"
+      ]
+    },
+    "cn_tech_giant_cross_attribution": {
+      "shape": "<subdomain>.<cn-tech-giant-apex> attributed to non-CN-tech-giant manufacturer",
+      "cn_tech_giant_apex_set": [
+        "qq.com",
+        "tencent.com",
+        "alibaba.com",
+        "alibabacloud.com",
+        "aliyun.com",
+        "weibo.com",
+        "baidu.com",
+        "xiaomi.com",
+        "huawei.com",
+        "alipay.com",
+        "oppomobile.com",
+        "meizu.com",
+        "line.me",
+        "vmall.com"
+      ],
+      "rationale": "CN-tech-giant ecosystem hostnames (xiaomi/huawei/meizu/alipay push SDK, line.me messaging, vmall.com Huawei store) appear in vendor SDK manifests as SDK dependencies rather than vendor-controlled infrastructure. Attribution to the SDK-integrating vendor (e.g., Hikvision, Dahua) is incorrect under CP29 \u00a71 vendor-ownership predicate.",
+      "verdict": "FP",
+      "affected_manufacturers_observed": [
+        "dji",
+        "hikvision",
+        "dahua",
+        "autel_robotics"
+      ]
+    },
+    "third_party_oss_sdk_root": {
+      "shape": "hostname under non-vendor OSS / standards / CDN / tooling / cert-authority apex",
+      "apex_examples": [
+        "googlecode.com",
+        "llvm.org",
+        "googleusercontent.com",
+        "gnome.org",
+        "linuxtv.org",
+        "xiph.org",
+        "openweathermap.org",
+        "u-blox.com",
+        "tuxfamily.org",
+        "scipy.org",
+        "skyward.io",
+        "khronos.org",
+        "expo.dev",
+        "launchdarkly.com",
+        "swmansion.com",
+        "actionbarsherlock.com",
+        "ormlite.com",
+        "haxx.se",
+        "journeyapps.com",
+        "ggpht.com",
+        "qbox.me"
+      ],
+      "rationale": "Vendor SDK / Wave I extraction surfaced third-party OSS library / SDK / CDN / cert-authority roots cited in binaries or READMEs. Per CP29 \u00a71 these are NOT vendor-controlled hostnames; the binary mention is a dependency-graph signal, not a vendor-infrastructure signal.",
+      "verdict": "FP",
+      "affected_manufacturers_observed": [
+        "dji",
+        "parrot",
+        "autel_robotics",
+        "dahua",
+        "hikvision"
+      ]
+    },
+    "malformed_concatenated_extraction_artifact": {
+      "shape": "single-label > 40 chars without sufficient hyphenation (<3 hyphens), OR overall hostname length > 120 chars",
+      "rationale": "Wave I extraction-time pipeline (regex-based hostname harvest) occasionally produced concatenated-host artifacts where multiple distinct hosts merged into a single gibberish label. Surfaced empirically in cisco_meraki AMBIGUOUS bucket.",
+      "verdict": "FP",
+      "affected_manufacturers_observed": [
+        "cisco_meraki",
+        "dji"
+      ]
+    }
+  },
+  "next_action": "CEO ratifies (a) the four FP classes above as canonical FP patterns for v1.5.0 disambig codification, (b) the supersession mechanic for FP-demotion (no v1.4.0 precedent \u2014 must pick: MAC-110 reclassification supersession pattern adapted for FP-class, novel sentinel-row-pointer pattern, or conflicts-table routing with `notes.fp_demoted=true` flag on identifiers row), (c) the disposition for 5 manufacturers in >30% halt band plus 4 manufacturers in 10-30% sweep band."
+}
