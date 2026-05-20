@@ -1,0 +1,1743 @@
+{
+  "resolved_active": [],
+  "resolved_demoted": [
+    {
+      "identifier_id": 35305,
+      "hostname": "terra-sz-hc1pro-cloudapi.oss-cn-shenzhen.aliyuncs.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_cloud_endpoint_url",
+      "current_confidence": 90,
+      "superseded_by": 35441,
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "hostname": "www.waveshare.com",
+      "vendor": "dji",
+      "mfr": "dji",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "docs.espressif.com",
+      "vendor": "dji",
+      "mfr": "dji",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "djisdksupport.zendesk.com",
+      "vendor": "dji",
+      "mfr": "dji",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "apt.llvm.org",
+      "vendor": "cellebrite",
+      "mfr": "cellebrite",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "assets.checkra.in",
+      "vendor": "cellebrite",
+      "mfr": "cellebrite",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "hex-rays.com",
+      "vendor": "cellebrite",
+      "mfr": "cellebrite",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "docs.hex-rays.com",
+      "vendor": "cellebrite",
+      "mfr": "cellebrite",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "arxiv.org",
+      "vendor": "cellebrite",
+      "mfr": "cellebrite",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "www.slideshare.net",
+      "vendor": "cellebrite",
+      "mfr": "cellebrite",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "developer.arm.com",
+      "vendor": "cellebrite",
+      "mfr": "cellebrite",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "bazad.github.io",
+      "vendor": "cellebrite",
+      "mfr": "cellebrite",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "medium.com",
+      "vendor": "clearview_ai",
+      "mfr": "clearview_ai",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "rootspace.app",
+      "vendor": "clearview_ai",
+      "mfr": "clearview_ai",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "skillicons.dev",
+      "vendor": "clearview_ai",
+      "mfr": "clearview_ai",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "docs.sendgrid.com",
+      "vendor": "clearview_ai",
+      "mfr": "clearview_ai",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "developers.google.com",
+      "vendor": "clearview_ai",
+      "mfr": "clearview_ai",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "insomnia.rest",
+      "vendor": "clearview_ai",
+      "mfr": "clearview_ai",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "hostname": "www.clearview.team",
+      "vendor": "clearview_ai",
+      "mfr": "clearview_ai",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    }
+  ],
+  "halt_single_class": [],
+  "halt_ceiling_exceeded": [],
+  "halt_no_mfr_mapping": [],
+  "no_op_already_at_or_above": [
+    {
+      "identifier_id": 23063,
+      "hostname": "documentation.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B",
+        "F",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 23064,
+      "hostname": "account.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "C",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23065,
+      "hostname": "dev.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23066,
+      "hostname": "developer.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "C",
+        "F",
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "identifier_id": 23067,
+      "hostname": "store.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23068,
+      "hostname": "www.hikvision.com",
+      "manufacturer": "hikvision",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "identifier_id": 23069,
+      "hostname": "app.autelrobotics.com",
+      "manufacturer": "autel_robotics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23070,
+      "hostname": "shop.autelrobotics.com",
+      "manufacturer": "autel_robotics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23071,
+      "hostname": "www.autelrobotics.com",
+      "manufacturer": "autel_robotics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23072,
+      "hostname": "auth.axis.com",
+      "manufacturer": "axis_communications",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23073,
+      "hostname": "status.axis.com",
+      "manufacturer": "axis_communications",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23074,
+      "hostname": "sso.berla.co",
+      "manufacturer": "berla",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23075,
+      "hostname": "store.bluepointalert.com",
+      "manufacturer": "bluepoint_alert",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23076,
+      "hostname": "partners.briefcam.com",
+      "manufacturer": "briefcam",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23077,
+      "hostname": "community.cellebrite.com",
+      "manufacturer": "cellebrite",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23078,
+      "hostname": "status.cellebrite.com",
+      "manufacturer": "cellebrite",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23079,
+      "hostname": "account.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23080,
+      "hostname": "api.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 23081,
+      "hostname": "apps.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23082,
+      "hostname": "community.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23083,
+      "hostname": "developers.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23084,
+      "hostname": "docs.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23085,
+      "hostname": "kb.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23086,
+      "hostname": "link.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23087,
+      "hostname": "portal.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23088,
+      "hostname": "status.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23089,
+      "hostname": "vision.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23090,
+      "hostname": "status.clearview.ai",
+      "manufacturer": "clearview_ai",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23091,
+      "hostname": "developer.cradlepoint.com",
+      "manufacturer": "cradlepoint",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23092,
+      "hostname": "docs.cradlepoint.com",
+      "manufacturer": "cradlepoint",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 23093,
+      "hostname": "partners.cradlepoint.com",
+      "manufacturer": "cradlepoint",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23094,
+      "hostname": "portal.cradlepoint.com",
+      "manufacturer": "cradlepoint",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23095,
+      "hostname": "status.cradlepoint.com",
+      "manufacturer": "cradlepoint",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23096,
+      "hostname": "blog.dedrone.com",
+      "manufacturer": "dedrone",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23097,
+      "hostname": "dev.dedrone.com",
+      "manufacturer": "dedrone",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23098,
+      "hostname": "downloads.dedrone.com",
+      "manufacturer": "dedrone",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23099,
+      "hostname": "accounts.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23100,
+      "hostname": "flysafe.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "C"
+      ]
+    },
+    {
+      "identifier_id": 23101,
+      "hostname": "mydjiflight.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23102,
+      "hostname": "support.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23103,
+      "hostname": "www.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B",
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "identifier_id": 23104,
+      "hostname": "partners.een.com",
+      "manufacturer": "eagle_eye_networks",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23105,
+      "hostname": "status.een.com",
+      "manufacturer": "eagle_eye_networks",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23106,
+      "hostname": "docs.flocksafety.com",
+      "manufacturer": "flock_safety",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23107,
+      "hostname": "flocksafety.com",
+      "manufacturer": "flock_safety",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "C"
+      ]
+    },
+    {
+      "identifier_id": 23108,
+      "hostname": "help.flocksafety.com",
+      "manufacturer": "flock_safety",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23109,
+      "hostname": "login.flocksafety.com",
+      "manufacturer": "flock_safety",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23110,
+      "hostname": "status.flocksafety.com",
+      "manufacturer": "flock_safety",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23111,
+      "hostname": "www.flocksafety.com",
+      "manufacturer": "flock_safety",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "C"
+      ]
+    },
+    {
+      "identifier_id": 23112,
+      "hostname": "developer.genetec.com",
+      "manufacturer": "genetec",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23113,
+      "hostname": "downloads.genetec.com",
+      "manufacturer": "genetec",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23114,
+      "hostname": "status.genetec.com",
+      "manufacturer": "genetec",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23115,
+      "hostname": "partners.getac.com",
+      "manufacturer": "getac",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23116,
+      "hostname": "docs.hak5.org",
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 23117,
+      "hostname": "downloads.hak5.org",
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23118,
+      "hostname": "help.hak5.org",
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23119,
+      "hostname": "ezvizlife.com",
+      "manufacturer": "hikvision",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "C"
+      ]
+    },
+    {
+      "identifier_id": 23120,
+      "hostname": "hikvision.com",
+      "manufacturer": "hikvision",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "C"
+      ]
+    },
+    {
+      "identifier_id": 23121,
+      "hostname": "international-robot.hikvision.com",
+      "manufacturer": "hikvision",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23122,
+      "hostname": "apps.jacobs.com",
+      "manufacturer": "jacobs",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23123,
+      "hostname": "help.jacobs.com",
+      "manufacturer": "jacobs",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23124,
+      "hostname": "store.jacobs.com",
+      "manufacturer": "jacobs",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23125,
+      "hostname": "support.l3harris.com",
+      "manufacturer": "l3harris",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23126,
+      "hostname": "community.magnetforensics.com",
+      "manufacturer": "magnet_forensics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23127,
+      "hostname": "login.magnetforensics.com",
+      "manufacturer": "magnet_forensics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23128,
+      "hostname": "partners.magnetforensics.com",
+      "manufacturer": "magnet_forensics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23129,
+      "hostname": "status.magnetforensics.com",
+      "manufacturer": "magnet_forensics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23130,
+      "hostname": "support.magnetforensics.com",
+      "manufacturer": "magnet_forensics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23131,
+      "hostname": "developer.motorolasolutions.com",
+      "manufacturer": "motorola_solutions",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23132,
+      "hostname": "sso.motorolasolutions.com",
+      "manufacturer": "motorola_solutions",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23133,
+      "hostname": "status.motorolasolutions.com",
+      "manufacturer": "motorola_solutions",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23134,
+      "hostname": "accounts.parrot.com",
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23135,
+      "hostname": "appcentral.parrot.com",
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23136,
+      "hostname": "developer.parrot.com",
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F",
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ]
+    },
+    {
+      "identifier_id": 23137,
+      "hostname": "droneacademy.parrot.com",
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23138,
+      "hostname": "support.parrot.com",
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23139,
+      "hostname": "www.parrot.com",
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "identifier_id": 23140,
+      "hostname": "docs.rekor.ai",
+      "manufacturer": "rekor",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23141,
+      "hostname": "help.rekor.ai",
+      "manufacturer": "rekor",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23142,
+      "hostname": "partners.rekor.ai",
+      "manufacturer": "rekor",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23143,
+      "hostname": "support.rekor.ai",
+      "manufacturer": "rekor",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23144,
+      "hostname": "wiki.rekor.ai",
+      "manufacturer": "rekor",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23145,
+      "hostname": "blog.rhombussystems.com",
+      "manufacturer": "rhombus_systems",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23146,
+      "hostname": "partners.rhombussystems.com",
+      "manufacturer": "rhombus_systems",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23147,
+      "hostname": "blog.sierrawireless.com",
+      "manufacturer": "sierra_wireless",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23148,
+      "hostname": "forum.sierrawireless.com",
+      "manufacturer": "sierra_wireless",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23149,
+      "hostname": "partner.sierrawireless.com",
+      "manufacturer": "sierra_wireless",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23150,
+      "hostname": "partners.sierrawireless.com",
+      "manufacturer": "sierra_wireless",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23151,
+      "hostname": "status.sierrawireless.com",
+      "manufacturer": "sierra_wireless",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23152,
+      "hostname": "apidocs.skydio.com",
+      "manufacturer": "skydio",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 23153,
+      "hostname": "portal.skydio.com",
+      "manufacturer": "skydio",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23154,
+      "hostname": "status.skydio.com",
+      "manufacturer": "skydio",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23155,
+      "hostname": "store.skydio.com",
+      "manufacturer": "skydio",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23156,
+      "hostname": "blog.soundthinking.com",
+      "manufacturer": "soundthinking",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23157,
+      "hostname": "blog.utility.com",
+      "manufacturer": "utility_inc",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "F"
+      ]
+    },
+    {
+      "identifier_id": 23498,
+      "hostname": "developer.axis.com",
+      "manufacturer": "axis_communications",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "F",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 23615,
+      "hostname": "help.axis.com",
+      "manufacturer": "axis_communications",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "F",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 24018,
+      "hostname": "www.axis.com",
+      "manufacturer": "axis_communications",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 27025,
+      "hostname": "dashboard.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 27261,
+      "hostname": "www.meraki.com",
+      "manufacturer": "cisco_meraki",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 27339,
+      "hostname": "cradlepoint.com",
+      "manufacturer": "cradlepoint",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 28111,
+      "hostname": "www.een.com",
+      "manufacturer": "eagle_eye_networks",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "J_package_registry"
+      ]
+    },
+    {
+      "identifier_id": 28525,
+      "hostname": "hak5.org",
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 28536,
+      "hostname": "payloads.hak5.org",
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 28537,
+      "hostname": "payloadstudio.hak5.org",
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 28539,
+      "hostname": "shop.hak5.org",
+      "manufacturer": "hak5",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 34060,
+      "hostname": "www.magnetforensics.com",
+      "manufacturer": "magnet_forensics",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    },
+    {
+      "identifier_id": 34893,
+      "hostname": "cloud.skydio.com",
+      "manufacturer": "skydio",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 97,
+      "computed_new": 95,
+      "ceiling": 95,
+      "source_classes": [
+        "B",
+        "I_github_readme"
+      ]
+    }
+  ],
+  "lifts_to_apply": [
+    {
+      "identifier_id": 26656,
+      "hostname": "cellebrite.com",
+      "manufacturer": "cellebrite",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 85,
+      "new_confidence": 95,
+      "lift_basis": "section_8_3_cross_source_corroboration",
+      "source_classes": [
+        "B",
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ],
+      "waves_involved": [
+        "wave_i_8_delta",
+        "wave_i_9_delta",
+        "wave_i_pre_v1"
+      ],
+      "ceiling": 95,
+      "band_default": [
+        75,
+        90
+      ],
+      "band_lifted": [
+        80,
+        95
+      ]
+    },
+    {
+      "identifier_id": 27746,
+      "hostname": "enterprise.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 85,
+      "new_confidence": 95,
+      "lift_basis": "section_8_3_cross_source_corroboration",
+      "source_classes": [
+        "B",
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ],
+      "waves_involved": [
+        "wave_i_8_delta",
+        "wave_i_9_delta",
+        "wave_i_pre_v1"
+      ],
+      "ceiling": 95,
+      "band_default": [
+        75,
+        90
+      ],
+      "band_lifted": [
+        80,
+        95
+      ]
+    },
+    {
+      "identifier_id": 34615,
+      "hostname": "firmware.parrot.com",
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 85,
+      "new_confidence": 95,
+      "lift_basis": "section_8_3_cross_source_corroboration",
+      "source_classes": [
+        "B",
+        "I_github_source_new_orgs"
+      ],
+      "waves_involved": [
+        "wave_i_9_delta",
+        "wave_i_pre_v1"
+      ],
+      "ceiling": 95,
+      "band_default": [
+        75,
+        90
+      ],
+      "band_lifted": [
+        80,
+        95
+      ]
+    },
+    {
+      "identifier_id": 34617,
+      "hostname": "forum.developer.parrot.com",
+      "manufacturer": "parrot",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 85,
+      "new_confidence": 95,
+      "lift_basis": "section_8_3_cross_source_corroboration",
+      "source_classes": [
+        "B",
+        "I_github_source_new_orgs"
+      ],
+      "waves_involved": [
+        "wave_i_9_delta",
+        "wave_i_pre_v1"
+      ],
+      "ceiling": 95,
+      "band_default": [
+        75,
+        90
+      ],
+      "band_lifted": [
+        80,
+        95
+      ]
+    },
+    {
+      "identifier_id": 35304,
+      "hostname": "fh.dji.com",
+      "manufacturer": "dji",
+      "identifier_type": "vendor_controlled_hostname",
+      "current_confidence": 90,
+      "new_confidence": 95,
+      "lift_basis": "section_8_3_cross_source_corroboration",
+      "source_classes": [
+        "I_github_source_new_orgs",
+        "I_github_subsidiary_source"
+      ],
+      "waves_involved": [
+        "wave_i_8_delta",
+        "wave_i_9_delta"
+      ],
+      "ceiling": 95,
+      "band_default": [
+        75,
+        88
+      ],
+      "band_lifted": [
+        80,
+        93
+      ]
+    }
+  ]
+}
