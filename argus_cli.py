@@ -65,7 +65,13 @@ def _read_phase_from_state(state_path: Path) -> str:
     for line in state_path.read_text(encoding="utf-8").splitlines():
         m = re.match(r"^\*\*Current phase:\*\*\s*(.+?)\s*$", line)
         if m:
-            return m.group(1)
+            # Return only the phase marker (first sentence) — the trailing
+            # prose in PROJECT_STATE.md historically embedded schema_version
+            # and identifier counts that drifted out of sync with the live DB.
+            # The empirical anchors are now derived in cmd_status via SQL.
+            full = m.group(1)
+            first_sentence_end = full.find(". ")
+            return full[:first_sentence_end + 1] if first_sentence_end > 0 else full
     return "(phase not found in PROJECT_STATE.md)"
 
 
@@ -92,6 +98,43 @@ def cmd_status(args: argparse.Namespace) -> int:
             "FROM schema_version ORDER BY version DESC LIMIT 1"
         ).fetchone()
 
+        # Active vs. total identifier counts — SQL-derived per §6.4 (active =
+        # superseded_by IS NULL). These anchors are computed live to prevent
+        # the prose-drift class (v1.0.0 → v1.4.x).
+        identifiers_active = 0
+        identifiers_total = 0
+        if "identifiers" in existing:
+            identifiers_active = conn.execute(
+                "SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL"
+            ).fetchone()[0]
+            identifiers_total = conn.execute(
+                "SELECT COUNT(*) FROM identifiers"
+            ).fetchone()[0]
+
+        # Manufacturers hub+arm split (CP31 / migration 0025). The
+        # `query_default` column gates default-visibility filtering: hubs
+        # carry 'visible' (default queries surface them); arms carry
+        # 'hidden_arm' (default queries filter them out via
+        # `WHERE query_default = 'visible'`). Reported only when the
+        # post-CP31 columns are present so the CLI degrades gracefully
+        # against a pre-CP31 backup DB.
+        manufacturers_hubs: int | None = None
+        manufacturers_arms: int | None = None
+        if "manufacturers" in existing:
+            mfr_cols = {
+                r["name"]
+                for r in conn.execute("PRAGMA table_info(manufacturers)")
+            }
+            if {"is_arm", "query_default"}.issubset(mfr_cols):
+                manufacturers_hubs = conn.execute(
+                    "SELECT COUNT(*) FROM manufacturers "
+                    "WHERE query_default = 'visible'"
+                ).fetchone()[0]
+                manufacturers_arms = conn.execute(
+                    "SELECT COUNT(*) FROM manufacturers "
+                    "WHERE query_default = 'hidden_arm'"
+                ).fetchone()[0]
+
         last_run = conn.execute(
             "SELECT id, agent_id, source_id, started_at, finished_at, status "
             "FROM extraction_runs ORDER BY started_at DESC LIMIT 1"
@@ -105,6 +148,16 @@ def cmd_status(args: argparse.Namespace) -> int:
             )
         else:
             print("Schema version: (none — migrations not applied)")
+        print(
+            f"Identifiers: {identifiers_active} active / "
+            f"{identifiers_total} total (active = superseded_by IS NULL)"
+        )
+        if manufacturers_hubs is not None and manufacturers_arms is not None:
+            print(
+                f"Manufacturers: {manufacturers_hubs} visible (hub) + "
+                f"{manufacturers_arms} hidden (arm) = "
+                f"{manufacturers_hubs + manufacturers_arms} total"
+            )
         print(f"Current phase: {_read_phase_from_state(state_path)}")
         print()
 
