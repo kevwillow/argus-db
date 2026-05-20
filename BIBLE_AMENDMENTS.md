@@ -3504,3 +3504,111 @@ If ANY of these thresholds fire, the Validator close-out audit is required.
 This SAR-15.5 entry is the bible-amendment sibling of SAR-15 + the MAC-183 post-ship audit narrative.
 
 ═══════════════════════════════════════════════════════════════════════
+
+## Correction Pass 31 — FCC EAS identifier_type cluster + multi-arm manufacturer hub-and-spoke schema (CP30 reserved)
+
+### Scope
+
+CP31 codifies the FCC EAS grantee identifier_type cluster + the multi-arm manufacturer hub-and-spoke schema. Migration 0025 lands the schema (identifier_type CHECK enum 54 → 56, pair_kind 4 → 5, manufacturers +3 columns + Parrot conversion). 4-path downstream consumer audit at MAC-199 (commit `f9bcf22`) ratifies the runtime semantics. This commit closes the §11 #11 coordinated 2-commit shape per [MAC-197](/MAC/issues/MAC-197) board-accepted plan rev `d59e6af5`.
+
+### CP30 reservation footnote
+
+CP30 remains reserved for `vendor_asn_prefix` + `vendor_controlled_ip` codification per CP29 §3 — Wave I.10/I.13 falsified at zero-evidence, conservative ≥1-empirical-evidence gate holds. CP31 renumbers to skip CP30 without consuming the reservation slot; CP30 holds until ASN-prefix observation surfaces (likely Wave I-prime with RDAP url-pattern fix) and/or cert IP-SAN surface yields non-zero in a future cycle. Numbering precedent: CP29 reserved CP30 for these deferred items, CEO ratification at [MAC-184#comment-25b3ff0b](/MAC/issues/MAC-184#comment-25b3ff0b-f763-4291-90e9-490f1656a2c9) reclaimed CP31 for the FCC EAS cluster, deferred items re-reserved for CP32+ as they materialize.
+
+### §1 — Codified amendments (5)
+
+1. **`identifiers.identifier_type` CHECK enum +2** — `fcc_grantee_code` (3- to 5-char FCC EAS grantee prefix; regulatory entity identifier) + `equipment_class_code` (3-char FCC EAS equipment-class code; paired with grantee per §11 #7 provenance). Migration 0025 carries cumulative **54 → 56** enum values. PROJECT_BIBLE.md §4.4 mapping table updated with 2 new rows; both DROPPED per §11 #13 default at `device_category='unknown'`.
+
+2. **`identifiers.pair_kind` CHECK enum +1** — `fcc_grantee_equipment_class`. Migration 0025 carries cumulative **4 → 5** enum values per CP14 paired-identifier discipline. Pair semantics: `grantee_code` is one identifier row; `equipment_class_code` is a sibling row with `paired_identifier_id` pointing back to the grantee row and `pair_kind='fcc_grantee_equipment_class'`.
+
+3. **`manufacturers` hub-and-spoke schema extension** (3 new columns) — `parent_manufacturer_id INTEGER NULL REFERENCES manufacturers(id)`, `is_arm BOOLEAN NOT NULL DEFAULT 0`, `query_default TEXT NOT NULL DEFAULT 'visible' CHECK (query_default IN ('visible','hidden_arm'))`. Default queries against `manufacturers` MUST filter `WHERE query_default = 'visible'` unless explicitly auditing arm rows. PROJECT_BIBLE.md §4.6 codifies the full default-query rule + future-FK forward-looking binding.
+
+4. **Parrot conversion** (inline data migration) — existing Parrot id=25 remains as hub (`is_arm=0, parent_manufacturer_id=NULL, query_default='visible', primary_category='drone'` preserved); new "Parrot Automotive" arm row inserted at id=222 with `parent_manufacturer_id=25, is_arm=1, query_default='hidden_arm', primary_category='automotive_telematics', aliases='PARROT FAURECIA AUTOMOTIVE SAS,Parrot Faurecia Automotive S.A.S'`.
+
+5. **§8.2 fccid.io source-band re-attestation** — fccid.io (sid=51) is `crowdsourced`; single-source ceiling stays at **conf=75** per CP15. The Phase 7-bis 177-row §7.2 fccid.io cohort lands at conf=75 per row; §8.3 corroboration lift requires non-fccid independent source per CP24 cross-source independence. PROJECT_BIBLE.md §8.2 footnote paragraph appended.
+
+### §2 — Multi-arm vendor schema semantics
+
+Hub rows: `is_arm=0, parent_manufacturer_id=NULL, query_default='visible'`.
+Arm rows: `is_arm=1, parent_manufacturer_id=<hub.id>, query_default='hidden_arm'`.
+
+Arm rows surface only via three explicit paths:
+
+- Explicit `WHERE query_default IN ('visible','hidden_arm')` (audit query)
+- JOIN through `parent_manufacturer_id` (parent-child traversal)
+- Direct FK reference from `identifiers.manufacturer_id` (per-identifier attestation; future-FK migration pending — see §3 below)
+
+**Phase 7-bis attestation routing** (post-CP31, blocked on [MAC-196](/MAC/issues/MAC-196) Numerex close, which is landed at `1344f5d`): 2AG-attested fccid.io rows (177-row §7.2 cohort) point at the arm canonical (Parrot Automotive id=222), NOT the hub. Per-row `device_category` on those identifier rows depends on the §2.1 `identifiers.device_category` CHECK enum admitting an automotive-telematics value — see §6 below for the CP32 follow-up on this enum gap.
+
+### §3 — Downstream consumer audit (4 paths) — post-MAC-199 actual
+
+The CP31 plan §5 prescribed JOIN-based filtering at `exports/argus_export.csv` generator + `exports/lynceus_export.py`. MAC-199 surfaced an **architectural-state correction**:
+
+> `db/validation/export_lynceus.py` (which produces all three exports — `argus_export.csv`, `argus_export_high_confidence.json`, the standard JSON) **does NOT JOIN `manufacturers` today**. The sole canonical-row query reads `identifiers.manufacturer` as denormalized TEXT. No `manufacturer_id` FK exists on `identifiers`.
+
+**Arm-row protection in the v1.4.1 schema is implicit:** no identifier in the current canonical carries `manufacturer = 'Parrot Automotive'`, so the arm canonical cannot leak into any export. Adding `WHERE query_default='visible'` to a JOIN that doesn't exist would be code without effect.
+
+**Forward-looking architectural binding (CP31 surface).** When a future migration adds `identifiers.manufacturer_id` as an FK (pre-staged by CP31's hub-and-spoke columns), the export-path JOIN MUST re-establish the visible-filter as `WHERE m.query_default = 'visible' OR id.manufacturer_id = m.id`. This binding is the canonical architectural commitment of CP31; future migration-design proposals consuming `identifiers.manufacturer_id` must paste-not-cite this requirement in their dispatch §1. Documented at `_phase_cp31_implementation/manufacturers_query_audit.md` §E in MAC-199 commit `f9bcf22`.
+
+**Path-by-path post-MAC-199 disposition:**
+
+1. **`exports/argus_export.csv` generator** — denormalized TEXT reads `identifiers.manufacturer`; no JOIN, no filter required at v1.4.1 schema. Future-FK forward-looking binding documented above.
+2. **`exports/lynceus_export.py`** — same denormalized read; arm canonical absent from current data shape so arm rows DROP from high-conf JSON implicitly. Test §B in `tests/test_cp31_consumer_audit.py` synthesizes export queries to confirm arm canonical absence.
+3. **`argus_cli.py status`** — MAC-198 added hub+arm split reporting line: `Manufacturers: 51 visible (hub) + 1 hidden (arm) = 52 total`. MAC-199 cross-verified.
+4. **`project_knowledge_search` / live-query path audit** — 28 occurrences of `FROM manufacturers` / `JOIN manufacturers` classified at MAC-199. 4 hub-only live-query lexicon enumeration sites received the `WHERE query_default = 'visible'` filter in commit `f9bcf22`:
+    - `db/validation/phase3_inference_candidates.py:730`
+    - `db/validation/sar8_bulk_stage.py:134`
+    - `db/sources/usaspending.py:391`
+    - `db/validation/mac101_item_a_registry_xcheck.py:135`
+
+   2 by-name lookup sites left neutral (caller controls intent — `db/validation/coverage_matrix.py:412`, `db/validation/wave_a_first_promotion.py:90`). 17 admission/promotion one-shot scripts left unfiltered (arms participate by design in admission flows). 2 migration+test files out of live-query scope. 2 doc references with no code change. 1 already-correct (argus_cli.py — MAC-198 split reporting).
+
+### §4 — Plan baseline-count correction (Validator MAC-199 paste-not-cite nit)
+
+The CP31 plan §1 #1 stated "53 total values (51 CP29 + 2 CP31)" for the `identifiers.identifier_type` enum cumulative-sweep. Live post-CP31 count is **56 values (54 pre-CP31 + 2 CP31)**, verified via `sqlite_master` CHECK enum parse against `~/argus/db/argus.db` post-migration 0025. CP29 §1 codified 3 net-new identifier_types (`vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`) → migration 0024 extended the CHECK enum 51 → 54. The CP31 plan misstated the pre-CP31 baseline as 51 (stale by one CP cycle). Migration 0025's `+2 addition` is correct; the cumulative-sweep count was wrong. Non-blocking discipline note; surfaced via Validator MAC-199 paste-not-cite preamble per SAR-13 + §3399. Carry-forward refinement: dispatch authoring MUST DB-verify the pre-cycle baseline count via `sqlite_master` CHECK enum parse before stating cumulative totals (sub-rule of SAR-13).
+
+### §5 — Sibling commits + empirical anchors
+
+**Sibling commits (this CP cycle):**
+
+- **Migration 0025 + Parrot conversion** (MAC-198 DBArchitect): commit `40b166e`
+- **4-path consumer audit + 8 new tests** (MAC-199 Validator): commit `f9bcf22`
+- **This bible amendment commit** (MAC-197 CEO close): commit `<this-commit>`
+
+**Empirical anchors:**
+
+- 2AG = Parrot Faurecia Automotive SAS (FCC EAS database); arm row id=222 codified
+- 40 char-prefix shape: 3-5 char `fcc_grantee_code` + 3-char `equipment_class_code` (FCC ID composition `grantee_code + product_code`; equipment_class_code sibling to grantee — paired via `pair_kind='fcc_grantee_equipment_class'`)
+- Single §7.0 api.dbeta.me Parrot-hub attestation pre-CP31 (no arm exposure risk at v1.4.1 ship-state)
+- 177-row Phase 7-bis §7.2 fccid.io cohort (out-of-scope future ship; unblocked post-this-CP + MAC-196 landed at `1344f5d`)
+- Board disposition: [MAC-184 comment 25b3ff0b](/MAC/issues/MAC-184#comment-25b3ff0b-f763-4291-90e9-490f1656a2c9) (Option 2C hub-and-spoke ratified)
+- Live DB verification post-migration 0025: 56 identifier_types, 5 pair_kinds, 52 mfgs (51 hub + 1 arm), schema_version=25
+
+### §6 — Carry-forward (CP32 candidates; NOT codified here)
+
+Surfaced by MAC-199 + held for CP32 (or single-purpose follow-ups) per CEO disposition. None of these block v1.4.1 ship; all are forward-looking discipline items:
+
+1. **§2.1 `device_category` CHECK enum extension** — admit `automotive_telematics` (or equivalent canonical) so 2AG-attested fccid.io identifiers can land at a §2.1-compliant `device_category` matching their arm's `primary_category`. The §2.1 enum is owned by `identifiers.device_category` (migration 0001; 12 values currently); `manufacturers.primary_category` carries NO CHECK constraint per MAC-198 SKIP decision so the arm's `primary_category='automotive_telematics'` was admissible without enum extension. Phase 7-bis 177-row cohort attestation routing WILL hit this gap at promotion-time; CP32 (or single-purpose enum-extension migration) required BEFORE Phase 7-bis. Test workaround at MAC-199 §C #4 used `device_category='drone'` to honor plan-intent within current schema constraints (arm-ness does not auto-exclude; per-row category check is independent of hub-vs-arm).
+
+2. **Future `identifiers.manufacturer_id` FK migration** — pre-staged by CP31 hub-and-spoke columns. When this migration lands (no scheduled cycle; opportunistic when the next manufacturer-attribution refactor surfaces), the export-path JOIN MUST re-establish the visible-filter per §3 above. Migration-time binding text: `WHERE m.query_default = 'visible' OR id.manufacturer_id = m.id`. This carry-forward IS the architectural contract that gives CP31's hub-and-spoke columns their downstream effect.
+
+3. **Stale `tests/test_type_mapping_covers_every_identifier_type`** — pre-existing failure surfaced by MAC-199 full-suite run (523 passed, 1 failed; failure pre-dates MAC-199). 5 types missing from `IDENTIFIER_TYPE_TO_PATTERN_TYPE ∪ DROPPED_REASONS` mapping table: 3 CP29 hostname types (`vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`) + 2 CP31 FCC EAS types (`fcc_grantee_code`, `equipment_class_code`). Currently masked by §11 #13 unknown-category gate at export-time. CP32 (or single-purpose mapping-table sync) updates the lookup table to match the live CHECK enum.
+
+4. **Exports/ regen post-MAC-196 + CP31** — `argus_export.csv` + `argus_export_high_confidence.json` were last regenerated 2026-05-20T00:43:59Z, pre-MAC-196 Numerex admission + pre-MAC-198 migration 0025. Operator-decision item: regen post-v1.4.1 ship to bring exports current with canonical DB state. Not a CP-class amendment; queued as a ship-prep task.
+
+5. **Multi-arm vendor backlog** — Cisco/Meraki, Motorola Solutions, Harris RF vs Harris Aerial, Honeywell ACS division. Backlogged for arm-split at v1.4.2+ as identifiers surface attesting to specific arms; no urgency. CP31 ships only Parrot conversion; other splits ship per evidence arrival.
+
+### §7 — Architectural firsts (CP31 cycle)
+
+1. **First multi-arm hub-and-spoke schema** in the framework (3 net-new columns; first FK self-reference on `manufacturers`).
+2. **First arm-canonical row** in the framework (`Parrot Automotive` id=222, `query_default='hidden_arm'`).
+3. **First `pair_kind='fcc_grantee_equipment_class'` paired-identifier** (extends CP14 paired-identifier discipline to regulatory entity pairing).
+4. **First explicit forward-looking FK architectural binding** in a CP memo (§3 + §6.2 above); CP31 codifies what a *future* migration MUST do, not what this cycle does.
+5. **First "implicit protection via denormalized data shape"** documented as a discipline pattern — current-state protection is genuine but stops working at a future-FK migration; CP31 makes the binding explicit so the future migration cannot silently regress.
+6. **First Validator-paste-not-cite-caught dispatch baseline arithmetic error** propagated into a CP memo (Validator's 51→54 nit at §4 above caught at MAC-199 close, not at plan-confirmation gate).
+
+### §11 #11 self-binding satisfied
+
+This CP31 entry is the §11 #11 amendment-log pairing for migration 0025 (`db/migrations/0025_cp31_fcc_eas_identifier_type_cluster_plus_hub_and_spoke.sql` at commit `40b166e`) + 4-path consumer audit at commit `f9bcf22` + this bible commit. CP-anchor: this commit + [MAC-197](/MAC/issues/MAC-197) closure. Schema version bumps 24 → 25.
+
+═══════════════════════════════════════════════════════════════════════

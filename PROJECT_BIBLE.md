@@ -277,6 +277,8 @@ The downstream consumer (Lynceus, the Raspberry Pi RF security monitor) has a fi
 | `chipset_codename` | (DROPPED) | added Correction Pass 21 (migration 0019; MAC-117 round-2 vocab); firmware-anchored device model class (Qualcomm SoC codenames: APQ8009, etc.). NOT RF-broadcast at the model-class level (vendor OUI `oui` MAP captures device-vendor; chipset-codename is a sub-model attribute extracted from firmware). Same shape rationale as `qualcomm_chip_format_id` DROP. |
 | `firmware_build_string` | (DROPPED) | added Correction Pass 21 (migration 0019; MAC-117 round-2 vocab); Qualcomm BOOT/SBL build version string (e.g., `BOOT.BF.3.3-00163`). Device-side firmware identity; NOT RF-broadcast. Same shape rationale as `firmware_branded_string` DROP. |
 | `firmware_build_uuid` | (DROPPED) | added Correction Pass 21 (migration 0019; MAC-117 round-2 vocab); firmware build GUID (binary-unique identifier per build). NOT RF-broadcast; firmware-anchored. Same shape rationale as `firmware_sha256_hash` DROP. |
+| `fcc_grantee_code` | (DROPPED) | added Correction Pass 31 (migration 0025); FCC EAS grantee code (3- to 5-char regulatory entity prefix assigned to manufacturers by FCC for equipment authorization). NOT an RF-broadcast identifier — it is the issuing-prefix of FCC IDs (`grantee_code + product_code` form). Paired with `equipment_class_code` via `pair_kind='fcc_grantee_equipment_class'` per CP14 paired-identifier discipline. Default DROP via §11 #13 at `device_category='unknown'`; high-conf-export INCLUDE requires explicit per-row `device_category` at a valid §2.1 enum value. |
+| `equipment_class_code` | (DROPPED) | added Correction Pass 31 (migration 0025); FCC EAS equipment-class code (3-char regulatory code denoting device type within a grantee's EAS filings). Always paired with `fcc_grantee_code` per §11 #7 provenance. Same shape rationale as `fcc_grantee_code` DROP — regulatory metadata, not RF-broadcast. |
 
 **CP16 new `pattern_type` values (Lynceus integration team call-out).** This amendment introduces three new `pattern_type` values: `ble_manufacturer_id`, `drone_id_prefix`, and `wifi_aware_service_name`. **Architectural separation — Argus and Lynceus are parallel tracks, not a serial dependency.** CP16 ratification on the Argus side unblocks promotion-cycle-2 (415 FAA RID `drone_id_prefix` rows + 2 SIG `ble_manufacturer_id` rows) and the post-promotion export-regen immediately. Those rows ride the export at apply time regardless of Lynceus-side scanner-code state. If a running Lynceus instance does not yet support a new `pattern_type` at scan time, the entries are silently unmatched at runtime per Lynceus's own scanner contract — consumer-side unknown-pattern handling. The export pipeline does not error; the entries are not dropped on the Argus side; canonical Argus DB carries the full promotion. Lynceus integration team can sequence the three pattern_types independently for runtime match coverage.
 
@@ -312,6 +314,28 @@ The export worker (§7.5) derives Lynceus severity from Argus `device_category` 
 **Confidence vs. severity rule.** Confidence affects whether a record is exported (threshold 70 for the high-confidence file — see §6 Phase 5 and §7.5), not severity. A high-severity record at confidence 50 is dropped from the high-confidence export entirely; it is NOT downgraded to low severity.
 
 **Procurement-only carveout.** Procurement-only records (`source_type='procurement'` with no MAC/OUI/UUID, only an agency-bought-vendor mapping) are NEVER exported to Lynceus. They are analytical only. The Lynceus export contains only records with concrete identifiers. (See also §8.4 and §11 #14.)
+
+### 4.6 Multi-arm manufacturer hub-and-spoke schema (CP31 — migration 0025)
+
+CP31 added three columns to the `manufacturers` table to support multi-arm vendors — manufacturers with internal divisions that produce structurally distinct device classes (e.g., Parrot SAS's drone vs. automotive-telematics arms):
+
+- `parent_manufacturer_id INTEGER NULL REFERENCES manufacturers(id)` — FK self-reference for arm → hub linkage. NULL on hubs; set to hub's id on arms.
+- `is_arm BOOLEAN NOT NULL DEFAULT 0` — explicit arm flag. 0 on hubs (default backfill).
+- `query_default TEXT NOT NULL DEFAULT 'visible' CHECK (query_default IN ('visible','hidden_arm'))` — default-query semantics. Hubs default to 'visible'; arms default to 'hidden_arm'.
+
+**Default query rule.** All queries against `manufacturers` MUST filter `WHERE query_default = 'visible'` UNLESS the call site is explicitly auditing arm rows. Arm rows surface only via:
+
+- Explicit `WHERE query_default IN ('visible','hidden_arm')` (audit query)
+- JOIN through `parent_manufacturer_id` (parent-child traversal)
+- Direct FK reference from `identifiers.manufacturer_id` (per-identifier attestation; future-FK migration pending — see CP31 §3 in BIBLE_AMENDMENTS)
+
+**Current-state architectural caveat (v1.4.1).** `identifiers.manufacturer` is denormalized TEXT; no `manufacturer_id` FK exists yet on `identifiers`. Arm-row protection in exports is therefore IMPLICIT: identifiers attesting to arm canonicals would carry the arm's canonical name as TEXT, but with no identifier carrying an arm-canonical name in the current data shape, the visible-filter is a no-op against current export queries. CP31 codifies the hub-and-spoke columns as pre-stage for a future `identifiers.manufacturer_id` FK migration; when that lands, every export-path JOIN MUST re-establish the visible-filter as `WHERE m.query_default = 'visible' OR id.manufacturer_id = m.id`.
+
+**Hub-arm precedent (v1.4.1 CP31).** Parrot SAS (id=25, hub; `primary_category='drone'`, `is_arm=0`, `query_default='visible'`) + Parrot Automotive (id=222, arm; `parent_manufacturer_id=25`, `is_arm=1`, `query_default='hidden_arm'`, `primary_category='automotive_telematics'`). Phase 7-bis 177-row §7.2 fccid.io cohort routes 2AG-attested rows to the arm id=222.
+
+**Future arm-splits** (Honeywell ACS division, Cisco/Meraki, Motorola Solutions, Harris RF vs Harris Aerial) are backlogged for v1.4.2+ per evidence arrival; no urgency. CP31 ships schema + Parrot conversion only.
+
+**Downstream consumer audit (4 paths)** discipline codified at BIBLE_AMENDMENTS CP31 §3 — cross-referenced from `feedback_bible_amendment_downstream_consumer_audit`. Live-query hub-only lexicon enumeration sites (4 identified at MAC-199, commit `f9bcf22`) carry the `WHERE query_default = 'visible'` filter; export paths defer until future-FK migration lands.
 
 ---
 
@@ -817,6 +841,8 @@ ExtractionWorker queue ordering should prioritize the installer/pairing-flow coh
 The Getac BWC Viewer 2-UUID pattern (Wave G HB56 deliverable) is the canonical evidence base. Future Wave G' / iOS surfaces may broaden the evidence base; SAR-11 candidate-FP-class enumeration applies to `vendor_template_namespace_uuid` extracts as it does to other UUID candidates.
 
 Default per-row confidence at extraction time = midpoint of the relevant sub-band. SAR-7 / SAR-8 / SAR-9 corroboration adjusts up; framework-string proximity, single-app-only surfacing, or cross-vendor-default appearance adjusts down. **SAR-11 (ratified at Correction Pass 17, 2026-05-13)** handles framework-UUID and third-party-BLE-library FP classes per the chunked Priority A/B/C/D structure documented at BIBLE_AMENDMENTS.md SAR-11. §8.4 strict-promotion rule (≥80) applies as written.
+
+**fccid.io source-band re-attestation (CP31 — paste-not-cite from CP15).** fccid.io (sid=51) is `crowdsourced` per the §8.2 table above; single-source ceiling stays at **conf=75** per CP15. The Phase 7-bis 177-row §7.2 fccid.io cohort (re-dispatched post-CP31 + MAC-196 Numerex close at `1344f5d`) lands at conf=75 per row. §8.3 corroboration lift requires a non-fccid independent source per CP24 cross-source independence. No band drift, no special-case lift for fccid.io shape — the crowdsourced ceiling holds.
 
 ### 8.3 Dedup logic
 
