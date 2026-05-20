@@ -63,7 +63,8 @@
       "Axis Communications AB",
       "Meraki LLC",
       "Getac Technology Corporation",
-      "Jacobs Solutions Inc."
+      "Jacobs Solutions Inc.",
+      "Honeywell International Inc."
     ]
   },
   "fp_scrub_disposition": {
@@ -94,5 +95,9 @@
       "size_bytes": 1522058,
       "note": "regenerated coverage_matrix + drop_tally bins"
     }
+  },
+  "post_ship_corrections": {
+    "honeywell_alias_appended_post_ship": true,
+    "note": "Phase 6 enrichment script omitted 'honeywell' from VENDOR_KEY_TO_CANON map; the 'Honeywell International Inc.' alias from firmware OTA cert was appended to mfg_id=211 (Honeywell) in a post-ship corrective UPDATE. Original Phase 6 close-report incorrectly stated Honeywell was not in canonical lexicon \u2014 corrected here."
   }
 }

@@ -53,15 +53,16 @@ raw_observations FK-chained:           12,358
 
 ### Manufacturer alias enrichment
 
-5 novel Subject DN O observations appended to canonical manufacturers.aliases:
+6 novel Subject DN O / firmware-cert observations appended to canonical manufacturers.aliases:
 
-- **Autel Robotics** (mfg_id=206): appended `Autel Intelligent Technology Corp.` (3 cert observations)
-- **Axis Communications** (mfg_id=7): appended `Axis Communications AB` (2 cert observations)
-- **Cisco Meraki** (mfg_id=207): appended `Meraki LLC` (2 cert observations)
-- **Getac** (mfg_id=18): appended `Getac Technology Corporation` (1 cert observation)
-- **Jacobs** (mfg_id=13): appended `Jacobs Solutions Inc.` (1 cert observation)
+- **Autel Robotics** (mfg_id=206): appended `Autel Intelligent Technology Corp.` (3 live-cert observations)
+- **Axis Communications** (mfg_id=7): appended `Axis Communications AB` (2 live-cert observations)
+- **Cisco Meraki** (mfg_id=207): appended `Meraki LLC` (2 live-cert observations)
+- **Getac** (mfg_id=18): appended `Getac Technology Corporation` (1 live-cert observation)
+- **Jacobs** (mfg_id=13): appended `Jacobs Solutions Inc.` (1 live-cert observation)
+- **Honeywell** (mfg_id=211): appended `Honeywell International Inc.` (firmware OTA cert — added in post-ship corrective pass; the main Phase 6 enrichment script omitted Honeywell from its vendor-key-to-canonical mapping)
 
-**Honeywell International Inc.** observed in firmware-embedded code-signing cert but NOT yet in canonical 51-vendor lexicon — logged for v1.4.1+ operator-review admission decision.
+**Honeywell International Inc.** observed in firmware-embedded code-signing cert. Honeywell IS already in the canonical 51-vendor lexicon (mfg_id=211, canonical_name "Honeywell" with aliases "Honeywell Pro-Watch, Honeywell International, Honeywell Building Technologies"); the firmware-derived legal-entity string `Honeywell International Inc.` has been appended as a 4th alias to that row. (Post-ship corrective: the original Phase 6 enrichment script omitted `honeywell` from its vendor-key-to-canonical mapping and so missed this alias-merge during the main pass.)
 
 ### Bible amendments
 
