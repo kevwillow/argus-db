@@ -3612,3 +3612,106 @@ Surfaced by MAC-199 + held for CP32 (or single-purpose follow-ups) per CEO dispo
 This CP31 entry is the §11 #11 amendment-log pairing for migration 0025 (`db/migrations/0025_cp31_fcc_eas_identifier_type_cluster_plus_hub_and_spoke.sql` at commit `40b166e`) + 4-path consumer audit at commit `f9bcf22` + this bible commit. CP-anchor: this commit + [MAC-197](/MAC/issues/MAC-197) closure. Schema version bumps 24 → 25.
 
 ═══════════════════════════════════════════════════════════════════════
+
+## Deferral Note 1 — MAC-203 §44.3 Honeywell product nomenclature corpus deferred (no §11 #7 evidence trail surviving)
+
+**Date:** 2026-05-20
+**Commit:** `<this-commit>` — `docs(bible): MAC-203 Deferral Note 1 — §44.3 Honeywell product nomenclature corpus (no surviving §11 #7 evidence)` (self-referential per CP31 §5 precedent; resolve via `git log BIBLE_AMENDMENTS.md`)
+**Source:** [MAC-203](/MAC/issues/MAC-203) Validator verdict comment `0ac4e5ae` (Path 1 — intentional scope narrowing — confirmed) on top of [MAC-200](/MAC/issues/MAC-200) §9.2.c Phase 9 Wave I.13 carry-forward heartbeat surface.
+**Bible edit:** NONE — pure deferral note per §11 #11 amendment-log discipline for deliberate-deferral path. No PROJECT_BIBLE.md text mutated; no schema mutation; no DB writes. Schema_version unchanged at 25.
+
+### §1 — What was deferred
+
+Wave I.14a runguide §44.3 (`~/argus-internal/new data 5.20/wave_i_14a_canonical_remine_runguide.md` lines 273-294) proposed a structured `manufacturers.notes.product_families` enrichment on the v1.4.1 Honeywell admission with the following shape:
+
+```json
+{
+  "target_canonical_name": "Honeywell International Inc.",
+  "proposed_notes_enrichment": {
+    "product_families": [
+      {"family": "CT_series_mobile_computers", "models": ["CT40", "CT45", "CT60", "CT30P"], "category": "rugged_android_mobile_computer"},
+      {"family": "CN_series", "models": ["CN80", "CN85"], "category": "rugged_handheld"},
+      {"family": "VM_series", "models": ["VM1A"], "category": "vehicle_mount_computer"},
+      {"family": "CK_series", "models": ["CK65"], "category": "mobile_computer"}
+    ],
+    "codenames": ["hon660", "hon4290"],
+    "codesign_branches": ["dubai_android_releasekey"],
+    "evidence": "Wave I.13 firmware extraction (~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/per_corpus/honeywell_firmware_outer/)"
+  }
+}
+```
+
+The §44.3 spec's prescribed output artifact (`diagnostic_outputs/honeywell_product_nomenclature_enrichment.json`) was NEVER materialized — `find /home/kev/argus /home/kev/argus-internal -name 'honeywell_product_nomenclature_enrichment*'` returns zero hits.
+
+### §2 — Why it was deferred (Path 1 — intentional scope narrowing — confirmed)
+
+Phase 8 ([MAC-195](/MAC/issues/MAC-195)) was dispatched with a three-item scope, all of which were applied as written:
+
+1. **Honeywell admission** to canonical `manufacturers` lexicon (51 → 52 rows).
+2. **§6.4 alias enrichment** — `HoneywellSecurityGroup` tier-3 `ct_log_common_name` appended to `Honeywell.aliases` (key: `mac195_alias_enrichment`).
+3. **§6.5 cert-issuer vendor row enrichment** — top 5 issuer organizations from the 3,628 ct_log certs; ACS division attestation (Honeywell ACS / `CN=Honeywell CodeSign RSA CA` / `dubai_android_releasekey` / `CT45`+`CT40` device models) appended to `Honeywell.notes` (keys: `cert_issuer_supply_chain` + `honeywell_acs_division_attestation`).
+
+`product_families` / `codenames` / `codesign_branches` (plural) were **never** in the MAC-195 dispatch scope. `_phase_8_honeywell_admission/apply_phase_8_honeywell_landing.py` grep confirms zero references to any of those keys. The CT45+CT40 device-model attestation in the dispatch is framed as a sub-field of the cert-chain attestation under §6.5, NOT as a stand-alone product-nomenclature enrichment.
+
+The §44.3 spec is a **Wave I.14a remine sub-pass proposal** authored as a forward-looking enrichment scaffold, not a Phase 8 deliverable. The v1.4.1 Stage 1 integration tree (MAC-184 → MAC-195) routed only the §6.4 alias + §6.5 cert-chain subsets through Phase 8.
+
+### §3 — Why it cannot be re-applied at v1.4.1 ship (§11 #7 halt fires)
+
+The §44.3-cited evidence path is **absent** from the filesystem:
+
+```text
+$ ls /home/kev/argus-internal/wave_i_pre_v1/
+ls: cannot access '/home/kev/argus-internal/wave_i_pre_v1/': No such file or directory
+```
+
+This is consistent with the MAC-200 §9.1.d confirmation that the Wave I.13 sandbox does not survive on this filesystem.
+
+Surviving Wave I.7/I.8 firmware-cert evidence (the layer that backed the §6.5 cert-chain attestation already absorbed at MAC-195) attests **CT45+CT40 only** (already integrated under `notes.honeywell_acs_division_attestation[0].device_models_attested`). No surviving extraction surface attests `CT60`, `CT30P`, `CN80`, `CN85`, `VM1A`, `CK65`, `hon660`, or `hon4290`.
+
+The MAC-200 heartbeat and the §44.3 runguide itself are derivative/planning artifacts, NOT §11 #7-admissible source_url/source_excerpt anchors (precedent: MAC-200 §9.1.d Decision 2 ruling on the `test.ys7.com:88` skip-log — runguide planning enumeration is not §11 #7 admissible).
+
+Per MAC-203 halt criteria (verbatim): *"If evidence cannot be traced to a verifiable source_url + source_excerpt for any of the missing models / codenames: HALT and surface that subset of the §44.3 spec as deferred-with-amendment-log-note (path 1 outcome)."*
+
+### §4 — DB-verified post-MAC-203 state (no mutation)
+
+```text
+$ python3 (PRAGMA query_only=1)
+id=211 name=Honeywell
+TOP KEYS: ['admission_basis', 'admission_date_utc', 'admission_dispatch_ref',
+           'admission_integration_ref', 'cert_issuer_supply_chain', 'description',
+           'documented_absence', 'honeywell_acs_division_attestation',
+           'mac195_alias_enrichment']
+  product_families: ABSENT
+  codenames: ABSENT
+  codesign_branches: ABSENT
+  honeywell_acs_division_attestation[0].device_models_attested: ['CT45', 'CT40']
+  honeywell_acs_division_attestation[0].code_signing_branch: dubai_android_releasekey
+```
+
+Top-level keys on id=211 match the MAC-195 dispatch exactly. The three missing keys remain absent by design.
+
+### §5 — Future re-application requires a fresh extraction
+
+Re-application of `product_families` / `codenames` / `codesign_branches` on id=211 requires a future wave to re-collect Honeywell firmware nomenclature with §11 #7-compliant `source_url` + `source_excerpt` per missing model/codename. When (if) such a wave surfaces (e.g., a fresh Wave I.15+ firmware-extraction sandbox with surviving artifacts), it can dispatch a Phase-N+ product-nomenclature integration ticket against id=211 under its own `sweep_event_id`.
+
+Per MAC-203 out-of-scope guard: **no** Phase-N+ re-application dispatch is queued at this time because there is no surviving evidence trail to re-apply from. This is not a CP32 candidate; it is a forward-looking re-application gate that fires only on evidence-arrival.
+
+### §6 — Architectural firsts (this deferral entry)
+
+1. **First standalone Deferral Note** in `BIBLE_AMENDMENTS.md` (no bible text edit, no schema mutation, no DB write — pure §11 #11 deliberate-deferral accountability trail).
+2. **First documented case** of a Wave I.14a remine sub-pass proposal explicitly classified as out-of-scope vs. the v1.4.1 Stage 1 integration tree it referenced.
+3. **First explicit precedent** that runguide §-spec proposals are NOT auto-promoted to dispatch scope — dispatch scope is what the dispatch enumerates; runguide proposals are scaffolds that may or may not be routed through a phase.
+
+### §7 — Out-of-scope guard
+
+- No Phase 9 ([MAC-200](/MAC/issues/MAC-200)) back-fill (closed scope per CEO ratification at MAC-200 close).
+- No mutation to any Honeywell id=211 notes key besides the (now-verified-deferred) `product_families` / `codenames` / `codesign_branches` triad — and that triad remains ABSENT by deliberate scope.
+- No CP-class amendment surfaced — the §44.3 spec's identifier-shape did not propose a new `identifier_type`; it was a `notes`-key enrichment proposal only.
+
+### §8 — §11 #11 self-binding satisfied
+
+This deferral entry IS the §11 #11 amendment-log pairing for the deliberate-deferral path ratified at MAC-203. No bible text was edited; no migration was applied; no DB write was made. The entry exists solely to preserve the audit-trail invariant that an undocumented deferral (even one ratified as Path 1) is a process violation regardless of whether the deferral decision itself is correct.
+
+Branch: `v1.4.1-integration-stage-1` (MAC-203 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
+
+═══════════════════════════════════════════════════════════════════════
