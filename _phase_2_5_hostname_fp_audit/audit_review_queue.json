@@ -1,0 +1,881 @@
+{
+  "schema_version": 1,
+  "dispatch": "MAC-188",
+  "marked_at": "2026-05-20T18:27:49Z",
+  "carry_forward_basis": "Q2.A \u2014 strict AMBIGUOUS-row carry-forward (not silently demoted).",
+  "stage_2_consumer": "v1.4.2 / Stage 2 operator-review pass + Lynceus integration audit-flag review",
+  "total_rows": 143,
+  "by_manufacturer": {
+    "hikvision": 97,
+    "cisco_meraki": 25,
+    "axon": 7,
+    "motorola_solutions": 6,
+    "honeywell": 2,
+    "avigilon": 1,
+    "dahua": 1,
+    "drt": 1,
+    "eagle_eye_networks": 1,
+    "hak5": 1,
+    "rhombus_systems": 1
+  },
+  "rows": [
+    {
+      "id": 35267,
+      "manufacturer": "avigilon",
+      "identifier": "avigilondata.blob.core.windows.net",
+      "reason": "vendor_tenant_on_third_party_cloud::blob.core.windows.net"
+    },
+    {
+      "id": 35269,
+      "manufacturer": "axon",
+      "identifier": "axon-assets.nyc3.digitaloceanspaces.com",
+      "reason": "no_match::apex=digitaloceanspaces.com"
+    },
+    {
+      "id": 35277,
+      "manufacturer": "axon",
+      "identifier": "axon-docs.s3.amazonaws.com",
+      "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
+    },
+    {
+      "id": 35270,
+      "manufacturer": "axon",
+      "identifier": "axon-images.s3.amazonaws.com",
+      "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
+    },
+    {
+      "id": 35274,
+      "manufacturer": "axon",
+      "identifier": "axon-private.s3.amazonaws.com",
+      "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
+    },
+    {
+      "id": 24364,
+      "manufacturer": "axon",
+      "identifier": "axon-staging.s3.amazonaws.com",
+      "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
+    },
+    {
+      "id": 35276,
+      "manufacturer": "axon",
+      "identifier": "axon-temp.s3.amazonaws.com",
+      "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
+    },
+    {
+      "id": 35275,
+      "manufacturer": "axon",
+      "identifier": "axon-tmp.s3.amazonaws.com",
+      "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
+    },
+    {
+      "id": 26974,
+      "manufacturer": "cisco_meraki",
+      "identifier": "010-knz-501.mktorest.combineeventhandlershttps",
+      "reason": "no_match::apex=mktorest.combineeventhandlershttps"
+    },
+    {
+      "id": 26978,
+      "manufacturer": "cisco_meraki",
+      "identifier": "account.sandbox.meraki-go.comcastarraylikeobjectcastle.museumonitor",
+      "reason": "no_match::apex=comcastarraylikeobjectcastle.museumonitor"
+    },
+    {
+      "id": 26987,
+      "manufacturer": "cisco_meraki",
+      "identifier": "ap.meraki.com.wshttp",
+      "reason": "no_match::apex=com.wshttp"
+    },
+    {
+      "id": 26995,
+      "manufacturer": "cisco_meraki",
+      "identifier": "api.meraki.comienzodiac-piscesfreesite.host",
+      "reason": "no_match::apex=comienzodiac-piscesfreesite.host"
+    },
+    {
+      "id": 35278,
+      "manufacturer": "cisco_meraki",
+      "identifier": "cisco-meraki-logs.s3.amazonaws.com",
+      "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
+    },
+    {
+      "id": 27051,
+      "manufacturer": "cisco_meraki",
+      "identifier": "example.com.android.voicemail.permission.read",
+      "reason": "no_match::apex=permission.read"
+    },
+    {
+      "id": 27052,
+      "manufacturer": "cisco_meraki",
+      "identifier": "example.com.deyarli",
+      "reason": "no_match::apex=com.deyarli"
+    },
+    {
+      "id": 27053,
+      "manufacturer": "cisco_meraki",
+      "identifier": "example.comiercuri.ui.blur",
+      "reason": "no_match::apex=ui.blur"
+    },
+    {
+      "id": 27055,
+      "manufacturer": "cisco_meraki",
+      "identifier": "example.comparepurplelighterr",
+      "reason": "no_match::apex=example.comparepurplelighterr"
+    },
+    {
+      "id": 27056,
+      "manufacturer": "cisco_meraki",
+      "identifier": "example.comyfast.space",
+      "reason": "no_match::apex=comyfast.space"
+    },
+    {
+      "id": 27057,
+      "manufacturer": "cisco_meraki",
+      "identifier": "exemple.comil.phone-outgoing-outlinese",
+      "reason": "no_match::apex=comil.phone-outgoing-outlinese"
+    },
+    {
+      "id": 27064,
+      "manufacturer": "cisco_meraki",
+      "identifier": "forums.expo.dev.brand.sentry-unblockselectorhardware",
+      "reason": "no_match::apex=brand.sentry-unblockselectorhardware"
+    },
+    {
+      "id": 27085,
+      "manufacturer": "cisco_meraki",
+      "identifier": "hcaptcha.com",
+      "reason": "no_match::apex=hcaptcha.com"
+    },
+    {
+      "id": 27090,
+      "manufacturer": "cisco_meraki",
+      "identifier": "invertase.link",
+      "reason": "no_match::apex=invertase.link"
+    },
+    {
+      "id": 27119,
+      "manufacturer": "cisco_meraki",
+      "identifier": "mrousavy.com",
+      "reason": "no_match::apex=mrousavy.com"
+    },
+    {
+      "id": 27128,
+      "manufacturer": "cisco_meraki",
+      "identifier": "my.meraki.com.yellowlighteraggiungi",
+      "reason": "no_match::apex=com.yellowlighteraggiungi"
+    },
+    {
+      "id": 27163,
+      "manufacturer": "cisco_meraki",
+      "identifier": "pinterest.com",
+      "reason": "no_match::apex=pinterest.com"
+    },
+    {
+      "id": 27207,
+      "manufacturer": "cisco_meraki",
+      "identifier": "switch.meraki.com.zmotionsearchchangetboundsyrconfirmer",
+      "reason": "no_match::apex=com.zmotionsearchchangetboundsyrconfirmer"
+    },
+    {
+      "id": 27214,
+      "manufacturer": "cisco_meraki",
+      "identifier": "tools.ieft.org",
+      "reason": "no_match::apex=ieft.org"
+    },
+    {
+      "id": 27230,
+      "manufacturer": "cisco_meraki",
+      "identifier": "www.amazon.com",
+      "reason": "no_match::apex=amazon.com"
+    },
+    {
+      "id": 27237,
+      "manufacturer": "cisco_meraki",
+      "identifier": "www.bouncycastle.org",
+      "reason": "no_match::apex=bouncycastle.org"
+    },
+    {
+      "id": 27240,
+      "manufacturer": "cisco_meraki",
+      "identifier": "www.colorcombos.com",
+      "reason": "no_match::apex=colorcombos.com"
+    },
+    {
+      "id": 27247,
+      "manufacturer": "cisco_meraki",
+      "identifier": "www.example.computewindowedrenderlimits",
+      "reason": "no_match::apex=example.computewindowedrenderlimits"
+    },
+    {
+      "id": 27259,
+      "manufacturer": "cisco_meraki",
+      "identifier": "www.measurementlab.net",
+      "reason": "no_match::apex=measurementlab.net"
+    },
+    {
+      "id": 27267,
+      "manufacturer": "cisco_meraki",
+      "identifier": "www.opengis.net",
+      "reason": "no_match::apex=opengis.net"
+    },
+    {
+      "id": 35284,
+      "manufacturer": "dahua",
+      "identifier": "dahua-cdn.s3.amazonaws.com",
+      "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
+    },
+    {
+      "id": 35289,
+      "manufacturer": "drt",
+      "identifier": "drtstorage.blob.core.windows.net",
+      "reason": "vendor_tenant_on_third_party_cloud::blob.core.windows.net"
+    },
+    {
+      "id": 35296,
+      "manufacturer": "eagle_eye_networks",
+      "identifier": "developer.cameramanager.com",
+      "reason": "no_match::apex=cameramanager.com"
+    },
+    {
+      "id": 35299,
+      "manufacturer": "hak5",
+      "identifier": "hak5.github.io",
+      "reason": "vendor_tenant_on_third_party_cloud::github.io"
+    },
+    {
+      "id": 29255,
+      "manufacturer": "hikvision",
+      "identifier": "any.any.com",
+      "reason": "no_match::apex=any.com"
+    },
+    {
+      "id": 29258,
+      "manufacturer": "hikvision",
+      "identifier": "api.flutter.dev",
+      "reason": "no_match::apex=flutter.dev"
+    },
+    {
+      "id": 29271,
+      "manufacturer": "hikvision",
+      "identifier": "app-st.net",
+      "reason": "no_match::apex=app-st.net"
+    },
+    {
+      "id": 29286,
+      "manufacturer": "hikvision",
+      "identifier": "ccc.sys.miui.com",
+      "reason": "no_match::apex=miui.com"
+    },
+    {
+      "id": 29289,
+      "manufacturer": "hikvision",
+      "identifier": "city.ip138.com",
+      "reason": "no_match::apex=ip138.com"
+    },
+    {
+      "id": 29291,
+      "manufacturer": "hikvision",
+      "identifier": "collect-eu-test.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29292,
+      "manufacturer": "hikvision",
+      "identifier": "collect-eu.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29293,
+      "manufacturer": "hikvision",
+      "identifier": "collect-ind.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29294,
+      "manufacturer": "hikvision",
+      "identifier": "collect-ru.hik-partnerru.com",
+      "reason": "no_match::apex=hik-partnerru.com"
+    },
+    {
+      "id": 29295,
+      "manufacturer": "hikvision",
+      "identifier": "collect-sa.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29296,
+      "manufacturer": "hikvision",
+      "identifier": "collect-sgp.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29297,
+      "manufacturer": "hikvision",
+      "identifier": "collect-us-test.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29298,
+      "manufacturer": "hikvision",
+      "identifier": "collect-us.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29304,
+      "manufacturer": "hikvision",
+      "identifier": "d.gt.igexin.com",
+      "reason": "no_match::apex=igexin.com"
+    },
+    {
+      "id": 29307,
+      "manufacturer": "hikvision",
+      "identifier": "dartbug.com",
+      "reason": "no_match::apex=dartbug.com"
+    },
+    {
+      "id": 29308,
+      "manufacturer": "hikvision",
+      "identifier": "data-dra.push.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29309,
+      "manufacturer": "hikvision",
+      "identifier": "data-drcn.push.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29310,
+      "manufacturer": "hikvision",
+      "identifier": "data-dre.push.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29311,
+      "manufacturer": "hikvision",
+      "identifier": "data-drru.push.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29312,
+      "manufacturer": "hikvision",
+      "identifier": "data.flurry.com",
+      "reason": "no_match::apex=flurry.com"
+    },
+    {
+      "id": 29313,
+      "manufacturer": "hikvision",
+      "identifier": "data.hicloud.com",
+      "reason": "no_match::apex=hicloud.com"
+    },
+    {
+      "id": 29317,
+      "manufacturer": "hikvision",
+      "identifier": "docs.mongodb.com",
+      "reason": "no_match::apex=mongodb.com"
+    },
+    {
+      "id": 29320,
+      "manufacturer": "hikvision",
+      "identifier": "download.ezvizops.com",
+      "reason": "no_match::apex=ezvizops.com"
+    },
+    {
+      "id": 29338,
+      "manufacturer": "hikvision",
+      "identifier": "etherx.jabber.org",
+      "reason": "no_match::apex=jabber.org"
+    },
+    {
+      "id": 29345,
+      "manufacturer": "hikvision",
+      "identifier": "flutter.dev",
+      "reason": "no_match::apex=flutter.dev"
+    },
+    {
+      "id": 29346,
+      "manufacturer": "hikvision",
+      "identifier": "g.co",
+      "reason": "no_match::apex=g.co"
+    },
+    {
+      "id": 29348,
+      "manufacturer": "hikvision",
+      "identifier": "grs.dbankcloud.asia",
+      "reason": "no_match::apex=dbankcloud.asia"
+    },
+    {
+      "id": 29349,
+      "manufacturer": "hikvision",
+      "identifier": "grs.dbankcloud.cn",
+      "reason": "no_match::apex=dbankcloud.cn"
+    },
+    {
+      "id": 29350,
+      "manufacturer": "hikvision",
+      "identifier": "grs.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29351,
+      "manufacturer": "hikvision",
+      "identifier": "grs.dbankcloud.eu",
+      "reason": "no_match::apex=dbankcloud.eu"
+    },
+    {
+      "id": 29355,
+      "manufacturer": "hikvision",
+      "identifier": "hct-sgp-uat-2-aliyun-lts.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29356,
+      "manufacturer": "hikvision",
+      "identifier": "hct-sgp-uat-2-aliyun.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29357,
+      "manufacturer": "hikvision",
+      "identifier": "hct-sgp-uat-8-v1.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29361,
+      "manufacturer": "hikvision",
+      "identifier": "hik-e.hikccs.com",
+      "reason": "no_match::apex=hikccs.com"
+    },
+    {
+      "id": 29362,
+      "manufacturer": "hikvision",
+      "identifier": "hik-proconnectru.com",
+      "reason": "no_match::apex=hik-proconnectru.com"
+    },
+    {
+      "id": 29395,
+      "manufacturer": "hikvision",
+      "identifier": "hpc-sgp-uat-7.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29396,
+      "manufacturer": "hikvision",
+      "identifier": "hpc-sgp-uat-8-lts.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29397,
+      "manufacturer": "hikvision",
+      "identifier": "hpc-sgp-uat-8-oem.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29398,
+      "manufacturer": "hikvision",
+      "identifier": "hpc-sgp-uat-9.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29414,
+      "manufacturer": "hikvision",
+      "identifier": "ieu-team.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29416,
+      "manufacturer": "hikvision",
+      "identifier": "ieu.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29418,
+      "manufacturer": "hikvision",
+      "identifier": "ieu.ltsplatinumpartner.com",
+      "reason": "no_match::apex=ltsplatinumpartner.com"
+    },
+    {
+      "id": 29422,
+      "manufacturer": "hikvision",
+      "identifier": "iind-team.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29424,
+      "manufacturer": "hikvision",
+      "identifier": "iind.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29426,
+      "manufacturer": "hikvision",
+      "identifier": "iind.ltsplatinumpartner.com",
+      "reason": "no_match::apex=ltsplatinumpartner.com"
+    },
+    {
+      "id": 29434,
+      "manufacturer": "hikvision",
+      "identifier": "ionicframework.com",
+      "reason": "no_match::apex=ionicframework.com"
+    },
+    {
+      "id": 29435,
+      "manufacturer": "hikvision",
+      "identifier": "ip.taobao.com",
+      "reason": "no_match::apex=taobao.com"
+    },
+    {
+      "id": 29440,
+      "manufacturer": "hikvision",
+      "identifier": "isa-team.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29442,
+      "manufacturer": "hikvision",
+      "identifier": "isa.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29444,
+      "manufacturer": "hikvision",
+      "identifier": "isa.ltsplatinumpartner.com",
+      "reason": "no_match::apex=ltsplatinumpartner.com"
+    },
+    {
+      "id": 29453,
+      "manufacturer": "hikvision",
+      "identifier": "isgp-team-aliyun.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29454,
+      "manufacturer": "hikvision",
+      "identifier": "isgp-team.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29456,
+      "manufacturer": "hikvision",
+      "identifier": "isgp.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29458,
+      "manufacturer": "hikvision",
+      "identifier": "isgp.ltsplatinumpartner.com",
+      "reason": "no_match::apex=ltsplatinumpartner.com"
+    },
+    {
+      "id": 29464,
+      "manufacturer": "hikvision",
+      "identifier": "ius-team.hikcentralconnect.com",
+      "reason": "no_match::apex=hikcentralconnect.com"
+    },
+    {
+      "id": 29466,
+      "manufacturer": "hikvision",
+      "identifier": "ius.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29468,
+      "manufacturer": "hikvision",
+      "identifier": "ius.ltsplatinumpartner.com",
+      "reason": "no_match::apex=ltsplatinumpartner.com"
+    },
+    {
+      "id": 29475,
+      "manufacturer": "hikvision",
+      "identifier": "jabber.org",
+      "reason": "no_match::apex=jabber.org"
+    },
+    {
+      "id": 29476,
+      "manufacturer": "hikvision",
+      "identifier": "java.sun.com",
+      "reason": "no_match::apex=sun.com"
+    },
+    {
+      "id": 29477,
+      "manufacturer": "hikvision",
+      "identifier": "javax.xml.xmlconstants",
+      "reason": "no_match::apex=xml.xmlconstants"
+    },
+    {
+      "id": 29504,
+      "manufacturer": "hikvision",
+      "identifier": "metok.sys.miui.com",
+      "reason": "no_match::apex=miui.com"
+    },
+    {
+      "id": 29505,
+      "manufacturer": "hikvision",
+      "identifier": "metrics-dra.dt.hicloud.com",
+      "reason": "no_match::apex=hicloud.com"
+    },
+    {
+      "id": 29506,
+      "manufacturer": "hikvision",
+      "identifier": "metrics1.data.hicloud.com",
+      "reason": "no_match::apex=hicloud.com"
+    },
+    {
+      "id": 29507,
+      "manufacturer": "hikvision",
+      "identifier": "metrics2.data.hicloud.com",
+      "reason": "no_match::apex=hicloud.com"
+    },
+    {
+      "id": 29508,
+      "manufacturer": "hikvision",
+      "identifier": "metrics5.data.hicloud.com",
+      "reason": "no_match::apex=hicloud.com"
+    },
+    {
+      "id": 29510,
+      "manufacturer": "hikvision",
+      "identifier": "napi.growingio.com",
+      "reason": "no_match::apex=growingio.com"
+    },
+    {
+      "id": 29512,
+      "manufacturer": "hikvision",
+      "identifier": "netbeans.org",
+      "reason": "no_match::apex=netbeans.org"
+    },
+    {
+      "id": 29536,
+      "manufacturer": "hikvision",
+      "identifier": "proton.flurry.com",
+      "reason": "no_match::apex=flurry.com"
+    },
+    {
+      "id": 29541,
+      "manufacturer": "hikvision",
+      "identifier": "realm.io",
+      "reason": "no_match::apex=realm.io"
+    },
+    {
+      "id": 29550,
+      "manufacturer": "hikvision",
+      "identifier": "sdk.open.amp.igexin.com",
+      "reason": "no_match::apex=igexin.com"
+    },
+    {
+      "id": 29551,
+      "manufacturer": "hikvision",
+      "identifier": "sdk.open.inc2.igexin.com",
+      "reason": "no_match::apex=igexin.com"
+    },
+    {
+      "id": 29552,
+      "manufacturer": "hikvision",
+      "identifier": "sdk.open.lbs.igexin.com",
+      "reason": "no_match::apex=igexin.com"
+    },
+    {
+      "id": 29553,
+      "manufacturer": "hikvision",
+      "identifier": "sdk.open.phone.igexin.com",
+      "reason": "no_match::apex=igexin.com"
+    },
+    {
+      "id": 29582,
+      "manufacturer": "hikvision",
+      "identifier": "store-at-dre.hispace.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29583,
+      "manufacturer": "hikvision",
+      "identifier": "store-dra.hispace.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29584,
+      "manufacturer": "hikvision",
+      "identifier": "store-drcn.hispace.dbankcloud.cn",
+      "reason": "no_match::apex=dbankcloud.cn"
+    },
+    {
+      "id": 29585,
+      "manufacturer": "hikvision",
+      "identifier": "store-dre.hispace.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29586,
+      "manufacturer": "hikvision",
+      "identifier": "store-drru.hispace.dbankcloud.com",
+      "reason": "no_match::apex=dbankcloud.com"
+    },
+    {
+      "id": 29587,
+      "manufacturer": "hikvision",
+      "identifier": "store.hispace.hicloud.com",
+      "reason": "no_match::apex=hicloud.com"
+    },
+    {
+      "id": 29596,
+      "manufacturer": "hikvision",
+      "identifier": "team.hikcentralconnectru.com",
+      "reason": "no_match::apex=hikcentralconnectru.com"
+    },
+    {
+      "id": 29598,
+      "manufacturer": "hikvision",
+      "identifier": "test.baidu",
+      "reason": "no_match::apex=test.baidu"
+    },
+    {
+      "id": 29599,
+      "manufacturer": "hikvision",
+      "identifier": "test.shipin7.com",
+      "reason": "no_match::apex=shipin7.com"
+    },
+    {
+      "id": 29653,
+      "manufacturer": "hikvision",
+      "identifier": "vn-app-dic.vn-sng.ufileos.com",
+      "reason": "no_match::apex=ufileos.com"
+    },
+    {
+      "id": 29657,
+      "manufacturer": "hikvision",
+      "identifier": "waze.com",
+      "reason": "no_match::apex=waze.com"
+    },
+    {
+      "id": 29665,
+      "manufacturer": "hikvision",
+      "identifier": "www.guardingmaster.com",
+      "reason": "no_match::apex=guardingmaster.com"
+    },
+    {
+      "id": 29666,
+      "manufacturer": "hikvision",
+      "identifier": "www.hik",
+      "reason": "no_match::apex=www.hik"
+    },
+    {
+      "id": 29668,
+      "manufacturer": "hikvision",
+      "identifier": "www.hik-partner.com",
+      "reason": "no_match::apex=hik-partner.com"
+    },
+    {
+      "id": 29669,
+      "manufacturer": "hikvision",
+      "identifier": "www.hik-proconnect.com",
+      "reason": "no_match::apex=hik-proconnect.com"
+    },
+    {
+      "id": 29672,
+      "manufacturer": "hikvision",
+      "identifier": "www.isapi.org",
+      "reason": "no_match::apex=isapi.org"
+    },
+    {
+      "id": 29674,
+      "manufacturer": "hikvision",
+      "identifier": "www.jivesoftware.com",
+      "reason": "no_match::apex=jivesoftware.com"
+    },
+    {
+      "id": 29675,
+      "manufacturer": "hikvision",
+      "identifier": "www.ltsecurityinc.com",
+      "reason": "no_match::apex=ltsecurityinc.com"
+    },
+    {
+      "id": 29677,
+      "manufacturer": "hikvision",
+      "identifier": "www.ltsplatinumpartner.com",
+      "reason": "no_match::apex=ltsplatinumpartner.com"
+    },
+    {
+      "id": 29678,
+      "manufacturer": "hikvision",
+      "identifier": "www.me-app.net",
+      "reason": "no_match::apex=me-app.net"
+    },
+    {
+      "id": 29680,
+      "manufacturer": "hikvision",
+      "identifier": "www.net.cn",
+      "reason": "no_match::apex=www.net.cn"
+    },
+    {
+      "id": 29684,
+      "manufacturer": "hikvision",
+      "identifier": "www.slf4j.org",
+      "reason": "no_match::apex=slf4j.org"
+    },
+    {
+      "id": 29685,
+      "manufacturer": "hikvision",
+      "identifier": "www.smartsurvey.co.uk",
+      "reason": "no_match::apex=smartsurvey.co.uk"
+    },
+    {
+      "id": 29688,
+      "manufacturer": "hikvision",
+      "identifier": "www.tensorflow.org",
+      "reason": "no_match::apex=tensorflow.org"
+    },
+    {
+      "id": 35295,
+      "manufacturer": "honeywell",
+      "identifier": "hppki.honeywell",
+      "reason": "no_match::apex=hppki.honeywell"
+    },
+    {
+      "id": 35293,
+      "manufacturer": "honeywell",
+      "identifier": "www.unicode",
+      "reason": "no_match::apex=www.unicode"
+    },
+    {
+      "id": 34463,
+      "manufacturer": "motorola_solutions",
+      "identifier": "sdk.hockeyapp.net",
+      "reason": "no_match::apex=hockeyapp.net"
+    },
+    {
+      "id": 34553,
+      "manufacturer": "motorola_solutions",
+      "identifier": "waveoncloud.com",
+      "reason": "no_match::apex=waveoncloud.com"
+    },
+    {
+      "id": 34577,
+      "manufacturer": "motorola_solutions",
+      "identifier": "www.partnersinrhyme.com",
+      "reason": "no_match::apex=partnersinrhyme.com"
+    },
+    {
+      "id": 34578,
+      "manufacturer": "motorola_solutions",
+      "identifier": "www.quut.com",
+      "reason": "no_match::apex=quut.com"
+    },
+    {
+      "id": 34581,
+      "manufacturer": "motorola_solutions",
+      "identifier": "www.speex.org",
+      "reason": "no_match::apex=speex.org"
+    },
+    {
+      "id": 34582,
+      "manufacturer": "motorola_solutions",
+      "identifier": "www.sun.com",
+      "reason": "no_match::apex=sun.com"
+    },
+    {
+      "id": 35297,
+      "manufacturer": "rhombus_systems",
+      "identifier": "modelcontextprotocol.io",
+      "reason": "no_match::apex=modelcontextprotocol.io"
+    }
+  ]
+}

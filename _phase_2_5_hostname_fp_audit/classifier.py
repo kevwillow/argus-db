@@ -166,6 +166,68 @@ KNOWN_FP_ROOTS = {
     # CN tech giants where the manufacturer is NOT one of them
     "qq.com", "tencent.com", "alibaba.com", "alibabacloud.com",
     "aliyun.com", "weibo.com", "baidu.com",
+    # CP31-provisional enrichment — cohort AMBIGUOUS reclassification
+    # under third_party_oss_sdk_root + cn_tech_giant_cross_attribution
+    # (CEO-ratified PROVISIONAL rules for MAC-188 sweep; bible-codified
+    # at Stage 2 per CP31).
+    "gicert.com", "symcb.com", "symauth.com", "alphassl.com",
+    "keynectis.com", "certplus.com",
+    "libusb.info", "libusb.org", "lodash.com", "narwhaljs.org",
+    "underscorejs.org", "sizzlejs.com", "mathiasbynens.be",
+    "paulirish.com", "philbit.com", "rentzsch.com",
+    "osm.org", "openstreetmap.org",
+    "skia.org", "valgrind.org", "ecma-international.org",
+    "oasis-open.org", "onvif.org", "monkey.org",
+    "relaxng.org", "sourceware.org", "sgi.com", "samba.org",
+    "linuxfoundation.org", "linuxvideo.org",
+    "transgaming.com", "trolltech.com", "suitable.com",
+    "webmproject.org", "mesa3d.org",
+    "imeitou.com", "fisglobal.com", "elecard.com",
+    "materialdesignicons.com", "inkscape.org",
+    "midnight-commander.org", "ogre3d.org",
+    "7-zip.org", "xmlsoft.org", "tortall.net",
+    "modp.com", "mths.be", "webk.it",
+    "evintl-ccrt.gwww.gicert.com", "pki-crl.symauth.com",
+    "dabeaz.com", "torchmobile.com", "trevp.net",
+    "arm.com", "silver.arm.com",
+    "getdropbox.com", "cloudbees.com",
+    "taobao.org", "registry.npm.taobao.org",
+    # CN tech giants (extended)
+    "bilibili.com", "douyin.com", "kuaishou.com",
+    "vivo.com.cn", "vivo.com", "oppo.com", "umeng.com",
+    "getui.com", "tenpay.com",
+    # Standards / w3-adjacent / icu
+    "icu-project.org", "svgwg.org", "ietf.org", "iastate.edu",
+    "utexas.edu", "hiroshima-u.ac.jp", "nursat.kz",
+    "linux-usb.org", "linfo.org", "isc.org", "libpng.org",
+    "cryptopp.com", "grinninglizard.com", "xfa.org",
+    "tempuri.org", "unlicense.org",
+    # Personal blogs / hacker pages
+    "daemonology.net", "brynosaurus.com", "azillionmonkeys.com",
+    "jcip.net", "jclark.com", "winimage.com", "rosettacode.org",
+    "seanpatrickobrien.com", "phreedom.org", "strongtalk.org",
+    "monkey.org", "tortall.net", "torchmobile.com",
+    "mikepenz.com", "nedbatchelder.com",
+    "blackmagicdesign.com", "chromestatus.com",
+    "3waylabs.com", "movable-type.co.uk", "netlib.org",
+    "squareup.com", "getpostman.com", "wikiart.org",
+    "wiki.osgeo.org", "osgeo.org", "squid-cache.org",
+    "wiki.commonjs.org", "commonjs.org",
+    "wiki.squid-cache.org",
+    "utmiss.com",  # university tracking
+    "dj2006.net",  # personal blog
+    "tst.eu",  # personal/community
+    "planet-d.net",  # personal
+    # Truncated / malformed extraction-artifact apex shapes (no TLD)
+    "www.css", "www.google", "www.hortcut", "www.icon",
+    "www.interpretation", "www.language", "www.recent",
+    "www.style", "www.text-decoration", "www.world", "www.years",
+    "www.wencodeuricomponent",
+    # symcb.com extraction-artifact variants (CA cert parser pollution)
+    "symcb.com0l", "symcb.com0e",
+    # Additional OSS / personal / cloud-infra roots surfaced post-reclass
+    "flotcharts.org", "me.uk", "jstott.me.uk",
+    "google.internal", "io.doucmentsource",
 }
 
 # Hostnames that are likely valid vendor-cloud-endpoint shapes (vendor-tenant
@@ -189,6 +251,7 @@ VENDOR_OWNED_ROOTS = {
         "dji.com", "dji.net", "djicdn.com", "djicorp.com", "djiservice.org",
         "djiservices.com", "dji-services.com", "dji-usrd.com", "skypixel.com",
         "dbeta.me", "rcdroneairsports.com", "djistatic.com", "aasky.net",
+        "robomaster.com",
     ],
     "axon": ["axon.com", "axon.io", "evidence.com", "taser.com", "axoncloud.com"],
     "honeywell": [
@@ -233,7 +296,7 @@ VENDOR_OWNED_ROOTS = {
         "dahuatech.com", "dahuasecurity.com", "dahua.com",
         "easy4ipcloud.com", "lechange.com", "dolynkcloud.com",
         "dolynksecurity.com", "ecosightsecurity.com", "cossecurity.com",
-        "dahuaddns.com", "imou.com",
+        "dahuaddns.com", "imou.com", "quickddns.com",
     ],
     "flock_safety": ["flocksafety.com", "flock.com"],
     "verkada": ["verkada.com"],
@@ -257,7 +320,7 @@ VENDOR_OWNED_ROOTS = {
     "septier": ["septier.com"],
     "engility": ["engility.com"],
     "utility_inc": ["utility.com"],
-    "drt": ["drtsolutions.net", "digitalreceiver.com"],
+    "drt": ["drtsolutions.net", "digitalreceiver.com", "drtinc.com"],
     "reveal": ["revealmedia.com"],
     "lenel": ["lenel.com", "lenels2.com"],
     "pips_technology": ["pipstechnology.com", "pips.com"],

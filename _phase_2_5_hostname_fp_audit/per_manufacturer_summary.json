@@ -75,21 +75,21 @@
       "manufacturer": "hikvision",
       "n": 460,
       "tp": 344,
-      "fp": 16,
-      "ambiguous": 100,
-      "fp_rate_pct": 3.48,
-      "ambiguous_rate_pct": 21.74,
+      "fp": 19,
+      "ambiguous": 97,
+      "fp_rate_pct": 4.13,
+      "ambiguous_rate_pct": 21.09,
       "fp_rate_worst_case_pct": 25.22
     },
     {
       "manufacturer": "dji",
       "n": 436,
-      "tp": 241,
-      "fp": 83,
-      "ambiguous": 112,
-      "fp_rate_pct": 19.04,
-      "ambiguous_rate_pct": 25.69,
-      "fp_rate_worst_case_pct": 44.72
+      "tp": 242,
+      "fp": 194,
+      "ambiguous": 0,
+      "fp_rate_pct": 44.5,
+      "ambiguous_rate_pct": 0.0,
+      "fp_rate_worst_case_pct": 44.5
     },
     {
       "manufacturer": "cellebrite",
@@ -204,12 +204,12 @@
     {
       "manufacturer": "dahua",
       "n": 101,
-      "tp": 75,
-      "fp": 13,
-      "ambiguous": 13,
-      "fp_rate_pct": 12.87,
-      "ambiguous_rate_pct": 12.87,
-      "fp_rate_worst_case_pct": 25.74
+      "tp": 76,
+      "fp": 24,
+      "ambiguous": 1,
+      "fp_rate_pct": 23.76,
+      "ambiguous_rate_pct": 0.99,
+      "fp_rate_worst_case_pct": 24.75
     },
     {
       "manufacturer": "magnet_forensics",
@@ -265,10 +265,10 @@
       "manufacturer": "autel_robotics",
       "n": 61,
       "tp": 50,
-      "fp": 8,
-      "ambiguous": 3,
-      "fp_rate_pct": 13.11,
-      "ambiguous_rate_pct": 4.92,
+      "fp": 11,
+      "ambiguous": 0,
+      "fp_rate_pct": 18.03,
+      "ambiguous_rate_pct": 0.0,
       "fp_rate_worst_case_pct": 18.03
     },
     {
@@ -384,12 +384,12 @@
     {
       "manufacturer": "drt",
       "n": 13,
-      "tp": 0,
+      "tp": 2,
       "fp": 10,
-      "ambiguous": 3,
+      "ambiguous": 1,
       "fp_rate_pct": 76.92,
-      "ambiguous_rate_pct": 23.08,
-      "fp_rate_worst_case_pct": 100.0
+      "ambiguous_rate_pct": 7.69,
+      "fp_rate_worst_case_pct": 84.62
     },
     {
       "manufacturer": "berla",

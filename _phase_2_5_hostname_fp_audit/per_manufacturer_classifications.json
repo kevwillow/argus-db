@@ -436,6 +436,14 @@
         "reason": "known_fp_root::greenrobot.org"
       },
       {
+        "id": 23190,
+        "identifier": "metadata.google.internal",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::google.internal"
+      },
+      {
         "id": 23191,
         "identifier": "modelb-d4935.firebaseio.com",
         "identifier_type": "vendor_controlled_hostname",
@@ -452,6 +460,14 @@
         "reason": "known_fp_root::baidu.com"
       },
       {
+        "id": 23193,
+        "identifier": "org.dom4j.io.doucmentsource",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::io.doucmentsource"
+      },
+      {
         "id": 23197,
         "identifier": "playready.directtaps.net",
         "identifier_type": "vendor_controlled_hostname",
@@ -466,24 +482,6 @@
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "known_fp_root::hamcrest.com"
-      }
-    ],
-    "AMBIGUOUS": [
-      {
-        "id": 23190,
-        "identifier": "metadata.google.internal",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=google.internal"
-      },
-      {
-        "id": 23193,
-        "identifier": "org.dom4j.io.doucmentsource",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=io.doucmentsource"
       },
       {
         "id": 23213,
@@ -491,9 +489,10 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=me.uk"
+        "reason": "known_fp_root::me.uk"
       }
-    ]
+    ],
+    "AMBIGUOUS": []
   },
   "avigilon": {
     "TP": [
@@ -35105,6 +35104,14 @@
         "reason": "vendor_owned_root::dahuasecurity.com"
       },
       {
+        "id": 27516,
+        "identifier": "www.quickddns.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "vendor_owned_root::quickddns.com"
+      },
+      {
         "id": 27520,
         "identifier": "ydypt.dahuatech.com",
         "identifier_type": "vendor_controlled_hostname",
@@ -35211,12 +35218,100 @@
         "reason": "known_fp_root::alipay.com"
       },
       {
+        "id": 27484,
+        "identifier": "schema.getpostman.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::getpostman.com"
+      },
+      {
         "id": 27485,
         "identifier": "sj.qq.com",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "known_fp_root::qq.com"
+      },
+      {
+        "id": 27486,
+        "identifier": "source.icu-project.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::icu-project.org"
+      },
+      {
+        "id": 27487,
+        "identifier": "squareup.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::squareup.com"
+      },
+      {
+        "id": 27507,
+        "identifier": "www.cryptopp.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::cryptopp.com"
+      },
+      {
+        "id": 27510,
+        "identifier": "www.grinninglizard.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::grinninglizard.com"
+      },
+      {
+        "id": 27511,
+        "identifier": "www.isc.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::isc.org"
+      },
+      {
+        "id": 27513,
+        "identifier": "www.libpng.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::libpng.org"
+      },
+      {
+        "id": 27514,
+        "identifier": "www.linfo.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::linfo.org"
+      },
+      {
+        "id": 27517,
+        "identifier": "www.tenpay.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::tenpay.com"
+      },
+      {
+        "id": 27518,
+        "identifier": "www.vivo.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::vivo.com"
+      },
+      {
+        "id": 27519,
+        "identifier": "www.xfa.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::xfa.org"
       }
     ],
     "AMBIGUOUS": [
@@ -35227,102 +35322,6 @@
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "vendor_tenant_on_third_party_cloud::s3.amazonaws.com"
-      },
-      {
-        "id": 27484,
-        "identifier": "schema.getpostman.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=getpostman.com"
-      },
-      {
-        "id": 27486,
-        "identifier": "source.icu-project.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=icu-project.org"
-      },
-      {
-        "id": 27487,
-        "identifier": "squareup.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=squareup.com"
-      },
-      {
-        "id": 27507,
-        "identifier": "www.cryptopp.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=cryptopp.com"
-      },
-      {
-        "id": 27510,
-        "identifier": "www.grinninglizard.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=grinninglizard.com"
-      },
-      {
-        "id": 27511,
-        "identifier": "www.isc.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=isc.org"
-      },
-      {
-        "id": 27513,
-        "identifier": "www.libpng.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=libpng.org"
-      },
-      {
-        "id": 27514,
-        "identifier": "www.linfo.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=linfo.org"
-      },
-      {
-        "id": 27516,
-        "identifier": "www.quickddns.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=quickddns.com"
-      },
-      {
-        "id": 27517,
-        "identifier": "www.tenpay.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=tenpay.com"
-      },
-      {
-        "id": 27518,
-        "identifier": "www.vivo.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=vivo.com"
-      },
-      {
-        "id": 27519,
-        "identifier": "www.xfa.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=xfa.org"
       }
     ]
   },
@@ -38333,6 +38332,14 @@
         "reason": "vendor_owned_root::dji.com"
       },
       {
+        "id": 35302,
+        "identifier": "www.robomaster.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "vendor_owned_root::robomaster.com"
+      },
+      {
         "id": 28051,
         "identifier": "www.romo.dji.com",
         "identifier_type": "vendor_controlled_hostname",
@@ -38655,6 +38662,14 @@
         "reason": "known_fp_root::errorprone.info"
       },
       {
+        "id": 27750,
+        "identifier": "evintl-ccrt.gwww.gicert.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::gicert.com"
+      },
+      {
         "id": 27751,
         "identifier": "exslt.org",
         "identifier_type": "vendor_controlled_hostname",
@@ -38693,6 +38708,14 @@
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "known_fp_root::symcb.com"
+      },
+      {
+        "id": 27765,
+        "identifier": "g2.symcb.com0l",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::symcb.com0l"
       },
       {
         "id": 27766,
@@ -38919,12 +38942,124 @@
         "reason": "known_fp_root::googlecode.com"
       },
       {
+        "id": 27836,
+        "identifier": "libusb.info",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::libusb.info"
+      },
+      {
+        "id": 27837,
+        "identifier": "libusb.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::libusb.org"
+      },
+      {
         "id": 27842,
         "identifier": "llvm.org",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "known_fp_root::llvm.org"
+      },
+      {
+        "id": 27843,
+        "identifier": "lodash.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::lodash.com"
+      },
+      {
+        "id": 27844,
+        "identifier": "log.getdropbox.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::getdropbox.com"
+      },
+      {
+        "id": 27846,
+        "identifier": "m.imeitou.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::imeitou.com"
+      },
+      {
+        "id": 27850,
+        "identifier": "materialdesignicons.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::materialdesignicons.com"
+      },
+      {
+        "id": 27851,
+        "identifier": "mathiasbynens.be",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::mathiasbynens.be"
+      },
+      {
+        "id": 27852,
+        "identifier": "mesonet.agron.iastate.edu",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::iastate.edu"
+      },
+      {
+        "id": 27853,
+        "identifier": "mikepenz.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::mikepenz.com"
+      },
+      {
+        "id": 27857,
+        "identifier": "modp.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::modp.com"
+      },
+      {
+        "id": 27860,
+        "identifier": "mths.be",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::mths.be"
+      },
+      {
+        "id": 27862,
+        "identifier": "narwhaljs.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::narwhaljs.org"
+      },
+      {
+        "id": 27863,
+        "identifier": "nedbatchelder.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::nedbatchelder.com"
+      },
+      {
+        "id": 27864,
+        "identifier": "netflixoss.ci.cloudbees.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::cloudbees.com"
       },
       {
         "id": 27865,
@@ -38951,12 +39086,60 @@
         "reason": "known_fp_root::llvm.org"
       },
       {
+        "id": 27869,
+        "identifier": "osm.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::osm.org"
+      },
+      {
+        "id": 27870,
+        "identifier": "oss.sgi.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::sgi.com"
+      },
+      {
+        "id": 27873,
+        "identifier": "paulirish.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::paulirish.com"
+      },
+      {
+        "id": 27875,
+        "identifier": "philbit.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::philbit.com"
+      },
+      {
+        "id": 27876,
+        "identifier": "pki-crl.symauth.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::symauth.com"
+      },
+      {
         "id": 27877,
         "identifier": "pki.intel.com",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "known_fp_root::intel.com"
+      },
+      {
+        "id": 27878,
+        "identifier": "pod.tst.eu",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::tst.eu"
       },
       {
         "id": 27879,
@@ -38967,12 +39150,60 @@
         "reason": "known_fp_root::googlecode.com"
       },
       {
+        "id": 27891,
+        "identifier": "receive.utmiss.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::utmiss.com"
+      },
+      {
+        "id": 27894,
+        "identifier": "registry.npm.taobao.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::taobao.org"
+      },
+      {
+        "id": 27895,
+        "identifier": "relaxng.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::relaxng.org"
+      },
+      {
+        "id": 27897,
+        "identifier": "rentzsch.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::rentzsch.com"
+      },
+      {
+        "id": 27901,
+        "identifier": "rosettacode.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::rosettacode.org"
+      },
+      {
         "id": 27903,
         "identifier": "s1.symcb.com",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "known_fp_root::symcb.com"
+      },
+      {
+        "id": 27904,
+        "identifier": "s2.symcb.com0e",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::symcb.com0e"
       },
       {
         "id": 27905,
@@ -38991,12 +39222,76 @@
         "reason": "known_fp_root::googlecode.com"
       },
       {
+        "id": 27910,
+        "identifier": "silver.arm.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::silver.arm.com"
+      },
+      {
+        "id": 27911,
+        "identifier": "site.icu-project.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::icu-project.org"
+      },
+      {
+        "id": 27912,
+        "identifier": "sizzlejs.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::sizzlejs.com"
+      },
+      {
+        "id": 27913,
+        "identifier": "skal.planet-d.net",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::planet-d.net"
+      },
+      {
+        "id": 27914,
+        "identifier": "skia.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::skia.org"
+      },
+      {
+        "id": 27915,
+        "identifier": "sourceware.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::sourceware.org"
+      },
+      {
         "id": 27923,
         "identifier": "support.googlecode.com",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "known_fp_root::googlecode.com"
+      },
+      {
+        "id": 27924,
+        "identifier": "svgwg.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::svgwg.org"
+      },
+      {
+        "id": 27925,
+        "identifier": "sw.blackmagicdesign.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::blackmagicdesign.com"
       },
       {
         "id": 27926,
@@ -39007,12 +39302,92 @@
         "reason": "known_fp_root::symcb.com"
       },
       {
+        "id": 27927,
+        "identifier": "talloc.samba.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::samba.org"
+      },
+      {
+        "id": 27928,
+        "identifier": "tempuri.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::tempuri.org"
+      },
+      {
         "id": 35305,
         "identifier": "terra-sz-hc1pro-cloudapi.oss-cn-shenzhen.aliyuncs.com",
         "identifier_type": "vendor_cloud_endpoint_url",
         "confidence": 90,
         "source_type": "manufacturer_app",
         "reason": "third_party_cloud_no_vendor_tenant::aliyuncs.com"
+      },
+      {
+        "id": 27935,
+        "identifier": "transgaming.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::transgaming.com"
+      },
+      {
+        "id": 27936,
+        "identifier": "trevp.net",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::trevp.net"
+      },
+      {
+        "id": 27937,
+        "identifier": "trolltech.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::trolltech.com"
+      },
+      {
+        "id": 27943,
+        "identifier": "underscorejs.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::underscorejs.org"
+      },
+      {
+        "id": 27944,
+        "identifier": "unlicense.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::unlicense.org"
+      },
+      {
+        "id": 27945,
+        "identifier": "upgrade.dj2006.net",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::dj2006.net"
+      },
+      {
+        "id": 27946,
+        "identifier": "valgrind.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::valgrind.org"
+      },
+      {
+        "id": 27949,
+        "identifier": "webk.it",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::webk.it"
       },
       {
         "id": 27950,
@@ -39023,12 +39398,388 @@
         "reason": "known_fp_root::weibo.com"
       },
       {
+        "id": 27951,
+        "identifier": "wiki.commonjs.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::wiki.commonjs.org"
+      },
+      {
+        "id": 27952,
+        "identifier": "wiki.osgeo.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::wiki.osgeo.org"
+      },
+      {
+        "id": 27953,
+        "identifier": "wiki.squid-cache.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::squid-cache.org"
+      },
+      {
+        "id": 27956,
+        "identifier": "www.3waylabs.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::3waylabs.com"
+      },
+      {
+        "id": 27957,
+        "identifier": "www.7-zip.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::7-zip.org"
+      },
+      {
+        "id": 27958,
+        "identifier": "www.adel.nursat.kz",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::nursat.kz"
+      },
+      {
+        "id": 27962,
+        "identifier": "www.alphassl.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::alphassl.com"
+      },
+      {
+        "id": 27967,
+        "identifier": "www.azillionmonkeys.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::azillionmonkeys.com"
+      },
+      {
+        "id": 27969,
+        "identifier": "www.bilibili.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::bilibili.com"
+      },
+      {
+        "id": 27971,
+        "identifier": "www.brynosaurus.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::brynosaurus.com"
+      },
+      {
+        "id": 27973,
+        "identifier": "www.certplus.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::certplus.com"
+      },
+      {
+        "id": 27975,
+        "identifier": "www.chromestatus.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::chromestatus.com"
+      },
+      {
+        "id": 27978,
+        "identifier": "www.css",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::www.css"
+      },
+      {
+        "id": 27979,
+        "identifier": "www.dabeaz.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::dabeaz.com"
+      },
+      {
+        "id": 27980,
+        "identifier": "www.daemonology.net",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::daemonology.net"
+      },
+      {
+        "id": 27987,
+        "identifier": "www.douyin.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::douyin.com"
+      },
+      {
+        "id": 27989,
+        "identifier": "www.ecma-international.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::ecma-international.org"
+      },
+      {
+        "id": 27991,
+        "identifier": "www.elecard.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::elecard.com"
+      },
+      {
+        "id": 27997,
+        "identifier": "www.fisglobal.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::fisglobal.com"
+      },
+      {
+        "id": 27998,
+        "identifier": "www.flotcharts.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::flotcharts.org"
+      },
+      {
+        "id": 27999,
+        "identifier": "www.getui.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::getui.com"
+      },
+      {
+        "id": 28000,
+        "identifier": "www.google",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::www.google"
+      },
+      {
+        "id": 28002,
+        "identifier": "www.hortcut",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::www.hortcut"
+      },
+      {
+        "id": 28003,
+        "identifier": "www.icon",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::www.icon"
+      },
+      {
+        "id": 28004,
+        "identifier": "www.inkscape.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::inkscape.org"
+      },
+      {
+        "id": 28005,
+        "identifier": "www.interpretation",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::www.interpretation"
+      },
+      {
+        "id": 28007,
+        "identifier": "www.jcip.net",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::jcip.net"
+      },
+      {
+        "id": 28008,
+        "identifier": "www.jclark.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::jclark.com"
+      },
+      {
+        "id": 28010,
+        "identifier": "www.keynectis.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::keynectis.com"
+      },
+      {
         "id": 28011,
         "identifier": "www.khronos.org",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "known_fp_root::khronos.org"
+      },
+      {
+        "id": 28012,
+        "identifier": "www.kuaishou.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::kuaishou.com"
+      },
+      {
+        "id": 28014,
+        "identifier": "www.language",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::www.language"
+      },
+      {
+        "id": 28016,
+        "identifier": "www.lib.utexas.edu",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::utexas.edu"
+      },
+      {
+        "id": 28018,
+        "identifier": "www.linux-usb.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::linux-usb.org"
+      },
+      {
+        "id": 28019,
+        "identifier": "www.linuxfoundation.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::linuxfoundation.org"
+      },
+      {
+        "id": 28020,
+        "identifier": "www.linuxvideo.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::linuxvideo.org"
+      },
+      {
+        "id": 28025,
+        "identifier": "www.math.sci.hiroshima-u.ac.jp",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::hiroshima-u.ac.jp"
+      },
+      {
+        "id": 28026,
+        "identifier": "www.mesa3d.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::mesa3d.org"
+      },
+      {
+        "id": 28027,
+        "identifier": "www.midnight-commander.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::midnight-commander.org"
+      },
+      {
+        "id": 28031,
+        "identifier": "www.monkey.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::monkey.org"
+      },
+      {
+        "id": 28032,
+        "identifier": "www.movable-type.co.uk",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::movable-type.co.uk"
+      },
+      {
+        "id": 28037,
+        "identifier": "www.netlib.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::netlib.org"
+      },
+      {
+        "id": 28038,
+        "identifier": "www.oasis-open.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::oasis-open.org"
+      },
+      {
+        "id": 28039,
+        "identifier": "www.ogre3d.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::ogre3d.org"
+      },
+      {
+        "id": 28040,
+        "identifier": "www.onvif.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::onvif.org"
+      },
+      {
+        "id": 28041,
+        "identifier": "www.openstreetmap.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::openstreetmap.org"
+      },
+      {
+        "id": 28042,
+        "identifier": "www.oppo.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::oppo.com"
+      },
+      {
+        "id": 28043,
+        "identifier": "www.phreedom.org",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::phreedom.org"
       },
       {
         "id": 28044,
@@ -39047,774 +39798,12 @@
         "reason": "known_fp_root::qq.com"
       },
       {
-        "id": 28068,
-        "identifier": "www.usertrust.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "known_fp_root::usertrust.com"
-      }
-    ],
-    "AMBIGUOUS": [
-      {
-        "id": 27750,
-        "identifier": "evintl-ccrt.gwww.gicert.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=gicert.com"
-      },
-      {
-        "id": 27765,
-        "identifier": "g2.symcb.com0l",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=symcb.com0l"
-      },
-      {
-        "id": 27836,
-        "identifier": "libusb.info",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=libusb.info"
-      },
-      {
-        "id": 27837,
-        "identifier": "libusb.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=libusb.org"
-      },
-      {
-        "id": 27843,
-        "identifier": "lodash.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=lodash.com"
-      },
-      {
-        "id": 27844,
-        "identifier": "log.getdropbox.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=getdropbox.com"
-      },
-      {
-        "id": 27846,
-        "identifier": "m.imeitou.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=imeitou.com"
-      },
-      {
-        "id": 27850,
-        "identifier": "materialdesignicons.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=materialdesignicons.com"
-      },
-      {
-        "id": 27851,
-        "identifier": "mathiasbynens.be",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=mathiasbynens.be"
-      },
-      {
-        "id": 27852,
-        "identifier": "mesonet.agron.iastate.edu",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=iastate.edu"
-      },
-      {
-        "id": 27853,
-        "identifier": "mikepenz.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=mikepenz.com"
-      },
-      {
-        "id": 27857,
-        "identifier": "modp.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=modp.com"
-      },
-      {
-        "id": 27860,
-        "identifier": "mths.be",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=mths.be"
-      },
-      {
-        "id": 27862,
-        "identifier": "narwhaljs.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=narwhaljs.org"
-      },
-      {
-        "id": 27863,
-        "identifier": "nedbatchelder.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=nedbatchelder.com"
-      },
-      {
-        "id": 27864,
-        "identifier": "netflixoss.ci.cloudbees.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=cloudbees.com"
-      },
-      {
-        "id": 27869,
-        "identifier": "osm.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=osm.org"
-      },
-      {
-        "id": 27870,
-        "identifier": "oss.sgi.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=sgi.com"
-      },
-      {
-        "id": 27873,
-        "identifier": "paulirish.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=paulirish.com"
-      },
-      {
-        "id": 27875,
-        "identifier": "philbit.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=philbit.com"
-      },
-      {
-        "id": 27876,
-        "identifier": "pki-crl.symauth.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=symauth.com"
-      },
-      {
-        "id": 27878,
-        "identifier": "pod.tst.eu",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=tst.eu"
-      },
-      {
-        "id": 27891,
-        "identifier": "receive.utmiss.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=utmiss.com"
-      },
-      {
-        "id": 27894,
-        "identifier": "registry.npm.taobao.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=taobao.org"
-      },
-      {
-        "id": 27895,
-        "identifier": "relaxng.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=relaxng.org"
-      },
-      {
-        "id": 27897,
-        "identifier": "rentzsch.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=rentzsch.com"
-      },
-      {
-        "id": 27901,
-        "identifier": "rosettacode.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=rosettacode.org"
-      },
-      {
-        "id": 27904,
-        "identifier": "s2.symcb.com0e",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=symcb.com0e"
-      },
-      {
-        "id": 27910,
-        "identifier": "silver.arm.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=arm.com"
-      },
-      {
-        "id": 27911,
-        "identifier": "site.icu-project.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=icu-project.org"
-      },
-      {
-        "id": 27912,
-        "identifier": "sizzlejs.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=sizzlejs.com"
-      },
-      {
-        "id": 27913,
-        "identifier": "skal.planet-d.net",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=planet-d.net"
-      },
-      {
-        "id": 27914,
-        "identifier": "skia.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=skia.org"
-      },
-      {
-        "id": 27915,
-        "identifier": "sourceware.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=sourceware.org"
-      },
-      {
-        "id": 27924,
-        "identifier": "svgwg.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=svgwg.org"
-      },
-      {
-        "id": 27925,
-        "identifier": "sw.blackmagicdesign.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=blackmagicdesign.com"
-      },
-      {
-        "id": 27927,
-        "identifier": "talloc.samba.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=samba.org"
-      },
-      {
-        "id": 27928,
-        "identifier": "tempuri.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=tempuri.org"
-      },
-      {
-        "id": 27935,
-        "identifier": "transgaming.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=transgaming.com"
-      },
-      {
-        "id": 27936,
-        "identifier": "trevp.net",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=trevp.net"
-      },
-      {
-        "id": 27937,
-        "identifier": "trolltech.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=trolltech.com"
-      },
-      {
-        "id": 27943,
-        "identifier": "underscorejs.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=underscorejs.org"
-      },
-      {
-        "id": 27944,
-        "identifier": "unlicense.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=unlicense.org"
-      },
-      {
-        "id": 27945,
-        "identifier": "upgrade.dj2006.net",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=dj2006.net"
-      },
-      {
-        "id": 27946,
-        "identifier": "valgrind.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=valgrind.org"
-      },
-      {
-        "id": 27949,
-        "identifier": "webk.it",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=webk.it"
-      },
-      {
-        "id": 27951,
-        "identifier": "wiki.commonjs.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=commonjs.org"
-      },
-      {
-        "id": 27952,
-        "identifier": "wiki.osgeo.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=osgeo.org"
-      },
-      {
-        "id": 27953,
-        "identifier": "wiki.squid-cache.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=squid-cache.org"
-      },
-      {
-        "id": 27956,
-        "identifier": "www.3waylabs.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=3waylabs.com"
-      },
-      {
-        "id": 27957,
-        "identifier": "www.7-zip.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=7-zip.org"
-      },
-      {
-        "id": 27958,
-        "identifier": "www.adel.nursat.kz",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=nursat.kz"
-      },
-      {
-        "id": 27962,
-        "identifier": "www.alphassl.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=alphassl.com"
-      },
-      {
-        "id": 27967,
-        "identifier": "www.azillionmonkeys.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=azillionmonkeys.com"
-      },
-      {
-        "id": 27969,
-        "identifier": "www.bilibili.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=bilibili.com"
-      },
-      {
-        "id": 27971,
-        "identifier": "www.brynosaurus.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=brynosaurus.com"
-      },
-      {
-        "id": 27973,
-        "identifier": "www.certplus.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=certplus.com"
-      },
-      {
-        "id": 27975,
-        "identifier": "www.chromestatus.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=chromestatus.com"
-      },
-      {
-        "id": 27978,
-        "identifier": "www.css",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.css"
-      },
-      {
-        "id": 27979,
-        "identifier": "www.dabeaz.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=dabeaz.com"
-      },
-      {
-        "id": 27980,
-        "identifier": "www.daemonology.net",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=daemonology.net"
-      },
-      {
-        "id": 27987,
-        "identifier": "www.douyin.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=douyin.com"
-      },
-      {
-        "id": 27989,
-        "identifier": "www.ecma-international.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=ecma-international.org"
-      },
-      {
-        "id": 27991,
-        "identifier": "www.elecard.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=elecard.com"
-      },
-      {
-        "id": 27997,
-        "identifier": "www.fisglobal.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=fisglobal.com"
-      },
-      {
-        "id": 27998,
-        "identifier": "www.flotcharts.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=flotcharts.org"
-      },
-      {
-        "id": 27999,
-        "identifier": "www.getui.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=getui.com"
-      },
-      {
-        "id": 28000,
-        "identifier": "www.google",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.google"
-      },
-      {
-        "id": 28002,
-        "identifier": "www.hortcut",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.hortcut"
-      },
-      {
-        "id": 28003,
-        "identifier": "www.icon",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.icon"
-      },
-      {
-        "id": 28004,
-        "identifier": "www.inkscape.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=inkscape.org"
-      },
-      {
-        "id": 28005,
-        "identifier": "www.interpretation",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.interpretation"
-      },
-      {
-        "id": 28007,
-        "identifier": "www.jcip.net",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=jcip.net"
-      },
-      {
-        "id": 28008,
-        "identifier": "www.jclark.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=jclark.com"
-      },
-      {
-        "id": 28010,
-        "identifier": "www.keynectis.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=keynectis.com"
-      },
-      {
-        "id": 28012,
-        "identifier": "www.kuaishou.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=kuaishou.com"
-      },
-      {
-        "id": 28014,
-        "identifier": "www.language",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.language"
-      },
-      {
-        "id": 28016,
-        "identifier": "www.lib.utexas.edu",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=utexas.edu"
-      },
-      {
-        "id": 28018,
-        "identifier": "www.linux-usb.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=linux-usb.org"
-      },
-      {
-        "id": 28019,
-        "identifier": "www.linuxfoundation.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=linuxfoundation.org"
-      },
-      {
-        "id": 28020,
-        "identifier": "www.linuxvideo.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=linuxvideo.org"
-      },
-      {
-        "id": 28025,
-        "identifier": "www.math.sci.hiroshima-u.ac.jp",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=hiroshima-u.ac.jp"
-      },
-      {
-        "id": 28026,
-        "identifier": "www.mesa3d.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=mesa3d.org"
-      },
-      {
-        "id": 28027,
-        "identifier": "www.midnight-commander.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=midnight-commander.org"
-      },
-      {
-        "id": 28031,
-        "identifier": "www.monkey.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=monkey.org"
-      },
-      {
-        "id": 28032,
-        "identifier": "www.movable-type.co.uk",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=movable-type.co.uk"
-      },
-      {
-        "id": 28037,
-        "identifier": "www.netlib.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=netlib.org"
-      },
-      {
-        "id": 28038,
-        "identifier": "www.oasis-open.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=oasis-open.org"
-      },
-      {
-        "id": 28039,
-        "identifier": "www.ogre3d.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=ogre3d.org"
-      },
-      {
-        "id": 28040,
-        "identifier": "www.onvif.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=onvif.org"
-      },
-      {
-        "id": 28041,
-        "identifier": "www.openstreetmap.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=openstreetmap.org"
-      },
-      {
-        "id": 28042,
-        "identifier": "www.oppo.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=oppo.com"
-      },
-      {
-        "id": 28043,
-        "identifier": "www.phreedom.org",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=phreedom.org"
-      },
-      {
         "id": 28049,
         "identifier": "www.recent",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.recent"
-      },
-      {
-        "id": 35302,
-        "identifier": "www.robomaster.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=robomaster.com"
+        "reason": "known_fp_root::www.recent"
       },
       {
         "id": 28053,
@@ -39822,7 +39811,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=seanpatrickobrien.com"
+        "reason": "known_fp_root::seanpatrickobrien.com"
       },
       {
         "id": 28054,
@@ -39830,7 +39819,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=squid-cache.org"
+        "reason": "known_fp_root::squid-cache.org"
       },
       {
         "id": 28056,
@@ -39838,7 +39827,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=strongtalk.org"
+        "reason": "known_fp_root::strongtalk.org"
       },
       {
         "id": 28057,
@@ -39846,7 +39835,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.style"
+        "reason": "known_fp_root::www.style"
       },
       {
         "id": 28058,
@@ -39854,7 +39843,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=suitable.com"
+        "reason": "known_fp_root::suitable.com"
       },
       {
         "id": 28059,
@@ -39862,7 +39851,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=symauth.com"
+        "reason": "known_fp_root::symauth.com"
       },
       {
         "id": 28062,
@@ -39870,7 +39859,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.text-decoration"
+        "reason": "known_fp_root::www.text-decoration"
       },
       {
         "id": 28063,
@@ -39878,7 +39867,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=torchmobile.com"
+        "reason": "known_fp_root::torchmobile.com"
       },
       {
         "id": 28064,
@@ -39886,7 +39875,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=tortall.net"
+        "reason": "known_fp_root::tortall.net"
       },
       {
         "id": 28067,
@@ -39894,7 +39883,15 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=umeng.com"
+        "reason": "known_fp_root::umeng.com"
+      },
+      {
+        "id": 28068,
+        "identifier": "www.usertrust.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::usertrust.com"
       },
       {
         "id": 28069,
@@ -39902,7 +39899,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=vivo.com.cn"
+        "reason": "known_fp_root::vivo.com.cn"
       },
       {
         "id": 28070,
@@ -39910,7 +39907,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=webmproject.org"
+        "reason": "known_fp_root::webmproject.org"
       },
       {
         "id": 28071,
@@ -39918,7 +39915,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.wencodeuricomponent"
+        "reason": "known_fp_root::www.wencodeuricomponent"
       },
       {
         "id": 28072,
@@ -39926,7 +39923,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=winimage.com"
+        "reason": "known_fp_root::winimage.com"
       },
       {
         "id": 28073,
@@ -39934,7 +39931,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.world"
+        "reason": "known_fp_root::www.world"
       },
       {
         "id": 28074,
@@ -39942,7 +39939,7 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=www.years"
+        "reason": "known_fp_root::www.years"
       },
       {
         "id": 28075,
@@ -39950,9 +39947,10 @@
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
-        "reason": "no_match::apex=xmlsoft.org"
+        "reason": "known_fp_root::xmlsoft.org"
       }
-    ]
+    ],
+    "AMBIGUOUS": []
   },
   "droneshield": {
     "TP": [
@@ -40041,7 +40039,24 @@
     "AMBIGUOUS": []
   },
   "drt": {
-    "TP": [],
+    "TP": [
+      {
+        "id": 28089,
+        "identifier": "drtinc.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "primary_registry",
+        "reason": "vendor_owned_root::drtinc.com"
+      },
+      {
+        "id": 28090,
+        "identifier": "www.drtinc.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "primary_registry",
+        "reason": "vendor_owned_root::drtinc.com"
+      }
+    ],
     "FP": [
       {
         "id": 28086,
@@ -40126,28 +40141,12 @@
     ],
     "AMBIGUOUS": [
       {
-        "id": 28089,
-        "identifier": "drtinc.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "primary_registry",
-        "reason": "no_match::apex=drtinc.com"
-      },
-      {
         "id": 35289,
         "identifier": "drtstorage.blob.core.windows.net",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "vendor_tenant_on_third_party_cloud::blob.core.windows.net"
-      },
-      {
-        "id": 28090,
-        "identifier": "www.drtinc.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "primary_registry",
-        "reason": "no_match::apex=drtinc.com"
       }
     ]
   },
@@ -52371,6 +52370,14 @@
         "reason": "known_fp_root::huawei.com"
       },
       {
+        "id": 29285,
+        "identifier": "c-hzgt2.getui.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::getui.com"
+      },
+      {
         "id": 29303,
         "identifier": "cpki-caweb.huawei.com",
         "identifier_type": "vendor_controlled_hostname",
@@ -52443,6 +52450,22 @@
         "reason": "known_fp_root::baidu.com"
       },
       {
+        "id": 29538,
+        "identifier": "push.umeng.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::umeng.com"
+      },
+      {
+        "id": 29548,
+        "identifier": "s-gt.getui.com",
+        "identifier_type": "vendor_controlled_hostname",
+        "confidence": 85,
+        "source_type": "manufacturer_app",
+        "reason": "known_fp_root::getui.com"
+      },
+      {
         "id": 29549,
         "identifier": "schemas.openxmlformats.org",
         "identifier_type": "vendor_controlled_hostname",
@@ -52475,14 +52498,6 @@
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "no_match::apex=app-st.net"
-      },
-      {
-        "id": 29285,
-        "identifier": "c-hzgt2.getui.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=getui.com"
       },
       {
         "id": 29286,
@@ -53005,28 +53020,12 @@
         "reason": "no_match::apex=flurry.com"
       },
       {
-        "id": 29538,
-        "identifier": "push.umeng.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=umeng.com"
-      },
-      {
         "id": 29541,
         "identifier": "realm.io",
         "identifier_type": "vendor_controlled_hostname",
         "confidence": 85,
         "source_type": "manufacturer_app",
         "reason": "no_match::apex=realm.io"
-      },
-      {
-        "id": 29548,
-        "identifier": "s-gt.getui.com",
-        "identifier_type": "vendor_controlled_hostname",
-        "confidence": 85,
-        "source_type": "manufacturer_app",
-        "reason": "no_match::apex=getui.com"
       },
       {
         "id": 29550,
