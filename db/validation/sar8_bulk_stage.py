@@ -130,8 +130,11 @@ def _is_known_fake_oui(oui_prefix: str) -> tuple[bool, str | None]:
 
 
 def _build_lexicon(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    # CP31 (migration 0025) — hub-only lexicon: arm rows participate via
+    # FK, not vendor-name disambig.
     rows = conn.execute(
-        "SELECT canonical_name, aliases, primary_category FROM manufacturers"
+        "SELECT canonical_name, aliases, primary_category FROM manufacturers "
+        "WHERE query_default = 'visible'"
     ).fetchall()
     out: list[dict[str, Any]] = []
     for r in rows:

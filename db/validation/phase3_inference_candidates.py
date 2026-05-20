@@ -726,8 +726,13 @@ FLAGGED_FOR_REVIEW_ARTIFACT_PATH = (
 def evaluate() -> dict[str, Any]:
     conn = _connect()
     try:
+        # CP31 (migration 0025) — hub-and-spoke schema. Inference lexicon is
+        # hub-only: arm rows are FK-attested by `parent_manufacturer_id`, not
+        # canonical-name-matched, so including them in the lexicon would
+        # mis-attribute candidate_manufacturer strings to arm canonicals.
         manufacturers = conn.execute(
-            "SELECT id, canonical_name, aliases, primary_category FROM manufacturers"
+            "SELECT id, canonical_name, aliases, primary_category FROM manufacturers "
+            "WHERE query_default = 'visible'"
         ).fetchall()
         lexicon = build_canonical_lookup(manufacturers)
 

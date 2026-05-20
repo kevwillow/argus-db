@@ -128,11 +128,17 @@ def _load_class_b_rows(conn: sqlite3.Connection) -> list[sqlite3.Row]:
 
 
 def _load_manufacturers(conn: sqlite3.Connection) -> list[tuple[str, str | None]]:
-    """Load the §2.1 lexicon rows."""
+    """Load the §2.1 lexicon rows.
+
+    CP31 (migration 0025) — hub-only: §2.1 lexicon reflects the visible
+    canonical set; arm rows are queried separately by FK when needed.
+    """
     return [
         (r["canonical_name"], r["aliases"])
         for r in conn.execute(
-            "SELECT canonical_name, aliases FROM manufacturers ORDER BY id"
+            "SELECT canonical_name, aliases FROM manufacturers "
+            "WHERE query_default = 'visible' "
+            "ORDER BY id"
         )
     ]
 

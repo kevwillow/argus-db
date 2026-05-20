@@ -387,8 +387,12 @@ def load_vendor_keywords(
     Reading at run time means a future Correction Pass that adds/removes
     a vendor auto-syncs without a code edit.
     """
+    # CP31 (migration 0025) — only fire USAspending API queries for hub
+    # canonicals; arms participate through their hub's procurement footprint.
     rows = conn.execute(
-        "SELECT canonical_name FROM manufacturers ORDER BY canonical_name"
+        "SELECT canonical_name FROM manufacturers "
+        "WHERE query_default = 'visible' "
+        "ORDER BY canonical_name"
     ).fetchall()
     pairs: list[tuple[str, str]] = []
     for (canonical,) in rows:
