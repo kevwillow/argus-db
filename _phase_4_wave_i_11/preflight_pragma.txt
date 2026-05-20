@@ -1,0 +1,220 @@
+# Pre-flight PRAGMA capture — MAC-190 Phase 4 Wave I.11
+# Captured: 2026-05-20T18:49:49.526948Z
+
+## PRAGMA user_version
+(0,)
+
+## PRAGMA integrity_check
+[('ok',)]
+
+## PRAGMA table_info(identifiers)
+  (0, 'id', 'INTEGER', 0, None, 1)
+  (1, 'identifier', 'TEXT', 1, None, 0)
+  (2, 'identifier_type', 'TEXT', 1, None, 0)
+  (3, 'device_category', 'TEXT', 1, None, 0)
+  (4, 'manufacturer', 'TEXT', 0, None, 0)
+  (5, 'model', 'TEXT', 0, None, 0)
+  (6, 'confidence', 'INTEGER', 0, None, 0)
+  (7, 'source_url', 'TEXT', 1, None, 0)
+  (8, 'source_type', 'TEXT', 1, None, 0)
+  (9, 'source_excerpt', 'TEXT', 0, None, 0)
+  (10, 'geographic_scope', 'TEXT', 0, None, 0)
+  (11, 'first_seen', 'DATETIME', 0, None, 0)
+  (12, 'last_verified', 'DATETIME', 0, None, 0)
+  (13, 'notes', 'TEXT', 0, None, 0)
+  (14, 'superseded_by', 'INTEGER', 0, None, 0)
+  (15, 'paired_identifier_id', 'INTEGER', 0, None, 0)
+  (16, 'pair_kind', 'TEXT', 0, None, 0)
+
+## PRAGMA table_info(manufacturers)
+  (0, 'id', 'INTEGER', 0, None, 1)
+  (1, 'canonical_name', 'TEXT', 1, None, 0)
+  (2, 'aliases', 'TEXT', 0, None, 0)
+  (3, 'primary_category', 'TEXT', 0, None, 0)
+  (4, 'source_url', 'TEXT', 1, None, 0)
+  (5, 'notes', 'TEXT', 0, None, 0)
+  (6, 'added_at', 'DATETIME', 1, 'CURRENT_TIMESTAMP', 0)
+
+## PRAGMA table_info(raw_observations)
+  (0, 'id', 'INTEGER', 0, None, 1)
+  (1, 'source_id', 'INTEGER', 0, None, 0)
+  (2, 'extraction_run_id', 'INTEGER', 0, None, 0)
+  (3, 'source_url', 'TEXT', 1, None, 0)
+  (4, 'raw_payload', 'TEXT', 0, None, 0)
+  (5, 'candidate_identifier', 'TEXT', 0, None, 0)
+  (6, 'candidate_type', 'TEXT', 0, None, 0)
+  (7, 'candidate_category', 'TEXT', 0, None, 0)
+  (8, 'candidate_manufacturer', 'TEXT', 0, None, 0)
+  (9, 'source_excerpt', 'TEXT', 0, None, 0)
+  (10, 'captured_at', 'DATETIME', 1, 'CURRENT_TIMESTAMP', 0)
+  (11, 'processed_at', 'DATETIME', 0, None, 0)
+  (12, 'promoted_identifier_id', 'INTEGER', 0, None, 0)
+  (13, 'notes', 'TEXT', 0, None, 0)
+  (14, 'source_row_key', 'TEXT', 0, None, 0)
+
+## sqlite_master CHECK enums
+-- manufacturers:
+CREATE TABLE manufacturers (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    canonical_name  TEXT NOT NULL UNIQUE,
+    aliases         TEXT,           -- comma-separated alternate names
+    primary_category TEXT,          -- best-fit §2.1 category, NULL when multi-purpose
+    source_url      TEXT NOT NULL,  -- where the canonical name comes from (bible itself is fine)
+    notes           TEXT,
+    added_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+
+-- raw_observations:
+CREATE TABLE raw_observations (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_id           INTEGER REFERENCES sources(id) ON DELETE SET NULL,
+    extraction_run_id   INTEGER REFERENCES extraction_runs(id) ON DELETE SET NULL,
+    source_url          TEXT NOT NULL,
+    raw_payload         TEXT,           -- raw extracted blob (JSON/TEXT)
+    candidate_identifier TEXT,           -- pre-normalization
+    candidate_type      TEXT,
+    candidate_category  TEXT,
+    candidate_manufacturer TEXT,
+    source_excerpt      TEXT,
+    captured_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    processed_at        DATETIME,
+    promoted_identifier_id INTEGER REFERENCES identifiers(id) ON DELETE SET NULL,
+    notes               TEXT
+, source_row_key TEXT)
+
+-- conflicts:
+CREATE TABLE conflicts (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    identifier_a_id     INTEGER REFERENCES identifiers(id) ON DELETE CASCADE,
+    identifier_b_id     INTEGER REFERENCES identifiers(id) ON DELETE CASCADE,
+    raw_observation_id  INTEGER REFERENCES raw_observations(id) ON DELETE CASCADE,
+    reason              TEXT NOT NULL,    -- e.g. 'known_fake_pattern', 'category_disagreement'
+    detected_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    resolved_at         DATETIME,
+    resolved_by         TEXT,             -- agent id or human
+    resolution_notes    TEXT
+)
+
+-- identifiers:
+CREATE TABLE "identifiers" (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    identifier        TEXT NOT NULL,
+    identifier_type   TEXT NOT NULL CHECK (identifier_type IN (
+                          -- Pre-CP13 (0001 initial) — 9 values
+                          'oui', 'mac', 'mac_range', 'bssid',
+                          'ssid_exact', 'ssid_pattern',
+                          'ble_uuid', 'ble_service',
+                          'device_fingerprint',
+                          -- CP13 (migration 0009) — Wave G structural fidelity (3)
+                          'ble_local_name', 'ble_characteristic',
+                          'product_family_codename',
+                          -- CP14 (migration 0011) — G-3 BLE SIG manufacturer IDs (1)
+                          'ble_manufacturer_id',
+                          -- CP14 (migration 0013) — Drone-RID + proprietary
+                          -- protocol cluster (13)
+                          'drone_id_prefix',
+                          'icao_24bit_address',
+                          'rf_channel',
+                          'burst_cadence_ms',
+                          'bandwidth_mhz',
+                          'device_class_id',
+                          'rf_burst_duration',
+                          'rf_protocol_constant',
+                          'wifi_aware_service_name',
+                          'wifi_ie_element_id',
+                          'bluetooth_le_pdu_type',
+                          'wifi_frame_control_subtype',
+                          'wifi_nan_param_signature',
+                          -- CP14 (migration 0014) — surveillance metadata (1)
+                          'alpr_model',
+                          -- CP20 (migration 0018) — SAR-13 §S.3 vendor-anchored
+                          -- / device-naming cluster (14)
+                          'ble_protocol_byte_table',
+                          'ble_service_uuid',
+                          'ble_company_id',
+                          'frequency_band',
+                          'ble_protocol_byte',
+                          'operator_profile',
+                          'x509_cert_sha256_prefix',
+                          'ble_adv_interval',
+                          'ble_payload_offset',
+                          'firmware_sha256_hash',
+                          'network_endpoint',
+                          'firmware_image_variant',
+                          'qualcomm_chip_format_id',
+                          'firmware_branded_string',
+                          -- MAC-117 (migration 0019) — round-2 vocab
+                          -- extension (7) per §1 routing slate (A)
+                          'asdstan_message_type',
+                          'asdstan_enum_value',
+                          'dji_protocol_struct_format',
+                          'gpt_partition_uuid',
+                          'chipset_codename',
+                          'firmware_build_string',
+                          'firmware_build_uuid',
+                          -- CP28 (migration 0023) — Wave H desktop-axis vendor-
+                          -- registered non-BLE cluster (3)
+                          'windows_installer_productcode_vendor_registered',
+                          'windows_com_clsid_vendor_registered',
+                          'vendor_document_uuid_cloud_reference',
+                          -- CP29 (migration 0024 — this migration) — Wave I/I.5/
+                          -- I.6/I.7 vendor cloud-infrastructure hostname corpus (3)
+                          'vendor_controlled_hostname',
+                          'vendor_cloud_endpoint_url',
+                          'vendor_controlled_hostname_deprecated'
+                      )),
+    device_category   TEXT NOT NULL CHECK (device_category IN (
+                          'alpr', 'imsi_catcher', 'body_cam', 'police_radio',
+                          'drone', 'gunshot_detect', 'hacking_tool',
+                          'covert_cam', 'gps_tracker', 'face_recog',
+                          'drone_detect', 'unknown'
+                      )),
+    manufacturer      TEXT,
+    model             TEXT,
+    confidence        INTEGER CHECK (confidence BETWEEN 0 AND 100),
+    source_url        TEXT NOT NULL,
+    source_type       TEXT NOT NULL CHECK (source_type IN (
+                          'official', 'regulatory', 'procurement',
+                          'academic', 'foia', 'crowdsourced',
+                          'inferred', 'manufacturer_doc',
+                          'manufacturer_app',
+                          -- CP15 (migration 0015) — primary_registry
+                          'primary_registry'
+                      )),
+    source_excerpt    TEXT CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200),
+    geographic_scope  TEXT,
+    first_seen        DATETIME,
+    last_verified     DATETIME,
+    notes             TEXT,
+    superseded_by     INTEGER REFERENCES identifiers(id) ON DELETE SET NULL,
+    -- CP14 (migration 0012) — paired-identifier discipline
+    paired_identifier_id INTEGER REFERENCES identifiers(id) ON DELETE SET NULL,
+    pair_kind            TEXT CHECK (
+                             pair_kind IS NULL
+                             OR pair_kind IN (
+                                 'la_bit_flip',
+                                 'frdid_sibling',
+                                 'vendor_as_container',
+                                 'firmware_generation'
+                             )
+                         )
+)
+
+## value_class_ceilings table check (expect: absent)
+[]
+
+## State counts
+  active identifiers (superseded_by IS NULL): 34796
+  total identifiers: 35138
+  raw_observations: 146214
+  manufacturers: 51
+  conflicts: 36
+
+## Phase 2.5 sentinel rows (mfr=NULL, conf=0)
+  count: 262
+
+## Manufacturer lookup — Autel (component-supplier OUI target)
+  (206, 'Autel Robotics', 'Autel, Autel Intelligent Technology Corp.', '{"admission_date_utc": "2026-05-18T15:00:00Z", "admission_dispatch_ref": "MAC-104d", "admission_integration_ref": "MAC-178", "description": "Admitted via wave-G v2 manufacturer-app extraction (MAC-104d).", "product_family_taxonomy": [{"apk_package": "com.autelrobotics.explorer", "apk_sha256": "0a04f1186092bb52ed5fa26daf1589ef788fb124505123c3c2a8ad1ed64230ff", "apk_version": "V1.2.14", "integration_dispatch": "MAC-178", "occurrence_count": 175, "proposed_confidence_band": "90-95", "source_dispatch": "MAC-104d", "source_file_relative": "sources/com/autel/libupdrage/upgrade/impl/AutelUpgradeImpl.java", "value": "EVO", "vendor_key": "autel_explorer_0a04f118"}, {"apk_package": "com.autelrobotics.explorer", "apk_sha256": "0a04f1186092bb52ed5fa26daf1589ef788fb124505123c3c2a8ad1ed64230ff", "apk_version": "V1.2.14", "integration_dispatch": "MAC-178", "occurrence_count": 6, "proposed_confidence_band": "90-95", "source_dispatch": "MAC-104d", "source_file_relative": "res/values-it/strings.xml", "value": "Smart", "vendor_key": "autel_explorer_0a04f118"}]}')
+
+## Manufacturer lookup — Hikvision (component-supplier OUI target)
+  (209, 'Hikvision', 'Hangzhou Hikvision Digital Technology, HikCentral, HikConnect', '{"admission_date_utc": "2026-05-18T15:00:00Z", "admission_dispatch_ref": "MAC-104", "admission_integration_ref": "MAC-178", "description": "Admitted via wave-G v2 manufacturer-app extraction (MAC-104).", "ndaa_section_889_note": "NDAA Section 889 federally-restricted; state/local LE deployments persist outside the federal-procurement bar (runguide §0 scope).", "product_family_taxonomy": [{"apk_package": "com.hikvision.hikconnect", "apk_sha256": "6ee6129f5a9f108f79342790f8d7e89a18f7ed1405492792b39078e27d7ed349", "apk_version": "6.11.631.0506", "integration_dispatch": "MAC-178", "occurrence_count": 19, "proposed_confidence_band": "90-95", "source_dispatch": "MAC-104", "source_file_relative": "sources/defpackage/dk0.java", "value": "HikConnect", "vendor_key": "hikvision_hikconnect_6ee6129f"}, {"apk_package": "com.hikvision.hikconnect", "apk_sha256": "6ee6129f5a9f108f79342790f8d7e89a18f7ed1405492792b39078e27d7ed349", "apk_version": "6.11.631.0506", "integration_dispatch": "MAC-178", "occurrence_count": 2, "proposed_confidence_band": "90-95", "source_dispatch": "MAC-104", "source_file_relative": "sources/com/hikvision/hikconnect/sdk/util/WebViewPreLoadHelper.java", "value": "Ezviz", "vendor_key": "hikvision_hikconnect_6ee6129f"}, {"apk_package": "com.hikvision.hikconnect", "apk_sha256": "6ee6129f5a9f108f79342790f8d7e89a18f7ed1405492792b39078e27d7ed349", "apk_version": "6.11.631.0506", "integration_dispatch": "MAC-178", "occurrence_count": 732, "proposed_confidence_band": "90-95", "source_dispatch": "MAC-104", "source_file_relative": "res/values-fa/strings.xml", "value": "HikCentral", "vendor_key": "hikvision_hikconnect_6ee6129f"}, {"apk_package": "com.mcu.iVMS", "apk_sha256": "2e036b01fe330b0b478bb093547ce8da8de81ea8e7c6db73a7b1acec7a8b4873", "apk_version": "4.7.12", "integration_dispatch": "MAC-178", "occurrence_count": 17404, "proposed_confidence_band": "90-95", "source_dispatch": "MAC-104", "source_file_relative": "sources/e/a/c/a/n.java", "value": "iVMS", "vendor_key": "hikvision_ivms_2e036b01"}, {"apk_package": "com.mcu.iVMS", "apk_sha256": "2e036b01fe330b0b478bb093547ce8da8de81ea8e7c6db73a7b1acec7a8b4873", "apk_version": "4.7.12", "integration_dispatch": "MAC-178", "occurrence_count": 32, "proposed_confidence_band": "90-95", "source_dispatch": "MAC-104", "source_file_relative": "res/values-cs/strings.xml", "value": "IPC", "vendor_key": "hikvision_ivms_2e036b01"}]}')
