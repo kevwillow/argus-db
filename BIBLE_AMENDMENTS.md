@@ -3285,3 +3285,149 @@ Surfaced by CP28 (queued for future CP candidacy):
 This CP28 entry is the §11 #11 amendment-log pairing for migration `0023_identifier_type_check_extension_cp28` + the SAR-12 7-FP-class codification + the wrapper ±90-char windowed-clipping discipline + the CP28(a)/(b) deferrals. Bible HEAD bumps from the CP27 commit to the CP28 commit landed alongside this entry. CP-anchor: migration commit `2795ebba7866ad164121668321e213308aa87936` + [MAC-181](/MAC/issues/MAC-181) child issue ID. Schema version bumps 22 → 23.
 
 ═══════════════════════════════════════════════════════════════════════
+
+Correction Pass 29 — Wave I/I.5/I.6/I.7 vendor cloud-infrastructure hostname corpus value_classes + SAR-13 schema-fabrication discipline + SAR-13.5 bucket attribution discipline
+
+## Correction Pass 29 — vendor cloud-infrastructure hostname corpus value_classes (3 codified + 2 deferred)
+
+### Scope
+
+CP29 codifies three net-new `identifier_type` enum values empirically anchored by the cumulative 4-wave Wave I autonomous extraction effort (Wave I main 12,212 hostnames + I.5 26 + I.6 193 + I.7 159; 12,590 unique). Migration 0024 extends the CHECK enum 51 → 54. Two candidate value classes deferred per conservative ≥1-empirical-evidence gate; reserved for CP30 / migration 0025.
+
+### §1 — Codified value_classes (3)
+
+**`vendor_controlled_hostname`** — Vendor-owned cloud-infrastructure hostname (e.g. `hppki.honeywell.com`, `duss.djicorp.com`, vendor-apex subdomains observed in CT logs). Confidence ladder:
+
+- 75-90 single-source default (predominantly Class B crt.sh CT log attestations)
+- 85-95 cross-source corroboration (CP24 independence: ≥2 distinct extraction source-classes from genuinely independent providers)
+- 95-99 firmware-embedded cert chain (vendor-signed code-signing CA + multi-source corroboration)
+
+Empirical Wave I anchor: 12,620 attestation rows over 12,590 unique hostnames across 8 source-classes (B 11,551; A 587; I_github_readme 211; I_github_source 159; F 133; D+D_bucket_enum_deep 60; C 8; A_bucket_payload_firmware 8/4 unique; J 4).
+
+**`vendor_cloud_endpoint_url`** — Vendor-controlled cloud endpoint URL with path component embedding a vendor-recognizable signature (URL-shape superset of CP28 `vendor_document_uuid_cloud_reference`). Confidence ladder:
+
+- 80-90 single-source default
+- 90-97 with binary + CT log + sitemap multi-source corroboration
+
+Empirical Wave I anchor: 419 attestations carrying `vendor_cloud_endpoint_url` in the `candidate_value_class_alternates` field (URL-pattern variant co-extant on hostname).
+
+**`vendor_controlled_hostname_deprecated`** — Vendor-owned hostname previously publicly resolvable, NXDOMAIN-verified deprecated. Retained as historical attribution anchor + supersession-chain pivot. Confidence ladder:
+
+- 80-87 default (NXDOMAIN active-verification at extraction time is dominant evidence)
+
+Empirical Wave I anchor: 568 NXDOMAIN-verified entries from Wave I.6 sub-pass 7 `deprecated_hostname_verified.json classifications.confirmed_deprecated_nxdomain=568`. 565 promoted into canonical identifiers (3 dropped at Phase 2 scrub).
+
+### §2 — Confidence-band ladder (paste-not-cite)
+
+| Value class | Single-source default | Cross-source | Firmware-cert ceiling |
+|---|---|---|---|
+| `vendor_controlled_hostname` | 75-90 | 85-95 | 95-99 |
+| `vendor_cloud_endpoint_url` | 80-90 | 90-97 | — |
+| `vendor_controlled_hostname_deprecated` | 80-87 | — | — |
+
+Marquee Phase 5 anchor: **`hppki.honeywell.com`** promoted at confidence=99 via 4-source independent corroboration (2 Honeywell OTA signing certs from CT40 Android firmware META-INF/com/android/otacert + crt.sh CT log + binary Class A extraction + bucket payload `A_bucket_payload_firmware`). Issuer DN `C=US, O=Honeywell International Inc., OU=ACS, CN=Honeywell CodeSign RSA CA`; cert sha256 `60a8cf8feeb33926366776b395d6c8d9334bd8b42038b85563622ce0a1d0745b`. Strongest possible attribution chain in the framework — firmware-embedded cert + vendor-signed code-signing CA + multi-source-class corroboration.
+
+### §3 — Deferred candidates (2; NOT codified in migration 0024)
+
+**`vendor_asn_prefix`** — Wave I class G extraction; `asn_findings.json total=0`; class G halted with `url_pattern_issue` carry-forward to Wave I-prime. Per conservative ≥1-empirical-evidence gate, codification deferred. Reserved for CP30 / migration 0025 when ASN-prefix observation surfaces (likely Wave I-prime with RDAP url-pattern fix).
+
+**`vendor_controlled_ip`** — Wave I.5 + I.6 + I.7 cert IP-SAN sub-passes returned 0/0/0 IP SANs:
+
+- Wave I.5: crt.sh PEM fetch rate-limited (0/0)
+- Wave I.6: total=0/0
+- Wave I.7 sub-pass 11: partial-killed at hikvision after 0/31 IP SANs surfaced from 31 certs (budget-vs-yield tradeoff)
+
+Deferred until empirical observation surfaces. Reserved for CP30 / migration 0025.
+
+### §4 — Source admissions enabling CP29 (13 new sources, sid range 54-66)
+
+| sid | source_class | first_admitted_in | ratification_band |
+|---|---|---|---|
+| 54 | B (CT log aggregator) | v1.4.0 | primary_registry_adjacent |
+| 55 | K (public archive temporal) | v1.4.0 | community_public_archive |
+| 56 | I (vendor first-party source/README) | v1.4.0 | vendor_published |
+| 57-61 | G (5 RIR RDAP endpoints) | v1.4.0 | primary_registry |
+| 62-64 | J (3 public package registries) | v1.4.0 | vendor_published |
+| 65 | A_bucket_payload (vendor public cloud-storage payload) | v1.4.0 | vendor_published — SAR-13.5 attribution-gate-binding |
+| 66 | A/C/D/F umbrella (Wave I extraction methodology) | v1.4.0 | extraction_methodology_umbrella |
+
+Source_type CHECK enum maps to closest existing 13-value enum; semantic source_class + ratification_band live in `sources.notes` JSON per CP14/CP16 pattern. CP30 candidate for 5 new source_type enum values (certificate_transparency_log, public_archive, vendor_first_party_source_code, public_package_registry, vendor_cloud_storage_payload) deferred to Wave I-prime.
+
+### §5 — Known limitations
+
+- Single-vendor attestation ≠ ceiling promotion. Confidence ceiling of 90 for `vendor_controlled_hostname` single-source unless CP24 cross-source independence holds.
+- §8.3 lift requires CP24 cross-source independence verification. Same-vendor's other binary repackaging ≠ independent source; two GitHub repos in same org ≠ independent.
+- Wave I extraction-time pre-scrub was already extensive (Class B 5% calibration FP rate; Class A 481 fp_dropped of 1,214 surfaced). Cumulative Phase 2 FP-scrub survivor rate of 97.21% reflects extraction-time pre-scrub; carry-forward manual top-50 GitHub-sourced calibration to anchor empirical FP rate post-v1.4.0.
+- `device_category='unknown'` is the default Phase 5 categorization for Wave I cloud-infrastructure hostnames (these are vendor attribution anchors, not device-pairable identifiers per §11 #13). All 12,239 v1.4.0 promotions correctly DROP from Lynceus export at the §11 #13 device-category-unknown gate.
+
+### §11 #11 self-binding satisfied
+
+This CP29 entry is the §11 #11 amendment-log pairing for migration `0024_cp29_vendor_hostname_corpus_value_classes` + SAR-13 entry + SAR-13.5 entry. CP-anchor: migration commit `<TBD-this-cycle>` + [MAC-183](/MAC/issues/MAC-183) child issue ID. Schema version bumps 23 → 24.
+
+═══════════════════════════════════════════════════════════════════════
+
+SAR-13 — Runguide-schema-fabrication discipline (PRAGMA-verify before SQL drafting)
+
+## SAR-13 — Runguide-schema-fabrication discipline
+
+### Codification
+
+SAR-13 codifies the discipline that all runguide / dispatch SQL referencing canonical schema tables MUST be DB-verified at drafting time via `PRAGMA table_info(<table>)` against the live `~/argus/db/argus.db`, OR explicitly marked TBV (to-be-verified) with a §3.0 probe re-disposition required. Schema fabrication caught at integration time forces phase halt + operator review.
+
+### Verification methodology
+
+Before drafting any SQL that touches a canonical table:
+
+1. `PRAGMA table_info(<table>)` against the live DB
+2. Cross-reference EVERY column name + type against `DATA_DICTIONARY.md`
+3. Inspect CREATE TABLE statement via `sqlite_master` for embedded CHECK constraints (PRAGMA table_info does NOT surface CHECKs — separate query required)
+4. If any column name / type / CHECK enum value referenced in SQL does not exist in the live schema: HALT — do NOT fabricate
+
+### Empirical anchor
+
+**Origin** (codified): Wave I §3.0 probe (2026-05-19). Assistant Claude's runguide referenced `manufacturer_id` and `WHERE active=1` against the live `manufacturers` table that has NEITHER (actual id column is `id`; no `active` column exists). Caught pre-execution via the §3.0 probe SAR-12 §S.2 discipline; methodology adapted.
+
+**Recurrence** (v1.4.0 MAC-183 integration): dispatch §0.2 / §10.1 reference `schema_migrations` table; live name is `schema_version` (per migration 0001 convention). Caught pre-SQL-drafting at Phase 0 §0.2 baseline verification. Phase 1 migration 0024 used correct table name.
+
+**Recurrence** (v1.4.0 MAC-183 Phase 6): `deployment_observations.license` is NOT NULL with a CHECK enum (5 values: ODbL-1.0 / CC-BY-NC-SA-4.0 / public-domain / foia / unspecified). Initial Phase 6 multi_tenant_patterns insert used `license='CT_LOG_PUBLIC_OBSERVATIONAL_NON_PII'` (semantic but not enum-compliant); 106-row insert returned 0 errors but 0 rows committed (silent CHECK rejection). Caught post-insert via row-count delta = 0 anomaly investigation. PRAGMA table_info had captured `license TEXT NOT NULL` but NOT the CHECK enum — full schema-statement-via-sqlite_master query is the load-bearing methodology.
+
+### Carry-forward refinement (post-v1.4.0)
+
+The Wave I integration cycle surfaced a sub-rule: **PRAGMA table_info alone is insufficient for SAR-13.** Column types + NOT NULL surface, but CHECK constraints (including CHECK enums) do not. SAR-13 binding methodology MUST include `SELECT sql FROM sqlite_master WHERE type='table' AND name='<table>'` parsing for every CHECK clause that affects insert / update validation.
+
+### §11 #11 self-binding satisfied
+
+This SAR-13 entry is the bible-amendment sibling of CP29 + migration 0024 + SAR-13.5. Anchored at MAC-183 dispatch (Paperclip CEO comment `575aca55-9843-4e1f-811f-e20436e06e12`, 2026-05-20T00:08:31Z) + integration close.
+
+═══════════════════════════════════════════════════════════════════════
+
+SAR-13.5 — Bucket attribution discipline (content-based attribution gate before promotion)
+
+## SAR-13.5 — Bucket attribution discipline
+
+### Codification
+
+SAR-13.5 codifies that bucket discovery via predictable-slug enumeration produces a high FP rate (~57% misattribution observed). Public-bucket promotion (any candidate with `source_class=A_bucket_payload` or `source_class=D_misconfig_bucket`) requires content-based attribution verification BEFORE any acquisition or identifier promotion fires.
+
+### Verification methodology
+
+1. Per-bucket attribution probe: filename semantic match + path structure match + optional DNS CNAME corroboration
+2. Three-state classification per bucket:
+   - **`confirmed`** — content matches vendor; promotion allowed
+   - **`rejected_slug_collision`** — bucket exists but belongs to a different entity; DROP candidate; do NOT acquire
+   - **`ambiguous_operator_review_required`** — content insufficient to attribute; operator review required before promotion
+3. SAR-13.5 gate must be passed at Phase 2 FP-scrub time; candidates from `rejected_slug_collision` or `ambiguous_operator_review_required` buckets are DROPPED at Phase 2 §2.3
+
+### Empirical anchor
+
+**Origin** (codified): Wave I.5 sub-pass 1A surfaced 7 PUBLIC buckets via slug enumeration; Wave I.6 sub-pass 4 content-attribution gate reclassified only 1 as `confirmed` (Honeywell), 3 as `rejected_slug_collision` (e.g., `axon-cdn` belongs to ArtHaus burlesque gallery, NOT Axon), 3 as `ambiguous`. **57% misattribution rate** at slug-discovery time.
+
+### Phase 2 binding (v1.4.0 MAC-183)
+
+Per Phase 2 §2.3, `bucket_attribution_verification.json` was consulted for the cumulative corpus. 0 bucket attribution drops applied — buckets present in I.5/I.6 deltas were already attribution-vetted at sandbox time before flowing into v1.4.0 sandbox outputs. Source `vendor_public_bucket_payload` (sid=65) carries SAR-13.5 attribution-gate-binding in its admission notes; per-row Phase 5 promotion for `source_class=A_bucket_payload_firmware` requires bucket `attribution_status='confirmed'` (Honeywell OTA signing infrastructure confirmed, 3 surviving promotion rows).
+
+### §11 #11 self-binding satisfied
+
+This SAR-13.5 entry is the bible-amendment sibling of CP29 + migration 0024 + SAR-13. Anchored at MAC-183 dispatch + integration close.
+
+═══════════════════════════════════════════════════════════════════════
