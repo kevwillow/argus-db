@@ -1,0 +1,231 @@
+{
+  "dispatch": "MAC-201 \u00a77.5-bis",
+  "methodology": {
+    "within_identifiers_table_lifts": 0,
+    "within_identifiers_table_lifts_note": "All 34 within-identifiers \"cross-references\" are fccid.io-internal (equipment_class codes like DTS/PCB/JBP shared across vendors via same source sid=51). Per CP24, same-source re-extraction is not \u00a78.3 corroboration.",
+    "structural_anchor_lifts_proposed": 14,
+    "lift_formula": "\u00a78.3 = min(99, max(originals) + 5); primary_registry single-source ceiling 85 per CP15",
+    "independence_rationale": "fcc_grantees (sid=7 FCC.gov EAS open-data) is independent of fccid.io (sid=51 third-party scrape) per CP24 cross-source independence test (different collector, different methodology). CP21 strict-reading places sid=7 in primary_registry band (per line 805).",
+    "lift_NOT_auto_applied": "\u00a711 #8 cardinal rule \u2014 Validator proposes, CEO ratifies. Structural-anchor-as-\u00a78.3-corroboration is a methodology question, not auto-promotable."
+  },
+  "lift_candidates": [
+    {
+      "identifier_id": 35682,
+      "grantee_code": "ABY",
+      "manufacturer": "Motorola Solutions",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "ABY",
+        "grantee_name": "Motorola Solutions, Inc.",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35686,
+      "grantee_code": "ABZ",
+      "manufacturer": "Motorola Solutions",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "ABZ",
+        "grantee_name": "Motorola Solutions, Inc.",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35690,
+      "grantee_code": "ARQ",
+      "manufacturer": "Motorola Solutions",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "ARQ",
+        "grantee_name": "Motorola Solutions, Inc.",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35693,
+      "grantee_code": "MKM",
+      "manufacturer": "Motorola Solutions",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "MKM",
+        "grantee_name": "Motorola Solutions, Inc.",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35695,
+      "grantee_code": "N7N",
+      "manufacturer": "Sierra Wireless",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "N7N",
+        "grantee_name": "Sierra Wireless Inc.",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35711,
+      "grantee_code": "EL5",
+      "manufacturer": "Harris",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "EL5",
+        "grantee_name": "Harris Corporation",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35713,
+      "grantee_code": "LL9",
+      "manufacturer": "Sierra Wireless",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "LL9",
+        "grantee_name": "Sierra Wireless Inc",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35718,
+      "grantee_code": "NK7",
+      "manufacturer": "Harris",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "NK7",
+        "grantee_name": "Harris Corporation",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35720,
+      "grantee_code": "PNF",
+      "manufacturer": "Sierra Wireless",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "PNF",
+        "grantee_name": "Sierra Wireless, Inc",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35722,
+      "grantee_code": "QQL",
+      "manufacturer": "Sierra Wireless",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "QQL",
+        "grantee_name": "Sierra Wireless, Inc.",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35723,
+      "grantee_code": "TWV",
+      "manufacturer": "Sierra Wireless",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "TWV",
+        "grantee_name": "Sierra Wireless, Inc.",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35725,
+      "grantee_code": "UXX",
+      "manufacturer": "Cradlepoint",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "UXX",
+        "grantee_name": "Cradlepoint, Inc.",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35731,
+      "grantee_code": "X4G",
+      "manufacturer": "Axon",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "X4G",
+        "grantee_name": "Axon Enterprise, Inc",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    },
+    {
+      "identifier_id": 35737,
+      "grantee_code": "YJV",
+      "manufacturer": "WatchGuard",
+      "current_conf": 75,
+      "fcc_grantees_anchor": {
+        "grantee_code": "YJV",
+        "grantee_name": "Enforcement Video, LLC (d.b.a. WatchGuard Video)",
+        "source_url": "https://opendata.fcc.gov/resource/3b3k-34jp.csv?$limit=200000",
+        "source_id": 7
+      },
+      "proposed_conf": 90,
+      "rationale": "fcc_grantees(sid=7) primary_registry anchor + fccid.io(sid=51) crowdsourced; \u00a78.3 = min(99, max(75, 85)+5) = 90"
+    }
+  ],
+  "no_lift_grantees": [
+    {
+      "identifier_id": 35699,
+      "grantee_code": "2AG",
+      "manufacturer": "Parrot Automotive",
+      "reason": "no fcc_grantees anchor (CP15 \u00a78.3 single-source band holds)"
+    },
+    {
+      "identifier_id": 35704,
+      "grantee_code": "2AH",
+      "manufacturer": "DJI",
+      "reason": "no fcc_grantees anchor (CP15 \u00a78.3 single-source band holds)"
+    },
+    {
+      "identifier_id": 35707,
+      "grantee_code": "2AL",
+      "manufacturer": "Reveal",
+      "reason": "no fcc_grantees anchor (CP15 \u00a78.3 single-source band holds)"
+    }
+  ],
+  "no_lift_equipment_class_count": 41,
+  "no_lift_equipment_class_note": "equipment_class_code values are FCC EAS rule-part labels (47 CFR \u00a7\u00a715/22/90/95 categories). No structured equipment_class_codes table exists in argus to provide a structural anchor. 41 rows stay at conf=75 single-source fccid.io ceiling."
+}

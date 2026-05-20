@@ -1,0 +1,40 @@
+{
+  "dispatch": "MAC-201",
+  "pre": {
+    "identifiers_active": 34968,
+    "raw_observations": 146573
+  },
+  "post": {
+    "identifiers_active": 34968,
+    "raw_observations": 146573
+  },
+  "delta": {
+    "identifiers_active": 0,
+    "raw_observations": 0
+  },
+  "wave_i_14b": {
+    "wave": "Wave I.14b (V2)",
+    "extraction_run_id": 114,
+    "plan_rows": 53,
+    "promoted_grantee": 0,
+    "reused_grantee": 53,
+    "promoted_equip": 0,
+    "reused_equip": 53,
+    "raw_obs_inserted": 0,
+    "arm_routed_count": 0,
+    "halts": 0
+  },
+  "wave_i_14c": {
+    "wave": "Wave I.14c (V3)",
+    "extraction_run_id": 115,
+    "plan_rows": 124,
+    "promoted_grantee": 0,
+    "reused_grantee": 124,
+    "promoted_equip": 0,
+    "reused_equip": 124,
+    "raw_obs_inserted": 0,
+    "arm_routed_count": 19,
+    "halts": 0
+  },
+  "halts": []
+}
