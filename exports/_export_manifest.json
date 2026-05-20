@@ -1,109 +1,98 @@
 {
-  "generated_at_utc": "2026-05-19T02:40:09Z",
-  "generation_dispatch": "MAC-181",
-  "argus_version_pre_bump": "v1.2.0",
-  "argus_version_post_bump_recommended": "v1.3.0",
-  "release_narrative": "Wave H pre-v1 desktop-axis static-analysis integration. The first release in which the vendor-companion-app extraction methodology generalizes from the Wave G Android mobile axis to Windows / macOS / Linux desktop application binaries. 3 real-vendor binaries + 1 FP-control binary processed (Hikvision iVMS-4200 + DJI Assistant 2 Mavic + DJI Assistant 2 FPV + FileZilla H2-disambig control). Net BLE = 0 after CP26 §8 semantic-validation audit; the 4 surviving UUID-shaped values all re-class to one of three new CP28(c) identifier_type values. Migration 0023 extends the identifier_type CHECK enum 48 → 51.",
-  "wave_summary_ref": "extraction_outputs/wave_h_pre_v1/HANDOFF_TO_VALIDATOR.md",
-  "runguide_canonical_path": "android_test/WAVE_H_RUNGUIDE.md",
-  "wrapper_canonical_path": "android_test/tools/extraction/wave_h_wrapper.py",
-  "baseline_canonical_count_pre_mac181": 22549,
-  "canonical_count_post_mac181": 22553,
-  "canonical_count_delta": 4,
-  "sources_pre_mac181": 52,
-  "sources_post_mac181": 53,
-  "sources_delta": 1,
-  "manufacturers_pre_mac181": 49,
-  "manufacturers_post_mac181": 51,
-  "manufacturers_delta": 2,
-  "raw_observations_pre_mac181": 133825,
-  "raw_observations_post_mac181": 133830,
-  "raw_observations_delta": 5,
+  "generated_at_utc": "2026-05-20T00:44:53Z",
+  "generation_dispatch": "MAC-183",
+  "argus_version_pre_bump": "v1.3.0",
+  "argus_version_post_bump_recommended": "v1.4.0",
+  "release_narrative": "Wave I/I.5/I.6/I.7 vendor cloud-infrastructure hostname corpus integration. 4-wave autonomous extraction effort (12,212 main + 26 + 193 + 159 = 12,590 cumulative unique hostnames) integrated via 12+1 source admissions, ~12k raw_observation FK-chained provenance rows, and 12,239 identifier promotions across 51 canonical vendors. Migration 0024 extends the identifier_type CHECK enum 51 \u2192 54 with three CP29 value classes (vendor_controlled_hostname, vendor_cloud_endpoint_url, vendor_controlled_hostname_deprecated). Marquee findings include hppki.honeywell.com promoted at 99 (firmware-cert ceiling via 2 Honeywell OTA signing certs + crt.sh + binary + bucket payload), 565 NXDOMAIN-verified deprecated hostnames, 108 \u00a78.3 cross-source lifts. SAR-13 + SAR-13.5 codified as bible-amendment siblings.",
+  "wave_summary_ref": "argus-internal/wave_i_pre_v1/ (Wave I main + I.5 + I.6 + I.7 sub-passes)",
+  "runguide_canonical_path": "argus-internal/wave_i_pre_v1/runguide.md",
+  "baseline_canonical_count_pre_v1_4_0": 22633,
+  "baseline_active_count_pre_v1_4_0": 22553,
+  "canonical_count_post_v1_4_0": 34872,
+  "active_count_post_v1_4_0": 34792,
+  "canonical_count_delta_total": 12239,
+  "canonical_count_delta_active": 12239,
+  "sources_pre_v1_4_0": 53,
+  "sources_post_v1_4_0": 66,
+  "sources_delta": 13,
+  "manufacturers_pre_v1_4_0": 51,
+  "manufacturers_post_v1_4_0": 51,
+  "manufacturers_aliases_appended": 5,
+  "raw_observations_pre_v1_4_0": 133830,
+  "raw_observations_post_v1_4_0": 146188,
+  "raw_observations_delta": 12358,
+  "deployment_observations_pre_v1_4_0": 116668,
+  "deployment_observations_post_v1_4_0": 116774,
+  "deployment_observations_delta": 106,
   "behavioral_signatures_unchanged": 131,
-  "schema_version_pre_mac181": 22,
-  "schema_version_post_mac181": 23,
+  "schema_version_pre_v1_4_0": 23,
+  "schema_version_post_v1_4_0": 24,
   "schema_migrations_applied": [
-    "0023_identifier_type_check_extension_cp28"
+    "0024_cp29_vendor_hostname_corpus_value_classes"
   ],
   "bible_amendments_applied": [
-    "CP28"
+    "CP29",
+    "SAR-13",
+    "SAR-13.5"
   ],
-  "cp28_resolution": {
-    "cp28_c_ratified_identifier_types": [
-      "windows_installer_productcode_vendor_registered",
-      "windows_com_clsid_vendor_registered",
-      "vendor_document_uuid_cloud_reference"
+  "cp29_resolution": {
+    "cp29_codified_value_classes": [
+      "vendor_controlled_hostname",
+      "vendor_cloud_endpoint_url",
+      "vendor_controlled_hostname_deprecated"
     ],
-    "cp28_a_deferred_source_type": "vendor_application_static_analysis",
-    "cp28_b_deferred_license_posture_sentinel": "sanctioned_vendor_public_distribution_facts_only"
+    "cp29_deferred_value_classes": [
+      "vendor_asn_prefix",
+      "vendor_controlled_ip"
+    ],
+    "cp29_deferred_rationale": "conservative \u22651-evidence gate per Phase 1 \u00a71.1; 0 empirical observations across Wave I/I.5/I.6/I.7 (class G halted url_pattern_issue; cert IP-SAN sub-passes 0/0/0)",
+    "cp29_codified_count": 3,
+    "cp29_deferred_count": 2
+  },
+  "sar_codifications": {
+    "sar_13": "runguide-schema-fabrication discipline (DB-verified PRAGMA before SQL drafting) \u2014 Wave I \u00a73.0 probe origin",
+    "sar_13_5": "bucket attribution discipline (content-based attribution gate before promotion) \u2014 Wave I.5 sub-pass 1A \u2192 Wave I.6 sub-pass 4 origin"
+  },
+  "marquee_findings": {
+    "hppki_honeywell_com_firmware_cert_ceiling": "promoted at conf=99; 4-source corroboration (firmware OTA cert + crt.sh + binary + bucket payload)",
+    "honeywell_ota_signing_cert_chain": "Honeywell CodeSign RSA CA + Honeywell International Inc. issuer (subject_dn=dubai_android_releasekey Code Signing); 2 certs from CT40 Android OTA META-INF/com/android/otacert; sha256=60a8cf8feeb33926366776b395d6c8d9334bd8b42038b85563622ce0a1d0745b",
+    "nxdomain_verified_deprecated_hostnames": "565 (of 568 NXDOMAIN-verified; 3 dropped in Phase 2 scrub) promoted at vendor_controlled_hostname_deprecated confidence=87",
+    "eight_three_lifts_applied": 108,
+    "novel_manufacturer_aliases_appended": [
+      "Autel Intelligent Technology Corp.",
+      "Axis Communications AB",
+      "Meraki LLC",
+      "Getac Technology Corporation",
+      "Jacobs Solutions Inc."
+    ]
+  },
+  "fp_scrub_disposition": {
+    "pre_scrub_unique_hostnames": 12590,
+    "survivors": 12239,
+    "survivor_rate": "97.21%",
+    "gate": "PROCEED but FLAG (>50% threshold; expected per Wave I extraction-time pre-scrub; Class B crt.sh 5% calibration FP rate already-within-tolerance)",
+    "carry_forward": "manual top-50 GitHub-sourced calibration review (dispatch \u00a72.5)"
   },
   "files": {
     "argus_export.json": {
-      "path": "exports/argus_export.json",
       "size_bytes": 85769,
-      "sha256": "6eabb2b792be3d62d68832f71440548a220e8e99c0dd8aa77f3162bdf643e2ee",
-      "description": "Lynceus JSON — confidence ≥30 floor; §4.4 mapping + CP7 geographic_scope filter (default US); operational alert feed",
-      "entry_count": 495
-    },
-    "argus_export_high_confidence.json": {
-      "path": "exports/argus_export_high_confidence.json",
-      "size_bytes": 20948,
-      "sha256": "0a9457cc060caf5f7cc515817b1554310a0b804f35223e1a2ddfd5e0ad05a2eb",
-      "description": "Lynceus JSON — confidence ≥70 floor + source_type ∉ {crowdsourced, inferred} + CP7 strict; recommended default for Lynceus scanner",
-      "entry_count": 114
-    },
-    "argus_export_behavioral_signatures.json": {
-      "path": "exports/argus_export_behavioral_signatures.json",
-      "size_bytes": 55065,
-      "sha256": "2e4b67b84c782661b6587233a3473ac247a66e3118b2167f1423ec68efc10d9e",
-      "description": "Rayhunter JSON — all 131 active behavioral_signatures rows",
-      "entry_count": 55
+      "note": "Lynceus-filtered; Wave I identifiers dropped by \u00a711 #13 device_category=unknown ban (expected)"
     },
     "argus_export.csv": {
-      "path": "exports/argus_export.csv",
-      "size_bytes": 12536268,
-      "sha256": "0a4f1110806ecb3129889c32b516d107d4b43310822ecec158e997f21f12b8f4",
-      "description": "Human-readable rich-import CSV — all 22553 canonical rows (no Lynceus filtering)"
+      "size_bytes": 21066238,
+      "note": "all 34,792 active identifiers including 12,239 Wave I cloud-infra hostnames"
+    },
+    "argus_export_high_confidence.json": {
+      "size_bytes": 20948,
+      "note": "Lynceus-filtered \u226570; same \u00a711 #13 filter applies"
+    },
+    "argus_export_behavioral_signatures.json": {
+      "size_bytes": 55065,
+      "note": "behavioral_signatures unchanged at 131; 55 active records"
     },
     "coverage_report.md": {
-      "path": "exports/coverage_report.md",
-      "size_bytes": 1518134,
-      "sha256": "a6add4138ed16015a59a99e0fb18bc2ba6fc1fc99976029876a63961540bab80",
-      "description": "Coverage matrix + gap analysis + §9 item 9 dropped-from-export tally reconciliation"
+      "size_bytes": 1522058,
+      "note": "regenerated coverage_matrix + drop_tally bins"
     }
-  },
-  "delta_vs_forecast": {
-    "argus_export.json": {
-      "forecast": "0-1 new entries (vendor_document_uuid_cloud_reference is MAP-class)",
-      "actual": "+1 row (DJI f4d4dbf5-... vendor_document_uuid_cloud_reference @ confidence 90; geographic_scope='global' passes CP7 unconditionally)",
-      "reason": "matches forecast upper bound. The 2 Hikvision MSI ProductCodes have device_category='unknown' (per Hikvision manufacturers.primary_category=NULL) so they are dropped to `unknown_category` bin per §11 #13 before reaching the §4.4 DROPPED gate. The DJI windows_com_clsid_vendor_registered row reaches the §4.4 gate and drops to `windows_com_clsid_vendor_registered=1` per CP28(c) DROPPED posture."
-    },
-    "argus_export_high_confidence.json": {
-      "forecast": "0 new entries (band 80-95 makes threshold but geographic_scope filter check)",
-      "actual": "+1 row (DJI f4d4dbf5-... at confidence 90; geographic_scope='global' passes both CP7 strict + §4.4 MAP)",
-      "reason": "delta vs forecast: forecast assumed geographic_scope might be 'unknown' (which fails CP7 strict). The promotion-time geographic_scope set to 'global' (cloud-document UUIDs are global by nature) lets the row pass the high-conf gate. Surfaces 1 new row vs the conservative 0 forecast — not a violation, just a tighter geographic_scope assignment than the forecast assumed."
-    },
-    "argus_export.csv": {
-      "forecast": "+4 new rows (all 4 promoted identifiers)",
-      "actual": "+4 rows (all 4 Wave H promoted identifiers; no Lynceus filtering applied — CSV is the full canonical state)",
-      "reason": "matches forecast exactly ✓"
-    },
-    "argus_export_behavioral_signatures.json": {
-      "forecast": "unchanged (DB total = 131; Wave H adds zero behavioral_signatures)",
-      "actual": "unchanged (131 source rows; 55 emitted)",
-      "reason": "matches forecast exactly ✓"
-    },
-    "manufacturers": {
-      "forecast": "+0 (no new vendors; Wave H processed existing vendors)",
-      "actual": "+2 (Eagle Eye Networks id=220 + Rhombus Systems id=221; stub admissions per MAC-178 P5 precedent for Cohort A absence-investigation findings)",
-      "reason": "delta vs forecast: surfaced 2 new vendors via Cohort A absence-investigation (EEN Viewer = Microsoft Store UWP MSIX, not Electron; Rhombus Console = web-only) that were not yet in the canonical manufacturers lexicon. MAC-178 P5 precedent admits absence-only vendors as stub rows with `notes.admission_basis='documented_absence_only'`. Eagle Eye + Rhombus follow that pattern."
-    }
-  },
-  "post_mac181_section_8_10_backfill": {
-    "dispatch_ref": "MAC-181 §8.10 (D1.a per [MAC-182](/MAC/issues/MAC-182) operator directive 2026-05-19T02:27:53Z)",
-    "description": "Single-row UPDATE on id=23059 setting notes.cloud_url_hostname='duss.djicorp.com'; CP28 §4.1 third bullet half-sentence codifies the metadata-key convention prospectively for all future vendor_document_uuid_cloud_reference promotions.",
-    "rows_modified": 1,
-    "identifier_count_delta_post_§8_9": 0,
-    "export_regen_triggered": true
   }
 }
