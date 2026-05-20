@@ -3431,3 +3431,76 @@ Per Phase 2 §2.3, `bucket_attribution_verification.json` was consulted for the 
 This SAR-13.5 entry is the bible-amendment sibling of CP29 + migration 0024 + SAR-13. Anchored at MAC-183 dispatch + integration close.
 
 ═══════════════════════════════════════════════════════════════════════
+
+SAR-15 — Per-vendor probe-scope discipline (vendor admission basis binds extraction scope)
+
+## SAR-15 — Per-vendor probe-scope discipline
+
+### Codification
+
+SAR-15 codifies that **per-vendor probes during multi-vendor extraction must respect the rationale of the vendor's canonical admission**. A vendor admitted to the canonical lexicon for one specific axis (e.g., MAC-cohort completeness) should NOT be auto-included in extraction passes targeting a different axis (e.g., cloud-infrastructure hostname enumeration) without explicit operator ratification of the cross-axis probe.
+
+### Methodology
+
+Before any multi-vendor extraction pass that iterates over the canonical manufacturers lexicon:
+
+1. **Read the admission basis** for each vendor from `manufacturers.notes` JSON (typical key: `added_via`, e.g., `'MAC-170 P2 (UK CH cycle-1 admission)'`).
+2. **Apply axis-filter**: only include vendors whose admission basis aligns with the extraction's target axis. For surveillance-equipment hostname extraction, this means filtering OUT vendors admitted purely for industrial-MAC-cohort completeness, drone-MAC-cohort fills, or other non-surveillance-axis bases.
+3. **Document the filter** in the extraction runguide §1 / §3.0 probe disposition.
+
+### Empirical anchor
+
+**Origin** (codified post-MAC-183 board feedback, 2026-05-20): Wave I v1.4.0 cumulative extraction probed all 51 canonical vendors uniformly and surfaced **252 corporate-infrastructure hostnames under `matthey.com` apex** (`ace.matthey.com`, `amer-sbc1.matthey.com`, `analyticalservices.matthey.com`, etc.). Johnson Matthey PLC (mfg_id=205) was admitted to canonical lexicon at MAC-170 P2 (2026-05-17) for the **40:f3:85 /28 MA-M sibling MAC cohort completeness**, not for surveillance-axis hostname extraction. The 252 matthey.com hostnames are vendor-controlled per CP29 §1 strict reading but are corporate-IT infrastructure rather than surveillance-axis attribution anchors.
+
+**Disposition (this cycle):** 252 rows preserved in canonical (per §11 #7 audit-trail discipline; no destructive DELETE) but flagged via `identifiers.notes.scope_review_required=true` + `notes.scope_review_reason` + `notes.scope_review_event='mac183_postship_audit_2026_05_20'` to mark them for Wave I-prime / v1.4.1 operator review. Future Wave-X-style multi-vendor passes MUST apply the SAR-15 axis-filter before iterating.
+
+### Carry-forward
+
+- Wave I-prime / v1.4.1 axis-filter implementation in the per-vendor probe loop
+- Operator-decision pass on the 252 JM rows: retain (if matthey.com infra is in-scope for downstream analyses) vs. supersede (if strict surveillance-axis bound applies)
+- Any future canonical-lexicon admission record MUST explicitly state the **admission_axis** (surveillance-equipment / industrial-MAC-cohort / drone-MAC-cohort / etc.) in `manufacturers.notes` JSON for downstream extraction passes to filter against
+
+### §11 #11 self-binding satisfied
+
+This SAR-15 entry is the bible-amendment sibling of the MAC-183 post-ship audit (board comment `ddfb43d2-d87a-4fba-a12d-352b539f79fb`, 2026-05-20T00:54:23Z) + post-ship corrective commit `2d17b0d` + the 252-row JM scope-review-flag UPDATE pass.
+
+═══════════════════════════════════════════════════════════════════════
+
+SAR-15.5 — Validator-role independent close-out audit discipline for large-ship cycles
+
+## SAR-15.5 — Validator-role independent close-out audit discipline
+
+### Codification
+
+SAR-15.5 codifies that **large multi-phase ship cycles (10+ phases or 10k+ identifier promotions) SHOULD include a Validator-role independent close-out audit pass** even when the CEO chooses self-execute routing. The Validator role re-derives empirical anchors from raw sandbox artifacts and cross-checks them against the CEO's outputs to catch lookup-table omissions, schema-fab slips, and miscount errors that single-executor passes miss.
+
+### Methodology
+
+Before declaring a large-ship cycle done:
+
+1. **Spawn a Validator agent** (per the lead-orchestrated phases pattern in CLAUDE.md / `~/argus/agents/`).
+2. **Validator independently re-derives** the cycle's headline empirical anchors from sandbox artifacts (cumulative-unique-host count, per-vendor breakdown, per-source-class breakdown, per-confidence-band breakdown, total raw_observations FK-chain count, novel-manufacturer-alias diff vs canonical lexicon, etc.).
+3. **Validator cross-checks** the CEO-self-executed close report's claims against the independently-derived anchors. Discrepancies of any kind → halt + surface to operator before tag-push.
+4. **Validator's report** is appended to the cycle's `INTEGRATION_FINAL_REPORT.md` as a sibling §A1 section.
+
+### Empirical anchor
+
+**Origin** (codified post-MAC-183 board feedback, 2026-05-20): The MAC-183 v1.4.0 cycle self-executed all 10 phases without a Validator role. The Phase 6 enrichment script omitted `honeywell` from its `VENDOR_KEY_TO_CANON` lookup table (because the I.6 vendor_legal_entity_observations file processed during Phase 6 didn't contain Honeywell — the Honeywell observation came from I.7 firmware certs in a separate file). The CEO's close report incorrectly stated "Honeywell not in canonical 51-vendor lexicon — logged for v1.4.1+ admission" when in fact Honeywell IS canonical (mfg_id=211 with existing aliases). A Validator-role independent re-derive of the manufacturer-alias diff would have cross-checked each observed Subject DN O against the actual canonical lexicon (not just the script's lookup table) and caught the slip pre-tag.
+
+**Disposition (this cycle):** Honeywell alias appended post-ship via corrective commit `2d17b0d`. SAR-15.5 codifies the methodology so the next big-ship cycle (e.g., Wave I-prime / v1.5.0) routes through a Validator close-out audit by default.
+
+### Threshold heuristic
+
+Large-ship cycle threshold for SAR-15.5 application:
+- ≥10 phases OR
+- ≥10,000 identifier-row promotions OR
+- ≥3 net-new sources OR
+- ≥1 new schema migration
+
+If ANY of these thresholds fire, the Validator close-out audit is required.
+
+### §11 #11 self-binding satisfied
+
+This SAR-15.5 entry is the bible-amendment sibling of SAR-15 + the MAC-183 post-ship audit narrative.
+
+═══════════════════════════════════════════════════════════════════════

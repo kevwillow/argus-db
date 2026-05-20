@@ -69,6 +69,8 @@ raw_observations FK-chained:           12,358
 - **CP29** — vendor hostname corpus value_classes (3 codified, 2 deferred)
 - **SAR-13** — runguide-schema-fabrication discipline (PRAGMA-verify all column names + types prior to any SQL drafting against canonical schema)
 - **SAR-13.5** — bucket attribution discipline (content-based attribution gate before any public-bucket-derived promotion; three-state classification: confirmed / rejected_slug_collision / ambiguous_operator_review_required)
+- **SAR-15** *(post-ship codification, board comment 2026-05-20)* — per-vendor probe-scope discipline (per-vendor extraction passes must respect the rationale of the vendor's canonical admission; surfaced by 252 Johnson Matthey corporate-IT hostnames that surfaced from a vendor admitted for industrial-MAC-cohort completeness, not surveillance-axis hostname extraction; 252 rows flagged via `notes.scope_review_required=true` for Wave I-prime / v1.4.1 operator review per SAR-15)
+- **SAR-15.5** *(post-ship codification, board comment 2026-05-20)* — Validator-role independent close-out audit discipline for large-ship cycles (≥10 phases / ≥10k promotions / ≥3 new sources / ≥1 new migration); surfaced by the Honeywell-in-lexicon miss the main self-executed pass missed
 
 ### Lynceus export disposition
 
