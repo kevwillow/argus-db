@@ -190,10 +190,170 @@ This heartbeat captures pre-flight reads only. No `UPDATE`, `INSERT`, `DELETE`, 
 
 ---
 
-## 7. Next-action handoff
+## 7. Next-action handoff (run 1)
 
 - **Status:** MAC-206 → blocked, reassigned to CEO
 - **Unblock owner:** CEO (ratification of β.1 / β.2 / β.3)
 - **Unblock action:** CEO comments on MAC-206 with chosen recovery path; DBArchitect resumes Phase 2 (or files MAC-206a) under that disposition
 - **Bible amendment (Phase 3):** not drafted — gated on Phase 2 execution
 - **Downstream-consumer sweep (Phase 3):** not yet performed — gated on bible-amendment drafting
+
+---
+
+# Run 2 — 2026-05-20 (β.1 ratified, Phase 1.5 scan executed → β.3 fork triggered)
+
+**Status:** HALT @ Phase 1.5 · no mutations issued · MAC-206 → blocked, reassigning to CEO with β.3 fork request
+**Branch:** `v1.4.1-integration-stage-1` @ `b1b0be2`
+**Auth:** CEO ratified β.1 + Phase 1.5 read-only `json_valid(notes)=0` scan (MAC-206 comment 845582bd 2026-05-20T23:38)
+
+## 1.5 Phase 1.5 scan — `json_valid(notes)=0` across `identifiers` / `sources` / `raw_observations`
+
+SQL executed verbatim (read-only, no mutations):
+
+```sql
+SELECT id, COALESCE(source_url,'<n/a>'), length(notes), substr(notes, max(1, length(notes)-120))
+FROM <table>
+WHERE notes IS NOT NULL AND json_valid(notes)=0
+ORDER BY id;
+```
+
+### 1.5.a `identifiers` — 112 defective rows
+
+| shape | count | example id | sample head (≤200c, paste-not-cite) |
+|---|---:|---:|---|
+| `non-json-leading` (plain-text Phase-5 Step-4 follow-on² notes) | 106 | 413 | `Phase-5 Step-4 follow-on² (MAC-44). raw_observations.id=53738. SAR-9 disposition=accept via alias='Motorola Solutions'. candidate_manufacturer (raw)='Motorola Solutions Inc.'. §8.2 inferred 30–70; baseline 50…` |
+| `json-truncated-or-noisy` (JSON + appended text, RAVEN_* services) | 5 | 554 | `{"raven_const_name": "RAVEN_GPS_SERVICE", "sub_band": "60-70 (crowdsourced Tier-3)", …}` then trailing free text `…Cat correction per §11 #1 (no fabrication). Conf 70->75 reflects Wave-A re-confirmation…` |
+| `json-then-pipe-text` (id=539, the original blocker) | 1 | 539 | `{"apk_package": "com.flocksafety.hazyhiwire", "apk_version": "2.4.0", …, "§8.3_boost_pending": "77→82 via B.3.4…"} \| §8.3 corroboration 2026-05-10: …` |
+
+id-range distribution: `[400-499] = 73 rows`, `[500-599] = 39 rows`. All 112 defective ids fall in the early single-digit and low-3-digit id range. Across the carve-out target window `[533,553]`, the **only defective row is id=539** — the other 20 target rows are JSON-clean.
+
+### 1.5.b `sources` — 22 defective rows
+
+| sid | length | head (paste-not-cite, ≤160c) |
+|---:|---:|---|
+| 7  | 1353 | `{"bulk_csv_byte_count": 8241406, "bulk_csv_sha256": "5cd60fbe…", "byte_count": 8241406, "content_sha256": …}` (tail: `…carry regulatory or official band independently per their own provenance.`) — JSON+text concat |
+| 11 |   63 | `Wave-B2 cohort3_hak5_wayback (MAC-20) idempotency verify run 2.` — plain text |
+| 12 |  164 | `Wave-A Phase-4 Step-2 A2 cohort extraction. Hybrid regex+LLM under claude_local. Disambig (…) applied at regex post-filter.` — plain text |
+| 16 |  155 | `Wave-A repo registered 2026-05-11 via wave_a_ingest_to_raw_observations.py per MAC-63 board direction d3d1bbda (Path B). Slug: MaxwellDPS_Flock-You-Android` — plain text |
+| 17 |  149 | (same template) `Slug: judcrandall_lookout.py` |
+| 18 |  156 | (same template) `Slug: tesorrells_RF-Drone-Detection` |
+| 19 |  157 | (same template) `Slug: opendroneid_opendroneid-core-c` |
+| 20 |  154 | (same template) `Slug: colonelpanichacks_flock-you` |
+| 21 |  152 | (same template) `Slug: colonelpanichacks_oui-spy` |
+| 22 |  152 | (same template) `Slug: colonelpanichacks_Sky-Spy` |
+| 23 |  148 | (same template) `Slug: alphafox02_DragonSync` |
+| 24 |  146 | (same template) `Slug: seemoo-lab_AirGuard` |
+| 25 |  155 | (same template) `Slug: opendroneid_receiver-android` |
+| 26 |  158 | (same template) `Slug: opendroneid_wireshark-dissector` |
+| 27 |  164 | (same template) `Slug: cyber-defence-campus_RemoteIDReceiver` |
+| 28 |  146 | (same template) `Slug: proto17_dji_droneid` |
+| 29 |  143 | (same template) `Slug: nixxxo_tagfinder` |
+| 30 |  143 | (same template) `Slug: EFForg_rayhunter` |
+| 31 |  155 | (same template) `Slug: eylonK14_IMSICatcherDetector` |
+| 32 |  150 | (same template) `Slug: CellularPrivacy_AIMSICD` |
+| 33 |  174 | (same template) `Slug: GainSec_Flock-Safety-Trap-Shooter-Sniffer-Alarm` |
+| 34 |  266 | `Bluetooth SIG canonical machine-readable YAML for 16-bit company IDs. Public, no auth. Per CP15 §8.2 primary_registry sub-rule + §11 #8 tightening direct-issuer…` — plain text |
+
+**Shape summary:** 1 `json+text-concat` (sid=7), 21 `plain-text-legacy` (sids 11, 12, 16–34). Neither sid=13 nor sid=14 (the MAC-206 carve-out source rows) is in the defective set — **the carve-out's source-side provenance reads stay clean**.
+
+### 1.5.c `raw_observations` — 52,501 defective rows (35.9% of all rows with notes)
+
+Aggregate: 39,241 on sid=1, 6,956 on sid=3, 6,303 on sid=2, 1 on sid=12. None on sid=13 / sid=14.
+
+Shape: virtually all are postal-address strings (FCC/IEEE registration data) where the `notes` column was populated with raw address text during bulk ingest — e.g.:
+
+```
+rid=52746 sid=1 :: '100 CHEMIN DE BAILLOT MONTAUBAN  FR 82000'
+rid=52728 sid=1 :: 'No.388 Ning Qiao Road,Jin Qiao Pudong Shanghai Shanghai   CN'
+rid=52740 sid=1 :: '7760 France Ave S Suite 340 Bloomington MN US 55438'
+rid=52905 sid=1 :: 'Via Lorenteggio nr. 240 Milan Italy IT 20147'
+```
+
+(Distribution by leading character: ~94 distinct categories, dominant ones are digit-prefixed street numbers and Latin/CJK street-name prefixes — full per-character tally available in `/tmp/phase15_classify.txt`. Not pasted here in full to keep heartbeat human-readable; sample above is representative.)
+
+**Origin:** sids 1, 2, 3 are FCC EAS / IEEE OUI bulk-ingested registration sources where `notes` was populated with `address` field content from the upstream registry, not JSON metadata. This is **structural — the schema's `notes` column has always been used as free-form text on these sources**, not as JSON. The defects predate JSON-extract-based discipline.
+
+Total `raw_observations` rows = 146,573; with `notes IS NOT NULL` = 146,346. So **35.9% of raw_observations.notes is non-JSON by long-standing convention**, not by corruption.
+
+### 1.5.d Carve-out target window status (the only thing the MAC-206 mutation cares about)
+
+| target ids | defective? |
+|---|---|
+| 533–538, 540–553 (20 rows) | clean — JSON-parseable |
+| 539 (1 row) | defective — `json-then-pipe-text` (original blocker, recap from §3) |
+
+The MAC-206 carve-out's 21-row target set is otherwise clean. Only the id=539 repair is in-scope-for-β.1.
+
+## 1.5 Branch decision per CEO ratification rules
+
+CEO branch rules from comment 845582bd:
+
+> - **Only id=539** → execute Phase 1.6 sibling repair, then Phase 2 carve-out as spec'd. One heartbeat.
+> - **id=539 + ≤5 additional rows of the same `{valid JSON} | <plain-text suffix>` shape on `identifiers`** → expand Phase 1.6, then Phase 2.
+> - **>5 defects on `identifiers`, OR varied shapes that don't fit the template, OR any defects on `sources.notes` / `raw_observations.notes`** → HALT, surface, and we'll fork to β.3
+
+**All three β.3 trigger conditions fire:**
+
+- 112 defects on `identifiers` (vastly >5)
+- Varied shapes (`plain-text-legacy` × 106, `json-truncated-or-noisy` × 5, `json-then-pipe-text` × 1)
+- Defects on `sources.notes` (22) AND `raw_observations.notes` (52,501)
+
+→ **HALT. Fork to β.3 per CEO ratification rule.** No mutations issued; MAC-206 remains in clean read-only state.
+
+## 1.5 DBArchitect surface — β.3 framing question for CEO
+
+The scan reveals that **most "defects" are not corruption — they are pre-JSON-convention plain-text notes** that have always been there:
+
+- The 106 `Phase-5 Step-4 follow-on²` notes on identifiers were written as plain-text rationales (MAC-44 era) before the project adopted JSON-as-default for `notes`. Same for the 21 `Wave-A repo registered…` plain-text notes on sources (MAC-63 era) and effectively all of the 52,501 address strings on raw_observations sids 1/2/3 (FCC/IEEE bulk-ingest era).
+- The only **true JSON corruption** — i.e., a row that was *intended* to carry structured JSON but ended up structurally broken — is id=539 (JSON-then-pipe-text concat) and the 5 RAVEN_* ids 554–558 (JSON-then-appended-text concat, similar shape). Plus possibly sid=7 (JSON-then-appended-text on sources).
+
+**The β.3 fork is therefore not "repair 52,635 rows" — it is "decide whether the bible §11 invariant is supposed to apply to legacy plain-text notes at all, and if so, how much DB-wide repair work the v1.4.1 Stage 1 cycle is willing to absorb."**
+
+Three sub-options for β.3 disposition (DBArchitect recommends β.3c):
+
+### β.3a — full DB-wide JSON-repair sweep before MAC-206 proceeds
+
+Scope: convert all 52,635 non-JSON `notes` blobs to JSON-clean form (either by wrapping plain text as `{"legacy_text_note": "..."}` or by a per-table convention). This is a **massive** undertaking: 52,501 raw_observations row UPDATEs, 106 identifiers wrapping operations, 21 sources wrapping operations, plus shape-classification work on the 6 likely-corruption rows (id=539, ids=554-558, sid=7).
+
+Pros: makes bible §11 JSON-extract invariant globally true.
+Cons: 52k+ row mutations on v1.4.1 Stage 1 is well outside the carve-out's scope; backup discipline non-trivial; downstream-consumer audit becomes a giant exercise; risks blocking v1.4.1 Stage 1 release for the duration.
+
+### β.3b — repair only the 6 likely-corruption rows; accept legacy plain-text on the rest
+
+Scope: repair id=539 + ids=554-558 (6 identifier rows) + sid=7 (1 source row). The 52,628 legacy plain-text rows are documented as "always-plain-text by convention" and the bible invariant is **read as not applying to them** (no change to bible language; reader's job to understand which rows the invariant targets).
+
+Then resume MAC-206 carve-out on the 21 target rows as planned in β.1, since id=539 will be repaired as part of this step.
+
+Pros: surgical; preserves MAC-206 sequencing; addresses only true corruption; keeps v1.4.1 Stage 1 release-able.
+Cons: leaves the global-vs-scoped invariant question implicit; future readers might re-discover the 52k legacy rows and re-trigger this debate.
+
+### β.3c — repair only id=539 (β.1 scope) + explicit bible amendment scoping the invariant to "rows that carry structured JSON metadata"
+
+Scope: repair id=539 only (β.1 as originally ratified). Bible §11 amendment includes an explicit scoping clause: *"The audit invariant applies to identifiers rows whose `notes` carries structured JSON metadata. Legacy plain-text `notes` (pre-JSON-convention rows, primarily Phase-5 Step-4 follow-on² rationales and Wave-A repo-registration notes) are out of scope; the invariant does not require their backfill."* Defer the 5 RAVEN_* + sid=7 + raw_observations repair work to a separate data-integrity initiative (e.g., a CP33 candidate or a v1.4.2 hygiene cycle).
+
+Pros: cleanest discipline — explicit scoping in the bible rather than implicit reader-convention; minimum mutation footprint (1 row); MAC-206 ships under its original scope; the 5 RAVEN_* + sid=7 rows become a separately-scoped follow-up issue with their own audit trail; v1.4.1 Stage 1 unblocked.
+Cons: introduces an "applicability scope" clause to the bible invariant — but per [[feedback_bible_amendment_downstream_consumer_audit|S.6.1/S.7/S.8 amendment-ratification gate]] discipline, this is exactly the kind of scoping the downstream-consumer sweep is supposed to surface anyway, and it makes the existing legacy plain-text reality first-class.
+
+**DBArchitect recommendation: β.3c.** The 52k+ raw_observations addresses are not "corruption" — they are a different schema convention from a different era. Forcing them through JSON repair is a category error. The bible amendment should acknowledge that the JSON-structured-notes invariant applies to rows that opt into the JSON convention, not to all rows globally. β.3c also keeps MAC-206 sized correctly and v1.4.1 Stage 1 unblocked.
+
+If CEO disagrees and wants β.3b (the additional 6 likely-corruption-row repair) bundled into MAC-206, DBArchitect can execute that in the next heartbeat under the same backup; the audit per-row is small and the RAVEN_* repair template is the same as id=539's (`json_set` to add a recovered-suffix key with a dated phrase). Not the recommended path because it widens MAC-206 scope beyond carve-out, but cheaper than β.3a by orders of magnitude.
+
+## 1.5 Audit-surface choice (disclosed but moot under HALT)
+
+`sqlite_master` scan for audit/sweep/event/log tables returns only `source_reclassifications` — which the issue spec already says is the wrong table for this work (it's for source-class changes, not identifier-notes enrichment). **No existing cumulative audit table with a `sweep_event_id` column exists in the v1.4.1 Stage 1 DB.**
+
+Per CEO guidance "prefer additive over net-new table this late in the cycle," the canonical surface for the carve-out + repair audit trail under β.1 (or any branch that proceeds with mutations) is **the per-row `notes` payload itself** — each mutated row gets a new JSON-keyed audit fragment with the `sweep_event_id`, mutation timestamp, ratification ref, and rationale. This satisfies "audit-append-don't-mutate" (§11 #7) without a schema change.
+
+This choice is moot under the current HALT (no mutations to audit), but DBArchitect discloses it so the next heartbeat doesn't relitigate the surface choice if CEO ratifies β.3b/β.3c.
+
+## 1.5 Non-mutation attestation (run 2)
+
+Phase 1.5 was read-only (`SELECT … FROM identifiers/sources/raw_observations WHERE json_valid(notes)=0`). No `UPDATE`/`INSERT`/`DELETE`/migration was issued. No DB backup taken (none required — no mutations). `git status` confirms only this heartbeat file `_phase_10_schema_anomaly/carve_out_execution.md` is staged-for-modification this run.
+
+## 1.5 Next-action handoff (run 2)
+
+- **Status:** MAC-206 → blocked (re-blocked at Phase 1.5), reassigning to CEO
+- **Unblock owner:** CEO (β.3a / β.3b / β.3c ratification)
+- **Unblock action:** CEO comments on MAC-206 with chosen β.3 sub-disposition; DBArchitect resumes execution under that scope
+- **DBArchitect recommendation:** β.3c — repair id=539 only, add explicit applicability-scoping clause to the bible §11 amendment, defer 5 RAVEN_* + sid=7 to a separate hygiene initiative
+- **Bible amendment (Phase 3):** drafting deferred until β.3 disposition lands (because the applicability-scoping clause is the key open question)
