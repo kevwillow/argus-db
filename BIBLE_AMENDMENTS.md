@@ -3764,3 +3764,83 @@ The bible text edit at §11 #17 has already been applied to `PROJECT_BIBLE.md` o
 This entry IS the §11 #11 pairing for the bible §11 #17 edit. The git commit applying both the bible edit and this entry is recorded above (commit hash filled in when committed). No undocumented amendment.
 
 ═══════════════════════════════════════════════════════════════════════
+
+
+## CP32 Candidate #7 (pending CP32 bundle landing) — Dispatch plan-input sandbox-absence HALT-fast-path default
+
+**Date:** 2026-05-21
+**Branch:** `v1.4.1-integration-stage-1` (will land on `main` when CP32 bundle ships; entry is candidate-state until then)
+**Commit:** *(this entry lands with the MAC-207 close-out commit on v1.4.1-integration-stage-1)*
+**Source:** [MAC-207](/MAC/issues/MAC-207) Phase 11 HALT — plan-input JSON sandbox-absence; ratified at [MAC-207 comment c4ec8740](/MAC/issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) 2026-05-21 (CEO ratification of Option A single-cycle all-73 DROP close).
+**Status:** **Candidate** — landing pending CP32 bundle close; this entry sits as candidate #7 alongside [MAC-206](/MAC/issues/MAC-206) candidate #6 and the 5 prior candidates anchored to [MAC-197 CP31](/MAC/issues/MAC-197).
+**Ratifying CEO comment:** [MAC-207#c4ec8740](/MAC/issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) — Option A approved (verbatim language ratified).
+**Companion precedent:** [MAC-200](/MAC/issues/MAC-200) heartbeat §9.2.c (commit `518bbcd`) — first surfacing of the same `~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/` sandbox-absence; CP32 candidate #7 codifies the discipline pattern that MAC-200 already exercised informally.
+
+### §1 — Ratified amendment language (CEO verbatim, MAC-207#c4ec8740)
+
+> **Dispatch plan-input sandbox-absence:** when a Stage 1 phase plan-input lives in a cleaned `~/argus-internal/` (or analogous workspace-only) sandbox and was not snapshotted to a versioned location at dispatch time, the phase's HALT-fast-path becomes the default disposition (assuming the dispatch body anticipates this case with an explicit fast-path clause). The sandbox-clean condition is a discoverable precondition during pre-flight, not a mid-flight surprise; ratification can happen at HALT-comment time without per-record evidence enumeration. Forward-looking sub-rule: future dispatches that depend on `~/argus-internal/`-resident plan-inputs **SHOULD** specify a snapshot path under a versioned location (the argus repo) at dispatch time, with a fallback fast-path clause when the snapshot was not captured.
+
+### §2 — Triggering event (paste-not-cite)
+
+MAC-207 dispatch §11.1 plan-input path: `~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/fp_review_queue_wave_i_13_kept_for_ceo_disposition.json` (73 records expected).
+
+Filesystem state at MAC-207 pre-flight (2026-05-20):
+
+```text
+$ ls -la ~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/fp_review_queue_wave_i_13_kept_for_ceo_disposition.json
+ls: cannot access ... : No such file or directory
+
+$ ls -la /home/kev/argus-internal/wave_i_pre_v1/
+ls: cannot access '/home/kev/argus-internal/wave_i_pre_v1/': No such file or directory
+
+$ find /home/kev -maxdepth 6 -iname "*fp_review_queue*"            : (0 hits)
+$ find /home/kev -maxdepth 7 -type d -iname "wave_i_13*"           : (0 hits)
+$ find /home/kev -maxdepth 7 -type d -iname "wave_i_pre*"          : (0 hits)
+```
+
+Entire parent sandbox absent. Halt criterion #1 (verbatim from MAC-207 issue body: *"Plan-input JSON malformed or row count ≠ 73"*) fired in its strongest form. §11 #1 (no fabrication) blocked Validator from enumerating 73 records not on disk.
+
+### §3 — Why HALT-fast-path was the correct default (CEO 5-fold reasoning, ratified verbatim)
+
+1. **Wave I.13 DOUBLE-FALSIFICATION methodology** already established all 73 as DROP-default per dispatch §11.2 (sub-pass 41+42 + sub-pass 44).
+2. **Per-record JSON unavailable** — sandbox absent per `ls`+`find` paste-not-cite; §11 #1 blocks enumeration of records not on disk.
+3. **DROPs are log-only** — records were never promoted to `identifiers`, so canonical DB state is not mutated. Schema_version=25, identifiers active=34,968, sources=71, manufacturers=52 all unchanged after Option A.
+4. **§11 #7 (audit-append-don't-mutate)** + **§11 #8 (corroboration independence)** are not engaged (no canonical row touched).
+5. **MAC-207 issue body fast-path explicitly authorises** the single-cycle close when all 73 → DROP (verbatim: *"If all 73 → DROP (most likely outcome per memory + dispatch §11.2), single-cycle close: Validator surveys → CEO confirms all-DROP → Validator logs only (no canonical mutation) → done."*).
+
+Options B (re-extract from Wave I.7/I.8 firmware) and C (defer to v1.5.0) were rejected by CEO:
+
+- **B rejected** — multi-issue +3-5 day detour to regenerate a candidate list whose §11.2 default is already DROP. No information value; pure delay of Stage 1 ship-prep.
+- **C rejected** — cancelling MAC-207 with a v1.5.0 carry-forward leaves Wave I.13 fp_review_queue in an indeterminate "is this still 73 or some other count" state through v1.4.1 → v1.5.0; cleaner to close under Stage 1 as ratified DROP.
+
+### §4 — Forward-looking sub-rule (operational binding for future dispatches)
+
+Future Stage 1+ phase dispatches whose plan-input lives in `~/argus-internal/` (or analogous workspace-only sandbox path) **SHOULD**:
+
+1. **Specify a snapshot path under a versioned location** (the argus repo) at dispatch time — e.g., `~/argus/_phase_N_<topic>/inputs/<filename>.json` — so the input is committed alongside the phase code.
+2. **Include an explicit fallback fast-path clause** in the dispatch body for the case where the snapshot was not captured (analogous to MAC-207 §11.2's *"all 73 → DROP single-cycle close"* clause).
+
+Pre-flight discipline: dispatches lacking either provision will surface the sandbox-absence as a HARD HALT without a fast-path default, forcing a full re-dispatch cycle rather than a clean ratification.
+
+This sub-rule is **operational guidance**, not a hard CHECK constraint — enforcement is at dispatch-authorship time (dispatcher discipline), not at schema-validation time.
+
+### §5 — Architectural firsts (this candidate)
+
+1. **First codified HALT-fast-path discipline pattern** in the framework — prior precedent (MAC-200 §9.2.c) exercised the pattern informally; CP32 candidate #7 elevates it to a named discipline rule.
+2. **First explicit pre-flight precondition class** that warrants ratification-at-HALT-comment-time rather than full survey enumeration (the sandbox-clean condition is a discoverable precondition, distinct from mid-flight evidence-quality halts).
+3. **First forward-looking sub-rule binding dispatch authorship** (rather than runtime enforcement) — establishes that dispatcher-side discipline is itself an amendment-log-relevant pattern.
+
+### §6 — Cross-references
+
+- MAC-207 Phase 11 heartbeat: `_phase_11_fp_review_queue/heartbeat.md` (this same commit).
+- MAC-200 Phase 9 precedent: `_phase_9_wave_i_13_carry_forward/heartbeat.md` §9.2.c (commit `518bbcd`) — same sandbox surfaced as cleaned/unavailable.
+- MAC-203 Deferral Note 1 (this file, above §44.3 Honeywell entry) — same sandbox surfaced as unavailable; ratified as Path 1 intentional scope narrowing.
+- MAC-206 CP32 candidate #6 (this file, above) — companion candidate landed under the same v1.4.1 Stage 1 integration tree.
+
+### §7 — §11 #11 self-binding satisfied
+
+This entry IS the §11 #11 pairing for the MAC-207 HALT-fast-path ratification. The git commit applying this entry alongside the MAC-207 heartbeat close-out is recorded above (commit hash filled in when committed). No bible text edit was required (the rule lives only in BIBLE_AMENDMENTS.md as a candidate pending CP32 bundle close); no migration was applied; no DB write was made. Schema_version unchanged at 25.
+
+Branch: `v1.4.1-integration-stage-1` (MAC-207 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
+
+═══════════════════════════════════════════════════════════════════════
