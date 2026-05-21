@@ -85,12 +85,8 @@ extraction_outputs/**/*.pre_*_backup
 # Delete locally once push to remote is verified.
 .git.pre-filter-backup/
 
-# Phase 2 historical audit scratch (cycle-trail gap from MAC-186; tracking separately if board pivots)
-_phase_2_github_fp_calibration/
-
 # Agent control state (per-instance, do not commit)
 .claude-flow/
-_numerex_admission/.claude-flow/
 
 # DB phase backup snapshots (extends existing db/*.db rule for *_backup-suffixed files)
 db/*_backup*
