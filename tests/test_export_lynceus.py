@@ -99,52 +99,67 @@ def _row(**kw) -> ActiveRow:
 # ────────────────────────────────────────────────────────────────────────────
 
 
-def test_type_mapping_covers_every_identifier_type() -> None:
-    # Post-MAC-117 (migration 0019): dispositions are split across
-    # IDENTIFIER_TYPE_TO_PATTERN_TYPE (15 MAP cases) + DROPPED_REASONS (12
-    # CP16 DROPPED cases + 14 MAC-109 mig-0018 DROPPED cases + 7 MAC-117
-    # mig-0019 DROPPED cases = 33). Union must equal the full post-mig-0019
-    # identifier_type enum (48 cumulative values per migration 0019).
-    expected = {
-        # Pre-CP13 (migration 0001)
-        "oui", "mac", "mac_range", "bssid",
-        "ssid_exact", "ssid_pattern",
-        "ble_uuid", "ble_service",
-        "device_fingerprint",
-        # CP13 (migration 0009) — Wave G analytical-only types
-        "ble_local_name", "ble_characteristic", "product_family_codename",
-        # CP14 (migration 0011) — G-3 BLE SIG manufacturer IDs
-        "ble_manufacturer_id",
-        # CP14 (migration 0013) — Drone-RID + proprietary-protocol cluster
-        "drone_id_prefix", "icao_24bit_address",
-        "rf_channel", "burst_cadence_ms", "bandwidth_mhz",
-        "device_class_id", "rf_burst_duration", "rf_protocol_constant",
-        "wifi_aware_service_name",
-        "wifi_ie_element_id", "bluetooth_le_pdu_type",
-        "wifi_frame_control_subtype", "wifi_nan_param_signature",
-        # CP14 (migration 0014) — surveillance metadata
-        "alpr_model",
-        # MAC-109 (migration 0018) — SAR-13 §S.3 vendor-anchored /
-        # device-naming cluster (14 net-new). All DROPPED-class by default
-        # pending §4.4 MAP ratification (MAC-110 §E architectural firsts).
-        "ble_protocol_byte_table", "ble_service_uuid", "ble_company_id",
-        "frequency_band", "ble_protocol_byte", "operator_profile",
-        "x509_cert_sha256_prefix", "ble_adv_interval", "ble_payload_offset",
-        "firmware_sha256_hash", "network_endpoint",
-        "firmware_image_variant", "qualcomm_chip_format_id",
-        "firmware_branded_string",
-        # MAC-117 (migration 0019) — round-2 vocab extension (7 net-new) per
-        # SAR-13 §S.3 routing slate (A). All DROPPED-class by default
-        # pending §4.4 MAP ratification at next CP21 round.
-        "asdstan_message_type", "asdstan_enum_value",
-        "dji_protocol_struct_format", "gpt_partition_uuid",
-        "chipset_codename", "firmware_build_string", "firmware_build_uuid",
-    }
-    assert (
-        set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()) | set(DROPPED_REASONS.keys())
-        == expected
+def _get_identifier_type_enum(db_path: str) -> frozenset[str]:
+    """Read the live `identifier_type` CHECK enum from sqlite_master.
+
+    CP32 §3 refactor: replaces the hardcoded mig-0019 48-value `expected` set
+    so that future identifier_type CHECK extensions (CP29/CP31/...) are
+    enforced against the live DB schema without per-migration test drift.
+
+    Strips SQL line comments (`--`...) and splits on commas, then strips
+    quotes. Returns a frozenset of identifier_type literal values.
+    """
+    import re
+    import sqlite3
+
+    con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    try:
+        sql = con.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='identifiers'"
+        ).fetchone()[0]
+    finally:
+        con.close()
+    match = re.search(
+        r"identifier_type\s+TEXT[^,]*CHECK\s*\(\s*identifier_type\s+IN\s*\((.*?)\)\s*\)",
+        sql,
+        re.S,
     )
-    # CP16 split-structure invariant — no key overlap between MAP dict and
+    assert match is not None, "could not locate identifier_type CHECK enum in sqlite_master"
+    cleaned = re.sub(r"--[^\n]*", "", match.group(1))
+    return frozenset(
+        v.strip().strip("'\"")
+        for v in cleaned.split(",")
+        if v.strip().strip("'\"")
+    )
+
+
+def test_type_mapping_covers_every_identifier_type() -> None:
+    """CP32 §3 (MAC-220): dynamic enum read replaces hardcoded mig-0019 baseline.
+
+    Every value in the live `identifiers.identifier_type` CHECK enum must
+    have a §4.4 disposition surface — either MAP (in IDENTIFIER_TYPE_TO_PATTERN_TYPE)
+    or DROPPED (in DROPPED_REASONS). Test asserts:
+
+    1.  Union of the two dicts ⊇ live enum (no missing dispositions).
+    2.  Split-structure invariant: no key overlaps between MAP and DROPPED
+        (every type has exactly one disposition surface).
+
+    The dynamic enum read removes the per-migration test-drift mode that
+    let CP20 (mig 0018), CP28 (mig 0023), CP29 (mig 0024), and CP31 (mig
+    0025) silently bypass §4.4 disposition discipline.
+    """
+    repo_root = Path(__file__).resolve().parent.parent
+    db_path = str(repo_root / "db" / "argus.db")
+    enum_vals = _get_identifier_type_enum(db_path)
+    disposition_keys = set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys()) | set(
+        DROPPED_REASONS.keys()
+    )
+    missing = enum_vals - disposition_keys
+    assert not missing, (
+        f"§4.4 disposition surfaces missing identifier_type entries: {sorted(missing)}; "
+        f"add to either IDENTIFIER_TYPE_TO_PATTERN_TYPE (MAP) or DROPPED_REASONS (DROPPED)"
+    )
+    # Split-structure invariant — no key overlap between MAP dict and
     # DROPPED_REASONS (every type has exactly one disposition surface).
     assert (
         set(IDENTIFIER_TYPE_TO_PATTERN_TYPE.keys())

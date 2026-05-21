@@ -180,6 +180,18 @@ DROPPED_REASONS: dict[str, str] = {
     # gate at export_lynceus.py::_reconcile requires byte-identical parity.
     "windows_installer_productcode_vendor_registered": "windows_installer_productcode_vendor_registered",
     "windows_com_clsid_vendor_registered": "windows_com_clsid_vendor_registered",
+    # CP29 (migration 0024) — Wave I/I.5/I.6/I.7 vendor cloud-infrastructure
+    # hostname corpus (3 net-new identifier_types). Default DROPPED-class
+    # pending §4.4 MAP ratification at next CP21 round. Mirrors
+    # export_lynceus.py::DROPPED_REASONS verbatim.
+    "vendor_controlled_hostname": "vendor_controlled_hostname",
+    "vendor_cloud_endpoint_url": "vendor_cloud_endpoint_url",
+    "vendor_controlled_hostname_deprecated": "vendor_controlled_hostname_deprecated",
+    # CP31 (migration 0025) — FCC EAS identifier-type cluster (2 net-new
+    # identifier_types). Default DROPPED-class. Mirrors export_lynceus.py::
+    # DROPPED_REASONS verbatim.
+    "fcc_grantee_code": "fcc_grantee_code",
+    "equipment_class_code": "equipment_class_code",
 }
 
 # §8.2 confidence-band ceilings — annotation reference only (no mutations).

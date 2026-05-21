@@ -179,6 +179,29 @@ DROPPED_REASONS: dict[str, str] = {
     # IDENTIFIER_TYPE_TO_PATTERN_TYPE above per CP28(c) §4.4 posture.
     "windows_installer_productcode_vendor_registered": "windows_installer_productcode_vendor_registered",  # Install/registry context only; low passive-scan utility
     "windows_com_clsid_vendor_registered": "windows_com_clsid_vendor_registered",  # Install/registry context only; low passive-scan utility
+    # CP29 (migration 0024) — Wave I/I.5/I.6/I.7 vendor cloud-infrastructure
+    # hostname corpus (3 net-new identifier_types). Default DROPPED-class
+    # pending §4.4 MAP ratification at next CP21 round. Mirrors the §4.4
+    # CP28(c) sibling MAP precedent (`vendor_document_uuid_cloud_reference`)
+    # which is the only currently-promoted cloud-hostname identifier_type;
+    # the CP29 corpus types remain DROPPED-class until per-type MAP
+    # ratification lifts them individually. All current live rows carry
+    # `device_category='unknown'` and tally via the §11 #13 carve-out;
+    # adding them to DROPPED_REASONS aligns §4.4 disposition discipline
+    # without changing live row classifications.
+    "vendor_controlled_hostname": "vendor_controlled_hostname",  # Vendor cloud-hostname corpus; Lynceus-side scanner work item to add cloud-hostname pattern_type
+    "vendor_cloud_endpoint_url": "vendor_cloud_endpoint_url",  # Cloud endpoint URL — out-of-band IP/DNS; not RF-broadcast pattern
+    "vendor_controlled_hostname_deprecated": "vendor_controlled_hostname_deprecated",  # Deprecated vendor hostname — carried for audit, not in match table
+    # CP31 (migration 0025) — FCC EAS identifier-type cluster (2 net-new
+    # identifier_types). Default DROPPED-class — FCC grantee/equipment-class
+    # codes are regulatory entity IDs, not RF-broadcast wire-pattern values
+    # observable by Lynceus's passive scanners. Promoting them would require
+    # a Lynceus-side scanner pathway that doesn't exist (FCC IDs are vendor-
+    # registration metadata, not on-air broadcast strings). All current live
+    # rows carry `device_category='unknown'` and tally via the §11 #13
+    # carve-out.
+    "fcc_grantee_code": "fcc_grantee_code",  # FCC EAS grantee code — regulatory entity ID; not RF-broadcast wire pattern
+    "equipment_class_code": "equipment_class_code",  # FCC EAS equipment-class code — regulatory ID; not RF-broadcast wire pattern
 }
 
 # §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
@@ -832,6 +855,15 @@ def _build_export(
         # IDENTIFIER_TYPE_TO_PATTERN_TYPE; it doesn't need a bin here.
         "windows_installer_productcode_vendor_registered": 0,
         "windows_com_clsid_vendor_registered": 0,
+        # CP29 (migration 0024) — Wave I vendor cloud-infrastructure hostname
+        # corpus (3 net-new). See DROPPED_REASONS for rationale.
+        "vendor_controlled_hostname": 0,
+        "vendor_cloud_endpoint_url": 0,
+        "vendor_controlled_hostname_deprecated": 0,
+        # CP31 (migration 0025) — FCC EAS identifier-type cluster (2 net-new).
+        # See DROPPED_REASONS for rationale.
+        "fcc_grantee_code": 0,
+        "equipment_class_code": 0,
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,
