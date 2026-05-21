@@ -1,17 +1,24 @@
 {
   "_meta": {
-    "argus_version": "24",
-    "exported_at": "2026-05-20T00:44:06Z",
-    "record_count": 55,
+    "argus_version": "25",
+    "exported_at": "2026-05-21T01:00:37Z",
+    "record_count": 125,
     "confidence_threshold": 70,
-    "argus_run_id": "ad6aacfa-5980-555b-b11b-5d0e5d894771",
-    "source_record_count": 131,
+    "argus_run_id": "28e57d53-32e6-5026-9a04-267feaafcd82",
+    "source_record_count": 201,
     "dropped_in_export": {
       "below_confidence_threshold": 76,
       "unknown_category": 0
     }
   },
   "entries": [
+    {
+      "signature_name": "BSIG-2026-05-11-AIRGUARD-ANTISTALKING-N-LOCATIONS-T-MINUTES",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "000c38a3476d0e2b"
+    },
     {
       "signature_name": "5G NSA inherits 4G LTE IMSI-exposing-message catalog (via TS 137.340)",
       "cellular_generation": "5G_NSA",
@@ -24,6 +31,34 @@
       },
       "confidence": 80,
       "argus_record_id": "043d3a1aa5a5c4f3"
+    },
+    {
+      "signature_name": "wappush_silent_sms_received",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "06b51e2c85c46134"
+    },
+    {
+      "signature_name": "description='DJI Encrypted (O4)'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "09be8fda5336df26"
+    },
+    {
+      "signature_name": "description='DJI Mini 5 (O4)'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "0db8a08816e3f797"
+    },
+    {
+      "signature_name": "imsi_format_validation",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "10dc90c739ea9d40"
     },
     {
       "signature_name": "Diagnostic detector for IMSI-exposing NAS messages (Marlin paper catalog)",
@@ -61,6 +96,20 @@
       },
       "confidence": 80,
       "argus_record_id": "142ff632d439c955"
+    },
+    {
+      "signature_name": "0x2C7C:0x0125",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "15909bf528c04f64"
+    },
+    {
+      "signature_name": "2429.5 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "178a49d475318c46"
     },
     {
       "signature_name": "Attach Reject Cause #35",
@@ -111,6 +160,13 @@
       "argus_record_id": "20edc8acbf0e3b43"
     },
     {
+      "signature_name": "SIB1 fixture analyzer (CID/TAC/MCC/MNC display)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "2178745c7437330c"
+    },
+    {
       "signature_name": "Detach Request (Type='re-attach not required') Cause #7",
       "cellular_generation": null,
       "threshold_json": {
@@ -142,6 +198,20 @@
       },
       "confidence": 80,
       "argus_record_id": "22b17127d189c356"
+    },
+    {
+      "signature_name": "cell_id_not_in_OCID_db",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "232be2f729a5df9f"
+    },
+    {
+      "signature_name": "id_type='Serial Number (ANSI/CTA-2063-A)'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "250bd9442dcd095b"
     },
     {
       "signature_name": "Attach Reject Cause #6",
@@ -210,6 +280,13 @@
       "argus_record_id": "299e3499e302720a"
     },
     {
+      "signature_name": "2444.5 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "2a1763effdf5800c"
+    },
+    {
       "signature_name": "Detach Request (Type='re-attach not required') Cause #14",
       "cellular_generation": null,
       "threshold_json": {
@@ -241,6 +318,13 @@
       },
       "confidence": 80,
       "argus_record_id": "2a671b20bfec786d"
+    },
+    {
+      "signature_name": "Connection Release/Redirected Carrier 2G Downgrade",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "2ea44664a5a2383b"
     },
     {
       "signature_name": "Location Updating Reject Cause #13",
@@ -289,6 +373,27 @@
       },
       "confidence": 80,
       "argus_record_id": "351ded24bbbca240"
+    },
+    {
+      "signature_name": "adsb_icao_24bit_hex_uppercase",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "3637a92118a779f3"
+    },
+    {
+      "signature_name": "0x05c6:0xf622",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "3703fb7d211f0c1e"
+    },
+    {
+      "signature_name": "description='DJI O4 (Decrypted)'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "371656375157d6e1"
     },
     {
       "signature_name": "Service Reject Cause #11",
@@ -348,6 +453,13 @@
       "argus_record_id": "3999bd67242f33f2"
     },
     {
+      "signature_name": "mysterious_signal_strength_deviation",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "3b5ce2c793c283cb"
+    },
+    {
       "signature_name": "Attach Reject Cause #15",
       "cellular_generation": null,
       "threshold_json": {
@@ -379,6 +491,13 @@
       },
       "confidence": 80,
       "argus_record_id": "3dcbdc24f04c5b73"
+    },
+    {
+      "signature_name": "Qualcomm /dev/diag OTA capture pre-requisite",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "3e03eb3121e8171f"
     },
     {
       "signature_name": "Identity Request",
@@ -420,6 +539,62 @@
       "argus_record_id": "3e990879d6883988"
     },
     {
+      "signature_name": "600 ms",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "40a317f898949285"
+    },
+    {
+      "signature_name": "5776.5 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "423891772bd62174"
+    },
+    {
+      "signature_name": "LTE SIB6/7 Downgrade (T7)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "4342cf502299bcc0"
+    },
+    {
+      "signature_name": "TP-Link M7350 / M7310 (Rayhunter-supported detectors)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "441685b401151efb"
+    },
+    {
+      "signature_name": "5796.5 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "454874cbe180e3ea"
+    },
+    {
+      "signature_name": "DroneID_state_info_bitfield",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 90,
+      "argus_record_id": "4657c0df3f4c61ff"
+    },
+    {
+      "signature_name": "fpv_center_mhz~=5800",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "471519c97883c62d"
+    },
+    {
+      "signature_name": "type_0_silent_sms_received",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "503b7ac709c0f154"
+    },
+    {
       "signature_name": "Service Reject Cause #7",
       "cellular_generation": null,
       "threshold_json": {
@@ -451,6 +626,41 @@
       },
       "confidence": 80,
       "argus_record_id": "50beb42909a10955"
+    },
+    {
+      "signature_name": "Qualcomm diag log codes — cellular OTA capture (20 entries)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "5349c4ddfc7ebf7b"
+    },
+    {
+      "signature_name": "BSIG-2026-05-11-AIRGUARD-FINDMY-MFGDATA-PREFIX",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "549ad62e4e389c4f"
+    },
+    {
+      "signature_name": "description='DJI Mini 2 (O2)'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "5bb30bbe0851fe73"
+    },
+    {
+      "signature_name": "description='DJI Mavic 3'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "5ddd935d46e5f53e"
+    },
+    {
+      "signature_name": "signal_type='analog-video'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "5dfc59467b676ba8"
     },
     {
       "signature_name": "Attach Reject Cause #12",
@@ -508,6 +718,41 @@
       },
       "confidence": 80,
       "argus_record_id": "636380413ed77376"
+    },
+    {
+      "signature_name": "DroneID_app_location_disclosure",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 92,
+      "argus_record_id": "64aeaf5a59f7c5e0"
+    },
+    {
+      "signature_name": "5756.5 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "657bba70dfd48aa3"
+    },
+    {
+      "signature_name": "mwi_silent_sms_received",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "65909eb7acb8de5d"
+    },
+    {
+      "signature_name": "transport='BT5-LR-Extended'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "69ddf435e99a7327"
+    },
+    {
+      "signature_name": "NAS Null Cipher (EPS Encryption EEA0/NEA0 Null)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "6b13bee78b9ae405"
     },
     {
       "signature_name": "Attach Reject Cause #13",
@@ -657,6 +902,13 @@
       "argus_record_id": "78f036b4d0fe2442"
     },
     {
+      "signature_name": "transport='WiFi-Beacon'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "79ff3f5e1c73498f"
+    },
+    {
       "signature_name": "Detach Request (Type='re-attach not required') Cause #11",
       "cellular_generation": null,
       "threshold_json": {
@@ -688,6 +940,41 @@
       },
       "confidence": 80,
       "argus_record_id": "7d29f438cb802406"
+    },
+    {
+      "signature_name": "10 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "809c73a8aad40fd7"
+    },
+    {
+      "signature_name": "T-Mobile TMOHS1 (Wingtech-built hotspot, Rayhunter-supported detector)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "85a334634dfe00af"
+    },
+    {
+      "signature_name": "Incomplete SIB (SIB1 scheduling chain < 2)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "863dad41bbaea1b8"
+    },
+    {
+      "signature_name": "drone-900FHSS-NETID-<id> + transport=ISM-FHSS",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "86bc0d593f76e5d1"
+    },
+    {
+      "signature_name": "Wingtech CT2MHS01 (Americas hotspot, Rayhunter-supported detector)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "88c28a11908aa326"
     },
     {
       "signature_name": "Detach Request (Type='re-attach not required') Cause #6",
@@ -736,6 +1023,13 @@
       "argus_record_id": "8e87f801d578dbf3"
     },
     {
+      "signature_name": "lac_change_routing_detection",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "8ee9ca8f7d9232ad"
+    },
+    {
       "signature_name": "Abort Cause #6",
       "cellular_generation": null,
       "threshold_json": {
@@ -767,6 +1061,13 @@
       },
       "confidence": 80,
       "argus_record_id": "90b959061532a705"
+    },
+    {
+      "signature_name": "2399.5 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "92586503a91f286b"
     },
     {
       "signature_name": "Location Updating Reject Cause #12",
@@ -802,6 +1103,20 @@
       "argus_record_id": "9451a868ee05106a"
     },
     {
+      "signature_name": "DroneID_altitude_height_ft_encoding (raw/3.281 → metres)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 88,
+      "argus_record_id": "9511acd33723d0e6"
+    },
+    {
+      "signature_name": "transport='ISM-FHSS'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "953f71372d7cbb99"
+    },
+    {
       "signature_name": "Routing Area Update Reject Cause #9",
       "cellular_generation": "3G",
       "threshold_json": {
@@ -824,6 +1139,13 @@
       },
       "confidence": 80,
       "argus_record_id": "965b6a151f713ebf"
+    },
+    {
+      "signature_name": "freq_mhz~=5756.5 + DJI O4 (Decrypted)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "96dac58b74b0325f"
     },
     {
       "signature_name": "Detach Request (Type='re-attach not required') Cause #3",
@@ -916,6 +1238,20 @@
       "argus_record_id": "9c97f7252faecd63"
     },
     {
+      "signature_name": "transport='WiFi-NAN'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "9f6f0b79c0c451aa"
+    },
+    {
+      "signature_name": "Null Cipher (RRC EEA0)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "9faf347662f3ce50"
+    },
+    {
       "signature_name": "CM Service Reject Cause #6",
       "cellular_generation": null,
       "threshold_json": {
@@ -973,6 +1309,27 @@
       "argus_record_id": "a2aac4a4f776bd2a"
     },
     {
+      "signature_name": "0x05c6:0x90b6",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "a3ee3f393b057a53"
+    },
+    {
+      "signature_name": "2459.5 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "a41338b0fbc8d3f0"
+    },
+    {
+      "signature_name": "BSIG-2026-05-11-SKYSPY-ODID-WIFI-BEACON-VENDOR-IE-FILTER",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "a5529a2ec678f926"
+    },
+    {
       "signature_name": "Tracking Area Update Reject Cause #14",
       "cellular_generation": "4G",
       "threshold_json": {
@@ -995,6 +1352,13 @@
       },
       "confidence": 80,
       "argus_record_id": "a575f3ec2e9fcb9d"
+    },
+    {
+      "signature_name": "2414.5 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "a78564182743e5b4"
     },
     {
       "signature_name": "Detach Request (Type='re-attach not required') Cause #13",
@@ -1028,6 +1392,13 @@
       },
       "confidence": 80,
       "argus_record_id": "a89f0ef5c5e003c8"
+    },
+    {
+      "signature_name": "handover_reference_present_routing_detection",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "aacdc8b00f1d406c"
     },
     {
       "signature_name": "CM Service Reject Cause #4",
@@ -1120,6 +1491,13 @@
       "argus_record_id": "b56d70cbecb85797"
     },
     {
+      "signature_name": "hop_count_routing_detection",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "b6f0c3aa3c76a507"
+    },
+    {
       "signature_name": "Attach Reject Cause #3",
       "cellular_generation": null,
       "threshold_json": {
@@ -1186,6 +1564,13 @@
       "argus_record_id": "b7b81ad88ef87b56"
     },
     {
+      "signature_name": "signal_type='fpv'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "b890cbe899f2acf6"
+    },
+    {
       "signature_name": "Routing Area Update Reject Cause #11",
       "cellular_generation": "3G",
       "threshold_json": {
@@ -1210,6 +1595,20 @@
       "argus_record_id": "c221a532ed1efa93"
     },
     {
+      "signature_name": "0x05c6:0xf626",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "c267bcd98ce558be"
+    },
+    {
+      "signature_name": "BSIG-2026-05-11-SKYSPY-ODID-BLE-FILTER",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "c3e1e9d2e571744c"
+    },
+    {
       "signature_name": "Routing Area Update Reject Cause #7",
       "cellular_generation": "3G",
       "threshold_json": {
@@ -1232,6 +1631,27 @@
       },
       "confidence": 80,
       "argus_record_id": "c440fa088561903d"
+    },
+    {
+      "signature_name": "0x05c6:0xf601",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "c4d55d7b5ab2da8a"
+    },
+    {
+      "signature_name": "rapid_redetection_routing_flag",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "c63becdfebad7de8"
+    },
+    {
+      "signature_name": "no_neighboring_cells_when_NCL_supported",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "cd48b12873411494"
     },
     {
       "signature_name": "Detach Request (Type='re-attach not required') Cause #8",
@@ -1265,6 +1685,20 @@
       },
       "confidence": 80,
       "argus_record_id": "ce1654b1a3bdaef6"
+    },
+    {
+      "signature_name": "rf_center=1090MHz proto=ADS-B Mode-S",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "cf373da8fe1a21a1"
+    },
+    {
+      "signature_name": "cdma_femtocell_NID_range",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "d4a8cfcc7495ec55"
     },
     {
       "signature_name": "Attach Reject Cause #7",
@@ -1366,6 +1800,13 @@
       "argus_record_id": "dc13bbfe8718446c"
     },
     {
+      "signature_name": "DroneID_serial_default='SecureStorage?'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 90,
+      "argus_record_id": "ded6c48e1a3d6de4"
+    },
+    {
       "signature_name": "Attach Reject Cause #11",
       "cellular_generation": null,
       "threshold_json": {
@@ -1397,6 +1838,20 @@
       },
       "confidence": 80,
       "argus_record_id": "e0b61c52122eca21"
+    },
+    {
+      "signature_name": "DroneID_coord_encoding=value/174533.0_radians_to_degrees",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 92,
+      "argus_record_id": "e10443b2ec486692"
+    },
+    {
+      "signature_name": "signal_type='digital-fhss'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "e18dbfd778694d7d"
     },
     {
       "signature_name": "Authentication and Ciphering Reject",
@@ -1478,6 +1933,20 @@
       },
       "confidence": 80,
       "argus_record_id": "e5e2edcdc2fc80a2"
+    },
+    {
+      "signature_name": "rf_center=978MHz proto=ADS-B UAT (US only)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "e6a2dd1c0b05f12d"
+    },
+    {
+      "signature_name": "GSMTAP type table (0x01-0x14, 20 packet types)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "eebd214ce2334ba9"
     },
     {
       "signature_name": "Detach Request (Type='re-attach not required') Cause #12",
@@ -1577,6 +2046,27 @@
       },
       "confidence": 80,
       "argus_record_id": "f55ead4a92147d5c"
+    },
+    {
+      "signature_name": "15.36 MHz",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "f62d8dfdcaa15009"
+    },
+    {
+      "signature_name": "id_type='CAA Assigned Registration ID'",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "fc27c8752f926e52"
+    },
+    {
+      "signature_name": "changing_LAC_on_same_CID",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 85,
+      "argus_record_id": "fc510b1683713742"
     },
     {
       "signature_name": "Location Updating Reject Cause #6",

@@ -1,103 +1,147 @@
 {
-  "generated_at_utc": "2026-05-20T00:44:53Z",
-  "generation_dispatch": "MAC-183",
-  "argus_version_pre_bump": "v1.3.0",
-  "argus_version_post_bump_recommended": "v1.4.0",
-  "release_narrative": "Wave I/I.5/I.6/I.7 vendor cloud-infrastructure hostname corpus integration. 4-wave autonomous extraction effort (12,212 main + 26 + 193 + 159 = 12,590 cumulative unique hostnames) integrated via 12+1 source admissions, ~12k raw_observation FK-chained provenance rows, and 12,239 identifier promotions across 51 canonical vendors. Migration 0024 extends the identifier_type CHECK enum 51 \u2192 54 with three CP29 value classes (vendor_controlled_hostname, vendor_cloud_endpoint_url, vendor_controlled_hostname_deprecated). Marquee findings include hppki.honeywell.com promoted at 99 (firmware-cert ceiling via 2 Honeywell OTA signing certs + crt.sh + binary + bucket payload), 565 NXDOMAIN-verified deprecated hostnames, 108 \u00a78.3 cross-source lifts. SAR-13 + SAR-13.5 codified as bible-amendment siblings.",
-  "wave_summary_ref": "argus-internal/wave_i_pre_v1/ (Wave I main + I.5 + I.6 + I.7 sub-passes)",
-  "runguide_canonical_path": "argus-internal/wave_i_pre_v1/runguide.md",
-  "baseline_canonical_count_pre_v1_4_0": 22633,
-  "baseline_active_count_pre_v1_4_0": 22553,
-  "canonical_count_post_v1_4_0": 34872,
-  "active_count_post_v1_4_0": 34792,
-  "canonical_count_delta_total": 12239,
-  "canonical_count_delta_active": 12239,
-  "sources_pre_v1_4_0": 53,
+  "generated_at_utc": "2026-05-21T01:00:30Z",
+  "generation_dispatch": "MAC-184 Phase 12",
+  "predecessor_commit": "1080b5c",
+  "branch": "v1.4.1-integration-stage-1",
+  "argus_version_pre_bump": "v1.4.0",
+  "argus_version_post_bump_recommended": "v1.4.1",
+  "release_narrative": "v1.4.1 Stage 1 integration close-out (MAC-209 Phase 12 — final pre-rc1 export regeneration). Stage 1 child issues integrated since v1.4.0 baseline: CP31 (mig-0025, identifier_type CHECK enum 54→56 with fcc_grantee_code + equipment_class_code, pair_kind 4→5 with fcc_grantee_equipment_class — first multi-arm vendor pairing under the structural-anchor confidence lift), MAC-201 (first §7.5-bis 14-row 75→85 lift via fcc_grantees structural anchor at anchor_conf=80), MAC-206 (21-row Flock Safety + Getac apkpure-sourced direct-admission carve-out audit metadata + id=539 sibling-pair forward repair), and MAC-188 cumulative FP demote cycle (262 third_party_oss_sdk_root supersessions). Coverage matrix regenerated to bin-classify 176 net-new active rows + 262 superseded rows since v1.4.0 baseline; export reconciliation arithmetic balances at standard 34,968 source → 514 record / 34,454 dropped, high-conf 34,968 source → 114 record / 34,854 dropped.",
+  "stage_1_dispatch_chain": [
+    "MAC-200 (Stage 1 baseline branch carry-forward)",
+    "MAC-201 (§7.5-bis structural-anchor lift — first 14 rows)",
+    "MAC-203 (Deferral Note 1 — §44.3 Honeywell product nomenclature corpus)",
+    "MAC-204 (Stage 1 catalogue work)",
+    "MAC-205 (Stage 1 catalogue work)",
+    "MAC-206 (Phase 10d β.3c — direct-admission carve-out 21 rows + bible §11 #17 + id=539 sibling repair)",
+    "MAC-207 (Phase 11 close — Option A all-73 DROP + CP32 cand #7)",
+    "MAC-209 (Phase 12 — this export regen)"
+  ],
+  "stage_1_predecessor_chain_head": "1080b5c",
+  "baseline_canonical_count_post_v1_4_0": 34872,
+  "baseline_active_count_post_v1_4_0": 34792,
+  "canonical_count_post_v1_4_1_stage_1": 35310,
+  "active_count_post_v1_4_1_stage_1": 34968,
+  "canonical_count_delta_total": 438,
+  "canonical_count_delta_active": 176,
   "sources_post_v1_4_0": 66,
-  "sources_delta": 13,
-  "manufacturers_pre_v1_4_0": 51,
+  "sources_post_v1_4_1_stage_1": 71,
+  "sources_delta": 5,
   "manufacturers_post_v1_4_0": 51,
-  "manufacturers_aliases_appended": 5,
-  "raw_observations_pre_v1_4_0": 133830,
+  "manufacturers_post_v1_4_1_stage_1": 52,
+  "manufacturers_delta": 1,
   "raw_observations_post_v1_4_0": 146188,
-  "raw_observations_delta": 12358,
-  "deployment_observations_pre_v1_4_0": 116668,
+  "raw_observations_post_v1_4_1_stage_1": 146573,
+  "raw_observations_delta": 385,
   "deployment_observations_post_v1_4_0": 116774,
-  "deployment_observations_delta": 106,
-  "behavioral_signatures_unchanged": 131,
-  "schema_version_pre_v1_4_0": 23,
+  "deployment_observations_post_v1_4_1_stage_1": 116774,
+  "deployment_observations_delta": 0,
+  "behavioral_signatures_post_v1_4_0": 131,
+  "behavioral_signatures_post_v1_4_1_stage_1": 201,
+  "behavioral_signatures_delta": 70,
   "schema_version_post_v1_4_0": 24,
+  "schema_version_post_v1_4_1_stage_1": 25,
   "schema_migrations_applied": [
-    "0024_cp29_vendor_hostname_corpus_value_classes"
+    "0025_cp31_fcc_eas_identifier_type_cluster_and_pair_kind"
   ],
   "bible_amendments_applied": [
-    "CP29",
-    "SAR-13",
-    "SAR-13.5"
+    "CP31"
   ],
-  "cp29_resolution": {
-    "cp29_codified_value_classes": [
-      "vendor_controlled_hostname",
-      "vendor_cloud_endpoint_url",
-      "vendor_controlled_hostname_deprecated"
+  "cp31_resolution": {
+    "cp31_codified_identifier_types": [
+      "fcc_grantee_code",
+      "equipment_class_code"
     ],
-    "cp29_deferred_value_classes": [
-      "vendor_asn_prefix",
-      "vendor_controlled_ip"
+    "cp31_codified_pair_kinds": [
+      "fcc_grantee_equipment_class"
     ],
-    "cp29_deferred_rationale": "conservative \u22651-evidence gate per Phase 1 \u00a71.1; 0 empirical observations across Wave I/I.5/I.6/I.7 (class G halted url_pattern_issue; cert IP-SAN sub-passes 0/0/0)",
-    "cp29_codified_count": 3,
-    "cp29_deferred_count": 2
+    "cp31_active_fcc_grantee_code_rows": 17,
+    "cp31_active_equipment_class_code_rows": 41,
+    "cp31_active_paired_rows": 41,
+    "cp31_first_multi_arm_vendor_pairing": "Parrot Automotive arm (manufacturers id=222, parent_manufacturer_id=25 Parrot)"
   },
-  "sar_codifications": {
-    "sar_13": "runguide-schema-fabrication discipline (DB-verified PRAGMA before SQL drafting) \u2014 Wave I \u00a73.0 probe origin",
-    "sar_13_5": "bucket attribution discipline (content-based attribution gate before promotion) \u2014 Wave I.5 sub-pass 1A \u2192 Wave I.6 sub-pass 4 origin"
+  "mac_201_section_7_5_bis_lift": {
+    "first_section_7_5_bis_lift_cohort_size": 14,
+    "first_section_7_5_bis_lift_cohort_codes": [
+      "ABY", "ABZ", "ARQ", "MKM", "N7N", "LL9", "PNF", "QQL", "TWV", "EL5", "NK7", "UXX", "X4G", "YJV"
+    ],
+    "pre_conf": 75,
+    "post_conf": 85,
+    "sub_rule": "structural_anchor (anchor_conf=80)",
+    "anchor_table": "fcc_grantees",
+    "cp_anchor": "CP32-pending",
+    "ratification_issue": "MAC-201"
   },
-  "marquee_findings": {
-    "hppki_honeywell_com_firmware_cert_ceiling": "promoted at conf=99; 4-source corroboration (firmware OTA cert + crt.sh + binary + bucket payload)",
-    "honeywell_ota_signing_cert_chain": "Honeywell CodeSign RSA CA + Honeywell International Inc. issuer (subject_dn=dubai_android_releasekey Code Signing); 2 certs from CT40 Android OTA META-INF/com/android/otacert; sha256=60a8cf8feeb33926366776b395d6c8d9334bd8b42038b85563622ce0a1d0745b",
-    "nxdomain_verified_deprecated_hostnames": "565 (of 568 NXDOMAIN-verified; 3 dropped in Phase 2 scrub) promoted at vendor_controlled_hostname_deprecated confidence=87",
-    "eight_three_lifts_applied": 108,
-    "novel_manufacturer_aliases_appended": [
-      "Autel Intelligent Technology Corp.",
-      "Axis Communications AB",
-      "Meraki LLC",
-      "Getac Technology Corporation",
-      "Jacobs Solutions Inc.",
-      "Honeywell International Inc."
-    ]
+  "mac_206_carve_out_disposition": {
+    "carve_out_active_row_count": 21,
+    "carve_out_id_range": "533-553",
+    "carve_out_vendor_breakdown": {
+      "Flock Safety": 19,
+      "Getac": 2
+    },
+    "carve_out_identifier_type_breakdown": {
+      "ble_service": 3,
+      "ble_characteristic": 3,
+      "ble_local_name": 1,
+      "product_family_codename": 14
+    },
+    "carve_out_source_type": "manufacturer_app",
+    "carve_out_in_argus_export_csv": 21,
+    "carve_out_in_argus_export_json": 0,
+    "carve_out_in_argus_export_high_confidence_json": 0,
+    "carve_out_lynceus_drop_rationale": "All 21 rows DROP at §4.4 type-mapping gate (ble_service/ble_characteristic/ble_local_name/product_family_codename are not in Lynceus pattern_type map). High-conf-export halt-criterion (CP19 crowdsourced-ceiling) NOT triggered — these rows are source_type='manufacturer_app' not 'crowdsourced', and the §4.4 drop precedes any source_type evaluation."
   },
-  "fp_scrub_disposition": {
-    "pre_scrub_unique_hostnames": 12590,
-    "survivors": 12239,
-    "survivor_rate": "97.21%",
-    "gate": "PROCEED but FLAG (>50% threshold; expected per Wave I extraction-time pre-scrub; Class B crt.sh 5% calibration FP rate already-within-tolerance)",
-    "carry_forward": "manual top-50 GitHub-sourced calibration review (dispatch \u00a72.5)"
+  "mac_188_fp_demote_cycle": {
+    "superseder_rows_post_v1_4_0": 262,
+    "superseder_classifier_reason": "known_fp_root::aloft.rocks (and sibling third_party_oss_sdk_root patterns)",
+    "demoted_at_window": "2026-05-20T18:27:49Z (post-MAC-45 v1.4.0 generation)",
+    "impact_on_export": "262 rows superseded; coverage_matrix_report.json regenerated this pass to absorb the supersessions (per v1.4.0 commit 300e51b precedent)"
+  },
+  "halt_criteria_audit_2026_05_21": {
+    "head_branch_pre_flight": "PASS (HEAD=1080b5c, branch=v1.4.1-integration-stage-1)",
+    "canonical_state_drift": "PASS (schema=25, total=35310, active=34968, sources=71, manufacturers=52, raw_obs=146573, integrity=ok — matches dispatch table verbatim)",
+    "cp31_enum_extension_live": "PASS (sqlite_master CREATE TABLE confirms fcc_grantee_code + equipment_class_code + fcc_grantee_equipment_class)",
+    "export_script_raised_uncaught_exception": "RECOVERED (first run halted on MAC-45 coverage_matrix_report.json staleness — id=23160 writer-classified None vs map 'unknown_category' because id=23160 was superseded post-MAC-45-generation by MAC-188 FP demote; resolved by regenerating MAC-45 coverage_matrix_report.json per v1.4.0 commit 300e51b precedent; coverage_matrix.py is read-only per its docstring; no script patched silently)",
+    "meta_dropped_in_export_reconciliation_standard": "PASS (34968 source - 514 record = 34454 dropped; sum(dropped_in_export) = 34454)",
+    "meta_dropped_in_export_reconciliation_high_conf": "PASS (34968 source - 114 record = 34854 dropped; sum(dropped_in_export) = 34854)",
+    "device_category_unknown_in_high_conf": "PASS (0 rows; §11 #13 ban honored)",
+    "source_type_procurement_in_high_conf": "PASS (0 rows; §11 #14 ban honored)",
+    "mac_206_carve_out_in_high_conf": "PASS (0 rows; CP19 crowdsourced-ceiling not violated — §4.4 drop precedes source_type evaluation)",
+    "lynceus_argus_record_id_collision_or_drift": "PASS (3-sample stability verification: id=1 mac|e4:aa:ea:80:a1:9b → eea6f74486eea9c0 (v1.4.0 baseline); id=35682 fcc_grantee_code|ABY → 2debaa47e623b44b (CP31); id=540 product_family_codename|AVICORE → a72a124244fe4728 (MAC-206 carve-out) — all three sha256(type|identifier)[:16] computations match CSV row values)"
   },
   "files": {
     "argus_export.json": {
-      "size_bytes": 85769,
-      "note": "Lynceus-filtered; Wave I identifiers dropped by \u00a711 #13 device_category=unknown ban (expected)"
-    },
-    "argus_export.csv": {
-      "size_bytes": 21066238,
-      "note": "all 34,792 active identifiers including 12,239 Wave I cloud-infra hostnames"
+      "size_bytes": 88747,
+      "record_count": 514,
+      "confidence_threshold": 30,
+      "note": "Lynceus-filtered standard export; +3 records vs v1.4.0 (511→514) driven by CP31 and Stage 1 net-new active rows that survived §4.4/§11 #13/§11 #14 filtering"
     },
     "argus_export_high_confidence.json": {
-      "size_bytes": 20948,
-      "note": "Lynceus-filtered \u226570; same \u00a711 #13 filter applies"
+      "size_bytes": 20951,
+      "record_count": 114,
+      "confidence_threshold": 70,
+      "note": "Lynceus-filtered high-conf export; +1 record vs v1.4.0 (113→114). MAC-201 §7.5-bis lift cohort (14 fcc_grantee_code @ conf=85) correctly DROPS at §4.4 type-mapping gate (fcc_grantee_code not in Lynceus pattern_type map) AND at §11 #13 device_category='unknown' gate. The +1 net delta is driven by the smaller cohort of Stage 1 non-unknown / Lynceus-mappable rows."
+    },
+    "argus_export.csv": {
+      "size_bytes": 21395866,
+      "record_count": 34968,
+      "note": "All 34,968 active identifiers; no Lynceus filtering. Includes the 14 MAC-201 lifted fcc_grantee_code rows @ conf=85 with notes.section_8_3_lift.sub_rule='structural_anchor (anchor_conf=80)' preserved verbatim; all 41 equipment_class_code rows; all 21 MAC-206 carve-out rows (ids 533-553)."
     },
     "argus_export_behavioral_signatures.json": {
-      "size_bytes": 55065,
-      "note": "behavioral_signatures unchanged at 131; 55 active records"
+      "size_bytes": 69361,
+      "source_record_count": 201,
+      "record_count": 125,
+      "note": "behavioral_signatures DB grew 131→201 (+70) since v1.4.0 baseline; sibling-export survivor count 55→125 (+70) reflects the same growth. Argus_run_id=28e57d53-32e6-5026-9a04-267feaafcd82 (UUID5 from canonical-row fingerprint). Dispatch text 'unchanged at 131' was stale relative to current DB — paste-not-cite verification per [[feedback_db_verify_dispatch_claims]] surfaces the real count."
     },
     "coverage_report.md": {
-      "size_bytes": 1522058,
-      "note": "regenerated coverage_matrix + drop_tally bins"
+      "size_bytes": 1522766,
+      "note": "Regenerated coverage_matrix + drop_tally bins reconciled against fresh extraction_outputs/mac45/coverage_matrix_report.json (9.2 MB)."
     }
   },
-  "post_ship_corrections": {
-    "honeywell_alias_appended_post_ship": true,
-    "note": "Phase 6 enrichment script omitted 'honeywell' from VENDOR_KEY_TO_CANON map; the 'Honeywell International Inc.' alias from firmware OTA cert was appended to mfg_id=211 (Honeywell) in a post-ship corrective UPDATE. Original Phase 6 close-report incorrectly stated Honeywell was not in canonical lexicon \u2014 corrected here."
+  "non_goals_observed": {
+    "no_canonical_db_mutations": "PRAGMA query_only = ON honored throughout export pass (export_lynceus.py + export_behavioral_signatures.py + coverage_matrix.py all enforce read-only)",
+    "no_schema_bump": "schema_version unchanged at 25 (CP31 mig-0025 already landed pre-Phase-12)",
+    "no_rc1_or_tag_cut": "deferred to Phase 13",
+    "no_cp32_bundle_absorption": "CP32 candidates #1-7 remain Stage 2 work; this manifest references CP-anchor='CP32-pending' only as audit metadata",
+    "no_branch_push": "v1.4.1-integration-stage-1 stays local until Phase 13 rc1"
   }
 }
