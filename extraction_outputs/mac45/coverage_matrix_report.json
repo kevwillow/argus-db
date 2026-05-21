@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 34968,
+  "pre_active_count": 34964,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -239763,7 +239763,7 @@
       "deployment_observations_count": 30,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 1257
+      "active_identifier_count": 1253
     },
     {
       "canonical_name": "janova GmbH",
@@ -243707,7 +243707,7 @@
     "confidence_floor": 30,
     "drop_pi_self_exclude": false,
     "bins": {
-      "unknown_category": 34216,
+      "unknown_category": 34212,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
@@ -243755,7 +243755,7 @@
       "excluded_source_type": 0
     },
     "survivors": 514,
-    "reconciles": 34968,
+    "reconciles": 34964,
     "drop_assignments": {
       "413": "unknown_category",
       "414": "unknown_category",
@@ -274108,7 +274108,6 @@
       "31579": "unknown_category",
       "31580": "unknown_category",
       "31581": "unknown_category",
-      "31582": "unknown_category",
       "31583": "unknown_category",
       "31584": "unknown_category",
       "31585": "unknown_category",
@@ -274585,8 +274584,6 @@
       "32056": "unknown_category",
       "32057": "unknown_category",
       "32058": "unknown_category",
-      "32059": "unknown_category",
-      "32060": "unknown_category",
       "32061": "unknown_category",
       "32062": "unknown_category",
       "32063": "unknown_category",
@@ -275037,7 +275034,6 @@
       "32508": "unknown_category",
       "32509": "unknown_category",
       "32510": "unknown_category",
-      "32511": "unknown_category",
       "32512": "unknown_category",
       "32513": "unknown_category",
       "32514": "unknown_category",
@@ -278218,7 +278214,7 @@
     "confidence_floor": 70,
     "drop_pi_self_exclude": true,
     "bins": {
-      "unknown_category": 34216,
+      "unknown_category": 34212,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 39,
@@ -278266,7 +278262,7 @@
       "excluded_source_type": 361
     },
     "survivors": 114,
-    "reconciles": 34968,
+    "reconciles": 34964,
     "drop_assignments": {
       "1": "excluded_source_type",
       "413": "unknown_category",
@@ -309000,7 +308996,6 @@
       "31579": "unknown_category",
       "31580": "unknown_category",
       "31581": "unknown_category",
-      "31582": "unknown_category",
       "31583": "unknown_category",
       "31584": "unknown_category",
       "31585": "unknown_category",
@@ -309477,8 +309472,6 @@
       "32056": "unknown_category",
       "32057": "unknown_category",
       "32058": "unknown_category",
-      "32059": "unknown_category",
-      "32060": "unknown_category",
       "32061": "unknown_category",
       "32062": "unknown_category",
       "32063": "unknown_category",
@@ -309929,7 +309922,6 @@
       "32508": "unknown_category",
       "32509": "unknown_category",
       "32510": "unknown_category",
-      "32511": "unknown_category",
       "32512": "unknown_category",
       "32513": "unknown_category",
       "32514": "unknown_category",

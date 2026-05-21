@@ -68,6 +68,7 @@ import argparse
 import csv
 import hashlib
 import json
+import re
 import sqlite3
 import uuid
 from dataclasses import dataclass
@@ -667,9 +668,26 @@ def _build_meta(
     }
 
 
+# §11 #3 export-time email-shape guard (MAC-217). Defense-in-depth: future
+# ingest leaks must not silently re-introduce PII into v1.4.1+ exports.
+_PII_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
+
+
+def _assert_no_email_pii(path: Path) -> None:
+    text = path.read_text(encoding="utf-8")
+    matches = _PII_EMAIL_RE.findall(text)
+    if matches:
+        sample = matches[:3]
+        raise Halt(
+            f"§11 #3 export-guard FAILED for {path.name}: {len(matches)} email-shape token(s) "
+            f"found. Sample (up to 3): {sample}. Refusing to emit PII-bearing export."
+        )
+
+
 def _write_json(path: Path, payload: dict[str, Any]) -> int:
     text = json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=False) + "\n"
     path.write_text(text, encoding="utf-8")
+    _assert_no_email_pii(path)
     return len(text.encode("utf-8"))
 
 
@@ -731,6 +749,7 @@ def _write_csv(path: Path, rows: list[ActiveRow], schema_version: int, exported_
                     "notes": (row.notes or "").replace("\r\n", "\n"),
                 }
             )
+    _assert_no_email_pii(path)
     return path.stat().st_size
 
 
@@ -1400,6 +1419,7 @@ def run(
     )
     coverage_path = exports_dir / "coverage_report.md"
     coverage_path.write_text(coverage_md_text, encoding="utf-8")
+    _assert_no_email_pii(coverage_path)
     coverage_size = coverage_path.stat().st_size
 
     return {

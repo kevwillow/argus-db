@@ -1,16 +1,16 @@
 {
   "_meta": {
     "argus_version": "25",
-    "exported_at": "2026-05-21T01:00:30Z",
+    "exported_at": "2026-05-21T14:39:54Z",
     "record_count": 514,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "ceb0367b-a6e0-56c6-9852-e79bb2333320",
-    "source_record_count": 34968,
+    "argus_run_id": "2dee4109-4193-52e6-9c2e-7db4fae43226",
+    "source_record_count": 34964,
     "dropped_in_export": {
-      "unknown_category": 34216,
+      "unknown_category": 34212,
       "ssid_pattern": 13,
       "device_fingerprint": 0,
       "ble_local_name": 20,
