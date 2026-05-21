@@ -1,6 +1,6 @@
 # Argus — Upstream Attribution and Credits
 
-Argus integrates data derived from 53 upstream sources (canonical registries, procurement data, public-records databases, academic research, community-research repositories, vendor-published documentation, international corporate registries, US state Secretary-of-State registries, judicial filings, federal disclosure / entity-registration sources, FCC Equipment Authorization aggregators and primary surfaces, and — new in v1.3.0 — a Wave H desktop-axis vendor-application static-analysis methodology source surfacing Cohort D drone tooling + Cohort F sanctioned-vendor v1 vendor-registered non-BLE identifiers) plus a canonical lexicon of 51 surveillance-technology vendors. This document attributes every upstream contribution, names the integration shape, and records license-carry-forward obligations downstream consumers must honor.
+Argus integrates data derived from **71 upstream sources** (canonical registries, procurement data, public-records databases, academic research, community-research repositories, vendor-published documentation, international corporate registries, US state Secretary-of-State registries, judicial filings, federal disclosure / entity-registration sources, FCC Equipment Authorization aggregators and primary surfaces, the Wave H desktop-axis vendor-application static-analysis methodology source, the Wave I/I.5/I.6/I.7 13-source vendor cloud-infrastructure hostname corpus admission, and — new in v1.4.1 — 5 vendor companion APK sources [Hikvision Hik-Connect, Dahua DMSS, Motorola Solutions WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot] admitted via [MAC-204](/MAC/issues/MAC-204) Phase 10b admit-then-rebind disposition under the sid=13 envelope) plus a canonical lexicon of **52 surveillance-technology vendor entries** (51 hub-visible canonicals + 1 multi-arm `hidden_arm` row — Parrot Automotive id=222, the first arm canonical under the CP31 hub-and-spoke schema). This document attributes every upstream contribution, names the integration shape, and records license-carry-forward obligations downstream consumers must honor.
 
 For the binding license terms, see [LICENSE](LICENSE) (AGPL-3.0-or-later — code), [LICENSE-DATA](LICENSE-DATA) (ODbL-1.0 — database), and [LICENSE-DOCS](LICENSE-DOCS) (CC-BY-SA-4.0 — documentation). The LICENSE-DATA §2.1 per-source license-posture taxonomy is the structural anchor for the source enumerations below.
 
@@ -80,6 +80,40 @@ One source was admitted in v1.3.0 via the MAC-181 / MAC-177 Wave H pre-v1 wave: 
 | sid | Name | source_type | License | access_mode | admission_date_utc |
 |---|---|---|---|---|---|
 | 53 | Vendor Desktop Application Static Analysis — Wave H | manufacturer_app | per_vendor (no_license_declared_facts_only) | per_vendor_public_download_no_auth (cycle_completion_state=`partial_cohort_set_complete`) | 2026-05-18T00:00:00Z |
+
+### v1.4.1 additions — Vendor companion APK admissions (manufacturer_app)
+
+Five vendor companion APK sources were admitted in v1.4.1 via mig-0026a (the first `Na_` sub-slot data-only addendum precedent under CP32 §1). Admitted under [MAC-204](/MAC/issues/MAC-204) Phase 10b Hypothesis C admit-then-rebind disposition per CEO ratification on MAC-202: the 5 vendor APKs share license posture + analysis envelope with the existing sid=13 (Flock Safety FS Installer) row — static analysis under 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption; per-row sentinel `identifiers.notes.upstream_license_posture='no_license_declared_facts_only'` applies. Source rows seeded at v1.4.1; row admissions promoting identifiers anchored to these sids land at future Stage-2 validator phases as evidence-arrival propagates them through the Phase-5 promotion gate.
+
+- **[Hikvision Hik-Connect](https://hikconnect.com)** (sources.id=67; `com.hikvision.hikconnect@6.11.631.0506`) — vendor companion app; cloud VMS / video doorbell; admitted with NDAA Section 889 note (state/local LE deployments persist outside the federal-procurement bar).
+- **[Dahua DMSS](https://www.dahuasecurity.com)** (sources.id=68; `com.mm.android.DMSS@2.4.14`) — vendor companion app; cloud VMS / camera management; admitted with NDAA Section 889 note.
+- **[Motorola Solutions WAVE PTT](https://www.motorolasolutions.com)** (sources.id=69; `com.motorolasolutions.wave@3.1.8.47141`) — vendor companion app; push-to-talk radio + Milicom PTT Button accessory pairing surface.
+- **[Parrot FreeFlight 6](https://www.parrot.com/en/freeflight-6)** (sources.id=70; `com.parrot.freeflight6@6.7.6`) — vendor companion app; drone flight + ARSDK + ASD-STAN Drone-RID protocol surface.
+- **[DJI Industry Pilot](https://www.dji.com)** (sources.id=71; `com.dji.industry.pilot@v1.9.0`) — vendor companion app; DJI enterprise pilot console.
+
+### v1.4.1 additions — Manufacturer lexicon (1 hidden_arm row)
+
+The CP31 multi-arm hub-and-spoke schema landed at v1.4.1 (mig-0025; commit `40b166e`) admits its first arm canonical:
+
+- **Parrot Automotive** (manufacturers.id=222) — admitted as a `hidden_arm` row under the existing Parrot hub (id=25). `is_arm=1, parent_manufacturer_id=25, query_default='hidden_arm', primary_category='automotive_telematics', aliases='PARROT FAURECIA AUTOMOTIVE SAS,Parrot Faurecia Automotive S.A.S'`. Default queries against `manufacturers` filter `WHERE query_default = 'visible'` and do not surface this arm; explicit-opt-in audit queries surface it (see [DATA_DICTIONARY.md §4.4](DATA_DICTIONARY.md) for the three explicit-opt-in paths). The arm is admitted in anticipation of the Phase 7-bis 177-row fccid.io 2AG-attested cohort promotion (deferred to v1.4.2 — first v1.4.2 work item).
+
+### v1.4.1 additions — Honeywell ACS division attestation completion
+
+The [MAC-195](/MAC/issues/MAC-195) Phase 8 wave (Stage 1 sub-pass 43) completed the Honeywell admission via ACS division enrichment — appending the `Honeywell.notes.honeywell_acs_division_attestation` key with CT45 + CT40 device-model attestations + the `dubai_android_releasekey` code-signing branch attribution. The enrichment was anchored on 7 Honeywell OTA signing certs recovered from CT40 + CT45 Android firmware (Honeywell CodeSign RSA CA / OU=ACS / O=Honeywell International Inc.). The §44.3 product-nomenclature-corpus enrichment from the Wave I.14a runguide was DEFERRED at [MAC-203](/MAC/issues/MAC-203) per Path 1 (intentional scope narrowing — no surviving §11 #7 evidence trail at v1.4.1; see [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) Deferral Note 1).
+
+### v1.4.1 — Numerex Corporation alias resolution (not a separate admission)
+
+[MAC-196](/MAC/issues/MAC-196) resolved Numerex Corporation as **Sierra Wireless acquisition aliases** rather than as a separate manufacturer admission — the candidate Numerex rows merge into the Sierra Wireless canonical via the alias-aware JOIN discipline. No `manufacturers` row count delta for Numerex.
+
+### v1.4.1 admission ledger summary
+
+| sid | Name | source_type | License | access_mode | admission_date_utc |
+|---|---|---|---|---|---|
+| 67 | Hikvision Hik-Connect (com.hikvision.hikconnect@6.11.631.0506) | manufacturer_app | per_vendor (no_license_declared_facts_only) | per_vendor_public_download_no_auth | 2026-05-21 |
+| 68 | Dahua DMSS (com.mm.android.DMSS@2.4.14) | manufacturer_app | per_vendor (no_license_declared_facts_only) | per_vendor_public_download_no_auth | 2026-05-21 |
+| 69 | Motorola Solutions WAVE PTT (com.motorolasolutions.wave@3.1.8.47141) | manufacturer_app | per_vendor (no_license_declared_facts_only) | per_vendor_public_download_no_auth | 2026-05-21 |
+| 70 | Parrot FreeFlight 6 (com.parrot.freeflight6@6.7.6) | manufacturer_app | per_vendor (no_license_declared_facts_only) | per_vendor_public_download_no_auth | 2026-05-21 |
+| 71 | DJI Industry Pilot (com.dji.industry.pilot@v1.9.0) | manufacturer_app | per_vendor (no_license_declared_facts_only) | per_vendor_public_download_no_auth | 2026-05-21 |
 
 ---
 
@@ -171,7 +205,7 @@ Downstream consumers redistributing Argus's database content inherit the same fa
 
 ---
 
-## 7 — Surveillance-technology vendor lexicon (manufacturers table; 49 canonical entries)
+## 7 — Surveillance-technology vendor lexicon (manufacturers table; 52 canonical entries: 51 hub-visible + 1 hidden_arm)
 
 The `manufacturers` table is the canonical lexicon of surveillance-technology vendors used as the Tier-2/3 device_category inference allowlist. Each entry contributes vendor attribution to identifier rows. This is NOT a data source in the registry sense above; it's an internal curated lexicon used at promotion time. Listed alphabetically:
 
@@ -215,6 +249,7 @@ The `manufacturers` table is the canonical lexicon of surveillance-technology ve
 | Magnet Forensics | hacking_tool |
 | Motorola Solutions | (uncategorized — multi-purpose-vendor carveout) |
 | Parrot | drone |
+| Parrot Automotive | automotive_telematics *(v1.4.1 — first multi-arm `hidden_arm` row under CP31 hub-and-spoke schema; `is_arm=1, parent_manufacturer_id=25 [Parrot hub], query_default='hidden_arm'`)* |
 | PIPS Technology | alpr |
 | Rekor | alpr |
 | Reveal | body_cam |
@@ -232,6 +267,8 @@ The `manufacturers` table is the canonical lexicon of surveillance-technology ve
 **v1.2.0 lexicon additions (14 vendors, from 35 to 49):** 4 positive-extraction admissions from the MAC-104 Wave-G v2 PlayStore companion-app extraction pass — **Hikvision** and **Dahua** (both admitted with NDAA Section 889 note: state/local LE deployments persist outside the federal-procurement bar), **Autel Robotics**, and **Cisco Meraki**. 10 stub admissions from absence-investigation cycles (apk-pure 404 + apk-mirror "no results" + cohort-prediction reasoning) — **Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome** — each carries `notes.admission_basis='documented_absence_only'`.
 
 **v1.3.0 lexicon additions (2 vendors, from 49 to 51):** 2 Cohort A stub admissions from Wave H pre-v1 desktop-axis absence-investigation — **Eagle Eye Networks** (Cohort A descope: EEN Viewer ships as a UWP MSIX package via Microsoft Store, not an Electron-class desktop client) and **Rhombus Systems** (Cohort A descope: Rhombus Console is a web app only; no desktop client distributed). Each carries `notes.documented_absence[]` with the absence-investigation findings; both are cloud-VMS / cloud-camera surveillance-tech vendors with structurally-absent desktop-axis client surface in 2026, anchoring the CP17 desktop-axis bifurcation thesis (cohort-presence dissolution dimension). Methodology source-of-truth: the Wave H wrapper at [`android_test/tools/extraction/wave_h_wrapper.py`](android_test/tools/extraction/wave_h_wrapper.py) (sibling to `wave_g_extractor.py`) carries the SAR-12 7-FP-class roster + the ±90-char windowed-clipping discipline.
+
+**v1.4.1 lexicon addition (1 arm row, from 51 to 52 total — 51 hub-visible + 1 hidden_arm):** **Parrot Automotive** (id=222) admitted as the framework's first multi-arm `hidden_arm` row under the CP31 hub-and-spoke schema (mig-0025). `parent_manufacturer_id=25, is_arm=1, query_default='hidden_arm', primary_category='automotive_telematics', aliases='PARROT FAURECIA AUTOMOTIVE SAS,Parrot Faurecia Automotive S.A.S'`. The existing Parrot hub row (id=25, `primary_category='drone'`) is preserved unchanged. Default queries against `manufacturers` filter `WHERE query_default = 'visible'` and do NOT surface the arm; explicit-opt-in audit queries (e.g., `WHERE query_default IN ('visible','hidden_arm')`) surface it. The multi-arm vendor backlog (Cisco/Meraki, Motorola Solutions, Harris RF vs Harris Aerial, Honeywell ACS division) is queued for evidence-driven arm splits at v1.4.2+ per CP32 §4 admission-cadence sub-rule.
 
 Lexicon evolution is documented in the amendment ledger at [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md). Aliases tracked per-vendor in `manufacturers.aliases`; multi-purpose-vendor carveouts are documented in `PROJECT_BIBLE.md` (see Canonical sources).
 

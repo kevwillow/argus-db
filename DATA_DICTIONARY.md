@@ -6,9 +6,9 @@ This document is the canonical schema reference for the Argus SQLite database (`
 
 **Audience:** downstream operators integrating Argus's exports, external researchers auditing the dataset, contributors adding new identifier candidates or methodology refinements, vendors reviewing how their equipment is represented.
 
-**Scope:** v1.0.0 schema (`schema_version=23` as of 2026-05-18; live verification timestamp 2026-05-19T00:41:07Z against `db/argus.db`). Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
+**Scope:** v1.0.0 schema reference, cumulative through `schema_version=26` (live verification 2026-05-21 against `db/argus.db` on branch `v1.4.1-integration-stage-1`). The dictionary title preserves the historical v1.0.0 baseline anchor; subsequent CP refreshes carry the cumulative schema state forward. Future schema migrations land as paired commits per project amendment-log discipline; this document updates in lockstep.
 
-**Last refresh:** Correction Pass 29 (2026-05-20) — migration 0024 (`identifiers.identifier_type` CHECK enum extension 51 → 54 values; CP29 vendor cloud-infrastructure hostname corpus cluster — `vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`; MAC-183 v1.4.0 release sweep / Wave I/I.5/I.6/I.7 vendor cloud-infrastructure hostname corpus integration; SAR-13 + SAR-13.5 sibling-codified). Prior refresh Correction Pass 28 (2026-05-18) — migration 0023 (`identifiers.identifier_type` CHECK enum extension 48 → 51 values; Wave H desktop-axis vendor-registered non-BLE cluster — `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`; MAC-181 v1.3.0 release sweep / Wave H pre-v1 promotion). Prior refresh Correction Pass 27 (2026-05-18) — migration 0022 (`fcc_citation_deferred_queue` staging table, MAC-178 cycle-7 wave Priority 1 deliverable; persists the 671-row deferred FCC.gov re-citation backlog under the dual-citation-pair convention from CP26 + MAC-178 P1+P2). MAC-178 P7 ratified CP27 §2.4 (Empirical-Premise Verification Precondition). Prior refresh Correction Pass 23 (2026-05-17) — migrations 0020 (`sources.source_type` CHECK extension; 10 → 13 values) + 0021 (`procurement_records.vendor_canonical_normalized` column + index + backfill).
+**Last refresh:** **Correction Pass 32 (2026-05-21)** — migration 0026 (`identifiers.device_category` + `behavioral_signatures.device_category` dual-table CHECK enum extension 12 → 13 values; `+automotive_telematics` per CP32 §1 — the framework's first dual-table CHECK literal sweep in a single migration for enum parity); migration 0026a (first `Na_` sub-slot data-only addendum precedent — 5 INSERT OR IGNORE rows admitting sids 67-71 vendor APK sources via [MAC-204](/MAC/issues/MAC-204) Phase 10b admit-then-rebind; no schema mutation, no `schema_version` bump). CP32 codifies 10 sub-sections covering §1 schema landing + 9 narrative/discipline amendments (the `Na_` sub-slot convention itself, `superseded_by` tri-state semantics, §11 #3 export-time PII generator post-condition guard pattern, Lynceus exports per-bundle regen cadence, multi-arm vendor backlog admission cadence, §11 #17 session-bounded admission carve-out, sandbox-absence HALT-fast-path default sub-rule, MAC-206 carve-out export-drop attribution rule, future `identifiers.manufacturer_id` FK architectural binding). [MAC-219](/MAC/issues/MAC-219) / [MAC-220](/MAC/issues/MAC-220) Stage 2 ratification. Prior refresh **Correction Pass 31 (2026-05-20)** — migration 0025 (`identifiers.identifier_type` CHECK enum extension 54 → 56 values; CP31 FCC EAS identifier-type cluster — `fcc_grantee_code`, `equipment_class_code`; `identifiers.pair_kind` CHECK enum extension 4 → 5 — `fcc_grantee_equipment_class`; `manufacturers` schema +3 columns — `parent_manufacturer_id`, `is_arm`, `query_default`; first multi-arm hub-and-spoke admission with Parrot Automotive arm row id=222 inline conversion; [MAC-197](/MAC/issues/MAC-197) / [MAC-198](/MAC/issues/MAC-198) / [MAC-199](/MAC/issues/MAC-199) Stage 1 ratification). Prior refresh Correction Pass 29 (2026-05-20) — migration 0024 (`identifiers.identifier_type` CHECK enum extension 51 → 54 values; CP29 vendor cloud-infrastructure hostname corpus cluster — `vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`; MAC-183 v1.4.0 release sweep / Wave I/I.5/I.6/I.7 vendor cloud-infrastructure hostname corpus integration; SAR-13 + SAR-13.5 sibling-codified). Prior refresh Correction Pass 28 (2026-05-18) — migration 0023 (`identifiers.identifier_type` CHECK enum extension 48 → 51 values; Wave H desktop-axis vendor-registered non-BLE cluster — `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`; MAC-181 v1.3.0 release sweep / Wave H pre-v1 promotion). Prior refresh Correction Pass 27 (2026-05-18) — migration 0022 (`fcc_citation_deferred_queue` staging table, MAC-178 cycle-7 wave Priority 1 deliverable; persists the 671-row deferred FCC.gov re-citation backlog under the dual-citation-pair convention from CP26 + MAC-178 P1+P2). MAC-178 P7 ratified CP27 §2.4 (Empirical-Premise Verification Precondition). Prior refresh Correction Pass 23 (2026-05-17) — migrations 0020 (`sources.source_type` CHECK extension; 10 → 13 values) + 0021 (`procurement_records.vendor_canonical_normalized` column + index + backfill).
 
 **Conventions:**
 - Column shape: `name TYPE NOT NULL DEFAULT … CHECK(…)` notation matches the migration source-of-truth at `db/migrations/*.sql`.
@@ -29,7 +29,7 @@ Throughout this document and the Argus project:
 
 ## §3. Schema overview
 
-The v1.0.0 schema carries **15 tables** at `schema_version=23`. They group into four functional categories:
+The v1.0.0 schema carries **15 tables**; cumulative through `schema_version=26` (post-CP32; the v1.4.1 ship-state). They group into four functional categories:
 
 ### §3.1 Canonical-state tables (Layer 1)
 
@@ -60,25 +60,25 @@ The v1.0.0 schema carries **15 tables** at `schema_version=23`. They group into 
 
 ### §3.4.1 Live row counts
 
-Verified against `db/argus.db` at 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wave + post-CP27 ratification; `SELECT COUNT(*)` over each table):
+Verified against `db/argus.db` 2026-05-21 (post-CP32 ratification on branch `v1.4.1-integration-stage-1`; `SELECT COUNT(*)` over each table; spot-check anchors at `~/argus-internal/wave_i_4_1_integration_stage_2/_phase_3_docs_pass/spot_checks.md`):
 
 | Table | Row count | Notes |
 |---|---:|---|
-| `identifiers` | **22,629** total = **22,549 active** + **80 superseded** | active = `superseded_by IS NULL`; +1 active in v1.1.0 (Johnson Matthey PLC via UK CH); +16 active in v1.2.0 (MAC-178 P3 — 16 MAC-104 candidates promoted, 4 held) |
-| `raw_observations` | **133,825** | append-only provenance source-of-truth; +691 in v1.2.0 (MAC-178 P2 fccid.io discovery-row admission, of which 671 are deferred-queue-paired) |
-| `sources` | **52** | source registry (+7 in v1.1.0: UK CH sid=44; DE/CA/TX SoS sid=45-47; CourtListener sid=48; SEC EDGAR sid=49; SAM.gov sid=50; +2 in v1.2.0: fccid.io sid=51, FCC Equipment Authorization System — Filings sid=52, both via MAC-178 P1) |
-| `manufacturers` | **49** | vendor metadata lookup (+1 in v1.1.0: Johnson Matthey PLC; +14 in v1.2.0 via the MAC-178 P4 + P5 autonomous overnight wave admissions) |
+| `identifiers` | **35,310** total = **34,964 active** + **342 chained-superseded** + **4 self-loop withdrawn-no-successor** | active = `superseded_by IS NULL`; CP32 §9 tri-state semantic: `NULL` = active / `<other_id>` = superseded by successor / `<self_id>` = withdrawn-no-successor (the §11 #3 PII-demote semantic; 4 [MAC-217](/MAC/issues/MAC-217) Track B Jacobs `*.escg.jacobs.com` cert-subject email PII demotes). Cumulative: +1 active in v1.1.0 (Johnson Matthey PLC); +16 active in v1.2.0 (MAC-178 P3); +12,239 active in v1.4.0 (Wave I/I.5/I.6/I.7 hostname corpus); +172 active in v1.4.1 (Stage 1 SAR-15.5 PASS) |
+| `raw_observations` | **146,573** | append-only provenance source-of-truth |
+| `sources` | **71** | source registry (+5 in v1.4.1 via mig-0026a: sids 67-71 vendor APKs — Hikvision Hik-Connect, Dahua DMSS, Motorola Solutions WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot; admitted under the [MAC-204](/MAC/issues/MAC-204) Phase 10b admit-then-rebind disposition; first `Na_` sub-slot data-only addendum precedent) |
+| `manufacturers` | **52** | vendor metadata lookup (+1 in v1.4.1: Parrot Automotive id=222 — first multi-arm `hidden_arm` row under CP31 hub-and-spoke schema; `is_arm=1, parent_manufacturer_id=25, query_default='hidden_arm', primary_category='automotive_telematics'`). Hub-visible split: 51 `query_default='visible'` + 1 `query_default='hidden_arm'` |
 | `deployment_observations` | **116,668** | Layer 2 deployment-location records |
 | `procurement_records` | **46,043** | analytical-only (never exported to Lynceus per §11 #14); +2,560 net-new in v1.1.0 via the MAC-172 USAspending deep-extension |
 | `fcc_grantees` | **50,153** | FCC EAS bulk-load |
 | `council_minutes_matters` | **3** | low-volume per format-fit cap discipline |
 | `wigle_anchor_priority` | **80,697** | pre-computed query priority; WiGLE API integration itself disabled in v1.0.0 pending operator quota grant |
-| `behavioral_signatures` | **131** | parametric metadata (added migration 0010) |
+| `behavioral_signatures` | **201** | parametric metadata (added migration 0010); CP32 §1 extended `device_category` CHECK enum 12 → 13 (`+automotive_telematics`) in mig-0026 for enum parity with `identifiers.device_category`, but 0 row promotions land at v1.4.1 |
 | `conflicts` | **20** | validator-side disputed rows |
 | `extraction_runs` | **106** | per-run telemetry |
 | `source_reclassifications` | **809** | per-row band-correction audit (added migration 0017) |
 | `fcc_citation_deferred_queue` | **671** | dual-citation-pair queue, fccid.io discovery-half (added migration 0022); 0 promoted, 671 awaiting async FCC.gov re-citation pass |
-| `schema_version` | **23** | migration ledger; one row per applied migration |
+| `schema_version` | **26** | migration ledger; one row per applied schema-mutating migration. mig-0026a is a `Na_` sub-slot data-only addendum and does NOT bump `schema_version` (filename↔schema_version 1:1 holds for schema-mutating migrations only) |
 
 ### §3.5 Relationship summary
 
@@ -108,7 +108,9 @@ fcc_citation_deferred_queue.promoted_raw_observation_id → raw_observations.id 
 
 ### §4.1. `identifiers` (Layer 1 canonical)
 
-The canonical Argus identifier table. Every row represents one identifier-to-attribution binding. Row count verified live 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wave + post-CP27): **22,549 active** (`superseded_by IS NULL`) + **80 superseded** = **22,629 total** (+1 active in v1.1.0: Johnson Matthey PLC via UK CH cross-registry closure; +16 active in v1.2.0 via MAC-178 P3 MAC-104 candidate promotion).
+The canonical Argus identifier table. Every row represents one identifier-to-attribution binding. Row count verified live 2026-05-21 (post-CP32, branch `v1.4.1-integration-stage-1`): **34,964 active** (`superseded_by IS NULL`) + **342 chained-superseded** (`superseded_by` points at a successor row) + **4 self-loop withdrawn-no-successor** (`superseded_by = id`; the §11 #3 PII-demote semantic codified at CP32 §9; [MAC-217](/MAC/issues/MAC-217) Track B Jacobs `*.escg.jacobs.com` cert-subject email PII demotes) = **35,310 total**.
+
+**`superseded_by` tri-state semantic (CP32 §9):** `NULL` = active / `<other_id>` = superseded by successor (canonical merge / dedup / deprecation) / `<self_id>` (self-loop) = withdrawn without successor. Active-set query convention unchanged: `WHERE superseded_by IS NULL`. Withdrawn-without-successor query: `WHERE superseded_by = id`. The schema column itself (`superseded_by INTEGER REFERENCES identifiers(id) ON DELETE SET NULL`) has always admitted all three cases; CP32 §9 makes the semantic explicit so future consumer audits, JOIN logic, and active-set queries handle all three cases correctly.
 
 #### Columns
 
@@ -116,8 +118,8 @@ The canonical Argus identifier table. Every row represents one identifier-to-att
 |---|---|---|---|---|
 | `id` | INTEGER | yes (PK) | autoincrement | Primary key. Stable per row; not directly exported to downstream consumers (consumer-facing stable identifier is `argus_record_id`, a 16-hex-char SHA-256 prefix; algorithm documented in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) — see Canonical sources at end). |
 | `identifier` | TEXT | yes | — | The identifier value itself (e.g., `aa:bb:cc:dd:ee:ff` MAC, `aa:bb:cc` OUI, `1581Fxxx` FAA RID drone prefix, `0x004C` BLE manufacturer ID, BLE service UUID, vendor SSID pattern). Normalization rules per identifier_type documented in METHODOLOGY §6.1 dedup-key normalization. |
-| `identifier_type` | TEXT | yes | — | Enum extended cumulatively across migrations 0001–0023 (full roster in §5.1; 51 canonical values at `schema_version=23`). Baseline migration 0001: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`. Migration 0009: `ble_local_name`, `ble_characteristic`, `product_family_codename`. Migration 0011: `ble_manufacturer_id`. Migration 0013: `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`. Migration 0014: `alpr_model`. Migration 0018: `ble_protocol_byte_table`, `ble_service_uuid`, `ble_company_id`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`. Migration 0019 (CP21 round-2 vocab): `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`. Migration 0023 (CP28 Wave H desktop-axis): `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`. The forward-codified `vendor_template_namespace_uuid` value (per the vendor-companion-app sub-banding amendment) is not in the current CHECK; it lands at first-promotion-time per the forward-looking-codification caveat. |
-| `device_category` | TEXT | yes | — | Enum (12 values per on-disk CHECK constraint): `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`. `unknown` rows are excluded from the Lynceus export per the multi-purpose-vendor discipline (canonical-only). |
+| `identifier_type` | TEXT | yes | — | Enum extended cumulatively across migrations 0001–0025 (**56 canonical values at `schema_version=26`** — the v1.4.1 ship state). Baseline migration 0001: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`. Migration 0009: `ble_local_name`, `ble_characteristic`, `product_family_codename`. Migration 0011: `ble_manufacturer_id`. Migration 0013: `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`. Migration 0014: `alpr_model`. Migration 0018: `ble_protocol_byte_table`, `ble_service_uuid`, `ble_company_id`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`. Migration 0019 (CP21 round-2 vocab): `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`. Migration 0023 (CP28 Wave H desktop-axis): `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`. Migration 0024 (CP29 Wave I vendor cloud-infrastructure hostname corpus): `vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`. **Migration 0025 (CP31 FCC EAS identifier-type cluster): `fcc_grantee_code`, `equipment_class_code`** — both DROPPED per §4.4 default at `device_category='unknown'` (CP32 §3 codified the disposition + landed DROPPED stubs in `db/validation/export_lynceus.py:DROPPED_REASONS`). The forward-codified `vendor_template_namespace_uuid` value (per the vendor-companion-app sub-banding amendment) is not in the current CHECK; it lands at first-promotion-time per the forward-looking-codification caveat. |
+| `device_category` | TEXT | yes | — | Enum (**13 values** per on-disk CHECK constraint, post-mig-0026 / CP32 §1): `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`, **`automotive_telematics`** (CP32 §1 — admitted via mig-0026 for enum parity with `manufacturers.primary_category` on the Parrot Automotive arm id=222; the schema slot opens for future Phase 7-bis 177-row fccid.io 2AG-attested cohort promotion at the Parrot Automotive arm canonical, but 0 row promotions land at v1.4.1). `unknown` rows are excluded from the Lynceus export per the multi-purpose-vendor discipline (canonical-only). Note: `behavioral_signatures.device_category` shares the same 13-value enum via mig-0026 dual-table CHECK literal sweep (the framework's first such sweep — CP21 cumulative-full-enum spirit applied across two separate CHECK literals in a single migration). |
 | `manufacturer` | TEXT | no | NULL | Vendor name in canonical form. Logical FK to `manufacturers.canonical_name` (not enforced). |
 | `model` | TEXT | no | NULL | Vendor's product name in marketing or internal form. Composes with METHODOLOGY §5.4 product-family taxonomy. |
 | `confidence` | INTEGER | no | NULL | Integer per schema-level CHECK `BETWEEN 0 AND 100`. **Operational cap at 99** per METHODOLOGY §5 confidence model: the corroboration-boost formula `min(99, max(...) + 5)` + the §5.6 ceiling rule cap effective confidence at 99 (humility-margin invariant). Schema-level CHECK permits 0-100 to give the operational layer flexibility; the 99-cap is enforced at write-time by the validator/dedup pass, not the schema. |
@@ -130,7 +132,7 @@ The canonical Argus identifier table. Every row represents one identifier-to-att
 | `notes` | TEXT | no | NULL | JSON blob carrying per-row metadata. **CP24 sub-rule (b) audit-trail conventions:** `notes.confidence_history[]` — required append-only audit-trail when `confidence` is UPDATED post-INSERT; each entry shape `{at_utc, from, to, rationale, dispatch, cp_anchor}`. `notes.corroborations[]` + `notes.corroboration_sessions[]` — provenance enrichment for within-source re-extraction (breadth-not-strength signal; does NOT lift confidence per §11 #8 sub-rule). `notes.cross_source_corroboration[]` — per-row cross-source corroboration markers from genuinely independent collectors (qualifies for §5.2 +5 lift). **CP25 §1 audit-trail convention:** `notes.cross_source_corroboration_reversals[]` — required append-only audit-trail when a `cross_source_corroboration[]` marker is retracted under §11 #1 or §11 #8 review; each entry shape `{at_utc, marker_key, rationale, dispatch, cp_anchor}`. The original corroboration-array entry is REMOVED (not soft-deleted); the reversal-array IS the audit-trail. First consumer: MAC-171 id=86738 SEC×USAspending recount drop. |
 | `superseded_by` | INTEGER | no | NULL | Self-reference FK: if non-NULL, this row was superseded per METHODOLOGY §6.4. Exports filter on `superseded_by IS NULL`. |
 | `paired_identifier_id` | INTEGER | no | NULL | Self-reference FK to a paired identifier per `pair_kind`. |
-| `pair_kind` | TEXT | no | NULL | Enum (4 non-NULL values + NULL per on-disk CHECK constraint): `la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation`. Pairing-discipline values from migration 0012. `static_mac_tracker` is a deferred item (queued for future canonical-bible §-text codification) and is NOT currently in the enum. |
+| `pair_kind` | TEXT | no | NULL | Enum (**5 non-NULL values + NULL** per on-disk CHECK constraint, post-mig-0025 / CP31): `la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation` (all from migration 0012); **`fcc_grantee_equipment_class`** (CP31 mig-0025; extends CP14 paired-identifier discipline to regulatory entity pairing — `grantee_code` row is one identifier; `equipment_class_code` is a sibling row with `paired_identifier_id` pointing back to the grantee row and `pair_kind='fcc_grantee_equipment_class'`). `static_mac_tracker` is a deferred item (queued for future canonical-bible §-text codification) and is NOT currently in the enum. |
 
 #### Indexes
 
@@ -205,19 +207,22 @@ Primary on `(id)`. Unique on `(name)`.
 
 ### §4.4. `manufacturers` (vendor metadata lookup)
 
-Vendor metadata + alias canonicalization. Row count verified live 2026-05-18T20:42:55Z (post-MAC-178 cycle-7 wave): **49** (+1 in v1.1.0: Johnson Matthey PLC, admitted 2026-05-17 via UK Companies House cross-registry closure; +14 in v1.2.0 via MAC-178 P4 + P5 autonomous overnight wave admissions).
+Vendor metadata + alias canonicalization. Row count verified live 2026-05-21 (post-CP32, branch `v1.4.1-integration-stage-1`): **52** total (51 `query_default='visible'` + 1 `query_default='hidden_arm'`). Cumulative: +1 in v1.1.0 (Johnson Matthey PLC); +14 in v1.2.0 (MAC-178 wave); +2 in v1.3.0 (Wave H Cohort A stubs — Eagle Eye Networks, Rhombus Systems); +1 in v1.4.1 (Parrot Automotive id=222 — first multi-arm `hidden_arm` row under CP31 hub-and-spoke schema; `is_arm=1, parent_manufacturer_id=25, query_default='hidden_arm', primary_category='automotive_telematics', aliases='PARROT FAURECIA AUTOMOTIVE SAS,Parrot Faurecia Automotive S.A.S'`).
 
 #### Columns
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `id` | INTEGER | yes (PK) | autoincrement | Primary key. FK target for `procurement_records.manufacturer_id`. |
+| `id` | INTEGER | yes (PK) | autoincrement | Primary key. FK target for `procurement_records.manufacturer_id`. (Future-FK from `identifiers.manufacturer_id` is BINDING-only at v1.4.1 per CP32 §2; not yet a live column.) |
 | `canonical_name` | TEXT | yes | — | Canonical vendor name. String-match target for `identifiers.manufacturer`. Word-boundary discipline: match `\bMotorola Solutions\b`, not `\bMotorola\b`. |
 | `aliases` | TEXT | no | NULL | **Comma-separated TEXT string** of vendor-name aliases (e.g., `'Avigilon,Avigilon Corp,Avigilon Inc.,Avigilon Corporation'`); NOT a JSON array. Schema-truth formalized at Correction Pass 23 (wide-net cycle-3 §1 finding #1 + cycle-4 §1 finding #1). There is NO separate `manufacturers_aliases` table. Append semantics: `aliases = CASE WHEN aliases IS NULL OR aliases = '' THEN ? ELSE aliases || ',' || ? END WHERE id = ?`. Lookup semantics: `WHERE aliases LIKE '%term%' OR LOWER(canonical_name) = LOWER(?)`. |
-| `primary_category` | TEXT | no | NULL | Primary `device_category` enum value. NULL for multi-purpose vendors. |
+| `primary_category` | TEXT | no | NULL | Primary `device_category` enum value (mirrors `identifiers.device_category` vocabulary; 13 values post-CP32 §1). NULL for multi-purpose vendors. Note: this column carries NO CHECK constraint (MAC-198 SKIP decision); the arm row's `primary_category='automotive_telematics'` was admissible at v1.4.1 before mig-0026 landed the matching `identifiers.device_category` enum value. |
 | `source_url` | TEXT | yes | — | Primary attribution URL. |
-| `notes` | TEXT | no | NULL | JSON blob: per-vendor metadata, corporate-split history (vendor-disambiguation discipline). |
+| `notes` | TEXT | no | NULL | JSON blob: per-vendor metadata, corporate-split history (vendor-disambiguation discipline), absence-investigation records (`notes.admission_basis='documented_absence_only'`), ACS division / cert-supply-chain enrichment (`notes.honeywell_acs_division_attestation` per [MAC-195](/MAC/issues/MAC-195)). |
 | `added_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of first registration. |
+| `parent_manufacturer_id` | INTEGER | no | NULL | **CP31 mig-0025: multi-arm hub-and-spoke.** Self-reference FK → `manufacturers(id)`. Hub rows carry `parent_manufacturer_id IS NULL`; arm rows point at their hub. Parrot Automotive id=222 is the first arm row, pointing at the Parrot hub id=25. |
+| `is_arm` | BOOLEAN | yes | `0` | **CP31 mig-0025.** `is_arm=0` for hub rows (the default; 51 rows at v1.4.1); `is_arm=1` for arm rows (1 row at v1.4.1: Parrot Automotive id=222). Composes with `query_default` for default-query filtering. |
+| `query_default` | TEXT | yes | `'visible'` | **CP31 mig-0025.** CHECK enum 2 values: `'visible'` (hub rows + admitted-as-canonical arm rows; default) or `'hidden_arm'` (arm rows requiring explicit-opt-in for surfacing). **Default queries against `manufacturers` MUST filter `WHERE query_default = 'visible'` unless explicitly auditing arm rows.** Three explicit-opt-in paths surface arm rows: (1) explicit `WHERE query_default IN ('visible','hidden_arm')` audit query; (2) JOIN through `parent_manufacturer_id` for parent-child traversal; (3) direct FK reference from a future `identifiers.manufacturer_id` (CP32 §2 architectural binding — not a live column at v1.4.1). |
 
 #### Indexes
 
@@ -439,7 +444,7 @@ Primary on `(id)`. Implicit unique on `(deployment_id)`. Additional on `(extract
 
 ### §4.10. `behavioral_signatures` (parametric metadata for behavioral signatures)
 
-Parametric metadata for behavioral-class detection signatures. Introduced in migration 0010. Row count at v1.0.0: **131** (per CHANGELOG; the v1.0.0 ship populated this table from the Marlin NDSS 2025 corpus and subsequent backfills).
+Parametric metadata for behavioral-class detection signatures. Introduced in migration 0010. Row count verified live 2026-05-21 (post-CP32): **201** (v1.0.0 baseline 131 from the Marlin NDSS 2025 corpus + subsequent Wave I.x backfills carried into v1.4.x; CP32 §1 mig-0026 extended `device_category` CHECK enum 12 → 13 for `+automotive_telematics` enum parity with `identifiers.device_category`, but 0 row promotions land at v1.4.1 — the schema slot opens for future evidence-arrival).
 
 #### Columns
 
@@ -454,7 +459,7 @@ Parametric metadata for behavioral-class detection signatures. Introduced in mig
 | `source_file_relative` | TEXT | no | NULL | File path relative to source repo. |
 | `source_line` | INTEGER | no | NULL | Line number. |
 | `confidence` | INTEGER | no | NULL | **CHECK constraint** `BETWEEN 0 AND 100`. The intake-time false-positive-class allowlist sub-rule applies. |
-| `device_category` | TEXT | yes | — | **CHECK constraint** 12 values mirroring `identifiers.device_category`: `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`. |
+| `device_category` | TEXT | yes | — | **CHECK constraint** 13 values mirroring `identifiers.device_category` post-mig-0026 / CP32 §1: `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`, `automotive_telematics`. The CP32 §1 dual-table CHECK literal sweep (the framework's first such sweep) maintains enum parity with `identifiers.device_category`; downstream consumers (Lynceus, exports, coverage matrix) treat `device_category` as a single conceptual vocabulary regardless of host table. |
 | `notes` | TEXT | no | NULL | JSON or free-text. |
 | `created_at` | DATETIME | no | `CURRENT_TIMESTAMP` | UTC timestamp. |
 | `updated_at` | DATETIME | no | `CURRENT_TIMESTAMP` | UTC timestamp of last update. |
@@ -539,11 +544,11 @@ Migration ledger: every applied migration has one row.
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=23` at the post-CP28 v1.0.0 state, verified live 2026-05-19T00:41:07Z). |
-| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0023_identifier_type_check_extension_cp28'`, `'0022_fcc_citation_deferred_queue'`, `'0021_procurement_vendor_canonical_normalized'`, `'0020_source_type_enum_extension'`, `'0019_identifier_types_round2'`, `'0017_source_reclassifications'`, `'0016_license_column'`). Full ledger 0001–0023 enumerated below. |
+| `version` | INTEGER | yes (PK) | — | Migration version number (sequential; current `MAX(version)=26` at the v1.4.1 ship state, verified live 2026-05-21). |
+| `name` | TEXT | yes | — | Human-readable migration name (e.g., `'0026_cp32_device_category_automotive_telematics'`, `'0025_cp31_fcc_eas_identifier_type_cluster_plus_hub_and_spoke'`, `'0024_cp29_vendor_hostname_corpus_value_classes'`, `'0023_identifier_type_check_extension_cp28'`, …). Full ledger 0001–0026 enumerated below. Data-only addendum migrations using the `Na_` sub-slot convention (e.g., `0026a_phase10_vendor_apk_sources_admission`) do NOT register a `schema_version` row — they apply alongside the schema-mutating `0026_` migration sharing the same numeric slot and modify data only. |
 | `applied_at` | DATETIME | yes | `CURRENT_TIMESTAMP` | UTC timestamp of migration application. |
 
-Live migration ledger at `schema_version=23` (verified live 2026-05-19T00:41:07Z):
+Live migration ledger at `schema_version=26` (verified live 2026-05-21):
 
 | version | name | applied_at |
 |---:|---|---|
@@ -570,6 +575,11 @@ Live migration ledger at `schema_version=23` (verified live 2026-05-19T00:41:07Z
 | 21 | `0021_procurement_vendor_canonical_normalized` | 2026-05-17T05:07:32Z |
 | 22 | `0022_fcc_citation_deferred_queue` | 2026-05-18T14:58:12Z |
 | 23 | `0023_identifier_type_check_extension_cp28` | 2026-05-19T00:35:33Z |
+| 24 | `0024_cp29_vendor_hostname_corpus_value_classes` | 2026-05-20T00:22:56Z |
+| 25 | `0025_cp31_fcc_eas_identifier_type_cluster_plus_hub_and_spoke` | 2026-05-20T22:03:01Z |
+| 26 | `0026_cp32_device_category_automotive_telematics` | 2026-05-21T16:54:12Z |
+
+**Plus** `0026a_phase10_vendor_apk_sources_admission` — first `Na_` sub-slot data-only addendum precedent (codified at CP32 §1). Shares numeric slot 26 with the schema-mutating 0026 migration; admits 5 INSERT OR IGNORE rows into `sources` (sids 67-71) for the [MAC-204](/MAC/issues/MAC-204) Phase 10b admit-then-rebind disposition. No schema mutation, no `schema_version` ledger row.
 
 #### Indexes (1 index per current schema)
 
@@ -653,11 +663,11 @@ The dual-citation-pair convention itself was codified at CP26 (within-source cor
 
 ## §5. Enum reference (consolidated)
 
-Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP29 v1.4.0 state (`schema_version=24`, verified live 2026-05-20T00:22:56Z). Migration 0024 (the v24 schema-shape addition) extends `identifiers.identifier_type` CHECK from 51 → 54 values; see §5.1 for the 3 net-new CP29 entries.
+Canonical enum-value rosters across the schema, verified on-disk via `PRAGMA table_info()` + CHECK-extract from `sqlite_master.sql` at the post-CP32 v1.4.1 state (`schema_version=26`, verified live 2026-05-21). Migration 0025 (CP31) extends `identifiers.identifier_type` CHECK from 54 → 56 values (`fcc_grantee_code`, `equipment_class_code`); migration 0026 (CP32 §1) extends `identifiers.device_category` and `behavioral_signatures.device_category` CHECK from 12 → 13 values (`+automotive_telematics`) in a single dual-table sweep.
 
-### §5.1. `identifiers.identifier_type` — 54 values
+### §5.1. `identifiers.identifier_type` — 56 values
 
-The cumulative roster across migrations 0001–0024. Distinct values currently present in `identifiers` (post-promotion at v24): 40 of the 54 — 38 carry-forward from CP21 close + 3 net-new CP28(c) + 2 net-new CP29 with first-row promotion (`vendor_controlled_hostname` × 11,674 rows + `vendor_controlled_hostname_deprecated` × 565 rows; `vendor_cloud_endpoint_url` codified but populated as `value_class_alternates` on Wave I hosts, no primary-type-promoted rows in v1.4.0). The remaining 13 values are codified at the schema layer but have not yet promoted any rows.
+The cumulative roster across migrations 0001–0025 (56 values at `schema_version=26`). The CP31 net-new values (`fcc_grantee_code`, `equipment_class_code`) added at mig-0025 carry first-row promotion at v1.4.1 — `fcc_grantee_code` × 17 rows + `equipment_class_code` × 41 rows per the [MAC-201](/MAC/issues/MAC-201) §7.5-bis structural-anchor lift cycle. CP29's `vendor_cloud_endpoint_url` carried 1 first-row promotion in the v1.4.x cycle. Remaining values are codified at the schema layer; promotion lands per evidence-arrival.
 
 Baseline (migration 0001): `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`.
 
@@ -677,11 +687,13 @@ Migration 0023 (CP28 Wave H desktop-axis vendor-registered non-BLE cluster — �
 
 Migration 0024 (CP29 vendor cloud-infrastructure hostname corpus — Wave I/I.5/I.6/I.7 cumulative; CP29 §2 ladder 75-90 default / 85-95 cross-source / 95-99 firmware-cert ceiling for hostname; 80-90 / 90-97 for url; 80-87 for deprecated; §4.4 posture MAP / MAP / DROPPED-for-active-scan-MAP-for-historical-attribution respectively): `vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`.
 
-Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per the forward-looking-codification caveat in the vendor-companion-app sub-banding amendment; `vendor_asn_prefix` + `vendor_controlled_ip` per CP29 §3 deferral (0 empirical observations across Wave I cumulative; reserved for CP30 / migration 0025).
+Migration 0025 (CP31 FCC EAS identifier-type cluster — both DROPPED per §4.4 default at `device_category='unknown'` per CP32 §3; landed DROPPED stubs in `db/validation/export_lynceus.py:DROPPED_REASONS`): `fcc_grantee_code` (3-5 char FCC EAS grantee prefix; regulatory entity identifier), `equipment_class_code` (3-char FCC EAS equipment-class code; paired with grantee via `pair_kind='fcc_grantee_equipment_class'`).
 
-### §5.2. `identifiers.device_category` + `behavioral_signatures.device_category` — 12 values
+Forward-codified (NOT in current CHECK): `vendor_template_namespace_uuid` per the forward-looking-codification caveat in the vendor-companion-app sub-banding amendment; `vendor_asn_prefix` + `vendor_controlled_ip` per CP29 §3 deferral (0 empirical observations through Wave I.x cumulative; **CP30 reservation slot preserved** — CP31 + CP32 both skipped CP30 to hold the reservation; admission criteria gate on Wave I-prime ASN-prefix observation surfacing and/or cert IP-SAN surface yielding non-zero).
 
-`alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`.
+### §5.2. `identifiers.device_category` + `behavioral_signatures.device_category` — 13 values
+
+`alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`, **`automotive_telematics`** (CP32 §1 — mig-0026 dual-table CHECK literal sweep; the framework's first such sweep, applied in a single migration for enum parity).
 
 ### §5.3. `identifiers.source_type` + `raw_observations.source_type` (mirror) — 10 values
 
@@ -705,9 +717,9 @@ NOT extended at CP23. The 3 new bands (`judicial_filing`, `disclosure_filing`, `
 
 `ODbL-1.0`, `CC-BY-NC-SA-4.0`, `public-domain`, `foia`, `unspecified`.
 
-### §5.7. `identifiers.pair_kind` — 4 non-NULL values + NULL
+### §5.7. `identifiers.pair_kind` — 5 non-NULL values + NULL
 
-`la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation`, NULL.
+`la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation` (all from migration 0012), **`fcc_grantee_equipment_class`** (CP31 mig-0025 — extends CP14 paired-identifier discipline to FCC EAS regulatory entity pairing), NULL.
 
 Forward-codified (NOT in current CHECK): `static_mac_tracker` is a deferred item; lands at future canonical-bible §-text codification.
 

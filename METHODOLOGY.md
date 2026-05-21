@@ -531,3 +531,53 @@ Wave I integration codified two SAR-class disciplines as bible-amendment sibling
 - **SAR-13.5**: bucket attribution discipline (content-based attribution gate before promotion; three-state classification confirmed / rejected_slug_collision / ambiguous_operator_review_required; 57% misattribution observed in slug-discovery without content gate).
 
 See BIBLE_AMENDMENTS.md SAR-13 + SAR-13.5 entries for full discipline-evolution narrative and empirical anchors.
+
+## §12 — Wave I.9 → I.14c reconciliation cycle (v1.4.1 narrative)
+
+The v1.4.1 ship integrates the **Wave I.9 → I.14c reconciliation cycle** — seven sub-waves (I.9 + I.11 + I.12 + I.13-carry-forward + I.14a + I.14b + I.14c) of academic-corpus, community-research, certificate-transparency, and hard-ID-falsification reconciliation work that closed evidence loops left open by Wave I/I.5/I.6/I.7 v1.4.0 ship. The cycle methodology pattern:
+
+1. **Academic + community repo retroactive promotion (Wave I.9 / I.11 / I.12)** — surface unpromoted academic-paper and community-repo evidence that had been documented during Wave I.5-I.7 surveys but not promoted because the v1.4.0 ship cut closed the cycle before validator review fired. Stage 1 walks the surveys, re-fires §7.4 validation against each unpromoted candidate, and either promotes (when source-band ceiling + §8.2/§8.3 composition allow) or files a documented-absence under the existing absence-investigation convention.
+2. **crt.sh Distinguished-Name extraction** — re-mine the existing crt.sh CT-log corpus (sid 54 admission at v1.4.0; 11,551 attestation rows) for Subject DN O fields not surfaced by the v1.4.0 first-pass Common-Name-only extraction. The DN-O pass surfaces additional vendor-name aliases (e.g., `Honeywell International Inc.` recovered from firmware-OTA cert chain at MAC-195 ACS division enrichment).
+3. **Wave I.13 hard-ID falsification empirical anchors** — load-bearing empirical-evidence cohort for the CP30 reservation (`vendor_asn_prefix` + `vendor_controlled_ip`). Wave I.13 fired the falsification probes; both candidate identifier_type classes returned 0 empirical observations. CP30 reservation footnote held verbatim through CP31 + CP32 (both skipped CP30 numerically to preserve the reservation slot).
+4. **Phase 2.5 hostname-corpus FP audit** ([MAC-188](/MAC/issues/MAC-188)) — cumulative third-party-OSS / SDK-root FP-class demote sweep against the v1.4.0 hostname corpus (12,239 promoted rows). 262 rows demoted via the §8.3 supersession path across 9 manufacturers. The DJI cohort dropped from 410 → 242 rows post-cleanup; the demoted rows preserve provenance in `notes.supersession_audit[]` per the CP25 reversal-array discipline.
+
+The reconciliation cycle composes with the §5 confidence model and §6 dedup logic unchanged — the cycle is a **provenance-density** cycle (filling out evidence chains that were under-attested at v1.4.0) rather than a confidence-uplift cycle. Net active identifier delta: +172 rows. The cycle's discipline-output is the v1.4.1 CP31 + CP32 bible-amendment bundle codifying the multi-arm hub-and-spoke schema + the ten-section CP32 narrative/discipline bundle.
+
+## §13 — SAR-15.5 first activation (v1.4.1 narrative)
+
+The Stage 1 close-out of the v1.4.1 cycle was the first activation of the **SAR-15.5 independent close-out audit discipline** (post-ship codified at v1.4.0; first applied at v1.4.1). SAR-15.5 fires automatically on any ship cycle that crosses ≥10 phases / ≥10k row promotions / ≥3 new sources / ≥1 new migration — empirically, "large-ship" cycles where the Validator-role main pass has historically had a chance to miss something the operator would catch on a second-pass review.
+
+The first activation surfaced **the Honeywell-in-lexicon miss**: the main Phase 6 enrichment script omitted `honeywell` from its vendor-key-to-canonical mapping table, so the firmware-derived legal-entity string `Honeywell International Inc.` had not been appended to the canonical Honeywell row (id=211, which exists per the v1.0.0 baseline). SAR-15.5 surfaced the miss; a post-ship corrective sub-pass landed the missing alias under the same `sweep_event_id` audit-trail discipline as the parent sweep. Net Stage 1 SAR-15.5 verdict: **PASS** (verdict was conditioned on the corrective sub-pass landing pre-tag; corrective sub-pass landed pre-tag; PASS issued).
+
+SAR-15.5 is the discipline framework's first dedicated "Validator-role-checks-Validator-role" audit pattern. Codified anchor: BIBLE_AMENDMENTS.md SAR-15.5 entry (post-ship corrective codification on the v1.4.0 board comment thread 2026-05-20).
+
+## §14 — `Na_` sub-slot migration convention (CP32 §1 — first application at v1.4.1)
+
+Mig-0026a (`db/migrations/0026a_phase10_vendor_apk_sources_admission.sql`) is the framework's first application of the **`Na_` sub-slot migration convention** codified inline at CP32 §1 (renamed from `0026_phase10_vendor_apk_sources_admission.sql` at commit `398c8b8`):
+
+> **Data-only addendum migrations sharing a numeric slot with a schema-mutating migration use a sub-letter suffix (`Na_…`) and apply after the main `N_` slot (lexical: `_` < `a`).**
+
+The convention frees the `0026_` slot for the schema-mutating CP32 §1 migration without renumbering downstream cycles. Filename↔schema_version 1:1 holds for schema-mutating migrations (`N_…`); data-only addenda live alongside via `Na_/Nb_/…` and do NOT register a `schema_version` ledger row.
+
+Pre-CP32-§1, the framework's filename convention required strict numeric-monotonic ordering with no sub-slots. Mig-0026a demonstrates that a data-only addendum sharing a numeric slot is admissible without breaking the convention: it cannot conflict with the schema-mutating migration at the same numeric slot because lexically `0026_…` < `0026a_…`, and the migration runner applies in lexical order. Future data-only addenda (Nb_, Nc_, …) compose the same way.
+
+No retroactive sweep of prior data-only entries is implied — the convention applies from CP32 onward; the v1.4.1 ship is the precedent-setting application.
+
+## §15 — §7.5 + §11 #3 export-time PII generator post-condition guard (CP32 §10 — v1.4.1)
+
+CP32 §10 codified the **export-time PII generator post-condition guard pattern** as a framework-level discipline rule. The pattern applies to every Lynceus-export emission call site:
+
+```python
+# canonical template per CP32 §10
+def _emit_export(path: Path, rows: list[dict]) -> None:
+    write_export(path, rows)        # row-classification gate already filtered PII
+    _assert_no_email_pii(path)      # post-condition guard re-reads the file and Halts on regex match
+```
+
+`_assert_no_email_pii(path)` re-reads the written file from disk, applies the regex predicate `\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b`, and raises `Halt` (not return-false) if any match survives. The guard is defense-in-depth — it catches BOTH (a) classification-gate bugs (a stale `_classify_row` predicate would leak PII at the row-emission layer if the guard didn't fire); and (b) new-code-path bypasses (a custom export script that bypasses the gate would still be caught at write-time).
+
+**Forward-looking sub-rule (CP32 §10):** any §11 hard-rule that constrains export content shape SHOULD have a paired `_assert_no_<rule>_<violation>(path)` post-condition guard at every emission call site. The pattern lives at `db/validation/export_lynceus.py` + `db/validation/export_behavioral_signatures.py` (7 live call sites at v1.4.1; commit `50b8232`); it composes with the existing row-classification gate per a defense-in-depth pattern.
+
+**Empirical anchor:** `argus_export.csv` regex-scan returns **0 email-shape matches** at v1.4.1 ship — the guard is active and clean.
+
+**Companion §11 #3 PII discipline composition:** [MAC-217](/MAC/issues/MAC-217) Track B demoted 4 Jacobs `*.escg.jacobs.com` rows during the §8.2 PII-strip when cert-subject personal email PII was discovered. The 4 rows are now `superseded_by = id` (self-loop) per the CP32 §9 tri-state semantic — the "withdrawn-without-successor" semantic, distinct from canonical-merge supersession. The PII row is REMOVED from any active-set query (`WHERE superseded_by IS NULL` excludes it) AND the row's self-loop signals "no successor exists" for forensic-grade audit-trail purposes. The defense composes: §11 #3 demoted the rows, CP32 §9 codified the self-loop semantic, CP32 §10 added the export-time post-condition guard.

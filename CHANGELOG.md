@@ -4,7 +4,46 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.4.0.)
+(No unreleased changes since v1.4.1.)
+
+## [v1.4.1] — 2026-05-21
+
+### Schema
+
+- `schema_version` 25 → **26** (mig-0026 CP32 §1 landed in Stage 2; mig-0025 CP31 landed earlier in this branch under Stage 1, bumping 24 → 25)
+- `identifiers.device_category` CHECK enum: 12 → **13** (`+automotive_telematics` per CP32 §1)
+- `behavioral_signatures.device_category` CHECK enum: 12 → **13** (`+automotive_telematics`; dual-table sweep applied in mig-0026 — the framework's first dual-table CHECK literal extension; enum parity with `identifiers.device_category`)
+- `identifiers.identifier_type` CHECK enum: 54 → **56** (CP31 `+fcc_grantee_code`, `+equipment_class_code`)
+- `identifiers.pair_kind` CHECK enum: 4 → **5** (CP31 `+fcc_grantee_equipment_class` per CP14 paired-identifier discipline)
+- `manufacturers` schema: +3 columns (`parent_manufacturer_id INTEGER NULL REFERENCES manufacturers(id)`, `is_arm BOOLEAN NOT NULL DEFAULT 0`, `query_default TEXT NOT NULL DEFAULT 'visible' CHECK (query_default IN ('visible','hidden_arm'))`) — CP31 multi-arm hub-and-spoke schema; first FK self-reference on `manufacturers`
+- **mig-0026a** — first `Na_` sub-slot data-only addendum precedent (5 INSERT OR IGNORE rows; no schema mutation, no `schema_version` bump). Lexical-after suffix admits a data-only migration alongside the schema-mutating `0026_` migration at the same numeric slot; renamed from `0026_phase10_*.sql` at commit `398c8b8`. CP32 §1 codifies the convention.
+
+### Data
+
+- Sources: 66 → **71** (+5 in v1.4.1 via mig-0026a — sids 67-71: Hikvision Hik-Connect, Dahua DMSS, Motorola Solutions WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot; all `source_type='manufacturer_app'` tier 3; admitted via [MAC-204](/MAC/issues/MAC-204) Phase 10b admit-then-rebind disposition under the sid=13 envelope)
+- Manufacturers: 51 → **52** (+1 in v1.4.1: Parrot Automotive id=222 — first multi-arm `hidden_arm` row in the framework; `parent_manufacturer_id=25, is_arm=1, query_default='hidden_arm', primary_category='automotive_telematics', aliases='PARROT FAURECIA AUTOMOTIVE SAS,Parrot Faurecia Automotive S.A.S'`)
+- Identifiers active: 34,792 → **34,964** (+172 net per Stage 1 SAR-15.5 PASS); total 34,872 → **35,310**; chained-superseded 80 → **342**; withdrawn-no-successor self-loops 0 → **4** (CP32 §9 + [MAC-217](/MAC/issues/MAC-217) Track B Jacobs `*.escg.jacobs.com` PII demotes)
+- Raw observations: ↑ to **146,573**
+- Behavioral signatures: **201** (unchanged this cycle — CP32 §1 schema extension opens the `automotive_telematics` slot but admits 0 row promotions at v1.4.1)
+
+### Bible amendments
+
+- **CP31** (mig-0025) — FCC EAS identifier_type cluster + multi-arm manufacturer hub-and-spoke schema. 5 codified amendments: identifier_type CHECK enum +2 (`fcc_grantee_code`, `equipment_class_code`); pair_kind CHECK enum +1 (`fcc_grantee_equipment_class`); manufacturers +3 columns; Parrot Automotive arm row inline conversion; §8.2 fccid.io source-band re-attestation. First multi-arm hub-and-spoke admission. Forward-looking architectural binding documented for a future `identifiers.manufacturer_id` FK migration. Ratification: [MAC-184#comment-25b3ff0b](/MAC/issues/MAC-184#comment-25b3ff0b-f763-4291-90e9-490f1656a2c9); landing commits `40b166e` (migration) + `f9bcf22` (consumer audit) + the bible commit on this branch.
+- **CP32** (mig-0026) — 10 sub-section bundle codification. §1 `device_category` dual-table CHECK extension (the only schema-mutating sub-section); §2 future `identifiers.manufacturer_id` FK binding (architectural-only); §3 dynamic `identifier_type` CHECK enum read at test runtime (commit `ed3f75d` test refactor + 5 DROPPED stubs in `db/validation/export_lynceus.py:DROPPED_REASONS`); §4 multi-arm vendor backlog admission cadence (narrative); §5 Lynceus exports per-bundle regen cadence (narrative); §6 §11 #17 session-bounded admission carve-out (folded from Stage 1 MAC-206); §7 sandbox-absence HALT-fast-path default sub-rule (folded from MAC-207); §8 MAC-206 carve-out export-drop attribution rule (folded from MAC-209); §9 `superseded_by` tri-state semantic clarification (NULL = active / `<other_id>` = superseded by successor / `<self_id>` = withdrawn-no-successor); §10 §11 #3 export-time generator post-condition guard pattern (first framework-level codification; canonical template `_assert_no_email_pii(path)` at 7 call sites across `db/validation/export_lynceus.py` + `db/validation/export_behavioral_signatures.py`). Ratification: [MAC-220](/MAC/issues/MAC-220) close on commit `9f76fd7`.
+- **Deferral Note 1** ([MAC-203](/MAC/issues/MAC-203) Honeywell §44.3 product-nomenclature corpus deferred at v1.4.1 — Path 1 intentional scope narrowing; no surviving §11 #7 evidence trail). First standalone Deferral Note in the bible-amendments ledger; documents the deliberate-deferral path without mutating bible text or schema.
+- **SAR-15.5** first activation (Stage 1) — independent close-out audit discipline for ≥10-phase / ≥10k-promotion / ≥3-new-source / ≥1-new-migration ship cycles. Verdict: PASS. Codification anchored Validator-role accountability for large-ship cycles and corrected the Honeywell-in-lexicon miss the main self-executed pass missed (pre-tag).
+
+### Documentation
+
+- New: `docs/lynceus_handoff_v1_4_1.md` — Lynceus-consumer-oriented integration handoff (schema-version accept-list, identifier_type enum delta, export shape, `_meta.dropped_in_export` reconciliation, severity recommendation for `automotive_telematics`, open questions for v1.4.2)
+- Stage 1 + Stage 2 final reports anchored at `~/argus-internal/wave_i_4_1_integration_stage_1/STAGE_1_FINAL_REPORT.md` + `~/argus-internal/wave_i_4_1_integration_stage_2/STAGE_2_FINAL_REPORT.md` (Paperclip-doc-not-file convention — NOT repo files)
+- README + CHANGELOG + DATA_DICTIONARY + CREDITS + METHODOLOGY refreshed for v1.4.1 ([MAC-223](/MAC/issues/MAC-223) Phase 3 single bundled commit; counts verified against live `db/argus.db` at HEAD pre-commit per the paste-not-cite discipline)
+
+### Notes
+
+- `v1.4.1-rc1` tag preserved in reflog at commit `6d33fa8` (annotated tag-object `e370777`); the Stage 2 Phase 5 close lands the final `v1.4.1` tag via Option A soft-reset to the final HEAD
+- Operator pushes the final tag + branch manually post-Phase-5 close — no automated push from the Validator-side Phase 3 docs pass
+- v1.4.1 ship is co-coordinated under [MAC-184](/MAC/issues/MAC-184) (Stage 1 parent) + [MAC-219](/MAC/issues/MAC-219) (Stage 2 parent — CP32 + Docs + Final Tag)
 
 ## [v1.4.0] — 2026-05-20
 
