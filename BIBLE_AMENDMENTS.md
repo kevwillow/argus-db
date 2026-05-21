@@ -3715,3 +3715,52 @@ This deferral entry IS the §11 #11 amendment-log pairing for the deliberate-def
 Branch: `v1.4.1-integration-stage-1` (MAC-203 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
 
 ═══════════════════════════════════════════════════════════════════════
+
+
+## CP32 Candidate #6 (pending CP32 bundle landing) — Direct-admission carve-out (wave_g_pre_v1, 21 rows) + §11 #17 applicability-scope clause
+
+**Date:** 2026-05-20
+**Branch:** `v1.4.1-integration-stage-1` (will land on `main` when CP32 bundle ships; entry is candidate-state until then)
+**Commit:** *(this entry lands with the bible §11 #17 edit in the same commit on v1.4.1-integration-stage-1)*
+**Source:** [MAC-206](/MAC/issues/MAC-206) Phase 10d Run 3 — β.3c ratified at [MAC-206 comment 90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) 2026-05-20 (CEO ratification)
+**Status:** **Candidate** — landing pending CP32 bundle close; this entry sits as candidate #6 alongside 5 existing CP32 candidates queued at CP31 close ([MAC-197 CP31](/MAC/issues/MAC-197))
+**Ratifying CEO comment:** [MAC-206#90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) — β.3c (verbatim applicability language ratified)
+**Companion CEO ratification:** [MAC-205](/MAC/issues/MAC-205) (disposition β + scope-handling Option A — 21 rows ratified for carve-out)
+
+### §1 — What was edited
+
+`PROJECT_BIBLE.md` §11 gained a new numbered entry **#17** with two stacked sub-bullets:
+
+1. **§11 #17 (top-level rule)** — Direct-admission carve-out clause. States the amended audit invariant (raw_observations predecessor OR `notes.direct_admission_carve_out=true` referencing sources.notes provenance); session-bounds to `wave_g_pre_v1` (sids 13, 14; 21 rows enumerated at MAC-205); declares non-future-pathway; cites wave_g_pre_v1 intentionality anchors (`mac_55_step_2_run` + `authority_chain` on sources rows); contrasts with the 16 apkpure-sourced identifiers admitted *outside* wave_g_pre_v1 (ids 23043–23058) that carry raw_observations predecessors per the canonical contract.
+2. **§11 #17 sub-bullet — Applicability scope** (CEO verbatim). Two excluded row classes:
+    - **Class 1 (out-of-scope by era's convention):** 106 `identifiers` MAC-44 rationales + 21 `sources` MAC-63 templates + ~52,501 `raw_observations` FCC/IEEE address strings. **Future migrations MUST NOT JSON-ify them.** No backfill required or authorized.
+    - **Class 2 (deferred intended-JSON repair):** 5 `identifiers` (ids 554-558, RAVEN_* services) + 1 `sources` (sid=7). Backfill required, deferred to [MAC-208](/MAC/issues/MAC-208).
+    - id=539 (Flock Safety, sid=13) is class 2 but was forward-repaired in MAC-206 (carve-out UPDATE mechanically requires `json_valid(notes)=1`). The MAC-206 repair lifted suffix verbatim into `notes.corroboration_note_2026_05_10` + added `notes.repair_audit.sweep_event_id='mac206_id539_repair_2026_05_20'`. repair_audit + carve_out_audit events cross-reference each other on id=539's row.
+3. **§11 #17 sub-bullet — Downstream-consumer applicability (MAC-206 Phase 3 sweep, 2026-05-20).** Records the in-heartbeat consumer sweep: `argus_cli.py`, `db/validation/export_lynceus.py`, `db/export/wave_a_snapshot_export.py` all read `identifiers.notes` as opaque-string (no json_extract); `db/validation/mac101_item_a_registry_xcheck.py` defensively guards with `WHERE json_valid(notes)` on raw_observations only. No consumer hard-requires global `json_valid(notes)=1` on identifiers. Adds an operational sub-rule binding future consumers that add `json_extract(notes,'$.X')` calls on columns where class-1 rows live.
+
+### §2 — What was changed in the DB (paste-not-cite from MAC-206 Phase 10d Run 3)
+
+- **Backup:** `db/argus.db.mac206_pre_carveout_backup` sha256 = `f346940861995b740c301fc520aab3500e2acebb158fcbe7aecb88f088c51bab`.
+- **Phase 1.6 sibling repair (sweep_event_id `mac206_id539_repair_2026_05_20`):** 1 row UPDATEd (id=539). Pre-UPDATE: `json_valid(notes)=0`, length=446 chars, sha256=`7855e94df59f0642390a6d66481e23a98577aed560b0673a706c036262783786`. Post-UPDATE: `json_valid(notes)=1`, 4 original keys preserved (`apk_package`, `apk_version`, `sub_band`, `§8.3_boost_pending`) + `corroboration_note_2026_05_10` (suffix lifted verbatim) + `repair_audit` (with forward-ref to carve-out event + MAC-208 child-issue ref).
+- **Phase 2 carve-out (sweep_event_id `mac206_wave_g_carveout_2026_05_20`):** 21 rows UPDATEd via `json_patch(notes, ?)` (first-run affected=21; idempotency re-run affected=0). Composite WHERE: `id IN (533..553) AND source_url IN (<flock_url>, <getac_url>) AND json_extract(notes,'$.direct_admission_carve_out') IS NULL`. Each row gained 7 carve-out top-level keys + `carve_out_audit` sub-object with `precondition_event` back-ref to the id=539 repair event + `child_issue_ref` to [MAC-208](/MAC/issues/MAC-208).
+- **No migration applied.** No schema/enum change. The carve-out is a `notes` JSON addition only.
+- **No fabrication.** Per §11 #1 paste-not-cite: id=539 suffix lifted verbatim (not paraphrased); all 21 rows' pre-existing keys preserved (json_patch is additive); audit metadata is timestamped + sweep_event_id-anchored.
+
+### §3 — Why this is a candidate, not a numbered CP
+
+CP31 landed at MAC-197 (`v1.4.1-integration-stage-1` HEAD at CP31 close). CP32 has 5 existing candidates queued; this is candidate #6. The final CP32 slot number is reserved for the bundle landing — if CP32 lands as a single bundle commit, this entry's title will be renumbered to a sub-section of the CP32 entry. If CP32 is split into CP32 + CP33, this entry may land as part of one of the bundle commits at the discretion of the bundle author. Either way, the carve-out clause + applicability clause MUST land in the same commit (they are conceptually paired per CEO ratification).
+
+The bible text edit at §11 #17 has already been applied to `PROJECT_BIBLE.md` on `v1.4.1-integration-stage-1` as part of the MAC-206 Phase 10d Run 3 heartbeat; this BIBLE_AMENDMENTS.md entry pairs with that edit per §11 #11 self-binding.
+
+### §4 — Cross-references
+
+- MAC-206 Phase 10d execution heartbeat: `_phase_10_schema_anomaly/carve_out_execution.md` Run 3 (this same commit).
+- Sibling [MAC-208](/MAC/issues/MAC-208) (v1.4.2 hygiene — repair 6 intended-JSON rows broken by `{json}<concat>text` defect): filed at MAC-206 Phase 10d Run 3 Step 2 with title-only stub body containing the verbatim scan paste of the 5 RAVEN_* + sid=7 rows. Not a blocker on MAC-206 or v1.4.1 Stage 1.
+- MAC-205 scoping heartbeat: `_phase_10_schema_anomaly/orphan_scoping.md` §3 — 21-row enumeration.
+- MAC-202 (sid=13 investigation) + MAC-204 (sid=13 rebind) — sibling MAC-184 children, both `done`.
+
+### §5 — §11 #11 self-binding satisfied
+
+This entry IS the §11 #11 pairing for the bible §11 #17 edit. The git commit applying both the bible edit and this entry is recorded above (commit hash filled in when committed). No undocumented amendment.
+
+═══════════════════════════════════════════════════════════════════════

@@ -357,3 +357,268 @@ Phase 1.5 was read-only (`SELECT … FROM identifiers/sources/raw_observations W
 - **Unblock action:** CEO comments on MAC-206 with chosen β.3 sub-disposition; DBArchitect resumes execution under that scope
 - **DBArchitect recommendation:** β.3c — repair id=539 only, add explicit applicability-scoping clause to the bible §11 amendment, defer 5 RAVEN_* + sid=7 to a separate hygiene initiative
 - **Bible amendment (Phase 3):** drafting deferred until β.3 disposition lands (because the applicability-scoping clause is the key open question)
+
+---
+
+# Run 3 — 2026-05-20 (β.3c ratified, full 7-step sequence executed in one heartbeat)
+
+**Status:** ✅ EXECUTED · Phase 1.6 repair + Phase 2 carve-out + Phase 3 bible amendment all landed under one backup
+**Branch:** `v1.4.1-integration-stage-1` @ `e61ffae` (pre-commit; new commit lands at heartbeat close)
+**Auth:** CEO ratified β.3c at [MAC-206 comment 90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) 2026-05-20T23:47:08Z (refined applicability clause + child-issue gate; verbatim language ratified)
+**Pre-authorized 7-step sequence:** Backup → file child issue → id=539 repair → 21-row carve-out → bible amendment → heartbeat → close
+
+## 3.1 Pre-flight re-verification (run 3, paste-not-cite)
+
+All Run 2 §1.5.d invariants re-confirmed unchanged at run 3 start (no parallel landing between Run 2 and Run 3):
+
+```
+total identifiers WHERE id BETWEEN 533 AND 553                           = 21
+by manufacturer:  Flock Safety = 19;  Getac = 2
+raw_observations WHERE promoted_identifier_id BETWEEN 533 AND 553        = 0
+raw_observations WHERE source_id = 13                                    = 0
+raw_observations WHERE source_id = 14                                    = 0
+extraction_runs  WHERE source_id = 13                                    = 0
+extraction_runs  WHERE source_id = 14                                    = 0
+identifiers WHERE id BETWEEN 533 AND 553 AND superseded_by IS NOT NULL   = 0
+identifiers WHERE id BETWEEN 533 AND 553 AND direct_admission_carve_out=1 = 0  (no already-carved)
+json_valid(notes) distribution: 1 row with jv=0 (id=539);  20 rows with jv=1
+```
+
+Source-side provenance signatures on `sources.notes` re-read for sid=13 + sid=14 — both carry verbatim:
+
+```
+sid=13: session_admission='wave_g_pre_v1'
+        authority_chain='MAC-1 ddc193cd → MAC-52 → CP12 90132fa → CP13 4e8a29c (migration 0009 manufacturer_app enum)'
+        mac_55_step_2_run='pre-auth 3 mechanical promotion 2026-05-11'
+sid=14: (same triple, verbatim)
+```
+
+→ No drift since MAC-205 scoping. Halt criteria PASSED. Proceeding to mutations.
+
+## 3.2 Step 1 — backup
+
+```
+$ cp db/argus.db db/argus.db.mac206_pre_carveout_backup
+$ sha256sum db/argus.db.mac206_pre_carveout_backup
+f346940861995b740c301fc520aab3500e2acebb158fcbe7aecb88f088c51bab  db/argus.db.mac206_pre_carveout_backup
+```
+
+## 3.3 Step 2 — file deferred-hygiene child issue (MAC-208)
+
+POST `/api/companies/{co}/issues` → **HTTP 201**.
+
+```
+id:         5129d69a-6f88-4c39-b5ed-d341423e55c9
+identifier: MAC-208
+status:     backlog
+priority:   low
+parentId:   7f88ac7a-abbd-4317-8348-cae1ef0f5f0e   (= MAC-184 v1.4.1 Stage 1 umbrella)
+title:      "v1.4.2 hygiene — repair 6 intended-JSON rows broken by `{json}<concat>text` defect
+             (id=539 was forward-repaired in MAC-206; this issue covers ids 554-558 + sid=7)"
+```
+
+Body contains: scan paste-not-cite of the 5 RAVEN_* identifier rows + the 1 sid=7 sources row (heads + tails, length annotations), forward-reference to the bible §11 #17 applicability clause, the CEO's probe question ("are all 6 rows symptoms of one ingest-time mechanic or independent one-offs?"), explicit out-of-scope guard against bundling in the 52,628 convention-era rows, and the explicit non-blocker disclaimer. No `blockedByIssueIds` set linking MAC-206 → MAC-208 (per CEO instruction: MAC-208 is forward-looking, not a precondition).
+
+## 3.4 Step 3 — Phase 1.6 id=539 sibling repair (sweep_event_id `mac206_id539_repair_2026_05_20`)
+
+Pre-UPDATE id=539 `notes` (paste-not-cite):
+
+```
+length: 446 chars
+sha256: 7855e94df59f0642390a6d66481e23a98577aed560b0673a706c036262783786
+shape:  {"apk_package": "com.flocksafety.hazyhiwire", "apk_version": "2.4.0",
+         "sub_band": "70-85 (manufacturer_app default SSID/BLE-local-name vendor-prefix)",
+         "§8.3_boost_pending": "77→82 via B.3.4 second-source uplift in same transaction"}
+         | §8.3 corroboration 2026-05-10: flock-back signatures.py:52 Penguin
+           ble_local_name second-source uplift; +5 boost (77→82 below 85 sub-band ceiling);
+           B.3.4 staged in raw_observations as provenance trail
+```
+
+UPDATE statement (single-row, composite WHERE + idempotency guard):
+
+```sql
+UPDATE identifiers
+   SET notes = ?              -- repaired JSON-object form, see below
+ WHERE id = 539
+   AND source_url = 'https://apkpure.com/flock-safety-device-app/com.flocksafety.hazyhiwire'
+   AND json_valid(notes) = 0  -- only repair if still defective (idempotency guard)
+```
+
+Mechanism: parse the JSON head (4 keys) verbatim; lift the freeform suffix (everything after ` | `) into a new key `corroboration_note_2026_05_10`; add a `repair_audit` JSON object with sweep_event_id + repaired_at_utc + repair_reason + original_blob_sha256 + original_blob_length_chars + suffix_lifted_into_key + related_event (forward-ref to the carve-out's sweep_event_id) + audit_ref (β.3c ratification anchor) + child_issue_ref (MAC-208). The mechanic preserves §11 #1 paste-not-cite — the suffix is verbatim, not paraphrased; the 4 existing keys are preserved bit-for-bit.
+
+Post-UPDATE verify:
+
+```
+affected rows:                           1  ✓
+json_valid(notes):                       1  ✓
+$.apk_package                            = 'com.flocksafety.hazyhiwire'                      (preserved)
+$.apk_version                            = '2.4.0'                                           (preserved)
+$.sub_band                               = '70-85 (manufacturer_app default SSID/BLE-…)'     (preserved)
+$."§8.3_boost_pending"                   = '77→82 via B.3.4 second-source uplift…'           (preserved; quoted-path syntax for non-ASCII key)
+$.corroboration_note_2026_05_10          = '§8.3 corroboration 2026-05-10: flock-back…'      (NEW — suffix verbatim)
+$.repair_audit.sweep_event_id            = 'mac206_id539_repair_2026_05_20'                  (NEW)
+$.repair_audit.original_blob_sha256      = '7855e94df59f0642390a6d66481e23a98577aed560…'    (NEW)
+$.repair_audit.related_event.sweep_event_id = 'mac206_wave_g_carveout_2026_05_20'            (NEW — forward-ref to Step 4 event)
+post-UPDATE notes length:                1391 chars
+```
+
+## 3.5 Step 4 — Phase 2 carve-out UPDATE (sweep_event_id `mac206_wave_g_carveout_2026_05_20`)
+
+Pre-execute confirmation that all 21 target rows are now json_valid=1 (Step 3's repair restored id=539 to the eligible set):
+
+```
+SELECT COUNT(*) FROM identifiers WHERE id BETWEEN 533 AND 553 AND json_valid(notes)=1   = 21  ✓
+```
+
+UPDATE statement (21-row, composite WHERE + idempotency guard, json_patch is additive):
+
+```sql
+UPDATE identifiers
+   SET notes = json_patch(notes, ?)        -- carve-out payload below
+ WHERE id IN (533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553)
+   AND source_url IN ('https://apkpure.com/flock-safety-device-app/com.flocksafety.hazyhiwire',
+                      'https://apkpure.com/getac-bwc-viewer/com.getac.android.mobileappBWC')
+   AND json_extract(notes, '$.direct_admission_carve_out') IS NULL
+```
+
+Payload (1292 chars):
+
+```json
+{
+  "direct_admission_carve_out": true,
+  "session_admission": "wave_g_pre_v1",
+  "authority_chain": "MAC-1 ddc193cd → MAC-52 → CP12 90132fa → CP13 4e8a29c (migration 0009 manufacturer_app enum)",
+  "mac_55_step_2_run": "pre-auth 3 mechanical promotion 2026-05-11",
+  "provenance_path": "sources.id={13|14}.notes",
+  "ratification_ref": "MAC-205 CEO ratification 2026-05-20 + MAC-206 β.3c ratification 2026-05-20 (CEO comment 90e6b70f)",
+  "carve_out_scope": "session-scoped historical exception; not a future admission pathway",
+  "carve_out_audit": {
+    "sweep_event_id": "mac206_wave_g_carveout_2026_05_20",
+    "applied_at_utc": "2026-05-20",
+    "applied_to_ids": [533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553],
+    "applied_to_sids": [13, 14],
+    "precondition_event": {
+      "sweep_event_id": "mac206_id539_repair_2026_05_20",
+      "kind": "id539_intended_json_sibling_repair",
+      "role": "id=539's intended-JSON defect was repaired in same heartbeat AS PRECONDITION FOR this carve-out (json_patch requires json_valid=1 on target row)"
+    },
+    "child_issue_ref": "MAC-208 (v1.4.2 hygiene; tracks sibling deferred rows ids 554-558 + sid=7; this carve-out does NOT depend on MAC-208 closing)",
+    "audit_ref": "MAC-206 Phase 10d Run 3 — β.3c ratified (CEO comment 90e6b70f 2026-05-20)"
+  }
+}
+```
+
+Post-UPDATE verify (paste-not-cite):
+
+```
+First-run affected rows:                              21  ✓
+Idempotency re-run affected rows:                      0  ✓
+SELECT COUNT(*) … direct_admission_carve_out=1:      21  ✓
+```
+
+Sample id=540 POST-carve-out notes (Flock, product_family_codename `AVICORE`):
+
+```json
+{
+  "sub_band": "90-95",
+  "apk_package": "com.flocksafety.hazyhiwire",
+  "apk_version": "2.4.0",
+  "direct_admission_carve_out": true,
+  "session_admission": "wave_g_pre_v1",
+  "authority_chain": "MAC-1 ddc193cd → MAC-52 → CP12 90132fa → CP13 4e8a29c (migration 0009 manufacturer_app enum)",
+  "mac_55_step_2_run": "pre-auth 3 mechanical promotion 2026-05-11",
+  "provenance_path": "sources.id={13|14}.notes",
+  "ratification_ref": "MAC-205 CEO ratification 2026-05-20 + MAC-206 β.3c ratification 2026-05-20 (CEO comment 90e6b70f)",
+  "carve_out_scope": "session-scoped historical exception; not a future admission pathway",
+  "carve_out_audit": {
+    "sweep_event_id": "mac206_wave_g_carveout_2026_05_20",
+    "applied_at_utc": "2026-05-20",
+    "applied_to_ids": [533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553],
+    "applied_to_sids": [13, 14],
+    "precondition_event": {
+      "sweep_event_id": "mac206_id539_repair_2026_05_20",
+      "kind": "id539_intended_json_sibling_repair",
+      "role": "id=539's intended-JSON defect was repaired in same heartbeat AS PRECONDITION FOR this carve-out (json_patch requires json_valid=1 on target row)"
+    },
+    "child_issue_ref": "MAC-208 (v1.4.2 hygiene; tracks sibling deferred rows ids 554-558 + sid=7; this carve-out does NOT depend on MAC-208 closing)",
+    "audit_ref": "MAC-206 Phase 10d Run 3 — β.3c ratified (CEO comment 90e6b70f 2026-05-20)"
+  }
+}
+```
+
+id=539's notes post-Step 4 carries BOTH the `repair_audit` key (from Step 3) AND the `carve_out_audit` key (from Step 4) — events cross-reference each other:
+
+```
+id=539 keys: ['apk_package', 'apk_version', 'authority_chain', 'carve_out_audit',
+              'carve_out_scope', 'corroboration_note_2026_05_10', 'direct_admission_carve_out',
+              'mac_55_step_2_run', 'provenance_path', 'ratification_ref', 'repair_audit',
+              'session_admission', 'sub_band', '§8.3_boost_pending']
+```
+
+repair_audit.related_event.sweep_event_id → 'mac206_wave_g_carveout_2026_05_20'  (forward-ref)
+carve_out_audit.precondition_event.sweep_event_id → 'mac206_id539_repair_2026_05_20'  (back-ref)
+
+Future readers can reconstruct the event order from either direction.
+
+## 3.6 Step 5 — bible §11 amendment + downstream-consumer sweep
+
+**Downstream-consumer sweep (per [[feedback_bible_amendment_downstream_consumer_audit]] S.6.1/S.7/S.8 gate):**
+
+Surveyed all known consumers of `identifiers.notes`:
+
+| Consumer | Path | Treatment | Verdict |
+|---|---|---|---|
+| `argus_cli.py` query | reads `notes` as opaque string for print | `_print_identifier_row` does not call json_extract on identifiers.notes | TOLERATES non-JSON |
+| `db/validation/export_lynceus.py` | reads `notes` as opaque string into `ActiveRow.notes` | downstream export passes it through; no json_extract on identifiers.notes | TOLERATES non-JSON |
+| `db/validation/mac101_item_a_registry_xcheck.py` | guards with `WHERE json_valid(notes)` | only on raw_observations rows, not identifiers; defensive filter | TOLERATES non-JSON |
+| `db/export/wave_a_snapshot_export.py` | calls `json_extract(er.notes,'$.wave')` | on `extraction_runs`, NOT identifiers | OUT OF SCOPE for §11 #17 applicability |
+| (other consumers) | grep'd `json_extract.*notes` and `json_valid` across repo | no hard-requirer found globally on identifiers.notes | TOLERATES non-JSON |
+
+**Sweep verdict:** No consumer hard-requires `json_valid(notes)=1` globally on `identifiers`. Bible commit lands clean. The 35.9% non-JSON `raw_observations.notes` rows that have existed since the FCC/IEEE bulk-ingest era pass through current consumers without conflict — this confirms the convention-era class-1 carve-out is empirically already-tolerated, not a new posture.
+
+Per the CEO's verbatim language, the §11 amendment was applied as a **new numbered §11 #17 rule** with three stacked sub-bullets:
+
+1. The carve-out clause itself (audit invariant amended; session-bounded; not a future admission pathway; CP32 candidate marker).
+2. The applicability-scope sub-clause (Class 1 = convention; Class 2 = deferred to MAC-208; id=539 forward-repaired in MAC-206).
+3. The downstream-consumer applicability sub-bullet (records the sweep finding + binds future consumers to guard with `WHERE json_valid(notes)` when adding json_extract calls on identifiers.notes).
+
+`BIBLE_AMENDMENTS.md` gained a corresponding `## CP32 Candidate #6` entry (pending CP32 bundle landing) per §11 #11 self-binding. Both edits land in the same git commit on `v1.4.1-integration-stage-1`.
+
+## 3.7 Step 6 — this heartbeat
+
+This is the Run 3 heartbeat appended to `_phase_10_schema_anomaly/carve_out_execution.md`. Paste-not-cite throughout (sha256s, exact counts, payload samples). No paraphrasing of the CEO ratification language; verbatim quoted into §11 #17 sub-bullet 2.
+
+## 3.8 Step 7 — handoff to CEO for close
+
+Final actions next:
+
+- PATCH MAC-206 → `status='done'` with paste-not-cite summary comment linking back to this heartbeat + MAC-208 + bible commit hash.
+- Reassign MAC-206 → CEO for close-out review.
+- MAC-208 stays `backlog` / unassigned (v1.4.2 cycle picks it up).
+
+## 3.9 Halt criteria — none fired
+
+| Criterion (from CEO comment 90e6b70f) | Status |
+|---|---|
+| id=539 repair UPDATE affects ≠1 row → HALT | passed (1) |
+| Phase 2 affects ≠21 rows first run → HALT | passed (21) |
+| Downstream-consumer sweep finds hard-requirer of `json_valid(notes)=1` globally → HALT bible commit | passed (none found) |
+| Child-issue creation API errors → HALT bible commit | passed (HTTP 201 MAC-208) |
+
+All four halt criteria passed. Bible commit + DB mutations + child issue + heartbeat all land in one heartbeat per CEO authorization.
+
+## 3.10 Non-fabrication attestation
+
+- id=539 freeform suffix lifted verbatim (not paraphrased).
+- All 21 carve-out target rows' pre-existing JSON keys preserved bit-for-bit via `json_patch` (additive-only mechanic).
+- All audit metadata is timestamped (2026-05-20), sweep_event_id-anchored, ratification-ref'd to the actual CEO comment id (90e6b70f), and cross-referenced between repair_audit ↔ carve_out_audit on id=539's row.
+- No `raw_observations` row fabricated (α rejected; binding).
+- No carve-out applied to any row outside the 21-row enumerated set; future apkpure-sourced identifiers (ids 23043-23058) admitted *outside* wave_g_pre_v1 continue to carry `raw_observations` predecessors per the canonical contract (§11 #17 explicitly notes this contrast).
+- No schema/enum/migration mutation. The carve-out + repair are `notes`-JSON-key additions only.
+
+## 3.11 Next-action handoff (run 3)
+
+- **Status:** MAC-206 → `done`, reassigning to CEO
+- **What landed:** bible §11 #17 (carve-out + applicability scope + downstream-consumer applicability) + BIBLE_AMENDMENTS.md CP32 Candidate #6 + 22 DB row mutations (1 repair + 21 carve-outs) + MAC-208 child issue (backlog).
+- **What didn't land (deliberately):** no CP32 bundle close (this is candidate #6, not the bundle); no MAC-208 work (forward-looking v1.4.2 hygiene); no main-branch push (work lives on `v1.4.1-integration-stage-1` until v1.4.1 ships).
+- **CEO close-out review:** verify bible §11 #17 language matches the verbatim ratified text; verify carve_out_audit / repair_audit shape; verify MAC-208 child issue body completeness; verify no halt criteria silently triggered. If all clean, MAC-206 stays `done` and CP32 bundle author can absorb candidate #6 into the bundle at landing time.
