@@ -1,0 +1,106 @@
+
+## integrity_check
+
+[('ok',)]
+
+## schema version
+
+(0,)
+
+## foreign_keys / journal_mode
+
+foreign_keys = (0,)
+journal_mode = ('delete',)
+
+## state checkpoint
+
+  identifiers_active = 34796
+  identifiers_total = 35138
+  raw_observations = 146218
+  manufacturers = 51
+  conflicts = 36
+  expected = {'identifiers_active': 34796, 'identifiers_total': 35138, 'raw_observations': 146218, 'manufacturers': 51, 'conflicts': 36}
+  delta_vs_expected = {'identifiers_active': 0, 'identifiers_total': 0, 'raw_observations': 0, 'manufacturers': 0, 'conflicts': 0}
+
+## manufacturers.aliases — schema introspection (CP23 TEXT-CSV)
+
+  aliases column = (2, 'aliases', 'TEXT', 0, None, 0)
+  notes column   = (5, 'notes', 'TEXT', 0, None, 0)
+  sample id=   1 "Flock Safety" aliases='Flock'
+  sample id=   2 "Vigilant Solutions" aliases='Vigilant'
+  sample id=   3 "Motorola Solutions" aliases='Motorola Vigilant, Motorola APX, Motorola V300, Motorola V500'
+  sample id=   4 "Genetec" aliases=None
+  sample id=   5 "Rekor" aliases=None
+  sample id=   6 "Avigilon" aliases=None
+  sample id=   7 "Axis Communications" aliases='Axis, Axis Communications AB'
+  sample id=   8 "Harris" aliases='Harris Corporation'
+  sample id=   9 "L3Harris" aliases='L3Harris Technologies'
+  sample id=  10 "Digital Receiver Technology" aliases='DRT, DRTBox, DRT Inc.'
+  rows with aliases LIKE '[%' = 0
+
+## manufacturers.notes — JSON-shape vs text-shape audit (§5.3 + §5.5 gate)
+
+  JSON-shape notes: 30
+  text-shape notes: 21
+  null/empty notes: 0
+  text-shape rows (require description-wrap migration before json_set):
+    id=   1 "Flock Safety": 'Fixed ALPR cameras (§2.1 #1).'
+    id=   7 "Axis Communications": 'Network cameras incl. traffic cams (§2.1 #1).'
+    id=   8 "Harris": 'Legacy IMSI-catcher SKUs StingRay / Hailstorm / Crossbow (§2.1 #2). Pre-2019 merger; see L3Harris fo'
+    id=   9 "L3Harris": 'Post-2019 merger entity. XL-series police radios (§2.1 #4). Multi-purpose — defense, IMSI, comms.'
+    id=  10 "Digital Receiver Technology": 'DRTBox IMSI catcher (§2.1 #2).'
+    id=  11 "Septier": 'IMSI catcher (§2.1 #2).'
+    id=  12 "KeyW": 'IMSI catcher (§2.1 #2).'
+    id=  13 "Jacobs": 'IMSI catcher variants (§2.1 #2). Acquired Engility 2019.'
+    id=  14 "Engility": 'IMSI catcher variants (§2.1 #2). Pre-2019 acquisition by Jacobs; retained for audit fidelity.'
+    id=  18 "Getac": 'Body cameras (§2.1 #3).'
+    id=  19 "Kenwood": 'VP/NX series radios when used by LE (§2.1 #4).'
+    id=  20 "Cradlepoint": 'In-vehicle LTE/WiFi routers — IBR900-series, R1900-series mobile routers (§2.1 #5). Standard data li'
+    id=  21 "Sierra Wireless": 'In-vehicle LTE/WiFi routers — AirLink GX, RV-series, MG90 mobile routers (§2.1 #5). Direct competito'
+    id=  24 "BRINC": 'LEMUR drone (§2.1 #6).'
+    id=  27 "Hak5": 'WiFi Pineapple, Bash Bunny, Packet Squirrel (§2.1 #8).'
+    id=  28 "Cellebrite": 'UFED forensics (§2.1 #8).'
+    id=  29 "Magnet Forensics": 'GrayKey forensics tool (§2.1 #8).'
+    id=  30 "Berla": 'iVe vehicle forensics (§2.1 #8).'
+    id=  31 "BriefCam": 'Video analytics / face_recog (§2.1 #11).'
+    id=  32 "Clearview AI": 'Face_recog endpoints where detectable (§2.1 #11).'
+    id=  33 "Dedrone": 'Drone detection systems — also wireless emitters (§2.1 #12).'
+  json_set probe Genetec id=4: notes_after_first120 = {"description":"ALPR / video management (§2.1 #1).","documented_absence":[{"channels_probed":["apk-pure"],"integration_d
+
+## sqlite_master CHECK enum re-attestation (§3399)
+
+  --- table identifiers ---
+    identifier_type   TEXT NOT NULL CHECK (identifier_type IN (
+    device_category   TEXT NOT NULL CHECK (device_category IN (
+    confidence        INTEGER CHECK (confidence BETWEEN 0 AND 100),
+    source_type       TEXT NOT NULL CHECK (source_type IN (
+    source_excerpt    TEXT CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200),
+    pair_kind            TEXT CHECK (
+  --- table manufacturers ---
+  --- table raw_observations ---
+
+## source_id 66 (Wave I umbrella) attestation
+
+  source_id=66 = (66, 'Wave I — Vendor Cloud-Infrastructure Hostname Corpus Extraction', 'manufacturer_app', 'https://wave-i.cloud-infra.argus.v1.4.0/')
+
+## sierra_wireless / sierrawireless presence probe (§5.6)
+
+  mfg: (21, 'Sierra Wireless', 'Sierra Wireless AirLink, Semtech Sierra')
+  ids manufacturer='sierra_wireless' n=126
+  ids manufacturer='Sierra Wireless' n=6
+  ids manufacturer='sierrawireless' n=1
+  ids exact 'sierrawireless' rows = [('sierrawireless', 1)]
+  ids with notes.slug_duplication_review = 1
+    (35300, 'sierrawireless', 'see_phase_5')
+
+## verdict
+
+{
+  "integrity_check_ok": true,
+  "counts_match_expected": true,
+  "aliases_is_text_csv": true,
+  "notes_supports_json_set_on_json_shape_rows": true,
+  "notes_text_shape_count": 21,
+  "notes_requires_text_wrap_migration_for_targets": true,
+  "source_66_present": true
+}
