@@ -3613,6 +3613,174 @@ This CP31 entry is the §11 #11 amendment-log pairing for migration 0025 (`db/mi
 
 ═══════════════════════════════════════════════════════════════════════
 
+## Correction Pass 32 — Stage 2 Phase 1 bundled codification (mig-0026 device_category extension + 9 narrative/discipline sub-sections)
+
+### Scope
+
+CP32 codifies a single bundled amendment with 10 sub-sections covering the Stage 2 Phase 1 dispatch ([MAC-220](/MAC/issues/MAC-220) parent [MAC-219](/MAC/issues/MAC-219)). Migration 0026 lands a single schema-level mutation — the `device_category` CHECK enum extension `+1 automotive_telematics` applied to BOTH `identifiers.device_category` and `behavioral_signatures.device_category`. The remaining nine sub-sections are narrative/discipline codifications folding three pending CP32 candidates (#6/#7/#8 from Stage 1 — MAC-206/MAC-207/MAC-209) plus six new amendments surfaced at MAC-217/MAC-198/MAC-199 close. Schema_version bumps 25 → 26.
+
+### CP30 reservation footnote (preserved unchanged)
+
+CP30 remains reserved for `vendor_asn_prefix` + `vendor_controlled_ip` codification per CP29 §3. CP32 numbering does NOT consume the CP30 reservation slot; CP30 holds until ASN-prefix observation surfaces (likely Wave I-prime with RDAP url-pattern fix) and/or cert IP-SAN surface yields non-zero in a future cycle. Precedent: CP31 already skipped CP30 by the same convention; CP32 carries the convention forward.
+
+### Pre-commit Na_ sub-slot convention (codified inline at CP32 §1, applied at Phase 1)
+
+Data-only addendum migrations sharing a numeric slot with a schema-mutating migration use a sub-letter suffix (`Na_…`) and apply after the main `N_` slot (lexical: `_` < `a`). Phase 1 reclassification of `0026_phase10_vendor_apk_sources_admission.sql` → `0026a_phase10_vendor_apk_sources_admission.sql` is the first application of this convention; no retroactive sweep of prior data-only entries is implied. The convention frees the `0026_` slot for the schema-mutating CP32 §1 migration without renumbering downstream cycles (which would have required per-line edits across the dispatch + bible text). Filename↔schema_version 1:1 holds for schema-mutating migrations (`N_…`); data-only addenda live alongside via `Na_/Nb_/…`. Rename commit: `398c8b8` (this branch).
+
+### §1 — Codified amendments (10 sub-sections)
+
+**Status legend:** **CODIFIED+LANDS** = bible text change + schema/code mutation in this CP. **CODIFIED** = bible text change only (narrative/discipline). **BINDING** = architectural commitment for a future migration (no current schema change).
+
+1. **CP32 §1 — `device_category` CHECK enum extension `+1 automotive_telematics`** *(CODIFIED+LANDS)*
+
+   Mechanism: migration 0026 (`db/migrations/0026_cp32_device_category_automotive_telematics.sql`) rebuilds BOTH `identifiers.device_category` (12 → 13) and `behavioral_signatures.device_category` (12 → 13). Per CEO pre-clearance (Phase 0 evidence `_preflight/preflight_evidence.md`): dual-table extend maintains enum parity across the two CHECK literals that share the conceptual device_category vocabulary. Downstream consumers (Lynceus, exports, coverage matrix) treat `device_category` as a single vocabulary regardless of host table.
+
+   Origin: CP31 §6 #1 carry-forward — surfaced at MAC-199 for Phase 7-bis 177-row §7.2 fccid.io 2AG-attested cohort (Parrot Automotive arm canonical id=222 holds `primary_category='automotive_telematics'` on `manufacturers.primary_category` per CP31 inline conversion; identifier rows promoting to that arm need `device_category` to match).
+
+   Affected paths: `db/migrations/0026_cp32_device_category_automotive_telematics.sql` (new), `PROJECT_BIBLE.md` §2.1 (vocabulary table +1 row), `db/argus.db` (schema=26, 0 row promotions land in this CP — schema slot opens; promotion is future evidence-arrival concern).
+
+   Phase 1 audit (live DB post-mig-0026): `PRAGMA integrity_check=ok`, `MAX(schema_version.version)=26`, `identifiers` active=34964 unchanged, total=35310 unchanged, `behavioral_signatures`=201 unchanged, 4 self-loops preserved, `identifier_type` CHECK enum=56 (CP31 preserved), `pair_kind` CHECK enum=5 (CP31 preserved), `manufacturers` CP31 columns (`parent_manufacturer_id`, `is_arm`, `query_default`) preserved. Idempotency: 2nd-run produces byte-identical sqlite_master + data hashes; see `_phase_1_cp32_codification/idempotency_2nd_run.txt`.
+
+2. **CP32 §2 — Future `identifiers.manufacturer_id` FK migration (architectural binding only)** *(BINDING)*
+
+   Mechanism: no schema mutation in CP32. Codifies the architectural binding that when a future migration adds `identifiers.manufacturer_id INTEGER NULL REFERENCES manufacturers(id)`, every export-path JOIN MUST re-establish the visible-filter as `WHERE m.query_default = 'visible' OR id.manufacturer_id = m.id` per CP31 §3 (4-path downstream consumer audit). Status: BINDING only; FK migration is v1.5.0+ pending evidence-arrival (no current identifier row carries an arm-canonical manufacturer name as denormalized TEXT, so the arm-row protection is implicit at v1.4.1; future-FK migration MUST re-establish it explicitly).
+
+   Origin: CP31 §6 #2 carry-forward; PROJECT_BIBLE.md §4.4 manufacturer architecture section already carries the binding text via CP31; CP32 §2 codifies it as a numbered amendment.
+
+   Affected paths: `PROJECT_BIBLE.md` §4.4 (text already present per CP31 — CP32 §2 codifies the architectural status without further text mutation).
+
+3. **CP32 §3 — Retire stale `test_type_mapping_covers_every_identifier_type`** *(CODIFIED+LANDS)*
+
+   Mechanism: refactor `tests/test_export_lynceus.py::test_type_mapping_covers_every_identifier_type` from a hardcoded mig-0019 48-value `expected` set to a dynamic read of the live `identifier_type` CHECK enum from sqlite_master at test runtime. The new test asserts that every value in the live enum has a §4.4 disposition surface — either MAP (in `IDENTIFIER_TYPE_TO_PATTERN_TYPE`) or DROPPED (in `DROPPED_REASONS`). 5 currently-missing values land in `DROPPED_REASONS` as stubs: `vendor_controlled_hostname` (CP29), `vendor_cloud_endpoint_url` (CP29), `vendor_controlled_hostname_deprecated` (CP29), `fcc_grantee_code` (CP31), `equipment_class_code` (CP31). All 5 mirror verbatim into `coverage_matrix.py::DROPPED_REASONS` per the reconcile-gate parity contract; 5 zero-init bin keys added to `export_lynceus.py`'s bins dict (coverage_matrix.py auto-initializes via the existing `for cp16_bin in DROPPED_REASONS.values(): bins[cp16_bin] = 0` loop).
+
+   Disposition: all 5 stubs are DROPPED-class pending §4.4 MAP ratification at a future CP, matching MAC-109/MAC-117/MAC-181 precedent. All currently-live rows with these identifier_types carry `device_category='unknown'` and tally via the §11 #13 unknown-category carve-out, so the addition does not change any live row's bin classification.
+
+   Origin: CP31 §6 #3 carry-forward — pre-existing test failure surfaced by MAC-199 full-suite run (523 passed, 1 failed; failure pre-dated MAC-199).
+
+   Affected paths: `tests/test_export_lynceus.py`, `db/validation/export_lynceus.py`, `db/validation/coverage_matrix.py`. PROJECT_BIBLE.md: no text change (test hygiene).
+
+   Verified: 524/524 repo test suite passes post-refactor.
+
+4. **CP32 §4 — Multi-arm vendor backlog admission cadence** *(CODIFIED — narrative)*
+
+   Mechanism: `PROJECT_BIBLE.md` §4.6 (multi-arm hub-and-spoke) gains a sub-rule on admission cadence — `hidden_arm` rows admit only when identifier-rows attest to specific arms (not pre-emptive). The backlog (Cisco/Meraki, Motorola Solutions, Harris RF vs Harris Aerial, Honeywell ACS division) does NOT auto-promote to arm splits on a schedule; arm splits ship only when concrete identifier evidence surfaces attesting to a specific arm. CP31 shipped only Parrot conversion because that was the only multi-arm case with concrete evidence (Parrot Faurecia Automotive S.A.S aliases on the existing Parrot id=25 row).
+
+   Origin: CP31 §6 #5 carry-forward.
+
+   Affected paths: `PROJECT_BIBLE.md` §4.6 (sub-rule added).
+
+5. **CP32 §5 — Lynceus exports regen cadence** *(CODIFIED — narrative)*
+
+   Mechanism: `PROJECT_BIBLE.md` §7.5 (export discipline) gains a sub-rule — `argus_export.csv` + `argus_export.json` + `argus_export_high_confidence.json` regenerate per v1.4.x bundle, not per data-touching commit. The per-bundle cadence avoids export-noise commits between substantive bundle landings; consumers can rely on a stable export shape that tracks the canonical-DB bundle close (not a moving target across mid-bundle micro-commits).
+
+   Origin: CP31 §6 #4 carry-forward — MAC-209 Phase 12 surfaced the cadence question (exports were last regenerated 2026-05-20T00:43:59Z, pre-MAC-196 + pre-MAC-198; v1.4.1 ship-prep included exports regen as a ship-prep task, not a continuous concern).
+
+   Affected paths: `PROJECT_BIBLE.md` §7.5 (sub-rule added).
+
+6. **CP32 §6 — §11 audit invariant — session-bounded admission carve-out + class-2 deferred → MAC-208 fork language** *(CODIFIED)*
+
+   Mechanism: `PROJECT_BIBLE.md` §11 #17 sub-rule clarification (added at MAC-206 in Stage 1) is now first-class codified. CP32 §6 confirms the class-2 deferred → MAC-208 fork language already landed at Stage 1 inline §11 #17 text (5 `identifiers` rows ids 554-558 RAVEN_*, plus 1 `sources` row sid=7, all `{json}<concat>text` defects). The §11 #17 wave_g_pre_v1 21-row carve-out invariant — every `identifiers` row has a `raw_observations` predecessor OR carries `notes.direct_admission_carve_out=true` referencing `sources.notes`-level provenance — is reaffirmed as session-bounded and explicitly NOT a future admission pathway. The Stage 1 inline edit at PROJECT_BIBLE.md §11 #17 footer reference "(CP32 candidate #6 — pending CP32 bundle landing)" is replaced this CP with "(CP32 §6 — codified)".
+
+   Origin: [MAC-206](/MAC/issues/MAC-206) Phase 10d Run 3 — β.3c CEO ratification at [MAC-206#90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) 2026-05-20; companion [MAC-205](/MAC/issues/MAC-205) 21-row enumeration + Option A.
+
+   Affected paths: `PROJECT_BIBLE.md` §11 #17 (status pointer flip from candidate → codified).
+
+   Empirical anchor: 21 rows UPDATEd via `json_patch(notes, ?)` (first-run affected=21; idempotency re-run affected=0); composite WHERE: `id IN (533..553) AND source_url IN (<flock_url>, <getac_url>) AND json_extract(notes,'$.direct_admission_carve_out') IS NULL`. Backup pre-carve-out: `db/argus.db.mac206_pre_carveout_backup` sha256=`f346940861995b740c301fc520aab3500e2acebb158fcbe7aecb88f088c51bab`.
+
+7. **CP32 §7 — Sandbox-absence HALT-fast-path default sub-rule** *(CODIFIED)*
+
+   Mechanism: `PROJECT_BIBLE.md` §11 (dispatch-discipline envelope) gains a sub-rule — dispatch plan-inputs in cleaned `~/argus-internal/` (or analogous workspace-only) sandboxes → HALT-fast-path = default disposition, assuming the dispatch body anticipates this case with an explicit fast-path clause. The sandbox-clean condition is a discoverable precondition during pre-flight, not a mid-flight surprise; ratification can happen at HALT-comment time without per-record evidence enumeration. Forward-looking sub-rule: future dispatches that depend on `~/argus-internal/`-resident plan-inputs **SHOULD** specify a snapshot path under a versioned location (the argus repo) at dispatch time, with a fallback fast-path clause when the snapshot was not captured.
+
+   Origin: [MAC-207](/MAC/issues/MAC-207) Phase 11 HALT ratified at [MAC-207#c4ec8740](/MAC/issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) 2026-05-21 (Option A all-73 DROP single-cycle close). Precedent: [MAC-200](/MAC/issues/MAC-200) §9.2.c first surfaced the same `~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/` sandbox-absence (commit `518bbcd`); CP32 §7 codifies the discipline pattern MAC-200 exercised informally (n=2 precedent: MAC-200 + MAC-207).
+
+   Affected paths: `PROJECT_BIBLE.md` §11 (sub-rule added as new bullet under dispatch-discipline section).
+
+8. **CP32 §8 — MAC-206 carve-out export-drop attribution rule** *(CODIFIED + code stamp)*
+
+   Mechanism: `PROJECT_BIBLE.md` §7.5 gains a sub-rule — drop attributions in `_meta.dropped_in_export` carry a specific rule reference. CP32 §8 codifies the specific case of the MAC-206 carve-out: the 21 wave_g_pre_v1 carve-out rows drop from Lynceus exports via the **§4.4 identifier_type → pattern_type mapping gate**, NOT via CP19 §8.2 crowdsourced-ceiling. Their `identifier_type` values (`ble_service`, `ble_characteristic`, `ble_local_name`, `product_family_codename`) are not in `IDENTIFIER_TYPE_TO_PATTERN_TYPE`, so they tally under `_meta.dropped_in_export.type_mapping_unmapped`. Their `source_type='manufacturer_app'` and confidence 82/87/92 are above all relevant floors — CP19 simply does not engage.
+
+   Forward-looking implication: if a future cycle admits any of these 4 identifier_types into `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (e.g., to surface BLE-service signatures in Lynceus scans), the carve-out rows WILL surface in exports at their current confidence. That admission MUST be deliberately coordinated with a §11 #17 applicability re-review.
+
+   This is the first post-execution dispatch-reasoning correction landed as a CP entry rather than a feedback memory — prior dispatch-reasoning errors (e.g., MAC-176 forecast error on Johnson Matthey MA-M routing) landed as feedback memories; this one earns a CP entry because it composes directly with §11 #17 and constrains future BLE-service identifier_type admission decisions.
+
+   Origin: [MAC-209](/MAC/issues/MAC-209) Phase 12 spot-check surfaced the mechanism correction; [[feedback_db_verify_dispatch_claims]] is the meta-discipline anchor.
+
+   Affected paths: `PROJECT_BIBLE.md` §7.5 (sub-rule added); export-generator code stamp (no code change required at CP32 time — the export generators already emit `_meta.dropped_in_export.type_mapping_unmapped` bin entries per the CP16 split-structure; the rule reference is documentation-discipline at audit-time).
+
+9. **CP32 §9 — `superseded_by` tri-state semantic clarification** *(CODIFIED)*
+
+   Mechanism: `PROJECT_BIBLE.md` §4.4 gains a sub-rule clarifying that `identifiers.superseded_by` carries three distinct semantics:
+   - **`NULL`** → row is **active** (canonical contract per §4.1; current count: 34,964 of 35,310 total).
+   - **`<other_id>`** → row is **superseded by a successor** identifier row (the canonical merge semantic; 342 rows; e.g., dedup §8.3 merge-with-supersession; deprecated MACs).
+   - **`<self_id>` (self-loop)** → row is **withdrawn without successor** (the §11 #3 PII-demotion semantic; 4 rows; MAC-217 Track B Jacobs `*.escg.jacobs.com` PII demotes — rows are §8.2 demoted to confidence=0 and self-loop-tagged so they're never surfaced as active and never point to an inappropriate successor; the self-loop is the "no successor exists" signal).
+
+   This tri-state was implicit in the schema and surfaced through the MAC-217 Track B 4 self-loops; CP32 §9 makes it explicit so future consumer audits, JOIN logic, and active-set queries handle all three cases correctly. Active-set query convention: `WHERE superseded_by IS NULL` (the canonical filter; both `<other_id>` and `<self_id>` rows are non-active). Withdrawn-without-successor query convention: `WHERE superseded_by = id`.
+
+   Origin: MAC-217 Track B (4 PII demotes); cross-ref `feedback_superseded_by_tri_semantic_post_mac217.md`.
+
+   Affected paths: `PROJECT_BIBLE.md` §4.4 (sub-rule added). No schema mutation — the existing `superseded_by INTEGER REFERENCES identifiers(id) ON DELETE SET NULL` column has always admitted all three cases.
+
+10. **CP32 §10 — §11 #3 export-time generator post-condition guard pattern** *(CODIFIED + code pattern reference)*
+
+    Mechanism: `PROJECT_BIBLE.md` §11 #3 (PII discipline) gains a sub-rule — export generators MUST include post-condition guards for hard-rule-bound content shapes. Canonical template: `_assert_no_email_pii(path)` per MAC-217 implementation at 6 emission call sites (covering all 3 Lynceus export shapes × the both-floors-applied audit). The guard runs AFTER the export file is written, re-reads the file, and raises `Halt` if any post-write content violates the hard-rule predicate (in this case, regex-detected email PII).
+
+    Forward-looking sub-rule: any §11 hard-rule that constrains export content shape SHOULD have a paired `_assert_no_<rule>_<violation>(path)` post-condition guard at every emission call site. This is the first framework-level codification of the pattern — prior PII-bounded checks lived only at the row-classification gate (`_classify_row` → drop bin), which is necessary but not sufficient: a bug in the classification gate or a future code-path that bypasses the gate (e.g., a custom export) would leak PII. The post-condition guard is defense-in-depth — it catches both classification-gate bugs AND new-code-path bypasses.
+
+    Origin: [MAC-217](/MAC/issues/MAC-217) Phase 5 (Stage 1) — `_assert_no_email_pii(path)` implemented at 6 emission call sites in the §8.2 PII-strip commit (`50b8232`); cross-ref to the 12 source_excerpt redactions + 4 VCH demotions + this guard pattern.
+
+    Affected paths: `PROJECT_BIBLE.md` §11 #3 (sub-rule added; code pattern reference). No new code in this CP — the guard pattern already lives at `db/validation/export_lynceus.py` post `50b8232`; CP32 §10 codifies it as a framework-level discipline rule.
+
+### §2 — Architectural firsts (CP32 cycle)
+
+1. **First `Na_` sub-slot convention** — data-only addendum migrations sharing a numeric slot with a schema-mutating migration use `Na_…` sub-letter suffix; CP32 §1 applies it to the 0026 slot (the first sub-slot use in the framework).
+2. **First dual-table `device_category` CHECK enum sweep** — CP21 cumulative-full-enum spirit applied across two separate CHECK literals (`identifiers.device_category` + `behavioral_signatures.device_category`) in a single migration, maintaining enum parity for downstream consumers that treat the vocabulary as conceptually unified.
+3. **First codified HALT-fast-path discipline pattern** (CP32 §7) — prior precedent (MAC-200 §9.2.c) exercised the pattern informally; CP32 §7 elevates it to a named discipline rule.
+4. **First post-execution dispatch-reasoning correction landed as a CP entry** (CP32 §8) — prior dispatch-reasoning errors landed as feedback memories; CP32 §8 earns a CP entry because it composes with §11 #17 and constrains future identifier_type admission decisions.
+5. **First framework-level export-time generator post-condition guard codification** (CP32 §10) — prior PII-bounded checks lived at the row-classification gate only; the post-condition guard is defense-in-depth against classification-gate bugs and new-code-path bypasses.
+6. **First codified tri-state semantic on a SET-NULL FK column** (CP32 §9) — `identifiers.superseded_by` carries three distinct semantics (NULL/other-id/self-id) made explicit via bible text, no schema mutation.
+7. **First bundled CP entry folding pre-existing Stage 1 candidate entries** — CP32 §6/§7/§8 each fold a previously-authored "CP32 Candidate #6/#7/#8" entry that anticipated the bundle landing; the original candidates land here as numbered sub-sections per the candidates' explicit "If CP32 lands as a single bundle commit, this entry's title will be renumbered to a sub-section" anticipation.
+
+### §3 — Sibling commits + cross-references
+
+**Sibling commits (this CP cycle, Phase 1 — MAC-220):**
+
+- **Commit 1 — `git mv 0026_phase10_*.sql 0026a_phase10_*.sql`** (Na_ sub-slot rename): `398c8b8`
+- **Commit 2 — Migration 0026 CP32 §1 schema landing**: `b0c5c9f`
+- **Commit 3 — CP32 §3 test refactor + DROPPED_REASONS stubs**: `ed3f75d`
+- **Commit 4 — This bible amendment + PROJECT_BIBLE.md text updates**: `<this-commit>`
+
+**Cross-references:**
+
+- [MAC-219](/MAC/issues/MAC-219) (v1.4.1 Stage 2 — CP32 + Docs + Final Tag parent)
+- [MAC-220](/MAC/issues/MAC-220) (Phase 1 — CP32 codification + mig-0026 + test refactor + bible — THIS dispatch)
+- [MAC-220 comment 5bb44924](/MAC/issues/MAC-220#comment-5bb44924-20fe-45b1-93bf-35ecdda2ee81) (CEO Option A-minimal disposition: 0026a_ rename + Na_ sub-slot convention)
+- [MAC-205](/MAC/issues/MAC-205) + [MAC-206](/MAC/issues/MAC-206) — CP32 §6 wave_g_pre_v1 carve-out lineage
+- [MAC-207](/MAC/issues/MAC-207) — CP32 §7 HALT-fast-path codification lineage
+- [MAC-209](/MAC/issues/MAC-209) — CP32 §8 export-drop attribution lineage
+- [MAC-217](/MAC/issues/MAC-217) — CP32 §9 tri-state semantic anchor (Track B 4 PII demotes) + CP32 §10 `_assert_no_email_pii(path)` precedent (commit `50b8232`)
+- [MAC-197](/MAC/issues/MAC-197) (CP31 — origin of §6 #1-#5 carry-forwards now codified at CP32 §1/§2/§3/§4/§5)
+- `db/migrations/0025_cp31_*.sql` (immediate-prior schema-mutating migration; baseline for CP32 §1 dual-table sweep)
+- `db/migrations/0026_cp32_device_category_automotive_telematics.sql` (this CP — schema-version 26)
+- `db/migrations/0026a_phase10_*.sql` (renamed from `0026_phase10_*.sql` at commit `398c8b8`; Na_ sub-slot precedent)
+
+**Phase 1 audit deliverables:** `~/argus-internal/wave_i_4_1_integration_stage_2/_phase_1_cp32_codification/` (sqlite_master_before.txt, sqlite_master_after.txt, idempotency_2nd_run.txt, post_state_anchors.md, commit_log.md) + `_heartbeats/hb_001_cp32_codification_complete.md`.
+
+### §4 — §11 envelope satisfied
+
+- **§11 #1 (no fabrication):** all 10 sub-sections trace to dispatch §1.1 origin; CP32 §1 cites the CP31 (mig-0025) Parrot Automotive arm row admission as the empirical anchor for `automotive_telematics`; no row-level promotions land in CP32.
+- **§11 #3 (PII discipline):** CP32 §10 strengthens the discipline by codifying the post-condition guard pattern. Phase 1 touches no identifier rows with PII; synthetic poison re-test deferred to Phase 4.
+- **§11 #5 (phase boundaries):** mig-0026 is schema slot only; row-level use of `automotive_telematics` is a future Stage-2 validator concern (future dispatch).
+- **§11 #7 (no promotion without provenance):** Phase 1 promotes no new identifiers.
+- **§11 #8 (no confidence drift):** no §8.3 lifts.
+- **§11 #11 (amendment-log discipline):** single bundled CP32 entry, 10 sub-sections, pre-existing Stage 1 candidates folded per their anticipation.
+- **§11 anti-fabrication on CHECK constraints (SAR-13 §3399 PRAGMA-first discipline):** applied to CP32 §1 — pre-migration sqlite_master capture verifies the 12-value baseline on BOTH tables before the rebuild; post-migration capture verifies the 13-value result + preservation of all other CHECK constraints (identifier_type 56-value, pair_kind 5-value, source_type 10-value, cellular_generation 4-value, source_excerpt length, confidence range, query_default 2-value).
+
+### §11 #11 self-binding satisfied
+
+This CP32 entry is the §11 #11 amendment-log pairing for migration 0026 (`db/migrations/0026_cp32_device_category_automotive_telematics.sql` at commit `b0c5c9f`) + the 0026a_ rename (commit `398c8b8`) + the test refactor (commit `ed3f75d`) + this bible commit. CP-anchor: this commit + [MAC-220](/MAC/issues/MAC-220) closure. Schema version bumps 25 → 26.
+
+═══════════════════════════════════════════════════════════════════════
+
 ## Deferral Note 1 — MAC-203 §44.3 Honeywell product nomenclature corpus deferred (no §11 #7 evidence trail surviving)
 
 **Date:** 2026-05-20
@@ -3717,13 +3885,13 @@ Branch: `v1.4.1-integration-stage-1` (MAC-203 is a v1.4.1 Stage 1 child of [MAC-
 ═══════════════════════════════════════════════════════════════════════
 
 
-## CP32 Candidate #6 (pending CP32 bundle landing) — Direct-admission carve-out (wave_g_pre_v1, 21 rows) + §11 #17 applicability-scope clause
+## CP32 Candidate #6 (folded into CP32 §6 — see Correction Pass 32 above) — Direct-admission carve-out (wave_g_pre_v1, 21 rows) + §11 #17 applicability-scope clause
 
 **Date:** 2026-05-20
-**Branch:** `v1.4.1-integration-stage-1` (will land on `main` when CP32 bundle ships; entry is candidate-state until then)
-**Commit:** *(this entry lands with the bible §11 #17 edit in the same commit on v1.4.1-integration-stage-1)*
+**Branch:** `v1.4.1-integration-stage-1`
+**Commit:** Bible edit at `PROJECT_BIBLE.md §11 #17` landed at MAC-206 Phase 10d Run 3 heartbeat commit; CP32 bundle codification landed at [MAC-220](/MAC/issues/MAC-220) commit `<this-commit>`.
 **Source:** [MAC-206](/MAC/issues/MAC-206) Phase 10d Run 3 — β.3c ratified at [MAC-206 comment 90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) 2026-05-20 (CEO ratification)
-**Status:** **Candidate** — landing pending CP32 bundle close; this entry sits as candidate #6 alongside 5 existing CP32 candidates queued at CP31 close ([MAC-197 CP31](/MAC/issues/MAC-197))
+**Status:** **CODIFIED** — folded into CP32 §6 above. This candidate entry preserved as expanded archival detail per its original "If CP32 lands as a single bundle commit, this entry's title will be renumbered to a sub-section of the CP32 entry" anticipation.
 **Ratifying CEO comment:** [MAC-206#90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) — β.3c (verbatim applicability language ratified)
 **Companion CEO ratification:** [MAC-205](/MAC/issues/MAC-205) (disposition β + scope-handling Option A — 21 rows ratified for carve-out)
 
@@ -3766,13 +3934,13 @@ This entry IS the §11 #11 pairing for the bible §11 #17 edit. The git commit a
 ═══════════════════════════════════════════════════════════════════════
 
 
-## CP32 Candidate #7 (pending CP32 bundle landing) — Dispatch plan-input sandbox-absence HALT-fast-path default
+## CP32 Candidate #7 (folded into CP32 §7 — see Correction Pass 32 above) — Dispatch plan-input sandbox-absence HALT-fast-path default
 
 **Date:** 2026-05-21
-**Branch:** `v1.4.1-integration-stage-1` (will land on `main` when CP32 bundle ships; entry is candidate-state until then)
-**Commit:** *(this entry lands with the MAC-207 close-out commit on v1.4.1-integration-stage-1)*
+**Branch:** `v1.4.1-integration-stage-1`
+**Commit:** CP32 bundle codification landed at [MAC-220](/MAC/issues/MAC-220) commit `<this-commit>`.
 **Source:** [MAC-207](/MAC/issues/MAC-207) Phase 11 HALT — plan-input JSON sandbox-absence; ratified at [MAC-207 comment c4ec8740](/MAC/issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) 2026-05-21 (CEO ratification of Option A single-cycle all-73 DROP close).
-**Status:** **Candidate** — landing pending CP32 bundle close; this entry sits as candidate #7 alongside [MAC-206](/MAC/issues/MAC-206) candidate #6 and the 5 prior candidates anchored to [MAC-197 CP31](/MAC/issues/MAC-197).
+**Status:** **CODIFIED** — folded into CP32 §7 above. This candidate entry preserved as expanded archival detail per its original Stage 1 candidate-state framing.
 **Ratifying CEO comment:** [MAC-207#c4ec8740](/MAC/issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) — Option A approved (verbatim language ratified).
 **Companion precedent:** [MAC-200](/MAC/issues/MAC-200) heartbeat §9.2.c (commit `518bbcd`) — first surfacing of the same `~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/` sandbox-absence; CP32 candidate #7 codifies the discipline pattern that MAC-200 already exercised informally.
 
@@ -3846,13 +4014,13 @@ Branch: `v1.4.1-integration-stage-1` (MAC-207 is a v1.4.1 Stage 1 child of [MAC-
 ═══════════════════════════════════════════════════════════════════════
 
 
-## CP32 Candidate #8 (pending CP32 bundle landing) — MAC-206 carve-out export-drop attribution (§4.4 type-mapping, NOT §8.2/CP19 crowdsourced-ceiling)
+## CP32 Candidate #8 (folded into CP32 §8 — see Correction Pass 32 above) — MAC-206 carve-out export-drop attribution (§4.4 type-mapping, NOT §8.2/CP19 crowdsourced-ceiling)
 
 **Date:** 2026-05-21
-**Branch:** `v1.4.1-integration-stage-1` (will land on `main` when CP32 bundle ships; entry is candidate-state until then)
-**Commit:** lands with the MAC-209 Phase 12 follow-up fixup commit on `v1.4.1-integration-stage-1` (BIBLE_AMENDMENTS.md amend + .gitignore hygiene). STAGE_1_FINAL_REPORT.md authored as Paperclip issue document on [MAC-211](/MAC/issues/MAC-211) at document key `stage_1_final_report` (final revision pinned post-rc1-tag closure).
+**Branch:** `v1.4.1-integration-stage-1`
+**Commit:** Originally landed alongside MAC-209 Phase 12 follow-up fixup commit (`6d33fa8`); CP32 bundle codification landed at [MAC-220](/MAC/issues/MAC-220) commit `<this-commit>`.
 **Source:** [MAC-209](/MAC/issues/MAC-209) Phase 12 spot-check finding — surfaced by Validator at [comment ef215248](/MAC/issues/MAC-209#comment-ef215248-…) 2026-05-21.
-**Status:** **Candidate** — landing pending CP32 bundle close; this entry sits as candidate #8 alongside candidates #6 + #7 (both this Stage 1 cycle) and the 5 prior candidates anchored to [MAC-197 CP31](/MAC/issues/MAC-197).
+**Status:** **CODIFIED** — folded into CP32 §8 above. This candidate entry preserved as expanded archival detail per its original Stage 1 candidate-state framing.
 **Ratifying CEO note:** This candidate codifies a dispatch-reasoning correction surfaced post-execution: the MAC-206 dispatch implied carve-out rows would drop from Lynceus high-conf export via CP19 §8.2 crowdsourced-ceiling. Validator's MAC-209 spot-check found they actually drop at §4.4 type-mapping. CEO ratifies the corrected mechanism as the canonical explanation.
 
 ### §1 — Ratified amendment language
