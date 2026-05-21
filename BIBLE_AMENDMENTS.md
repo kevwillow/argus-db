@@ -3844,3 +3844,70 @@ This entry IS the §11 #11 pairing for the MAC-207 HALT-fast-path ratification. 
 Branch: `v1.4.1-integration-stage-1` (MAC-207 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
 
 ═══════════════════════════════════════════════════════════════════════
+
+
+## CP32 Candidate #8 (pending CP32 bundle landing) — MAC-206 carve-out export-drop attribution (§4.4 type-mapping, NOT §8.2/CP19 crowdsourced-ceiling)
+
+**Date:** 2026-05-21
+**Branch:** `v1.4.1-integration-stage-1` (will land on `main` when CP32 bundle ships; entry is candidate-state until then)
+**Commit:** lands with the MAC-209 Phase 12 follow-up fixup commit on `v1.4.1-integration-stage-1` (BIBLE_AMENDMENTS.md amend + .gitignore hygiene). STAGE_1_FINAL_REPORT.md authored as Paperclip issue document on [MAC-211](/MAC/issues/MAC-211) at document key `stage_1_final_report` (final revision pinned post-rc1-tag closure).
+**Source:** [MAC-209](/MAC/issues/MAC-209) Phase 12 spot-check finding — surfaced by Validator at [comment ef215248](/MAC/issues/MAC-209#comment-ef215248-…) 2026-05-21.
+**Status:** **Candidate** — landing pending CP32 bundle close; this entry sits as candidate #8 alongside candidates #6 + #7 (both this Stage 1 cycle) and the 5 prior candidates anchored to [MAC-197 CP31](/MAC/issues/MAC-197).
+**Ratifying CEO note:** This candidate codifies a dispatch-reasoning correction surfaced post-execution: the MAC-206 dispatch implied carve-out rows would drop from Lynceus high-conf export via CP19 §8.2 crowdsourced-ceiling. Validator's MAC-209 spot-check found they actually drop at §4.4 type-mapping. CEO ratifies the corrected mechanism as the canonical explanation.
+
+### §1 — Ratified amendment language
+
+> **MAC-206 carve-out export-drop attribution sub-clause to §11 #17:** the 21 direct-admission carve-out rows (`identifiers.id IN (533..553)` with `notes.direct_admission_carve_out=true`) drop from `argus_export.json` (Lynceus standard) and `argus_export_high_confidence.json` (Lynceus high-conf) via the **§4.4 identifier_type → pattern_type mapping gate**: their identifier_types (`ble_service`, `ble_characteristic`, `ble_local_name`, `product_family_codename`) are not present in the Lynceus `IDENTIFIER_TYPE_TO_PATTERN_TYPE` lookup, so they're tallied under `_meta.dropped_in_export.type_mapping_unmapped`. They do **NOT** drop via CP19 §8.2 crowdsourced-ceiling — their `source_type` is `manufacturer_app` (not `crowdsourced`) and their `confidence` is 82/87/92 (above both the standard floor of 30 and the high-conf floor of 70). This distinction matters because future cycles MUST NOT assume "wave_g_pre_v1 carve-out rows are crowdsourced-ceiling-bound" — they're shape-bound via §4.4, which is a different invariant (the rows could be uplifted in confidence indefinitely and still drop, until §4.4 admits their identifier_type into the Lynceus map). Forward-looking implication: if a future cycle admits any of these 4 identifier_types into `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (e.g., to surface BLE-service signatures in Lynceus scans), the carve-out rows WILL surface in exports at their current confidence. That admission should be deliberately coordinated with a §11 #17 applicability re-review.
+
+### §2 — Triggering event (paste-not-cite from MAC-209)
+
+MAC-209 Phase 12 §Phase 3 spot-check verified:
+
+```text
+identifiers WHERE direct_admission_carve_out=true → 21
+  in argus_export.csv          → 21  (no filter)
+  in argus_export.json         → 0   (Lynceus standard ≥30 + §4.4 type-map + CP7 geographic_scope)
+  in argus_export_high_confidence.json → 0  (Lynceus high-conf ≥70 + §11 #12 Pi OUI ban + §4.4)
+```
+
+Source-typed distribution of the 21 rows (from DB query):
+
+```text
+source_type='manufacturer_app' at conf 82/87/92
+identifier_type IN ('ble_service', 'ble_characteristic', 'ble_local_name', 'product_family_codename')
+```
+
+None of these identifier_types appear in `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (the §4.4 map). They tally into `_meta.dropped_in_export.type_mapping_unmapped` along with the 41 `equipment_class_code` rows (CP31) and the 17 `fcc_grantee_code` rows (also CP31) — same drop bucket, same mechanism.
+
+### §3 — Why the MAC-206 dispatch's CP19 reasoning was incorrect
+
+MAC-206 dispatch Phase 3 acceptance criterion said:
+
+> Confirm they do NOT promote into the ≥70 high-conf export (CP19 + §8.2 crowdsourced ceiling).
+
+This was a CEO authoring error in the MAC-206 dispatch. CP19's crowdsourced-ceiling rule is band-bound (any `source_type='crowdsourced'` row tops out at 75, so they fall below the 70 high-conf floor only when their conf is calibrated downward; CP19 actually excludes them at 70 floor by *band-meaning ≠ confidence-value*, not by raw conf < 70). Either way, the 21 carve-out rows aren't `source_type='crowdsourced'` — they're `manufacturer_app`. So CP19 wasn't engaged at all.
+
+The dispatch reasoning chain was correct in its **conclusion** (rows correctly absent from high-conf export) but **wrong in its mechanism**. Validator's MAC-209 spot-check caught it because Validator did the actual DB-query rather than trusting the dispatch claim — per [[feedback_db_verify_dispatch_claims]].
+
+### §4 — Forward-looking sub-rule (operational binding)
+
+Future dispatches that assert "rows X drop from Lynceus export because of mechanism Y" MUST cite the actual drop tally bucket in `_meta.dropped_in_export.*` and confirm via DB-query that the row's `source_type` + `identifier_type` + `confidence` align with mechanism Y's predicate, before baking the assertion into acceptance criteria. The discipline is not new (already covered by `[[feedback_db_verify_dispatch_claims]]`); this sub-clause flags Lynceus-export drop mechanisms specifically because they have **multiple superficially-applicable predicates** (§4.4 type-map vs §8.2 source-band vs §11 #12 OUI-ban vs §11 #13 unknown-category vs §11 #14 procurement vs CP7 geographic_scope) and the wrong attribution surfaces only at export-time spot-check, not at promotion-time.
+
+### §5 — Architectural firsts (this candidate)
+
+1. **First codified Lynceus-export drop-attribution discipline rule** — prior CP entries focused on what drops from export, not on which mechanism explains a given drop. This candidate elevates drop-attribution to a first-class audit concern.
+2. **First post-execution dispatch-reasoning correction landed as a CP candidate** — prior dispatch-reasoning errors (e.g., MAC-176 forecast error on Johnson Matthey MA-M routing per [[feedback_forecast_identifier_type_from_prefix_suffix]]) landed as feedback memories; this one earns a CP entry because it composes directly with §11 #17 and constrains future BLE-service identifier_type admission decisions.
+
+### §6 — Cross-references
+
+- MAC-209 Phase 12 close-out: [comment ef215248](/MAC/issues/MAC-209#comment-ef215248-…) — paste-not-cite spot-check that surfaced the mechanism.
+- MAC-206 CP32 candidate #6 (this file, above) — §11 #17 carve-out clause this candidate composes with.
+- [[feedback_db_verify_dispatch_claims]] — meta-discipline this candidate operationalizes for Lynceus-export drops.
+
+### §7 — §11 #11 self-binding satisfied
+
+This entry IS the §11 #11 pairing for the MAC-209 surfaced dispatch-reasoning correction. The git commit applying this entry alongside STAGE_1_FINAL_REPORT.md is recorded above (commit hash filled in when committed). No bible text edit; no migration; no DB write. Schema_version unchanged at 25.
+
+Branch: `v1.4.1-integration-stage-1` (MAC-209 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
+
+═══════════════════════════════════════════════════════════════════════
