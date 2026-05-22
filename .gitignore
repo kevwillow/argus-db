@@ -75,19 +75,17 @@ android_test/tools/jdk/
 android_test/tools/env.sh
 
 # Point-in-time DB / export / extraction snapshots — local rollback aid only.
-# Pattern matches files like `argus.db.pre_mac101_backup`,
-# `argus_export.csv.pre_mac110_backup`, etc.
-db/argus.db.pre_*_backup
+# DB backups covered by the broader `db/*_backup*` pattern below.
+# Pattern matches files like `argus_export.csv.pre_mac110_backup`,
+# `coverage_matrix_report.json.pre_mac100_backup`, etc.
 exports/*.pre_*_backup
 extraction_outputs/**/*.pre_*_backup
-
-# Pre-filter-repo `.git/` safety copy (history rewrite rollback aid).
-# Delete locally once push to remote is verified.
-.git.pre-filter-backup/
 
 # Agent control state (per-instance, do not commit)
 .claude-flow/
 
-# DB phase backup snapshots (extends existing db/*.db rule for *_backup-suffixed files)
+# DB phase backup snapshots (extends existing db/*.db rule for *_backup-suffixed files).
+# Covers both legacy `argus.db.pre_<token>_backup` and current
+# `argus.db.<dispatch>_step<N>_pre_backup` naming conventions.
 db/*_backup*
 db/*_backup*.sha256
