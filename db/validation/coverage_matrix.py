@@ -558,10 +558,16 @@ def _assign_drop_bin(
         return "ble_characteristic"
     if row.identifier_type == "product_family_codename":
         return "product_family_codename"
-    if (
-        row.identifier_type == "mac_range"
-        and mac_range_size(row.identifier) > MAC_RANGE_EXPANSION_CEILING
-    ):
+    # SAR-18 (MAC-232 Step 9 board ratification 2026-05-22): `oversized_mac_range`
+    # predicate is UNCONDITIONAL on mac_range rows. Matches
+    # `db/validation/export_lynceus.py::_classify_row` lines 530-537. Previous
+    # `> MAC_RANGE_EXPANSION_CEILING` strict-greater-than predicate was latent-
+    # divergent from the exporter since v1.4.0; unmasked by MAC-232 Step 6 G-B
+    # retroactive recat lifting id=9404 (Eagle Eye Networks, `64:33:b5:4/28`,
+    # size=256) out of `unknown_category` into `cctv_camera`. Lynceus v0.3 has
+    # no mac_range expansion logic; until that feature ships (CP34 §4.4 slot),
+    # both classifiers MUST drop ALL mac_range rows unconditionally.
+    if row.identifier_type == "mac_range":
         return "oversized_mac_range"
     # CP16 (§4.4) — CP14-cluster DROPPED-class types. Branch placement mirrors
     # `db/validation/export_lynceus.py::_classify_row` (after the 6 legacy

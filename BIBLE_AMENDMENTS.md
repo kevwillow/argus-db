@@ -4748,3 +4748,65 @@ No carry-forward to v1.5.x.
 
 All items above carry forward into v1.5.x / v1.6.0 cycles. Full text + commit anchors live in `/PLANNED_AND_FUTURE_UPDATES.md`; this CP33 §7 entry is the bible-side pointer (per amendment-log discipline).
 
+
+## SAR-18 — Classifier-Predicate Parity Discipline (`oversized_mac_range` exemplar)
+
+**Driven by:** MAC-232 v1.5.0 Stage 1 Step 9 halt; board ratification 2026-05-22 (comment `d5de106b`).
+**Authority:** §11 #11 amendment-log + cross-classifier parity invariant.
+
+### Rule (verbatim per board)
+
+> The `oversized_mac_range` predicate MUST be unconditional (drop ALL `mac_range` rows) until Lynceus `mac_range` expansion logic is built. `coverage_matrix.py` and `export_lynceus.py` classifiers MUST share the same predicate; future classifier additions require dual-table parity check at PR time.
+
+### Driving case
+
+At MAC-232 Step 6 G-B retroactive recategorization (commit `0e13b20`), row `id=9404` (Eagle Eye Networks, `64:33:b5:4/28`, OUI-28, `mac_range_size=256`) was lifted from `device_category='unknown'` → `cctv_camera`. This unmasked a latent classifier-divergence:
+
+| Classifier | Predicate (pre-Path β) |
+|---|---|
+| `db/validation/coverage_matrix.py::_classify_row` (lines 561-565) | `mac_range_size(row.identifier) > 256` (strict greater-than) |
+| `db/validation/export_lynceus.py::_classify_row` (lines 530-537) | UNCONDITIONAL once `unknown_category` gate clears |
+
+At v1.4.1 ship: all 8 live `mac_range` rows had `device_category='unknown'`; both classifiers attributed to `unknown_category` first → divergence inert. The `export_lynceus.py` comment block at line 532-537 explicitly stated *"Currently no such row exists in the active identifiers set"* as a load-bearing assumption — that comment was true at v1.4.1 ship; Step 6 G-B violated it without updating either predicate.
+
+Step 9 Stage B `_reconcile` at line 645 halted with verbatim:
+```
+Halt: argus_export.json: row id=9404 writer-classified as 'oversized_mac_range'
+      but MAC-45 has no entry — input drift, STOP-THE-LINE.
+```
+
+### Resolution (Path β)
+
+Patched `db/validation/coverage_matrix.py` lines 561-565 (this commit) to drop the `> MAC_RANGE_EXPANSION_CEILING` strict-greater-than predicate. The predicate now reads:
+
+```python
+if row.identifier_type == "mac_range":
+    return "oversized_mac_range"
+```
+
+This matches `export_lynceus.py`'s posture. Both classifiers will agree on every `mac_range` row regardless of `mac_range_size`. id=9404 + id=470 + the other 6 `mac_range` rows all drop to `oversized_mac_range` and stay out of the Lynceus export.
+
+Paths α (build expansion logic) and γ (re-revert id=9404 to `unknown`) were rejected:
+- Path α: feature build deferred to v1.6.0+ under CP34 §4.4 slot (already queued in `PLANNED_AND_FUTURE_UPDATES.md`)
+- Path γ: leaves divergence latent; would re-fire on any future mac_range below-ceiling recategorization
+
+### Forward-going parity invariant
+
+Future classifier rule additions in `_classify_row` of either module MUST:
+1. Add the same rule (verbatim predicate) in BOTH modules in the same PR
+2. Surface in the PR description as a "dual-table parity" note
+3. Include a regression test that exercises the rule on at least one representative row
+
+This discipline extends the CP21 cumulative-full-enum sweep spirit (which governs CHECK constraint parity across migrations) to **runtime classifier predicates**. Reviewers MUST verify both files at PR review time.
+
+### CP34 §4.4 carry-forward
+
+`§4.4 mac_range expansion-ceiling-boundary disposition` candidate already queued in `PLANNED_AND_FUTURE_UPDATES.md` v1.6.0 backlog. SAR-18 supersedes that candidate's "Path α" branch (build expansion); the queue entry now narrows to: *"if and when Lynceus v0.4+ ships a mac_range expansion strategy, lift SAR-18's unconditional-drop and unmask the expansion path. Both classifiers must remain in lockstep."*
+
+### Cross-references
+
+- MAC-232 Step 9 close-out: `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step9_lynceus_export.md`
+- Step 6 G-B audit (the unmasking event): `_phase_6_recat/step6_audit.json` + commit `0e13b20`
+- Prior dispatch-vs-actual schema-truth observations (3 total in v1.5.0 Stage 1): G-E pair_kind, Step 4 NDAA, Step 7 disambig composition
+- Existing memory: [[feedback_bible_amendment_downstream_consumer_audit]] (sibling discipline for bible amendments → downstream consumers)
+
