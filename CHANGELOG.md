@@ -4,7 +4,108 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.4.1.)
+(No unreleased changes since v1.5.0.)
+
+## [v1.5.0] — 2026-05-22
+
+### What's new in v1.5.0
+
+Argus v1.5.0 lands the **lexicon-expansion wave** — a two-session parallel dispatch (S1 military/federal cohort + S2 commercial/consumer cohort) that grows the canonical manufacturer lexicon from 52 to **92** and admits 3 new `device_category` enum values codifying previously-unrepresented surveillance modalities. The wave is **canonical-enrichment-heavy, deployment-detection-light**: 848 net active identifier promotions land (34,964 → 35,812), but only a modest 5-row uplift to the Lynceus high-confidence export (114 → 119). The most directly-deployable findings are 35 FCC grantee codes (cross-cohort) + 2 ICAO 24-bit Mode-S addresses (CBP MQ-9 fleet via adsb.lol v2); the remainder is infrastructure-mapping + lexicon enrichment for analytical use.
+
+The headline architectural contribution is **3 SAR codifications** in one cycle — SAR-16 (alias-length-floor; ≥4 chars for bare substring), SAR-17 (no-generic-product-aliases; common English-word product names admit to `notes.product_family_codenames[]` typed enrichment per CP25 §3, not the `aliases` column), and SAR-18 (classifier-predicate parity; `coverage_matrix.py` + `export_lynceus.py` MUST share predicates, future additions require dual-table parity check at PR time). SAR-18 was surfaced mid-cycle by a halt-class issue (Step 9 Stage B `_reconcile` divergence on id=9404 Eagle Eye Networks `64:33:b5:4/28`); board ratification + Path β resolution + SAR codification all landed within 50 minutes. The halt-class-as-feature discipline worked as designed.
+
+### Schema
+
+- `schema_version` 26 → **27** (mig-0027 CP33 dual-table CHECK enum extension)
+- `identifiers.device_category` CHECK enum: 13 → **16** (CP33 `+cctv_camera`, `+persistent_surveillance`, `+through_wall_radar`)
+- `behavioral_signatures.device_category` CHECK enum: 13 → **16** (parity per CP32 dual-table precedent; second framework dual-table CHECK extension)
+- `identifiers.identifier_type` CHECK enum: 56 → **57** (CP33 `+imei_tac`; 8-digit IMEI Type Allocation Code; forward-compatible admission with 0 rows promoted this cycle per gate G-C)
+- `identifiers.pair_kind` CHECK enum: **5 values confirmed** (no change; v1.4.1 CHANGELOG correctly captured the CP31 4→5 transition. Gate G-E codified that the dispatch's "on-disk has 4 values" claim at cycle start was a PRAGMA-output reading error per [[feedback_pragma_alone_insufficient_for_sar13]] — `sqlite_master.sql` direct DDL read is the authoritative path; PRAGMA hides CHECK constraints. No migration needed; no-op log entry in CP33 §2.4.)
+
+### Data
+
+- Sources: 71 → **73** (+2 net: sid=72 GitHub Code Search REST API `source_type='crowdsourced'` tier 3 `license_posture='NO_LICENSE_DECLARED_per_repo_FEIST_FACTS_ONLY'`; sid=73 adsb.lol v2 `source_type='regulatory'` tier 3 `license_posture='PUBLIC_DOMAIN_EQUIVALENT_FAA_MODE_S_DERIVED'`)
+- Sources cited but NOT re-admitted (dedup-merged per §11 #11): **sid=54 crt.sh** (Certificate Transparency aggregator — 747 v1.5.0 citations); **sid=51 fccid.io** (60 v1.5.0 citations; Session 2 missed preflight check that sid=51 already shipped in v1.2.0 via MAC-178 — integration-time reconciliation in CP33 §1)
+- Manufacturers: 52 → **92** (+40 net via Stage 1 Step 4 cohort admissions; 2 arms in the lexicon now: Parrot Automotive id=222 from v1.4.1 + Pelco id=254 new in v1.5.0 under MSI id=3)
+- Identifiers active: 34,964 → **35,812** (+848 net promotions); chained-superseded ledger continues from v1.4.1 (Stage 1 Step 5 minted single `sweep_event_id=mac232_v1_5_0_stage1_step5_2026_05_22`)
+- Behavioral signatures: **201** (unchanged this cycle; CP33 §1 extends the schema slot for new categories but admits 0 row promotions to `behavioral_signatures.device_category` at v1.5.0)
+- Per-identifier_type promotions (Step 5): network_endpoint 747 (crt.sh cert SAN bulk) · fcc_grantee_code 36 · frequency_band 24 · vendor_controlled_hostname 21 · product_family_codename 17 (post G-G batch-reject) · icao_24bit_address 2 (CBP MQ-9 N870CB→ABF68A, N872CB→ABFDF8 via sid=73 adsb.lol) · ble_company_id 1 (Rohde & Schwarz 0x0019)
+
+### Manufacturer admissions (40 net new, cohort breakdown)
+
+- **Counter-drone / counter-UAS** (11): Anduril Industries (multi-product hub at id=223; 5 future arm-split candidates queued — Sentry Tower → persistent_surveillance, Anvil → drone_detect, Lattice OS → unknown_software_substrate, Roadrunner → drone_detect, Sentinel → drone_detect), Fortem Technologies, Citadel Defense, Black Sage Technologies, D-Fend Solutions, AeroDefense, Echodyne, Liteye Systems, Robin Radar Systems, MyDefence Communications, Sensofusion
+- **Border / persistent surveillance** (4 + 2 carveouts): Elbit Systems of America, General Atomics, TCOM, Persistent Surveillance Systems + Northrop Grumman & Lockheed Martin (multi-purpose §11 #10 carveouts, `primary_category='unknown'`)
+- **Through-wall radar** (3): Camero, NIITEK (zero-source admission — see Notes below), TiaLinx
+- **IMSI catcher** (1): Rohde & Schwarz
+- **Fleet telematics** (7): Geotab, Verizon Connect, Samsara, Motive, Lytx, Omnitracs, Trimble (multi-purpose §11 #10 carveout)
+- **CCTV camera / VMS** (7 incl. Pelco arm): Hanwha Vision, Bosch Security Systems (multi-purpose §11 #10 carveout), Milestone Systems, **Pelco** (arm-row id=254, `parent_manufacturer_id=3` Motorola Solutions, `is_arm=1`, `query_default='hidden_arm'` per CP31 §4.6 precedent + SEC Ex21 FY2025 evidence), Uniview (NDAA §889), Tiandy (NDAA §889), Vivotek
+- **Electronic monitoring** (5): BI Incorporated (standalone for v1.5.0 — Geo Group parent admission deferred to v1.5.x per gate G-F), Attenti, STOP, Sentinel Offender Services, Track Group
+
+### Retroactive recategorization (Step 6 / gate G-B)
+
+7 existing camera vendors retroactively recategorized to `primary_category='cctv_camera'` (post CP33 mig-0027 enum admission): Hikvision (id=209, 14 identifier rows touched), Dahua (id=208, 8 idents), Axis Communications (id=7, 6 idents; mfg-level re-scope from `'alpr'`), Avigilon (id=6, 1 ident; mfg-level re-scope from `'alpr'`), Verkada (id=210, 0 idents), Eagle Eye Networks (id=220, 1 ident), Rhombus Systems (id=221, 1 ident) — total 38 UPDATEs in single transaction. **NDAA §889 attribution preserved** verbatim on Hikvision + Dahua (`notes.ndaa_section_889_note` retained). **BriefCam (id=31) DEFERRED** per board G-B — `primary_category='face_recog'` unchanged (analytics-layer ambiguity; future v1.5.x sub-cycle).
+
+5 Axis Communications identifier rows (id=415, 433, 448, 460, 470) carried pre-JSON-notes-era plain-text notes from MAC-44 phase-5 step-4; wrapped at recat-touch time as `{"legacy_text_notes": "<verbatim>", "recategorization_history": [...]}` JSON envelope. No data loss; flagged as **CP34-pending candidate #4** for a repo-wide legacy-text-notes normalization sweep.
+
+### Bible amendments
+
+- **CP33** (mig-0027) — 7 sub-section bundle codification:
+  - §1 — 2 net source admissions (sid=72 GitHub Code Search REST API, sid=73 adsb.lol v2) + integration-time dedup-merge entries for sid=54 crt.sh + sid=51 fccid.io
+  - §2 — mig-0027 dual-table CHECK enum extensions (`identifiers.device_category` + `behavioral_signatures.device_category` 13→16; `identifiers.identifier_type` 56→57); §2.4 `pair_kind` no-op log entry (G-E disposition)
+  - §3 — 40 net manufacturer admissions + Pelco arm at id=254 (CP31 §4.6 precedent); §3.5 NDAA §889 dual-format observation (canonical Hikvision/Dahua use single-field `ndaa_section_889_note`; dispatch's claimed dual-key precedent was inaccurate; both formats applied to Uniview/Tiandy for query-path parity)
+  - §4 — 848 net active identifier promotions across 7 substep cohorts
+  - §5 — Step 6 G-B retroactive `cctv_camera` recategorization (7 mfg + 31 ident UPDATEs, dual-layer audit per §11 #11 + [[feedback_bible_amendment_downstream_consumer_audit]])
+  - §6 — Step 7 disambig queue triage (168 Elbit FCC grantee disambig deferred to v1.5.x sub-cycle; dispatch's "168 = 5 Phase A + 163 codenames" composition claim was inaccurate; actual queue is all Elbit/Tadiran FCC grantee disambig — schema-truth observation #3 in this cycle)
+  - §7 — `PLANNED_AND_FUTURE_UPDATES.md` v1.5.x patch + v1.6.0 new-cohort backlog pointer (created this cycle as new repo file)
+- **SAR-16** (formal codification) — **alias-length-floor discipline**: aliases ≤3 chars require corporate-suffix OR procurement-context OR product-context anchor regex disambig. Floor = 4-char minimum for bare substring matching. Driven by `lockheed-LM substring n=134` (Lockheed Martin's bare 2-char "LM" alias substring-matched 134 unrelated FCC grantee entries). Cross-references SAR-15 GENERIC_RISK_CANONICALS pre-load.
+- **SAR-17** (formal codification) — **no-generic-product-aliases discipline**: generic English-word product aliases (EAGLE, SENTINEL, STOP, ATLAS) admit to `notes.product_family_codenames[]` typed enrichment per CP25 §3 — NOT to bare `aliases` column. Driven by `mydefence-EAGLE substring n=41`. Pairs with SAR-16 for a 2-pronged alias-discipline regime.
+- **SAR-18** (formal codification) — **classifier-predicate parity discipline**: the `oversized_mac_range` predicate MUST be unconditional (drop ALL `mac_range` rows) until Lynceus `mac_range` expansion logic is built. `db/validation/coverage_matrix.py` + `db/validation/export_lynceus.py` classifiers MUST share the same predicate; future classifier additions require dual-table parity check at PR time. Driven by Step 9 Stage B `_reconcile` halt on id=9404 (Eagle Eye Networks, `64:33:b5:4/28`, size=256). Extends the CP21 cumulative-full-enum sweep spirit to **runtime classifier predicates**.
+
+### Halts encountered + dispositions
+
+**Single halt-class issue surfaced this cycle:**
+
+- **Step 9 Stage B `_reconcile` line 645** (halt-class as designed):
+  ```
+  Halt: argus_export.json: row id=9404 writer-classified as 'oversized_mac_range'
+        but MAC-45 has no entry — input drift, STOP-THE-LINE.
+  ```
+  Root cause: classifier-divergence between `coverage_matrix.py` (strict `mac_range_size > 256`) and `export_lynceus.py` (unconditional `mac_range → oversized`), latent since v1.4.0 because all mac_range rows had `device_category='unknown'` (both classifiers attributed to `unknown_category` first); unmasked by Step 6 G-B retroactive recat lifting id=9404 (Eagle Eye, size=256) out of `unknown_category`. Board ratified **Path β** (loosen `coverage_matrix.py` to match exporter posture) + codify SAR-18. Commit `8552222`. Stage 9 re-ran cleanly under new predicate. **No canonical DB mutations from the halt** — the discipline worked as designed.
+
+### Export delta (v1.4.1 → v1.5.0)
+
+| File | v1.4.1 | v1.5.0 | Δ |
+|---|---|---|---|
+| `argus_export.json` (≥30 conf, all filters) | 514 | **536** | +22 |
+| `argus_export_high_confidence.json` (≥70 floor) | 114 | **119** | **+5** |
+| `argus_export.csv` (full active set; authoritative count via `csv.reader`) | 34,968 | **35,812** | +844 |
+| `argus_export_behavioral_signatures.json` | 125 | 125 | 0 |
+
+**Honest framing:** this is a canonical-enrichment-heavy, deployment-detection-light wave. The high-confidence Lynceus uplift of +5 is the operational deployment-detection delta — the cycle added 848 net active identifiers, of which only 5 simultaneously meet (confidence ≥70) + (`device_category != 'unknown'`) + (`geographic_scope` US-or-empty) + (not Pi self-exclude OUI) + (`source_type` allowed) + (not `mac_range` per SAR-18). Most net promotions are `network_endpoint` rows at the `crt.sh` confidence ceiling of 75 — they pass the ≥70 floor but route to alternate drop bins via §4.4. The cycle's primary deliverable is **canonical lexicon enrichment** (40 new manufacturer admissions across 7 cohorts; 3 new `device_category` enum slots; SAR-16/17/18 discipline codifications) — not new directly-deployable detection rows.
+
+### Documentation
+
+- BIBLE_AMENDMENTS.md CP33 §1-§7 + SAR-16/17/18 (lines ~4085-4812)
+- `PLANNED_AND_FUTURE_UPDATES.md` — **new repo file** (Stage 1 Step 8) — v1.5.x patch + v1.6.0 new-cohort backlog + 8 CP34-pending candidates queue
+- v1.5.0 Stage 1 integration report at `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/INTEGRATION_REPORT_v1_5_0_stage1.md` (Paperclip-doc-not-file convention; NOT a repo file)
+- README + CHANGELOG + DATA_DICTIONARY + CREDITS + METHODOLOGY + PROJECT_STATE refreshed for v1.5.0 ([MAC-232](/MAC/issues/MAC-232) Stage 2 — Validator-side fact-sheet probe sweep verified every numeric claim against live `db/argus.db` at HEAD pre-commit per the paste-not-cite + SQL-probe-at-fact-lock-time discipline; this is the **structural fix for Stage 1's 3 schema-truth drifts**)
+
+### Cycle hygiene transparency (3 dispatch-vs-actual schema-truth drifts)
+
+Surfaced and resolved during Stage 1 (honest cycle observation, not self-flagellation — see also [[feedback_dispatch_preamble_live_state_verification]] for the recurring discipline). Each was caught by paste-not-cite Validator probes; each resolved without canonical mutation:
+
+1. **`pair_kind` "on-disk has 4 values" claim** (G-E) → actual 5 (CP31 mig-0025 already shipped at v1.4.1); PRAGMA-output reading error per SAR-13 §S.3. Resolution: no-op log entry in CP33 §2.4.
+2. **NDAA §889 precedent key shape** (Step 4) → canonical Hikvision/Dahua use single-field `notes.ndaa_section_889_note` with "runguide §0 scope" reference; dispatch's claimed dual-key (`ndaa_section_889_affected` + `ndaa_attribution_note`) was inaccurate. Resolution: applied BOTH formats to Uniview/Tiandy at admission for query-path parity. CP34-pending candidate #6 (sweep normalization).
+3. **S1 disambig queue composition** (Step 7) → actual 168 entries are all Elbit/Tadiran FCC grantee disambig (0 codenames in disambig queue; the codenames live in a separate file `identifier_candidates/wayback_pdf_extracted_v2.json` with 347 rows, batch-rejected per gate G-G at Step 5). Dispatch's "168 = 5 + 163 codenames" breakdown was inaccurate. Resolution: 168 deferred to v1.5.x Elbit sub-cycle.
+
+All three feed **CP34-pending candidate #7** — Validator-side dispatch live-state preamble verification sub-rule. Stage 2's Step 1 SQL-probe-at-fact-lock-time discipline is the prototype mitigation; codification into a formal SAR awaits empirical recurrence in v1.5.x.
+
+### Notes
+
+- **NIITEK zero-source admission** — admitted on `cohort_prediction` basis with `notes.zero_source_admission=true` + `notes.low_confidence_flag=true`. Chemring through-wall radar subsidiary; intentionally low-profile US government vendor. Identifier-level lift withheld; future v1.5.x cycle should re-attempt source attestation.
+- **Pre-push large-blob verification** runs at Stage 2 Step 9 per [[feedback_git_push_dryrun_insufficient_for_remote_hooks]] — Wayback PDF extraction outputs from S1 Phase B stay on external SSD (gitignored); canonical repo blob ceiling = 50MB. Operator pushes the final `v1.5.0` tag + branch manually post-Stage-2 verification.
+- v1.5.0 ship is co-coordinated under [MAC-232](/MAC/issues/MAC-232) (Stage 1 + Stage 2 single parent; 11 substeps + 11 substeps respectively)
+- Cycle wall-clock: ~74 minutes Stage 1 (excluding board-ratification wait windows; 3 ratification waits totaling several heartbeats) + Stage 2 docs refresh in flight
 
 ## [v1.4.1] — 2026-05-21
 

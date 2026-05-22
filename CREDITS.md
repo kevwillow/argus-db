@@ -1,6 +1,6 @@
 # Argus — Upstream Attribution and Credits
 
-Argus integrates data derived from **71 upstream sources** (canonical registries, procurement data, public-records databases, academic research, community-research repositories, vendor-published documentation, international corporate registries, US state Secretary-of-State registries, judicial filings, federal disclosure / entity-registration sources, FCC Equipment Authorization aggregators and primary surfaces, the Wave H desktop-axis vendor-application static-analysis methodology source, the Wave I/I.5/I.6/I.7 13-source vendor cloud-infrastructure hostname corpus admission, and — new in v1.4.1 — 5 vendor companion APK sources [Hikvision Hik-Connect, Dahua DMSS, Motorola Solutions WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot] admitted via [MAC-204](/MAC/issues/MAC-204) Phase 10b admit-then-rebind disposition under the sid=13 envelope) plus a canonical lexicon of **52 surveillance-technology vendor entries** (51 hub-visible canonicals + 1 multi-arm `hidden_arm` row — Parrot Automotive id=222, the first arm canonical under the CP31 hub-and-spoke schema). This document attributes every upstream contribution, names the integration shape, and records license-carry-forward obligations downstream consumers must honor.
+Argus integrates data derived from **73 upstream sources** (canonical registries, procurement data, public-records databases, academic research, community-research repositories, vendor-published documentation, international corporate registries, US state Secretary-of-State registries, judicial filings, federal disclosure / entity-registration sources, FCC Equipment Authorization aggregators and primary surfaces, the Wave H desktop-axis vendor-application static-analysis methodology source, the Wave I/I.5/I.6/I.7 13-source vendor cloud-infrastructure hostname corpus admission, 5 vendor companion APK sources [Hikvision Hik-Connect, Dahua DMSS, Motorola Solutions WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot] admitted in v1.4.1 via [MAC-204](/MAC/issues/MAC-204) Phase 10b admit-then-rebind disposition under the sid=13 envelope, and — new in **v1.5.0** — 2 additional sources from the lexicon-expansion wave [GitHub Code Search REST API sid=72; adsb.lol v2 FAA-registry-derived aircraft tracking sid=73]) plus a canonical lexicon of **92 surveillance-technology vendor entries** (51 hub-visible canonicals from v1.4.1 + 1 multi-arm `hidden_arm` row — Parrot Automotive id=222 — + 39 net-new cohort_prediction admissions from the v1.5.0 lexicon-expansion wave + 1 new multi-arm `hidden_arm` row — Pelco id=254 under Motorola Solutions id=3 — = **92 total** in the v1.5.0 lexicon). This document attributes every upstream contribution, names the integration shape, and records license-carry-forward obligations downstream consumers must honor.
 
 For the binding license terms, see [LICENSE](LICENSE) (AGPL-3.0-or-later — code), [LICENSE-DATA](LICENSE-DATA) (ODbL-1.0 — database), and [LICENSE-DOCS](LICENSE-DOCS) (CC-BY-SA-4.0 — documentation). The LICENSE-DATA §2.1 per-source license-posture taxonomy is the structural anchor for the source enumerations below.
 
@@ -115,6 +115,89 @@ The [MAC-195](/MAC/issues/MAC-195) Phase 8 wave (Stage 1 sub-pass 43) completed 
 | 70 | Parrot FreeFlight 6 (com.parrot.freeflight6@6.7.6) | manufacturer_app | per_vendor (no_license_declared_facts_only) | per_vendor_public_download_no_auth | 2026-05-21 |
 | 71 | DJI Industry Pilot (com.dji.industry.pilot@v1.9.0) | manufacturer_app | per_vendor (no_license_declared_facts_only) | per_vendor_public_download_no_auth | 2026-05-21 |
 
+### v1.5.0 additions — Lexicon-Expansion Wave source admissions (2 new sources + 2 dedup-merge citations)
+
+The v1.5.0 cycle admitted two new sources alongside the +40 net-new manufacturer cohort_prediction admissions (`+39` ordinary cohort plus the Pelco `hidden_arm` row under Motorola Solutions). Two existing sources (sid=51 fccid.io + sid=54 crt.sh aggregator) were cited heavily during the wave (747 + 60 v1.5.0 citations respectively) but were NOT re-admitted; per §11 #11 dedup-merge discipline established at integration-time reconciliation, identifier rows from a previously-admitted source-row update their existing sid rather than spawning duplicates.
+
+- **[GitHub Code Search REST API](https://api.github.com/search/code)** (sources.id=72) — GitHub's public code-search API (`GET /search/code` per https://docs.github.com/en/rest/search/search#search-code). `source_type='crowdsourced'` (tier 3); `access_mode='automated_api'`. Per-finding URL template: `https://github.com/{owner}/{repo}/blob/{sha}/{path}#L{line}` (pinned-SHA + line-anchored per §11 #1 source-url-direct). **License: NO_LICENSE_DECLARED** — the GitHub Code Search API itself carries no declared license; per-repo license declarations vary across hits. Argus extracts identifier facts (filename, line, SHA, URL) under the *Feist v. Rural Telephone Service* (499 U.S. 340 (1991)) facts-not-copyrightable doctrine per §11 #16; per-repo licenses inherit at the per-finding level but compilation arrangement (search-result ranking, snippet extraction, navigation surface) is NOT republished. Per-promoted-row sentinel: `identifiers.notes.upstream_license_posture='NO_LICENSE_DECLARED'`. Admitted via session `wave_v1_5_lexicon_expansion` (dispatch [MAC-232](/MAC/issues/MAC-232); see [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) CP33 §1). **Why included:** the code-search surface is the dominant first-party crowdsourced extraction surface for the v1.5.0 cohort_prediction wave (counter-UAS, persistent-surveillance, through-wall-radar, CCTV/VMS, electronic-monitoring vendors); per-finding factual extraction supports the cohort_prediction admission discipline under SAR-15 pre-load + SAR-16 alias-length-floor + SAR-17 no-generic-product-aliases.
+- **[adsb.lol v2 (FAA-registry-derived aircraft tracking)](https://api.adsb.lol/v2/)** (sources.id=73) — community-operated aircraft-tracking surface derived from live ADS-B broadcasts cross-referenced against the FAA Civil Aviation Registry (14 CFR Part 47 public record). `source_type='regulatory'` (tier 3 — the upstream FAA Part 47 registry is regulatory-of-record; the adsb.lol surface re-publishes the public-record portions verbatim with live ADS-B broadcast cross-reference). `access_mode='automated_api'`. Per-row URL templates: `https://api.adsb.lol/v2/icao/{icao24}` + `https://api.adsb.lol/v2/registration/{n_number}`. **License: PUBLIC_DOMAIN_EQUIVALENT** (FAA Civil Aviation Registry is 14 CFR Part 47 public record; live ADS-B broadcasts are public spectrum emissions under FCC Part 87 with no copyright on factual position/identification data per Feist). Attribution string: *"Aircraft-tracking data derived from FAA Civil Aviation Registry (14 CFR Part 47 public record) and live ADS-B broadcasts. The compilation surface is operated by adsb.lol; the underlying data is public-domain factual."* Admitted via session `wave_v1_5_lexicon_expansion` (dispatch [MAC-232](/MAC/issues/MAC-232); see [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) CP33 §1). **Why included:** the persistent-surveillance cohort (Elbit Systems of America, General Atomics, TCOM, Persistent Surveillance Systems) requires aircraft-axis identifier surfaces (ICAO-24 hex, N-number, registry-operator chain) for cohort_prediction admissions; adsb.lol's FAA-registry-derived surface is the canonical public-domain-equivalent aircraft-tracking source.
+
+**Integration-time dedup-merge note (per §11 #11):** sid=54 (Certificate Transparency Logs — crt.sh aggregator) was cited 747 times across the v1.5.0 cohort_prediction wave (cross-source corroboration anchor for vendor-controlled-hostname identifiers across counter-UAS / CCTV / persistent-surveillance vendors); sid=51 (fccid.io) was cited 60 times (FCC EAS grantee-code / equipment-class corroboration). Neither was re-admitted as a new sid — both inherit the v1.2.0 / v1.4.0 admission posture verbatim, and integration-time dedup-merge per §11 #11 collapses any candidate duplicate sid rows into the existing sids. The v1.5.0 source-row count delta is +2 net (71 → 73), not +4.
+
+**License-attribution carry-forward summary (v1.5.0 additions):** NO_LICENSE_DECLARED (sid 72 GitHub Code Search REST API) inherits the Feist facts-only regime per §6 below — `identifiers.notes.upstream_license_posture='NO_LICENSE_DECLARED'` on every promoted row; downstream consumers redistributing Argus's database content inherit the same facts-only posture for these rows. PUBLIC_DOMAIN_EQUIVALENT (sid 73 adsb.lol v2) carries no attribution-required obligation per the upstream FAA Part 47 public-record posture + Feist on the live-ADS-B portion; per-row `api.adsb.lol` source_url citation discipline still applies per §11 #2 source-url-direct.
+
+### v1.5.0 admission ledger summary
+
+| sid | Name | source_type | License | access_mode | admission_date_utc |
+|---|---|---|---|---|---|
+| 72 | GitHub Code Search REST API | crowdsourced | NO_LICENSE_DECLARED (per_finding_factual_extraction_only_per_feist_facts_only) | automated_api | 2026-05-22 |
+| 73 | adsb.lol v2 (FAA-registry-derived aircraft tracking) | regulatory | PUBLIC_DOMAIN_EQUIVALENT (FAA Part 47 + Feist on live ADS-B) | automated_api | 2026-05-22 |
+
+### v1.5.0 lexicon-expansion wave — Manufacturer cohort admissions (+40 net; 52 → 92 total)
+
+The v1.5.0 lexicon-expansion wave (dispatch [MAC-232](/MAC/issues/MAC-232); Two-Session Parallel Dispatch) admitted **40 net-new manufacturer canonicals** across 7 surveillance cohorts plus the multi-purpose §11 #10 carveout cohort. Per the integration-time counting reconciliation: 21 Session 1 (military/federal) + 19 Session 2 (commercial/consumer; the Pelco arm row counts within the Session 2 camera_vms cohort, not as a separate +1) = 40. The full per-vendor breakdown is canonicalized in `manufacturers` rows ids 223-262; CP33 §3 in BIBLE_AMENDMENTS.md carries the §-finding rationale.
+
+The cohort_prediction admission discipline composes with SAR-15 GENERIC_RISK_CANONICALS pre-load (per-vendor probe-scope discipline from v1.4.0), SAR-16 alias-length-floor (formal codification from the lockheed-LM n=134 substring-collision driving case), and SAR-17 no-generic-product-aliases (formal codification from the mydefence-EAGLE n=41 substring-collision driving case). The wave also introduces three new `identifiers.device_category` enum values via mig-0027 / CP33 §2: `cctv_camera`, `persistent_surveillance`, `through_wall_radar` (dual-table CHECK literal sweep continuing the CP32 §1 precedent).
+
+#### Counter-drone / counter-UAS cohort (11 new vendors)
+
+The existing counter-drone section (Dedrone + DroneShield in the v1.0.0 baseline) extends with 11 cohort_prediction admissions from the v1.5.0 Session 1 military/federal wave:
+
+- **Anduril Industries** (manufacturers.id=223) — admitted as multi-product hub (`notes.multi_product_admission=true`); future CP31-style arm-split candidates queued for v1.5.x — Sentry Tower → persistent_surveillance, Anvil → drone_detect, Lattice OS → unknown_software_substrate, Roadrunner → drone_detect, Sentinel → drone_detect.
+- **Fortem Technologies** (id=224), **Citadel Defense** (id=225), **Black Sage Technologies** (id=226), **D-Fend Solutions** (id=227), **AeroDefense** (id=228), **Echodyne** (id=229), **Liteye Systems** (id=230), **Robin Radar Systems** (id=231), **MyDefence Communications** (id=232), **Sensofusion** (id=233) — all admitted at `primary_category='drone_detect'` per cohort_prediction discipline. Citadel Defense, Black Sage Technologies, Echodyne, and Robin Radar Systems carry `notes.sar15_disambig_required=true` + `notes.sar15_high_risk_canonical=true` flag fields per Schema-truth-drift #3 (168 Elbit-class FCC disambig deferred to v1.5.x Elbit sub-cycle).
+
+#### Border / persistent-surveillance cohort (NEW SECTION — 4 new vendors + 2 multi-purpose §11 #10 carveouts)
+
+The v1.5.0 wave introduces the persistent-surveillance cohort and the CP33 §2 `identifiers.device_category='persistent_surveillance'` enum value. Cohort scope covers aerostat / lighter-than-air persistent platforms + tower-mounted persistent imaging + strategic-altitude aerial persistent surveillance:
+
+- **Elbit Systems of America** (id=234), **General Atomics** (id=237), **TCOM** (id=238), **Persistent Surveillance Systems** (id=239) — all admitted at `primary_category='persistent_surveillance'`. General Atomics, TCOM, and Persistent Surveillance Systems carry the SAR-15 disambig flag.
+- **Multi-purpose §11 #10 carveouts** (admitted at `primary_category='unknown'`; high-confidence Lynceus export excludes per §11 #13): **Northrop Grumman** (id=235), **Lockheed Martin** (id=236). Standardized footnote: *"admitted at `device_category='unknown'` per §11 #10 multi-purpose-vendor carveout; high-confidence Lynceus export excludes per §11 #13"*. Both vendors have substantial surveillance-adjacent product portfolios (aerostat platforms, persistent ISR, sensor packages) alongside broader IoT/defense product lines that disqualify primary_category at this admission cycle.
+
+#### Through-wall radar cohort (NEW SECTION — 3 new vendors)
+
+The v1.5.0 wave introduces the through-wall radar cohort and the CP33 §2 `identifiers.device_category='through_wall_radar'` enum value. The cohort is regulatorily distinct via FCC §15.519 UWB-LE-only carveout (operationally restricted to law-enforcement use):
+
+- **Camero** (id=240) — admitted at `primary_category='through_wall_radar'`; SAR-15 disambig flag present.
+- **NIITEK** (id=241) — admitted at `primary_category='through_wall_radar'` on cohort_prediction basis with **zero-source attestation** after wide-net sweep (Chemring through-wall radar subsidiary, intentionally low-profile US government vendor); `notes.zero_source_admission=true` + `notes.low_confidence_flag=true`; future v1.5.x cycle should re-attempt source attestation.
+- **TiaLinx** (id=242) — admitted at `primary_category='through_wall_radar'`.
+
+#### IMSI catcher cohort (existing section; +1 new vendor)
+
+- **Rohde & Schwarz** (id=243) — appended to the existing IMSI catcher section (Harris, Digital Receiver Technology, Engility, KeyW, Jacobs, Septier) at `primary_category='imsi_catcher'`.
+
+#### Fleet telematics cohort (NEW SECTION — 6 new vendors + 1 multi-purpose §11 #10 carveout)
+
+The v1.5.0 wave introduces the fleet-telematics cohort under the CP32 §1 `identifiers.device_category='automotive_telematics'` enum value (admitted in v1.4.1 mig-0026; first cohort_prediction populations land here):
+
+- **Geotab** (id=244), **Verizon Connect** (id=245), **Samsara** (id=246), **Motive** (id=247), **Lytx** (id=248), **Omnitracs** (id=249) — all admitted at `primary_category='automotive_telematics'`.
+- **Multi-purpose §11 #10 carveout**: **Trimble** (id=250) — admitted at `primary_category='unknown'` (surveillance-adjacent via fleet-management products but Trimble's broader IoT/auto/agriculture/geospatial presence dominates); high-confidence Lynceus export excludes per §11 #13.
+
+#### CCTV camera / VMS cohort (NEW SECTION — 6 new vendors + 1 hidden_arm + 1 multi-purpose §11 #10 carveout)
+
+The v1.5.0 wave introduces the CCTV camera / VMS cohort under the CP33 §2 `identifiers.device_category='cctv_camera'` enum value:
+
+- **Hanwha Vision** (id=251), **Milestone Systems** (id=253), **Vivotek** (id=257) — all admitted at `primary_category='cctv_camera'`.
+- **Pelco, Inc.** (id=254) — admitted as the framework's **second multi-arm `hidden_arm` row** under the CP31 hub-and-spoke schema (`parent_manufacturer_id=3` Motorola Solutions, `is_arm=1`, `query_default='hidden_arm'`, `primary_category='cctv_camera'`); evidence chain: MSI 10-K FY2025 Exhibit 21 (Pelco acquired by Motorola Solutions 2020; Delaware). Under Motorola Solutions canonical section (id=3), Pelco is a `hidden_arm` per CP31 §4.6 hub-and-spoke precedent (the first such precedent landed Parrot Automotive id=222 under Parrot id=25 at v1.4.1). Default queries against `manufacturers` filter `WHERE query_default = 'visible'` and do not surface this arm; explicit-opt-in audit queries surface it per CP31 §4.6.
+- **NDAA §889 cohort** (admitted with the standardized note *"NDAA §889 federal procurement bar applies; state/local LE deployments persist outside the federal-procurement bar (runguide §0 scope)"*): **Uniview** (id=255), **Tiandy** (id=256). Both carry the dual-format `notes.ndaa_section_889_note` (canonical) + `notes.ndaa_section_889_affected` (S2-staged) + `notes.ndaa_attribution_note` (S2-staged) per the v1.5.0 Step 4 schema-truth observation (Schema-truth-drift #2: Hikvision + Dahua use only the canonical `ndaa_section_889_note`; Uniview + Tiandy carry both the canonical and S2-staged forms for forward-compatibility).
+- **Multi-purpose §11 #10 carveout**: **Bosch Security Systems** (id=252) — admitted at `primary_category='unknown'` (broader Bosch IoT / automotive / industrial presence dominates); high-confidence Lynceus export excludes per §11 #13.
+
+**Retroactive cctv_camera recategorization (Stage 1 Step 6 / gate G-B):** seven existing v1.0.0 / v1.2.0 / v1.3.0 vendor canonicals flipped to `primary_category='cctv_camera'` to align with the new CP33 §2 enum value: **Hikvision** (id=209), **Dahua** (id=208), **Axis Communications** (id=7), **Avigilon** (id=6), **Verkada** (id=210), **Eagle Eye Networks** (id=220), **Rhombus Systems** (id=221). NDAA §889 attribution preserved verbatim on Hikvision (id=209) and Dahua (id=208) via the canonical `notes.ndaa_section_889_note` key. BriefCam (id=31) was **DEFERRED** per board (analytics-layer ambiguity: BriefCam is a video-analytics overlay on top of arbitrary CCTV/VMS, not itself a CCTV camera); `primary_category='face_recog'` unchanged. Total identifier rows recategorized: **31** (14 Hikvision + 8 Dahua + 6 Axis + 1 Avigilon + 1 Eagle Eye Networks + 1 Rhombus + 0 Verkada).
+
+#### Electronic monitoring cohort (NEW SECTION — 5 new vendors; standalone admission for v1.5.0)
+
+The v1.5.0 wave introduces the electronic-monitoring cohort under the existing `identifiers.device_category='gps_tracker'` enum value:
+
+- **BI Incorporated** (id=258) — admitted as **standalone for v1.5.0** (Geo Group parent admission deferred to v1.5.x per gate G-F; future arm-split shape: `is_arm=1, parent_manufacturer_id=<new Geo Group id>, query_default='hidden_arm'`).
+- **Attenti** (id=259), **STOP** (id=260), **Sentinel Offender Services** (id=261), **Track Group** (id=262) — all admitted at `primary_category='gps_tracker'`. STOP (id=260) and Sentinel Offender Services (id=261) carry `notes.sar15_disambig_required='multi-anchor confirmation before cross-source attribution lift'` per the per-vendor probe-scope discipline.
+
+#### v1.5.0 SAR codifications (BIBLE_AMENDMENTS.md)
+
+The v1.5.0 cycle codified three new SAR entries from in-cycle empirical anchors:
+
+- **SAR-16 — Alias-length-floor discipline** (BIBLE_AMENDMENTS.md line 4682): driving case lockheed-LM n=134 substring collisions; formal codification per BIBLE_AMENDMENTS.md.
+- **SAR-17 — No-generic-product-aliases discipline** (BIBLE_AMENDMENTS.md line 4701): driving case mydefence-EAGLE n=41 substring collisions; formal codification per BIBLE_AMENDMENTS.md.
+- **SAR-18 — Classifier-Predicate Parity Discipline** (BIBLE_AMENDMENTS.md line 4752): oversized_mac_range exemplar (Step 9 halt at id=9404 Eagle Eye Networks size=256); `coverage_matrix.py` and `export_lynceus.py` classifiers MUST share runtime predicates; future `_classify_row` rule additions require dual-table parity check at PR time.
+
 ---
 
 ## 2 — Tier 1/2 public-records and procurement data
@@ -205,62 +288,102 @@ Downstream consumers redistributing Argus's database content inherit the same fa
 
 ---
 
-## 7 — Surveillance-technology vendor lexicon (manufacturers table; 52 canonical entries: 51 hub-visible + 1 hidden_arm)
+## 7 — Surveillance-technology vendor lexicon (manufacturers table; 92 canonical entries at v1.5.0: 51 v1.4.1 hub-visible + 1 v1.4.1 hidden_arm (Parrot Automotive id=222) + 39 v1.5.0 net-new cohort_prediction admissions + 1 v1.5.0 hidden_arm (Pelco id=254 under Motorola Solutions))
 
 The `manufacturers` table is the canonical lexicon of surveillance-technology vendors used as the Tier-2/3 device_category inference allowlist. Each entry contributes vendor attribution to identifier rows. This is NOT a data source in the registry sense above; it's an internal curated lexicon used at promotion time. Listed alphabetically:
 
 | Vendor | Canonical category |
 |---|---|
+| AeroDefense | drone_detect *(v1.5.0 counter_uas cohort)* |
 | Aerodome | drone |
+| Anduril Industries | drone_detect *(v1.5.0 counter_uas cohort; **multi-product hub admission** — `notes.multi_product_admission=true`; 5 future arm-split candidates queued for v1.5.x: Sentry Tower → persistent_surveillance, Anvil → drone_detect, Lattice OS → unknown_software_substrate, Roadrunner → drone_detect, Sentinel → drone_detect)* |
+| Attenti | gps_tracker *(v1.5.0 electronic_monitoring cohort)* |
 | Autel Robotics | drone |
-| Avigilon | alpr |
-| Axis Communications | alpr |
+| Avigilon | cctv_camera *(v1.5.0 retroactive recat from `alpr` per gate G-B Step 6 retroactive cctv_camera recategorization; NDAA §889 not applicable)* |
+| Axis Communications | cctv_camera *(v1.5.0 retroactive recat from `alpr` per gate G-B; NDAA §889 not applicable)* |
 | Axon | body_cam |
 | Berla | hacking_tool |
+| BI Incorporated | gps_tracker *(v1.5.0 electronic_monitoring cohort; **standalone for v1.5.0** — Geo Group parent admission deferred to v1.5.x per gate G-F)* |
+| Black Sage Technologies | drone_detect *(v1.5.0 counter_uas cohort; `notes.sar15_disambig_required=true`)* |
 | BluePoint Alert | (uncategorized — documented_absence stub admission, v1.2.0) |
-| BriefCam | face_recog |
+| Bosch Security Systems | (uncategorized — **multi-purpose §11 #10 carveout**, v1.5.0 camera_vms cohort; admitted at `device_category='unknown'`; high-confidence Lynceus export excludes per §11 #13) |
+| BriefCam | face_recog *(NOT recategorized to cctv_camera per gate G-B — analytics-layer ambiguity: BriefCam is a video-analytics overlay on top of arbitrary CCTV/VMS, not itself a CCTV camera; `primary_category='face_recog'` unchanged)* |
 | BRINC | drone |
+| Camero | through_wall_radar *(v1.5.0 through_wall_radar cohort; FCC §15.519 UWB-LE-only regulatory carveout — operationally restricted to law-enforcement use; `notes.sar15_disambig_required=true`)* |
 | Cellebrite | hacking_tool |
 | Cisco Meraki | (uncategorized — positive-extraction admission, v1.2.0) |
+| Citadel Defense | drone_detect *(v1.5.0 counter_uas cohort; `notes.sar15_disambig_required=true`)* |
 | Clearview AI | face_recog |
 | Coban Technologies | body_cam |
 | Cradlepoint | (uncategorized — multi-purpose-vendor carveout) |
-| Dahua | (uncategorized — positive-extraction admission with NDAA §889 note, v1.2.0) |
+| Dahua | cctv_camera *(v1.5.0 retroactive recat from `(uncategorized)` per gate G-B; NDAA §889 federal procurement bar applies; state/local LE deployments persist outside the federal-procurement bar (runguide §0 scope); canonical `notes.ndaa_section_889_note`)* |
 | Dedrone | drone_detect |
+| D-Fend Solutions | drone_detect *(v1.5.0 counter_uas cohort)* |
 | Digital Ally | body_cam |
 | Digital Receiver Technology | imsi_catcher |
 | DJI | drone |
 | DroneShield | drone_detect |
-| Eagle Eye Networks | (uncategorized — documented_absence stub admission, v1.3.0) |
+| Eagle Eye Networks | cctv_camera *(v1.5.0 retroactive recat from `(uncategorized — documented_absence stub admission, v1.3.0)` per gate G-B)* |
+| Echodyne | drone_detect *(v1.5.0 counter_uas cohort; `notes.sar15_disambig_required=true`)* |
+| Elbit Systems of America | persistent_surveillance *(v1.5.0 border_persistent_surveillance cohort)* |
 | Engility | imsi_catcher |
 | Flock Safety | alpr |
+| Fortem Technologies | drone_detect *(v1.5.0 counter_uas cohort)* |
+| General Atomics | persistent_surveillance *(v1.5.0 border_persistent_surveillance cohort; `notes.sar15_disambig_required=true`)* |
 | Genetec | alpr |
+| Geotab | automotive_telematics *(v1.5.0 fleet_telematics cohort)* |
 | Getac | body_cam |
 | Hak5 | hacking_tool |
+| Hanwha Vision | cctv_camera *(v1.5.0 camera_vms cohort)* |
 | Harris | imsi_catcher |
-| Hikvision | (uncategorized — positive-extraction admission with NDAA §889 note, v1.2.0) |
-| Honeywell | (uncategorized — documented_absence stub admission, v1.2.0) |
+| Hikvision | cctv_camera *(v1.5.0 retroactive recat from `(uncategorized)` per gate G-B; NDAA §889 federal procurement bar applies; state/local LE deployments persist outside the federal-procurement bar (runguide §0 scope); canonical `notes.ndaa_section_889_note`)* |
+| Honeywell | (uncategorized — documented_absence stub admission, v1.2.0; v1.4.1 ACS division attestation completion via MAC-195) |
 | Jacobs | imsi_catcher |
 | Johnson Matthey PLC | (uncategorized — v1.1.0 closed Class B hold via UK Companies House #00033774; chemistry/precious-metals; no surveillance-adjacency) |
 | Kenwood | police_radio |
 | KeyW | imsi_catcher |
 | L3Harris | (uncategorized — multi-purpose-vendor) |
 | Lenel | (uncategorized — documented_absence stub admission, v1.2.0) |
+| Liteye Systems | drone_detect *(v1.5.0 counter_uas cohort)* |
+| Lockheed Martin | (uncategorized — **multi-purpose §11 #10 carveout**, v1.5.0 multi_purpose_carveout cohort; admitted at `device_category='unknown'`; high-confidence Lynceus export excludes per §11 #13) |
+| Lytx | automotive_telematics *(v1.5.0 fleet_telematics cohort)* |
 | Magnet Forensics | hacking_tool |
-| Motorola Solutions | (uncategorized — multi-purpose-vendor carveout) |
+| Milestone Systems | cctv_camera *(v1.5.0 camera_vms cohort)* |
+| Motive | automotive_telematics *(v1.5.0 fleet_telematics cohort)* |
+| Motorola Solutions | (uncategorized — multi-purpose-vendor carveout; v1.5.0 hub-and-spoke parent for new Pelco `hidden_arm` id=254 per gate G-A) |
+| MyDefence Communications | drone_detect *(v1.5.0 counter_uas cohort)* |
+| NIITEK | through_wall_radar *(v1.5.0 through_wall_radar cohort; **zero-source admission** on cohort_prediction basis after wide-net sweep — Chemring through-wall radar subsidiary, intentionally low-profile US government vendor; `notes.zero_source_admission=true` + `notes.low_confidence_flag=true`; future v1.5.x cycle should re-attempt source attestation)* |
+| Northrop Grumman | (uncategorized — **multi-purpose §11 #10 carveout**, v1.5.0 multi_purpose_carveout cohort; admitted at `device_category='unknown'`; high-confidence Lynceus export excludes per §11 #13) |
+| Omnitracs | automotive_telematics *(v1.5.0 fleet_telematics cohort)* |
 | Parrot | drone |
 | Parrot Automotive | automotive_telematics *(v1.4.1 — first multi-arm `hidden_arm` row under CP31 hub-and-spoke schema; `is_arm=1, parent_manufacturer_id=25 [Parrot hub], query_default='hidden_arm'`)* |
+| Pelco | cctv_camera *(v1.5.0 — second multi-arm `hidden_arm` row under CP31 hub-and-spoke schema, gate G-A; `is_arm=1, parent_manufacturer_id=3 [Motorola Solutions hub], query_default='hidden_arm'`; SEC Ex21 FY2025 evidence chain — Pelco, Inc. acquired 2020, Delaware)* |
+| Persistent Surveillance Systems | persistent_surveillance *(v1.5.0 border_persistent_surveillance cohort; `notes.sar15_disambig_required=true`)* |
 | PIPS Technology | alpr |
 | Rekor | alpr |
 | Reveal | body_cam |
-| Rhombus Systems | (uncategorized — documented_absence stub admission, v1.3.0) |
+| Rhombus Systems | cctv_camera *(v1.5.0 retroactive recat from `(uncategorized — documented_absence stub admission, v1.3.0)` per gate G-B)* |
+| Robin Radar Systems | drone_detect *(v1.5.0 counter_uas cohort; `notes.sar15_disambig_required=true`)* |
+| Rohde & Schwarz | imsi_catcher *(v1.5.0 imsi_catcher cohort)* |
+| Samsara | automotive_telematics *(v1.5.0 fleet_telematics cohort)* |
+| Sensofusion | drone_detect *(v1.5.0 counter_uas cohort)* |
+| Sentinel Offender Services | gps_tracker *(v1.5.0 electronic_monitoring cohort; `notes.sar15_disambig_required='multi-anchor confirmation before cross-source attribution lift'`)* |
 | Septier | imsi_catcher |
 | Sierra Wireless | (uncategorized — multi-purpose-vendor) |
 | Skydio | drone |
 | SoundThinking (ShotSpotter) | gunshot_detect |
+| STOP | gps_tracker *(v1.5.0 electronic_monitoring cohort; `notes.sar15_disambig_required='multi-anchor confirmation before cross-source attribution lift'`)* |
+| TCOM | persistent_surveillance *(v1.5.0 border_persistent_surveillance cohort; `notes.sar15_disambig_required=true`)* |
+| Tiandy | cctv_camera *(v1.5.0 camera_vms cohort; NDAA §889 federal procurement bar applies; state/local LE deployments persist outside the federal-procurement bar (runguide §0 scope); dual-format `notes.ndaa_section_889_note` (canonical) + `notes.ndaa_section_889_affected` (S2-staged) + `notes.ndaa_attribution_note` (S2-staged))* |
+| TiaLinx | through_wall_radar *(v1.5.0 through_wall_radar cohort; FCC §15.519 UWB-LE-only regulatory carveout)* |
+| Track Group | gps_tracker *(v1.5.0 electronic_monitoring cohort)* |
+| Trimble | (uncategorized — **multi-purpose §11 #10 carveout**, v1.5.0 fleet_telematics cohort; admitted at `device_category='unknown'`; broader IoT/auto/agriculture/geospatial presence dominates; high-confidence Lynceus export excludes per §11 #13) |
+| Uniview | cctv_camera *(v1.5.0 camera_vms cohort; NDAA §889 federal procurement bar applies; state/local LE deployments persist outside the federal-procurement bar (runguide §0 scope); dual-format `notes.ndaa_section_889_note` (canonical) + `notes.ndaa_section_889_affected` (S2-staged) + `notes.ndaa_attribution_note` (S2-staged))* |
 | Utility Inc | body_cam |
-| Verkada | (uncategorized — documented_absence stub admission, v1.2.0) |
+| Verizon Connect | automotive_telematics *(v1.5.0 fleet_telematics cohort)* |
+| Verkada | cctv_camera *(v1.5.0 retroactive recat from `(uncategorized — documented_absence stub admission, v1.2.0)` per gate G-B; 0 identifier rows currently at cctv_camera — manufacturer flip only)* |
 | Vigilant Solutions | alpr |
+| Vivotek | cctv_camera *(v1.5.0 camera_vms cohort)* |
 | WatchGuard | body_cam |
 | Wolfcom | body_cam |
 
@@ -269,6 +392,8 @@ The `manufacturers` table is the canonical lexicon of surveillance-technology ve
 **v1.3.0 lexicon additions (2 vendors, from 49 to 51):** 2 Cohort A stub admissions from Wave H pre-v1 desktop-axis absence-investigation — **Eagle Eye Networks** (Cohort A descope: EEN Viewer ships as a UWP MSIX package via Microsoft Store, not an Electron-class desktop client) and **Rhombus Systems** (Cohort A descope: Rhombus Console is a web app only; no desktop client distributed). Each carries `notes.documented_absence[]` with the absence-investigation findings; both are cloud-VMS / cloud-camera surveillance-tech vendors with structurally-absent desktop-axis client surface in 2026, anchoring the CP17 desktop-axis bifurcation thesis (cohort-presence dissolution dimension). Methodology source-of-truth: the Wave H wrapper at [`android_test/tools/extraction/wave_h_wrapper.py`](android_test/tools/extraction/wave_h_wrapper.py) (sibling to `wave_g_extractor.py`) carries the SAR-12 7-FP-class roster + the ±90-char windowed-clipping discipline.
 
 **v1.4.1 lexicon addition (1 arm row, from 51 to 52 total — 51 hub-visible + 1 hidden_arm):** **Parrot Automotive** (id=222) admitted as the framework's first multi-arm `hidden_arm` row under the CP31 hub-and-spoke schema (mig-0025). `parent_manufacturer_id=25, is_arm=1, query_default='hidden_arm', primary_category='automotive_telematics', aliases='PARROT FAURECIA AUTOMOTIVE SAS,Parrot Faurecia Automotive S.A.S'`. The existing Parrot hub row (id=25, `primary_category='drone'`) is preserved unchanged. Default queries against `manufacturers` filter `WHERE query_default = 'visible'` and do NOT surface the arm; explicit-opt-in audit queries (e.g., `WHERE query_default IN ('visible','hidden_arm')`) surface it. The multi-arm vendor backlog (Cisco/Meraki, Motorola Solutions, Harris RF vs Harris Aerial, Honeywell ACS division) is queued for evidence-driven arm splits at v1.4.2+ per CP32 §4 admission-cadence sub-rule.
+
+**v1.5.0 lexicon additions (40 net-new vendors, from 52 to 92 total — 51 v1.4.1 hub-visible + 1 v1.4.1 hidden_arm + 39 v1.5.0 cohort_prediction + 1 v1.5.0 hidden_arm):** the v1.5.0 lexicon-expansion wave admitted 40 net-new manufacturer canonicals (21 Session 1 military/federal + 19 Session 2 commercial/consumer, with Pelco arm counted within the Session 2 camera_vms cohort) across 7 surveillance cohorts plus 2 multi-purpose §11 #10 carveouts. The wave introduced 3 new `identifiers.device_category` enum values (`cctv_camera`, `persistent_surveillance`, `through_wall_radar`) via mig-0027 / CP33 §2, and admitted the framework's second multi-arm `hidden_arm` row — **Pelco** (id=254) under Motorola Solutions hub (id=3) per gate G-A — extending the CP31 hub-and-spoke precedent first applied to Parrot Automotive in v1.4.1. Stage 1 Step 6 (gate G-B) also flipped 7 existing vendors (Hikvision, Dahua, Axis Communications, Avigilon, Verkada, Eagle Eye Networks, Rhombus Systems) to `primary_category='cctv_camera'` (31 identifier rows recategorized; NDAA §889 attribution preserved on Hikvision + Dahua). Three SAR codifications anchored the wave: SAR-16 (alias-length-floor), SAR-17 (no-generic-product-aliases), SAR-18 (classifier-predicate parity). Per CP33 §7 v1.5.x/v1.6.0 backlog: arm-split candidates Avigilon-under-MSI + WatchGuard-under-MSI queued for v1.5.x; Geo Group admission + BI Incorporated arm-split queued for v1.5.x; 168-entry Elbit FCC grantee disambig queued for v1.5.x sub-cycle.
 
 Lexicon evolution is documented in the amendment ledger at [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md). Aliases tracked per-vendor in `manufacturers.aliases`; multi-purpose-vendor carveouts are documented in `PROJECT_BIBLE.md` (see Canonical sources).
 

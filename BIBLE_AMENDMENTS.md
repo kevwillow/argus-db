@@ -4082,9 +4082,23 @@ Branch: `v1.4.1-integration-stage-1` (MAC-209 is a v1.4.1 Stage 1 child of [MAC-
 
 ═══════════════════════════════════════════════════════════════════════
 
-## CP33 §1 (draft) — v1.5.0 Stage 1 source admissions + dedups
+## Correction Pass 33 — v1.5.0 Lexicon-Expansion Wave (mig-0027 dual-table CHECK extension + 7 sub-section bundle codification + SAR-16/17/18)
 
-> **DRAFT — Stage 1 Step 2 of MAC-232.** CEO will assemble final consolidated CP33 entry at Step 10. This section will be merged with sibling drafts from Steps 3 (schema), 4 (manufacturers), 5-7 (raw_observations → identifiers), 8 (exports), and 9 (SAR-15.5 audit). Do NOT cite this as ratified; cite the consolidated CP33 entry only.
+### Scope
+
+CP33 codifies a single bundled amendment with 7 sub-sections covering the [MAC-232](/MAC/issues/MAC-232) v1.5.0 lexicon-expansion-wave integration (Stage 1 + Stage 2). The cycle was a two-session parallel dispatch (S1 military/federal cohort + S2 commercial/consumer cohort). Migration 0027 lands a single dual-table schema-level mutation — the `device_category` CHECK enum extension `+3 (cctv_camera, persistent_surveillance, through_wall_radar)` applied to BOTH `identifiers.device_category` and `behavioral_signatures.device_category` (second framework dual-table CHECK literal extension after the CP32 §1 precedent) plus the `identifiers.identifier_type` CHECK enum `+1 imei_tac` forward-compatible admission. Schema_version bumps 26 → 27. The remaining sub-sections codify 40 net new manufacturer admissions + Pelco arm-under-MSI (id=254 — second framework `hidden_arm` row after Parrot Automotive id=222) + 848 net active identifier promotions + Step 6 G-B retroactive `cctv_camera` recategorization sweep (7 mfg + 31 ident rows; NDAA §889 attribution preserved on Hikvision + Dahua; BriefCam deferred to v1.5.x) + Step 7 disambig + FP-class triage + Step 8 v1.5.x/v1.6.0 backlog queue (the new `PLANNED_AND_FUTURE_UPDATES.md` repo file).
+
+Three independent SAR codifications land alongside CP33 — **SAR-16** (alias-length-floor; lockheed-LM n=134 driving case), **SAR-17** (no-generic-product-aliases; mydefence-EAGLE n=41 driving case), **SAR-18** (classifier-predicate parity; Step 9 `oversized_mac_range` halt at id=9404 Eagle Eye Networks size=256 → Path β ratification within 50 minutes of halt-surface). SAR-16 + SAR-17 codify cohort-disambiguation extensions of SAR-15 GENERIC_RISK_CANONICALS pre-load; SAR-18 extends the CP21 cumulative-full-enum sweep spirit (CHECK constraint parity across migrations) to runtime classifier predicates and forward-binds future `_classify_row` additions to dual-table parity review at PR time.
+
+### CP30 reservation footnote (preserved unchanged)
+
+CP30 remains reserved for `vendor_asn_prefix` + `vendor_controlled_ip` codification per CP29 §3 (preserved through CP31 + CP32; CP33 does NOT consume the CP30 reservation slot).
+
+### Status legend
+
+**CODIFIED+LANDS** = bible text change + schema/code mutation in this CP. **CODIFIED** = bible text change only (narrative/discipline). **BINDING** = architectural commitment for a future migration (no current schema change). **DEFERRED** = item explicitly scope-narrowed to v1.5.x or v1.6.0 backlog per PLANNED_AND_FUTURE_UPDATES.md.
+
+### §1 — v1.5.0 Stage 1 source admissions + dedups
 
 **Cycle:** v1.5.0 Stage 1 (MAC-232)
 **Branch:** `v1.5.0-integration-stage-1`
@@ -4155,9 +4169,7 @@ Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolid
 
 ═══════════════════════════════════════════════════════════════════════
 
-## CP33 §2 (draft) — Schema extension mig-0027 CP33
-
-> **DRAFT — Stage 1 Step 3 of MAC-232.** CEO will assemble final consolidated CP33 entry at Step 10. This section will be merged with sibling drafts from Step 2 (source admissions), Step 4 (manufacturers), Steps 5-7 (raw_observations → identifiers), Step 8 (exports), and Step 9 (SAR-15.5 audit). Do NOT cite this as ratified; cite the consolidated CP33 entry only.
+### §2 — Schema extension mig-0027 CP33
 
 **Cycle:** v1.5.0 Stage 1 (MAC-232)
 **Branch:** `v1.5.0-integration-stage-1`
@@ -4258,7 +4270,7 @@ Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolid
 
 ═══════════════════════════════════════════════════════════════════════
 
-## CP33 §3 (draft) — v1.5.0 Stage 1 manufacturer admissions (+40 net, 92 total)
+### §3 — v1.5.0 Stage 1 manufacturer admissions (+40 net, 92 total)
 
 **Status:** DRAFT — pending §11 #11 self-binding (commit-hash backfill at Stage 1 close).
 **Authority:** MAC-232 board ratification 2026-05-22 (G-A through G-G).
@@ -4385,7 +4397,7 @@ Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolid
 
 ═══════════════════════════════════════════════════════════════════════
 
-## CP33 §4 (draft) — v1.5.0 Stage 1 Step 5 identifier promotions
+### §4 — v1.5.0 Stage 1 Step 5 identifier promotions
 
 **Dispatch:** MAC-232 v1.5.0 Stage 1 Step 5
 **sweep_event_id:** `mac232_v1_5_0_stage1_step5_2026_05_22`
@@ -4563,7 +4575,7 @@ git commit hash applying this Step 5 amendment-draft. The commit applying this
 draft is referenced inline in the Step 5 close-out report at
 `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step5_identifier_promotion.md`.
 
-## CP33 §5 (draft) — v1.5.0 Stage 1 Step 6 retroactive `cctv_camera` recategorization (G-B)
+### §5 — v1.5.0 Stage 1 Step 6 retroactive `cctv_camera` recategorization (G-B)
 
 **Cycle:** v1.5.0 Stage 1 (MAC-232)
 **sweep_event_id:** `mac232_v1_5_0_stage1_step6_recat_2026_05_22`
@@ -4629,7 +4641,7 @@ SELECT device_category, COUNT(*) FROM identifiers WHERE superseded_by IS NULL GR
 ```
 
 
-## CP33 §6 (draft) — v1.5.0 Stage 1 Step 7 disambig + FP-class triage
+### §6 — v1.5.0 Stage 1 Step 7 disambig + FP-class triage
 
 **Cycle:** v1.5.0 Stage 1 (MAC-232)
 **Authority:** Board ratification 0ba8150f — G-G approved (codename batch-reject already applied at Step 5)
@@ -4716,7 +4728,7 @@ No carry-forward to v1.5.x.
 ---
 
 
-## CP33 §7 (draft) — v1.5.0 Stage 1 Step 8 v1.5.x/v1.6.0 backlog queue
+### §7 — v1.5.0 Stage 1 Step 8 v1.5.x/v1.6.0 backlog queue
 
 **Cycle:** v1.5.0 Stage 1 (MAC-232) Step 8
 **Pointer:** Created `/PLANNED_AND_FUTURE_UPDATES.md` (new repo file) capturing deferred items from v1.5.0 Stage 1 integration.
