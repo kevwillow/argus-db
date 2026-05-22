@@ -4154,3 +4154,106 @@ Both dedups are integration-time reconciliations per §11 #11; neither requires 
 Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolidated git commit hash at Step 10 close. This Step 2 draft section is one of the parallel amendment-drafts being assembled; the commit applying this draft is referenced inline in the Step 2 close-out report at `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step2_source_admissions.md`.
 
 ═══════════════════════════════════════════════════════════════════════
+
+## CP33 §2 (draft) — Schema extension mig-0027 CP33
+
+> **DRAFT — Stage 1 Step 3 of MAC-232.** CEO will assemble final consolidated CP33 entry at Step 10. This section will be merged with sibling drafts from Step 2 (source admissions), Step 4 (manufacturers), Steps 5-7 (raw_observations → identifiers), Step 8 (exports), and Step 9 (SAR-15.5 audit). Do NOT cite this as ratified; cite the consolidated CP33 entry only.
+
+**Cycle:** v1.5.0 Stage 1 (MAC-232)
+**Branch:** `v1.5.0-integration-stage-1`
+**Migration:** `db/migrations/0027_cp33_cctv_camera_persistent_surveillance_through_wall_radar_imei_tac.sql`
+**Migration SHA256:** `86ba28b12d6638501aebd0374e64f7701f189fc39759643d6d065e5e305b31c4`
+**Schema version:** 26 → 27 (bumped by mig-0027 footer)
+**Authority:** Board ratification 2026-05-22 (comment 0ba8150f), gates G-A through G-G approved.
+
+### §2.1 — `device_category` CHECK enum +3 net-new values (both host tables)
+
+Three new values admitted with per-value rationale citing v1.5.0 sandbox-session cohort proposals (S1 `proposed_bible_amendment_additions.md` military/federal + S2 `proposed_bible_amendment_additions.md` commercial/consumer).
+
+| New value | Cohort | Origin session | Rationale |
+|-----------|--------|----------------|-----------|
+| `cctv_camera` | Commercial/consumer | S2 | Distinguishes general-purpose CCTV from existing `covert_cam`; opens slot for the G-B retroactive recategorization of 7 vendors (executes at Step 6 AFTER this migration lands). G-B was board-ratified at 0ba8150f. |
+| `persistent_surveillance` | Military/federal | S1 | Surveillance-blimp / wide-area-motion-imagery class (e.g., JLENS-lineage / Logos Technologies / Sierra Nevada Gorgon Stare derivatives). 0 rows promoted this cycle; schema slot opens for future v1.5.x evidence-arrival. |
+| `through_wall_radar` | Military/federal | S1 | FCC §15.519 UWB-LE (ultra-wideband, low-emission) hand-held imaging radar. Distinct from `imsi_catcher` / `gps_tracker`. 0 rows promoted this cycle; schema slot opens for future v1.5.x evidence-arrival. |
+
+Per CP32 precedent, the +3 extension applies to BOTH host tables of `device_category` CHECK literals:
+- `identifiers.device_category`        13 → 16 values
+- `behavioral_signatures.device_category` 13 → 16 values
+
+### §2.2 — `identifier_type` CHECK enum +1 net-new value (`imei_tac`)
+
+Single addition admitted as dual-proposal merge:
+- S1 (military/federal cohort) proposed `imei_tac` in `proposed_bible_amendment_additions.md`.
+- S2 (commercial/consumer cohort) proposed `imei_tac` independently in its `proposed_bible_amendment_additions.md`.
+- Validator merged both into a single CHECK enum addition at MAC-232 v1.5.0 Stage 1 integration.
+
+**Semantic scope:** GSMA TAC (Type Allocation Code) — first 8 digits of an IMEI identifying the model/variant. Distinct from MAC `oui` (different registry, different prefix length, different device class).
+
+**Promotion ledger this cycle:** 0 rows. Per G-C (board-ratified), `imei_tac` is admitted **forward-compatible**: the schema slot opens for future v1.5.x cohort backfill; no row-level promotion is gated on this migration. Future v1.5.x cohort harvests from GSMA-derivative sources will use this identifier_type.
+
+`identifiers.identifier_type` enum: 56 → 57 values.
+
+### §2.3 — Dual-table CHECK extension per CP32 precedent
+
+CP32 codified the dual-table enum-parity sweep for `device_category` (separate CHECK literals on `identifiers` and `behavioral_signatures` because they are NOT FK-linked — downstream consumers like Lynceus, exports, and the coverage matrix treat the category as a single conceptual vocabulary regardless of host table). CP33 §2 applies that precedent to the +3 extension:
+
+| Host table | Pre-mig-0027 | Post-mig-0027 |
+|------------|--------------|---------------|
+| `identifiers.device_category`          | 13 | 16 |
+| `behavioral_signatures.device_category` | 13 | 16 |
+
+This keeps the two CHECK literals in lockstep per the CP21 cumulative-full-enum sweep spirit.
+
+### §2.4 — G-E `pair_kind` no-op log entry (verbatim from validator G-E report)
+
+Per board ratification G-E:
+
+> "Dispatch claimed `pair_kind` CHECK was 4 values on disk; SAR-13 preflight (sqlite_master.sql read) verified the actual on-disk value is 5 (CP31 already shipped `fcc_grantee_equipment_class`). G-E: do NOT touch pair_kind; the dispatch's '+1 to make it 5' claim was stale because CP31 already landed it. mig-0027 carries forward the 5-value enum verbatim."
+
+mig-0027 preserves the 5-value `pair_kind` enum verbatim from the post-0025 (CP31) state:
+`la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation`, `fcc_grantee_equipment_class` (CP31).
+
+Post-mig-0027 row count: `pair_kind` enum unchanged at 5. Verified via sqlite_master DDL read in `_phase_3_cp33_preflight/sqlite_master_after.txt`.
+
+### §2.5 — Schema version bump
+
+| Item | Pre | Post |
+|------|-----|------|
+| `schema_version` MAX | 26 | 27 |
+| Migration name      | `0026_cp32_device_category_automotive_telematics` | `0027_cp33_cctv_camera_persistent_surveillance_through_wall_radar_imei_tac` |
+| Migration file SHA256 | n/a | `86ba28b12d6638501aebd0374e64f7701f189fc39759643d6d065e5e305b31c4` |
+
+### §2.6 — Paste-not-cite post-state row counts
+
+Verified post-migration via `_phase_3_cp33_preflight/verification.log`:
+
+```
+schema_version: (27, '0027_cp33_cctv_camera_persistent_surveillance_through_wall_radar_imei_tac')
+identifiers total:           35,310   (unchanged from pre-mig-0027)
+identifiers active:          34,964   (unchanged from pre-mig-0027)
+behavioral_signatures:          201   (unchanged from pre-mig-0027)
+sources:                         73   (unchanged; Step 2 admissions stable)
+manufacturers:                   52   (unchanged from pre-mig-0027)
+
+identifier_type CHECK:           57 values (was 56; +1 imei_tac)
+identifiers.device_category:     16 values (was 13; +3 cctv_camera/persistent_surveillance/through_wall_radar)
+behavioral_signatures.device_category: 16 values (was 13; +3 parity)
+pair_kind CHECK:                  5 values (unchanged per G-E)
+
+FK check:                        [] empty (no violations)
+Indexes recreated:               10/10 (all carry-forward verbatim from 0026)
+
+Test INSERT (imei_tac + cctv_camera):       PASS
+Test INSERT (persistent_surveillance):      PASS
+Test INSERT (through_wall_radar):           PASS
+Test INSERT (bad enum value rejected):      PASS
+Post-rollback row count:                    PASS (test rows discarded)
+```
+
+SAR-13 preflight evidence: `_phase_3_cp33_preflight/sqlite_master_before.txt` (CHECK DDL read PRIOR to migration; baseline 56/13/13/5 confirmed via sqlite_master.sql, NOT via PRAGMA table_info per SAR-13 sub-rule [[feedback_pragma_alone_insufficient_for_sar13]]).
+
+### §2.7 — §11 #11 self-binding pending
+
+Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolidated git commit hash at Step 10 close. This Step 3 draft section is one of the parallel amendment-drafts being assembled; the commit applying this draft is referenced inline in the Step 3 close-out report at `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step3_migration.md`.
+
+═══════════════════════════════════════════════════════════════════════
