@@ -4257,3 +4257,128 @@ SAR-13 preflight evidence: `_phase_3_cp33_preflight/sqlite_master_before.txt` (C
 Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolidated git commit hash at Step 10 close. This Step 3 draft section is one of the parallel amendment-drafts being assembled; the commit applying this draft is referenced inline in the Step 3 close-out report at `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step3_migration.md`.
 
 ═══════════════════════════════════════════════════════════════════════
+
+## CP33 §3 (draft) — v1.5.0 Stage 1 manufacturer admissions (+40 net, 92 total)
+
+**Status:** DRAFT — pending §11 #11 self-binding (commit-hash backfill at Stage 1 close).
+**Authority:** MAC-232 board ratification 2026-05-22 (G-A through G-G).
+**Schema:** No schema change; relies on mig-0027 CHECK enum extensions ratified in §2.
+
+### §3.1 — Counts (per-cohort breakdown)
+
+Manufacturers table delta `52 → 92` (+40 net). Composition:
+
+| Cohort                       | Count | Source         |
+|------------------------------|-------|----------------|
+| counter-UAS (`drone_detect`) |    11 | Session 1 (military/federal) |
+| `persistent_surveillance`    |     4 | Session 1 (military/federal) |
+| `through_wall_radar`         |     3 | Session 1 (military/federal) |
+| `imsi_catcher`               |     1 | Session 1 (military/federal) |
+| `automotive_telematics`      |     6 | Session 2 (commercial/consumer) |
+| `cctv_camera` (+1 arm)       |     6 | Session 2 (commercial/consumer) |
+| `gps_tracker`                |     5 | Session 2 (commercial/consumer) |
+| `unknown` (multi-purpose §11 #10) | 4 | NG/LM (S1) + Trimble/Bosch SS (S2) |
+| **Total**                    |  **40** | (21 S1 + 19 S2; 2 SKIPs per board G-A/G-F) |
+
+Arms delta `1 → 2` (Parrot Automotive carries forward; Pelco arm-under-MSI new).
+
+### §3.2 — Pelco arm-under-MSI per G-A
+
+Per board ratification G-A (2026-05-22), Pelco admitted as a CP31 §4.6 arm row under Motorola Solutions (`parent_manufacturer_id=3`), `is_arm=1`, `query_default='hidden_arm'`. The standalone Pelco row staged in Session 2 SQL was SKIPPED. Final row at id=254 with `notes.shape='arm_under_parent'`, `notes.parent_name='Motorola Solutions'`, `notes.parent_id=3`, `notes.g_a_ratification='2026-05-22 board ratified arm-under-MSI per CP31 §4.6'`.
+
+### §3.3 — BI Incorporated standalone per G-F (Geo Group deferred)
+
+Per board ratification G-F (2026-05-22), BI Incorporated admitted standalone (`parent_manufacturer_id=NULL`, `is_arm=0`, `query_default='visible'`). The arm row staged in Session 2 SQL was SKIPPED because the proposed parent ("Geo Group") is NOT-IN-LEXICON — admission of Geo Group as a manufacturer deferred to v1.5.x. Final row at id=258 with `notes.g_f_ratification='2026-05-22 board ratified standalone admission; Geo Group admission deferred to v1.5.x'`.
+
+### §3.4 — Multi-purpose carveouts §11 #10
+
+Four rows admitted as `primary_category='unknown'` with `notes.multi_purpose_carveout='§11 #10'`, mirroring the Cradlepoint / Sierra Wireless / Motorola Solutions precedent:
+
+| id  | canonical_name           | session |
+|-----|--------------------------|---------|
+| 235 | Northrop Grumman         | S1      |
+| 236 | Lockheed Martin          | S1      |
+| 250 | Trimble                  | S2      |
+| 252 | Bosch Security Systems   | S2      |
+
+These rows DELIBERATELY remain at `primary_category='unknown'` post-backfill; the §4.5 backfill UPDATE WHERE clauses explicitly excluded them.
+
+### §3.5 — NDAA §889 dual-format schema-truth observation
+
+Session 2 staging SQL proposed NDAA attribution for Uniview + Tiandy using:
+```
+notes.ndaa_section_889_affected = true
+notes.ndaa_attribution_note     = "NDAA §889 federal procurement bar applies; state/local LE deployments persist."
+```
+
+Existing canonical precedent (Hikvision id=209, Dahua id=208) uses a SINGLE differently-named field:
+```
+notes.ndaa_section_889_note = "NDAA Section 889 federally-restricted; state/local LE deployments persist outside the federal-procurement bar (runguide §0 scope)."
+```
+
+**Resolution applied this step:** BOTH formats were inserted into Uniview (id=255) + Tiandy (id=256) at INSERT time — the canonical `ndaa_section_889_note` field was added alongside the S2-staged keys to give downstream query-paths parity with Hikvision/Dahua precedent.
+
+**Schema-truth observation:** Validator §8 Step 8 flagged this pre-execution. Going forward, either (a) future admissions should standardise on `ndaa_section_889_note` (canonical) OR (b) a SAR-style refinement should explicitly bless dual-format. Tracked for v1.5.x SAR slate as CP33-spirit downstream-consumer audit candidate (parallels SAR-13 sub-rules).
+
+### §3.6 — WatchGuard Video parent='Motorola Solutions' backfill (§15.2 low-cost)
+
+Per dispatch §15.2 bonus, WatchGuard Video (id=17) `notes` backfilled with:
+```
+notes.parent                    = "Motorola Solutions"
+notes.parent_backfill_dispatch  = "MAC-232"
+notes.parent_backfill_date_utc  = "2026-05-22"
+```
+
+This is a notes-only backfill (no `parent_manufacturer_id` FK promotion this cycle); future v1.5.x slate may consider promotion to true arm-under-parent shape pending re-classification review.
+
+### §3.7 — NIITEK zero-source admission (§11 #1 cohort_prediction)
+
+NIITEK (id=241, `primary_category='through_wall_radar'`) admitted with zero observed sources per Validator §4.3 (`extraction_yield_at_admission` shows 0 across FCC/USAspending/SEC/Wayback/crt.sh). Admission justified by §11 #1 cohort_prediction (parallel admissions Camero + TiaLinx in same cohort with sources >0). Flagged in `notes`:
+```
+notes.zero_source_admission = true
+notes.low_confidence_flag   = true
+```
+
+This is the only zero-source admission in v1.5.0 Stage 1 Step 4. Future evidence-arrival re-application gate fires per [[project_mac203_deferral_note_close]] precedent if NIITEK observations surface.
+
+### §3.8 — Anduril multi-product admission flag (future_arm_split_candidates queued)
+
+Anduril Industries (id=223) admitted under primary_category='drone_detect' with `notes.multi_product_admission=true` and `notes.future_arm_split_candidates` enumerating five products spanning multiple device categories (Sentry Tower → persistent_surveillance, Anvil → drone_detect, Lattice OS → unknown_software_substrate, Roadrunner → drone_detect, Sentinel → drone_detect). Arm-split deferred to v1.5.x as candidate CP31 §4.6 expansion.
+
+### §3.9 — Paste-not-cite post-state row counts
+
+Verified post-INSERT/UPDATE via `_phase_4_admissions/verification.log`:
+
+```
+total: (92,)            -- manufacturers row count
+arms: (2,)              -- is_arm=1 row count (Parrot Automotive + Pelco)
+
+primary_category distribution (new rows id > 222):
+  drone_detect            11
+  cctv_camera              6
+  automotive_telematics    6
+  gps_tracker              5
+  unknown                  4   (NG/LM/Trimble/Bosch SS §11 #10 carveouts)
+  persistent_surveillance  4
+  through_wall_radar       3
+  imsi_catcher             1
+
+Pelco (id=254):        parent_manufacturer_id=3 (MSI), is_arm=1, query_default='hidden_arm'
+BI Incorporated (258): parent_manufacturer_id=NULL, is_arm=0, query_default='visible' (single row only)
+WatchGuard (id=17):    notes.parent='Motorola Solutions', notes.parent_backfill_dispatch='MAC-232'
+NIITEK (id=241):       notes.zero_source_admission=1, notes.low_confidence_flag=1
+NDAA dual-format:      Uniview + Tiandy carry BOTH ndaa_section_889_note (canonical)
+                       AND ndaa_section_889_affected + ndaa_attribution_note (S2-staged)
+
+source_url NULL check:  empty (all 92 rows have non-null source_url)
+notes JSON validity:    all 40 new rows pass json_valid() round-trip
+schema_version:         27 (unchanged; mig-0027 from Step 3)
+identifiers active:     34,964 (unchanged this step)
+sources:                73 (unchanged this step)
+```
+
+### §3.10 — §11 #11 self-binding pending
+
+Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolidated git commit hash at Stage 1 close. This Step 4 draft section is one of the parallel amendment-drafts being assembled; the commit applying this draft is referenced inline in the Step 4 close-out report at `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step4_manufacturer_admissions.md`.
+
+═══════════════════════════════════════════════════════════════════════
