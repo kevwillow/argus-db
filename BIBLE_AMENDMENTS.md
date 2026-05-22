@@ -4079,3 +4079,78 @@ This entry IS the §11 #11 pairing for the MAC-209 surfaced dispatch-reasoning c
 Branch: `v1.4.1-integration-stage-1` (MAC-209 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
 
 ═══════════════════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════════════════
+
+## CP33 §1 (draft) — v1.5.0 Stage 1 source admissions + dedups
+
+> **DRAFT — Stage 1 Step 2 of MAC-232.** CEO will assemble final consolidated CP33 entry at Step 10. This section will be merged with sibling drafts from Steps 3 (schema), 4 (manufacturers), 5-7 (raw_observations → identifiers), 8 (exports), and 9 (SAR-15.5 audit). Do NOT cite this as ratified; cite the consolidated CP33 entry only.
+
+**Cycle:** v1.5.0 Stage 1 (MAC-232)
+**Branch:** `v1.5.0-integration-stage-1`
+**Schema version:** unchanged at 26 at Step 2 close (Step 3 will bump to 27 if migrations are required)
+**Net source admissions:** +2 (sid=72, 73). Sources 71 → 73.
+
+### §1 — Two new sources admitted
+
+1. **sid=72 — GitHub Code Search REST API**
+   - URL: `https://api.github.com/search/code`
+   - `source_type=crowdsourced`, `tier=3`
+   - License posture: `NO_LICENSE_DECLARED` — per-finding factual extraction only per Feist v Rural (cf. §11 #16). Per-repo license inherits, but findings are facts-only (filename, line, sha, URL).
+   - Auth: `GITHUB_TOKEN` PAT (30 authenticated req/min on code-search; 2.5s per-query pacing observed compliant)
+   - Rationale: content-search surface distinct from sid=56 (`raw.githubusercontent.com`) which is known-file retrieval. Different access modes, different rate limits, different admission predicates.
+   - Value-class ceiling: 75 (crowdsourced per CP15)
+   - First used: `wave_v1_5_session_1_military_federal`
+   - Compliance §11 #15: factual extraction only; not decompiled vendor source.
+
+2. **sid=73 — adsb.lol v2 (FAA-registry-derived aircraft tracking)**
+   - URL: `https://api.adsb.lol/v2/registration/`
+   - `source_type=regulatory`, `tier=3`
+   - License posture: `PUBLIC_DOMAIN_EQUIVALENT` (FAA Civil Aviation Registry-derived + live ADS-B broadcasts; FAA registry is 14 CFR Part 47 public record)
+   - Auth: none (public API)
+   - Rationale: adsbexchange now requires auth on v1 endpoints; adsb.lol provides equivalent ADS-B aggregator with free public API. Used for CBP MQ-9 Predator-B Mode-S (`icao_24bit_address`) extraction.
+   - Value-class ceiling: 90 (regulatory per CP15)
+   - First used: `wave_v1_5_session_1_military_federal`
+   - Session 1 yield: 2/10 CBP MQ-9 tails — ABF68A for N870CB, ABFDF8 for N872CB.
+
+### §2 — Two dedups logged (§11 #11 integration-time reconciliation)
+
+These were proposed as net-new in S1/S2 runguides, but at integration time were found to already exist in canonical `sources` table. No new sid issued; all downstream citations route to the existing sid.
+
+1. **crt.sh** — proposed by S1 #1; already admitted as **sid=54** ('Certificate Transparency Logs — crt.sh aggregator', URL `https://crt.sh/`). All S1 crt.sh citations at Step 5 (raw_observations admission) route to sid=54. Same dedup shape as fccid.io (G-E precedent ratified by board at MAC-232 dispatch).
+2. **fccid.io** — proposed by S2 #5; already admitted as **sid=51** (URL `https://fccid.io/`). 21 S2 grantee citations route to sid=51 at Step 5. Per MAC-232 dispatch Step 1 #2 + G-G ratification.
+
+Both dedups are integration-time reconciliations per §11 #11; neither requires a separate amendment slot — they are logged here for audit-trail completeness.
+
+### §3 — Six deferrals enumerated by reason class
+
+| # | Proposed source | Origin | Reason class | Deferral target |
+|---|-----------------|--------|--------------|-----------------|
+| 1 | DHS S&T via Wayback | S1 #3 | 0-yield (0 snapshots; would route to sid=55 Wayback CDX anyway) | v1.6.0 with alternative direct-access path |
+| 2 | Google Play Store | S2 #1 | 0-yield (S2 `companion_app_extraction` dir empty; 0 files extracted) | v1.5.x — fabrication risk gate |
+| 3 | ISED Canada Radio Equipment Search | S2 #2 | ~0-effective-yield (1 hit across S2 candidate JSON, likely false-positive substring) | v1.5.x |
+| 4 | RRA Korea | S2 #3 | Unreachable from this network (per S2 `STOP_THE_LINE_rra_korea_unreachable.md`) | v1.5.x or v1.6.0 |
+| 5 | ETSI | S2 #4 | ~0-effective-yield (1 hit, likely false-positive substring in grantee-codes file) | v1.5.x |
+| 6 | State DOC Procurement Portals | S2 #6 | Operator-opt-in required (stage as operator-manual queue, NOT auto-admit) | v1.5.x with operator-decision dispatch |
+
+### §4 — Architectural firsts
+
+1. **First v1.5.0 source admission** — opens the v1.5.0 ship cycle's source-admission ledger at sid=72.
+2. **First crowdsourced+NO_LICENSE_DECLARED source distinguishing two access surfaces of the same upstream platform (GitHub)** — sid=72 (api/search/code) vs sid=56 (raw.githubusercontent.com). Establishes precedent for admitting two sids per platform when access-mode/rate-limit/admission-predicate differ.
+3. **First batch-level integration-time §11 #11 reconciliation logging 2 dedups in a single amendment-log entry** — prior dedups (e.g., MAC-232 G-E fccid.io precedent) were logged individually; this batches crt.sh + fccid.io.
+4. **First deferral-table-by-reason-class in an amendment draft** — six-row deferral table with reason-class column establishes shape for future cycle integration-time deferral audits.
+
+### §5 — Cross-references
+
+- MAC-232 dispatch (G-A through G-G ratified by board).
+- CP15 (value-class ceilings: `crowdsourced=75`, `regulatory=90`).
+- §11 #11 (integration-time source dedup discipline).
+- §11 #15 (factual extraction only; not decompiled vendor source — relevant to sid=72 GitHub Code Search compliance).
+- §11 #16 (Feist v Rural facts-only doctrine — relevant to sid=72 NO_LICENSE_DECLARED license posture).
+- CP32 candidate (BIBLE_AMENDMENTS.md prior entry on §11 #17 carve-out) — not amended here.
+
+### §6 — §11 #11 self-binding pending
+
+Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolidated git commit hash at Step 10 close. This Step 2 draft section is one of the parallel amendment-drafts being assembled; the commit applying this draft is referenced inline in the Step 2 close-out report at `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step2_source_admissions.md`.
+
+═══════════════════════════════════════════════════════════════════════
