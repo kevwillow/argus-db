@@ -4628,3 +4628,90 @@ SELECT device_category, COUNT(*) FROM identifiers WHERE superseded_by IS NULL GR
   cctv_camera +31 (vs Step 5 close)
 ```
 
+
+## CP33 §6 (draft) — v1.5.0 Stage 1 Step 7 disambig + FP-class triage
+
+**Cycle:** v1.5.0 Stage 1 (MAC-232)
+**Authority:** Board ratification 0ba8150f — G-G approved (codename batch-reject already applied at Step 5)
+**Section discipline:** disambig queue triage + FP-class consolidation. SAR-class promotions (§9 below) for the 2 findings exceeding n=3 threshold.
+
+### §6.1 — Schema-truth observation: S1 disambig queue composition
+
+Dispatch claimed S1 disambig queue = 168 entries = 5 Phase A Elbit + 163 noisy Phase B codenames. **Inspection of `disambig_review_queue.json` shows all 168 entries are FCC grantee codes flagged for Elbit/Tadiran-alias substring disambig** (not codenames; not 163 vs 5 split). Validator §8 Step 9's "168 entries mostly Elbit/Tadiran subsidiary chain" was correct; dispatch's 5+163 breakdown was inaccurate. The G-G ratified codename batch-reject targeted a DIFFERENT staging file (`identifier_candidates/wayback_pdf_extracted_v2.json`, 347 rows — quantified at Step 5).
+
+### §6.2 — 168 Elbit FCC grantee disambig disposition
+
+168 entries deferred to v1.5.x **Elbit disambig sub-cycle**. Held at:
+- `~/argus-internal/wave_v1_5_lexicon_expansion/session_1_military_federal/disambig_review_queue.json`
+- Holding-pattern: NOT promoted to canonical this cycle (Step 5 promoted only the 15 high-confidence S1 fcc_grantee_codes, leaving these 168 as low-confidence candidates needing per-row anchor-verification).
+- Future cycle requires: per-row regulatory anchor (FCC EAS direct or fccid.io verbatim grantee-name match) + reject those that match only via short alias substring ("Elbit" or "Tadiran" bare).
+
+### §6.3 — S1 FP-class findings join SAR-15 GENERIC_RISK_CANONICALS pre-load
+
+| finding_id | n | disposition |
+|---|---|---|
+| tcom_acronym_collision | 1 | join SAR-15 pre-load — require corporate-suffix anchor ('TCOM L.P.') |
+| camero_substring_cameron_collision | 1 | join SAR-15 pre-load — require 'Camero-Tech' or 'Sago Systems' anchor |
+| lockheed_lm_substring_collision | **134** | **promote to formal SAR-16 alias-length-floor discipline (see §9.1)** |
+| mydefence_eagle_substring_collision | **41** | **promote to formal SAR-17 no-generic-product-aliases discipline (see §9.2)** |
+
+### §6.4 — S2 FP-class findings join SAR-15
+
+| class | disposition |
+|---|---|
+| motive_common_word_collision | join SAR-15; require fleet/ELD product-context + procurement-or-cellular anchor |
+| sentinel_common_word_collision | join SAR-15; require offender-monitoring-context + state-DOC anchor |
+| stop_short_name_allcaps_collision | join SAR-15; require SatTrack-of-People anchor AND state-DOC anchor (4-char allcaps highest-FP-risk class) |
+| bosch_seo_collision | already in carveout (§11 #10); SAR-15 reinforcement note |
+| trimble_surname_collision | already in carveout (§11 #10); SAR-15 reinforcement note |
+| pelco_acquisition_chain_relationship | CP31 §4.6 arm-split applied at Step 4 (G-A); FP-class informational |
+
+### §6.5 — S2 disambig queue (5 entries, post-workaround pass)
+
+All 5 resolved by S2's workaround pass:
+- Motive: FCC 2AQM7 grantee anchor confirmed
+- STOP: FCC S5E grantee + Houston TX address anchor
+- Sentinel: FCC VZL grantee anchor
+- Bosch: §11 #10 multi-purpose carveout retained
+- Trimble: §11 #10 multi-purpose carveout retained
+
+No carry-forward to v1.5.x.
+
+---
+
+## SAR-16 — Alias-length-floor discipline (formal codification)
+
+**Driven by:** v1.5.0 Stage 1 S1 finding `lockheed_lm_substring_collision` (n=134) exceeded SAR n=3 threshold.
+
+**Rule:** When a manufacturer canonical name has an alias of length ≤3 characters (e.g., "LM" for Lockheed Martin, "BI" for BI Incorporated, "GE" for General Electric), that short alias MUST NOT be used as a bare substring match against any source corpus. Short aliases require additional anchor regex disambig:
+- Word-boundary `\b` + corporate-suffix anchor (e.g., `\bLM\s+(?:Corp|Inc|Industries|Aeronautics)`), OR
+- Procurement-context anchor (e.g., source field `awardee_uei` matches the canonical UEI), OR
+- Product-context anchor (e.g., source field `description` contains canonical product family codename)
+
+**Case study:** Lockheed Martin's bare 2-char alias "LM" substring-matched 134 unrelated FCC grantee entries ("Stockholm Precision Tools", "Guglielmi", "Alma Lasers", etc.). Required min-alias-length=4 floor for SAR-15 second-pass to suppress these FPs. The 134 FPs is well above the SAR n=3 codification threshold.
+
+**Floor value:** **4 characters** minimum for bare substring matching. Aliases of length 1-3 require one of the additional anchor disciplines above.
+
+**Implementation invariant:** SAR-15 GENERIC_RISK_CANONICALS pre-load shall enumerate every existing canonical with alias-length<4 and tag them in `notes.alias_length_floor_required=true`. New admissions with short aliases require explicit anchor regex at admission time.
+
+**§11 #11 binding:** SAR-class amendment — formal bible-binding. Cross-references: [[feedback_per_vendor_probe_scope_discipline]] (SAR-15 + SAR-15.5 precedent), CP19 §5.2 spirit (FP-class promotion threshold).
+
+---
+
+## SAR-17 — No-generic-product-aliases discipline (formal codification)
+
+**Driven by:** v1.5.0 Stage 1 S1 finding `mydefence_eagle_substring_collision` (n=41) exceeded SAR n=3 threshold.
+
+**Rule:** Generic English-word product aliases (e.g., "EAGLE" for MyDefence's Eagle counter-UAS, "SENTINEL" for Sentinel Offender Services, "STOP" for Satellite Tracking of People, "ATLAS" for various vendors) MUST NOT be admitted as bare aliases in the `manufacturers.aliases` column. Generic product names require multi-word disambiguation:
+- `<vendor> <product>` form (e.g., "MyDefence Eagle", not "EAGLE")
+- `<product> <model>` form with vendor-specific suffix (e.g., "Eagle-NV", not "EAGLE")
+- Per-product-family aliases stored in `notes.product_family_codenames[]` array (CP25 §3 precedent), NOT in the bare `aliases` column
+
+**Case study:** MyDefence's "EAGLE" 5-char alias substring-matched 41 unrelated FCC grantee entries ("Eagle Industries", "Eagle Eye Networks" — separate vendor entirely, "EAGLE BROADBAND"). 41 FPs exceeds SAR n=3 codification threshold.
+
+**Implementation invariant:** New admissions with product-family names that are common English nouns shall stage product names ONLY in `notes.product_family_codenames[]` (typed enrichment), NOT in the `aliases` column. Retroactive sweep of existing canonicals with short generic aliases is a CP34-pending candidate.
+
+**§11 #11 binding:** SAR-class amendment — formal bible-binding. Cross-references: SAR-16 (alias-length-floor — together they form a 2-pronged alias-discipline regime), CP25 §3 (product_family_codenames typed enrichment).
+
+---
+
