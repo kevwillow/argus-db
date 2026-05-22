@@ -1,147 +1,91 @@
 {
-  "generated_at_utc": "2026-05-21T01:00:30Z",
-  "generation_dispatch": "MAC-184 Phase 12",
-  "predecessor_commit": "1080b5c",
-  "branch": "v1.4.1-integration-stage-1",
-  "argus_version_pre_bump": "v1.4.0",
-  "argus_version_post_bump_recommended": "v1.4.1",
-  "release_narrative": "v1.4.1 Stage 1 integration close-out (MAC-209 Phase 12 — final pre-rc1 export regeneration). Stage 1 child issues integrated since v1.4.0 baseline: CP31 (mig-0025, identifier_type CHECK enum 54→56 with fcc_grantee_code + equipment_class_code, pair_kind 4→5 with fcc_grantee_equipment_class — first multi-arm vendor pairing under the structural-anchor confidence lift), MAC-201 (first §7.5-bis 14-row 75→85 lift via fcc_grantees structural anchor at anchor_conf=80), MAC-206 (21-row Flock Safety + Getac apkpure-sourced direct-admission carve-out audit metadata + id=539 sibling-pair forward repair), and MAC-188 cumulative FP demote cycle (262 third_party_oss_sdk_root supersessions). Coverage matrix regenerated to bin-classify 176 net-new active rows + 262 superseded rows since v1.4.0 baseline; export reconciliation arithmetic balances at standard 34,968 source → 514 record / 34,454 dropped, high-conf 34,968 source → 114 record / 34,854 dropped.",
+  "generated_at_utc": "2026-05-22T16:05:32Z",
+  "generation_dispatch": "MAC-232",
+  "predecessor_commit": "8552222",
+  "branch": "v1.5.0-integration-stage-1",
+  "argus_version_pre_bump": "v1.4.1",
+  "argus_version_post_bump_recommended": "v1.5.0",
+  "release_narrative": "v1.5.0 Stage 1 integration close (MAC-232) — lexicon-expansion wave. CP33 (mig-0027): +3 device_category (cctv_camera, persistent_surveillance, through_wall_radar) + 1 identifier_type (imei_tac). +2 sources (sid=72 GitHub Code Search REST, sid=73 adsb.lol v2; crt.sh + fccid.io dedup-merged into existing sids 54+51). +40 manufacturers (21 S1 military/federal + 19 S2 commercial/consumer) + Pelco arm-under-MSI (G-A). +848 net active identifier promotions across 7 substep cohorts. G-B retroactive cctv_camera recategorization applied to 7 existing vendors (Hikvision/Dahua/Axis/Avigilon/Verkada/Eagle Eye/Rhombus; BriefCam deferred). SAR-16 (alias-length-floor) + SAR-17 (no-generic-product-aliases) + SAR-18 (classifier-predicate parity per Step 9 Path β) formal codifications. 7 CP34-pending candidates queued in PLANNED_AND_FUTURE_UPDATES.md.",
   "stage_1_dispatch_chain": [
-    "MAC-200 (Stage 1 baseline branch carry-forward)",
-    "MAC-201 (§7.5-bis structural-anchor lift — first 14 rows)",
-    "MAC-203 (Deferral Note 1 — §44.3 Honeywell product nomenclature corpus)",
-    "MAC-204 (Stage 1 catalogue work)",
-    "MAC-205 (Stage 1 catalogue work)",
-    "MAC-206 (Phase 10d β.3c — direct-admission carve-out 21 rows + bible §11 #17 + id=539 sibling repair)",
-    "MAC-207 (Phase 11 close — Option A all-73 DROP + CP32 cand #7)",
-    "MAC-209 (Phase 12 — this export regen)"
+    "MAC-232 Step 1 Validator reconcile (report only)",
+    "MAC-232 Step 2 source admissions (d73a788)",
+    "MAC-232 Step 3 mig-0027 CP33 (2128299)",
+    "MAC-232 Step 4 manufacturer admissions (99d713b)",
+    "MAC-232 Step 5 identifier promotion (24ccfa5)",
+    "MAC-232 Step 6 G-B retroactive recat (0e13b20)",
+    "MAC-232 Step 7 SAR-16+SAR-17 (ecf6d4b)",
+    "MAC-232 Step 8 PLANNED_AND_FUTURE_UPDATES.md (1931e75)",
+    "MAC-232 Step 9 Path β patch + SAR-18 (8552222)",
+    "MAC-232 Step 9 Export regen (this commit)"
   ],
-  "stage_1_predecessor_chain_head": "1080b5c",
-  "baseline_canonical_count_post_v1_4_0": 34872,
-  "baseline_active_count_post_v1_4_0": 34792,
-  "canonical_count_post_v1_4_1_stage_1": 35310,
-  "active_count_post_v1_4_1_stage_1": 34968,
-  "canonical_count_delta_total": 438,
-  "canonical_count_delta_active": 176,
-  "sources_post_v1_4_0": 66,
-  "sources_post_v1_4_1_stage_1": 71,
-  "sources_delta": 5,
-  "manufacturers_post_v1_4_0": 51,
-  "manufacturers_post_v1_4_1_stage_1": 52,
-  "manufacturers_delta": 1,
-  "raw_observations_post_v1_4_0": 146188,
-  "raw_observations_post_v1_4_1_stage_1": 146573,
-  "raw_observations_delta": 385,
-  "deployment_observations_post_v1_4_0": 116774,
-  "deployment_observations_post_v1_4_1_stage_1": 116774,
-  "deployment_observations_delta": 0,
-  "behavioral_signatures_post_v1_4_0": 131,
-  "behavioral_signatures_post_v1_4_1_stage_1": 201,
-  "behavioral_signatures_delta": 70,
-  "schema_version_post_v1_4_0": 24,
-  "schema_version_post_v1_4_1_stage_1": 25,
-  "schema_migrations_applied": [
-    "0025_cp31_fcc_eas_identifier_type_cluster_and_pair_kind"
-  ],
-  "bible_amendments_applied": [
-    "CP31"
-  ],
-  "cp31_resolution": {
-    "cp31_codified_identifier_types": [
-      "fcc_grantee_code",
-      "equipment_class_code"
-    ],
-    "cp31_codified_pair_kinds": [
-      "fcc_grantee_equipment_class"
-    ],
-    "cp31_active_fcc_grantee_code_rows": 17,
-    "cp31_active_equipment_class_code_rows": 41,
-    "cp31_active_paired_rows": 41,
-    "cp31_first_multi_arm_vendor_pairing": "Parrot Automotive arm (manufacturers id=222, parent_manufacturer_id=25 Parrot)"
-  },
-  "mac_201_section_7_5_bis_lift": {
-    "first_section_7_5_bis_lift_cohort_size": 14,
-    "first_section_7_5_bis_lift_cohort_codes": [
-      "ABY", "ABZ", "ARQ", "MKM", "N7N", "LL9", "PNF", "QQL", "TWV", "EL5", "NK7", "UXX", "X4G", "YJV"
-    ],
-    "pre_conf": 75,
-    "post_conf": 85,
-    "sub_rule": "structural_anchor (anchor_conf=80)",
-    "anchor_table": "fcc_grantees",
-    "cp_anchor": "CP32-pending",
-    "ratification_issue": "MAC-201"
-  },
-  "mac_206_carve_out_disposition": {
-    "carve_out_active_row_count": 21,
-    "carve_out_id_range": "533-553",
-    "carve_out_vendor_breakdown": {
-      "Flock Safety": 19,
-      "Getac": 2
-    },
-    "carve_out_identifier_type_breakdown": {
-      "ble_service": 3,
-      "ble_characteristic": 3,
-      "ble_local_name": 1,
-      "product_family_codename": 14
-    },
-    "carve_out_source_type": "manufacturer_app",
-    "carve_out_in_argus_export_csv": 21,
-    "carve_out_in_argus_export_json": 0,
-    "carve_out_in_argus_export_high_confidence_json": 0,
-    "carve_out_lynceus_drop_rationale": "All 21 rows DROP at §4.4 type-mapping gate (ble_service/ble_characteristic/ble_local_name/product_family_codename are not in Lynceus pattern_type map). High-conf-export halt-criterion (CP19 crowdsourced-ceiling) NOT triggered — these rows are source_type='manufacturer_app' not 'crowdsourced', and the §4.4 drop precedes any source_type evaluation."
-  },
-  "mac_188_fp_demote_cycle": {
-    "superseder_rows_post_v1_4_0": 262,
-    "superseder_classifier_reason": "known_fp_root::aloft.rocks (and sibling third_party_oss_sdk_root patterns)",
-    "demoted_at_window": "2026-05-20T18:27:49Z (post-MAC-45 v1.4.0 generation)",
-    "impact_on_export": "262 rows superseded; coverage_matrix_report.json regenerated this pass to absorb the supersessions (per v1.4.0 commit 300e51b precedent)"
-  },
-  "halt_criteria_audit_2026_05_21": {
-    "head_branch_pre_flight": "PASS (HEAD=1080b5c, branch=v1.4.1-integration-stage-1)",
-    "canonical_state_drift": "PASS (schema=25, total=35310, active=34968, sources=71, manufacturers=52, raw_obs=146573, integrity=ok — matches dispatch table verbatim)",
-    "cp31_enum_extension_live": "PASS (sqlite_master CREATE TABLE confirms fcc_grantee_code + equipment_class_code + fcc_grantee_equipment_class)",
-    "export_script_raised_uncaught_exception": "RECOVERED (first run halted on MAC-45 coverage_matrix_report.json staleness — id=23160 writer-classified None vs map 'unknown_category' because id=23160 was superseded post-MAC-45-generation by MAC-188 FP demote; resolved by regenerating MAC-45 coverage_matrix_report.json per v1.4.0 commit 300e51b precedent; coverage_matrix.py is read-only per its docstring; no script patched silently)",
-    "meta_dropped_in_export_reconciliation_standard": "PASS (34968 source - 514 record = 34454 dropped; sum(dropped_in_export) = 34454)",
-    "meta_dropped_in_export_reconciliation_high_conf": "PASS (34968 source - 114 record = 34854 dropped; sum(dropped_in_export) = 34854)",
-    "device_category_unknown_in_high_conf": "PASS (0 rows; §11 #13 ban honored)",
-    "source_type_procurement_in_high_conf": "PASS (0 rows; §11 #14 ban honored)",
-    "mac_206_carve_out_in_high_conf": "PASS (0 rows; CP19 crowdsourced-ceiling not violated — §4.4 drop precedes source_type evaluation)",
-    "lynceus_argus_record_id_collision_or_drift": "PASS (3-sample stability verification: id=1 mac|e4:aa:ea:80:a1:9b → eea6f74486eea9c0 (v1.4.0 baseline); id=35682 fcc_grantee_code|ABY → 2debaa47e623b44b (CP31); id=540 product_family_codename|AVICORE → a72a124244fe4728 (MAC-206 carve-out) — all three sha256(type|identifier)[:16] computations match CSV row values)"
-  },
+  "stage_1_predecessor_chain_head": "8552222",
+  "baseline_canonical_count_post_v1_4_1": 34964,
+  "active_canonical_count_post_v1_5_0_stage1": 35812,
+  "baseline_high_confidence_export_count_v1_4_1": 114,
+  "high_confidence_export_count_post_v1_5_0_stage1": 119,
+  "high_confidence_export_count_delta": 5,
   "files": {
     "argus_export.json": {
-      "size_bytes": 88747,
-      "record_count": 514,
+      "size_bytes": 92542,
+      "record_count": 536,
       "confidence_threshold": 30,
-      "note": "Lynceus-filtered standard export; +3 records vs v1.4.0 (511→514) driven by CP31 and Stage 1 net-new active rows that survived §4.4/§11 #13/§11 #14 filtering"
+      "note": "Lynceus-filtered standard export; +22 records vs v1.4.1 baseline (514→536) driven by MAC-232 Step 5 net-new identifier promotions that survived §4.4/§11 #13/§11 #14 filtering."
     },
     "argus_export_high_confidence.json": {
-      "size_bytes": 20951,
-      "record_count": 114,
+      "size_bytes": 21989,
+      "record_count": 119,
       "confidence_threshold": 70,
-      "note": "Lynceus-filtered high-conf export; +1 record vs v1.4.0 (113→114). MAC-201 §7.5-bis lift cohort (14 fcc_grantee_code @ conf=85) correctly DROPS at §4.4 type-mapping gate (fcc_grantee_code not in Lynceus pattern_type map) AND at §11 #13 device_category='unknown' gate. The +1 net delta is driven by the smaller cohort of Stage 1 non-unknown / Lynceus-mappable rows."
+      "note": "Lynceus-filtered high-conf export; +5 records vs v1.4.1 baseline (114→119). G-B retroactive cctv_camera recategorization moved selected rows out of §11 #13 unknown_category drop. SAR-18 (Path β) ensures mac_range rows drop unconditionally to oversized_mac_range bin in both classifiers."
     },
     "argus_export.csv": {
-      "size_bytes": 21395866,
-      "record_count": 34968,
-      "note": "All 34,968 active identifiers; no Lynceus filtering. Includes the 14 MAC-201 lifted fcc_grantee_code rows @ conf=85 with notes.section_8_3_lift.sub_rule='structural_anchor (anchor_conf=80)' preserved verbatim; all 41 equipment_class_code rows; all 21 MAC-206 carve-out rows (ids 533-553)."
+      "size_bytes": 22146085,
+      "record_count": 35812,
+      "note": "All 35,812 active identifiers; no Lynceus filtering. +844 rows vs v1.4.1 baseline 34,968 CSV count (net of supersessions)."
     },
     "argus_export_behavioral_signatures.json": {
       "size_bytes": 69361,
       "source_record_count": 201,
       "record_count": 125,
-      "note": "behavioral_signatures DB grew 131→201 (+70) since v1.4.0 baseline; sibling-export survivor count 55→125 (+70) reflects the same growth. Argus_run_id=28e57d53-32e6-5026-9a04-267feaafcd82 (UUID5 from canonical-row fingerprint). Dispatch text 'unchanged at 131' was stale relative to current DB — paste-not-cite verification per [[feedback_db_verify_dispatch_claims]] surfaces the real count."
+      "note": "behavioral_signatures DB unchanged from v1.4.1 (201 source rows). Sibling-export survivor count unchanged at 125. argus_run_id=28e57d53-32e6-5026-9a04-267feaafcd82."
     },
     "coverage_report.md": {
-      "size_bytes": 1522766,
-      "note": "Regenerated coverage_matrix + drop_tally bins reconciled against fresh extraction_outputs/mac45/coverage_matrix_report.json (9.2 MB)."
+      "size_bytes": 1526274,
+      "note": "Regenerated coverage_matrix + drop_tally bins reconciled against fresh extraction_outputs/mac45/coverage_matrix_report.json. oversized_mac_range bin now 2 (was 1 pre-Path-β) reflecting id=470 (Axis Communications 70:b3:d5:98:7) + id=9404 (Eagle Eye Networks 64:33:b5:4/28) both routing through unconditional mac_range drop."
     }
   },
+  "sar_18_classifier_parity_audit": {
+    "path_b_patch_commit": "8552222",
+    "predicate_pre_patch": "row.identifier_type == 'mac_range' and row.mac_range_size > MAC_RANGE_EXPANSION_CEILING (256)",
+    "predicate_post_patch": "row.identifier_type == 'mac_range' (unconditional)",
+    "classifier_diff_resolved": "db/validation/coverage_matrix.py::classify_row now matches db/validation/export_lynceus.py::_classify_row lines 530-537 verbatim semantics",
+    "active_mac_range_rows_total": 17795,
+    "active_mac_range_rows_non_unknown_category": 2,
+    "non_unknown_mac_range_breakdown": {
+      "id_470_axis_communications_70_b3_d5_98_7": "cctv_camera (G-B recat)",
+      "id_9404_eagle_eye_networks_64_33_b5_4_28": "cctv_camera (G-B recat, /28 MA-M size=256)"
+    },
+    "drop_tally_standard_oversized_mac_range_bin_pre_patch": 1,
+    "drop_tally_standard_oversized_mac_range_bin_post_patch": 2,
+    "lynceus_v0_3_mac_range_support": "absent; future CP34 §4.4 mac_range expansion slot reserved",
+    "no_canonical_mutation": "PRAGMA query_only = ON honored; this pass only regenerates exports + coverage_matrix outputs"
+  },
+  "halt_criteria_audit_2026_05_22": {
+    "head_branch_pre_flight": "PASS (HEAD=8552222, branch=v1.5.0-integration-stage-1)",
+    "canonical_state_drift": "PASS (schema=27, active=35812, sources=73, manufacturers=92 with 13 cctv_camera, integrity=ok — matches dispatch verification verbatim)",
+    "cp33_enum_extension_live": "PASS (schema_version=27 includes mig-0027 cctv_camera + persistent_surveillance + through_wall_radar device_categories + imei_tac identifier_type)",
+    "sar_18_classifier_parity": "PASS (coverage_matrix.py + export_lynceus.py both drop mac_range unconditionally to oversized_mac_range bin; both classifiers regenerated this pass yield oversized_mac_range=2)",
+    "coverage_matrix_halts": "PASS (0 halts; pre_active_count=35812)",
+    "export_lynceus_halts": "PASS (no HaltCondition raised; all 4 output artifacts written)",
+    "meta_dropped_in_export_reconciliation_standard": "PASS (35812 source - 536 record = 35276 dropped; reconciles with sum(dropped_in_export))",
+    "meta_dropped_in_export_reconciliation_high_conf": "PASS (35812 source - 119 record = 35693 dropped; reconciles with sum(dropped_in_export) + below_confidence_threshold + excluded_source_type + geographic_scope_mismatch)",
+    "device_category_unknown_in_high_conf": "PASS (0 rows; §11 #13 ban honored)",
+    "source_type_procurement_in_high_conf": "PASS (0 rows; §11 #14 ban honored)"
+  },
   "non_goals_observed": {
-    "no_canonical_db_mutations": "PRAGMA query_only = ON honored throughout export pass (export_lynceus.py + export_behavioral_signatures.py + coverage_matrix.py all enforce read-only)",
-    "no_schema_bump": "schema_version unchanged at 25 (CP31 mig-0025 already landed pre-Phase-12)",
-    "no_rc1_or_tag_cut": "deferred to Phase 13",
-    "no_cp32_bundle_absorption": "CP32 candidates #1-7 remain Stage 2 work; this manifest references CP-anchor='CP32-pending' only as audit metadata",
-    "no_branch_push": "v1.4.1-integration-stage-1 stays local until Phase 13 rc1"
+    "no_canonical_db_mutations": "PRAGMA query_only = ON honored throughout export pass",
+    "no_schema_bump": "schema_version unchanged at 27 (CP33 mig-0027 already landed pre-Step-9)",
+    "no_rc1_or_tag_cut": "deferred to Stage 2",
+    "no_cp34_bundle_absorption": "CP34 candidates 1-7 remain Stage 2+ work; this manifest references CP-anchor='CP34-pending' only as audit metadata in PLANNED_AND_FUTURE_UPDATES.md",
+    "no_branch_push": "v1.5.0-integration-stage-1 stays local until Stage 2 rc cut"
   }
 }

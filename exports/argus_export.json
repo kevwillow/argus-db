@@ -1,23 +1,23 @@
 {
   "_meta": {
-    "argus_version": "25",
-    "exported_at": "2026-05-21T14:39:54Z",
-    "record_count": 514,
+    "argus_version": "27",
+    "exported_at": "2026-05-22T16:05:10Z",
+    "record_count": 536,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "2dee4109-4193-52e6-9c2e-7db4fae43226",
-    "source_record_count": 34964,
+    "argus_run_id": "44f031a2-9516-531a-873a-f18fb4676c9a",
+    "source_record_count": 35812,
     "dropped_in_export": {
-      "unknown_category": 34212,
+      "unknown_category": 34450,
       "ssid_pattern": 13,
       "device_fingerprint": 0,
       "ble_local_name": 20,
-      "ble_characteristic": 5,
-      "product_family_codename": 21,
-      "oversized_mac_range": 0,
-      "icao_24bit_address": 0,
+      "ble_characteristic": 8,
+      "product_family_codename": 38,
+      "oversized_mac_range": 2,
+      "icao_24bit_address": 2,
       "rf_channel": 24,
       "burst_cadence_ms": 0,
       "bandwidth_mhz": 3,
@@ -30,16 +30,16 @@
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_service_uuid": 32,
+      "ble_service_uuid": 34,
       "ble_company_id": 1,
-      "frequency_band": 4,
+      "frequency_band": 28,
       "ble_protocol_byte": 0,
       "operator_profile": 3,
       "x509_cert_sha256_prefix": 3,
       "ble_adv_interval": 0,
       "ble_payload_offset": 0,
       "firmware_sha256_hash": 4,
-      "network_endpoint": 1,
+      "network_endpoint": 489,
       "firmware_image_variant": 1,
       "qualcomm_chip_format_id": 1,
       "firmware_branded_string": 1,
@@ -50,8 +50,13 @@
       "chipset_codename": 0,
       "firmware_build_string": 2,
       "firmware_build_uuid": 1,
-      "windows_installer_productcode_vendor_registered": 0,
+      "windows_installer_productcode_vendor_registered": 2,
       "windows_com_clsid_vendor_registered": 1,
+      "vendor_controlled_hostname": 20,
+      "vendor_cloud_endpoint_url": 0,
+      "vendor_controlled_hostname_deprecated": 0,
+      "fcc_grantee_code": 28,
+      "equipment_class_code": 0,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
@@ -167,6 +172,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
       "argus_record_id": "0ad9604395a51e7c"
+    },
+    {
+      "pattern": "ac:cc:8e",
+      "pattern_type": "oui",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "0b76b79ee41e4454"
     },
     {
       "pattern": "2126F",
@@ -349,6 +360,12 @@
       "argus_record_id": "168cbb456f48a1a8"
     },
     {
+      "pattern": "B0:A7:32",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "1730516cf445ffd6"
+    },
+    {
       "pattern": "1900A12S0022",
       "pattern_type": "drone_id_prefix",
       "description": "Tucok drone",
@@ -371,6 +388,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Light Quadcopter UAV drone",
       "argus_record_id": "1a4c7e6974f9b09a"
+    },
+    {
+      "pattern": "C4:2F:90",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "1a9a8011ba54922d"
     },
     {
       "pattern": "1949A0000M499",
@@ -595,6 +618,12 @@
       "argus_record_id": "2b968e8e0afa1929"
     },
     {
+      "pattern": "44:19:B6",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "2bf546340e5a73ea"
+    },
+    {
       "pattern": "1581F6QA",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -715,6 +744,12 @@
       "argus_record_id": "34077b9bc065ef49"
     },
     {
+      "pattern": "90:02:A9",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "34acd1c82fabb21e"
+    },
+    {
       "pattern": "1748CLTG9214910",
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
@@ -757,6 +792,12 @@
       "argus_record_id": "36ccd84dab2f103b"
     },
     {
+      "pattern": "4C:11:BF",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "3700262ccb021d3d"
+    },
+    {
       "pattern": "20557",
       "pattern_type": "drone_id_prefix",
       "description": "Gleesfun drone",
@@ -785,6 +826,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Holy Stone drone",
       "argus_record_id": "396cacf857f02a7e"
+    },
+    {
+      "pattern": "00:30:53",
+      "pattern_type": "oui",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "39b60b488cecc04c"
     },
     {
       "pattern": "1892CF22A238000",
@@ -1063,6 +1110,12 @@
       "argus_record_id": "51e6bce55d8bbfa8"
     },
     {
+      "pattern": "28:57:BE",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "5201622cc47d088f"
+    },
+    {
       "pattern": "70:08:94",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -1163,6 +1216,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Zephyr Systems drone",
       "argus_record_id": "5b8b12afae01b312"
+    },
+    {
+      "pattern": "0x0E25",
+      "pattern_type": "ble_manufacturer_id",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "5c4fdd8899cb87cd"
     },
     {
       "pattern": "17187042",
@@ -1279,6 +1338,12 @@
       "argus_record_id": "6778e7d6113082e0"
     },
     {
+      "pattern": "4C:BD:8F",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "6788a0227b54e0ee"
+    },
+    {
       "pattern": "1581F9DE",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -1289,6 +1354,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aurelia drone",
       "argus_record_id": "67c387985acf6f79"
+    },
+    {
+      "pattern": "00:40:8c",
+      "pattern_type": "oui",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "68946bf61c2cabb9"
     },
     {
       "pattern": "ec:72:f7",
@@ -1475,6 +1546,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Wingtra drone",
       "argus_record_id": "753f22fb3961a014"
+    },
+    {
+      "pattern": "B4:A3:82",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "758d8bf0aaaa7d54"
     },
     {
       "pattern": "8c:58:23",
@@ -1673,6 +1750,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Microdrones drone",
       "argus_record_id": "84d8e579e9475fe9"
+    },
+    {
+      "pattern": "3C:EF:8C",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "8618b3bb36272093"
     },
     {
       "pattern": "1656DTYR06MBD000",
@@ -2317,6 +2400,12 @@
       "argus_record_id": "b6b401819aed5a14"
     },
     {
+      "pattern": "E0:50:8B",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "b7453896bfe764ea"
+    },
+    {
       "pattern": "1869BU11P20000",
       "pattern_type": "drone_id_prefix",
       "description": "Ruko drone",
@@ -2369,6 +2458,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "bdf969b7da7c6bd4"
+    },
+    {
+      "pattern": "e8:27:25",
+      "pattern_type": "oui",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "be4c4ac30f67c8e5"
     },
     {
       "pattern": "1748CNA0922023",
@@ -2659,6 +2754,12 @@
       "argus_record_id": "d3827407d5918cb3"
     },
     {
+      "pattern": "18:68:CB",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d389d39cd548b554"
+    },
+    {
       "pattern": "1849E074B839",
       "pattern_type": "drone_id_prefix",
       "description": "Spektrum drone",
@@ -2773,6 +2874,12 @@
       "argus_record_id": "dc07a163cf10f2fe"
     },
     {
+      "pattern": "C0:56:E3",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "dc63ea3ed71b6414"
+    },
+    {
       "pattern": "00:16:00",
       "pattern_type": "oui",
       "description": "Cellebrite hacking_tool",
@@ -2849,6 +2956,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aeroo drone",
       "argus_record_id": "e193ccb72833faa0"
+    },
+    {
+      "pattern": "70:1a:d5",
+      "pattern_type": "oui",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "e1b5d4dcc06bc8a6"
     },
     {
       "pattern": "1865F113",
@@ -2941,6 +3054,12 @@
       "argus_record_id": "e79d25086fc7244c"
     },
     {
+      "pattern": "54:C4:15",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "e801529b6984ad22"
+    },
+    {
       "pattern": "1910F916",
       "pattern_type": "drone_id_prefix",
       "description": "Potensic drone",
@@ -2951,6 +3070,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Watts Innovations drone",
       "argus_record_id": "e9eb917e5367dccc"
+    },
+    {
+      "pattern": "A0:BD:1D",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "ea2ef90f8728ffdf"
     },
     {
       "pattern": "1863FPEG8219",
@@ -3091,6 +3216,12 @@
       "argus_record_id": "f6464a0e2bf5137f"
     },
     {
+      "pattern": "b8:a4:4f",
+      "pattern_type": "oui",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "f9114e5c8a1477bc"
+    },
+    {
       "pattern": "1928FXTD0000000002",
       "pattern_type": "drone_id_prefix",
       "description": "XM2 Labs drone",
@@ -3137,6 +3268,12 @@
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "ff5981ab6c873540"
+    },
+    {
+      "pattern": "0x075D",
+      "pattern_type": "ble_manufacturer_id",
+      "description": "Rhombus Systems cctv_camera",
+      "argus_record_id": "ff993d04e449cabe"
     },
     {
       "pattern": "1972C",
