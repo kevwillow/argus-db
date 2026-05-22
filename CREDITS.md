@@ -6,6 +6,28 @@ For the binding license terms, see [LICENSE](LICENSE) (AGPL-3.0-or-later — cod
 
 ---
 
+## How to read this document
+
+CREDITS.md has two halves: the per-source attribution roster (§1 through §8 below) and the per-vendor canonical lexicon (the manufacturer cohort sections at the bottom). New readers should skim this preamble first, then jump to whichever section answers their question.
+
+**The per-source attribution roster** names every upstream dataset Argus integrates and records the legal posture for downstream consumers. Sources are organized into tiers by `source_type` band: `primary_registry` (canonical allocation registries like IEEE/FCC/FAA), `regulatory` (regulatory disclosure surfaces), `academic` (peer-reviewed research), `crowdsourced` (community researcher repositories), `manufacturer_app` and `manufacturer_doc` (vendor-published documentation and APKs), `judicial_filing` / `disclosure_filing` / `procurement_disclosure` (judicial records, SEC EDGAR, SAM.gov, and similar), and `inferred` (cohort-prediction admissions where attestation is pending). Per-source license posture controls how downstream consumers can redistribute data derived from that source.
+
+**The per-vendor canonical lexicon** lists all 92 surveillance-technology manufacturers Argus tracks at v1.5.0. Vendors are admitted to the canonical state when at least one structural anchor (an FCC grantee record, an IEEE OUI allocation, an SEC Exhibit 21 subsidiary disclosure, a verified academic identification, etc.) attests to their existence and surveillance-equipment scope. Vendors without an attestable structural anchor are not admitted — Argus has no fabricated rows.
+
+**A few details worth knowing:**
+
+- **Multi-purpose carveouts (§11 #10).** Some vendors make both surveillance equipment and unrelated commercial products at scale (Northrop Grumman, Lockheed Martin, Trimble, Bosch Security Systems, etc.). These are admitted at `device_category='unknown'` rather than forced into a single surveillance category they don't cleanly map to. Their identifier rows are excluded from the high-confidence Lynceus export by design — pointing a runtime scanner at a Lockheed OUI would generate vast false-positive volume.
+
+- **Hub-and-spoke arm rows (CP31 hub-and-spoke schema).** When a vendor operates a wholly-owned subsidiary with a distinct surveillance product line (e.g., Pelco under Motorola Solutions, Parrot Automotive under Parrot), the subsidiary is admitted as an arm row pointing back to the parent via `parent_manufacturer_id`. Default queries against `manufacturers` filter `WHERE query_default='visible'` and do NOT surface arm rows; explicit audit queries opt in. At v1.5.0 there are 2 arm rows: Parrot Automotive (id=222) under Parrot (id=25), and Pelco (id=254) under Motorola Solutions (id=3). Future arm splits ship only on concrete identifier evidence — Cisco/Meraki, Harris RF vs Harris Aerial, Honeywell ACS division, Avigilon, and WatchGuard remain backlogged for evidence-driven splits.
+
+- **Per-cohort headline counts at v1.5.0 admission:** counter-UAS (11 vendors + 2 carveouts under `unknown`); persistent surveillance (4 vendors + 2 carveouts); through-wall radar (3 vendors; FCC §15.519 UWB-LE-only regulatory carveout); CCTV/IP camera (13 vendors including retroactive recategorization of 7 prior face_recog/multi-purpose vendors and the Pelco arm row); electronic monitoring / ankle-monitor (5 vendors; Geo Group arm split queued for v1.5.x); fleet telematics (6 vendors + 1 multi-purpose carveout under Trimble); IMSI catcher (1 new addition — Rohde & Schwarz — joining the existing 6-vendor roster); IMSI-catcher behavioral signatures (201 patterns, integrated from the Marlin academic foundation and adjacent community research).
+
+- **For the formal v1.5.0 admission record**, see [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) Correction Pass 33 — that's where each cohort's admission decisions, structural anchors, deferred items, and SAR-16/17/18 discipline-rule codifications are recorded with case-study anchors.
+
+- **For a plain-language tour of what Argus is and how to use the exports**, see [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md). This document (CREDITS.md) is dense by design — it's the legal-and-attribution surface, not the introductory overview.
+
+---
+
 ## 1 — Tier 1 canonical registries (primary_registry)
 
 These sources are authoritative allocation-class registries operated by standards bodies or regulatory authorities. Argus treats them as `source_type='primary_registry'` per the source-type confidence-band ceiling rule.

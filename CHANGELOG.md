@@ -2,6 +2,18 @@
 
 All notable changes to Argus are documented in this file. The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project does not yet adopt semantic-versioning for the dataset shape itself — see "Schema versioning" below for the migration-ledger discipline.
 
+## TL;DR
+
+**Argus tracks surveillance vendor identifiers** — MAC ranges, FCC grantee codes, hostnames, certificate SANs, BLE company IDs, IMEI Type Allocation Codes, and dozens of other identifier classes — used by US law enforcement and adjacent surveillance deployments.
+
+**Each version (v1.X.Y) bundles** a cycle of source admissions, manufacturer admissions, schema migrations, and bible-amendment ratifications. Headline metrics per version: schema_version, source count, manufacturer count, active identifier count, Lynceus high-confidence export count.
+
+**To read entries below:** find your version of interest; the `### Schema` section lists migration deltas; the `### Data` section lists count deltas; the `### Bible amendments` section lists the formal discipline codifications (Correction Passes + SAR rules); the `### Halts encountered` section lists any halt-class issues that surfaced during the cycle and their ratifications.
+
+**For the user-facing overview** of what Argus is and how to use the exports, start with [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md).
+
+---
+
 ## [Unreleased]
 
 (No unreleased changes since v1.5.0.)
