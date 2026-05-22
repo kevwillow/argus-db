@@ -4382,3 +4382,183 @@ sources:                73 (unchanged this step)
 Final CP33 entry consolidating Steps 2-9 will satisfy §11 #11 with the consolidated git commit hash at Stage 1 close. This Step 4 draft section is one of the parallel amendment-drafts being assembled; the commit applying this draft is referenced inline in the Step 4 close-out report at `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step4_manufacturer_admissions.md`.
 
 ═══════════════════════════════════════════════════════════════════════
+
+═══════════════════════════════════════════════════════════════════════
+
+## CP33 §4 (draft) — v1.5.0 Stage 1 Step 5 identifier promotions
+
+**Dispatch:** MAC-232 v1.5.0 Stage 1 Step 5
+**sweep_event_id:** `mac232_v1_5_0_stage1_step5_2026_05_22`
+**Date:** {'total': 36158, 'active': 35812}  (post-state; this draft)
+**Authority:** MAC-232 board ratification `0ba8150f` (G-G + G-C + G-D applied)
+
+### §4.1 Per-identifier_type promotion counts
+
+```
+identifier_type                     count
+----------------------------------- -----
+network_endpoint                    747
+fcc_grantee_code                    36
+frequency_band                      24
+vendor_controlled_hostname          21
+product_family_codename             17
+icao_24bit_address                  2
+ble_company_id                      1
+TOTAL                               848
+```
+
+### §4.2 Per-source_id citation counts
+
+```
+source_id  name                                                    count
+---------- ------------------------------------------------------- -----
+sid=54     crt.sh                                                  747
+sid=51     fccid.io                                                60
+sid=72     GitHub Code Search REST API                             38
+sid=73     adsb.lol v2                                             2
+sid=34     Bluetooth SIG company-identifier registry               1
+```
+
+### §4.3 §5.2/§8.3 +5 lift applied (vendors + row counts)
+
+Cross-source §8.3 +5 lift applied per CP15 ceiling cap. **Within-source-only**
+S1 vendors (Citadel Defense, Black Sage Technologies, MyDefence Communications,
+Sensofusion, TiaLinx) excluded from lift per Validator Step 1 §4.2. **NIITEK**
+excluded (zero-source admission; carries `low_confidence_flag` in identifier
+rows when promoted in future cycles).
+
+```
+manufacturer                        lifted_rows
+----------------------------------- -----------
+Northrop Grumman                    172
+Geotab                              70
+Motive                              61
+Samsara                             58
+BI Incorporated                     56
+Attenti                             52
+Bosch Security Systems              48
+Lockheed Martin                     43
+TCOM                                40
+Pelco                               27
+Hanwha Vision                       10
+Sentinel Offender Services          8
+Uniview                             7
+Tiandy                              6
+Rohde & Schwarz                     5
+Vivotek                             3
+Lytx                                3
+General Atomics                     3
+Camero                              3
+Verizon Connect                     2
+Track Group                         2
+STOP                                2
+Omnitracs                           2
+Milestone Systems                   2
+D-Fend Solutions                    2
+Trimble                             1
+Fortem Technologies                 1
+Elbit Systems of America            1
+Echodyne                            1
+AeroDefense                         1
+TOTAL                               692
+```
+
+**Within-source S1 vendors (no lift this cycle):**
+- Sensofusion (108 rows promoted at base ceiling)
+- MyDefence Communications (47 rows promoted at base ceiling)
+- TiaLinx (1 row promoted at base ceiling)
+- Citadel Defense + Black Sage Technologies (no rows this cycle)
+
+### §4.4 Dedup outcomes
+
+```
+INSERTs:                                    848
+UPDATEs (cross-source bucket existing row): 0
+Skipped — same source already attested:     29
+Skipped — within-source §11 #8 not corrob:  0
+Skipped — CHECK enum violation:             1
+Skipped — corporate-attestation (sec/proc): 20
+```
+
+Corporate-attestation skips (20 rows) are sec_edgar_cik_anchor (2) +
+sec_exhibit_21_subsidiary_confirmed (3) + procurement_vendor_canonical (15) —
+not identifier-shaped; consumed by `manufacturers` table updates in Step 4.
+
+### §4.5 G-G batch-reject
+
+Per board G-G ruling on MAC-232, S1's `wayback_pdf_extracted_v2.json` and
+`wayback_pdf_extracted_v2_scrubbed.json` were class-rejected without promotion:
+
+```
+wayback_pdf_extracted_v2.json:            255 rows skipped
+  (240 product_family_codename + 12 network_endpoint + 3 frequency_band)
+wayback_pdf_extracted_v2_scrubbed.json:   92 rows skipped
+  (77 noisy product_family_codename per G-G + 12 network_endpoint + 3 freq_band)
+TOTAL G-G batch-rejected:                  347 rows
+
+G-G per-finding rejection (S2 codenames with HIGH fp_risk):
+  'BVMS' / Bosch Security Systems  (fp_risk=HIGH, 11128 GitHub hits — too common)
+  'satellite tracking of people' / STOP  (sentence fragment, not codename)
+TOTAL G-G per-finding S2 rejected: 2 distinct codenames (×3 raw rows each)
+```
+
+Disposition: routed to Step 7 disambig closure for documentation; no canonical
+DB row created. Sandbox candidate files preserved unchanged for audit trail.
+
+### §4.6 Pelco PEL grantee ambiguity
+
+Pelco 'PEL' fcc_grantee_code row staged with `notes.disposition=`
+`'ambiguous_pending_resolution'` per Validator Step 1 §15.1. The 'PEL' grantee
+code might be assigned to KCC (Korea Communications Commission), not FCC.
+Resolution deferred to v1.5.x correction-cycle following FCC EAS direct
+verification (currently unreachable per STOP_THE_LINE record).
+
+**Staged confidence:** 75 (crowdsourced ceiling; no +5 cross-source lift
+applied because Pelco is cross-source bucket vendor but lift+5=80 still capped
+at ceiling=75).
+
+### §4.7 NIITEK low-confidence-flag carry-forward
+
+NIITEK identifier rows excluded from this Step 5 promotion (zero-source-admit
+manufacturer; no identifier candidates surfaced in S1 sweeps). Future cycles
+admitting NIITEK identifier rows MUST carry `notes.low_confidence_flag=true`
+per CP33 §4 + manufacturer-table convention (set at Step 4 admission).
+
+### §4.8 sweep_event_id minted
+
+`mac232_v1_5_0_stage1_step5_2026_05_22` — single ID applied across all Step 5 substeps for audit traceability.
+Identifier rows + raw_observations + extraction_runs all carry this ID in
+`notes.sweep_event_id` (JSON path) per [[feedback_scoped_updates_via_source_row_key]]
+traceability discipline.
+
+**extraction_runs added this Step:** 9
+(one per substep × per-source-route)
+
+### §4.9 Paste-not-cite final counts
+
+```
+identifiers total  pre-Step 5:  35310
+identifiers active pre-Step 5:  34964
+identifiers total  post-Step 5: 36158
+identifiers active post-Step 5: 35812
+net delta:                     +  848
+
+raw_observations added:        +  848
+extraction_runs added:         +    9
+
+total rows considered:        S1 774 + S2 534 = 1,308 raw candidates
+INSERTs:                              848
+UPDATEs (cross-source bucket):          0
+Skipped (same-source/within/check):    30
+Skipped (corporate attestation):       20
+Skipped (G-G S1 batch-reject):        347
+Skipped (G-G S2 per-finding):           2
+S2 dup-row collapse (×3 → ×1):       63 raw → 21 INSERT pairs (codenames+endpoints)
+```
+
+### §4.10 — §11 #11 self-binding pending
+
+Final CP33 consolidated entry at Stage 1 close will satisfy §11 #11 with the
+git commit hash applying this Step 5 amendment-draft. The commit applying this
+draft is referenced inline in the Step 5 close-out report at
+`~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step5_identifier_promotion.md`.
