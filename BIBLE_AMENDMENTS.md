@@ -4562,3 +4562,69 @@ Final CP33 consolidated entry at Stage 1 close will satisfy §11 #11 with the
 git commit hash applying this Step 5 amendment-draft. The commit applying this
 draft is referenced inline in the Step 5 close-out report at
 `~/argus-internal/wave_v1_5_lexicon_expansion/_integration_stage1/step5_identifier_promotion.md`.
+
+## CP33 §5 (draft) — v1.5.0 Stage 1 Step 6 retroactive `cctv_camera` recategorization (G-B)
+
+**Cycle:** v1.5.0 Stage 1 (MAC-232)
+**sweep_event_id:** `mac232_v1_5_0_stage1_step6_recat_2026_05_22`
+**Authority:** Board ratification 2026-05-22 (comment 0ba8150f) — G-B approved.
+**§11 #11 binding:** retroactive recategorization is bible-binding. This amendment-log entry preserves the per-row audit per [[feedback_bible_amendment_downstream_consumer_audit]] — downstream consumer (identifier rows) updated as sibling sweep.
+
+### §5.1 Manufacturer rows recategorized (7 total; BriefCam deferred)
+
+| id  | canonical            | from primary_category | to primary_category |
+|-----|----------------------|-----------------------|---------------------|
+| 209 | Hikvision            | NULL                  | cctv_camera         |
+| 208 | Dahua                | NULL                  | cctv_camera         |
+| 7   | Axis Communications  | alpr                  | cctv_camera         |
+| 6   | Avigilon             | alpr                  | cctv_camera         |
+| 210 | Verkada              | NULL                  | cctv_camera         |
+| 220 | Eagle Eye Networks   | unknown               | cctv_camera         |
+| 221 | Rhombus Systems      | unknown               | cctv_camera         |
+| 31  | BriefCam             | face_recog            | **DEFERRED**        |
+
+### §5.2 Identifier rows recategorized (31 total — downstream consumer audit)
+
+| manufacturer        | rows | from device_category | to device_category |
+|---------------------|------|----------------------|--------------------|
+| Hikvision           | 14   | unknown              | cctv_camera        |
+| Dahua               | 8    | unknown              | cctv_camera        |
+| Axis Communications | 6    | unknown              | cctv_camera        |
+| Avigilon            | 1    | unknown              | cctv_camera        |
+| Eagle Eye Networks  | 1    | unknown              | cctv_camera        |
+| Rhombus Systems     | 1    | unknown              | cctv_camera        |
+| Verkada             | 0    | (no active rows)     | —                  |
+
+Each updated row carries `notes.recategorization_history[]` with: from/to category, cycle, dispatch_ref, gate_ref, sweep_event_id, applied_utc, mfg_id.
+
+### §5.3 NDAA §889 preservation
+
+Hikvision (id=209) + Dahua (id=208) retain `notes.ndaa_section_889_note` verbatim ("NDAA Section 889 federally-restricted; state/local LE deployments persist outside the federal-procurement bar (runguide §0 scope).") — recategorization does NOT supersede the sanction note.
+
+### §5.4 Legacy-text-notes wrapping (5 rows; Axis Communications)
+
+5 identifier rows (id=415, 433, 448, 460, 470) had **plain-text** legacy notes from MAC-44 phase-5 step-4 follow-on² admission discipline (pre-JSON-notes convention). At update time, each plain-text payload was preserved in a JSON envelope as `{"legacy_text_notes": "<original text>", "recategorization_history": [...]}`. No data loss. CP34-pending candidate: schema-discipline sweep to normalize all legacy-text notes to JSON envelope shape.
+
+### §5.5 BriefCam deferral rationale
+
+BriefCam is an analytics layer on top of CCTV/ALPR — the operationally distinct value is `face_recog` (current) vs `cctv_camera` (could apply). Per board ratification G-B, defer to v1.5.x or later as an operator-decision sub-cycle.
+
+### §5.6 Lynceus high-confidence export impact (§11 #13 carveout)
+
+Pre-recat: 31 identifier rows for these 7 vendors had `device_category='unknown'` → excluded from Lynceus high-confidence export per §11 #13.
+Post-recat: 31 identifier rows now `device_category='cctv_camera'` → eligible for Lynceus export (subject to confidence ≥85 + superseded_by IS NULL per METHODOLOGY §5).
+
+Net Lynceus high-conf export uplift potential: up to 31 additional rows from these 7 vendors (subject to confidence ceiling per row at Step 9 regen).
+
+### §5.7 Paste-not-cite post-state counts
+
+```
+SELECT primary_category, COUNT(*) FROM manufacturers GROUP BY primary_category;
+  cctv_camera = 13 (6 new from S2 Step 4 + 7 retroactive from Step 6)
+```
+
+```
+SELECT device_category, COUNT(*) FROM identifiers WHERE superseded_by IS NULL GROUP BY device_category;
+  cctv_camera +31 (vs Step 5 close)
+```
+
