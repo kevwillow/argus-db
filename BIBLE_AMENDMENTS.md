@@ -4715,3 +4715,36 @@ No carry-forward to v1.5.x.
 
 ---
 
+
+## CP33 §7 (draft) — v1.5.0 Stage 1 Step 8 v1.5.x/v1.6.0 backlog queue
+
+**Cycle:** v1.5.0 Stage 1 (MAC-232) Step 8
+**Pointer:** Created `/PLANNED_AND_FUTURE_UPDATES.md` (new repo file) capturing deferred items from v1.5.0 Stage 1 integration.
+
+### §7.1 v1.5.x patch backlog
+
+- Avigilon + WatchGuard arm-under-MSI (SEC Exhibit 21 bonus from MSI 10-K FY2025)
+- Elbit FCC grantee disambig sub-cycle (168 entries, sandbox-held)
+- G-D DJI aliases hygiene amendment
+- G-F Geo Group admission + BI arm-split
+- G-B BriefCam recategorization operator-decision (deferred per board)
+
+### §7.2 v1.6.0 new-cohort backlog
+
+- Openpath Security, Silvus Technologies, VaaS International, RapidDeploy, Rave Wireless (SEC Ex21 bonus)
+- 6 source re-attempts (DHS S&T direct, Google Play, ISED, ETSI, RRA Korea, State DOC) — 0-yield deferrals from v1.5.0 Stage 1
+
+### §7.3 CP34-pending candidates (7 total)
+
+1. Corporate-attestation routing at extraction time
+2. S2 GitHub codename×3 dedup at extraction-time
+3. identifier_type CHECK lacks `ip_address` (admit or route to network_endpoint)
+4. Legacy-text-notes normalization sweep (CP-wide pre-JSON-notes residue)
+5. Short-generic-alias migration to product_family_codenames (SAR-17 retroactive)
+6. NDAA §889 attribution key normalization (single-field vs dual-field convention)
+7. Validator-side dispatch live-state preamble verification sub-rule (3 drift incidents in v1.5.0 Stage 1)
+
+### §7.4 §11 #11 binding
+
+All items above carry forward into v1.5.x / v1.6.0 cycles. Full text + commit anchors live in `/PLANNED_AND_FUTURE_UPDATES.md`; this CP33 §7 entry is the bible-side pointer (per amendment-log discipline).
+
