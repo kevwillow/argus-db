@@ -18,107 +18,121 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 (No unreleased changes since v1.5.2.)
 
-[v1.5.2] — 2026-05-23
+## [v1.5.2] — 2026-05-23
+
 This release closes a parallel work cycle covering CCTV camera vendors (Track A) and IMEI TAC research (Track B), and folds in the v1.5.1 documentation restructure.
-Highlights
 
-Added 146 new active identifiers across 8 CCTV camera vendors
-New identifier type: network_discovery_protocol_pattern, covering vendor camera-discovery protocols (Hikvision SADP, Dahua AirKiss/SmartConfig, Axis ONVIF WS-Discovery, Tiandy SADP-style)
-Extractor upgraded to v5 with safer IMEI TAC handling, four new false-positive filters, and 43 additional cellular-modem vocabulary tokens
-New utility for correctly extracting base APKs from .xapk, .apkm, and .apks bundles (replaces a heuristic that was silently picking the wrong file)
+### Highlights
 
-Schema
+- Added 146 new active identifiers across 8 CCTV camera vendors
+- New identifier type: `network_discovery_protocol_pattern`, covering vendor camera-discovery protocols (Hikvision SADP, Dahua AirKiss/SmartConfig, Axis ONVIF WS-Discovery, Tiandy SADP-style)
+- Extractor upgraded to v5 with safer IMEI TAC handling, four new false-positive filters, and 43 additional cellular-modem vocabulary tokens
+- New utility for correctly extracting base APKs from `.xapk`, `.apkm`, and `.apks` bundles (replaces a heuristic that was silently picking the wrong file)
 
-schema_version: 27 → 28
-identifier_type enum: 57 → 58 values
+### Schema
 
-Data
+- `schema_version`: 27 → 28
+- `identifier_type` enum: 57 → 58 values
 
-Sources: 73 (unchanged)
-Manufacturers: 92 (unchanged)
-Active identifiers: 35,812 → 35,958 (+146)
-Behavioral signatures: 201 (unchanged)
+### Data
 
-Per-vendor identifier additions
+- Sources: 73 (unchanged)
+- Manufacturers: 92 (unchanged)
+- Active identifiers: 35,812 → 35,958 (+146)
+- Behavioral signatures: 201 (unchanged)
+
+### Per-vendor identifier additions
+
 Hikvision 46 · Tiandy 53 · Axis 21 · Verkada 10 · Avigilon 9 · Dahua 7
-IMEI TAC research: notable negative result
+
+### IMEI TAC research — notable negative result
+
 A 25-vendor sweep across cellular gateways, fleet telematics, mobile ID apps, trail cameras, ankle monitors, consumer GPS trackers, and drone pilot apps yielded zero unique IMEI TACs.
+
 The reason matters: modern Android apps fetch TACs at runtime, dispatch them server-side, or hide numeric literals in encrypted strings. Companion-app analysis is no longer a productive way to harvest TACs.
+
 Future TAC work will pivot to four better-suited sources:
 
-GSMA TAC API and public TAC list mirrors
-FCC OET authorization grant filings (grantee + product codes map to TAC ranges)
-OTA firmware analysis of cellular modules (Quectel, Sierra, u-blox)
-Android apps that bundle TAC lookup tables as assets (TacDB, IMEI Info, Phone INFO Samsung)
+- GSMA TAC API and public TAC list mirrors
+- FCC OET authorization grant filings (grantee + product codes map to TAC ranges)
+- OTA firmware analysis of cellular modules (Quectel, Sierra, u-blox)
+- Android apps that bundle TAC lookup tables as assets (TacDB, IMEI Info, Phone INFO Samsung)
 
-Documentation
+### Documentation
+
 README, CHANGELOG, and project state docs refreshed and verified against the live database.
 
-[v1.5.0] — 2026-05-22
+## [v1.5.0] — 2026-05-22
+
 This release significantly expands the manufacturer lexicon through parallel sessions covering military/federal and commercial/consumer device makers.
-Highlights
 
-Manufacturer lexicon: 52 → 92 vendors
-Three new device categories: cctv_camera, persistent_surveillance, through_wall_radar
-848 new active identifiers
-New imei_tac identifier type (admitted for future use; no rows promoted this cycle)
-Most directly deployable additions: 35 FCC grantee codes and 2 ICAO 24-bit Mode-S addresses for CBP MQ-9 aircraft (via adsb.lol)
+### Highlights
 
-Schema
+- Manufacturer lexicon: 52 → 92 vendors
+- Three new device categories: `cctv_camera`, `persistent_surveillance`, `through_wall_radar`
+- 848 new active identifiers
+- New `imei_tac` identifier type (admitted for future use; no rows promoted this cycle)
+- Most directly deployable additions: 35 FCC grantee codes and 2 ICAO 24-bit Mode-S addresses for CBP MQ-9 aircraft (via adsb.lol)
 
-schema_version: 26 → 27
-device_category enum: 13 → 16 (in both identifiers and behavioral_signatures)
-identifier_type enum: 56 → 57
+### Schema
 
-Data
+- `schema_version`: 26 → 27
+- `device_category` enum: 13 → 16 (in both `identifiers` and `behavioral_signatures`)
+- `identifier_type` enum: 56 → 57
 
-Sources: 71 → 73 (added GitHub Code Search REST API and adsb.lol v2)
-Manufacturers: 52 → 92 (+40)
-Active identifiers: 34,964 → 35,812 (+848)
+### Data
 
-New manufacturer cohorts
+- Sources: 71 → 73 (added GitHub Code Search REST API and adsb.lol v2)
+- Manufacturers: 52 → 92 (+40)
+- Active identifiers: 34,964 → 35,812 (+848)
 
-Counter-drone / counter-UAS (11): Anduril, Fortem, Citadel Defense, Black Sage, D-Fend, AeroDefense, Echodyne, Liteye, Robin Radar, MyDefence, Sensofusion
-Border / persistent surveillance (6): Elbit Systems of America, General Atomics, TCOM, Persistent Surveillance Systems, Northrop Grumman, Lockheed Martin
-Through-wall radar (3): Camero, NIITEK, TiaLinx
-IMSI catcher (1): Rohde & Schwarz
-Fleet telematics (7): Geotab, Verizon Connect, Samsara, Motive, Lytx, Omnitracs, Trimble
-CCTV camera / VMS (7): Hanwha Vision, Bosch Security Systems, Milestone Systems, Pelco, Uniview, Tiandy, Vivotek
-Electronic monitoring (5): BI Incorporated, Attenti, STOP, Sentinel Offender Services, Track Group
+### New manufacturer cohorts
 
-Retroactive recategorization
-Seven existing camera vendors moved to the new cctv_camera primary category: Hikvision, Dahua, Axis Communications, Avigilon, Verkada, Eagle Eye Networks, Rhombus Systems.
-Documentation
+- Counter-drone / counter-UAS (11): Anduril, Fortem, Citadel Defense, Black Sage, D-Fend, AeroDefense, Echodyne, Liteye, Robin Radar, MyDefence, Sensofusion
+- Border / persistent surveillance (6): Elbit Systems of America, General Atomics, TCOM, Persistent Surveillance Systems, Northrop Grumman, Lockheed Martin
+- Through-wall radar (3): Camero, NIITEK, TiaLinx
+- IMSI catcher (1): Rohde & Schwarz
+- Fleet telematics (7): Geotab, Verizon Connect, Samsara, Motive, Lytx, Omnitracs, Trimble
+- CCTV camera / VMS (7): Hanwha Vision, Bosch Security Systems, Milestone Systems, Pelco, Uniview, Tiandy, Vivotek
+- Electronic monitoring (5): BI Incorporated, Attenti, STOP, Sentinel Offender Services, Track Group
+
+### Retroactive recategorization
+
+Seven existing camera vendors moved to the new `cctv_camera` primary category: Hikvision, Dahua, Axis Communications, Avigilon, Verkada, Eagle Eye Networks, Rhombus Systems.
+
+### Documentation
+
 README, CHANGELOG, data dictionary, credits, methodology, and project state docs all refreshed.
 
-[v1.4.1] — 2026-05-21
+## [v1.4.1] — 2026-05-21
+
 This release adds automotive telematics as a tracked device category and introduces schema support for multi-arm manufacturer relationships (parent/subsidiary structure).
-Highlights
 
-New automotive_telematics device category
-Added FCC Equipment Authorization System identifier types
-First multi-arm vendor admission: Parrot Automotive as a hidden arm of Parrot
+### Highlights
 
-Schema
+- New `automotive_telematics` device category
+- Added FCC Equipment Authorization System identifier types
+- First multi-arm vendor admission: Parrot Automotive as a hidden arm of Parrot
 
-schema_version: 25 → 26
-device_category enum: 12 → 13 (across both identifiers and behavioral_signatures tables)
-identifier_type enum: 54 → 56 (added fcc_grantee_code, equipment_class_code)
-pair_kind enum: 4 → 5 (added fcc_grantee_equipment_class)
-manufacturers table: 3 new columns for parent/arm relationships (parent_manufacturer_id, is_arm, query_default)
+### Schema
 
-Data
+- `schema_version`: 25 → 26
+- `device_category` enum: 12 → 13 (across both `identifiers` and `behavioral_signatures` tables)
+- `identifier_type` enum: 54 → 56 (added `fcc_grantee_code`, `equipment_class_code`)
+- `pair_kind` enum: 4 → 5 (added `fcc_grantee_equipment_class`)
+- `manufacturers` table: 3 new columns for parent/arm relationships (`parent_manufacturer_id`, `is_arm`, `query_default`)
 
-Sources: 66 → 71 (added 5 manufacturer apps: Hikvision Hik-Connect, Dahua DMSS, Motorola Solutions WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot)
-Manufacturers: 51 → 52 (+ Parrot Automotive)
-Active identifiers: 34,792 → 34,964 (+172)
-Raw observations: ~146,573
+### Data
 
-Documentation
+- Sources: 66 → 71 (added 5 manufacturer apps: Hikvision Hik-Connect, Dahua DMSS, Motorola Solutions WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot)
+- Manufacturers: 51 → 52 (+ Parrot Automotive)
+- Active identifiers: 34,792 → 34,964 (+172)
+- Raw observations: ~146,573
 
-New: docs/lynceus_handoff_v1_4_1.md — integration handoff for downstream consumers
-README, CHANGELOG, data dictionary, credits, and methodology refreshed for v1.4.1
+### Documentation
 
+- New: `docs/internal/lynceus_handoff_v1_4_1.md` — integration handoff for downstream consumers
+- README, CHANGELOG, data dictionary, credits, and methodology refreshed for v1.4.1
 
 ## [v1.4.0] — 2026-05-20
 
