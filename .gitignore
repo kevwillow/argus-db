@@ -85,7 +85,20 @@ extraction_outputs/**/*.pre_*_backup
 .claude-flow/
 
 # DB phase backup snapshots (extends existing db/*.db rule for *_backup-suffixed files).
-# Covers both legacy `argus.db.pre_<token>_backup` and current
-# `argus.db.<dispatch>_step<N>_pre_backup` naming conventions.
+# Covers legacy `argus.db.pre_<token>_backup`, `argus.db.<dispatch>_step<N>_pre_backup`,
+# and current `argus.db.pre_<topic>_<UTC-timestamp>` naming conventions (MAC-239 / Wave G/H v1).
 db/*_backup*
 db/*_backup*.sha256
+db/argus.db.pre_*
+
+# Cycle-specific raw-snapshot exports (Wave G/H v1 onward). Canonical Lynceus exports remain
+# committed; per-cycle raw snapshots live on disk for next-cycle consumer reference but do not
+# enter canonical repo history (300MB+ DB dumps + 28MB JSON exports per cycle would bloat history).
+exports/v*_raw_snapshot/
+exports/*_raw_snapshot/
+
+# Canonical extractor version backups — kept on disk for rollback, not committed (git history
+# already tracks prior versions via commit log). MAC-239 v4 → v5 case at
+# `android_test/tools/extraction/wave_g_extractor.py.v4_backup_<UTC-timestamp>`.
+android_test/tools/extraction/*.v[0-9]_backup_*
+android_test/tools/extraction/*.v[0-9][0-9]_backup_*

@@ -4832,3 +4832,255 @@ This discipline extends the CP21 cumulative-full-enum sweep spirit (which govern
 - Prior dispatch-vs-actual schema-truth observations (3 total in v1.5.0 Stage 1): G-E pair_kind, Step 4 NDAA, Step 7 disambig composition
 - Existing memory: [[feedback_bible_amendment_downstream_consumer_audit]] (sibling discipline for bible amendments → downstream consumers)
 
+
+## Correction Pass 35 (draft — CP35-pending; ratification at next CP34 dispatch or sooner if operator wants) — §4.4 Lynceus mapping for `network_discovery_protocol_pattern` (mig-0028 / CP34 Wave G/H v1 admission)
+
+**Origin:** MAC-239 Wave G/H v1 integration orchestration-completion pass, 2026-05-23.
+**Authority:** DBArchitect-surfaced HALT-class downstream-consumer-update gap at canonical Lynceus export regen (see `_dbarchitect_signoff.md` §Task 5). Pending CEO ratification + dispatch.
+**Status:** **DRAFT — CP35-pending.** Not ratified. Bible HEAD (`PROJECT_BIBLE.md` §4.4) NOT amended by this entry — that's CP35-ratification scope.
+
+### Why this Correction Pass exists
+
+Mig-0028 (CP34, this v1.5.2 cycle) admitted `network_discovery_protocol_pattern` (NDPP) to the `identifiers.identifier_type` CHECK enum. Eighteen NDPP rows were promoted under that CP from the Wave G/H v1 cohort (high-confidence `manufacturer_app` rows on `device_category='cctv_camera'` devices — Bosch, Axis, Hanwha, Pelco, Avigilon network-discovery-pattern observations from companion-app static analysis). The CP34 amendment landed the schema mutation + identifiers admission but **did not update the §4.4 Lynceus consumer-side mapping** in `db/validation/export_lynceus.py`.
+
+At canonical Lynceus export regen (DBArchitect Task 5, 2026-05-23), `_classify_row` halted with:
+
+```
+Halt: row id=36716 identifier_type=network_discovery_protocol_pattern has no §4.4 mapping
+but reached the survivor branch — §4.4 schema drift?
+```
+
+This is the **exact failure mode** codified in two operator-memory entries that pre-existed this cycle:
+
+- [[feedback_promotion_gate_needs_export_dryrun]] — promotion gate Step 1 staging needs export-regen dry-run before declaring §11 #11 self-binding satisfied.
+- [[feedback_bible_amendment_downstream_consumer_audit]] — bible amendments need parallel downstream-consumer updates as sibling commits.
+
+CP34 (the Wave G/H v1 integration CP) did not surface this gap because the integration cycle's promotion gate did not run an export-regen dry-run as a precondition. The 18 NDPP rows reached the survivor branch (not dropped by §11 #13 / §11 #14 / §11 #12 / CP7 / SAR-18 unconditional `oversized_mac_range` drop) with no `IDENTIFIER_TYPE_TO_PATTERN_TYPE` mapping AND no `DROPPED_REASONS` entry — the explicit halt path in `export_lynceus.py`.
+
+### Proposed amendment scope (to be ratified at CP35 dispatch)
+
+§4.4 of `PROJECT_BIBLE.md` currently enumerates the disposition for each `identifiers.identifier_type` under the Argus → Lynceus consumer contract: either MAP (route to a Lynceus `pattern_type`) or DROP (with explicit rationale into `DROPPED_REASONS`). NDPP needs a §4.4 entry. Two disposition options frame the CP35 decision; both options are valid and the choice depends on Lynceus consumer-side roadmap clarity at ratification time.
+
+#### Disposition option (a) — MAP to Lynceus `discovery_protocol_signature` pattern (new pattern_type in Lynceus v0.3)
+
+Add NDPP to `IDENTIFIER_TYPE_TO_PATTERN_TYPE` with a new Lynceus-side pattern_type slot:
+
+```python
+IDENTIFIER_TYPE_TO_PATTERN_TYPE = {
+    # …existing mappings…
+    "network_discovery_protocol_pattern": "discovery_protocol_signature",  # CP35
+}
+```
+
+Requires sibling work in the Lynceus repository: introduce `discovery_protocol_signature` as a recognized `pattern_type` in Lynceus v0.3+ scanner with semantics documented (matcher shape: regex/substring match on observed mDNS-SD / WS-Discovery / SSDP / ONVIF-WS-Discovery responses against the pattern body extracted from companion APK). This is sibling-CP work crossing the Argus ↔ Lynceus contract surface (cf. CP9 Talos → Lynceus rename slate + CP11 dual-artifact contract + CP16 §4.4 Lynceus mapping for the CP14 cluster — all prior precedents for `identifier_type → pattern_type` admission requiring parallel Lynceus consumer support).
+
+#### Disposition option (b) — DROP with rationale `NDPP_pending_lynceus_v0_3_scanner_support`
+
+Add NDPP to `DROPPED_REASONS` with explicit narrow rationale:
+
+```python
+DROPPED_REASONS = {
+    # …existing entries…
+    "network_discovery_protocol_pattern": "NDPP_pending_lynceus_v0_3_scanner_support",  # CP35
+}
+```
+
+NDPP rows survive in `identifiers` (high-confidence cohort retained for future export-time admission once Lynceus consumer-side gains pattern support); they are deliberately dropped at export-time until Lynceus v0.3 ships scanner-side discovery-protocol-signature matching. This is the conservative posture: the 18 NDPP rows stay in DB as canonical evidence; only the export-side surface is gated.
+
+This option mirrors the CP16 §4.4 cluster decision for several CP14-admitted identifier_types that were DROP'd pending Lynceus consumer-side support (cf. CP16 12 DROPPED entries vs 3 MAP). Default posture at CP35 ratification if Lynceus v0.3 roadmap is silent: **option (b)** — DROP with explicit pending-rationale.
+
+### Sibling consumer files requiring parallel update (per [[feedback_bible_amendment_downstream_consumer_audit]] discipline)
+
+CP35 ratification MUST land all of the following in a single coordinated commit (no partial application):
+
+1. **`PROJECT_BIBLE.md` §4.4** — bible text amendment adding NDPP row to the §4.4 mapping table (either MAP or DROP per ratified option).
+2. **`db/validation/export_lynceus.py`** — `_classify_row` consumer side: add NDPP to either `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (option a) or `DROPPED_REASONS` (option b).
+3. **`db/validation/coverage_matrix.py`** — `_classify_row` parity check (per SAR-18 classifier-predicate parity invariant). If option (b), NDPP routes to coverage-matrix "DROPPED" column with the same rationale string; if option (a), NDPP routes to a new pattern-type column.
+4. **CP35 §11 #11 self-binding** — final CP35 entry must cite the consolidated git commit hash + verify both `_classify_row` modules agree.
+
+### Evidence (CP35-pending citation slate)
+
+- `_dbarchitect_signoff.md` §Task 5 — DBArchitect HALT-class disclosure on canonical Lynceus export regen at row id=36716.
+- `~/argus/exports/v1_5_2_raw_snapshot/argus_export_high_confidence_20260523T030803Z.json` (sha `781e759c60b408220a41040a0205e20888aa4798cfc35740cf1871058c4d51c8`, 35,434 rows) — raw-snapshot export supplementing the stale canonical Lynceus export at v1.5.2 ship per Task 5 option (iii) default disposition.
+- `~/argus/exports/v1_5_2_raw_snapshot/argus_export_full_20260523T030803Z.sql.gz` (sha `6d97c20ab3aebc9d26069e10cd4ef0e1b5f168dc24bbf4b6527ebc90b5c7bd84`) — full DB dump pair.
+- `~/argus/extraction_outputs/mac45/coverage_matrix.md` + `coverage_matrix_report.json` — coverage matrix regenerated 0-halts against v1.5.2 DB; NDPP rows present in active set.
+- Mig-0028 (`db/migrations/0028_cp34_*.sql`) — the CP34 schema mutation that admitted NDPP without sibling §4.4 amendment.
+- Lynceus consumer-side roadmap (TBD at CP35 dispatch) — option (a) viability hinges on Lynceus v0.3 scanner support for `discovery_protocol_signature` pattern_type.
+
+### Cross-references
+
+- **Existing memory** [[feedback_promotion_gate_needs_export_dryrun]] — argues this exact failure mode should be caught at promotion-gate Step 1, not at post-CP export-regen. CP35 ratification should also tighten the promotion-gate runguide to require export-regen dry-run as a precondition (CP34 lacked this check; the gap reproduced here).
+- **Existing memory** [[feedback_bible_amendment_downstream_consumer_audit]] — codifies the sibling-commit discipline that CP35 must satisfy.
+- **CP16** — first §4.4 Lynceus mapping CP (for the CP14 cluster); same discipline shape, prior precedent for both MAP and DROP options.
+- **CP34** (Wave G/H v1 integration, this cycle) — the upstream amendment that admitted NDPP without satisfying §4.4 sibling-commit discipline. CP35 closes that gap.
+- **SAR-18** — classifier-predicate parity invariant; CP35 must satisfy SAR-18 by updating `coverage_matrix.py` in lockstep with `export_lynceus.py`.
+
+### §11 #11 self-binding pending
+
+This entry stages CP35 as draft. The §11 #11 self-binding clause activates at CP35 ratification: the consolidated commit hash applying the §4.4 amendment + sibling consumer updates (export_lynceus.py + coverage_matrix.py) + (if option a) the cross-repo Lynceus v0.3 commit must be enumerated here at ratification time. Currently UNRATIFIED — no commit, no binding.
+
+═══════════════════════════════════════════════════════════════════════
+
+
+## SAR-19 (draft — SAR-19-pending; ratification at next CP34 OR sooner if operator wants this codified before next dispatch cycle) — Dispatch-time pre-authorized DML requires corpus-wide diagnostic predicate (DBArchitect surface)
+
+**Driven by:** MAC-239 Wave G/H v1 integration, DBArchitect Task 2 refusal of dispatch-pre-authorized DML on 815 `axis_communications` rows (`_dbarchitect_signoff.md` §Task 2), 2026-05-23.
+**Authority:** Pending CEO ratification. Codification proposed at n=1 due to asymmetric §11 #1 fabrication risk; rationale enumerated below.
+**Status:** **DRAFT — SAR-19-pending.** Bible HEAD `PROJECT_BIBLE.md` NOT amended by this entry.
+
+### §1 — The rule
+
+> Any dispatch that pre-authorizes DML (UPDATE / DELETE / non-idempotent INSERT against canonical DB) MUST carry an explicit `corpus_diagnostic_predicate` clause stating: (i) the read-only `SELECT … COUNT(*) WHERE …` predicate that defines the affected row scope; (ii) the expected row count matching the dispatch's framed problem; (iii) at least one corpus-wide adjacency check (a sibling `SELECT … GROUP BY …` query that surfaces whether the affected rows share a single semantic shape — same `source_url` / `source_type` / `identifier_type` / first-seen window — aligning with the framed problem, OR whether they are part of a broader corpus that contradicts the dispatch's framing).
+>
+> The subagent (DBArchitect or equivalent DML-executing role) executes the predicate as a precondition before executing the pre-authorized DML. If the corpus diagnostic returns row counts or shapes that contradict the dispatch's framing, the subagent MUST refuse execution and surface the diagnostic mismatch for CEO ratification — even with pre-authorization in hand.
+
+### §2 — Why this discipline binds
+
+Pre-authorization in a dispatch is a **necessary** condition for DML execution but is not **sufficient**. The dispatch author works from a mental model of the DB at dispatch-time; the DBArchitect executes against the actual DB at execution-time. Corpus-wide evidence visible at execution-time can contradict the dispatch's framing — and when it does, silent execution of mis-framed DML produces §11 #1-class fabrication shape (writing canonical state that does not match the evidence in the DB).
+
+The DBArchitect retains diagnostic authority to refuse execution. This is structurally adjacent to the existing Validator-side [[feedback_scan_diagnostics_distinguish_convention_from_corruption]] discipline but on the DBArchitect surface (DML execution authority rather than read-only validation surface). It is also the DBArchitect-side mirror of the operator-side [[feedback_paste_not_cite_with_single_example_hides_fanout]] discipline (CEO must re-run aggregate count queries before ratifying scope rather than trusting "count + single illustrative row" prose).
+
+### §3 — Driving case (n=1 — MAC-239 Wave G/H v1 integration, Task 2)
+
+The MAC-239 dispatch framed 815 `axis_communications` rows under `device_category='unknown'` as drift requiring UPDATE to canonical `Axis Communications` + `device_category='cctv_camera'`. Pre-authorized DML:
+
+```sql
+UPDATE identifiers SET manufacturer='Axis Communications', device_category='cctv_camera'
+WHERE manufacturer='axis_communications' AND device_category='unknown' AND superseded_by IS NULL;
+```
+
+DBArchitect executed the read-only corpus-wide diagnostic before executing the DML:
+
+```sql
+SELECT manufacturer, device_category, source_type, identifier_type, COUNT(*)
+FROM identifiers
+WHERE manufacturer IN ('axis_communications', 'Axis Communications')
+  AND superseded_by IS NULL
+GROUP BY 1,2,3,4 ORDER BY 1,5 DESC;
+```
+
+The diagnostic surfaced two findings that contradicted the dispatch's framing:
+
+1. **All 815 affected rows are CP29 hostname corpus** (`identifier_type IN ('vendor_controlled_hostname', 'vendor_controlled_hostname_deprecated')` — 812 from `crt.sh` certificate transparency, 3 from `wave_i_aggregate`), with single first-seen window 2026-05-20T00:30:00Z. None are CCTV-product identifier types (no BLE / OUI / NDPP). Setting `device_category='cctv_camera'` on hostnames like `auth.axis.com` / `status.axis.com` / `developer.axis.com` is fabrication-shape — it conflates vendor-primary-line with per-hostname device-category attribution.
+2. **The lowercase manufacturer convention is corpus-wide, not axis-specific.** A sibling group-by surfaced 11,978 lowercase rows across the full CP29 hostname corpus (axon=2436, honeywell=1742, jacobs=1253, l3harris=846, axis_communications=815, …) vs 23 Title Case rows (Attenti, Tiandy, Motive, Hanwha Vision, Flock Safety, Pelco, …) and 261 unattributed. Notably `Flock Safety` (Title Case, 2 rows) AND `flock_safety` (lowercase, 67 rows) co-exist for the same vendor — unambiguous evidence of systemic CP29 corpus normalization inconsistency, not axis-specific drift. The 23 Title Case rows are the actual drift relative to the 11,978-row lowercase convention.
+
+Executing the dispatched DML would have written the **opposite** of the corpus convention (Title-Case-only update on 815 axis rows while leaving 11,163 other lowercase rows un-normalized), creating new inconsistency *within* CP29 — a §11 #1-class fabrication-shape outcome.
+
+DBArchitect refused execution, surfaced the diagnostic mismatch in `_dbarchitect_signoff.md` §Task 2, and escalated to CEO. Default disposition: defer to standalone hygiene cycle with properly-scoped dispatch addressing the entire 12,242-row CP29 hostname corpus in one pass.
+
+### §4 — Why codify at n=1 (asymmetric §11 #1 risk)
+
+The codification-default at this project is to wait for n=3 occurrences before promoting an observation to a SAR. SAR-19 deviates from that default on asymmetric-risk grounds:
+
+- **Cost of waiting for n=3**: future dispatches may continue to pre-authorize DML without `corpus_diagnostic_predicate`. If a future DBArchitect executes a similarly mis-framed pre-authorization, the DML lands silently, canonical state acquires §11 #1 fabrication shape, and the breach may not be detected until a downstream consumer-side audit fires — by which time the rows are mixed with thousands of unrelated rows and rollback becomes expensive (cf. MAC-202 / MAC-204 §10b sid=13 admit-then-rebind which required 20-row rebind across 5 vendor APKs to undo a similar mis-framing).
+- **Cost of codifying at n=1**: a one-line dispatch-template addition (`corpus_diagnostic_predicate: <SQL>`) for every future DML-authorized dispatch. Marginal authoring overhead; zero risk.
+- **Precedent**: SAR-13 was codified at n=1 (Wave G runguide schema fabrication) on similar asymmetric-risk grounds (silent fabrication outweighs codification cost). MAC-239 Task 2 establishes the same risk profile on the DBArchitect-DML surface.
+
+The n=1 framing rationale is recorded explicitly so future ratification cannot mistake SAR-19 for a discipline-evolution candidate awaiting n=3.
+
+### §5 — Bound surface (DBArchitect)
+
+SAR-19 binds the **DBArchitect** subagent role specifically — the agent invoked with DML-execution authority against canonical `~/argus/db/argus.db`. It does NOT bind:
+
+- Validator subagent (read-only DB authority; covered by [[feedback_scan_diagnostics_distinguish_convention_from_corruption]] sibling discipline).
+- CEO/operator-surface paste-not-cite discipline (covered by [[feedback_paste_not_cite_with_single_example_hides_fanout]]).
+- Worker subagents executing idempotent reads or self-contained schema migrations against their own scope.
+
+SAR-19 fills the third surface in the discipline triad: validator (read), operator (ratify), DBArchitect (write).
+
+### §6 — Forward application
+
+At each future DML-authorized dispatch:
+
+1. **Dispatch author** includes a `corpus_diagnostic_predicate` clause in the §0 baseline or dispatch-DML section, naming the read-only SQL the DBArchitect must execute before the authorized DML.
+2. **DBArchitect** executes the diagnostic predicate as a precondition. If the result matches the dispatch's framing (expected row count + expected semantic shape), proceed with DML. If the result contradicts the framing, refuse execution + surface mismatch in signoff doc + escalate to CEO.
+3. **Refusal is not failure.** A refusal-with-diagnostic-evidence is a successful DBArchitect outcome; silent mis-execution is the failure mode SAR-19 prevents.
+
+### §7 — Codification surfaces
+
+- `BIBLE_AMENDMENTS.md` (this entry; staged as draft).
+- `~/argus/docs/runguide/dbarchitect_*.md` (TBD path — DBArchitect runguide if it exists; otherwise added at ratification time).
+- Future operator dispatch templates for DBArchitect: add explicit `corpus_diagnostic_predicate` slot.
+- Cross-reference in [[feedback_scoped_updates_via_source_row_key]] (existing memory; SAR-19 generalizes scope-discipline to the corpus-wide diagnostic predicate).
+
+### §8 — Cross-references
+
+- `_dbarchitect_signoff.md` §Task 2 (driving case, full audit).
+- [[feedback_scan_diagnostics_distinguish_convention_from_corruption]] — Validator-side sibling discipline.
+- [[feedback_paste_not_cite_with_single_example_hides_fanout]] — operator-side sibling discipline.
+- [[feedback_scoped_updates_via_source_row_key]] — existing scope-discipline memo, narrower in scope than SAR-19.
+- SAR-13 — n=1 codification precedent (asymmetric-risk justification).
+- §11 #1 — fabrication-shape canonical authority (the harm SAR-19 prevents).
+
+═══════════════════════════════════════════════════════════════════════
+
+
+## §11 #18 (draft — §11 #18-pending; ratification at next CP34 cycle per Gate I-5 ratification at MAC-239 board comment 50ffacc8) — Operator-authorized in-cycle DML override pattern
+
+**Origin:** Wave G/H v1 integration (MAC-239), Gate I-5 ratification 2026-05-23 — operator DEFER to next CP34 cycle. Draft language pre-authored by prior CEO pass at `~/argus-internal/wave_g_h_v1_integration/handoff/proposed_bible_amendment_additions.md`; this entry stages the draft into canonical bible-amendments file.
+**Authority:** Board comment `50ffacc8` (2026-05-23) — "Gate I-5 — DEFER to next CP34 cycle; stage proposed_bible_amendment_additions.md entry with n=2 evidence + draft language."
+**Status:** **DRAFT — §11 #18-pending.** Bible HEAD `PROJECT_BIBLE.md` §11 NOT amended by this entry — that's CP34 ratification scope.
+
+### Draft language for §11 (to be ratified at next CP34)
+
+> **#18 — Operator-authorized in-cycle DML override.** When dispatch §0 baseline
+> verification surfaces a drift that should-have-shipped in a prior v1.5.x patch
+> and the in-flight cycle's §11 envelope is read-only (no schema migration, no
+> `identifiers` writes), the operator may authorize a single-statement DML
+> override against the canonical DB via in-session reply. The pattern is
+> constrained as follows:
+>
+> 1. **Authorization is per-statement and per-session.** Pre-authorization is
+>    not permitted. The operator must reply in the active dispatch session with
+>    explicit "patch it" (or equivalent) intent.
+> 2. **Single-statement scope.** Multi-DML batches require dispatch-class
+>    authorization (a new dispatch with explicit DML scope), not in-cycle
+>    override.
+> 3. **Drift-remediation only.** The override must address a baseline-drift
+>    discovered at §0 verification; it is not a vehicle for new feature work.
+> 4. **Mandatory pre-state and post-state capture** in an audit doc named
+>    `OPERATOR_AUTHORIZED_OVERRIDE_<TOPIC>.md` in the cycle's worktree. Must
+>    include the verbatim SQL, the row(s) affected, pre-state, post-state, and
+>    operator authorization timestamp.
+> 5. **Mandatory pre-patch backup.** Snapshot the canonical DB to
+>    `argus.db.pre_<topic>_<UTC-timestamp>` with sha256 captured.
+> 6. **Mandatory cross-reference in cycle handoff.** The cycle's
+>    `INTEGRATION_HANDOFF.md` and any session-summary doc must cite the
+>    override audit doc as `operator_authorized_exception[]`.
+> 7. **Read-only thereafter.** After the override executes, the cycle returns
+>    to read-only DB posture for the remainder of the run.
+
+### Evidence (n=2 this v1.5.x cycle)
+
+| Date | Topic | Audit doc | Backup | Authority |
+|---|---|---|---|---|
+| 2026-05-22 AM | Pelco (id=254) arm-tag DML | (Pelco override doc — referenced in [[project_mac239]] continuation; predates the Avigilon doc shape) | (Pelco pre-patch backup snapshot under `~/argus/db/`) | Operator in-session reply, dispatch ~2026-05-22T~17Z |
+| 2026-05-22 PM | Avigilon (id=6) arm-tag DML | `~/argus-internal/wave_g_h_v1_track_a/OPERATOR_AUTHORIZED_OVERRIDE_AVIGILON_ARM_PATCH.md` | `~/argus/db/argus.db.pre_avigilon_arm_patch_20260522T220908Z` | Operator in-session reply, session-1779485836426, 2026-05-22T22:09:08Z |
+
+### Why now (rationale for codification)
+
+Two occurrences in a single v1.5.x cycle (within 6 hours of each other) establishes the pattern as load-bearing rather than one-off. Both:
+
+- Were arm-tagging follow-ons (`parent_manufacturer_id` + `is_arm` + `query_default`) addressing pre-existing manufacturer-record drift carrying forward from v1.5.0 Stage 1 (MAC-232).
+- Were authorized identically (single-statement DML; explicit operator in-session reply).
+- Were logged identically (audit doc + backup + cross-reference into INTEGRATION_HANDOFF.md `operator_authorized_exception[]` slot).
+
+Codifying the protocol prevents future cycles from re-litigating the authorization shape and ensures the audit-doc + backup discipline becomes mandatory rather than ad-hoc.
+
+### Open question for operator at codification time
+
+- Should the audit doc template be added to the canonical worktree under `~/argus/docs/runguide/operator_override_template.md` to standardize future audit-doc shape? Currently the n=2 docs were authored ad-hoc with slight format differences (the Avigilon doc shape is more verbose; the Pelco doc shape is leaner). At CP34 ratification, operator decision is requested on template standardization vs. continued ad-hoc-with-mandatory-fields posture.
+
+### Cross-references
+
+- Source draft: `~/argus-internal/wave_g_h_v1_integration/handoff/proposed_bible_amendment_additions.md` (pre-authored by prior CEO pass; this entry preserves the draft verbatim with added shape-conforming framing).
+- Gate I-5 ratification: MAC-239 board comment `50ffacc8` (2026-05-23) — DEFER to next CP34.
+- Cycle handoff: `~/argus-internal/wave_g_h_v1_integration/INTEGRATION_HANDOFF.md` references this staging file.
+- Avigilon audit doc: `~/argus-internal/wave_g_h_v1_track_a/OPERATOR_AUTHORIZED_OVERRIDE_AVIGILON_ARM_PATCH.md` (load-bearing — operator can read for shape reference at CP34 ratification).
+- Pelco audit doc + override log: referenced in MAC-239 continuation; `_operator_authorized_overrides_log.md` (n=2 entries — Pelco AM + Avigilon PM).
+- Sibling discipline: SAR-19 (this same staging pass) — generalizes the DBArchitect-side refusal authority for dispatch-pre-authorized DML; SAR-19 + §11 #18 together form a 2-pronged DML-authorization regime where pre-authorization (SAR-19) and in-cycle override (§11 #18) are the two distinct paths to canonical-DB writes outside of standard schema-migration channels.
+
+### §11 #11 self-binding pending
+
+This entry stages §11 #18 as draft. §11 #11 self-binding activates at CP34 ratification: the consolidated commit hash applying the §11 #18 amendment to `PROJECT_BIBLE.md` §11 must be enumerated here at ratification time. Currently UNRATIFIED — no commit, no binding.
+

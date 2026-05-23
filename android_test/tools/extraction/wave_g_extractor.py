@@ -1,19 +1,31 @@
 #!/usr/bin/env python3
 """
-Wave G pre-v1 vendor companion APK identifier extractor.
+Wave G/H v1 Track B v5 vendor companion APK identifier extractor.
+
+v5 = v4 + IMEI TAC sub-extractor (Wave G/H v1 Track B runguide §5).
 
 Single-file Python module that:
   1. Walks jadx_out/ + apktool_out/ for a vendor.
-  2. Applies extraction patterns A-F per WAVE_G_RUNBOOK.md §4.4.
-  3. Applies disambiguation FP filters per §4.5.
+  2. Applies extraction patterns A-F per WAVE_G_RUNBOOK.md §4.4 (v4 carry-over)
+     PLUS IMEI TAC sub-extractor per Track B runguide §5 (v5 addition).
+  3. Applies disambiguation FP filters per §4.5 PLUS TAC-specific FP filters
+     (date / build-number / hash-prefix).
   4. Emits candidates.json (post-disambig survivors) + fp_findings.json
      (everything caught by the FP filters, for SAR-11 calibration).
   5. Returns counts dict for inclusion in analysis_log.md.
 
 Discipline anchors:
   - §11 #1: every candidate carries source_file + source_line + source_excerpt.
+  - §11 #3: PII discipline (TRACK B LOAD-BEARING). Full 15-digit IMEIs are NEVER
+            retained. TAC_REGEX captures exactly 8 digits via word-boundary anchor;
+            9+ digit numerics structurally yield no match (no \\b between two digits),
+            not truncation. Sanity check in extract_imei_tac() raises RuntimeError if
+            any candidate value violates len==8 + isdigit().
   - §11 #7: source_excerpt clipped to <=200 chars verbatim. Overflow drops with skip-log.
   - §11 #8: NO database writes, NO promotion. JSON deliverables only.
+  - §11 #15: Track B is FORBIDDEN from modifying canonical extractor at
+             ~/argus/android_test/tools/extraction/wave_g_extractor.py — this file
+             lives only in track_b sandbox; codification post-handoff via Validator.
 
 Usage:
   python3 wave_g_extractor.py \
@@ -69,6 +81,254 @@ RE_CRED = re.compile(
     r'["\']([^"\']{4,80})["\']',
     re.IGNORECASE,
 )
+
+# -------------------------- IMEI TAC sub-extractor (Track B v5, runguide §5 verbatim) --------------------------
+# Mission: populate the imei_tac enum value (currently 0 rows post-CP33).
+# Discipline: §11 #3 PII — full 15-digit IMEIs are NEVER retained;
+#             truncate to 8-digit TAC at extraction time.
+
+CELLULAR_MODEM_CONTEXT_TOKENS = {
+    # Generic cellular vocabulary
+    'IMEI', 'imei', 'TAC', 'tac',
+    'modem', 'Modem', 'cellular', 'Cellular',
+    'LTE', 'lte', 'CAT-M', 'CatM', 'NB-IoT', 'nbiot',
+    'GSM', 'gsm', 'WCDMA', 'wcdma', '5G', 'NR', 'sub6',
+    # Major modem-module vendor names
+    'Quectel', 'quectel', 'EC25', 'EG25', 'EG95', 'BG96', 'BG770',
+    'SierraWireless', 'sierra_wireless', 'sierra-wireless',
+    'HL7800', 'HL7802', 'EM7565', 'EM9191', 'AirPrime', 'MC7455',
+    'u-blox', 'ublox', 'SARA-R', 'SARA-N', 'SARA-G',
+    'Telit', 'telit', 'LE910', 'LM940', 'LN940',
+    'Fibocom', 'fibocom', 'FM150', 'FG621',
+    'Simcom', 'simcom', 'SIM7000', 'SIM7600', 'SIM7912',
+    # PDU / AT-command-related
+    'AT+CGSN', 'AT_CGSN', '+CGSN',
+    'getDeviceId', 'getImei', 'getTypeAllocationCode',
+    # === Track B cohort additions (subagent post-mortem recommendation) ===
+    # Network-identifier vocab (PLMN / cell measurement)
+    'PLMN', 'MCC', 'MNC', 'EARFCN', 'ARFCN',
+    'RSRP', 'RSRQ', 'SINR', 'CellInfoLte', 'CellInfoNr',
+    'ServiceState', 'TelephonyManager',
+    # Subscriber-ID vocab paired with TAC
+    'ICCID', 'IMSI', 'EID', 'ESN', 'MEID',
+    'eUICC', 'EuiccManager', 'SubscriptionManager',
+    # Additional AT commands (Quectel / u-blox specific)
+    'AT+QGMR', 'AT+QCFG', 'AT+CIMI', 'AT+CCID',
+    'AT+UMNOPROF', 'AT+UDCONF', 'AT+CEREG', 'AT+CGDCONT',
+    # Cradlepoint product SKUs
+    'IBR900', 'IBR1700', 'R1900', 'R2100', 'E300', 'E3000', 'MBR1200',
+    # Modem-management framework tokens
+    'RIL', 'Rild', 'ModemManager', 'MBIM', 'QMI', 'MBN',
+    'CarrierConfigManager', 'carrier_config',
+}
+
+# Exactly 8 digits, word-bounded — captures TAC values in source text.
+# CRITICAL: this regex captures EXACTLY 8 digits and nothing more.
+# Even if the source line contains a full 15-digit IMEI, only the
+# first-8-digit substring matches and is retained. The truncation
+# guarantee for §11 #3 PII discipline is structural to this regex.
+# (Word-boundary \b between two digits is false, so a 9+ digit run
+# yields no match at all rather than a truncated capture.)
+TAC_REGEX = re.compile(r'\b(\d{8})\b')
+
+
+def looks_like_date(tac: str) -> bool:
+    """YYYYMMDD-shaped 8-digit numbers."""
+    n = int(tac)
+    if 19000101 <= n <= 21001231:
+        mm = (n // 100) % 100
+        dd = n % 100
+        if 1 <= mm <= 12 and 1 <= dd <= 31:
+            return True
+    return False
+
+
+def looks_like_build_number(tac: str) -> bool:
+    """Common CI/build-numbering patterns."""
+    if len(set(tac)) <= 2:
+        return True
+    if tac in ('12345678', '00000000', '99999999', '01234567', '76543210'):
+        return True
+    return False
+
+
+def looks_like_bitmask_constant(tac: str) -> bool:
+    """FP class discovered Track B cohort run (Cradlepoint NCM 3.21):
+    Kotlin/R8 compiler-generated `data class copy()` bit-mask boilerplate emits
+    8-digit decimal constants that are powers of 2 (or shifted forms like
+    12*2^20, 6*2^20). These collide with the TAC regex but are never real TACs.
+
+    Filter: drop 8-digit values that are
+      - exact powers of 2 in [10000000..99999999]
+      - or k*2^n where k ∈ {3,5,6,7,9,10,12,14,15,...} and the result is 8 digits
+        (the value is divisible by a large power of 2 with a small odd-or-mixed cofactor)
+    """
+    n = int(tac)
+    # Exact power of 2
+    if n > 0 and (n & (n - 1)) == 0:
+        return True
+    # k * 2^n where 2^n >= 2^16 (i.e. low 16 bits are zero) AND k is small
+    # Real TACs almost never have many low-bit zeros (TAC values are GSMA-allocated,
+    # not bitwise-structured)
+    low_zero_bits = (n & -n).bit_length() - 1  # number of trailing zero bits
+    if low_zero_bits >= 16:
+        cofactor = n >> low_zero_bits
+        if cofactor < 32:  # small odd-ish cofactor (3, 5, 6, 7, 9, 10, 11, 12, ...)
+            return True
+    return False
+
+
+def looks_like_hash_prefix(tac: str, context: str) -> bool:
+    """If the 8 digits sit between non-digit hex chars, it's probably a hex hash."""
+    idx = context.find(tac)
+    if idx < 0:
+        return False
+    left = context[max(0, idx - 3):idx].lower()
+    right = context[idx + 8:min(len(context), idx + 11)].lower()
+    if any(c in 'abcdef' for c in left + right):
+        return True
+    return False
+
+
+# Pre-compiled patterns for the new FP filters added Track B cohort run
+_RE_R8_XOR_LITERAL = re.compile(r'\d{8}\s*\^\s*\d{8}')
+_RE_R8_XOR_BITOP = re.compile(r'\(\s*\(\s*~\s*-?\d+\s*\)\s*&\s*-?\d+\s*\)\s*\|\s*\(\s*\(\s*~\s*-?\d+\s*\)\s*&\s*-?\d+\s*\)')
+# Two adjacent 8-digit values as comma-separated function args = R8 string-decryption
+# call. Real cellular code rarely emits two TACs on one line as comma-separated ints.
+_RE_R8_PAIR_ARGS = re.compile(r'\d{8}\s*,\s*\d{8}')
+# R8 short-class-name pattern: C13206Vu.ql(...) — uppercase letter + digits + lowercase mix
+_RE_R8_SHORT_IDENT_CALL = re.compile(r'\b[A-Z]\d{2,6}[a-zA-Z]{1,4}\.[a-z]{1,3}\(')
+_RE_TRACKING_AREA_CODE_INDICATOR = re.compile(
+    r'\b(?:MAX_(?:NR_|LTE_|GSM_|WCDMA_)?TAC|'
+    r'TrackingArea(?:Code|Identity)|'
+    r'tracking.area.code|TAI|'
+    r'CellMeasurement|CellInfo[A-Z]|'
+    r'posclient|cellengine|'
+    r'TYPE_5G_NR\b|TYPE_LTE\b)',
+    re.IGNORECASE,
+)
+
+
+def looks_like_r8_xor_obfuscation(context: str) -> bool:
+    """FP class discovered Track B cohort run (Idemia NY Mobile ID 4.17.4):
+    R8/Proguard's name-decryption obfuscation emits 8-digit values in several
+    boilerplate forms used to deobfuscate symbol/class names at runtime:
+      - `N1 ^ N2` literal where both are 8-digit
+      - `(((~A) & B) | ((~B) & A))` — XOR via bitwise ops
+      - `f(d8, d8)` — paired 8-digit args to a 2-letter-method-name R8 call
+        like `C13264pv.vl(27800673, 27791217)`
+    None produces real IMEI TACs. The line also typically contains an
+    encrypted-string literal with control bytes like "\\u0007" / "\\u00f8".
+    """
+    if _RE_R8_XOR_LITERAL.search(context):
+        return True
+    if _RE_R8_XOR_BITOP.search(context):
+        return True
+    if _RE_R8_PAIR_ARGS.search(context):
+        return True
+    # R8 short-class-name + short-method-name + 8-digit args
+    if _RE_R8_SHORT_IDENT_CALL.search(context) and re.search(r'\d{8}', context):
+        return True
+    # Encrypted-string-literal indicator: control-byte escape sequences
+    if re.search(r'"\\u00[01][0-9a-fA-F]', context):
+        return True
+    return False
+
+
+def looks_like_tracking_area_code_constant(context: str) -> bool:
+    """FP class discovered Track B cohort run (Samsara Driver 2620.100):
+    NR/LTE Tracking Area Code (TAC) — 5G/4G *network-side* cell-tower-group identifier
+    (24-bit numeric). Semantically distinct from IMEI TAC (GSMA device Type Allocation
+    Code, also called "TAC"). The HERE Maps positioning SDK and others define
+    constants like `MAX_NR_TAC = 16777215` (0xFFFFFF, max 24-bit). These collide
+    with the 8-digit TAC_REGEX but are never IMEI TACs.
+
+    Trigger on contextual indicators in the surrounding text:
+      - MAX_*_TAC sentinel constants
+      - TrackingAreaCode / TrackingAreaIdentity class names
+      - posclient / cellengine / CellMeasurement package paths
+      - TYPE_5G_NR / TYPE_LTE companion enums
+    """
+    return bool(_RE_TRACKING_AREA_CODE_INDICATOR.search(context))
+
+
+# Stricter context-token matching: require word-boundary, not raw substring.
+# Reason: raw `'tac' in 'stackTraceElement'` matches; `'NR' in 'ENROLL'` matches;
+# `'lte' in 'filter='` matches. Cohort run produced ~13 spurious-token-match FPs
+# in heavily obfuscated apps. Word-boundary anchor cuts this dramatically.
+_TOKEN_BOUNDARY_CACHE: dict[str, re.Pattern] = {}
+
+
+def _token_boundary_re(token: str) -> re.Pattern:
+    if token not in _TOKEN_BOUNDARY_CACHE:
+        # Tokens are case-sensitive; allow underscore/hyphen/digit context but
+        # not letter context. For all-uppercase tokens (e.g. 'TAC', 'LTE', 'NR'),
+        # require word-boundary on both sides. For mixed-case tokens
+        # (e.g. 'Quectel'), word-boundary as well.
+        _TOKEN_BOUNDARY_CACHE[token] = re.compile(r'\b' + re.escape(token) + r'\b')
+    return _TOKEN_BOUNDARY_CACHE[token]
+
+
+def context_token_matches(text: str, tokens) -> str | None:
+    """Return the first context-token that word-boundary-matches in text, or None.
+    Replaces the original substring-containment check in extract_imei_tac_candidates."""
+    for tok in tokens:
+        # AT-command-style tokens contain special chars; fall back to substring
+        if any(c in tok for c in '+_-:'):
+            if tok in text:
+                return tok
+            continue
+        if _token_boundary_re(tok).search(text):
+            return tok
+    return None
+
+
+def extract_imei_tac_candidates(source_lines, package):
+    """Scan decompiled source for 8-digit values in cellular-modem context.
+    Returns candidates suitable for confidence-75-85 staging per Gate B-6.
+
+    Track B cohort patches over §5 verbatim spec:
+      - Context-token matching is word-boundary (was: substring containment).
+        Substring-match produced spurious hits like `'tac' in 'stackTrace'`,
+        `'NR' in 'ENROLL'`, `'lte' in 'filter='`.
+      - Three new FP filters layered in: bitmask constants, R8 XOR
+        string-decryption keys, NR/LTE Tracking Area Code constants.
+    """
+    candidates = []
+    for path, line_no, text in source_lines:
+        which_token = context_token_matches(text, CELLULAR_MODEM_CONTEXT_TOKENS)
+        if which_token is None:
+            continue
+        # Early-reject: lines that match the R8 XOR pattern or TAC tracking-area-code
+        # context can never produce a real IMEI TAC. Skip TAC_REGEX entirely.
+        if looks_like_r8_xor_obfuscation(text):
+            continue
+        if looks_like_tracking_area_code_constant(text):
+            continue
+        for m in TAC_REGEX.finditer(text):
+            tac = m.group(1)
+            # FP filters
+            if looks_like_date(tac):
+                continue
+            if looks_like_build_number(tac):
+                continue
+            if looks_like_bitmask_constant(tac):
+                continue
+            if looks_like_hash_prefix(tac, text):
+                continue
+            # PII §11 #3 truncation is structural to TAC_REGEX above.
+            candidates.append({
+                'value_class': 'imei_tac',
+                'value': tac,
+                'source_path': path,
+                'source_line': line_no,
+                'source_context': text[:200],
+                'package': package,
+                'context_token_matched': which_token,
+                'confidence_proposed': 80,  # mid-band per Gate B-6
+            })
+    return candidates
+
 
 # -------------------------- FP filter constants --------------------------
 
@@ -763,6 +1023,90 @@ def extract_oui(jadx_out: Path, apktool_out: Path) -> tuple[list[dict], list[dic
     return candidates, fp_findings, overflow_dropped
 
 
+def extract_imei_tac(jadx_out: Path, apktool_out: Path, package: str) -> tuple[list[dict], list[dict], int]:
+    """Track B v5 wrapper: drives §5 extract_imei_tac_candidates over jadx_out + apktool_out.
+
+    Conforms to the v4 (candidates, fp_findings, overflow_dropped) triple shape so it
+    aggregates cleanly into main() alongside ble/ssid/cred/oui/product_family.
+
+    §11 #3 truncation guarantee: relies on TAC_REGEX r'\\b(\\d{8})\\b' — see verbatim
+    block above. Any 9+ digit numeric in source is structurally skipped (no \\b between
+    two digits), not truncated. If raw candidates ever surface with len != 8, abort and
+    surface as PII surface event per §7 halt criterion #7.
+    """
+    candidates: list[dict] = []
+    fp_findings: list[dict] = []
+    overflow_dropped = 0
+    seen = set()
+    for root, path in iter_candidate_files(jadx_out, apktool_out):
+        # Build the (path, line_no, text) tuples for this file, then feed §5 verbatim function.
+        try:
+            rel = str(path.relative_to(root))
+            with path.open('r', encoding='utf-8', errors='replace') as fh:
+                file_lines = [(rel, lineno, line) for lineno, line in enumerate(fh, start=1)]
+        except Exception:
+            continue
+        raw_cands = extract_imei_tac_candidates(file_lines, package)
+        for rc in raw_cands:
+            tac = rc['value']
+            # PII §11 #3 structural-truncation sanity check. Halt-class if violated.
+            if len(tac) != 8 or not tac.isdigit():
+                raise RuntimeError(
+                    f"§11 #3 PII surface: extract_imei_tac_candidates returned non-8-digit value "
+                    f"{tac!r} at {rc['source_path']}:{rc['source_line']} — abort + audit TAC_REGEX."
+                )
+            rel_path = rc['source_path']
+            line_no = rc['source_line']
+            # Re-derive the source line for truncate_excerpt (§11 #7 <=200 char clip).
+            excerpt_raw = rc['source_context']
+            excerpt, truncated = truncate_excerpt(excerpt_raw)
+            if truncated:
+                overflow_dropped += 1
+                continue
+            key = (tac, rel_path, line_no)
+            if key in seen:
+                continue
+            seen.add(key)
+            record_base = {
+                'value': tac,
+                'value_class': 'imei_tac',
+                'source_root': root.name,
+                'source_file_relative': rel_path,
+                'source_line': line_no,
+                'source_excerpt': excerpt,
+                'context_token_matched': rc.get('context_token_matched'),
+                'package': package,
+            }
+            third_party = looks_like_third_party_lib(rel_path)
+            bundled_fork = looks_like_bundled_fork(rel_path)
+            path_artifact = looks_like_test_or_build_artifact(rel_path)
+            if third_party or bundled_fork or path_artifact:
+                fp_record = dict(record_base)
+                fp_record['fp_class'] = (
+                    f'bundled_fork:{bundled_fork}' if bundled_fork
+                    else (f'third_party_lib:{third_party}' if third_party
+                          else f'path_artifact:{path_artifact}')
+                )
+                fp_findings.append(fp_record)
+                continue
+            cand = dict(record_base)
+            # Gate B-6: confidence band 75-85; §5 verbatim sets mid-band 80.
+            cand['proposed_confidence_band'] = '75-85'
+            cand['confidence_proposed'] = rc.get('confidence_proposed', 80)
+            cand['fp_filters_applied'] = [
+                'date_yyyymmdd_drop',
+                'build_number_drop',
+                'hash_prefix_hexadj_drop',
+                'third_party_sdk_path_drop',
+                'bundled_fork_path_drop',
+                'test_or_build_artifact_drop',
+                'cellular_modem_context_token_required',
+            ]
+            cand['vendor_proximity_signals'] = []
+            candidates.append(cand)
+    return candidates, fp_findings, overflow_dropped
+
+
 def extract_product_taxonomy(
     jadx_out: Path,
     apktool_out: Path,
@@ -900,11 +1244,12 @@ def main() -> int:
     ssid_cands, ssid_fps, ssid_dropped = extract_ssids(args.jadx_out, args.apktool_out, args.vendor_prefix)
     cred_cands, cred_fps, cred_dropped = extract_credentials(args.jadx_out, args.apktool_out)
     oui_cands, oui_fps, oui_dropped = extract_oui(args.jadx_out, args.apktool_out)
+    tac_cands, tac_fps, tac_dropped = extract_imei_tac(args.jadx_out, args.apktool_out, args.package)
     fam_cands, fam_fps, fam_dropped = extract_product_taxonomy(
         args.jadx_out, args.apktool_out, args.product_family_keywords)
 
-    all_cands = uuid_cands + ssid_cands + cred_cands + oui_cands + fam_cands
-    all_fps = uuid_fps + ssid_fps + cred_fps + oui_fps + fam_fps
+    all_cands = uuid_cands + ssid_cands + cred_cands + oui_cands + tac_cands + fam_cands
+    all_fps = uuid_fps + ssid_fps + cred_fps + oui_fps + tac_fps + fam_fps
     # Cross-site FP propagation: a value flagged FP at any site is FP everywhere.
     all_cands, all_fps = propagate_value_level_fps(all_cands, all_fps)
     annotate_vendor_proximity(all_cands, args.package, args.vendor)
@@ -935,7 +1280,7 @@ def main() -> int:
         'candidates_total': len(all_cands),
         'fp_findings_total': len(all_fps),
         'source_excerpt_overflow_dropped_total': (
-            uuid_dropped + ssid_dropped + cred_dropped + oui_dropped + fam_dropped
+            uuid_dropped + ssid_dropped + cred_dropped + oui_dropped + tac_dropped + fam_dropped
         ),
         'by_class': {
             'ble_service_uuid': {
@@ -957,6 +1302,11 @@ def main() -> int:
                 'candidates': len(oui_cands),
                 'fp_findings': len(oui_fps),
                 'overflow_dropped': oui_dropped,
+            },
+            'imei_tac': {
+                'candidates': len(tac_cands),
+                'fp_findings': len(tac_fps),
+                'overflow_dropped': tac_dropped,
             },
             'product_family': {
                 'candidates': len(fam_cands),

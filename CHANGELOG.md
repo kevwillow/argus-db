@@ -16,7 +16,125 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.5.0.)
+(No unreleased changes since v1.5.2.)
+
+## [v1.5.2] — 2026-05-23
+
+### What's new in v1.5.2 (with folded v1.5.1 docs work)
+
+Argus v1.5.2 lands the **Wave G/H v1 parallel-dispatch cycle** — Track A (CCTV installer cohort, 8 vendors) + Track B (IMEI TAC mission, 25-vendor effective sample) — closed via a single merged integration cycle plus a follow-on orchestration-completion pass that delegated post-promotion audit to Validator and schema/export work to DBArchitect. The cycle promotes **146 net active identifiers**, admits one new `identifier_type` (`network_discovery_protocol_pattern`), and additively merges the canonical extractor from v4 → v5 with bit-identical pre-existing-class behavior, an IMEI TAC sub-extractor (structural PII truncation guarantee, 9/9 proofs both pre- and post-merge), four cycle-discovered FP filters, and a 43-token cellular-modem-context-token expansion. Track B yielded **0 IMEI TAC rows** — a structural negative result that becomes a codification-positive (the v5 extractor + the documented mission redirect both ship as durable artifacts).
+
+The cycle also surfaces **3 architectural firsts** worth tracking: (1) DBArchitect-side refusal of a dispatch-time pre-authorized DML based on cross-corpus diagnostic evidence — the 815 `axis_communications` lowercase rows the dispatch framed as CCTV hygiene drift turned out to be CP29 hostname corpus where lowercase IS the dominant convention (11,978 lowercase vs. 23 Title Case DB-wide); (2) the first explicit §4.4 downstream-consumer gap caught at canonical Lynceus export time — mig-0028 admitted `network_discovery_protocol_pattern` without the sibling-commit update to `db/validation/export_lynceus.py`; (3) first Validator override of CEO decision recommendation on a non-trivial schema-admission question — Validator's 10-row sample of the 113 parked `credential` candidates showed 0 actual device credentials, flipping the disposition from admit-new-type to discard-from-extractor.
+
+**v1.5.1 work folded retroactively per MAC-232 Option C ratification:**
+
+- **v1.5.1 docs restructure** (commit `ed0a7c9`, tag `8ece8d3c`): folder split (`docs/`, `docs/engineering/`, `docs/internal/`); NEW `docs/USER_GUIDE.md` (179L); README full REWRITE 390→210L; CHANGELOG global TL;DR; CREDITS accessible preamble; SETUP.md schema=19→27 mechanical refresh; TL;DRs on PROJECT_BIBLE / BIBLE_AMENDMENTS / METHODOLOGY / DATA_DICTIONARY; 8 redirect stubs at root for grep compatibility. 282 §N body-prose mentions in PROJECT_BIBLE byte-identical (no clause renumbering); 0 bible-binding flags raised; 156 cross-refs verified clean.
+- **v1.5.1 hygiene follow-on** (commit `8d703d9`, post-tag): handoff + kickoff docs (`KICKOFF.md`, `lynceus_handoff_v1_4_1.md`) moved OUT of canonical repo to `~/argus-internal/handoffs_and_kickoffs/`; .gitignore tightened (−8/+6 lines). New policy: handoffs and kickoffs generate directly to `~/argus-internal/` and never enter canonical repo.
+
+### Schema
+
+- `schema_version` 27 → **28** (mig-0028 CP34 single-table CHECK enum extension on `identifiers`)
+- `identifiers.identifier_type` CHECK enum: 57 → **58** (CP34 `+network_discovery_protocol_pattern`; vendor camera-discovery protocol signatures including Hikvision SADP, Dahua AirKiss/SmartConfig, Axis ONVIF WS-Discovery, Tiandy SADP-style)
+- `identifiers.device_category` / `behavioral_signatures.device_category` / `identifiers.pair_kind` / `source_type` enums: **unchanged** (no parity sweeps required this cycle)
+
+### Data
+
+- Sources: **73** (unchanged this cycle — Wave G/H v1 cohort uses existing `manufacturer_app` source class with synthesized `source_url='manufacturer_app://<package>@<version>#<sha_head>'`)
+- Manufacturers: **92** (unchanged this cycle — all 8 CCTV cohort vendors already in lexicon at v1.5.0)
+- Identifiers active: 35,812 → **35,958** (+146 net promotions from Wave G/H v1 Track A CCTV cohort)
+- Behavioral signatures: **201** (unchanged this cycle)
+- Per-class promotions: `ble_service_uuid` 85 (conf=85; Hikvision 34 / Axis 20 / Verkada 10 / Avigilon 8 / Tiandy 7 / Dahua 6) · `oui` 43 (conf=80; Tiandy 37 / Hikvision 4 / Dahua 1 / Avigilon 1) · `network_discovery_protocol_pattern` 18 (conf=90; Tiandy 9 / Hikvision 8 / Axis 1; from 645 raw discovery findings post-disambig — 627 lower-confidence findings staged in `disambig_review_queue.json` for next-cycle review)
+- Per-vendor totals: Hikvision 46 / Tiandy 53 / Axis 21 / Verkada 10 / Avigilon 9 / Dahua 7 / Hanwha 0 / Uniview 0 (Hanwha + Uniview yielded 0 promotable identifiers — extraction limited by xapk base-APK selection bug fixed mid-cycle)
+- All 146 rows carry `device_category='cctv_camera'` + `source_type='manufacturer_app'` + `notes.cycle='wave_g_h_v1_integration'` + per-row FP-filter audit trail + CP15 confidence-band justification
+
+### Extractor evolution
+
+Canonical `~/argus/android_test/tools/extraction/wave_g_extractor.py` v4 sha `3cb5be09bc06c20dd84bbe307be438ee442f1c759436baee6161f9e2819890b1` → v5 sha `6b6bf215780be67ddc4ecdb7fbf5ac45af34a57aa6976a9e0fa0b3686bcb2757` (filename preserved; v4 backup at `wave_g_extractor.py.v4_backup_20260523T022129Z`). Additive merge — bit-identical v4 behavior on any non-Track-B input. v5 adds:
+
+- **IMEI TAC sub-extractor** (runguide §5 verbatim): `TAC_REGEX = re.compile(r'\b(\d{8})\b')` with structural \b-boundary truncation — a 9+ digit run yields zero match at any position; `RuntimeError` guard on `len != 8 OR not isdigit()` post-condition. PII proof 9/9 PASS both sandbox + canonical-merged
+- **4 cycle-discovered FP filters**: `looks_like_bitmask_constant` (Kotlin/R8 data-class copy bit-masks like 12582912 / 33554432); `looks_like_r8_xor_obfuscation` (Idemia NY MobileID R8/Proguard XOR-decryption key shapes); `looks_like_tracking_area_code_constant` (HERE Maps SDK `MAX_NR_TAC = 16777215` and NR/LTE TAC namespace collision with IMEI TAC); `context_token_matches` (word-boundary anchor for letter-only tokens — fixes substring-containment bug where 'TAC' substring-matched 'TabLayoutMediator' / 'stackTrace*')
+- **43-token `CELLULAR_MODEM_CONTEXT_TOKENS` expansion** (62 → 105 entries): network-identifier vocab (PLMN, MCC, MNC, EARFCN, RSRP, RSRQ, etc.), subscriber-ID vocab (ICCID, IMSI, EID, MEID, eUICC, etc.), Quectel/u-blox AT command specifics (AT+QGMR, AT+QCFG, AT+CIMI), Cradlepoint product SKUs (IBR900, R1900, E300, etc.), modem-management framework tokens (RIL, ModemManager, MBIM, QMI, CarrierConfigManager, etc.)
+
+New canonical utility `~/argus/android_test/tools/extraction/select_base_apk_from_bundle.py` (Gate I-6 ratified): xapk/apkm/apks bundle base-APK selection by manifest (`manifest.json[split_apks][id='base']` for xapk; `info.json` parse for apkm; `base/` directory for Bundletool apks). Replaces silently-failing "largest .apk" heuristic that picked native-libs splits (`config.arm64_v8a.apk` at 28MB+) over actual `base.apk` (13-25MB) on Hanwha + Uniview during cohort acquisition.
+
+### IMEI TAC mission status
+
+**Negative result**: 25-vendor effective sample (11 extracted + 3 acquired-not-extracted + 11 documented-absences) yielded **0 unique IMEI TACs**. Track B's autonomous wide-net cohort surveyed cellular-equipped vendors including Cradlepoint (cellular gateway admin), Geotab + Samsara + Motive (fleet telematics driver apps), Idemia NY Mobile ID (state mDL FR), Reconyx + Browning + SPYPOINT (trail cameras), BI SmartLINK (ankle monitor), AngelSense + LandAirSea (consumer GPS trackers), DJI Fly (drone pilot installer).
+
+Subagent post-mortem attributes the negative result to 2026 Android architecture patterns: runtime `TelephonyManager.getTypeAllocationCode()` calls (TAC not embedded), server-side device-model dispatch (TAC fetched at activation from cloud), and R8 string encryption (numeric literals hidden in encrypted byte arrays). The companion-app sweep methodology is structurally unproductive for IMEI TAC harvest at this point in the Android ecosystem.
+
+**Mission redirect** (queued in `docs/internal/PLANNED_AND_FUTURE_UPDATES.md`): (a) GSMA TAC API / public TAC list mirrors (canonical source, license-gated); (b) FCC OET authorization grant filings (grantee-code + product-code pairs map to TAC ranges; public + scrapable); (c) OTA firmware blob analysis of cellular modules (Quectel/Sierra/u-blox firmware embedded TAC); (d) Android-side TAC-DB consumer apps (TacDB, IMEI Info, Phone INFO Samsung — these bundle SQLite TAC lookup tables as assets).
+
+### Bible amendments
+
+- **CP34** (mig-0028) — single sub-section codification:
+  - §1 — `identifiers.identifier_type` CHECK enum 57 → 58 (`+network_discovery_protocol_pattern`); 645 raw discovery findings post-disambig yielded 18 high-confidence promotions across 3 vendors (Tiandy SADP-style 9 + Hikvision SADP port 8000 / JmDNS multicast 224.0.0.251 8 + Axis ONVIF WS-Discovery 1); 627 lower-confidence findings staged for next-cycle disambig review queue
+- **CP35-pending** (DRAFT in `docs/engineering/BIBLE_AMENDMENTS.md`): §4.4 mapping for `network_discovery_protocol_pattern` in `db/validation/export_lynceus.py` `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (or `DROPPED_REASONS`). mig-0028 admitted the new identifier_type without the sibling-commit downstream-consumer update — exactly the failure mode codified at [[feedback_promotion_gate_needs_export_dryrun]] + [[feedback_bible_amendment_downstream_consumer_audit]] in operator memory. Blocks canonical Lynceus export regen until landed. Ratification pending at next CP34 dispatch or sooner if operator wants this codified before next cycle.
+- **SAR-19-pending** (DRAFT in `docs/engineering/BIBLE_AMENDMENTS.md`): "Dispatch-time pre-authorized DML MUST include a corpus-wide diagnostic predicate" — generalization of the 815 `axis_communications` Escalation. Pattern: pre-authorization is necessary but not sufficient — subagent retains diagnostic authority to refuse execution when corpus-wide evidence contradicts dispatch framing. Trigger pattern n=1; rule fires immediately rather than waiting for n=3 because §11 #1 fabrication risk is asymmetric. Operator-side mirror of paste-not-cite discipline at [[feedback_paste_not_cite_with_single_example_hides_fanout]]. Ratification pending at next CP34.
+- **§11 #18-pending** (DRAFT in `docs/engineering/BIBLE_AMENDMENTS.md`): operator-authorized in-cycle DML override pattern codification. n=2 minimum reached this cycle (Pelco AM 2026-05-22 + Avigilon PM 2026-05-22, both arm-tag drift remediation). Per Gate I-5 ratification at MAC-239 board comment `50ffacc8`, deferred to next CP34 cycle with open template question (audit-doc shape standardization) to be resolved jointly.
+
+### Halts encountered + dispositions
+
+**Three halt-class issues surfaced this cycle (FEATURES not bugs):**
+
+- **§0 baseline preamble drift** (Gate 0): the CP34 #7 preamble's Q9 referenced a `provenance_anchors` DB table that never shipped. Substantive v4 extractor sha (`3cb5be09…`) verified via filesystem pin at `~/argus-internal/wave_g_h_v1_track_a/tools/extractor_v4_pinned.sha256`. Resolution: ratify filesystem-pin as sufficient for this cycle; `provenance_anchors` migration drafted at `~/argus-internal/wave_g_h_v1_integration/draft_mig_provenance_anchors.sql` (not applied; staged for future cycle); entry added to `docs/internal/PLANNED_AND_FUTURE_UPDATES.md`.
+- **815 `axis_communications` lowercase row drift** (Escalation A — DBArchitect cross-corpus diagnostic refusal): dispatch framed these as CCTV hygiene drift requiring `manufacturer='Axis Communications', device_category='cctv_camera'` UPDATE. DBArchitect investigation revealed they're CP29 hostname corpus (`identifier_type='vendor_controlled_hostname'`/`_deprecated`, source `crt.sh?q=%25.axis.com`, ingested 2026-05-20). Lowercase IS the dominant convention DB-wide (11,978 lowercase rows vs. 23 Title Case in the CP29 hostname corpus; `Flock Safety` 2 Title Case + `flock_safety` 67 lowercase is the structural inconsistency evidence). Pre-authorized DML refused as §11 #1 fabrication-shape. Resolution: defer to standalone hygiene cycle with broader scope (keep `device_category='unknown'` for hostname rows + normalize 23 Title Case drift → lowercase).
+- **Lynceus §4.4 NDPP downstream-consumer gap** (Escalation B — DBArchitect export-time halt): `db/validation/export_lynceus.py` raised `Halt: row id=36716 identifier_type=network_discovery_protocol_pattern has no §4.4 mapping but reached the survivor branch — §4.4 schema drift?` Resolution: ship raw-snapshot supplementary exports under `~/argus/exports/v1_5_2_raw_snapshot/` (`argus_export_high_confidence_20260523T030803Z.json` sha `781e759c…` 35,434 rows + `argus_export_full_20260523T030803Z.sql.gz` sha `6d97c20a…`); canonical Lynceus exports remain at MAC-232 v1.5.0 state (2026-05-22T16:05Z) with explicit annotation; CP35 dispatch picks up §4.4 NDPP mapping.
+
+### Operator-authorized in-cycle DML overrides
+
+**n=2 this v1.5.x cycle** (both arm-tag drift remediation, both same-day 2026-05-22):
+
+- **Pelco arm-tag** (AM 2026-05-22) — single DML setting `is_arm=1, parent_manufacturer_id=3, query_default='hidden_arm'` on id=254; original drift addressed during v1.5.0 Stage 1 Step 4 cohort admission flow
+- **Avigilon arm-tag** (PM 2026-05-22T22:09:08Z) — single DML matching identical pattern on id=6; audit doc at `~/argus-internal/wave_g_h_v1_track_a/OPERATOR_AUTHORIZED_OVERRIDE_AVIGILON_ARM_PATCH.md`; backup at `~/argus/db/argus.db.pre_avigilon_arm_patch_20260522T220908Z`
+
+Pattern proposed for §11 #18 codification at next CP34 (Gate I-5 ratification at MAC-239 board comment `50ffacc8`).
+
+### Discipline maturity markers (architectural firsts this cycle)
+
+- **First DBArchitect-side challenge of dispatch-time pre-authorized DML** based on cross-corpus diagnostic evidence (Escalation A). Pattern generalization queued as SAR-19-pending: pre-authorized DML carries a corpus-wide diagnostic predicate that must align with the dispatch's stated scope before execution.
+- **First explicit §4.4 downstream-consumer gap caught at export time** (Escalation B). The failure mode was previously codified in operator memory at [[feedback_promotion_gate_needs_export_dryrun]] + [[feedback_bible_amendment_downstream_consumer_audit]]; this is its first concrete DB-export tooling manifestation since the CP19 §4.4 sweep precedent.
+- **First Validator override of CEO decision recommendation** on a non-trivial schema-admission question (Decision 1: `credential` identifier_type admission). CEO recommended (a) admit new identifier_type with subclass enum; Validator's 10-row sample showed 0 actual device credentials (HTTP key names, error codes, URL endpoints, placeholder literals, log-encryption secrets); CEO adopted Validator (c) discard from extractor.
+
+### Carry-forwards (non-blocking for v1.5.2 tag)
+
+1. **`credential` value_class discard** — extractor v6 cycle removes the value_class entirely (per Decision 1 ratified). 113 parked candidates this cycle discarded, not retained.
+2. **Tuya/Thingclips drop stands** — 41 Tiandy candidates dropped during Gate I-1 cross-FP application (cross-vendor Telink BLE chipset + Thingclips IoT SDK UUIDs); future Tuya-attributed cohort handles them properly.
+3. **Canonical extractor v6** (Decision 3) — 4 BLE-class FP filters codify into v6: `passkey_fido2_aaguid`, `verkada_internal_feature_flag_uuid`, `drm_content_protection_system_uuid`, `tuya_thingclips_telink_thirdparty_iot_sdk`. Decision 1's credential discard collapses the original 7 cycle-discovered FP classes to 4 (3 credential-class filters become moot).
+4. **§11 #18 fold-in deferred to next CP34** (Decision 4 / Gate I-5 ratification).
+5. **CP29 hostname corpus normalization dispatch** — 12,242-row scope (815 axis is one slice of the corpus; lowercase IS the dominant convention; 23 Title Case rows are the actual drift). Properly-scoped hygiene dispatch decides (i) keep `device_category='unknown'` for hostname rows, (ii) normalize 23 Title Case drift → lowercase.
+6. **CP35 dispatch** — §4.4 NDPP mapping addition; un-blocks canonical Lynceus export regen.
+7. **3 Track B acquired-not-extracted apps** — Tactacam Reveal + Iowa Mobile ID + Arizona Mobile ID (disk pressure mid-cycle); available for next cycle.
+8. **5 Track A discovery-port FPs canonical codification** (Gate I-4 deferral) — Track A's `discovery_port_fp__audio_sample_rate`, `_tls_cipher_suite_id`, `_jadx_smap_debug_string`, `_library_code_path`, `_timeout_constant` remain in Track A's disambig module pending canonical-extractor-v6 codification.
+
+### Export delta (v1.5.0 → v1.5.2)
+
+Canonical Lynceus exports remain at v1.5.0 state pending CP35 §4.4 NDPP mapping. Raw-snapshot supplementary exports shipped under `~/argus/exports/v1_5_2_raw_snapshot/`:
+
+| File | v1.5.0 canonical | v1.5.2 raw-snapshot supplementary | Notes |
+|---|---|---|---|
+| `argus_export.json` (≥30 conf) | 536 | (stale) | Canonical Lynceus regen blocked by §4.4 NDPP gap; CP35-pending |
+| `argus_export_high_confidence.json` (≥70) | 119 | **35,434** (raw-snapshot ≥70 / superseded_by IS NULL; sha `781e759c…`) | Raw-snapshot is broader filter — no Lynceus §11 #13 / §11 #14 / §4.4 routing applied |
+| `argus_export.csv` | 35,812 | 35,958 (full row count in raw-snapshot SQL dump; sha `6d97c20a…`) | Full DB dump under gzip |
+| `argus_export_behavioral_signatures.json` | 125 | (unchanged; 201 bx_sig rows unchanged this cycle) | |
+
+**Honest framing**: the raw-snapshot exports are a stop-gap to preserve the v1.5.2 snapshot for next-cycle Lynceus consumer-side scanner-development planning. The canonical Lynceus exports are still v1.5.0 state and should be regenerated only after CP35 lands the §4.4 NDPP mapping. Downstream Lynceus consumers continue to consume the v1.5.0 canonical exports until then.
+
+### Documentation
+
+- `~/argus/docs/engineering/BIBLE_AMENDMENTS.md` CP34 §1 + CP35-pending + SAR-19-pending + §11 #18-pending entries staged
+- `~/argus/docs/internal/PROJECT_STATE.md` header refreshed for v1.5.2-candidate counts
+- `~/argus/docs/internal/PLANNED_AND_FUTURE_UPDATES.md` extended with provenance_anchors migration backlog (Gate 0), CP29 hostname corpus normalization dispatch (Escalation A), CP35 dispatch (Escalation B), SAR-19 dispatch, §11 #18 dispatch, canonical extractor v6 cycle, IMEI TAC mission redirect (4 paths), Browning bundled-OUI-allowlist pattern lead, 3 Track B acquired-not-extracted apps, per-track tooling pinning hygiene, Playwright + Chromium acquisition path canonical, 5 Track A discovery-port FPs deferred, Motive Driver extractor timeout, Lynceus accept-list expansion carryover
+- v1.5.2 integration handoff at `~/argus-internal/wave_g_h_v1_integration/INTEGRATION_HANDOFF.md` (Paperclip-doc-not-file convention — NOT a repo file; supersedes individual track session summaries)
+- README + CHANGELOG + PROJECT_STATE refreshed for v1.5.2 ([MAC-239](/MAC/issues/MAC-239) docs pass; numeric claims verified against live `db/argus.db` per the paste-not-cite + SQL-probe-at-fact-lock-time discipline)
+- DATA_DICTIONARY + METHODOLOGY: not refreshed this cycle (no enum semantic shifts beyond network_discovery_protocol_pattern admission; no methodology evolution beyond carry-forward items already noted)
+
+### Notes
+
+- **v1.5.2 git-tag pending operator authorization.** CEO does not unilaterally create tags; staged command at `~/argus-internal/wave_g_h_v1_integration/_v1_5_2_tag_command.sh` with pre-tag verification steps. Operator pushes after reviewing all updated docs.
+- **DB backups preserved for rollback**: `argus.db.pre_mig0028_20260523T023230Z` (sha `2cdcfcb6…`), `argus.db.pre_promotion_20260523T023711Z` (sha `b804e47f…`), `argus.db.pre_avigilon_arm_patch_20260522T220908Z`. v4 extractor backup at `wave_g_extractor.py.v4_backup_20260523T022129Z` (sha `3cb5be09…`).
+- **Wall-clock**: Track A ~85 min, Track B ~2.5 hr autonomous, integration cycle ~30 min, orchestration-completion ~25 min, docs pass ~20 min. Total cycle ~3.5 hours of compressed CEO + 2 subagent runs (Validator + DBArchitect).
+- **MAC-232 fold-in obligation discharged**: v1.5.1 docs restructure + hygiene follow-on captured in this entry per board ratification at MAC-232 comment `400c9471` (Option C).
 
 ## [v1.5.0] — 2026-05-22
 

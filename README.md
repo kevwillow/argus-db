@@ -22,13 +22,13 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.5.0 (ship state):
+At v1.5.2 (pending tag — Wave G/H v1 integration close):
 
-- **35,812 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.)
+- **35,958 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.)
 - **92 manufacturers** — surveillance vendors classified by what they make
 - **73 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
 - **16 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, fleet telematics, etc.)
-- **57 identifier types** — the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, etc.)
+- **58 identifier types** — the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
 - **201 behavioral signatures** — cellular-control-plane patterns associated with IMSI-catcher detection
 
 An *identifier* is a piece of data that uniquely identifies a vendor's hardware on a wire or radio band — like an OUI (the first 24 bits of a MAC address that maps to a manufacturer), a BLE service UUID broadcast by a device, an FCC grantee code on a regulatory filing, or a hostname embedded in a vendor's companion app. When a downstream scanner observes one of these in the wild, it can use Argus to identify what vendor and what device category produced it.
@@ -84,16 +84,16 @@ Coverage is intentionally narrow at the per-category baseline — Argus has 92 v
 
 ## Most recent release
 
-**v1.5.0** (current ship state) integrates the lexicon-expansion wave:
+**v1.5.2** (pending tag — Wave G/H v1 integration close) integrates the parallel-dispatch CCTV cohort + IMEI TAC mission cycle:
 
-- 40 net-new manufacturers across 7 surveillance cohorts (counter-UAS, persistent surveillance, through-wall radar, IMSI catcher, fleet telematics, CCTV/VMS, electronic monitoring), plus 4 multi-purpose carveouts
-- 3 new device categories added (`cctv_camera`, `persistent_surveillance`, `through_wall_radar`)
-- 1 new identifier type added (`imei_tac` — 8-digit GSMA Type Allocation Codes, forward-compatible for Wave G/H companion-app extraction)
-- 2 new upstream sources admitted (GitHub Code Search REST API + adsb.lol v2 aircraft tracking)
-- Pelco admitted as the framework's second multi-arm "hidden arm" under Motorola Solutions (continuing the hub-and-spoke precedent from Parrot Automotive at v1.4.1)
-- Three new discipline rules codified (SAR-16 alias-length-floor; SAR-17 no-generic-product-aliases; SAR-18 classifier-predicate parity)
+- 146 net-new active identifiers (85 BLE service UUIDs, 43 OUIs, 18 network discovery protocol patterns) across 6 CCTV vendors (Hikvision, Tiandy, Axis, Verkada, Avigilon, Dahua)
+- 1 new identifier type added (`network_discovery_protocol_pattern` — vendor camera-discovery protocol signatures including Hikvision SADP, Dahua AirKiss/SmartConfig, Axis ONVIF WS-Discovery, Tiandy SADP-style)
+- Canonical extractor v4 → v5 additive merge (filename preserved): IMEI TAC sub-extractor with structural PII truncation guarantee (9/9 proofs both pre- and post-merge), 4 cycle-discovered FP filters (bitmask, R8 XOR, NR/LTE TAC collision, word-boundary token anchor), and a 43-token CELLULAR_MODEM_CONTEXT_TOKENS expansion
+- New canonical utility `select_base_apk_from_bundle.py` for xapk/apkm/apks bundle base-APK selection by manifest (replaces the silently-failing largest-apk heuristic)
+- IMEI TAC mission negative result codified — 25-vendor effective sample yielded 0 unique TACs; companion-app sweeps are structurally unproductive in 2026 Android (runtime `TelephonyManager`, server-side device-model dispatch, R8 string encryption); mission redirect documented for future cycles
+- Schema 27 → 28 (mig-0028 CHECK enum extension)
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the version-by-version history, and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the formal change record (Correction Pass 33).
+See [`CHANGELOG.md`](CHANGELOG.md) for the version-by-version history, and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the formal change record (Correction Pass 34; CP35 + SAR-19 + §11 #18 staged pending).
 
 ## Quickstart
 
@@ -120,7 +120,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.5.0).
+- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.5.2).
 - [`CREDITS.md`](CREDITS.md) — per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) — developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) — how Argus integrates sources, confidence model, dedup logic.
@@ -173,7 +173,7 @@ I plan and orchestrate this project myself, using Claude chat as a strategic-pla
 
 The AI agents are highly capable executors with substantial scoping autonomy inside the constraints I set. They surface findings, propose decompositions, escalate when something needs ratification, and run extensive verification work I couldn't do at scale manually. But they don't decide canonical contract. I do.
 
-This was not vibe-coded. Argus has 33 documented amendments to its canonical contract and 18 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough — provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
+This was not vibe-coded. Argus has 34 documented amendments to its canonical contract and 18 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough — provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
 
 ### Notable technical work
 
