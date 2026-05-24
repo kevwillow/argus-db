@@ -5088,7 +5088,7 @@ This entry stages §11 #18 as draft. §11 #11 self-binding activates at CP34 rat
 ## Correction Pass 36 — `identifiers.source_type` CHECK enum parity with `sources.source_type` (mig-0029) + 116-row J-5 proxy relabel
 
 **Date:** 2026-05-24
-**Commit:** `<pending — this commit>` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]])
+**Commit:** `7e6160e` on `main` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]; backfilled in follow-up commit per CEO ratification at MAC-251)
 **Origin:** [MAC-249](/MAC/issues/MAC-249) Phase G Validator CPN-A — schema gap surfaced between `sources.source_type` (extended at CP23 / mig-0020 with `judicial_filing` + `disclosure_filing` + `procurement_disclosure`) and `identifiers.source_type` (still at the pre-CP23 10-value enum).
 **Surfaced again:** [MAC-250](/MAC/issues/MAC-250) Phase H — J-5 (CourtListener RECAP, sid=48) dispatch landed 116 rows with `source_type='foia'` as CEO-ratified §8.2 65-85 band-bucket proxy.
 **Authority:** [MAC-251](/MAC/issues/MAC-251) — CEO-authored dispatch; CP-slot disambiguation ratified at MAC-251 wake comment `cb228e69-2c07-4062-9e92-06009f9f9c48` (option (b) — CP35 remains reserved for the standing NDPP §4.4 Lynceus mapping draft entry at BIBLE_AMENDMENTS.md:4836; this enum-parity work re-anchors to CP36).
