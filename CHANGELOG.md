@@ -16,7 +16,44 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.5.3.)
+(No unreleased changes since v1.5.4.)
+
+## [v1.5.4] — 2026-05-24
+
+A **docs-only** patch that refreshes the canonical documentation surface to the v1.5.3 / Wave J state. **No DB mutation, no migrations, no promotions, no export-semantic change.** `schema_version` stays at 29; the active identifier set stays at 37,801. This release exists because the v1.5.3 data ship (Wave J widenet) intentionally shipped its data ahead of the doc refresh (separate ship cycles); v1.5.4 brings the prose into line with the database.
+
+### Highlights
+
+- Canonical docs reconciled to live state: `schema_version=29`, 37,801 active identifiers, 73 sources, 92 manufacturers, 201 behavioral signatures, 116 `judicial_filing` rows, 18 NDPP rows.
+- `DATA_DICTIONARY.md` rolled forward two migrations (was pinned at schema 27): mig-0028 (CP34 `network_discovery_protocol_pattern`, `identifier_type` 57→58) and mig-0029 (CP36 `identifiers.source_type` parity, 10→13, `+judicial_filing`/`+disclosure_filing`/`+procurement_disclosure`).
+- `CREDITS.md` per-source yield narratives corrected for the four Wave-J-promoted sources (CourtListener 0→116 `judicial_filing`; fccid.io →687; Bluetooth SIG →705 `ble_company_id`; Wireshark →303) plus source_type / license-posture drift fixes.
+
+### Docs deltas
+
+- **`README.md`** — v1.5.2→v1.5.3 lead + "Most recent release" Wave-J narrative; active count 35,958→37,801; export records (standard 536→579); CSV "Records" corrected to the logical record count (37,801; the prior figure was a physical line count inflated by embedded newlines); amendment count 34→36.
+- **`docs/internal/PROJECT_STATE.md`** — current-state header refreshed to v1.5.3-staged + new "Wave J widenet headline counts" table; the prior Wave G/H cycle table preserved as history.
+- **`docs/internal/PLANNED_AND_FUTURE_UPDATES.md`** — Wave-J carry-forward section appended (MAC-252 dedup hardening; MAC-261 NULL-manufacturer + Harris normalization; MAC-262 ledger-token alignment; J-1 heuristic-hardening; Cradlepoint/Cellebrite alias-expansion gate; 54-row Wayback queue) **plus an explicit "cohorts NOT extracted this wave" record** — facial-recognition-beyond-Clearview and mobile-spyware cohorts carry to v1.6.0 (0 vendors extracted; `manufacturers` unchanged at 92).
+- **`docs/engineering/DATA_DICTIONARY.md`** — schema 27→29 refresh (17 stale-claim locations); migration ledger extended through 0029; true enum counts (identifier_type 58, device_category 16, source_type 13, pair_kind 5).
+- **`CREDITS.md`** — 11 surgical drift-fixes (sid 4/34/48/51 Wave-J yields; source_type framing for sids 1/2/3; sid 7 Socrata 2021-03-22 freeze note; DeFlock OSM attribution; sid 15 MIT; v1.4.0 source-id tags). All per-release admission ledgers + the 92-vendor lexicon preserved.
+- **`docs/engineering/PROJECT_BIBLE.md` + `BIBLE_AMENDMENTS.md`** — verified already-current through CP36 / CP36-extension (commit anchors `7e6160e`/`a89aaff`, `7666748`, `dda50b1` confirmed); no edit required.
+- **`docs/engineering/METHODOLOGY.md`** — §7.5 PII discipline verified accurate; v1.0.0-frozen methodology snapshot intentionally not re-versioned (one optional `judicial_filing` band-reconciliation note left to the bible per its own defer-to-bible rule).
+
+### Honest-absence dispositions (Phase K)
+
+The Wave-J external-review evidence pull surfaced 7 honest-absence findings; all dispositioned, none blocking:
+
+- The projected `_ceo_gates_queue` Phase-H deliverable shape was **formally retired** (gate-class items were routed inline via the MAC-250/251/252/253/255/256/257 issue comments by design); no retroactive backfill.
+- Three sandbox audit artifacts backfilled: `_j1_unattributed_enumerated.json` (653 BLE-SIG protocol-primitive rows), `within_source_reextractions.json` (7 J-2 within-source rows), and `wall_clock_min` on five extraction JSONs.
+- The facial-recognition / mobile-spyware cohort deprioritization is now durably recorded (PLANNED_AND_FUTURE_UPDATES).
+- The 67 NULL-manufacturer rows + "Harris"/"Harris Corporation" attribution-form variance deferred to the v1.5.x data-hygiene queue (own ratification cycle).
+
+### Schema
+
+- **No change.** `schema_version` = 29 (unchanged). No migrations. (Documentation note: the live `schema_version` row 29 is stamped `0029_cp35_…` while the on-disk migration file is `0029_cp36_…` — a benign apply-time pre-re-anchor token mismatch; the structural schema is correct. Documented verbatim in DATA_DICTIONARY §4.13; an optional one-row ledger re-stamp is deferred to the v1.5.x data-hygiene queue.)
+
+### Export verification
+
+- Exports regenerated against the unchanged live DB and confirmed byte-identical to the v1.5.3 exports modulo the `_meta.exported_at` timestamp — confirming the docs refresh did not leak into export semantics.
 
 ## [v1.5.3] — 2026-05-24
 
