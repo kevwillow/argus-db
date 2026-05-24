@@ -43,7 +43,7 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 |---|---:|---|
 | `exports/argus_export_high_confidence.json` | 119 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources. |
 | `exports/argus_export.json` | 579 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 41,823 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export.csv` | 37,801 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 125 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
