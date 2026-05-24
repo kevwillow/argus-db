@@ -5185,7 +5185,7 @@ Pre-mig backup: `db/argus.db.pre_mig0029_20260524T023858Z` (mig-0029 schema rebu
 ### CP36-extension — `coverage_matrix.py::SOURCE_TYPE_CEILINGS` add `judicial_filing` ceiling
 
 **Date:** 2026-05-24
-**Commit:** _(backfilled in follow-up commit per [[feedback_bible_amendment_downstream_consumer_audit]])_
+**Commit:** `dda50b1` on `main` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]; backfilled in follow-up commit per CEO ratification at MAC-256)
 **Origin:** [MAC-255](/MAC/issues/MAC-255) DBArchitect close-out — out-of-scope discovery: CP36 mig-0029 relabeled the 116 J-5 rows to canonical `source_type='judicial_filing'` but `db/validation/coverage_matrix.py::SOURCE_TYPE_CEILINGS` was not updated in the same coordinated commit, leaving the `_compute_halts` §8.2-sanity check (line 763) firing an `unknown_source_type` halt against the 116 J-5 rows on every validator pass.
 **Authority:** [MAC-256](/MAC/issues/MAC-256) — CEO-ratified single-touch close-out.
 **Status:** **RATIFIED** at this commit. Closes the CP36 coordinated-commit gap surfaced one CP-cycle late; analogous to how CP35 closed CP34's §4.4 mapping gap one cycle late.
