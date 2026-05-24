@@ -4838,7 +4838,7 @@ This discipline extends the CP21 cumulative-full-enum sweep spirit (which govern
 **Origin:** MAC-239 Wave G/H v1 integration orchestration-completion pass, 2026-05-23.
 **Authority:** DBArchitect-surfaced HALT-class downstream-consumer-update gap at canonical Lynceus export regen (see `_dbarchitect_signoff.md` §Task 5).
 **Ratification:** [MAC-255](/MAC/issues/MAC-255) — CEO ratification dispatch 2026-05-24; disposition **option (b)** DROP with rationale `NDPP_pending_lynceus_v0_3_scanner_support`.
-**Commit:** `<pending — this commit>` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]).
+**Commit:** `7666748` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]).
 **Status:** **RATIFIED** at this commit. `PROJECT_BIBLE.md` §4.4 amended in lockstep; `db/validation/export_lynceus.py` + `db/validation/coverage_matrix.py` updated with bin_label `NDPP_pending_lynceus_v0_3_scanner_support` per SAR-18 classifier-predicate parity.
 
 ### Why this Correction Pass exists
@@ -4917,7 +4917,7 @@ CP35 ratification MUST land all of the following in a single coordinated commit 
 
 ### §11 #11 self-binding
 
-CP35 is ratified at the single coordinated commit cited in the header (`<pending — this commit>`, to be backfilled in a follow-up `docs(bible): backfill CP35 entry commit hash <hash> (MAC-255)` commit per the CP36 precedent at 94d612d). The §11 #11 self-binding clause is satisfied at that commit: `PROJECT_BIBLE.md` §4.4 + `db/validation/export_lynceus.py` (DROPPED_REASONS + bins zero-init + bin_rows display) + `db/validation/coverage_matrix.py` (DROPPED_REASONS — auto-init via cp16_dropped loop) land together; no partial application. Option (a) MAP cross-repo Lynceus v0.3 commit is **out of scope** at this ratification — option (b) DROP is a single-repo amendment that does not require cross-repo coordination.
+CP35 is ratified at the single coordinated commit cited in the header (`7666748` — hash substituted in this follow-up backfill commit per the CP36 precedent at 94d612d). The §11 #11 self-binding clause is satisfied at that commit: `PROJECT_BIBLE.md` §4.4 + `db/validation/export_lynceus.py` (DROPPED_REASONS + bins zero-init + bin_rows display) + `db/validation/coverage_matrix.py` (DROPPED_REASONS — auto-init via cp16_dropped loop) land together; no partial application. Option (a) MAP cross-repo Lynceus v0.3 commit is **out of scope** at this ratification — option (b) DROP is a single-repo amendment that does not require cross-repo coordination.
 
 ═══════════════════════════════════════════════════════════════════════
 
