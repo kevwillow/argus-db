@@ -4833,11 +4833,13 @@ This discipline extends the CP21 cumulative-full-enum sweep spirit (which govern
 - Existing memory: [[feedback_bible_amendment_downstream_consumer_audit]] (sibling discipline for bible amendments → downstream consumers)
 
 
-## Correction Pass 35 (draft — CP35-pending; ratification at next CP34 dispatch or sooner if operator wants) — §4.4 Lynceus mapping for `network_discovery_protocol_pattern` (mig-0028 / CP34 Wave G/H v1 admission)
+## Correction Pass 35 — §4.4 Lynceus mapping for `network_discovery_protocol_pattern` (mig-0028 / CP34 Wave G/H v1 admission) — **RATIFIED** (option (b) DROP)
 
 **Origin:** MAC-239 Wave G/H v1 integration orchestration-completion pass, 2026-05-23.
-**Authority:** DBArchitect-surfaced HALT-class downstream-consumer-update gap at canonical Lynceus export regen (see `_dbarchitect_signoff.md` §Task 5). Pending CEO ratification + dispatch.
-**Status:** **DRAFT — CP35-pending.** Not ratified. Bible HEAD (`PROJECT_BIBLE.md` §4.4) NOT amended by this entry — that's CP35-ratification scope.
+**Authority:** DBArchitect-surfaced HALT-class downstream-consumer-update gap at canonical Lynceus export regen (see `_dbarchitect_signoff.md` §Task 5).
+**Ratification:** [MAC-255](/MAC/issues/MAC-255) — CEO ratification dispatch 2026-05-24; disposition **option (b)** DROP with rationale `NDPP_pending_lynceus_v0_3_scanner_support`.
+**Commit:** `<pending — this commit>` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]).
+**Status:** **RATIFIED** at this commit. `PROJECT_BIBLE.md` §4.4 amended in lockstep; `db/validation/export_lynceus.py` + `db/validation/coverage_matrix.py` updated with bin_label `NDPP_pending_lynceus_v0_3_scanner_support` per SAR-18 classifier-predicate parity.
 
 ### Why this Correction Pass exists
 
@@ -4857,24 +4859,20 @@ This is the **exact failure mode** codified in two operator-memory entries that 
 
 CP34 (the Wave G/H v1 integration CP) did not surface this gap because the integration cycle's promotion gate did not run an export-regen dry-run as a precondition. The 18 NDPP rows reached the survivor branch (not dropped by §11 #13 / §11 #14 / §11 #12 / CP7 / SAR-18 unconditional `oversized_mac_range` drop) with no `IDENTIFIER_TYPE_TO_PATTERN_TYPE` mapping AND no `DROPPED_REASONS` entry — the explicit halt path in `export_lynceus.py`.
 
-### Proposed amendment scope (to be ratified at CP35 dispatch)
+### Ratified amendment scope
 
-§4.4 of `PROJECT_BIBLE.md` currently enumerates the disposition for each `identifiers.identifier_type` under the Argus → Lynceus consumer contract: either MAP (route to a Lynceus `pattern_type`) or DROP (with explicit rationale into `DROPPED_REASONS`). NDPP needs a §4.4 entry. Two disposition options frame the CP35 decision; both options are valid and the choice depends on Lynceus consumer-side roadmap clarity at ratification time.
+§4.4 of `PROJECT_BIBLE.md` enumerates the disposition for each `identifiers.identifier_type` under the Argus → Lynceus consumer contract: either MAP (route to a Lynceus `pattern_type`) or DROP (with explicit rationale into `DROPPED_REASONS`). NDPP receives an §4.4 entry per the ratified disposition below.
 
-#### Disposition option (a) — MAP to Lynceus `discovery_protocol_signature` pattern (new pattern_type in Lynceus v0.3)
+**MAC-255 CEO ratification 2026-05-24 — option (b) DROP** with the following rationale (verbatim from the dispatch):
 
-Add NDPP to `IDENTIFIER_TYPE_TO_PATTERN_TYPE` with a new Lynceus-side pattern_type slot:
+> - option (a) MAP requires sibling Lynceus v0.3 scanner work (new `discovery_protocol_signature` pattern_type) — cross-repo coordination outside the v1.5.3 ship gate scope
+> - option (b) preserves the 18 NDPP rows in canonical `identifiers` (no row loss; high-conf cohort retained for future export-time admission once Lynceus v0.3 ships)
+> - mirrors CP16 default posture (12 DROPPED vs 3 MAP for CP14 cluster) and the draft's own default-disposition recommendation
+> - single-repo scope keeps the fix bounded; v1.5.3 can ship without waiting on Lynceus roadmap
 
-```python
-IDENTIFIER_TYPE_TO_PATTERN_TYPE = {
-    # …existing mappings…
-    "network_discovery_protocol_pattern": "discovery_protocol_signature",  # CP35
-}
-```
+(The draft's superseded option (a) MAP block — proposing a new `discovery_protocol_signature` pattern_type in Lynceus v0.3 — is withdrawn at this ratification and not codified. A future CP35-successor can re-introduce MAP once Lynceus v0.3 scanner-side support lands; the 18 NDPP rows are retained for that future lift.)
 
-Requires sibling work in the Lynceus repository: introduce `discovery_protocol_signature` as a recognized `pattern_type` in Lynceus v0.3+ scanner with semantics documented (matcher shape: regex/substring match on observed mDNS-SD / WS-Discovery / SSDP / ONVIF-WS-Discovery responses against the pattern body extracted from companion APK). This is sibling-CP work crossing the Argus ↔ Lynceus contract surface (cf. CP9 Talos → Lynceus rename slate + CP11 dual-artifact contract + CP16 §4.4 Lynceus mapping for the CP14 cluster — all prior precedents for `identifier_type → pattern_type` admission requiring parallel Lynceus consumer support).
-
-#### Disposition option (b) — DROP with rationale `NDPP_pending_lynceus_v0_3_scanner_support`
+#### Ratified disposition — DROP with rationale `NDPP_pending_lynceus_v0_3_scanner_support`
 
 Add NDPP to `DROPPED_REASONS` with explicit narrow rationale:
 
@@ -4885,9 +4883,11 @@ DROPPED_REASONS = {
 }
 ```
 
-NDPP rows survive in `identifiers` (high-confidence cohort retained for future export-time admission once Lynceus consumer-side gains pattern support); they are deliberately dropped at export-time until Lynceus v0.3 ships scanner-side discovery-protocol-signature matching. This is the conservative posture: the 18 NDPP rows stay in DB as canonical evidence; only the export-side surface is gated.
+NDPP rows survive in `identifiers` (high-confidence cohort retained for future export-time admission once Lynceus consumer-side gains pattern support); they are deliberately dropped at export-time until Lynceus v0.3 ships scanner-side discovery-protocol-signature matching. The conservative posture: the 18 NDPP rows stay in DB as canonical evidence; only the export-side surface is gated.
 
-This option mirrors the CP16 §4.4 cluster decision for several CP14-admitted identifier_types that were DROP'd pending Lynceus consumer-side support (cf. CP16 12 DROPPED entries vs 3 MAP). Default posture at CP35 ratification if Lynceus v0.3 roadmap is silent: **option (b)** — DROP with explicit pending-rationale.
+This option mirrors the CP16 §4.4 cluster decision for several CP14-admitted identifier_types that were DROP'd pending Lynceus consumer-side support (cf. CP16 12 DROPPED entries vs 3 MAP).
+
+**First DROPPED_REASONS entry whose bin_label differs from the identifier_type string.** All prior DROPPED_REASONS entries (CP16 + mig-0018 + mig-0019 + mig-0023 + mig-0024 + mig-0025 clusters) used the identifier_type verbatim as the bin_label. CP35 introduces a pending-rationale-form bin_label (`NDPP_pending_lynceus_v0_3_scanner_support`) per the dispatch's verbatim rationale-string requirement. Both `db/validation/export_lynceus.py::_build_export` bins-zero-init dict and `db/validation/export_lynceus.py::_build_coverage_report_md::fmt_bin_table` bin_rows display list carry the new bin_label as an explicit one-touch addition; `db/validation/coverage_matrix.py::_compute_drop_tally` auto-inits the new bin via the `cp16_dropped` loop, and `_drop_tally_to_dict` propagates via `bins.update(t.cp16_dropped)`.
 
 ### Sibling consumer files requiring parallel update (per [[feedback_bible_amendment_downstream_consumer_audit]] discipline)
 
@@ -4915,9 +4915,9 @@ CP35 ratification MUST land all of the following in a single coordinated commit 
 - **CP34** (Wave G/H v1 integration, this cycle) — the upstream amendment that admitted NDPP without satisfying §4.4 sibling-commit discipline. CP35 closes that gap.
 - **SAR-18** — classifier-predicate parity invariant; CP35 must satisfy SAR-18 by updating `coverage_matrix.py` in lockstep with `export_lynceus.py`.
 
-### §11 #11 self-binding pending
+### §11 #11 self-binding
 
-This entry stages CP35 as draft. The §11 #11 self-binding clause activates at CP35 ratification: the consolidated commit hash applying the §4.4 amendment + sibling consumer updates (export_lynceus.py + coverage_matrix.py) + (if option a) the cross-repo Lynceus v0.3 commit must be enumerated here at ratification time. Currently UNRATIFIED — no commit, no binding.
+CP35 is ratified at the single coordinated commit cited in the header (`<pending — this commit>`, to be backfilled in a follow-up `docs(bible): backfill CP35 entry commit hash <hash> (MAC-255)` commit per the CP36 precedent at 94d612d). The §11 #11 self-binding clause is satisfied at that commit: `PROJECT_BIBLE.md` §4.4 + `db/validation/export_lynceus.py` (DROPPED_REASONS + bins zero-init + bin_rows display) + `db/validation/coverage_matrix.py` (DROPPED_REASONS — auto-init via cp16_dropped loop) land together; no partial application. Option (a) MAP cross-repo Lynceus v0.3 commit is **out of scope** at this ratification — option (b) DROP is a single-repo amendment that does not require cross-repo coordination.
 
 ═══════════════════════════════════════════════════════════════════════
 

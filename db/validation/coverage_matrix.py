@@ -192,6 +192,15 @@ DROPPED_REASONS: dict[str, str] = {
     # DROPPED_REASONS verbatim.
     "fcc_grantee_code": "fcc_grantee_code",
     "equipment_class_code": "equipment_class_code",
+    # CP35 (mig-0028 / MAC-255) — NDPP §4.4 ratified DROP (option (b)). SAR-18
+    # parity gate requires this entry mirror export_lynceus.py::DROPPED_REASONS
+    # verbatim — both classifiers MUST route NDPP rows to the same bin label
+    # `NDPP_pending_lynceus_v0_3_scanner_support` (first DROPPED_REASONS entry
+    # whose bin_label differs from the identifier_type string). The
+    # `_compute_drop_tally` cp16-bin auto-init loop and `_drop_tally_to_dict`
+    # `bins.update(t.cp16_dropped)` handle new bins automatically; no other
+    # touch points in this module.
+    "network_discovery_protocol_pattern": "NDPP_pending_lynceus_v0_3_scanner_support",
 }
 
 # §8.2 confidence-band ceilings — annotation reference only (no mutations).
