@@ -1,7 +1,7 @@
 {
-    "generated_at_utc": "2026-05-24T04:17:22Z",
-    "generation_dispatch": "MAC-253",
-    "predecessor_commit": "7da55ed",
+    "generated_at_utc": "2026-05-24T04:38:35Z",
+    "generation_dispatch": "MAC-257",
+    "predecessor_commit": "3e022f3",
     "branch": "main",
     "argus_version_pre_bump": "v1.5.2",
     "argus_version_post_bump_recommended": "v1.5.3",
@@ -56,6 +56,8 @@
         }
     },
     "verification": {
+        "mac_256_post_fix_regen": true,
+        "mac_256_post_fix_regen_note": "Final post-MAC-256 regen (MAC-257 Phase I.2). MAC-256 (dda50b1) added SOURCE_TYPE_CEILINGS['judicial_filing']=85 to coverage_matrix.py AFTER the Phase I.1 regen at c0c66fb; the embedded coverage_matrix.md halt-line transitioned 'Halts at HB35: 1' -> '0' (unknown_source_type halt against the 116 J-5 judicial_filing rows closed). argus_export.json / argus_export_high_confidence.json / argus_export.csv / argus_export_behavioral_signatures.json are byte-identical to c0c66fb modulo _meta.exported_at (SOURCE_TYPE_CEILINGS is annotation-only; zero export_lynceus.py hits per SAR-18 parity). Only coverage_report.md changed substantively (halt-line 1->0 + ## Halts section removal).",
         "schema_version": 29,
         "sources_count": 73,
         "manufacturers_count": 92,

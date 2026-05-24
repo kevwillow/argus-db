@@ -46,13 +46,9 @@ Read-only pass. No identifier mutations. §8.3 dedup is closed at Step-5 (MAC-42
 - **§11 #6 (no live fetches)** — `PRAGMA query_only = ON` is set on the connection; the orchestrator cannot write and fires zero outbound HTTP calls.
 - **§11 #7 (provenance carry-through)** — each cell's `row_ids` field cites the source `identifiers.id` values; the underlying provenance (`source_url`, `source_excerpt`) lives unchanged on the cited rows.
 - **§11 #8 (no confidence drift)** — read-only pass; no writes to `confidence`. Phase-3 corroboration counts are annotation-only.
-- **§11 #11 (halt-the-line)** — defensive checks for drop-tally reconciliation, unknown-source-type, unknown-category export leak, and procurement-only export leak. Halts at HB35: 1 (see Halts section).
+- **§11 #11 (halt-the-line)** — defensive checks for drop-tally reconciliation, unknown-source-type, unknown-category export leak, and procurement-only export leak. Halts at HB35: 0.
 - **§11 #13 (unknown-category Talos-banned)** — the `unknown_category` bin captures every row with `device_category='unknown'`; a survival is a halt.
 - **§11 #14 (procurement-only Talos-banned)** — the `procurement_only` bin captures every row with `source_type='procurement'`; a survival is a halt.
-
-## Halts
-
-- **`unknown_source_type`** — Active rows carry source_type values not in §8.2 enum: ['judicial_filing']. §4.2 schema drift candidate.
 
 ## §6.1 Coverage matrix (rows × cols)
 

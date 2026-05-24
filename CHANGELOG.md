@@ -16,7 +16,53 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.5.2.)
+(No unreleased changes since v1.5.3.)
+
+## [v1.5.3] — 2026-05-24
+
+This release ships the **Wave J widenet** (MAC-245) — a five-phase corpus expansion (vendor / drone-RID / IMSI / GainSec / judicial-filing) — together with three checkpoint ratifications: CP35, CP36, and the CP36-extension. It is a confidence-invariant release: every count delta is a new-row promotion or a source-label parity fix; no existing identifier's confidence was lifted without a second independent source (§11 #8).
+
+### Highlights
+
+- **Wave J widenet:** +1,843 net-new active identifiers (Phase H, MAC-250), lifting the active set 35,958 → 37,801
+- **`judicial_filing` source_type** admitted to the enum (migration 0029) and 116 court-filing rows relabeled from the `foia` band-bucket proxy — a label-parity fix that left the confidence column untouched (§11 #8 invariant)
+- **`network_discovery_protocol_pattern` (NDPP)** Lynceus consumer-mapping ratified as DROP (§4.4); the 18 NDPP rows remain canonical in the DB, gated consumer-side until Lynceus v0.3 ships discovery-protocol-signature scanning
+- **Coverage-matrix halt closed:** the `unknown_source_type` validator halt that fired against the 116 J-5 rows on every pass is now resolved (CP36-extension)
+
+### Schema
+
+- `schema_version`: 28 → 29
+- `identifiers.source_type` enum: added `judicial_filing` (migration 0029, CP36 parity)
+
+### Data
+
+- Sources: 73 (unchanged)
+- Manufacturers: 92 (unchanged)
+- Active identifiers: 35,958 → 37,801 (+1,843)
+- Behavioral signatures: 201 (unchanged)
+- `judicial_filing` rows: 116 (confidence=75, relabeled from `foia`; confidence unchanged)
+- NDPP rows: 18 (canonical; DROPPED-class for the Lynceus export per CP35)
+
+### Export deltas (Lynceus / Rayhunter)
+
+- Standard export (`argus_export.json`, confidence ≥30): 536 → 579 records (+43)
+- High-confidence export (`argus_export_high_confidence.json`, confidence ≥70): 119 (unchanged count; cohort drift internal)
+- The 116 `judicial_filing` rows do **not** surface on either Talos export — all carry DROPPED-class identifier types (`product_family_codename` 109 + `firmware_branded_string` 7) per §4.4. This is correct filtering, not a regression.
+- `dropped_in_export.procurement_only` = 0 (§11 #14 parity)
+
+### Bible amendments
+
+- **CP35 (MAC-255):** §4.4 Lynceus consumer-mapping for `network_discovery_protocol_pattern` ratified as option (b) DROP, rationale `NDPP_pending_lynceus_v0_3_scanner_support`. 18 NDPP rows preserved in the canonical DB; consumer-side gating deferred to Lynceus v0.3 scanner support.
+- **CP36 (MAC-251):** `identifiers.source_type` enum parity (migration 0029) + 116 J-5 relabel (`foia` → `judicial_filing`) under the §11 #8 confidence-invariant (confidence column untouched).
+- **CP36-extension (MAC-256):** `SOURCE_TYPE_CEILINGS["judicial_filing"] = 85` added to `coverage_matrix.py` — closes the validator-side annotation-halt gap left when CP36 relabeled the source_type without updating the §8.2-sanity ceiling map in the same coordinated commit. Ceiling 85 inherits the `foia` band-ceiling proxy that landed the rows (§11 #8 invariant).
+
+### Sibling-discipline
+
+This cycle applied the downstream-consumer-audit discipline: each bible amendment was checked for sibling-commit obligations in its downstream consumers. CP35 surfaced the `export_lynceus.py` §4.4 mapping as a required sibling closure; CP36-extension surfaced the `coverage_matrix.py` ceiling map as a required sibling closure. Both were ratified and committed in-cycle rather than deferred.
+
+### Halts encountered
+
+- **`unknown_source_type` (coverage_matrix.py `_compute_halts`):** fired against the 116 J-5 `judicial_filing` rows after CP36's migration 0029 relabel, because the `SOURCE_TYPE_CEILINGS` §8.2-sanity map had not been updated in the same coordinated commit. Resolved by CP36-extension (MAC-256): the `coverage_report.md` halt-line transitioned `Halts at HB35: 1` → `0`.
 
 ## [v1.5.2] — 2026-05-23
 

@@ -324786,11 +324786,5 @@
       "38576": "product_family_codename"
     }
   },
-  "halts": [
-    {
-      "kind": "unknown_source_type",
-      "detail": "Active rows carry source_type values not in \u00a78.2 enum: ['judicial_filing']. \u00a74.2 schema drift candidate.",
-      "row_ids": []
-    }
-  ]
+  "halts": []
 }
