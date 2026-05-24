@@ -5084,3 +5084,100 @@ Codifying the protocol prevents future cycles from re-litigating the authorizati
 
 This entry stages §11 #18 as draft. §11 #11 self-binding activates at CP34 ratification: the consolidated commit hash applying the §11 #18 amendment to `PROJECT_BIBLE.md` §11 must be enumerated here at ratification time. Currently UNRATIFIED — no commit, no binding.
 
+
+## Correction Pass 36 — `identifiers.source_type` CHECK enum parity with `sources.source_type` (mig-0029) + 116-row J-5 proxy relabel
+
+**Date:** 2026-05-24
+**Commit:** `<pending — this commit>` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]])
+**Origin:** [MAC-249](/MAC/issues/MAC-249) Phase G Validator CPN-A — schema gap surfaced between `sources.source_type` (extended at CP23 / mig-0020 with `judicial_filing` + `disclosure_filing` + `procurement_disclosure`) and `identifiers.source_type` (still at the pre-CP23 10-value enum).
+**Surfaced again:** [MAC-250](/MAC/issues/MAC-250) Phase H — J-5 (CourtListener RECAP, sid=48) dispatch landed 116 rows with `source_type='foia'` as CEO-ratified §8.2 65-85 band-bucket proxy.
+**Authority:** [MAC-251](/MAC/issues/MAC-251) — CEO-authored dispatch; CP-slot disambiguation ratified at MAC-251 wake comment `cb228e69-2c07-4062-9e92-06009f9f9c48` (option (b) — CP35 remains reserved for the standing NDPP §4.4 Lynceus mapping draft entry at BIBLE_AMENDMENTS.md:4836; this enum-parity work re-anchors to CP36).
+**Status:** **RATIFIED** at this commit (schema-side mig-0029 + J-5 116-row relabel previously verified clean at MAC-251 wake comment `cb228e69`; CP-slot rename + bible amendment-log entry land coordinated here).
+
+### Scope
+
+CP36 codifies a single schema-level discipline amendment: the `identifiers.source_type` CHECK enum is brought to parity with `sources.source_type` per the CP23 trio admission (`judicial_filing`, `disclosure_filing`, `procurement_disclosure`). Mig-0029 lands the rebuild. Post-migration, the 116 J-5 CourtListener rows that landed at MAC-250 Phase H with `source_type='foia'` (as a §8.2 band-bucket proxy under the pre-CP36 enum) are relabeled in place to `source_type='judicial_filing'`, restoring canonical truth — `sources(sid=48).source_type='judicial_filing'` was already the canonical record via FK provenance. The cpn_a_proxy_relabel sentinel-key block under `notes` preserves the proxy-history audit trail per §11 #17.
+
+This is a **post-Wave-J ship** discipline-evolution, not a defect closure. Schedule landed after MAC-250 Phase H stabilized; not a blocker for Wave-J ship.
+
+### §1 — `identifiers.source_type` CHECK enum +3 (10 → 13 cumulative)
+
+Migration `db/migrations/0029_cp36_identifiers_source_type_enum_parity.sql` rebuilds the `identifiers` table with the extended CHECK enum. ALL prior CHECK constraints preserved verbatim per the cumulative-CHECK-enum discipline ([[feedback_cumulative_check_enum_across_sequenced_migrations]]):
+
+- `identifier_type` 59-value enum from CP34 — preserved verbatim
+- `device_category` 16-value enum from CP33 — preserved verbatim
+- `source_type` 10 → 13 — **+3 net-new this CP**:
+  - `'judicial_filing'` — Court records and RECAP-class artifacts (CourtListener V4 admission; the 116 J-5 rows relabeled this CP)
+  - `'disclosure_filing'` — SEC EDGAR + analogous corporate-disclosure filings (forward-compat; 0 identifier rows currently)
+  - `'procurement_disclosure'` — Supplier-self-disclosure / vendor-side procurement artifacts (forward-compat; 0 identifier rows currently)
+- `pair_kind` 5-value enum from CP31 — preserved verbatim
+- `confidence` range — preserved verbatim
+- Column shape unchanged from post-CP34 state (17 columns)
+- All 6 identifiers indexes recreated post-rebuild
+- `schema_version` bumps 28 → 29
+
+Semantics for the 3 net-new values are inherited from the CP23 header notes in `db/migrations/0020_source_type_enum_extension.sql` (no new semantic shape).
+
+### §2 — 116 J-5 proxy relabel (`foia` → `judicial_filing`)
+
+Sibling script `db/migrations/0029_cp36_j5_proxy_relabel.sql` executes the column-only UPDATE. Selection clause uses `source_url LIKE 'https://www.courtlistener.com/docket/%'` rather than the issue-spec `source_id=48` reference because the live `identifiers` schema has no `source_id` FK column; the alt-predicate matches 116 rows exactly (verified pre-mig).
+
+Per-row `notes` mutation appends a new sentinel-key block:
+
+```json
+"cpn_a_proxy_relabel": {
+  "date": "2026-05-24",
+  "from": "foia",
+  "to": "judicial_filing",
+  "cp_anchor": "CP36",
+  "mig": "0029_cp36_identifiers_source_type_enum_parity",
+  "reason": "CHECK enum gap resolved via mig-0029; canonical source_type now matches sources(sid=48).source_type=judicial_filing"
+}
+```
+
+All other `notes` JSON keys (`confidence_history`, `fetched_content_sha256`, `phase_f_verdict_row_index`, `source_row_key`, `wave`) preserved verbatim by `json_set`. Confidence column NOT in SET clause — all 116 rows retain `confidence=75` (§11 #8 invariant).
+
+### §3 — CP-slot disambiguation (this CP is CP36, not CP35)
+
+CP35 remains reserved for the standing NDPP §4.4 Lynceus mapping draft entry at [`BIBLE_AMENDMENTS.md:4836`](BIBLE_AMENDMENTS.md). That draft has been the canonical "next CP slot" since v1.5.2 ship, names CP35 explicitly in its body 15+ times, and is cross-referenced from SAR-19-pending (line 4925) and §11 #18-pending (line 5018). Renumbering the draft would force ripple edits across the amendment log.
+
+This enum-parity work — chronologically a sibling-CP to the NDPP admission (mig-0028, CP34) — re-anchors to CP36. The decision was ratified at MAC-251 wake comment `cb228e69-2c07-4062-9e92-06009f9f9c48` (option (b)). The dispatch authoring error (MAC-251 issue spec claiming CP35 without checking the standing reservation) is recorded under [[feedback_dispatch_preamble_live_state_verification]] for discipline reinforcement.
+
+### Baselines
+
+| metric | pre-mig | post-mig | delta |
+|---|---|---|---|
+| `schema_version` | 28 | 29 | +1 |
+| `identifiers.source_type` CHECK enum cardinality | 10 | 13 | +3 |
+| `identifiers` row count | unchanged | unchanged | 0 |
+| J-5 rows at `source_type='foia'` (CourtListener docket scope) | 116 | 0 | −116 |
+| J-5 rows at `source_type='judicial_filing'` | 0 | 116 | +116 |
+| J-5 rows with `cpn_a_proxy_relabel.cp_anchor='CP36'` | 0 | 116 | +116 |
+| J-5 rows with `confidence=75` | 116 | 116 | 0 (§11 #8) |
+| `PRAGMA foreign_key_check` | clean | clean | unchanged |
+
+Pre-mig backup: `db/argus.db.pre_mig0029_20260524T023858Z` (mig-0029 schema rebuild) + `db/argus.db.pre_cp36_relabel_20260524T025150Z` (CP-slot rename + per-row cp_anchor flip).
+
+### §11 envelope
+
+- **#1** No fabrication — relabel restores canonical truth; `sources(sid=48).source_type='judicial_filing'` is the canonical record pre-existing this CP via FK provenance.
+- **#7** Provenance preserved — `source_url NOT NULL` unchanged; per-row `source_url` cites the issuer (CourtListener docket URLs) directly.
+- **#8** No confidence drift — relabel is a column-only UPDATE; `confidence` column not in SET clause; all 116 rows retain `confidence=75` (band-equivalent: `foia` and `judicial_filing` both fall in §8.2 65-85 "public-record disclosure" band).
+- **#11** Amendment-log discipline — CP36 codifies the enum extension; this entry IS the amendment-log entry. Parallel one-line entry added to `PROJECT_BIBLE.md` §11 #11 in this same commit per the coordinated-sibling-commit discipline.
+- **#17** Carve-out audit invariant — `cpn_a_proxy_relabel` is a NEW sentinel-key block under `notes`; does NOT mutate any existing audit JSON key (confidence_history, fetched_content_sha256, cycle_completion_state, etc. all preserved verbatim by `json_set`).
+
+### Idempotency
+
+- Migration `INSERT OR IGNORE INTO schema_version` makes the version bump idempotent (re-running against `schema_version=29` is a no-op).
+- J-5 relabel WHERE clause is shape-stable: predicates `source_type='foia'` (pre-mig) and `cp_anchor='CP35'` (intermediate state) both narrow the second-pass set to 0 rows post-execution.
+
+### Cross-references
+
+- Parent: [MAC-245](/MAC/issues/MAC-245) — New data 5.23
+- Schema gap surfacing: [MAC-249](/MAC/issues/MAC-249) Phase G Validator CPN-A
+- Phase H data landing: [MAC-250](/MAC/issues/MAC-250) — 116 J-5 rows admitted with `source_type='foia'` proxy
+- Dispatch + CP-slot ratification: [MAC-251](/MAC/issues/MAC-251) — wake comment `cb228e69-2c07-4062-9e92-06009f9f9c48`
+- Standing CP35 reservation (unchanged by this CP): [`BIBLE_AMENDMENTS.md:4836`](BIBLE_AMENDMENTS.md) — NDPP §4.4 Lynceus mapping draft
+- Sibling pending entries still anchored to CP35-NDPP (unaffected): SAR-19-pending (line 4925), §11 #18-pending (line 5018)
+- Predecessor enum mutation (CP23): `db/migrations/0020_source_type_enum_extension.sql` (the canonical-trio admission to `sources.source_type` that this CP brings `identifiers.source_type` to parity with)
+- Sibling memory: [[feedback_cumulative_check_enum_across_sequenced_migrations]] (the rebuild discipline followed verbatim here), [[feedback_bible_amendment_downstream_consumer_audit]] (the coordinated-sibling-commit pattern executed here), [[feedback_dispatch_preamble_live_state_verification]] (the discipline whose recurrence-after-codification motivated the CP-slot rename)

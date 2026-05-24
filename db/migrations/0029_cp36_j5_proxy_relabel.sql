@@ -1,12 +1,13 @@
 -- ============================================================================
--- Script:    0029_cp35_j5_proxy_relabel.sql
--- Sibling of: 0029_cp35_identifiers_source_type_enum_parity.sql
--- Purpose:   Post-CP35-enum-extension UPDATE: relabel the 116 J-5 CourtListener
+-- Script:    0029_cp36_j5_proxy_relabel.sql
+-- Sibling of: 0029_cp36_identifiers_source_type_enum_parity.sql
+-- Purpose:   Post-CP36-enum-extension UPDATE: relabel the 116 J-5 CourtListener
 --            rows admitted at MAC-250 Phase H with `source_type='foia'` as
 --            CPN-A band-bucket proxy → canonical `source_type='judicial_filing'`
 --            now admissible per mig-0029 enum extension.
 -- Authority: MAC-251 dispatch — verbatim UPDATE shape from issue §Scope/Post-
---            migration UPDATE relabel.
+--            migration UPDATE relabel. CP-slot ratified as CP36 at MAC-251
+--            wake comment cb228e69 (option (b)).
 -- Idempotency: WHERE clause is shape-stable. Re-running against an already-
 --            relabeled DB matches 0 rows (source_type is no longer 'foia' on
 --            those rows). Safe to re-run.
@@ -45,8 +46,8 @@ SET source_type = 'judicial_filing',
             'date', '2026-05-24',
             'from', 'foia',
             'to', 'judicial_filing',
-            'cp_anchor', 'CP35',
-            'mig', '0029_cp35_identifiers_source_type_enum_parity',
+            'cp_anchor', 'CP36',
+            'mig', '0029_cp36_identifiers_source_type_enum_parity',
             'reason', 'CHECK enum gap resolved via mig-0029; canonical source_type now matches sources(sid=48).source_type=judicial_filing'
         )
     )

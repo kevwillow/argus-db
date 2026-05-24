@@ -1,6 +1,6 @@
 -- ============================================================================
--- Migration: 0029_cp35_identifiers_source_type_enum_parity
--- Purpose:   CP35 — extend `identifiers.source_type` CHECK enum +3 net-new
+-- Migration: 0029_cp36_identifiers_source_type_enum_parity
+-- Purpose:   CP36 — extend `identifiers.source_type` CHECK enum +3 net-new
 --            values (10 → 13 cumulative) to achieve parity with the
 --            `sources.source_type` enum (extended at CP23 / migration 0020):
 --              - 'judicial_filing'
@@ -13,15 +13,13 @@
 --            where 116 rows landed with `source_type='foia'` as the
 --            CEO-ratified §8.2 65-85 band-bucket proxy.
 --
--- Authority: MAC-251 dispatch (post-Wave-J cleanup; CEO-authored issue spec
---            naming this migration and CP35 anchor explicitly). CEO
---            ratification of the CP-number assignment is the open question
---            being raised back to CEO at MAC-251 reassign; this migration's
---            filename and per-row `cp_anchor='CP35'` in the J-5 relabel
---            follow MAC-251 spec verbatim. If CEO renumbers the CP slot,
---            this migration filename + the per-row `cp_anchor` are the only
---            scope-affecting artifacts; a follow-up rename + UPDATE would
---            be required for either to change.
+-- Authority: MAC-251 dispatch (post-Wave-J cleanup; CEO-authored issue spec).
+--            CP-slot disambiguation ratified at MAC-251 wake comment
+--            cb228e69-2c07-4062-9e92-06009f9f9c48 (option (b)): CP35 remains
+--            reserved for the standing NDPP §4.4 Lynceus mapping draft entry
+--            (BIBLE_AMENDMENTS.md:4836); this enum-parity work re-anchors to
+--            CP36. Mig filename, schema_version name, and per-row
+--            `cp_anchor='CP36'` in the J-5 relabel reflect the ratified slot.
 --
 -- Bible:     §11 #1   no fabrication — relabel restores canonical truth
 --                     (sources(sid=48).source_type already='judicial_filing'
@@ -36,12 +34,11 @@
 --            §11 #8   no confidence drift — relabel is a column UPDATE,
 --                     not a row delta; identifiers.confidence column not
 --                     touched. 116 rows retain confidence=75 verbatim.
---            §11 #11  amendment-log discipline — CP35 BIBLE_AMENDMENTS.md
---                     entry pending CEO disambiguation of CP35 slot
---                     collision with the pre-existing CP35-draft NDPP §4.4
---                     Lynceus mapping entry. Schema-side migration ships
---                     this commit; bible amendment-log entry follows in
---                     a coordinated sibling commit per CEO ratification.
+--            §11 #11  amendment-log discipline — CP36 BIBLE_AMENDMENTS.md
+--                     entry authored in this commit as the coordinated
+--                     sibling per CEO ratification at MAC-251 wake comment
+--                     cb228e69. CP35 slot stands reserved for the NDPP §4.4
+--                     Lynceus mapping draft (BIBLE_AMENDMENTS.md:4836).
 --            §11 #17  carve-out audit invariant — the post-migration UPDATE
 --                     appends `notes.cpn_a_proxy_relabel` (a new JSON
 --                     sentinel-key block); does NOT mutate existing audit
@@ -110,8 +107,10 @@
 --   0026a = MAC-204 phase10 vendor APK source admissions (data-only)
 --   0027  = CP33 §1-§2 — cctv_camera + persistent_surveillance + through_wall_radar + imei_tac
 --   0028  = CP34 — network_discovery_protocol_pattern identifier_type
---   0029  = CP35 — this migration (identifiers.source_type enum parity with
---                  sources.source_type per CP23 trio)
+--   0029  = CP36 — this migration (identifiers.source_type enum parity with
+--                  sources.source_type per CP23 trio; CP35 reserved for NDPP
+--                  §4.4 mapping draft per MAC-251 wake comment cb228e69
+--                  CP-slot disambiguation)
 -- ============================================================================
 
 PRAGMA foreign_keys = OFF;
@@ -228,7 +227,7 @@ CREATE TABLE identifiers_new (
                           'manufacturer_app',
                           -- CP15 (migration 0015)
                           'primary_registry',
-                          -- CP35 (this migration) — enum parity with
+                          -- CP36 (this migration) — enum parity with
                           -- sources.source_type per CP23 trio; closes the
                           -- gap surfaced at MAC-249 Phase G Validator CPN-A.
                           'judicial_filing',
@@ -280,7 +279,7 @@ CREATE INDEX IF NOT EXISTS idx_identifiers_paired
 
 -- ─── Schema version bump ────────────────────────────────────────────────────
 INSERT OR IGNORE INTO schema_version (version, name) VALUES
-    (29, '0029_cp35_identifiers_source_type_enum_parity');
+    (29, '0029_cp36_identifiers_source_type_enum_parity');
 
 COMMIT;
 
@@ -291,7 +290,7 @@ PRAGMA foreign_keys = ON;
 
 -- ============================================================================
 -- Post-migration state (expected):
---   - schema_version row (29, '0029_cp35_identifiers_source_type_enum_parity')
+--   - schema_version row (29, '0029_cp36_identifiers_source_type_enum_parity')
 --   - identifiers.source_type CHECK accepts 13 values (10 prior + 3 new)
 --   - identifiers row count unchanged (column-preserving INSERT SELECT *)
 --   - All 6 identifiers indexes recreated
@@ -302,5 +301,5 @@ PRAGMA foreign_keys = ON;
 --   - 116 J-5 rows (source_url LIKE 'https://www.courtlistener.com/docket/%'
 --     AND source_type='foia' AND notes.wave='j_widenet') relabeled to
 --     source_type='judicial_filing' with notes.cpn_a_proxy_relabel sentinel.
---   - See `db/migrations/0029_cp35_j5_proxy_relabel.sql` (sibling script).
+--   - See `db/migrations/0029_cp36_j5_proxy_relabel.sql` (sibling script).
 -- ============================================================================
