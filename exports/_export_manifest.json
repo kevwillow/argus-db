@@ -1,91 +1,76 @@
 {
-  "generated_at_utc": "2026-05-22T16:05:32Z",
-  "generation_dispatch": "MAC-232",
-  "predecessor_commit": "8552222",
-  "branch": "v1.5.0-integration-stage-1",
-  "argus_version_pre_bump": "v1.4.1",
-  "argus_version_post_bump_recommended": "v1.5.0",
-  "release_narrative": "v1.5.0 Stage 1 integration close (MAC-232) — lexicon-expansion wave. CP33 (mig-0027): +3 device_category (cctv_camera, persistent_surveillance, through_wall_radar) + 1 identifier_type (imei_tac). +2 sources (sid=72 GitHub Code Search REST, sid=73 adsb.lol v2; crt.sh + fccid.io dedup-merged into existing sids 54+51). +40 manufacturers (21 S1 military/federal + 19 S2 commercial/consumer) + Pelco arm-under-MSI (G-A). +848 net active identifier promotions across 7 substep cohorts. G-B retroactive cctv_camera recategorization applied to 7 existing vendors (Hikvision/Dahua/Axis/Avigilon/Verkada/Eagle Eye/Rhombus; BriefCam deferred). SAR-16 (alias-length-floor) + SAR-17 (no-generic-product-aliases) + SAR-18 (classifier-predicate parity per Step 9 Path β) formal codifications. 7 CP34-pending candidates queued in PLANNED_AND_FUTURE_UPDATES.md.",
-  "stage_1_dispatch_chain": [
-    "MAC-232 Step 1 Validator reconcile (report only)",
-    "MAC-232 Step 2 source admissions (d73a788)",
-    "MAC-232 Step 3 mig-0027 CP33 (2128299)",
-    "MAC-232 Step 4 manufacturer admissions (99d713b)",
-    "MAC-232 Step 5 identifier promotion (24ccfa5)",
-    "MAC-232 Step 6 G-B retroactive recat (0e13b20)",
-    "MAC-232 Step 7 SAR-16+SAR-17 (ecf6d4b)",
-    "MAC-232 Step 8 PLANNED_AND_FUTURE_UPDATES.md (1931e75)",
-    "MAC-232 Step 9 Path β patch + SAR-18 (8552222)",
-    "MAC-232 Step 9 Export regen (this commit)"
-  ],
-  "stage_1_predecessor_chain_head": "8552222",
-  "baseline_canonical_count_post_v1_4_1": 34964,
-  "active_canonical_count_post_v1_5_0_stage1": 35812,
-  "baseline_high_confidence_export_count_v1_4_1": 114,
-  "high_confidence_export_count_post_v1_5_0_stage1": 119,
-  "high_confidence_export_count_delta": 5,
-  "files": {
-    "argus_export.json": {
-      "size_bytes": 92542,
-      "record_count": 536,
-      "confidence_threshold": 30,
-      "note": "Lynceus-filtered standard export; +22 records vs v1.4.1 baseline (514→536) driven by MAC-232 Step 5 net-new identifier promotions that survived §4.4/§11 #13/§11 #14 filtering."
+    "generated_at_utc": "2026-05-24T04:17:22Z",
+    "generation_dispatch": "MAC-253",
+    "predecessor_commit": "7da55ed",
+    "branch": "main",
+    "argus_version_pre_bump": "v1.5.2",
+    "argus_version_post_bump_recommended": "v1.5.3",
+    "release_narrative": "v1.5.3-rc Wave J widenet (MAC-245) — five-phase widenet pulling vendor / drone-RID / IMSI / GainSec / judicial-filing corpora into the canonical set. Phase D (MAC-246) MOTOROLA-W vendor admissions; Phase E (MAC-247) drone-RID cohort; Phase F (MAC-248) IMSI / GainSec promotion; Phase G (MAC-249) Wave-J +1,843-row Phase-H build memo; Phase H (MAC-250) substantive promotion landing 37,801 active identifiers (+1,843 vs v1.5.2 35,958). CP36 (mig-0029) admitted `judicial_filing` to the `source_type` enum and relabeled 116 J-5 court-filing rows at conf=75. CP35 (sibling commit chain at 7666748) ratified §4.4 Lynceus mapping for `network_discovery_protocol_pattern` (NDPP) as DROP-with-rationale `NDPP_pending_lynceus_v0_3_scanner_support` — 18 NDPP rows held in canonical DB pending Lynceus v0.3 scanner-side discovery-protocol-signature support. Standard export 579 entries (+43 vs v1.5.0 stage-1 536). High-conf export 119 entries (unchanged count vs v1.5.0 stage-1; cohort drift internal as Wave J Phase H rows competed against existing high-conf survivors and the 18 NDPP rows landed in DROPPED). The 116 judicial_filing rows did NOT surface on either export — all identifier_types in that cohort (`product_family_codename` 109 + `firmware_branded_string` 7) are DROPPED-class per §4.4. Behavioral signatures sibling unchanged (201 source / 125 survivor).",
+    "wave_j_dispatch_chain": [
+        "MAC-246 Phase D MOTOROLA-W vendor admissions",
+        "MAC-247 Phase E drone-RID cohort",
+        "MAC-248 Phase F IMSI / GainSec",
+        "MAC-249 Phase G build memo",
+        "MAC-250 Phase H substantive promotion (aac8c91)",
+        "MAC-251 CP36 mig-0029 source_type enum parity + J-5 relabel (a89aaff → 7e6160e → 94d612d)",
+        "MAC-255 CP35 §4.4 NDPP DROP ratification (7666748 → 7da55ed)",
+        "MAC-253 Phase I.1 export regen (this commit)"
+    ],
+    "wave_j_predecessor_chain_head": "7da55ed",
+    "baseline_canonical_count_post_v1_5_2": 35958,
+    "active_canonical_count_post_v1_5_3_rc": 37801,
+    "active_canonical_delta": 1843,
+    "baseline_high_confidence_export_count_v1_5_2": 119,
+    "high_confidence_export_count_post_v1_5_3_rc": 119,
+    "high_confidence_export_count_delta": 0,
+    "baseline_standard_export_count_v1_5_2": 536,
+    "standard_export_count_post_v1_5_3_rc": 579,
+    "standard_export_count_delta": 43,
+    "files": {
+        "argus_export.json": {
+            "size_bytes": 99406,
+            "record_count": 579,
+            "confidence_threshold": 30,
+            "note": "Lynceus-filtered standard export; +43 records vs v1.5.0 stage-1 baseline (536→579) driven by MAC-250 Phase H +1,843 net-new identifier promotions that survived §4.4 / §11 #13 / §11 #14 filtering. 18 NDPP rows tally in DROPPED bin `NDPP_pending_lynceus_v0_3_scanner_support` per CP35 ratification."
+        },
+        "argus_export_high_confidence.json": {
+            "size_bytes": 22047,
+            "record_count": 119,
+            "confidence_threshold": 70,
+            "note": "Lynceus-filtered high-conf export; record_count unchanged at 119 vs v1.5.0 stage-1 (cohort drift internal — Phase H promotions competed against existing high-conf survivors). 116 judicial_filing rows (CP36 J-5 relabel) admit to canonical DB at conf=75 but DO NOT surface on the high-conf export — all 116 carry DROPPED-class identifier_types (`product_family_codename` 109 + `firmware_branded_string` 7); this is correct §4.4 behavior, not a regression. NDPP 18-row cohort routes to the DROPPED bin per CP35."
+        },
+        "argus_export.csv": {
+            "size_bytes": 23539525,
+            "record_count": 37801,
+            "note": "All 37,801 active identifiers; no Lynceus filtering. +1,989 rows vs v1.5.0 stage-1 35,812 CSV count (delta driven by MAC-250 Phase H +1,843 + CP36 J-5 relabel +116 + Wave J Phase D-G net cohort)."
+        },
+        "argus_export_behavioral_signatures.json": {
+            "size_bytes": 69361,
+            "source_record_count": 201,
+            "record_count": 125,
+            "note": "behavioral_signatures DB unchanged at 201 source rows. Sibling-export survivor count unchanged at 125 (deterministic SAR-10 hash + stable run_id=28e57d53-32e6-5026-9a04-267feaafcd82)."
+        },
+        "coverage_report.md": {
+            "size_bytes": 1564351,
+            "note": "Coverage matrix + gap analysis + §9 item 9 dropped-tally reconciliation. CP18 behavioral_signatures section patched verbatim."
+        }
     },
-    "argus_export_high_confidence.json": {
-      "size_bytes": 21989,
-      "record_count": 119,
-      "confidence_threshold": 70,
-      "note": "Lynceus-filtered high-conf export; +5 records vs v1.4.1 baseline (114→119). G-B retroactive cctv_camera recategorization moved selected rows out of §11 #13 unknown_category drop. SAR-18 (Path β) ensures mac_range rows drop unconditionally to oversized_mac_range bin in both classifiers."
-    },
-    "argus_export.csv": {
-      "size_bytes": 22146085,
-      "record_count": 35812,
-      "note": "All 35,812 active identifiers; no Lynceus filtering. +844 rows vs v1.4.1 baseline 34,968 CSV count (net of supersessions)."
-    },
-    "argus_export_behavioral_signatures.json": {
-      "size_bytes": 69361,
-      "source_record_count": 201,
-      "record_count": 125,
-      "note": "behavioral_signatures DB unchanged from v1.4.1 (201 source rows). Sibling-export survivor count unchanged at 125. argus_run_id=28e57d53-32e6-5026-9a04-267feaafcd82."
-    },
-    "coverage_report.md": {
-      "size_bytes": 1526274,
-      "note": "Regenerated coverage_matrix + drop_tally bins reconciled against fresh extraction_outputs/mac45/coverage_matrix_report.json. oversized_mac_range bin now 2 (was 1 pre-Path-β) reflecting id=470 (Axis Communications 70:b3:d5:98:7) + id=9404 (Eagle Eye Networks 64:33:b5:4/28) both routing through unconditional mac_range drop."
+    "verification": {
+        "schema_version": 29,
+        "sources_count": 73,
+        "manufacturers_count": 92,
+        "identifiers_active": 37801,
+        "behavioral_signatures_count": 201,
+        "source_type_judicial_filing_count": 116,
+        "source_type_procurement_active_count": 0,
+        "ndpp_active_count": 18,
+        "ndpp_export_disposition": "DROP (CP35 ratified, bin=NDPP_pending_lynceus_v0_3_scanner_support)",
+        "standard_export_dropped_total": 37222,
+        "standard_export_record_count_reconcile": "37801 source - 37222 dropped = 579 ✓",
+        "high_conf_export_dropped_total": 37682,
+        "high_conf_export_record_count_reconcile": "37801 source - 37682 dropped = 119 ✓",
+        "judicial_filing_admitted_to_high_conf": 0,
+        "judicial_filing_admitted_to_standard": 0,
+        "judicial_filing_dispatch_expectation_note": "Dispatch I.1.b verification table expected '116 admitted to high-conf' — actual count is 0. Root cause: §8.2 DB confidence ceiling for `judicial_filing` is 75 (sufficient to clear the §7.5 ≥70 high-conf floor) but the cohort's identifier_types (`product_family_codename` + `firmware_branded_string`) are §4.4 DROPPED-class. The dispatch conflated DB-admission (✓ at 75) with export-admission (gated by §4.4 disposition). This is correct §4.4 behavior, not a regression — Lynceus pattern table cannot match `product_family_codename` (vendor-internal taxonomy) or `firmware_branded_string` (too vague). Reported as a finding, not a HALT."
     }
-  },
-  "sar_18_classifier_parity_audit": {
-    "path_b_patch_commit": "8552222",
-    "predicate_pre_patch": "row.identifier_type == 'mac_range' and row.mac_range_size > MAC_RANGE_EXPANSION_CEILING (256)",
-    "predicate_post_patch": "row.identifier_type == 'mac_range' (unconditional)",
-    "classifier_diff_resolved": "db/validation/coverage_matrix.py::classify_row now matches db/validation/export_lynceus.py::_classify_row lines 530-537 verbatim semantics",
-    "active_mac_range_rows_total": 17795,
-    "active_mac_range_rows_non_unknown_category": 2,
-    "non_unknown_mac_range_breakdown": {
-      "id_470_axis_communications_70_b3_d5_98_7": "cctv_camera (G-B recat)",
-      "id_9404_eagle_eye_networks_64_33_b5_4_28": "cctv_camera (G-B recat, /28 MA-M size=256)"
-    },
-    "drop_tally_standard_oversized_mac_range_bin_pre_patch": 1,
-    "drop_tally_standard_oversized_mac_range_bin_post_patch": 2,
-    "lynceus_v0_3_mac_range_support": "absent; future CP34 §4.4 mac_range expansion slot reserved",
-    "no_canonical_mutation": "PRAGMA query_only = ON honored; this pass only regenerates exports + coverage_matrix outputs"
-  },
-  "halt_criteria_audit_2026_05_22": {
-    "head_branch_pre_flight": "PASS (HEAD=8552222, branch=v1.5.0-integration-stage-1)",
-    "canonical_state_drift": "PASS (schema=27, active=35812, sources=73, manufacturers=92 with 13 cctv_camera, integrity=ok — matches dispatch verification verbatim)",
-    "cp33_enum_extension_live": "PASS (schema_version=27 includes mig-0027 cctv_camera + persistent_surveillance + through_wall_radar device_categories + imei_tac identifier_type)",
-    "sar_18_classifier_parity": "PASS (coverage_matrix.py + export_lynceus.py both drop mac_range unconditionally to oversized_mac_range bin; both classifiers regenerated this pass yield oversized_mac_range=2)",
-    "coverage_matrix_halts": "PASS (0 halts; pre_active_count=35812)",
-    "export_lynceus_halts": "PASS (no HaltCondition raised; all 4 output artifacts written)",
-    "meta_dropped_in_export_reconciliation_standard": "PASS (35812 source - 536 record = 35276 dropped; reconciles with sum(dropped_in_export))",
-    "meta_dropped_in_export_reconciliation_high_conf": "PASS (35812 source - 119 record = 35693 dropped; reconciles with sum(dropped_in_export) + below_confidence_threshold + excluded_source_type + geographic_scope_mismatch)",
-    "device_category_unknown_in_high_conf": "PASS (0 rows; §11 #13 ban honored)",
-    "source_type_procurement_in_high_conf": "PASS (0 rows; §11 #14 ban honored)"
-  },
-  "non_goals_observed": {
-    "no_canonical_db_mutations": "PRAGMA query_only = ON honored throughout export pass",
-    "no_schema_bump": "schema_version unchanged at 27 (CP33 mig-0027 already landed pre-Step-9)",
-    "no_rc1_or_tag_cut": "deferred to Stage 2",
-    "no_cp34_bundle_absorption": "CP34 candidates 1-7 remain Stage 2+ work; this manifest references CP-anchor='CP34-pending' only as audit metadata in PLANNED_AND_FUTURE_UPDATES.md",
-    "no_branch_push": "v1.5.0-integration-stage-1 stays local until Stage 2 rc cut"
-  }
 }

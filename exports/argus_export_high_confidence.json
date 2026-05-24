@@ -1,21 +1,21 @@
 {
   "_meta": {
-    "argus_version": "27",
-    "exported_at": "2026-05-22T16:05:10Z",
+    "argus_version": "29",
+    "exported_at": "2026-05-24T04:17:22Z",
     "record_count": 119,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "44f031a2-9516-531a-873a-f18fb4676c9a",
-    "source_record_count": 35812,
+    "argus_run_id": "c78d5169-24e0-5c64-8de6-452ab26c241a",
+    "source_record_count": 37801,
     "dropped_in_export": {
-      "unknown_category": 34450,
+      "unknown_category": 36145,
       "ssid_pattern": 13,
       "device_fingerprint": 0,
       "ble_local_name": 20,
       "ble_characteristic": 8,
-      "product_family_codename": 38,
+      "product_family_codename": 179,
       "oversized_mac_range": 2,
       "icao_24bit_address": 2,
       "rf_channel": 24,
@@ -30,7 +30,7 @@
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_service_uuid": 34,
+      "ble_service_uuid": 119,
       "ble_company_id": 1,
       "frequency_band": 28,
       "ble_protocol_byte": 0,
@@ -42,7 +42,7 @@
       "network_endpoint": 489,
       "firmware_image_variant": 1,
       "qualcomm_chip_format_id": 1,
-      "firmware_branded_string": 1,
+      "firmware_branded_string": 8,
       "asdstan_message_type": 7,
       "asdstan_enum_value": 18,
       "dji_protocol_struct_format": 2,
@@ -57,11 +57,12 @@
       "vendor_controlled_hostname_deprecated": 0,
       "fcc_grantee_code": 28,
       "equipment_class_code": 0,
+      "NDPP_pending_lynceus_v0_3_scanner_support": 18,
       "procurement_only": 0,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 39,
       "excluded_source_type": 376,
-      "geographic_scope_mismatch": 2
+      "geographic_scope_mismatch": 45
     }
   },
   "entries": [
