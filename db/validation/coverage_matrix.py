@@ -211,6 +211,9 @@ SOURCE_TYPE_CEILINGS: dict[str, int] = {
     "procurement": 85,
     "academic": 90,
     "foia": 85,
+    # CP36-extension (MAC-256) — judicial_filing inherits foia proxy-band
+    # ceiling per §11 #8 invariant (CP36 confidence-preservation contract).
+    "judicial_filing": 85,
     "crowdsourced": 75,
     "inferred": 70,
     # CP12 (bible §8.2) — vendor companion app static-analysis extract.

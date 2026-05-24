@@ -5181,3 +5181,51 @@ Pre-mig backup: `db/argus.db.pre_mig0029_20260524T023858Z` (mig-0029 schema rebu
 - Sibling pending entries still anchored to CP35-NDPP (unaffected): SAR-19-pending (line 4925), §11 #18-pending (line 5018)
 - Predecessor enum mutation (CP23): `db/migrations/0020_source_type_enum_extension.sql` (the canonical-trio admission to `sources.source_type` that this CP brings `identifiers.source_type` to parity with)
 - Sibling memory: [[feedback_cumulative_check_enum_across_sequenced_migrations]] (the rebuild discipline followed verbatim here), [[feedback_bible_amendment_downstream_consumer_audit]] (the coordinated-sibling-commit pattern executed here), [[feedback_dispatch_preamble_live_state_verification]] (the discipline whose recurrence-after-codification motivated the CP-slot rename)
+
+### CP36-extension — `coverage_matrix.py::SOURCE_TYPE_CEILINGS` add `judicial_filing` ceiling
+
+**Date:** 2026-05-24
+**Commit:** _(backfilled in follow-up commit per [[feedback_bible_amendment_downstream_consumer_audit]])_
+**Origin:** [MAC-255](/MAC/issues/MAC-255) DBArchitect close-out — out-of-scope discovery: CP36 mig-0029 relabeled the 116 J-5 rows to canonical `source_type='judicial_filing'` but `db/validation/coverage_matrix.py::SOURCE_TYPE_CEILINGS` was not updated in the same coordinated commit, leaving the `_compute_halts` §8.2-sanity check (line 763) firing an `unknown_source_type` halt against the 116 J-5 rows on every validator pass.
+**Authority:** [MAC-256](/MAC/issues/MAC-256) — CEO-ratified single-touch close-out.
+**Status:** **RATIFIED** at this commit. Closes the CP36 coordinated-commit gap surfaced one CP-cycle late; analogous to how CP35 closed CP34's §4.4 mapping gap one cycle late.
+
+#### Scope (single-touch fix)
+
+One-line dict addition to `db/validation/coverage_matrix.py:213` adjacent to `"foia": 85,` for source-band-cluster locality:
+
+```python
+"judicial_filing": 85,
+```
+
+Ceiling rationale (paste-not-cite from MAC-256 ratification body): `PROJECT_BIBLE.md` §8.2 confidence-scoring table (lines 787–800) does NOT enumerate `judicial_filing` as a discrete source-band. The 116 J-5 rows (CourtListener RECAP, sid=48) were originally landed at MAC-250 Phase H under `source_type='foia'` as a §8.2 band-bucket proxy at `confidence=75`. CP36 mig-0029 (commit `7e6160e`, MAC-251) relabeled them to canonical `source_type='judicial_filing'` while preserving §11 #8 invariant (all 116 rows stay at `confidence=75`). The operational ceiling for `judicial_filing` therefore inherits from the `foia` band proxy that landed the rows. From §8.2 table: `foia` (released documents) | 65–85 → **`"judicial_filing": 85`** (band ceiling = 85, mirroring `foia` + `procurement` + `primary_registry` single-source ceilings).
+
+#### §11 envelope
+
+- **#1 no fabrication** — adding annotation-only ceiling entry; no identifier rows synthesized
+- **#7 provenance** — zero DB mutation; no `source_url` touch
+- **#8 confidence-preservation** — §11 #8 invariant from CP36 is the controlling rationale for ceiling=85 (foia inheritance); the 116 J-5 rows remain at `confidence=75` (unchanged)
+- **#11 amendment-log discipline** — this stanza IS the amendment-log entry; commit hash backfilled here per [[feedback_bible_amendment_downstream_consumer_audit]]
+- **#13 SAR-18 parity** — `SOURCE_TYPE_CEILINGS` is annotation-only (not a classifier predicate); `export_lynceus.py` does NOT consume this dict — verified pre-commit via `grep -n "SOURCE_TYPE_CEILINGS\|source_type_ceilings" db/validation/export_lynceus.py` (zero hits). No sibling-update required outside `coverage_matrix.py`.
+
+#### Out of scope (anti-scope)
+
+- **PROJECT_BIBLE.md §8.2 mutation** — §8.2 table intentionally does not enumerate `judicial_filing` as a discrete band; the proxy-history-via-§11-#8 chain (MAC-250 Phase H foia-proxy → CP36 mig-0029 relabel → CP36-extension ceiling-dict close-out) is the durable codification. Admitting `judicial_filing` as a discrete §8.2 band (with its own band range) is a separate CP-class decision (likely cycle-7+ when more J-class sources land); not this CP.
+- **`disclosure_filing` / `procurement_disclosure` ceilings** — also missing from the dict, but both have **zero live rows** (verified at MAC-251: only `judicial_filing` has rows from the +3 CP23 source_type cluster). Forward-looking dead code; admit when first row lands.
+- **116 J-5 row confidence mutation** — §11 #8 invariant from CP36 holds verbatim; the 116 rows stay at `confidence=75`.
+
+#### Verification (executed at CP-close)
+
+```bash
+cd ~/argus && python3 db/validation/coverage_matrix.py
+```
+
+Result: clean pass; the `unknown_source_type` halt at `coverage_matrix.py:763` no longer fires against `judicial_filing`. `extraction_outputs/mac45/coverage_matrix_report.json` `unknown_source_type` row reduces to `detail` referencing zero unenumerated values (or the halt is omitted entirely if no other drift remains).
+
+#### Cross-references
+
+- Parent CP: CP36 (`identifiers.source_type` CHECK enum parity, mig-0029, MAC-251)
+- Surfacing issue: [MAC-255](/MAC/issues/MAC-255) (CP35 NDPP §4.4 ratification close-out, out-of-scope discovery)
+- Authority issue: [MAC-256](/MAC/issues/MAC-256) (this CP-extension)
+- Predecessor commits: `7e6160e` (CP36 mig-0029 schema + relabel), `94d612d` (CP36 hash-backfill follow-up)
+- Sibling memory: [[feedback_bible_amendment_downstream_consumer_audit]] (the coordinated-sibling-commit discipline whose CP36 execution missed this dict; this CP-extension closes the gap)
