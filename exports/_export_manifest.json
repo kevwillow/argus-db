@@ -1,78 +1,78 @@
 {
-    "generated_at_utc": "2026-05-24T04:38:35Z",
-    "generation_dispatch": "MAC-257",
-    "predecessor_commit": "3e022f3",
+    "generated_at_utc": "2026-05-25T02:08:55Z",
+    "generation_dispatch": "MAC-275",
+    "predecessor_commit": "458fa11",
     "branch": "main",
-    "argus_version_pre_bump": "v1.5.2",
-    "argus_version_post_bump_recommended": "v1.5.3",
-    "release_narrative": "v1.5.3-rc Wave J widenet (MAC-245) — five-phase widenet pulling vendor / drone-RID / IMSI / GainSec / judicial-filing corpora into the canonical set. Phase D (MAC-246) MOTOROLA-W vendor admissions; Phase E (MAC-247) drone-RID cohort; Phase F (MAC-248) IMSI / GainSec promotion; Phase G (MAC-249) Wave-J +1,843-row Phase-H build memo; Phase H (MAC-250) substantive promotion landing 37,801 active identifiers (+1,843 vs v1.5.2 35,958). CP36 (mig-0029) admitted `judicial_filing` to the `source_type` enum and relabeled 116 J-5 court-filing rows at conf=75. CP35 (sibling commit chain at 7666748) ratified §4.4 Lynceus mapping for `network_discovery_protocol_pattern` (NDPP) as DROP-with-rationale `NDPP_pending_lynceus_v0_3_scanner_support` — 18 NDPP rows held in canonical DB pending Lynceus v0.3 scanner-side discovery-protocol-signature support. Standard export 579 entries (+43 vs v1.5.0 stage-1 536). High-conf export 119 entries (unchanged count vs v1.5.0 stage-1; cohort drift internal as Wave J Phase H rows competed against existing high-conf survivors and the 18 NDPP rows landed in DROPPED). The 116 judicial_filing rows did NOT surface on either export — all identifier_types in that cohort (`product_family_codename` 109 + `firmware_branded_string` 7) are DROPPED-class per §4.4. Behavioral signatures sibling unchanged (201 source / 125 survivor).",
-    "wave_j_dispatch_chain": [
-        "MAC-246 Phase D MOTOROLA-W vendor admissions",
-        "MAC-247 Phase E drone-RID cohort",
-        "MAC-248 Phase F IMSI / GainSec",
-        "MAC-249 Phase G build memo",
-        "MAC-250 Phase H substantive promotion (aac8c91)",
-        "MAC-251 CP36 mig-0029 source_type enum parity + J-5 relabel (a89aaff → 7e6160e → 94d612d)",
-        "MAC-255 CP35 §4.4 NDPP DROP ratification (7666748 → 7da55ed)",
-        "MAC-253 Phase I.1 export regen (this commit)"
+    "argus_version_pre_bump": "v1.5.4",
+    "argus_version_post_bump_recommended": "v1.6.0",
+    "release_narrative": "v1.6.0 Wave K+L combined widenet. Phase H (MAC-273) substantive promotion landing 41,428 active identifiers (+3,627 vs v1.5.4 37,801), +34 manufacturers (92->126, the facial-recognition / mobile-spyware / mobile-forensics surveillance-vendor cohort: NSO Group, QuaDream, Paravision, NEC NeoFace, Rank One Computing, Oxygen Forensics, MSAB, SS8 Networks, Trovicor, Utimaco, Pen-Link, Polaris Wireless, et al.), +1 source (73->74). CP37 (mig-0030, commit 2f3c6d7) admitted the `network_surveillance` device_category to the enum and wrote 131 network_surveillance rows (vendor_controlled_hostname 65 + x509_cert_sha256_prefix 40 + product_family_codename 14 + firmware_branded_string 7 + device_fingerprint 5; confidence 65-82). All 131 carry §4.4-DROPPED identifier_types in Lynceus v0.2, so they surface only in the CSV full dump and do NOT appear on either JSON export -- this is the expected CP37 downstream-consumer gap, queued as Wave M.1 Lynceus-catchup, not a regression. Standard export 580 entries (+1 vs v1.5.4 579, the lone addition being an `ssid blackmagic` Flipper-Devices hacking_tool row that clears the §4.4 ssid mapping). High-conf export 119 entries (UNCHANGED vs v1.5.4; every Wave-K high-confidence addition uses §4.4-DROPPED identifier_types). Behavioral signatures sibling unchanged (201 source / 125 survivor; behavioral_signatures table not modified this wave). 16 v1.5.4-vintage Grayshift/GrayKey product_family_codename judicial_filing rows received a ratified §8.3 corroboration uplift 75->80 during the Phase H canonical write (independent GitHub README corroborates the CourtListener docket; min(99,max(75)+5)=80; §11 #8/CP24-compliant, confidence_history-logged); product_family_codename is §4.4-DROPPED so this is CSV-only and the JSON exports are unaffected.",
+    "wave_kl_dispatch_chain": [
+        "MAC-273 Phase H CP37 mig-0030 device_category +network_surveillance + Wave K+L canonical write (2f3c6d7)",
+        "MAC-275 Phase I.1 export regen + Lynceus smoke + delta verify (this commit)"
     ],
-    "wave_j_predecessor_chain_head": "7da55ed",
-    "baseline_canonical_count_post_v1_5_2": 35958,
-    "active_canonical_count_post_v1_5_3_rc": 37801,
-    "active_canonical_delta": 1843,
-    "baseline_high_confidence_export_count_v1_5_2": 119,
-    "high_confidence_export_count_post_v1_5_3_rc": 119,
+    "wave_kl_predecessor_commit": "458fa11",
+    "baseline_canonical_count_v1_5_4": 37801,
+    "active_canonical_count_v1_6_0": 41428,
+    "active_canonical_delta": 3627,
+    "baseline_high_confidence_export_count_v1_5_4": 119,
+    "high_confidence_export_count_v1_6_0": 119,
     "high_confidence_export_count_delta": 0,
-    "baseline_standard_export_count_v1_5_2": 536,
-    "standard_export_count_post_v1_5_3_rc": 579,
-    "standard_export_count_delta": 43,
+    "baseline_standard_export_count_v1_5_4": 579,
+    "standard_export_count_v1_6_0": 580,
+    "standard_export_count_delta": 1,
     "files": {
         "argus_export.json": {
-            "size_bytes": 99406,
-            "record_count": 579,
+            "size_bytes": 99589,
+            "record_count": 580,
             "confidence_threshold": 30,
-            "note": "Lynceus-filtered standard export; +43 records vs v1.5.0 stage-1 baseline (536→579) driven by MAC-250 Phase H +1,843 net-new identifier promotions that survived §4.4 / §11 #13 / §11 #14 filtering. 18 NDPP rows tally in DROPPED bin `NDPP_pending_lynceus_v0_3_scanner_support` per CP35 ratification."
+            "argus_run_id": "f34b982c-de6f-5df6-8837-d4e5edb3b0d5",
+            "dropped_total": 40848,
+            "note": "Lynceus-filtered standard export; +1 record vs v1.5.4 (579->580), an `ssid blackmagic` Flipper-Devices hacking_tool row. All 131 CP37 network_surveillance rows are §4.4-DROPPED (their identifier_types have no Lynceus v0.2 pattern_type) and appear only in the CSV. ssid_pattern drop=18 (§4.4, incl. FlockYou 14@85 + 5 inferred). 41428 active - 40848 dropped = 580."
         },
         "argus_export_high_confidence.json": {
-            "size_bytes": 22047,
+            "size_bytes": 22054,
             "record_count": 119,
             "confidence_threshold": 70,
-            "note": "Lynceus-filtered high-conf export; record_count unchanged at 119 vs v1.5.0 stage-1 (cohort drift internal — Phase H promotions competed against existing high-conf survivors). 116 judicial_filing rows (CP36 J-5 relabel) admit to canonical DB at conf=75 but DO NOT surface on the high-conf export — all 116 carry DROPPED-class identifier_types (`product_family_codename` 109 + `firmware_branded_string` 7); this is correct §4.4 behavior, not a regression. NDPP 18-row cohort routes to the DROPPED bin per CP35."
+            "argus_run_id": "f34b982c-de6f-5df6-8837-d4e5edb3b0d5",
+            "dropped_total": 41309,
+            "note": "Lynceus-filtered high-conf export; record_count UNCHANGED at 119 vs v1.5.4 (every Wave-K high-confidence addition, incl. all 131 network_surveillance rows and the 16 GrayKey 75->80 uplifts, uses §4.4-DROPPED identifier_types -> CSV-only). geographic_scope_mismatch=45 (CP7 unknown/NULL rejection, high-conf-strict). self_exclude_oui=0 (§8.4/§11 #12 Pi OUI ban clean). 41428 active - 41309 dropped = 119."
         },
         "argus_export.csv": {
-            "size_bytes": 23539525,
-            "record_count": 37801,
-            "note": "All 37,801 active identifiers; no Lynceus filtering. +1,989 rows vs v1.5.0 stage-1 35,812 CSV count (delta driven by MAC-250 Phase H +1,843 + CP36 J-5 relabel +116 + Wave J Phase D-G net cohort)."
+            "size_bytes": 25056266,
+            "record_count": 41428,
+            "note": "All 41,428 active identifiers; no Lynceus filtering. +3,627 rows vs v1.5.4 37,801 (Phase H Wave K+L canonical write). Carries the 131 network_surveillance rows + 34 new surveillance-vendor manufacturers + the 16 GrayKey §8.3 corroboration uplifts (75->80)."
         },
         "argus_export_behavioral_signatures.json": {
             "size_bytes": 69361,
             "source_record_count": 201,
             "record_count": 125,
-            "note": "behavioral_signatures DB unchanged at 201 source rows. Sibling-export survivor count unchanged at 125 (deterministic SAR-10 hash + stable run_id=28e57d53-32e6-5026-9a04-267feaafcd82)."
+            "argus_run_id": "28e57d53-32e6-5026-9a04-267feaafcd82",
+            "note": "behavioral_signatures DB unchanged at 201 source rows this wave; sibling-export survivor count unchanged at 125 (76 below the >=70 floor). Byte-identical to v1.5.4 modulo _meta.exported_at."
         },
         "coverage_report.md": {
-            "size_bytes": 1564351,
-            "note": "Coverage matrix + gap analysis + §9 item 9 dropped-tally reconciliation. CP18 behavioral_signatures section patched verbatim."
+            "size_bytes": 1567242,
+            "note": "Coverage matrix + gap analysis + §9 item 9 dropped-tally reconciliation. CP18 behavioral_signatures section patched verbatim. Embeds extraction_outputs/mac45/coverage_matrix.md (regenerated this wave, pre_active_count=41428, halts=0)."
         }
     },
     "verification": {
-        "mac_256_post_fix_regen": true,
-        "mac_256_post_fix_regen_note": "Final post-MAC-256 regen (MAC-257 Phase I.2). MAC-256 (dda50b1) added SOURCE_TYPE_CEILINGS['judicial_filing']=85 to coverage_matrix.py AFTER the Phase I.1 regen at c0c66fb; the embedded coverage_matrix.md halt-line transitioned 'Halts at HB35: 1' -> '0' (unknown_source_type halt against the 116 J-5 judicial_filing rows closed). argus_export.json / argus_export_high_confidence.json / argus_export.csv / argus_export_behavioral_signatures.json are byte-identical to c0c66fb modulo _meta.exported_at (SOURCE_TYPE_CEILINGS is annotation-only; zero export_lynceus.py hits per SAR-18 parity). Only coverage_report.md changed substantively (halt-line 1->0 + ## Halts section removal).",
-        "schema_version": 29,
-        "sources_count": 73,
-        "manufacturers_count": 92,
-        "identifiers_active": 37801,
+        "validator_dispatch": "MAC-275 Phase I.1",
+        "schema_version": 30,
+        "sources_count": 74,
+        "manufacturers_count": 126,
+        "identifiers_active": 41428,
+        "identifiers_active_high_confidence_ge70": 40786,
         "behavioral_signatures_count": 201,
-        "source_type_judicial_filing_count": 116,
+        "network_surveillance_active_count": 131,
+        "network_surveillance_export_disposition": "All 131 §4.4-DROPPED in Lynceus v0.2 (0 in either JSON export); CSV-only; CP37 downstream gap -> Wave M.1",
         "source_type_procurement_active_count": 0,
-        "ndpp_active_count": 18,
-        "ndpp_export_disposition": "DROP (CP35 ratified, bin=NDPP_pending_lynceus_v0_3_scanner_support)",
-        "standard_export_dropped_total": 37222,
-        "standard_export_record_count_reconcile": "37801 source - 37222 dropped = 579 ✓",
-        "high_conf_export_dropped_total": 37682,
-        "high_conf_export_record_count_reconcile": "37801 source - 37682 dropped = 119 ✓",
-        "judicial_filing_admitted_to_high_conf": 0,
-        "judicial_filing_admitted_to_standard": 0,
-        "judicial_filing_dispatch_expectation_note": "Dispatch I.1.b verification table expected '116 admitted to high-conf' — actual count is 0. Root cause: §8.2 DB confidence ceiling for `judicial_filing` is 75 (sufficient to clear the §7.5 ≥70 high-conf floor) but the cohort's identifier_types (`product_family_codename` + `firmware_branded_string`) are §4.4 DROPPED-class. The dispatch conflated DB-admission (✓ at 75) with export-admission (gated by §4.4 disposition). This is correct §4.4 behavior, not a regression — Lynceus pattern table cannot match `product_family_codename` (vendor-internal taxonomy) or `firmware_branded_string` (too vague). Reported as a finding, not a HALT."
+        "standard_export_dropped_total": 40848,
+        "standard_export_record_count_reconcile": "41428 active - 40848 dropped = 580",
+        "high_conf_export_dropped_total": 41309,
+        "high_conf_export_record_count_reconcile": "41428 active - 41309 dropped = 119",
+        "self_exclude_oui_drops": 0,
+        "coverage_matrix_halts": 0,
+        "lynceus_smoke": "lynceus-warden@9c5825e import_argus --dry-run: 41428 total, 23443 imported, 17857 unknown_type, 0 errors, exit 0; no regression vs v1.5.4 baseline (delta reconciles to +3,627)",
+        "vintage_row_regression": "0 of 37,801 v1.5.4 ids missing; 16 ids confidence 75->80 (ratified §8.3/§11 #8 GrayKey corroboration uplift, confidence_history-logged, CSV-only); all other tracked fields unchanged",
+        "halt_class_items": "none"
     }
 }
