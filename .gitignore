@@ -102,3 +102,19 @@ exports/*_raw_snapshot/
 # `android_test/tools/extraction/wave_g_extractor.py.v4_backup_<UTC-timestamp>`.
 android_test/tools/extraction/*.v[0-9]_backup_*
 android_test/tools/extraction/*.v[0-9][0-9]_backup_*
+
+# Internal planning / point-in-time artifacts — keep the canonical tree clean of
+# staged migrations, pre-action backups, stop-the-line memos, handoff docs, patch-cycle
+# summaries, pre-tag audit dirs, and probe logs. These are operational scratch, archived
+# to the internal sandbox when needed. Narrow patterns validated against canonical files
+# (__init__.py, docs/internal/, exports/_export_manifest.json, bible/history/, root stubs).
+# Added MAC-278 (post-v1.6.1 repo-hygiene cleanup).
+*_STAGED.py
+*.pre_*_backup
+*.pre_wave_*
+*.pre_cp*
+STOP_THE_LINE_*.md
+HANDOFF_*.md
+_patch_cycle_*/
+_v1_*_pretag*/
+_probe_log.md
