@@ -5229,3 +5229,46 @@ Result: clean pass; the `unknown_source_type` halt at `coverage_matrix.py:763` n
 - Authority issue: [MAC-256](/MAC/issues/MAC-256) (this CP-extension)
 - Predecessor commits: `7e6160e` (CP36 mig-0029 schema + relabel), `94d612d` (CP36 hash-backfill follow-up)
 - Sibling memory: [[feedback_bible_amendment_downstream_consumer_audit]] (the coordinated-sibling-commit discipline whose CP36 execution missed this dict; this CP-extension closes the gap)
+
+---
+
+## Correction Pass 37 — §4.1/§4.4 `device_category` CHECK enum extension `network_surveillance` (mig-0030 / Wave K cohort 3 admission) — **RATIFIED** (Option A)
+
+**Date:** 2026-05-24
+**Commit:** `<backfill>` on `main` (single coordinated commit: migration file + this amendment-log stanza, per [[feedback_bible_amendment_downstream_consumer_audit]])
+**Origin:** [MAC-273](/MAC/issues/MAC-273) Wave K+L combined Phase H canonical writes. Wave K cohort 3 (lawful-intercept / network-surveillance platforms) had no admitting `device_category`; `hacking_tool` (cohort-2/cohort-4 home) denotes offensive exploitation + forensic extraction and would blur the offensive-vs-passive distinction downstream consumers rely on.
+**Authority:** [MAC-273](/MAC/issues/MAC-273) — CEO/operator-ratified Option A (GATE-1), 2026-05-24, after Validator Phase F reverify ([MAC-272](/MAC/issues/MAC-272)) returned zero halt-class with all four gates PASS.
+**Status:** **RATIFIED** at this commit. Schema 29 → 30.
+
+#### Scope
+
+One net-new `device_category` enum value, `network_surveillance`, added to the CHECK constraint on **both** host tables — `identifiers.device_category` and `behavioral_signatures.device_category` — maintaining the CP32/CP33 dual-table parity invariant. Applied via SQLite table-rebuild (CP21 cumulative-full-enum pattern, mirrors mig-0026/0027). Migration file `db/migrations/0030_cp37_device_category_network_surveillance.sql`; `schema_version` row `(30, '0030_cp37_device_category_network_surveillance')`.
+
+Cohort-3 vendors anchoring the new value (§11 #1 — each cites a concrete vendor): **Pen-Link, SS8 Networks, Cognyte, Utimaco (LIMS), Polaris Wireless, Trovicor**. At this CP, **131** previously-gated `identifiers` rows (`promotion_plan_identifiers_c3_GATED.sql`) were promoted carrying `device_category='network_surveillance'` — they would have FAILED the enum CHECK before mig-0030 (the gate is load-bearing). 0 `behavioral_signatures` rows carry the new value yet (forward-compat parity).
+
+#### CP-slot / ledger note
+
+Filed as file `0030` / **CP37** / `schema_version` row **30**, per the Wave-K dispatch terminology and the standing FILE convention. Note the known ledger-vs-file offset: `schema_version` row 29 is named `0029_cp35_identifiers_source_type_enum_parity` while the migration FILE is `0029_cp36_*` — CP37 keeps the file convention (the offset is tracked separately; not re-litigated here).
+
+#### §11 envelope
+
+- **#1 no fabrication** — enum value cites six concrete cohort-3 vendors; the 131 promoted rows are the Validator-PASSed battery, not synthesized.
+- **#7 provenance** — table-rebuild preserves every row verbatim (`INSERT … SELECT *`, id-preserving); no `source_url` touched; `foreign_key_check` clean before and after.
+- **#11 amendment-log discipline** — this stanza IS the amendment-log entry (no silent CP); paired with the migration file in one coordinated commit.
+- **#13 Lynceus unknown-bucket carveout** — `network_surveillance` is a PROMOTING category (excluded-when-`unknown` does NOT apply); behaves like the CP33 promoting categories.
+
+#### Verification (executed at apply, paste-not-cite from live DB)
+
+Dry-run on a scratch copy first (all expected counts matched exactly), then identical scripts applied to canonical `db/argus.db`:
+
+- `PRAGMA integrity_check` = `ok`; `PRAGMA foreign_key_check` = clean (between every step + final).
+- schema `30`; active identifiers **41,428** (37,801 + 3,495 main + 131 c3 + 1 wave_l); total `41,774`; manufacturers **126** (+34); sources **74** (+1 CISA KEV); behavioral_signatures `201` (unchanged).
+- `network_surveillance` rows = **131**; identifier_type enum violations = **0**.
+- Pre-write DB sha256 `8ba9eecc7845fa66ad046d1053712da99cf51eed4919d777ff41c7e0ae7608b6` (= timestamped backup); post-write sha256 `75b9f69dbd31c8b5c347936d4eb115ab28df9d247193b4e6ad75b9df637614be`.
+
+#### Cross-references
+
+- Migration: `db/migrations/0030_cp37_device_category_network_surveillance.sql`
+- Reverify authority: [MAC-272](/MAC/issues/MAC-272) (Validator Phase F — zero halt-class, four gates PASS)
+- Sibling gate: GATE-2 (Anduril Lattice OS arm `primary_category='unknown'`, operator-ratified Option A) applied in the same Phase H manufacturers batch.
+- Predecessor CP-cluster: CP32 (mig-0026 `automotive_telematics`), CP33 (mig-0027 `cctv_camera`/`persistent_surveillance`/`through_wall_radar`) — same dual-table parity discipline.
