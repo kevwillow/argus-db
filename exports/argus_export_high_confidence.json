@@ -1,13 +1,13 @@
 {
   "_meta": {
     "argus_version": "30",
-    "exported_at": "2026-05-25T02:08:05Z",
+    "exported_at": "2026-05-25T02:33:05Z",
     "record_count": 119,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "f34b982c-de6f-5df6-8837-d4e5edb3b0d5",
+    "argus_run_id": "5933f493-c78f-52fd-8997-abe1aa3641a3",
     "source_record_count": 41428,
     "dropped_in_export": {
       "unknown_category": 36152,

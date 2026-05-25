@@ -1446,11 +1446,11 @@
       "identifier_type": "ssid_pattern",
       "n": 8,
       "n_by_source_type": {
-        "crowdsourced": 8
+        "inferred": 8
       },
-      "min_conf": 85,
-      "max_conf": 85,
-      "median_conf": 85.0,
+      "min_conf": 50,
+      "max_conf": 50,
+      "median_conf": 50.0,
       "row_ids": [
         35597,
         35598,
@@ -22223,11 +22223,11 @@
       "identifier_type": "ssid_pattern",
       "n": 6,
       "n_by_source_type": {
-        "crowdsourced": 6
+        "inferred": 6
       },
-      "min_conf": 85,
-      "max_conf": 85,
-      "median_conf": 85.0,
+      "min_conf": 50,
+      "max_conf": 50,
+      "median_conf": 50.0,
       "row_ids": [
         35591,
         35592,

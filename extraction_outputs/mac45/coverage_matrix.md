@@ -56,7 +56,7 @@ Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `iden
 | `police_radio` | `ble_local_name` | 1 | crowdsourced=1 | 85 | 85 | 85 | 35614 |
 | `police_radio` | `ble_characteristic` | 2 | manufacturer_app=2 | 87 | 87 | 87.0 | 23049, 23050 |
 | `drone` | `oui` | 28 | crowdsourced=14, primary_registry=14 | 40 | 95 | 80.0 | 421, 423, 424, 431, 432, 435, 436, 444 … +20 |
-| `drone` | `ssid_pattern` | 8 | crowdsourced=8 | 85 | 85 | 85.0 | 35597, 35598, 35599, 35600, 35601, 35602, 35603, 35604 |
+| `drone` | `ssid_pattern` | 8 | inferred=8 | 50 | 50 | 50.0 | 35597, 35598, 35599, 35600, 35601, 35602, 35603, 35604 |
 | `drone` | `product_family_codename` | 32 | crowdsourced=32 | 75 | 75 | 75.0 | 38545, 38546, 38547, 38548, 38549, 38550, 38551, 38552 … +24 |
 | `drone` | `drone_id_prefix` | 427 | crowdsourced=335, primary_registry=92 | 75 | 85 | 75 | 569, 570, 571, 572, 573, 574, 575, 576 … +419 |
 | `drone` | `rf_channel` | 24 | crowdsourced=24 | 65 | 85 | 65.0 | 22773, 22774, 22775, 22776, 22777, 22778, 22779, 22780 … +16 |
@@ -81,7 +81,7 @@ Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `iden
 | `drone_detect` | `product_family_codename` | 13 | manufacturer_app=6, manufacturer_doc=2, procurement=5 | 65 | 92 | 70 | 542, 543, 38584, 38585, 38586, 38587, 38595, 38603 … +5 |
 | `unknown` | `oui` | 330 | crowdsourced=299, primary_registry=31 | 75 | 95 | 75.0 | 413, 414, 416, 418, 419, 420, 422, 425 … +322 |
 | `unknown` | `mac_range` | 17802 | crowdsourced=9, inferred=4, primary_registry=17789 | 50 | 95 | 85.0 | 467, 468, 469, 488, 489, 490, 491, 4951 … +17794 |
-| `unknown` | `ssid_pattern` | 6 | crowdsourced=6 | 85 | 85 | 85.0 | 35591, 35592, 35593, 35594, 35595, 35596 |
+| `unknown` | `ssid_pattern` | 6 | inferred=6 | 50 | 50 | 50.0 | 35591, 35592, 35593, 35594, 35595, 35596 |
 | `unknown` | `product_family_codename` | 3 | manufacturer_app=2, regulatory=1 | 65 | 78 | 65 | 38596, 38597, 38598 |
 | `unknown` | `ble_manufacturer_id` | 3967 | primary_registry=3967 | 85 | 95 | 85 | 567, 568, 984, 985, 986, 987, 988, 989 … +3959 |
 

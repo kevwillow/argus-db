@@ -5272,3 +5272,53 @@ Dry-run on a scratch copy first (all expected counts matched exactly), then iden
 - Reverify authority: [MAC-272](/MAC/issues/MAC-272) (Validator Phase F — zero halt-class, four gates PASS)
 - Sibling gate: GATE-2 (Anduril Lattice OS arm `primary_category='unknown'`, operator-ratified Option A) applied in the same Phase H manufacturers batch.
 - Predecessor CP-cluster: CP32 (mig-0026 `automotive_telematics`), CP33 (mig-0027 `cctv_camera`/`persistent_surveillance`/`through_wall_radar`) — same dual-table parity discipline.
+
+---
+
+## Correction Pass 38 — Step-2.3 codified: crowdsourced-detection-app `ssid_pattern`s default to `inferred/50` (FlockYou full-enum sweep) — **RATIFIED** (Option A)
+
+**Date:** 2026-05-25
+**Commit:** `<this commit>` on `main` (single coordinated commit: the 14-row reclassification + this amendment-log stanza, per [[feedback_bible_amendment_downstream_consumer_audit]]; hash backfilled in follow-up commit).
+**Origin:** [MAC-273](/MAC/issues/MAC-273) Step-2.3 ruling — Wave-K Phase H applied it to the **5 new** rows (ids 39582, 39583, 39610, 39613, 41839). [MAC-274](/MAC/issues/MAC-274) is the S.7 downstream-consumer sweep of the **14 pre-existing** identical-source rows (ids 35591–35604; `github.com/MaxwellDPS/Flock-You-Android`; landed MAC-192 `phase_6_wave_i_14a_retroactive_promotion`) that sat at `crowdsourced/85`.
+**Authority:** [MAC-274](/MAC/issues/MAC-274) — board/operator-ratified Option A in the [MAC-271](/MAC/issues/MAC-271) thread (operator comment 2026-05-25T02:06Z), relayed as the formal go-signal by the CEO on MAC-274.
+**Status:** **RATIFIED** at this commit. No schema change (`schema_version` unchanged at 30); `notes`/classification reconciliation only.
+
+#### Rule (durable §8.2 classification sub-rule)
+
+An `ssid_pattern` (or other identifier) whose **sole provenance is a crowdsourced detection / counter-surveillance application's hardcoded pattern list** (e.g. `Flock-You-Android` `SsidPatterns.kt` / `RogueWifiMonitor.kt` / `RfSignalAnalyzer.kt`) is a **third-party inference, NOT a vendor-published default**. It is classified `source_type='inferred'`, `confidence=50` (§8.2 inferred baseline), tagged `notes.fp_class='crowdsourced_detection_app_not_vendor_default'`.
+
+This is **source-class based** — it applies **uniformly regardless of which vendor each pattern purports to detect**. A row escapes this default **only** with an *independent vendor-default corroboration*: a separate row/source of `source_type IN ('manufacturer_doc','manufacturer_app','official','regulatory')` attesting the same pattern, in which case standard §8.3 corroboration applies and the row may sit above 50. Future waves ingesting from a crowdsourced-detection-app source MUST auto-apply this default at promotion time.
+
+#### Full-enum sweep discharge (S.7)
+
+A policy ruling of this class carries an S.7 obligation to enumerate **all** pre-existing rows from the same source class for uniform reconciliation. This CP discharges that obligation for the MAC-192 FlockYou cohort: **5 (Wave-K) + 14 (this CP) = 19 rows total** now at `inferred/50` + `fp_class`. The 14 were verified (MAC-274 enumeration, paste-not-cite) to carry **no independent vendor-default corroboration** anywhere in `identifiers` (no exact-dup row; no non-crowdsourced `ssid_pattern` attestation for any of Sierra Wireless / Cradlepoint / DJI / Parrot / Skydio / Autel Robotics).
+
+#### Applied write (the 14 rows)
+
+`crowdsourced/85 → inferred/50` for ids 35591–35604. `notes` mutation is **additive only** (§11 #7): existing MAC-192 provenance block preserved verbatim, `source_url` untouched; appended keys `confidence_history[]` `{from:85,to:50}`, `source_type_history[]` `{crowdsourced→inferred}`, `fp_class`, `reconciliation{dispatch:MAC-274,parent:MAC-273,policy:step_2_3}`. Staging script: `db/migrations/_drafts/mac274_flockyou_ssid_reconcile_STAGED.py` (idempotent; dry-run default).
+
+#### §11 envelope
+
+- **#1 no fabrication** — no rows synthesized; 14 existing rows reclassified.
+- **#7 provenance** — `source_url` untouched; additive `notes` only.
+- **#8 confidence-preservation** — NOT invoked: this is an intentional §8.2 reclassification with full `confidence_history[]` audit, not a silent value change.
+- **#11 amendment-log discipline** — this stanza IS the amendment-log entry; landed in the same coordinated commit as the write (no silent CP).
+- **#13 SAR-18 parity** — `fp_class` is annotation-only (not a classifier predicate).
+
+#### Export impact — **none on either Lynceus JSON export**
+
+Verified pre- and post-write: §4.4 maps `ssid_pattern → (DROPPED)` ("Lynceus has no regex support in v0.2"; `export_lynceus.py:97,530-531`). All `ssid_pattern` rows are categorically excluded from **both** `argus_export.json` (≥30) and `argus_export_high_confidence.json` (≥70), independent of confidence/source_type. The MAC-274 dispatch's premise that the 14 sat "inside the ≥70 high-confidence export" did **not** hold; net Lynceus export-membership delta = **0**. The reclassification is visible only in the unfiltered `argus_export.csv` (full dump, now `50/inferred`) and the coverage matrix band tallies (`crowdsourced −14 / inferred +14`). Post-regen the two Lynceus JSON exports are byte-identical modulo the per-run `exported_at`/`argus_run_id` generation stamps. See [[reference_ssid_pattern_excluded_from_both_lynceus_exports]].
+
+#### Verification (executed at apply, paste-not-cite from live DB)
+
+- Pre-write DB sha256 `75b9f69dbd31c8b5c347936d4eb115ab28df9d247193b4e6ad75b9df637614be` (= timestamped backup `db/argus.db.pre_mac274_20260525T022708Z`).
+- `PRAGMA integrity_check` = `ok`; `PRAGMA foreign_key_check` = clean (before + after).
+- active identifiers **41,428** (unchanged — reclassification, not deletion); total **41,774** (unchanged).
+- 14 target rows post-write: `50 | inferred` × 14; FlockYou `fp_class` rows = **19** (5 + 14).
+- coverage_matrix regen: `pre_active_count=41428`, **Halts: 0**, standard survivors 580 / high-conf 164.
+
+#### Cross-references
+
+- Parent ruling: [MAC-273](/MAC/issues/MAC-273) Step-2.3 (5 Wave-K rows: ids 39582/39583/39610/39613/41839).
+- Predecessor CP: CP19 (§8.2 `crowdsourced`/`inferred` high-confidence-export exclusion); §4.4 `ssid_pattern` DROP.
+- Sibling memory: [[reference_ssid_pattern_excluded_from_both_lynceus_exports]], [[feedback_flockyou_ssid_pattern_policy_split]], [[feedback_bible_amendment_downstream_consumer_audit]].
