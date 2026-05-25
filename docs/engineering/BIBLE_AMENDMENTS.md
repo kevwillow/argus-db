@@ -5278,7 +5278,7 @@ Dry-run on a scratch copy first (all expected counts matched exactly), then iden
 ## Correction Pass 38 — Step-2.3 codified: crowdsourced-detection-app `ssid_pattern`s default to `inferred/50` (FlockYou full-enum sweep) — **RATIFIED** (Option A)
 
 **Date:** 2026-05-25
-**Commit:** `<this commit>` on `main` (single coordinated commit: the 14-row reclassification + this amendment-log stanza, per [[feedback_bible_amendment_downstream_consumer_audit]]; hash backfilled in follow-up commit).
+**Commit:** `8a89816` on `main` (single coordinated commit: the 14-row reclassification + this amendment-log stanza, per [[feedback_bible_amendment_downstream_consumer_audit]]; hash backfilled in this follow-up commit).
 **Origin:** [MAC-273](/MAC/issues/MAC-273) Step-2.3 ruling — Wave-K Phase H applied it to the **5 new** rows (ids 39582, 39583, 39610, 39613, 41839). [MAC-274](/MAC/issues/MAC-274) is the S.7 downstream-consumer sweep of the **14 pre-existing** identical-source rows (ids 35591–35604; `github.com/MaxwellDPS/Flock-You-Android`; landed MAC-192 `phase_6_wave_i_14a_retroactive_promotion`) that sat at `crowdsourced/85`.
 **Authority:** [MAC-274](/MAC/issues/MAC-274) — board/operator-ratified Option A in the [MAC-271](/MAC/issues/MAC-271) thread (operator comment 2026-05-25T02:06Z), relayed as the formal go-signal by the CEO on MAC-274.
 **Status:** **RATIFIED** at this commit. No schema change (`schema_version` unchanged at 30); `notes`/classification reconciliation only.
