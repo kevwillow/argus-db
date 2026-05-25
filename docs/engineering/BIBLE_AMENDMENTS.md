@@ -5235,7 +5235,7 @@ Result: clean pass; the `unknown_source_type` halt at `coverage_matrix.py:763` n
 ## Correction Pass 37 — §4.1/§4.4 `device_category` CHECK enum extension `network_surveillance` (mig-0030 / Wave K cohort 3 admission) — **RATIFIED** (Option A)
 
 **Date:** 2026-05-24
-**Commit:** `<backfill>` on `main` (single coordinated commit: migration file + this amendment-log stanza, per [[feedback_bible_amendment_downstream_consumer_audit]])
+**Commit:** `2f3c6d7` on `main` (single coordinated commit: migration file + this amendment-log stanza, per [[feedback_bible_amendment_downstream_consumer_audit]]; hash backfilled in follow-up commit)
 **Origin:** [MAC-273](/MAC/issues/MAC-273) Wave K+L combined Phase H canonical writes. Wave K cohort 3 (lawful-intercept / network-surveillance platforms) had no admitting `device_category`; `hacking_tool` (cohort-2/cohort-4 home) denotes offensive exploitation + forensic extraction and would blur the offensive-vs-passive distinction downstream consumers rely on.
 **Authority:** [MAC-273](/MAC/issues/MAC-273) — CEO/operator-ratified Option A (GATE-1), 2026-05-24, after Validator Phase F reverify ([MAC-272](/MAC/issues/MAC-272)) returned zero halt-class with all four gates PASS.
 **Status:** **RATIFIED** at this commit. Schema 29 → 30.
