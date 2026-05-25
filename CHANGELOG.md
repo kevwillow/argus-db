@@ -18,6 +18,35 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 (No unreleased changes since v1.5.4.)
 
+## v1.6.0 — Wave K + Wave L combined ship (2026-05-25)
+
+### Highlights
+- **Wave K cohort expansion (+3,626 identifiers):** face_recog 462 · spyware/offensive 2,940 · lawful-intercept/network-surveillance 131 · forensic 24 · counter-UAS 42 · Flipper-adhoc 27.
+- **Wave L:** CISA KEV source admission (sources 73→74) + 1 AirLink ALEOS identifier (bundled in the same Phase H transaction).
+- **+34 manufacturers** (→126), including 5 CP31 arm-splits: Grayshift→Magnet Forensics (id 29); Anduril Anvil/Lattice OS/Roadrunner/Sentry Tower→Anduril (id 223). Magnet Forensics (id 29) received a +5 §5.2 cross-source lift (GrayKey↔Grayshift), not a re-insert.
+- **Net active identifiers 37,801 → 41,428** (total 38,147 → 41,774; identical deltas = zero supersession churn).
+- **CP37 — `network_surveillance` device_category** ratified (Option A); GATE-2 Anduril Lattice OS admitted under existing `unknown`.
+- **CP38 — FlockYou reconcile:** 14 pre-existing crowdsourced `ssid_pattern` rows demoted `crowdsourced/85 → inferred/50` (uniform with the 5 Wave-K rows from Step-2.3; 19 rows total at `fp_class='crowdsourced_detection_app_not_vendor_default'`). Reclassification only — rows + provenance retained.
+
+### Schema
+- **mig-0030 (CP37):** `device_category` CHECK enum 16→17 (`+network_surveillance`), dual-table parity (`identifiers` + `behavioral_signatures`). schema_version 29→30.
+- Bible: CP37 stanza @ `2f3c6d7`; CP38 stanza @ `8a89816` (both in `docs/engineering/BIBLE_AMENDMENTS.md`, §11 #11 coordinated commits).
+
+### Discipline data points
+- Phase F §7.5 cohort-2 PII reverify PASS (2,940 candidates); MAC-252 dedup pre-flight compounding=0 (57-group baseline held); Phase H 21-assertion + 20-row spot-check PASS (first combined-wave single transaction).
+- CEO Step-0 caught `wave_k_aggregation_20260524.md` staleness vs executable SQL (34/3,626/131 authoritative, not the prose's 33/3,113/35); scope-expansion premise reconciled to Δ=0 (no fabrication against a false premise); CP38 = S.7 uniform-source-class downstream sweep.
+
+### Deferred — v1.6.1 patch queue
+- MAC-252 schema-level UNIQUE-index hardening on `(identifier_value, identifier_type, manufacturer)`.
+- CT coverage-gap recovery (certspotter/crt.sh): cohort-3 tail (SS8/Cognyte/Utimaco/Polaris Wireless/Trovicor), all cohort-4, aaronia, epirus.
+
+### Deferred — Wave M backlog
+- Post-Phase-H Wave L re-sweep (MITRE ATT&CK / MISP / CISA KEV vs net-new Wave K vendors).
+- Exploratory expansion appetite (operator mid-flight request).
+
+### Downstream / Lynceus
+- CP37 `network_surveillance` device_category not yet in Lynceus v0.2 enum → Wave M.1 Lynceus-catchup (documented downstream gap, not a regression). The 131 network_surveillance rows export in the CSV/JSON where they clear the floor; `ssid_pattern` rows remain §4.4-dropped from Lynceus JSON.
+
 ## [v1.5.4] — 2026-05-24
 
 A **docs-only** patch that refreshes the canonical documentation surface to the v1.5.3 / Wave J state. **No DB mutation, no migrations, no promotions, no export-semantic change.** `schema_version` stays at 29; the active identifier set stays at 37,801. This release exists because the v1.5.3 data ship (Wave J widenet) intentionally shipped its data ahead of the doc refresh (separate ship cycles); v1.5.4 brings the prose into line with the database.

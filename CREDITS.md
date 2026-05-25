@@ -220,6 +220,18 @@ The v1.5.0 cycle codified three new SAR entries from in-cycle empirical anchors:
 - **SAR-17 — No-generic-product-aliases discipline** (BIBLE_AMENDMENTS.md line 4701): driving case mydefence-EAGLE n=41 substring collisions; formal codification per BIBLE_AMENDMENTS.md.
 - **SAR-18 — Classifier-Predicate Parity Discipline** (BIBLE_AMENDMENTS.md line 4752): oversized_mac_range exemplar (Step 9 halt at id=9404 Eagle Eye Networks size=256); `coverage_matrix.py` and `export_lynceus.py` classifiers MUST share runtime predicates; future `_classify_row` rule additions require dual-table parity check at PR time.
 
+### v1.6.0 additions — Wave L source admission (1 new source: CISA KEV)
+
+The Wave K + Wave L combined ship admitted **one new source** (Wave L), bundled into the same Phase H transaction as the Wave K cohort expansion. Wave K itself admitted **no new sources** — its +3,626 identifiers were extracted from previously-admitted sources under the §11 #11 dedup-merge discipline (existing sids updated rather than re-admitted). The source-row count delta is +1 net (73 → 74). (Note: `sources.id=77` was assigned to CISA KEV; sids 74–76 are unassigned staging gaps, not live rows — the live row count is 74.)
+
+- **[CISA Known Exploited Vulnerabilities Catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)** (sources.id=77) — the Cybersecurity and Infrastructure Security Agency's machine-readable catalog of CVEs with confirmed in-the-wild exploitation (machine feed `known_exploited_vulnerabilities.json`, catalogVersion 2026.05.22). `source_type='regulatory'` (tier 1; CP15 value-class ceiling 90). **License: PUBLIC_DOMAIN** (US federal government work, 17 U.S.C. §105). Caveat: the public catalog landing page is WAF-gated against automated robots reads; the machine-feed JSON is the canonical ingest surface, and the WAF posture was operator-confirmed at admission time. Admitted Wave L 2026-05-24 (`last_status='admitted_wave_l'`). **Why included:** the v1.6.0 offensive-tool / spyware cohort (Candiru, NSO Group, Cytrox / Intellexa, Gamma Group, QuaDream, Hacking Team / Memento Labs) needs an authoritative exploitation-confirmation anchor; CISA KEV is the canonical US-government exploited-vulnerability surface for cross-referencing vendor-attributed exploit tooling.
+
+### v1.6.0 admission ledger summary
+
+| sid | Name | source_type | License | access_mode | admission_date_utc |
+|---|---|---|---|---|---|
+| 77 | CISA Known Exploited Vulnerabilities Catalog | regulatory | PUBLIC_DOMAIN (17 U.S.C. §105 US federal work) | automated_feed (JSON) | 2026-05-24 |
+
 ---
 
 ## 2 — Tier 1/2 public-records and procurement data
@@ -310,7 +322,7 @@ Downstream consumers redistributing Argus's database content inherit the same fa
 
 ---
 
-## 7 — Surveillance-technology vendor lexicon (manufacturers table; 92 canonical entries at v1.5.0: 51 v1.4.1 hub-visible + 1 v1.4.1 hidden_arm (Parrot Automotive id=222) + 39 v1.5.0 net-new cohort_prediction admissions + 1 v1.5.0 hidden_arm (Pelco id=254 under Motorola Solutions))
+## 7 — Surveillance-technology vendor lexicon (manufacturers table; 92 canonical entries at v1.5.0: 51 v1.4.1 hub-visible + 1 v1.4.1 hidden_arm (Parrot Automotive id=222) + 39 v1.5.0 net-new cohort_prediction admissions + 1 v1.5.0 hidden_arm (Pelco id=254 under Motorola Solutions); +34 v1.6.0 Wave K+L net-new (29 standalone + 5 CP31 arm-splits) → 126 total)
 
 The `manufacturers` table is the canonical lexicon of surveillance-technology vendors used as the Tier-2/3 device_category inference allowlist. Each entry contributes vendor attribution to identifier rows. This is NOT a data source in the registry sense above; it's an internal curated lexicon used at promotion time. Listed alphabetically:
 
@@ -416,6 +428,15 @@ The `manufacturers` table is the canonical lexicon of surveillance-technology ve
 **v1.4.1 lexicon addition (1 arm row, from 51 to 52 total — 51 hub-visible + 1 hidden_arm):** **Parrot Automotive** (id=222) admitted as the framework's first multi-arm `hidden_arm` row under the CP31 hub-and-spoke schema (mig-0025). `parent_manufacturer_id=25, is_arm=1, query_default='hidden_arm', primary_category='automotive_telematics', aliases='PARROT FAURECIA AUTOMOTIVE SAS,Parrot Faurecia Automotive S.A.S'`. The existing Parrot hub row (id=25, `primary_category='drone'`) is preserved unchanged. Default queries against `manufacturers` filter `WHERE query_default = 'visible'` and do NOT surface the arm; explicit-opt-in audit queries (e.g., `WHERE query_default IN ('visible','hidden_arm')`) surface it. The multi-arm vendor backlog (Cisco/Meraki, Motorola Solutions, Harris RF vs Harris Aerial, Honeywell ACS division) is queued for evidence-driven arm splits at v1.4.2+ per CP32 §4 admission-cadence sub-rule.
 
 **v1.5.0 lexicon additions (40 net-new vendors, from 52 to 92 total — 51 v1.4.1 hub-visible + 1 v1.4.1 hidden_arm + 39 v1.5.0 cohort_prediction + 1 v1.5.0 hidden_arm):** the v1.5.0 lexicon-expansion wave admitted 40 net-new manufacturer canonicals (21 Session 1 military/federal + 19 Session 2 commercial/consumer, with Pelco arm counted within the Session 2 camera_vms cohort) across 7 surveillance cohorts plus 2 multi-purpose §11 #10 carveouts. The wave introduced 3 new `identifiers.device_category` enum values (`cctv_camera`, `persistent_surveillance`, `through_wall_radar`) via mig-0027 / CP33 §2, and admitted the framework's second multi-arm `hidden_arm` row — **Pelco** (id=254) under Motorola Solutions hub (id=3) per gate G-A — extending the CP31 hub-and-spoke precedent first applied to Parrot Automotive in v1.4.1. Stage 1 Step 6 (gate G-B) also flipped 7 existing vendors (Hikvision, Dahua, Axis Communications, Avigilon, Verkada, Eagle Eye Networks, Rhombus Systems) to `primary_category='cctv_camera'` (31 identifier rows recategorized; NDAA §889 attribution preserved on Hikvision + Dahua). Three SAR codifications anchored the wave: SAR-16 (alias-length-floor), SAR-17 (no-generic-product-aliases), SAR-18 (classifier-predicate parity). Per CP33 §7 v1.5.x/v1.6.0 backlog: arm-split candidates Avigilon-under-MSI + WatchGuard-under-MSI queued for v1.5.x; Geo Group admission + BI Incorporated arm-split queued for v1.5.x; 168-entry Elbit FCC grantee disambig queued for v1.5.x sub-cycle.
+
+**v1.6.0 lexicon additions (34 net-new manufacturer rows, from 92 to 126 total — 29 standalone canonicals + 5 CP31 hub-and-spoke arm-splits):** the Wave K + Wave L combined ship admitted 34 net-new manufacturer rows across six cohorts. A **new `network_surveillance` device_category** (mig-0030 / CP37) anchors the lawful-intercept cohort. The 5 arm-splits extend the CP31 hub-and-spoke precedent: **Grayshift** (id=281) under **Magnet Forensics** (id=29) — the GrayKey↔Grayshift relationship; Magnet Forensics also received a +5 §5.2 cross-source confidence lift, **not** a re-insert; and **Anduril Anvil** (id=264), **Anduril Roadrunner** (id=266), **Anduril Sentry Tower** (id=267), **Anduril Lattice OS** (id=265), all under **Anduril Industries** (id=223). GATE-2: Anduril Lattice OS was admitted under the existing `device_category='unknown'` (no new software-substrate enum value). Cohort breakdown:
+
+- **Offensive-tool / spyware + mobile-forensic cohort (`hacking_tool`, 12 rows incl. the Grayshift arm):** Candiru, Compelson, Cytrox / Intellexa, Detego, Flipper Devices Inc., Gamma Group, Grayshift *(arm under Magnet Forensics)*, Hacking Team / Memento Labs, MSAB, NSO Group, Oxygen Forensics, QuaDream.
+- **Face-recognition cohort (`face_recog`, 8 rows):** AnyVision / Oosto, Cognitec Systems, DataWorks Plus, FaceFirst, Idemia, NEC NeoFace, Paravision, Rank One Computing.
+- **Network-surveillance / lawful-intercept cohort (`network_surveillance` — NEW CP37 category, 6 rows):** Cognyte, Pen-Link, Polaris Wireless, SS8 Networks, Trovicor, Utimaco.
+- **Counter-UAS / drone-detect cohort (`drone_detect`, 6 rows incl. 2 Anduril arms):** Aaronia AG, CACI SkyTracker, Epirus Inc., Hidden Level Inc., Anduril Anvil *(arm under Anduril Industries)*, Anduril Roadrunner *(arm under Anduril Industries)*.
+- **Persistent-surveillance cohort (`persistent_surveillance`, 1 row):** Anduril Sentry Tower *(arm under Anduril Industries)*.
+- **Unknown / GATE-2 (`unknown`, 1 row):** Anduril Lattice OS *(arm under Anduril Industries)*.
 
 Lexicon evolution is documented in the amendment ledger at [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md). Aliases tracked per-vendor in `manufacturers.aliases`; multi-purpose-vendor carveouts are documented in `PROJECT_BIBLE.md` (see Canonical sources).
 

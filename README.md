@@ -22,12 +22,12 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.5.3 (Wave J widenet close):
+At v1.6.0 (Wave K + Wave L combined ship):
 
-- **37,801 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.)
-- **92 manufacturers** — surveillance vendors classified by what they make
-- **73 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
-- **16 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, fleet telematics, etc.)
+- **41,428 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.)
+- **126 manufacturers** — surveillance vendors classified by what they make
+- **74 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
+- **17 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, etc.)
 - **58 identifier types** — the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
 - **201 behavioral signatures** — cellular-control-plane patterns associated with IMSI-catcher detection
 
@@ -42,8 +42,8 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 | Export | Records | Best for |
 |---|---:|---|
 | `exports/argus_export_high_confidence.json` | 119 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources. |
-| `exports/argus_export.json` | 579 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 37,801 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export.json` | 580 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export.csv` | 41,428 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 125 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
@@ -80,19 +80,20 @@ Argus covers surveillance equipment used by US law enforcement and adjacent oper
 - Real-time deployment status. Argus tells you what an identifier *is*; not whether it's currently deployed near you. That's the downstream scanner's job.
 - Vendors whose surveillance offering isn't public-record attestable. If we can't trace it back to a citable source, it doesn't ship.
 
-Coverage is intentionally narrow at the per-category baseline — Argus has 92 vendors, but most categories have 3-13 vendors in the lexicon, not hundreds. Expansion comes via community contributions and future research waves.
+Coverage is intentionally narrow at the per-category baseline — Argus has 126 vendors, but most categories have 3-13 vendors in the lexicon, not hundreds. Expansion comes via community contributions and future research waves.
 
 ## Most recent release
 
-**v1.5.3** (Wave J widenet close) ships a five-phase corpus expansion (vendor / drone-RID / IMSI / GainSec / judicial-filing), depth-mining the existing 92-vendor roster:
+**v1.6.0** (Wave K + Wave L combined ship) expands the corpus across six device-category cohorts and admits one new source, bundled in a single Phase H transaction:
 
-- **+1,843 net-new active identifiers** (35,958 → 37,801) — BLE SIG company IDs (705), FCC OET equipment-class + grantee codes (687), Wireshark OUI / MAC-range (303), CourtListener RECAP product-family + firmware strings (116), Wayback vendor-page codenames (32)
-- New `judicial_filing` source_type (migration 0029); 116 court-filing rows relabeled from the `foia` band-bucket proxy — a label-parity fix that left the confidence column untouched (§11 #8 invariant)
-- `network_discovery_protocol_pattern` (NDPP) Lynceus consumer-mapping ratified as DROP (§4.4); the 18 NDPP rows remain canonical in the DB, gated consumer-side until Lynceus v0.3 ships discovery-protocol-signature scanning
-- Confidence-invariant release: every count delta is a new-row promotion or a source-label parity fix; no existing identifier's confidence was lifted without an independent second source (§11 #8)
-- Schema 28 → 29 (migration 0029 — `identifiers.source_type` enum parity)
+- **+3,627 net-new active identifiers** (37,801 → 41,428) — Wave K cohorts: face_recog (462), spyware/offensive (2,940), lawful-intercept / network-surveillance (131), forensic (24), counter-UAS (42), Flipper-adhoc (27); plus Wave L: +1 AirLink ALEOS identifier
+- **+34 manufacturers** (92 → 126), including five CP31 arm-splits (Grayshift → Magnet Forensics; Anduril Anvil / Lattice OS / Roadrunner / Sentry Tower → Anduril)
+- **+1 source** (73 → 74) — CISA KEV (Known Exploited Vulnerabilities catalog), admitted in Wave L
+- New `network_surveillance` device_category (migration 0030, CP37); device_category enum 16 → 17
+- CP38 FlockYou reconcile: 14 crowdsourced `ssid_pattern` rows demoted `crowdsourced/85 → inferred/50` — reclassification only, rows + provenance retained; no confidence lifted without an independent second source (§11 #8 invariant)
+- Schema 29 → 30 (migration 0030 — `device_category` +`network_surveillance`, dual-table parity)
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the version-by-version history, and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the formal change record (Correction Pass 36 + CP36-extension; CP35 landed — NDPP §4.4 DROP mapping; SAR-19 + §11 #18 still staged-pending).
+See [`CHANGELOG.md`](CHANGELOG.md) for the version-by-version history, and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the formal change record (Correction Pass 37 + Correction Pass 38; CP37 — `network_surveillance` device_category; CP38 — FlockYou crowdsourced-ssid reconcile).
 
 ## Quickstart
 
@@ -119,7 +120,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.5.3).
+- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.0).
 - [`CREDITS.md`](CREDITS.md) — per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) — developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) — how Argus integrates sources, confidence model, dedup logic.
@@ -172,7 +173,7 @@ I plan and orchestrate this project myself, using Claude chat as a strategic-pla
 
 The AI agents are highly capable executors with substantial scoping autonomy inside the constraints I set. They surface findings, propose decompositions, escalate when something needs ratification, and run extensive verification work I couldn't do at scale manually. But they don't decide canonical contract. I do.
 
-This was not vibe-coded. Argus has 36 documented amendments to its canonical contract and 18 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough — provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
+This was not vibe-coded. Argus has 38 documented amendments to its canonical contract and 18 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough — provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
 
 ### Notable technical work
 
