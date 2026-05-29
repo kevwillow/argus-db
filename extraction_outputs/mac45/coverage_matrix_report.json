@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 41544,
+  "pre_active_count": 41508,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -45023,7 +45023,7 @@
       "deployment_observations_count": 501,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
-      "active_identifier_count": 32
+      "active_identifier_count": 31
     },
     {
       "canonical_name": "Axis Communications AB",
@@ -73714,7 +73714,7 @@
       "deployment_observations_count": 122,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
-      "active_identifier_count": 20
+      "active_identifier_count": 19
     },
     {
       "canonical_name": "Dai Nippon Printing Co., Ltd.",
@@ -109970,7 +109970,7 @@
       "deployment_observations_count": 255,
       "council_minutes_matters_count": 0,
       "high_corroboration": true,
-      "active_identifier_count": 75
+      "active_identifier_count": 65
     },
     {
       "canonical_name": "Hildebrand Technology Limited",
@@ -219259,7 +219259,7 @@
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 59
+      "active_identifier_count": 35
     },
     {
       "canonical_name": "Tiandy (Tuya/Tuyabec BLE config)",
@@ -250481,11 +250481,11 @@
       "vendor_controlled_hostname_deprecated": 4,
       "fcc_grantee_code": 29,
       "equipment_class_code": 6,
-      "NDPP_pending_lynceus_v0_3_scanner_support": 29,
+      "NDPP_pending_lynceus_v0_3_scanner_support": 11,
       "excluded_source_type": 0
     },
-    "survivors": 610,
-    "reconciles": 41544,
+    "survivors": 592,
+    "reconciles": 41508,
     "drop_assignments": {
       "420": "unknown_category",
       "429": "unknown_category",
@@ -285818,24 +285818,6 @@
       "36676": "ble_service_uuid",
       "36677": "ble_service_uuid",
       "36678": "ble_service_uuid",
-      "36716": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36717": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36718": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36719": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36720": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36721": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36722": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36723": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36724": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36725": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36726": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36727": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36728": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36729": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36730": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36731": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36732": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36733": "NDPP_pending_lynceus_v0_3_scanner_support",
       "36734": "unknown_category",
       "36735": "unknown_category",
       "36736": "unknown_category",
@@ -291478,11 +291460,11 @@
       "vendor_controlled_hostname_deprecated": 4,
       "fcc_grantee_code": 29,
       "equipment_class_code": 6,
-      "NDPP_pending_lynceus_v0_3_scanner_support": 29,
+      "NDPP_pending_lynceus_v0_3_scanner_support": 11,
       "excluded_source_type": 379
     },
-    "survivors": 191,
-    "reconciles": 41544,
+    "survivors": 173,
+    "reconciles": 41508,
     "drop_assignments": {
       "1": "excluded_source_type",
       "420": "unknown_category",
@@ -327233,24 +327215,6 @@
       "36676": "ble_service_uuid",
       "36677": "ble_service_uuid",
       "36678": "ble_service_uuid",
-      "36716": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36717": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36718": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36719": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36720": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36721": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36722": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36723": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36724": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36725": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36726": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36727": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36728": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36729": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36730": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36731": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36732": "NDPP_pending_lynceus_v0_3_scanner_support",
-      "36733": "NDPP_pending_lynceus_v0_3_scanner_support",
       "36734": "unknown_category",
       "36735": "unknown_category",
       "36736": "unknown_category",

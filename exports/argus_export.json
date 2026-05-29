@@ -1,14 +1,14 @@
 {
   "_meta": {
     "argus_version": "30",
-    "exported_at": "2026-05-29T02:07:58Z",
-    "record_count": 610,
+    "exported_at": "2026-05-29T02:52:49Z",
+    "record_count": 592,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "f1b75e80-1425-58a2-896c-ce5aba77e7fb",
-    "source_record_count": 41544,
+    "argus_run_id": "e63f30b7-3ccc-5e43-9186-f4bd8d994d30",
+    "source_record_count": 41508,
     "dropped_in_export": {
       "unknown_category": 33329,
       "ssid_pattern": 18,
@@ -57,7 +57,7 @@
       "vendor_controlled_hostname_deprecated": 4,
       "fcc_grantee_code": 29,
       "equipment_class_code": 6,
-      "NDPP_pending_lynceus_v0_3_scanner_support": 29,
+      "NDPP_pending_lynceus_v0_3_scanner_support": 11,
       "procurement_only": 6,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
@@ -1867,12 +1867,6 @@
       "argus_record_id": "79a4e0fad1f4f751"
     },
     {
-      "pattern": "ff:ff:ff",
-      "pattern_type": "oui",
-      "description": "Dahua cctv_camera",
-      "argus_record_id": "79bde3eecd67cb20"
-    },
-    {
       "pattern": "00:11:75",
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
@@ -3019,96 +3013,6 @@
       "argus_record_id": "d2b6c45e2583546d"
     },
     {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Hikvision cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
-      "pattern": "00:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "d2e6a9baf8f91639"
-    },
-    {
       "pattern": "1894DRAZRXDCX000",
       "pattern_type": "drone_id_prefix",
       "description": "Drone-Clone Xperts drone",
@@ -3605,18 +3509,6 @@
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "f328f535d79393e4"
-    },
-    {
-      "pattern": "01:01:01",
-      "pattern_type": "oui",
-      "description": "Hikvision cctv_camera",
-      "argus_record_id": "f45c85c46b604145"
-    },
-    {
-      "pattern": "01:01:01",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "f45c85c46b604145"
     },
     {
       "pattern": "20686S2",
