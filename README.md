@@ -22,9 +22,9 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.0 (Wave K + Wave L combined ship):
+At v1.6.2:
 
-- **41,428 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.)
+- **41,508 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.)
 - **126 manufacturers** — surveillance vendors classified by what they make
 - **74 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
 - **17 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, etc.)
@@ -41,9 +41,9 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 119 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources. |
-| `exports/argus_export.json` | 580 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 41,428 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export_high_confidence.json` | 146 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources. |
+| `exports/argus_export.json` | 592 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export.csv` | 41,508 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 125 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
@@ -84,14 +84,12 @@ Coverage is intentionally narrow at the per-category baseline — Argus has 126 
 
 ## Most recent release
 
-**v1.6.0** (Wave K + Wave L combined ship) expands the corpus across six device-category cohorts and admits one new source, bundled in a single Phase H transaction:
+**v1.6.2** is a correctness-pass over the v1.6.0 data ship. No schema migration, no new sources or manufacturers — the schema version stays at 30 and the source / manufacturer counts stay at 74 / 126. Two surgical mutations against the v1.6.0 corpus:
 
-- **+3,627 net-new active identifiers** (37,801 → 41,428) — Wave K cohorts: face_recog (462), spyware/offensive (2,940), lawful-intercept / network-surveillance (131), forensic (24), counter-UAS (42), Flipper-adhoc (27); plus Wave L: +1 AirLink ALEOS identifier
-- **+34 manufacturers** (92 → 126), including five CP31 arm-splits (Grayshift → Magnet Forensics; Anduril Anvil / Lattice OS / Roadrunner / Sentry Tower → Anduril)
-- **+1 source** (73 → 74) — CISA KEV (Known Exploited Vulnerabilities catalog), admitted in Wave L
-- New `network_surveillance` device_category (migration 0030, CP37); device_category enum 16 → 17
-- CP38 FlockYou reconcile: 14 crowdsourced `ssid_pattern` rows demoted `crowdsourced/85 → inferred/50` — reclassification only, rows + provenance retained; no confidence lifted without an independent second source (§11 #8 invariant)
-- Schema 29 → 30 (migration 0030 — `device_category` +`network_surveillance`, dual-table parity)
+- **+116 corrected Phase-6 promotes** (MAC-288) — Wave G/H Phase-6 re-promotion landed 116 net-new identifiers in id range `[42593, 42708]` plus 8 confidence lifts on previously-staged rows, all citing the MAC-288 ratification in `notes.corroborations`.
+- **−36 §11 #1 strip** (MAC-291) — 36 placeholder / documentation-pattern rows from the Wave G/H v1 CCTV integration were demoted via self-loop `superseded_by = id` with a `notes.strip_audit` audit object. Distribution: 18 OUI placeholders (`00:00:00` ×15, `01:01:01` ×2, `ff:ff:ff` ×1) + 18 NDPP placeholders (`224.0.0.251` ×3, `8000` ×12, `1900` ×2, `5353` ×1). The 36 rows are excluded from all three Lynceus consumer exports.
+
+Net active identifier delta vs v1.6.0: **41,428 → 41,508** (+80 net). v1.6.0 itself (the underlying data ship) expanded the corpus across six device-category cohorts (face_recog, spyware/offensive, lawful-intercept / network-surveillance, forensic, counter-UAS, Flipper-adhoc) and admitted CISA KEV as the 74th source.
 
 See [`CHANGELOG.md`](CHANGELOG.md) for the version-by-version history, and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the formal change record (Correction Pass 37 + Correction Pass 38; CP37 — `network_surveillance` device_category; CP38 — FlockYou crowdsourced-ssid reconcile).
 
@@ -120,7 +118,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.0).
+- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.2).
 - [`CREDITS.md`](CREDITS.md) — per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) — developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) — how Argus integrates sources, confidence model, dedup logic.
@@ -165,7 +163,7 @@ Every active identifier traces back to:
 
 ## How I built this
 
-Argus is the result of many long days and longer nights of iterative work across multiple machines — Windows dev boxes for some scraping and analysis work, Linux dev machines and a Linux server for the database, orchestration, and most agent work. The build process spans research, scraping, validation, schema design, license posture, discipline framework, and the audit trail that backs every promotion. The substantive growth from a 514-row baseline to over 37,000 active identifiers happened across roughly five-plus weeks of compressed work; the architectural framework that makes those promotions trustworthy took longer.
+Argus is the result of many long days and longer nights of iterative work across multiple machines — Windows dev boxes for some scraping and analysis work, Linux dev machines and a Linux server for the database, orchestration, and most agent work. The build process spans research, scraping, validation, schema design, license posture, discipline framework, and the audit trail that backs every promotion. The substantive growth from a 514-row baseline to over 41,000 active identifiers happened across roughly five-plus weeks of compressed work; the architectural framework that makes those promotions trustworthy took longer.
 
 ### Operator-led orchestration
 

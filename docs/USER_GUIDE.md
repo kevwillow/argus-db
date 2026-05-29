@@ -32,33 +32,33 @@ Concrete examples of what's in the lexicon:
 
 Argus ships four export files alongside the source SQLite database. Pick the one that matches your use case:
 
-### `exports/argus_export_high_confidence.json` (119 rows at v1.5.0)
+### `exports/argus_export_high_confidence.json` (146 rows at v1.6.2)
 
 This is the strict export. It only contains rows where:
 
-- The `confidence` score is **at least 70 on a 0-99 scale** (the high-confidence cutoff codified at §7.5 of the project bible).
+- The `confidence` score is **at least 70 on a 0-99 scale** (the high-confidence cutoff codified at §7.5 of the project bible, `PROJECT_BIBLE.md` line 664; never ≥80).
 - The source isn't `crowdsourced` or `inferred` — community researcher repositories and cohort-prediction admissions are excluded from this export to keep the false-positive rate low.
-- The `device_category` isn't `unknown` — multi-purpose vendors that can't cleanly map to a single surveillance category (e.g., Northrop Grumman, Lockheed Martin) are excluded by design.
+- The `device_category` isn't `unknown` — multi-purpose vendors that can't cleanly map to a single surveillance category (e.g., Northrop Grumman, Lockheed Martin) are excluded by design (§11 #13 hard rule).
 
 **Use this export when:** you're feeding a runtime scanner (Lynceus) that's going to alert on matches. You want the false-positive rate to be as close to zero as feasible.
 
-### `exports/argus_export.json` (536 rows at v1.5.0)
+### `exports/argus_export.json` (592 rows at v1.6.2)
 
 The standard export. Same shape as the high-confidence export but with a looser confidence floor (≥30) and the US-scope filter applied (CP7 + CP11 dual-artifact contract).
 
 **Use this export when:** you want broader scanner coverage and you're willing to accept more false positives, or you're doing analytical work where you want to see the medium-confidence rows.
 
-### `exports/argus_export.csv` (39,832 rows at v1.5.0)
+### `exports/argus_export.csv` (41,508 data rows at v1.6.2)
 
 The rich-import export. All active rows, including the `device_category='unknown'` rows that don't ship in the JSON exports. Has 15 columns covering identifier, identifier_type, device_category, manufacturer, model, confidence, source_url, source_type, geographic_scope, first_seen, last_verified, and audit metadata.
 
 **Use this export when:** you're hydrating a downstream watchlist with operator-side filters, doing analytical research, or building derivative tooling. Apply your own filters (geographic scope, device category, confidence floor) at import time — the CSV gives you everything and lets you decide what to keep.
 
-**CSV consumer note:** line 1 of the CSV is a `# meta:` comment with schema version, export timestamp, and record counts. Line 2 is the column header. Use `csv.DictReader` with a sniffer or `pandas.read_csv(comment='#')` to handle it correctly.
+**CSV consumer note:** line 1 of the CSV is a `# meta:` comment with schema version, export timestamp, and record counts (the `record_count=41508` field is the canonical data-row count; the physical file is longer because some quoted `notes` and `source_excerpt` fields contain embedded newlines). Line 2 is the column header. Use `csv.DictReader` with a sniffer or `pandas.read_csv(comment='#')` to handle it correctly.
 
-### `exports/argus_export_behavioral_signatures.json` (125 rows at v1.5.0)
+### `exports/argus_export_behavioral_signatures.json` (125 rows at v1.6.2)
 
-The sibling export for cellular-band scanners. Where the other three exports key on wire-observable patterns (MACs, OUIs, BLE UUIDs, etc.), this one keys on cellular-control-plane behavioral patterns associated with IMSI-catcher detection. Rayhunter consumes this format.
+The sibling export for cellular-band scanners. Where the other three exports key on wire-observable patterns (MACs, OUIs, BLE UUIDs, etc.), this one keys on cellular-control-plane behavioral patterns associated with IMSI-catcher detection. Rayhunter consumes this format. Drawn from 201 active `behavioral_signatures` rows at v1.6.2 ship; the 76 row drop reflects the `below_confidence_threshold` + `unknown_category` drop-bucket reconciliation.
 
 ### What each row represents
 
@@ -77,12 +77,12 @@ Every row in the JSON exports carries a stable shape:
 ```
 
 - **`pattern`** is the actual identifier — the MAC, the OUI prefix, the BLE UUID, the FCC grantee code, the hostname, etc.
-- **`pattern_type`** says what kind of identifier this is (`mac`, `oui`, `mac_range`, `bssid`, `ssid_exact`, `ble_uuid`, `ble_service`, `fcc_grantee_code`, `vendor_controlled_hostname`, etc. — 57 values total at v1.5.0).
+- **`pattern_type`** says what kind of identifier this is (`mac`, `oui`, `mac_range`, `bssid`, `ssid_exact`, `ble_uuid`, `ble_service`, `fcc_grantee_code`, `vendor_controlled_hostname`, etc. — **58 values total at v1.6.2**, of which 49 carry promoted rows).
 - **`description`** is a human-readable label — usually "Vendor Name — model or category context".
 - **`argus_record_id`** is a 16-hex-character stable identifier. It survives source-attribution changes, confidence drift, and most schema migrations. Bind to this when you need to track a specific row across export versions.
 - **`confidence`** is the 0-99 confidence score. ≥70 = strong attribution from at least one canonical source. ≥85 = cross-corroborated by independent second source.
-- **`device_category`** is what kind of equipment this is (`alpr`, `imsi_catcher`, `body_cam`, `drone`, `cctv_camera`, `persistent_surveillance`, `through_wall_radar`, `gps_tracker`, etc. — 16 values total at v1.5.0).
-- **`source_type`** is the source-class band (`primary_registry`, `regulatory`, `academic`, `manufacturer_doc`, `manufacturer_app`, `crowdsourced`, `inferred`, etc. — 13 values total at v1.5.0). Different bands have different confidence ceilings.
+- **`device_category`** is what kind of equipment this is (`alpr`, `imsi_catcher`, `body_cam`, `drone`, `cctv_camera`, `persistent_surveillance`, `through_wall_radar`, `gps_tracker`, `network_surveillance` (added at v1.6.2 / CP37 for lawful-intercept / monitoring-center vendors), etc. — **17 values total at v1.6.2**, of which 16 carry promoted rows).
+- **`source_type`** is the source-class band (`primary_registry`, `regulatory`, `academic`, `manufacturer_doc`, `manufacturer_app`, `crowdsourced`, `inferred`, `judicial_filing`, `disclosure_filing`, `procurement_disclosure`, etc. — **13 values total at v1.6.2** on both `identifiers` and `sources` after the CP36 dual-table parity close). Different bands have different confidence ceilings.
 
 ---
 
@@ -126,7 +126,7 @@ For Lynceus-specific integration shapes (file paths, refresh cadence, `severity_
 
 Argus is canonical-enrichment-strong and deployment-detection-modest. Here's what that means in practice.
 
-**The lexicon is comprehensive.** At v1.5.0 there are 92 surveillance-equipment vendors with structural-anchor-attested admission. Every major surveillance category (ALPR, IMSI catchers, body cams, drones, CCTV, ankle monitors, fleet telematics, counter-drone, persistent surveillance, through-wall radar, gunshot detection, face recognition, forensic extraction) has multiple representative vendors. The cohort_prediction wave at v1.5.0 specifically targeted under-represented categories — counter-UAS went from 4 to 13+ vendors, fleet telematics from 0 to 6, etc.
+**The lexicon is comprehensive.** At v1.6.2 there are **126 manufacturers** in the canonical curated list (`manufacturers` table; was 92 at v1.5.0 ship — net +34 across the v1.5.x → v1.6.x cycles). Every major surveillance category (ALPR, IMSI catchers, body cams, drones, CCTV, ankle monitors, fleet telematics, counter-drone, persistent surveillance, through-wall radar, gunshot detection, face recognition, forensic extraction, and lawful-intercept / network surveillance — added as a discrete `device_category` at v1.6.2 / CP37) has multiple representative vendors. The cohort_prediction wave at v1.5.0 specifically targeted under-represented categories — counter-UAS went from 4 to 13+ vendors, fleet telematics from 0 to 6, etc.; the Wave K admission at v1.6.0 / v1.6.2 added Pen-Link / SS8 Networks / Cognyte / Utimaco LIMS / Polaris Wireless / Trovicor under the new `network_surveillance` category.
 
 **The deployment-detection surface is still modest.** Most identifiers in the canonical state are **FCC grantee codes**, **vendor-controlled hostnames**, **certificate SAN entries from crt.sh CT logs**, and **IEEE OUI allocations** — they confirm "this vendor exists and ships product" but they don't give a runtime scanner a wire-observable signature to alert on. The most-deployment-actionable identifier classes — full MACs, BSSIDs, SSID patterns, BLE service UUIDs, drone Remote-ID prefixes — represent a smaller fraction of the database. That gap is being closed by companion-app static-analysis waves (Wave G/H/I) but progress is per-cycle and per-vendor.
 
@@ -145,7 +145,7 @@ A few things Argus is deliberately not:
 - **Not a real-time monitor.** Argus is the lexicon; the scanner is the monitor. If you want to know whether there's a Hikvision camera 30 meters from you right now, you need a scanner like Lynceus with Argus's exports loaded as its watchlist. Argus alone can't tell you what's nearby.
 - **Not a "spy on my neighbor" tool.** Every row in the canonical database is keyed to *vendor and equipment category*, not to *individuals or specific deployments*. We can tell you that a given FCC grantee code maps to "Flock Safety, ALPR" — we don't track which neighborhoods Flock has cameras deployed in.
 - **Not a deanonymization tool.** Argus has a strict no-PII discipline (§11 #3 of the project bible). Officer names, badge numbers, home addresses, registered-agent-with-residential-address entries — all excluded by default. Class B sustained holds exist for ambiguous cases where individual-shaped names lack corporate-entity confirmation.
-- **Not exhaustive.** With 92 vendors and 35,812 identifiers we miss many surveillance vendors that ship to US LE. Notable gaps include some smaller regional ALPR vendors, many of the long tail of body-cam OEMs, and most non-US drone vendors. Coverage expansion happens via community contribution and per-cycle research waves.
+- **Not exhaustive.** With **126 manufacturers** in the canonical curated list and **41,508 active identifiers** at v1.6.2 ship (vs 92 / 35,812 at v1.5.0), we miss many surveillance vendors that ship to US LE. Notable gaps include some smaller regional ALPR vendors, many of the long tail of body-cam OEMs, and most non-US drone vendors. Coverage expansion happens via community contribution and per-cycle research waves.
 - **Not a fabrication machine.** If we don't have a citable public source for an identifier, the answer is "no record" — not "plausible record." The discipline framework actively prevents AI-agent-driven fabrication; every promotion gates through a structural-anchor attestation requirement.
 - **Not authoritative for vendor disputes.** Vendors who disagree with their inclusion or categorization can open a GitHub issue. Argus's doctrinal grounding is *Feist v. Rural Telephone Service* (factual data not copyrightable) + 17 USC §1201(j) (security research exemption) + 37 CFR §201.40(b) + nominative fair use.
 
@@ -154,7 +154,7 @@ A few things Argus is deliberately not:
 ## 6. Where to learn more
 
 - [`../README.md`](../README.md) — Project overview, headline metrics, downstream consumer architecture.
-- [`../CHANGELOG.md`](../CHANGELOG.md) — Version-by-version release history (v1.0.0 through v1.5.0).
+- [`../CHANGELOG.md`](../CHANGELOG.md) — Version-by-version release history (v1.0.0 through v1.6.2).
 - [`../CREDITS.md`](../CREDITS.md) — Per-source attribution, per-vendor canonical lexicon, license posture for downstream consumers.
 - [`engineering/METHODOLOGY.md`](engineering/METHODOLOGY.md) — How source admissions work, confidence model, dedup logic, provenance discipline.
 - [`engineering/DATA_DICTIONARY.md`](engineering/DATA_DICTIONARY.md) — Schema reference (every table, column, enum value).

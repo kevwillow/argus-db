@@ -16,7 +16,39 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.6.1.)
+(No unreleased changes since v1.6.2.)
+
+## v1.6.2 — 2026-05-29
+
+A **correctness pass** over the v1.6.0 data ship. **No schema migration, no new sources, no new manufacturers** — the schema version stays at 30 and the source / manufacturer counts stay at 74 / 126. Two surgical mutations against the v1.6.0 corpus.
+
+### What changed
+
+- **Corrected promotion of 116 identifiers (MAC-279 Phase 6).** A revisited 116-row promotion landed in identifier id range `[42593, 42708]`, plus 8 confidence- or provenance-only lifts on previously-staged rows (two true cross-source corroboration lifts: id=27468 85→90, id=29328 90→95; six provenance-only lifts holding their prior confidence). The original Phase 5 emission would have over-lifted one row above the per-source confidence ceiling for `manufacturer_app` evidence; a mechanical cite-re-verification against the bible caught it, and the corrected pipeline held the disposition. Every lifted row carries an audit note citing the MAC-288 ratification.
+
+- **Placeholder strip of 36 Wave G/H v1 CCTV rows (MAC-291).** 36 documentation-pattern rows from the Wave G/H v1 CCTV integration were demoted via a self-loop on `superseded_by` with a structured audit object. Distribution: 18 OUI placeholders (`00:00:00` ×15, `01:01:01` ×2, `ff:ff:ff` ×1) plus 18 network-discovery-protocol-pattern placeholders (`224.0.0.251` ×3, `1900` ×2, `5353` ×1, `8000` ×12). All 36 rows are excluded from every Lynceus consumer export.
+
+By the numbers, compared with the previous release:
+
+| | v1.6.1 | v1.6.2 |
+|---|---|---|
+| Schema version | 30 | 30 (unchanged) |
+| Active identifiers | 41,428 | **41,508** (+80 net: +116 promotion, −36 strip) |
+| Total identifiers | 41,774 | 41,890 (+116; strip demotes are self-loops, not deletes) |
+| Demoted (`superseded_by IS NOT NULL`) | 346 | 382 (+36) |
+| Sources | 74 | 74 (unchanged) |
+| Manufacturers | 126 | 126 (unchanged) |
+| Behavioral signatures | 201 | 201 (unchanged) |
+| Lynceus high-confidence export records | 146 | 146 (the 36 strip rows were already below the ≥70 cut) |
+| Lynceus standard export records | 610 | 592 (−18 from the OUI strip; the 18 protocol-pattern strips were already excluded by the §4.4 NDPP drop bucket) |
+| Lynceus CSV export records | 41,544 | 41,508 (−36, 1:1 with the strip demotes) |
+
+### Technical notes
+
+- Schema version stays at 30. No migrations.
+- The latest bible amendments remain CP37 (the `network_surveillance` device category, schema-mutating at v1.6.0) and CP38 (the FlockYou crowdsourced-SSID reconcile, data-only at v1.6.0). No new CP entries this release.
+- Full amendment records remain in the engineering bible (`docs/engineering/BIBLE_AMENDMENTS.md`).
+- Backup of the pre-strip database snapshot is captured in `extraction_runs.id=126` (`notes.backup_sha256`); the on-disk backup file is held in the project's internal archive (not in the canonical source tree).
 
 ## v1.6.1 — 2026-05-25
 

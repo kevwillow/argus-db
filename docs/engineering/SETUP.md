@@ -4,7 +4,7 @@
 
 Audience: someone who just cloned the repo and wants to query, export, or extend the database. This includes downstream consumers (Lynceus, Rayhunter, other scanners), research collaborators, and developers extending Argus.
 
-Verified-working against `schema_version=27` (v1.5.0 ship state, CP33 ratified). Time-to-setup for a first-time user with Python 3.11+ already installed: about 2 minutes for the database verification path, about 5 minutes if you want to regenerate the exports yourself.
+Verified-working against `schema_version=30` (v1.6.2 ship state, CP37 ratified). Time-to-setup for a first-time user with Python 3.11+ already installed: about 2 minutes for the database verification path, about 5 minutes if you want to regenerate the exports yourself.
 
 For semantics (confidence bands, dedup logic, provenance discipline), read [METHODOLOGY.md](METHODOLOGY.md). For the schema (every table + every column), read [DATA_DICTIONARY.md](DATA_DICTIONARY.md).
 
@@ -25,7 +25,7 @@ git clone https://github.com/kevwillow/argus-db.git
 cd argus
 ```
 
-The repo ships with `db/argus.db` already populated (`schema_version=27`, 35,812 active identifiers) and the canonical exports already generated under `exports/`. You can query and consume Argus immediately without running any pipeline steps.
+The repo ships with `db/argus.db` already populated (`schema_version=30`, 41,508 active identifiers) and the canonical exports already generated under `exports/`. You can query and consume Argus immediately without running any pipeline steps.
 
 ## §3. Verify the shipped database
 
@@ -35,24 +35,30 @@ Confirm the cloned database is intact:
 python3 argus_cli.py status
 ```
 
-Expected output (row counts as of `schema_version=27`, v1.5.0 ship state):
+Expected output (row counts as of `schema_version=30`, v1.6.2 ship state):
 
 ```
 Argus DB: <repo>/db/argus.db
-Schema version: 27 (0027_cp33_cctv_camera_persistent_surveillance_through_wall_radar_imei_tac)
-…
+Schema version: 30 (0030_cp37_device_category_network_surveillance, applied 2026-05-25 01:26:01)
+Identifiers: 41508 active / 41890 total (active = superseded_by IS NULL)
+Manufacturers: 118 visible (hub) + 8 hidden (arm) = 126 total
+Current phase: …
+
 Row counts:
-  identifiers: 36158 (35812 active)
-  procurement_records: 46043
-  manufacturers: 92
-  sources: 73
+  identifiers: 41890
+  procurement_records: 50492
+  manufacturers: 126
+  sources: 74
   raw_observations: 147421
   deployment_observations: 116774
-  extraction_runs: 119
+  extraction_runs: 121
   conflicts: 36
-  behavioral_signatures: 201
-  schema_version: 27
+  schema_version: 30
+
+Last extraction run: id=125 agent=… started=… finished=… status=completed
 ```
+
+(Note: `behavioral_signatures` is queryable directly via `sqlite3 db/argus.db "SELECT COUNT(*) FROM behavioral_signatures;"` — live count at HEAD = 201. The `argus_cli.py status` row-counts listing does not include it.)
 
 Sample query against a known identifier (Flock Safety ALPR MAC, `id=1`):
 
@@ -76,15 +82,15 @@ Build into a throwaway path first:
 python3 -m db.init_db --db-path /tmp/argus_fresh.db
 ```
 
-This applies all 27 migrations idempotently. Confirm the resulting `schema_version`:
+This applies all 30 migrations idempotently (32 `.sql` files on disk; two slots — `0026` + `0026a` and `0029_cp36_identifiers_source_type_enum_parity` + `0029_cp36_j5_proxy_relabel` — carry two files each, both applied at the same `schema_version` step). Confirm the resulting `schema_version`:
 
 ```sh
 python3 -c "import sqlite3; print(sqlite3.connect('/tmp/argus_fresh.db').execute('SELECT MAX(version) FROM schema_version').fetchone()[0])"
 ```
 
-Expected output: `27`.
+Expected output: `30`.
 
-The migration files live at `db/migrations/0001_initial.sql` through `db/migrations/0027_cp33_*.sql`; the full ledger with applied-at timestamps is in [DATA_DICTIONARY.md](DATA_DICTIONARY.md) §4.13.
+The migration files live at `db/migrations/0001_initial.sql` through `db/migrations/0030_cp37_*.sql`; the full ledger with applied-at timestamps is in [DATA_DICTIONARY.md](DATA_DICTIONARY.md) §4.13.
 
 ## §5. Re-running the source-ingest pipeline (advanced)
 
@@ -99,7 +105,7 @@ pip install -r requirements-vendor-docs.txt   # vendor-companion-app static-anal
 pip install -r requirements-wigle.txt         # WiGLE planning state (currently inert; awaits operator-side WiGLE quota grant)
 ```
 
-There is no single "load all sources" command — source-loading is per-source per-runbook, since most sources require operator decisions (which OUIs to ingest, which FCC grantee filters to apply, etc.). For a first-time user, the shipped `db/argus.db` is the v1.5.0 release artifact; regenerating from upstream is a separate research project rather than a setup step.
+There is no single "load all sources" command — source-loading is per-source per-runbook, since most sources require operator decisions (which OUIs to ingest, which FCC grantee filters to apply, etc.). For a first-time user, the shipped `db/argus.db` is the v1.6.2 release artifact; regenerating from upstream is a separate research project rather than a setup step.
 
 ## §6. Regenerate the exports
 
@@ -117,26 +123,28 @@ ls -la exports/argus_export.csv exports/argus_export.json \
        exports/argus_export_behavioral_signatures.json
 ```
 
-At `schema_version=27` against the shipped DB:
+At `schema_version=30` against the shipped DB:
 
 | File | Records | Notes |
 |---|---:|---|
-| `argus_export.json` | 536 | standard alert-feed (≥30 confidence; CP7 US scope filter) |
-| `argus_export_high_confidence.json` | 119 | ≥70 confidence + CP19 source_type exclusion (excludes `inferred` / `crowdsourced`) |
+| `argus_export.json` | 592 | standard alert-feed (≥30 confidence; CP7 US scope filter) |
+| `argus_export_high_confidence.json` | 146 | ≥70 confidence + CP19 source_type exclusion (excludes `inferred` / `crowdsourced`) |
 | `argus_export_behavioral_signatures.json` | 125 | sibling export for behavioral-signature consumers (Rayhunter target) |
-| `argus_export.csv` | 39,832 | rich-import feed; unfiltered active rows; consumers apply geographic / category / confidence filters at import |
+| `argus_export.csv` | 41,508 | rich-import feed; unfiltered active rows; consumers apply geographic / category / confidence filters at import |
 
 The contract for each export is codified in [PROJECT_BIBLE.md](PROJECT_BIBLE.md) §7.5 (CP11 dual-artifact + CP18 behavioral_signatures sibling + CP19 high-conf source_type exclusion + CP22 canonical timestamp format).
 
 ## §7. Run the test suite (optional)
 
-The test suite is the highest-fidelity verification that the install works end-to-end. From the repo root:
+The test suite is the highest-fidelity verification that the install works end-to-end. `pytest` is not installed in the system Python; the repo ships a virtualenv at `.venv/` containing `pytest 9.0.3`. From the repo root:
 
 ```sh
-python3 -m pytest tests/ -q
+.venv/bin/python -m pytest tests/ -q
 ```
 
-A clean run reports all tests passing. If any test fails, the install has drifted from the verified ship state — file an issue with the test name + traceback.
+(Or activate the venv first via `source .venv/bin/activate` and then run `pytest tests/ -q`.)
+
+At HEAD `def7b95` (v1.6.2 ship): **520 passed, 1 skipped, 3 failed.** The 3 failing tests are known classifier-predicate-parity surfaces tracked separately (`test_drop_bin_undersized_mac_range_survives`, `test_type_mapping_covers_every_identifier_type`, `test_type_mapping_drops_match_44_verbatim`) — they reflect a post-CP34/MAC-291 drop-bin label drift in the export classifier and an `imei_tac` identifier_type missing from the `IDENTIFIER_TYPE_TO_PATTERN_TYPE` / `DROPPED_REASONS` table. If you see additional failures beyond these 3, the install has drifted from the verified ship state — file an issue with the test name + traceback.
 
 ## §8. Downstream consumption pattern (Lynceus / Rayhunter / other scanners)
 
@@ -156,18 +164,18 @@ For the canonical Lynceus integration shape (file paths, refresh cadence, `sever
 - [DATA_DICTIONARY.md](DATA_DICTIONARY.md) — full schema reference, every table + column + enum
 - [PROJECT_BIBLE.md](PROJECT_BIBLE.md) — canonical specification (source-of-truth at any disagreement)
 - [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) — amendment ledger (Correction Pass entries + SAR series)
-- [CHANGELOG.md](../../CHANGELOG.md) — release ledger (v1.0.0 through v1.5.0 ship state + post-ship CP entries)
+- [CHANGELOG.md](../../CHANGELOG.md) — release ledger (v1.0.0 through v1.6.2 ship state + post-ship CP entries)
 - [CREDITS.md](../../CREDITS.md) — per-source attribution + upstream license chain
 
 ## §10. Common gotchas
 
 - **README.md Quickstart references `requirements.txt`** which does not exist at the repo root. The two pinned-dependency files (`requirements-vendor-docs.txt`, `requirements-wigle.txt`) are domain-specific (vendor-app static analysis + WiGLE planning) and are not required for the read-path or for export regeneration. If you hit a `pip install -r requirements.txt` failure, skip that step — the read-path in §3 requires no install.
-- **Migration count grows per release**: at v1.0.0 there were 19 migrations; at v1.5.0 there are 27. Migration numbering is sequential and append-only; older migrations don't change.
-- **`identifier_type` and `device_category` enums are CHECK-constrained**: 57 identifier_type values and 16 device_category values as of v1.5.0. Adding new values requires a rebuild-pattern migration; see [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) Correction Pass entries (CP13/CP14/CP20/CP28/CP29/CP31/CP33) for the canonical examples.
-- **Active vs total identifiers**: the `superseded_by` column tracks soft-deletes. Active rows are `superseded_by IS NULL`. Total = 36,158; active = 35,812; the gap is rows demoted via §11 #3 procedures.
+- **Migration count grows per release**: at v1.0.0 there were 19 migrations; at v1.5.0 there were 27; at v1.6.2 there are 30 (32 `.sql` files; two slots — `0026`/`0026a` and `0029_cp36_identifiers_source_type_enum_parity`/`0029_cp36_j5_proxy_relabel` — carry two files apiece). Migration numbering is sequential and append-only; older migrations don't change.
+- **`identifier_type` and `device_category` enums are CHECK-constrained**: 58 `identifier_type` values and 17 `device_category` values (CHECK-enum cardinality) as of v1.6.2. Adding new values requires a rebuild-pattern migration; see [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) Correction Pass entries (CP13/CP14/CP20/CP28/CP29/CP31/CP33/CP34/CP37) for the canonical examples. (See [`reference_readme_stats_enum_vs_populated.md`](../../docs_audit/) discipline: README/SETUP convention quotes CHECK-enum cardinality, not populated cardinality — live populated counts at HEAD are 49 / 16.)
+- **Active vs total identifiers**: the `superseded_by` column tracks soft-deletes. Active rows are `superseded_by IS NULL`. Total = 41,890; active = 41,508; the gap (382 rows) is the post-MAC-217 tri-semantic mix — 342 successor-pointer demotes + 40 self-loop demotes (4 pre-MAC-217 PII self-loops + 36 MAC-291 §11 #1 strip self-loops). See [`docs/engineering/DATA_DICTIONARY.md`](DATA_DICTIONARY.md) §3.4.1.
 
 ---
 
 ## Footnote — historical schema-version reference
 
-This document was originally authored against `schema_version=19` (v1.0.0 ship state, 2026-05-15, commit `33dc318`) with 22,532 active identifiers across 34 manufacturers and 43 sources. The post-v1.0.0 ship cycles (CP20 through CP33) substantially expanded the source corpus (+30 sources), manufacturer cohort (+58 manufacturers), and identifier-type vocabulary (+30 identifier_type enum values). The verified-working anchors above reflect v1.5.0 (`schema_version=27`) ship state.
+This document was originally authored against `schema_version=19` (v1.0.0 ship state, 2026-05-15, commit `33dc318`) with 22,532 active identifiers across 34 manufacturers and 43 sources. The post-v1.0.0 ship cycles (CP20 through CP37) substantially expanded the source corpus (+31 sources to 74), manufacturer cohort (+92 manufacturers to 126), and identifier-type vocabulary (+31 enum values to 58 CHECK-constrained types). The verified-working anchors above reflect v1.6.2 (`schema_version=30`) ship state at HEAD `def7b95`.
