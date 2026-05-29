@@ -706,10 +706,18 @@ def _build_meta(
 # ingest leaks must not silently re-introduce PII into v1.4.1+ exports.
 _PII_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
 
+# MAC-288 Phase 6 surfaced a false-positive class: APK / IPA / AAR package
+# source_urls of the shape `com.foo.bar@1.2.3.apk` (Android package@version
+# with software-container suffix) match the email regex but are not PII.
+# These suffixes are not real DNS TLDs, so the carve-out cannot mask a
+# legitimately-deliverable address. §11 #11 amendment surfaced to CEO.
+_SOFTWARE_PACKAGE_SUFFIXES = (".apk", ".ipa", ".aar", ".jar", ".deb", ".rpm", ".xpi")
+
 
 def _assert_no_email_pii(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
-    matches = _PII_EMAIL_RE.findall(text)
+    raw_matches = _PII_EMAIL_RE.findall(text)
+    matches = [m for m in raw_matches if not m.lower().endswith(_SOFTWARE_PACKAGE_SUFFIXES)]
     if matches:
         sample = matches[:3]
         raise Halt(

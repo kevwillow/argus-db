@@ -1,22 +1,22 @@
 {
   "_meta": {
     "argus_version": "30",
-    "exported_at": "2026-05-25T02:33:05Z",
-    "record_count": 119,
+    "exported_at": "2026-05-29T02:07:58Z",
+    "record_count": 146,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "5933f493-c78f-52fd-8997-abe1aa3641a3",
-    "source_record_count": 41428,
+    "argus_run_id": "f1b75e80-1425-58a2-896c-ce5aba77e7fb",
+    "source_record_count": 41544,
     "dropped_in_export": {
-      "unknown_category": 36152,
+      "unknown_category": 33329,
       "ssid_pattern": 18,
       "device_fingerprint": 6,
       "ble_local_name": 21,
       "ble_characteristic": 13,
-      "product_family_codename": 244,
-      "oversized_mac_range": 2,
+      "product_family_codename": 254,
+      "oversized_mac_range": 28,
       "icao_24bit_address": 2,
       "rf_channel": 24,
       "burst_cadence_ms": 0,
@@ -30,38 +30,38 @@
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_service_uuid": 121,
+      "ble_service_uuid": 122,
       "ble_company_id": 2,
       "frequency_band": 32,
       "ble_protocol_byte": 0,
       "operator_profile": 3,
-      "x509_cert_sha256_prefix": 254,
+      "x509_cert_sha256_prefix": 255,
       "ble_adv_interval": 0,
       "ble_payload_offset": 0,
       "firmware_sha256_hash": 17,
-      "network_endpoint": 3408,
+      "network_endpoint": 3410,
       "firmware_image_variant": 3,
       "qualcomm_chip_format_id": 1,
-      "firmware_branded_string": 26,
+      "firmware_branded_string": 29,
       "asdstan_message_type": 7,
       "asdstan_enum_value": 18,
       "dji_protocol_struct_format": 2,
       "gpt_partition_uuid": 3,
-      "chipset_codename": 0,
-      "firmware_build_string": 4,
+      "chipset_codename": 16,
+      "firmware_build_string": 19,
       "firmware_build_uuid": 1,
       "windows_installer_productcode_vendor_registered": 2,
       "windows_com_clsid_vendor_registered": 1,
-      "vendor_controlled_hostname": 333,
+      "vendor_controlled_hostname": 3151,
       "vendor_cloud_endpoint_url": 1,
-      "vendor_controlled_hostname_deprecated": 0,
+      "vendor_controlled_hostname_deprecated": 4,
       "fcc_grantee_code": 29,
-      "equipment_class_code": 0,
-      "NDPP_pending_lynceus_v0_3_scanner_support": 22,
+      "equipment_class_code": 6,
+      "NDPP_pending_lynceus_v0_3_scanner_support": 29,
       "procurement_only": 6,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 40,
-      "excluded_source_type": 376,
+      "excluded_source_type": 379,
       "geographic_scope_mismatch": 45
     }
   },
@@ -89,6 +89,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
       "argus_record_id": "07fed1b848044dae"
+    },
+    {
+      "pattern": "50:13:9d",
+      "pattern_type": "oui",
+      "description": "Sierra Wireless automotive_telematics",
+      "argus_record_id": "08ba884cc4bbaa57"
     },
     {
       "pattern": "1587A540002APD",
@@ -139,16 +145,58 @@
       "argus_record_id": "0d8a34e130a69e94"
     },
     {
+      "pattern": "00:26:7e",
+      "pattern_type": "oui",
+      "description": "Parrot drone",
+      "argus_record_id": "0e6ef5183f5a20a6"
+    },
+    {
+      "pattern": "00:24:37",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "107664406ea24c1b"
+    },
+    {
       "pattern": "88:29:85",
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "108e8f0bd4b6da48"
     },
     {
+      "pattern": "4c:cc:34",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "13fd07260e6f48dc"
+    },
+    {
       "pattern": "1587A0510001TBT",
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
       "argus_record_id": "150f53c8e8e78fb6"
+    },
+    {
+      "pattern": "10:74:6f",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "16f810b92a2695b1"
+    },
+    {
+      "pattern": "00:a0:d5",
+      "pattern_type": "oui",
+      "description": "Sierra Wireless automotive_telematics",
+      "argus_record_id": "18004a32f2123e7a"
+    },
+    {
+      "pattern": "00:18:85",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "1a12b495b1e624d6"
+    },
+    {
+      "pattern": "90:3a:e6",
+      "pattern_type": "oui",
+      "description": "Parrot drone",
+      "argus_record_id": "1c452b196c10dab1"
     },
     {
       "pattern": "1581F5BK",
@@ -199,6 +247,12 @@
       "argus_record_id": "2d2457f62e430201"
     },
     {
+      "pattern": "9c:86:2b",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "2d83bcd3cf36b221"
+    },
+    {
       "pattern": "1581F67Q",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -229,10 +283,22 @@
       "argus_record_id": "34077b9bc065ef49"
     },
     {
+      "pattern": "90:03:b7",
+      "pattern_type": "oui",
+      "description": "Parrot drone",
+      "argus_record_id": "3680762fce7effc7"
+    },
+    {
       "pattern": "1871C00000000",
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
       "argus_record_id": "36ccd84dab2f103b"
+    },
+    {
+      "pattern": "00:02:68",
+      "pattern_type": "oui",
+      "description": "Harris persistent_surveillance",
+      "argus_record_id": "374727b9c4420369"
     },
     {
       "pattern": "1796F001",
@@ -245,6 +311,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
       "argus_record_id": "38e6567e2e06fac2"
+    },
+    {
+      "pattern": "00:06:ec",
+      "pattern_type": "oui",
+      "description": "Harris persistent_surveillance",
+      "argus_record_id": "3c1b876628ba5c24"
     },
     {
       "pattern": "1748CH",
@@ -331,10 +403,22 @@
       "argus_record_id": "51e6bce55d8bbfa8"
     },
     {
+      "pattern": "48:2c:ea",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "55e911d833059e9e"
+    },
+    {
       "pattern": "1581F4QZ",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "57650624cd4c1bb3"
+    },
+    {
+      "pattern": "0c:bf:15",
+      "pattern_type": "oui",
+      "description": "Genetec cctv_camera",
+      "argus_record_id": "58156e31b1fdfc1f"
     },
     {
       "pattern": "b4:1e:52",
@@ -367,10 +451,22 @@
       "argus_record_id": "5ed7a90faba9f4b6"
     },
     {
+      "pattern": "cc:93:4a",
+      "pattern_type": "oui",
+      "description": "Sierra Wireless automotive_telematics",
+      "argus_record_id": "604da50fd6312c9c"
+    },
+    {
       "pattern": "1581F67P",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "60b5872383d34e21"
+    },
+    {
+      "pattern": "28:a3:31",
+      "pattern_type": "oui",
+      "description": "Sierra Wireless automotive_telematics",
+      "argus_record_id": "647f6524f598ac45"
     },
     {
       "pattern": "1581F5BL",
@@ -463,6 +559,12 @@
       "argus_record_id": "7aa408d8a277935a"
     },
     {
+      "pattern": "64:ce:6e",
+      "pattern_type": "oui",
+      "description": "Sierra Wireless automotive_telematics",
+      "argus_record_id": "7dea9c3aa868a56f"
+    },
+    {
       "pattern": "1587A5400024GH",
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
@@ -473,6 +575,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Microdrones drone",
       "argus_record_id": "82e68bb270cfe01d"
+    },
+    {
+      "pattern": "00:1f:92",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "83e56c1f08115ba8"
     },
     {
       "pattern": "1644FMD4E1VA0000",
@@ -607,16 +715,34 @@
       "argus_record_id": "b4e7964b29533d0f"
     },
     {
+      "pattern": "00:12:1c",
+      "pattern_type": "oui",
+      "description": "Parrot drone",
+      "argus_record_id": "b5dd85cdbeb03302"
+    },
+    {
       "pattern": "e8:27:25",
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
       "argus_record_id": "be4c4ac30f67c8e5"
     },
     {
+      "pattern": "b8:e2:8c",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "bec4da78009bc0c5"
+    },
+    {
       "pattern": "1668BS20",
       "pattern_type": "drone_id_prefix",
       "description": "Skydio drone",
       "argus_record_id": "c126fe1d66424b05"
+    },
+    {
+      "pattern": "00:bf:15",
+      "pattern_type": "oui",
+      "description": "Genetec cctv_camera",
+      "argus_record_id": "c7191059bc5b7b64"
     },
     {
       "pattern": "1581F5FJ",
@@ -697,6 +823,12 @@
       "argus_record_id": "dccea5f38dfee0d4"
     },
     {
+      "pattern": "84:db:2f",
+      "pattern_type": "oui",
+      "description": "Sierra Wireless automotive_telematics",
+      "argus_record_id": "dd9b9f36bd8d3ca3"
+    },
+    {
       "pattern": "1787F04BM",
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
@@ -719,6 +851,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "uAvionix drone",
       "argus_record_id": "e4939955e30ad104"
+    },
+    {
+      "pattern": "a0:14:3d",
+      "pattern_type": "oui",
+      "description": "Parrot drone",
+      "argus_record_id": "e6f69467b726c22c"
     },
     {
       "pattern": "1863FPEG8219",
@@ -751,6 +889,12 @@
       "argus_record_id": "edbac6b416864b33"
     },
     {
+      "pattern": "00:04:7d",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "ee6ba1f85f7588af"
+    },
+    {
       "pattern": "1668BE10JA00",
       "pattern_type": "drone_id_prefix",
       "description": "Skydio drone",
@@ -775,10 +919,28 @@
       "argus_record_id": "f328f535d79393e4"
     },
     {
+      "pattern": "00:17:f3",
+      "pattern_type": "oui",
+      "description": "Harris persistent_surveillance",
+      "argus_record_id": "f7818dc81f66d28a"
+    },
+    {
+      "pattern": "00:00:c3",
+      "pattern_type": "oui",
+      "description": "Harris persistent_surveillance",
+      "argus_record_id": "f7e1c05b9ea4dbd3"
+    },
+    {
       "pattern": "b8:a4:4f",
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
       "argus_record_id": "f9114e5c8a1477bc"
+    },
+    {
+      "pattern": "00:24:92",
+      "pattern_type": "oui",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "fa714fb1bf249f86"
     }
   ]
 }
