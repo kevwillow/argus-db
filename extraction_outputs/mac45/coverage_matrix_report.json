@@ -52,9 +52,9 @@
         "crowdsourced": 37,
         "primary_registry": 1
       },
-      "min_conf": 65,
+      "min_conf": 70,
       "max_conf": 85,
-      "median_conf": 77.5,
+      "median_conf": 85.0,
       "row_ids": [
         449,
         22810,
@@ -103,9 +103,9 @@
       "n_by_source_type": {
         "crowdsourced": 4
       },
-      "min_conf": 65,
-      "max_conf": 70,
-      "median_conf": 65.0,
+      "min_conf": 70,
+      "max_conf": 85,
+      "median_conf": 85.0,
       "row_ids": [
         1,
         22807,
@@ -144,9 +144,9 @@
       "n_by_source_type": {
         "crowdsourced": 3
       },
-      "min_conf": 65,
-      "max_conf": 65,
-      "median_conf": 65,
+      "min_conf": 85,
+      "max_conf": 85,
+      "median_conf": 85,
       "row_ids": [
         22908,
         22909,
@@ -160,9 +160,9 @@
       "n_by_source_type": {
         "crowdsourced": 5
       },
-      "min_conf": 60,
-      "max_conf": 70,
-      "median_conf": 60,
+      "min_conf": 70,
+      "max_conf": 85,
+      "median_conf": 85,
       "row_ids": [
         559,
         560,
@@ -214,7 +214,7 @@
         "crowdsourced": 8,
         "manufacturer_app": 1
       },
-      "min_conf": 60,
+      "min_conf": 70,
       "max_conf": 85,
       "median_conf": 85,
       "row_ids": [
@@ -252,7 +252,7 @@
         "crowdsourced": 7,
         "manufacturer_app": 12
       },
-      "min_conf": 65,
+      "min_conf": 85,
       "max_conf": 92,
       "median_conf": 92,
       "row_ids": [
@@ -424,9 +424,9 @@
       "n_by_source_type": {
         "crowdsourced": 11
       },
-      "min_conf": 65,
-      "max_conf": 65,
-      "median_conf": 65,
+      "min_conf": 85,
+      "max_conf": 85,
+      "median_conf": 85,
       "row_ids": [
         22885,
         22886,
@@ -2318,9 +2318,9 @@
       "n_by_source_type": {
         "crowdsourced": 2
       },
-      "min_conf": 65,
-      "max_conf": 65,
-      "median_conf": 65.0,
+      "min_conf": 85,
+      "max_conf": 85,
+      "median_conf": 85.0,
       "row_ids": [
         22771,
         22772
@@ -93949,7 +93949,7 @@
       "deployment_observations_count": 86458,
       "council_minutes_matters_count": 1,
       "high_corroboration": true,
-      "active_identifier_count": 125
+      "active_identifier_count": 231
     },
     {
       "canonical_name": "Florida R&D Associates LLC",
@@ -244330,18 +244330,6 @@
       "active_identifier_count": 2
     },
     {
-      "canonical_name": "flock_safety",
-      "aliases_used": [
-        "flock_safety"
-      ],
-      "fcc_grantees_count": 0,
-      "procurement_records_count": 0,
-      "deployment_observations_count": 80208,
-      "council_minutes_matters_count": 0,
-      "high_corroboration": false,
-      "active_identifier_count": 67
-    },
-    {
       "canonical_name": "flsystem",
       "aliases_used": [
         "flsystem"
@@ -291413,7 +291401,7 @@
       "unknown_category": 33329,
       "procurement_only": 6,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 40,
+      "below_confidence_threshold": 14,
       "oversized_mac_range": 28,
       "ssid_pattern": 18,
       "device_fingerprint": 6,
@@ -291461,9 +291449,9 @@
       "fcc_grantee_code": 29,
       "equipment_class_code": 6,
       "NDPP_pending_lynceus_v0_3_scanner_support": 11,
-      "excluded_source_type": 379
+      "excluded_source_type": 336
     },
-    "survivors": 173,
+    "survivors": 242,
     "reconciles": 41508,
     "drop_assignments": {
       "1": "excluded_source_type",
@@ -291497,11 +291485,6 @@
       "551": "product_family_codename",
       "552": "product_family_codename",
       "553": "product_family_codename",
-      "554": "excluded_source_type",
-      "555": "excluded_source_type",
-      "556": "excluded_source_type",
-      "557": "excluded_source_type",
-      "558": "excluded_source_type",
       "559": "ssid_pattern",
       "560": "ssid_pattern",
       "561": "ssid_pattern",
@@ -313598,8 +313581,6 @@
       "22746": "unknown_category",
       "22747": "unknown_category",
       "22748": "unknown_category",
-      "22771": "below_confidence_threshold",
-      "22772": "below_confidence_threshold",
       "22773": "rf_channel",
       "22774": "rf_channel",
       "22775": "rf_channel",
@@ -313616,28 +313597,6 @@
       "22786": "rf_channel",
       "22787": "rf_channel",
       "22788": "rf_channel",
-      "22807": "below_confidence_threshold",
-      "22808": "below_confidence_threshold",
-      "22809": "below_confidence_threshold",
-      "22810": "below_confidence_threshold",
-      "22811": "below_confidence_threshold",
-      "22812": "below_confidence_threshold",
-      "22813": "below_confidence_threshold",
-      "22814": "below_confidence_threshold",
-      "22815": "below_confidence_threshold",
-      "22816": "below_confidence_threshold",
-      "22817": "below_confidence_threshold",
-      "22818": "below_confidence_threshold",
-      "22819": "below_confidence_threshold",
-      "22820": "below_confidence_threshold",
-      "22821": "below_confidence_threshold",
-      "22822": "below_confidence_threshold",
-      "22823": "below_confidence_threshold",
-      "22824": "below_confidence_threshold",
-      "22825": "below_confidence_threshold",
-      "22826": "below_confidence_threshold",
-      "22827": "below_confidence_threshold",
-      "22828": "excluded_source_type",
       "22829": "below_confidence_threshold",
       "22830": "below_confidence_threshold",
       "22831": "below_confidence_threshold",
@@ -313717,9 +313676,6 @@
       "22905": "firmware_sha256_hash",
       "22906": "firmware_sha256_hash",
       "22907": "firmware_sha256_hash",
-      "22908": "below_confidence_threshold",
-      "22909": "below_confidence_threshold",
-      "22910": "below_confidence_threshold",
       "22911": "firmware_sha256_hash",
       "22912": "x509_cert_sha256_prefix",
       "22913": "x509_cert_sha256_prefix",
@@ -326112,25 +326068,6 @@
       "35567": "unknown_category",
       "35568": "vendor_controlled_hostname",
       "35569": "vendor_controlled_hostname",
-      "35570": "excluded_source_type",
-      "35571": "excluded_source_type",
-      "35572": "excluded_source_type",
-      "35573": "excluded_source_type",
-      "35574": "excluded_source_type",
-      "35575": "excluded_source_type",
-      "35576": "excluded_source_type",
-      "35577": "excluded_source_type",
-      "35578": "excluded_source_type",
-      "35579": "excluded_source_type",
-      "35580": "excluded_source_type",
-      "35581": "excluded_source_type",
-      "35582": "excluded_source_type",
-      "35583": "excluded_source_type",
-      "35584": "excluded_source_type",
-      "35585": "excluded_source_type",
-      "35586": "excluded_source_type",
-      "35587": "excluded_source_type",
-      "35588": "excluded_source_type",
       "35589": "unknown_category",
       "35590": "unknown_category",
       "35591": "unknown_category",
@@ -326160,24 +326097,6 @@
       "35615": "ble_local_name",
       "35616": "ble_local_name",
       "35617": "ble_local_name",
-      "35618": "excluded_source_type",
-      "35619": "excluded_source_type",
-      "35620": "excluded_source_type",
-      "35621": "excluded_source_type",
-      "35622": "excluded_source_type",
-      "35623": "excluded_source_type",
-      "35624": "excluded_source_type",
-      "35625": "excluded_source_type",
-      "35626": "excluded_source_type",
-      "35627": "excluded_source_type",
-      "35628": "excluded_source_type",
-      "35629": "excluded_source_type",
-      "35630": "excluded_source_type",
-      "35631": "excluded_source_type",
-      "35632": "excluded_source_type",
-      "35633": "excluded_source_type",
-      "35634": "excluded_source_type",
-      "35635": "excluded_source_type",
       "35636": "ble_service_uuid",
       "35637": "ble_service_uuid",
       "35638": "ble_service_uuid",

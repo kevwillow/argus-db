@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "argus_version": "30",
-    "exported_at": "2026-05-29T02:52:49Z",
-    "record_count": 146,
+    "argus_version": "31",
+    "exported_at": "2026-05-30T15:42:57Z",
+    "record_count": 178,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "e63f30b7-3ccc-5e43-9186-f4bd8d994d30",
+    "argus_run_id": "5162935c-b5c6-5a3e-a4ba-d5ca119eac06",
     "source_record_count": 41508,
     "dropped_in_export": {
       "unknown_category": 33329,
@@ -60,9 +60,9 @@
       "NDPP_pending_lynceus_v0_3_scanner_support": 11,
       "procurement_only": 6,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 40,
-      "excluded_source_type": 379,
-      "geographic_scope_mismatch": 27
+      "below_confidence_threshold": 14,
+      "excluded_source_type": 336,
+      "geographic_scope_mismatch": 64
     }
   },
   "entries": [
@@ -77,6 +77,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Ascent AeroSystems drone",
       "argus_record_id": "0071d25f2613f37b"
+    },
+    {
+      "pattern": "14:5a:fc",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "0523969063b0126e"
     },
     {
       "pattern": "1596F31",
@@ -143,6 +149,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "0d8a34e130a69e94"
+    },
+    {
+      "pattern": "38:5b:44",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "0de438475138ac61"
     },
     {
       "pattern": "00:26:7e",
@@ -229,6 +241,12 @@
       "argus_record_id": "24493d61823561a3"
     },
     {
+      "pattern": "08:3a:88",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "244ce9a1646a5443"
+    },
+    {
       "pattern": "9c:5a:8a",
       "pattern_type": "oui",
       "description": "DJI drone",
@@ -281,6 +299,18 @@
       "pattern_type": "drone_id_prefix",
       "description": "PARROT drone",
       "argus_record_id": "34077b9bc065ef49"
+    },
+    {
+      "pattern": "58:8e:81",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "352ca48cb7f2e84e"
+    },
+    {
+      "pattern": "e4:aa:ea",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "35deddad6f79bad6"
     },
     {
       "pattern": "90:03:b7",
@@ -403,6 +433,18 @@
       "argus_record_id": "51e6bce55d8bbfa8"
     },
     {
+      "pattern": "d8:f3:bc",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "52c10d8b08035a0c"
+    },
+    {
+      "pattern": "00003300-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "52f6bf7990060f7a"
+    },
+    {
       "pattern": "48:2c:ea",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
@@ -451,6 +493,12 @@
       "argus_record_id": "5ed7a90faba9f4b6"
     },
     {
+      "pattern": "00003200-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "5ef22302a7634fb4"
+    },
+    {
       "pattern": "cc:93:4a",
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
@@ -461,6 +509,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "60b5872383d34e21"
+    },
+    {
+      "pattern": "e4:aa:ea:80:40:40",
+      "pattern_type": "mac",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "60c559cafa28b2d1"
     },
     {
       "pattern": "28:a3:31",
@@ -481,6 +535,12 @@
       "argus_record_id": "6598b0e099cd320b"
     },
     {
+      "pattern": "04:0d:84",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "672ebdf790f8a601"
+    },
+    {
       "pattern": "00:40:8c",
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
@@ -493,10 +553,34 @@
       "argus_record_id": "690ec880c2e8716f"
     },
     {
+      "pattern": "Flock",
+      "pattern_type": "ssid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "69248a5dad0c2eab"
+    },
+    {
+      "pattern": "Flock",
+      "pattern_type": "ssid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "69248a5dad0c2eab"
+    },
+    {
+      "pattern": "80:30:49",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "69deceaa2e9a639b"
+    },
+    {
       "pattern": "17207",
       "pattern_type": "drone_id_prefix",
       "description": "Leica Geosystems AG drone",
       "argus_record_id": "6b281f228c552457"
+    },
+    {
+      "pattern": "90:35:ea",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "6dcc7e8573a2ae85"
     },
     {
       "pattern": "1581F45T",
@@ -509,6 +593,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Sony drone",
       "argus_record_id": "6f8dd52534dd3c19"
+    },
+    {
+      "pattern": "70:c9:4e",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "718f398306ff65de"
     },
     {
       "pattern": "1774FREM1010000",
@@ -527,6 +617,12 @@
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "759d22ae8c310a68"
+    },
+    {
+      "pattern": "Flock-*",
+      "pattern_type": "ssid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "765db90376bacdbb"
     },
     {
       "pattern": "e4:7a:2c",
@@ -557,6 +653,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
       "argus_record_id": "7aa408d8a277935a"
+    },
+    {
+      "pattern": "1c:34:f1",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "7d15f9960e3c1218"
     },
     {
       "pattern": "64:ce:6e",
@@ -619,6 +721,12 @@
       "argus_record_id": "8f6d7a48b568c851"
     },
     {
+      "pattern": "3c:91:80",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "8fe4e5a016255a7e"
+    },
+    {
       "pattern": "f4d4dbf5-ba4b-40db-9a44-f8395f3728cf",
       "pattern_type": "vendor_document_uuid_cloud_reference",
       "description": "DJI drone",
@@ -673,6 +781,12 @@
       "argus_record_id": "9a9fe61cadafd8f9"
     },
     {
+      "pattern": "58:00:e3:c8:69:66",
+      "pattern_type": "mac",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "9ef19e99e8f2bf48"
+    },
+    {
       "pattern": "1587A05",
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
@@ -691,10 +805,22 @@
       "argus_record_id": "a090d3ed5ada4e98"
     },
     {
+      "pattern": "b4:e3:f9",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "a159fc50de85e0c1"
+    },
+    {
       "pattern": "AA2",
       "pattern_type": "drone_id_prefix",
       "description": "Applied Aeronautics drone",
       "argus_record_id": "a22b218f37826650"
+    },
+    {
+      "pattern": "94:34:69",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "a324b45c330bc306"
     },
     {
       "pattern": "17906090",
@@ -707,6 +833,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
       "argus_record_id": "ae00e7e7711ee581"
+    },
+    {
+      "pattern": "9c:2f:9d:1a:c0:03",
+      "pattern_type": "mac",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "afcb7d370b76f04e"
     },
     {
       "pattern": "1787F07BM",
@@ -737,6 +869,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Skydio drone",
       "argus_record_id": "c126fe1d66424b05"
+    },
+    {
+      "pattern": "94:08:53",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "c58227f4af0fc09d"
     },
     {
       "pattern": "00:bf:15",
@@ -787,6 +925,12 @@
       "argus_record_id": "d30df38a13b98013"
     },
     {
+      "pattern": "00003100-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "d3548b94fac0f910"
+    },
+    {
       "pattern": "1785C00000000",
       "pattern_type": "drone_id_prefix",
       "description": "Watts Innovations drone",
@@ -823,6 +967,12 @@
       "argus_record_id": "dccea5f38dfee0d4"
     },
     {
+      "pattern": "74:4c:a1",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "dcfa1615a6d111cb"
+    },
+    {
       "pattern": "84:db:2f",
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
@@ -847,10 +997,28 @@
       "argus_record_id": "e2fed72e20892eca"
     },
     {
+      "pattern": "00003400-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "e427dbb1d2e2029a"
+    },
+    {
+      "pattern": "00003500-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "e42c67030014e18e"
+    },
+    {
       "pattern": "1792C000000",
       "pattern_type": "drone_id_prefix",
       "description": "uAvionix drone",
       "argus_record_id": "e4939955e30ad104"
+    },
+    {
+      "pattern": "9c:2f:9d",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "e4fb964f328c8b50"
     },
     {
       "pattern": "a0:14:3d",
@@ -869,6 +1037,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Percepto AirMax drone",
       "argus_record_id": "ec0fba115c1155ef"
+    },
+    {
+      "pattern": "ec:1b:bd",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "ec251088bab72011"
     },
     {
       "pattern": "18077455",
@@ -893,6 +1067,18 @@
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "ee6ba1f85f7588af"
+    },
+    {
+      "pattern": "Flock-230503",
+      "pattern_type": "ssid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "ef29f65fa5ed8a78"
+    },
+    {
+      "pattern": "Flock-230503",
+      "pattern_type": "ssid",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "ef29f65fa5ed8a78"
     },
     {
       "pattern": "1668BE10JA00",
@@ -941,6 +1127,12 @@
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "fa714fb1bf249f86"
+    },
+    {
+      "pattern": "f0:82:c0",
+      "pattern_type": "oui",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "ff5981ab6c873540"
     }
   ]
 }

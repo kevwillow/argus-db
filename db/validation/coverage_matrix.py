@@ -239,6 +239,30 @@ PI_SELF_EXCLUDE_OUIS: frozenset[str] = frozenset(
 # wider-net rich-import consumers.
 EXCLUDED_SOURCE_TYPES: frozenset[str] = frozenset({"inferred", "crowdsourced"})
 
+# CP39 §7.5 carve-out — must mirror `export_lynceus.py` constant of the same
+# name. The two modules cross-check at `_reconcile`-time and halt on any
+# divergence; do NOT update one without updating the other.
+CP39_FLOCK_HUNT_CARVEOUT_URL_PATTERNS: tuple[str, ...] = (
+    "deflock.me",
+    "MaxwellDPS/Flock-You",
+    "colonelpanichacks/flock-you",
+    "GainSec/Flock-Safety-Trap",
+    "GainSec/anti-crime-ecosystem-research",
+    "GainSec/flock-safety-falcon",
+    "DeflockJoplin/flock-you",
+    "EthanThePhoenix38/flock-you",
+    "FoggedLens/deflock-app",
+    "NSM-Barii",
+    "flock-back",
+)
+
+
+def _cp39_flock_hunt_carveout(source_url: str | None) -> bool:
+    """Return True iff the row qualifies for the CP39 §7.5 carve-out."""
+    if not source_url:
+        return False
+    return any(p in source_url for p in CP39_FLOCK_HUNT_CARVEOUT_URL_PATTERNS)
+
 # §6.2 Phase-3 corroboration thresholds (dispatch verbatim).
 HIGH_CORROBORATION_GRANTEES_FLOOR = 10
 HIGH_CORROBORATION_PROCUREMENT_FLOOR = 10
@@ -272,6 +296,10 @@ class ActiveRow:
     manufacturer: Optional[str]
     source_type: str
     confidence: int
+    # CP39 (v1.6.2.1) — source_url is required to evaluate the §7.5 floor
+    # carve-out for named Flock-hunt project sources. Kept Optional only for
+    # defensive backward-compat; the loader always populates it.
+    source_url: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -365,7 +393,7 @@ def _connect(db_path: Path) -> sqlite3.Connection:
 def _load_active_rows(conn: sqlite3.Connection) -> list[ActiveRow]:
     cur = conn.execute(
         "SELECT id, identifier, identifier_type, device_category, "
-        "manufacturer, source_type, confidence "
+        "manufacturer, source_type, confidence, source_url "
         "FROM identifiers WHERE superseded_by IS NULL ORDER BY id"
     )
     rows: list[ActiveRow] = []
@@ -379,6 +407,7 @@ def _load_active_rows(conn: sqlite3.Connection) -> list[ActiveRow]:
                 manufacturer=r["manufacturer"],
                 source_type=r["source_type"],
                 confidence=r["confidence"] if r["confidence"] is not None else 0,
+                source_url=r["source_url"],
             )
         )
     return rows
@@ -599,7 +628,9 @@ def _assign_drop_bin(
     # this gate has passed every prior static filter; the bin captures the
     # CP19-specific drop attribution.
     if drop_source_types and row.source_type in drop_source_types:
-        return "excluded_source_type"
+        # CP39 §7.5 carve-out — see CP39_FLOCK_HUNT_CARVEOUT_URL_PATTERNS.
+        if not _cp39_flock_hunt_carveout(row.source_url):
+            return "excluded_source_type"
     return None
 
 

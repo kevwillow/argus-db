@@ -16,7 +16,48 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## [Unreleased]
 
-(No unreleased changes since v1.6.2.)
+(No unreleased changes since v1.6.2.1.)
+
+## v1.6.2.1 — 2026-05-30
+
+A **schema-bump patch** that adds a new optional `severity` column to the `identifiers` table and labels Flock Safety + Flock-context data as `severity='high'`, plus lifts a cohort of crowdsourced Flock-hunting data into the high-confidence export.
+
+### What's new
+
+- **New column: `identifiers.severity`** — optional enum (`high` / `medium` / `low` / `NULL`). Default `NULL`. Captures surveillance-impact class as an axis orthogonal to `confidence` (which captures identifier-veracity). Narrow scope this cycle: only Flock-attested rows are labeled `high`; everything else stays `NULL` pending future cycles.
+
+- **Flock-hunt project carve-out — 124 identifiers promoted into the high-confidence export.** Rows whose source is one of the named Flock-hunting GitHub projects (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar — 10 named sources) are now admitted at confidence ≥85 with `severity='high'`, even though `source_type` remains `crowdsourced`/`inferred`/`academic`. The rationale: those upstream projects have been released and have active users, which is sufficient external verification for our purposes. This is the first carve-out to the strict `≥70 + excludes crowdsourced/inferred` floor on `argus_export_high_confidence.json`; it is named and bounded (does not open the floor for arbitrary crowdsourced lifts elsewhere).
+
+- **All Flock Safety records now labeled `severity='high'`.** 231 Flock Safety identifiers + 61 partner/LE-context identifiers from Flock-hunting sources (SoundThinking, Hikvision-via-FlockYou, Axon-via-Flock-context, etc.) carry the new `severity='high'` field. Total `severity='high'` rows: **292**.
+
+- **Manufacturer normalization (clerical sub-pass).** 67 rows previously labeled with lowercase `flock_safety` are now canonical `Flock Safety` (matching manufacturers.id=1). 39 NULL-manufacturer Qualcomm-chipset rows from a Flock-firmware repo are attributed to `Flock Safety` per the narrow plan's fallback rule; the underlying Qualcomm Snapdragon chipset family is captured in `notes` for a future cycle that may admit Qualcomm to the manufacturer lexicon.
+
+### What stayed the same (intentional)
+
+- **CP38 takes precedence on third-party detection patterns.** 19 `ssid_pattern` rows that CP38 (v1.6.0) demoted to `inferred/50` because they're third-party detection guesses about *other* vendors (Sierra Wireless, Cradlepoint, DJI, Parrot, Skydio, Autel, Grayshift, Magnet Forensics, MSAB, Oxygen Forensics) **retain their `inferred/50` classification AND keep `severity=NULL`** — even though they live in a Flock-hunting repo. The CP39 carve-out is for Flock-Safety-attributable data, not for arbitrary content hosted in those repos.
+- **False-positive caught.** One IEEE OUI row attributed to `Flock Audio Inc.` (a pro audio company, unrelated to Flock Safety surveillance) was excluded from the carve-out and the severity tag.
+
+### By the numbers, compared with v1.6.2
+
+| | v1.6.2 | v1.6.2.1 |
+|---|---|---|
+| Schema version | 30 | **31** (+1 column: `severity`) |
+| Active identifiers | 41,508 | 41,508 (unchanged — labeling/lift only, no insert/delete) |
+| Sources | 74 | 74 (unchanged) |
+| Manufacturers | 126 | 126 (unchanged) |
+| `manufacturer = 'Flock Safety'` (canonical) | 125 | **231** (+67 lowercase-normalize + 39 NULL-mfr attribution) |
+| `manufacturer = 'flock_safety'` (lowercase) | 67 | 0 |
+| `severity = 'high'` | 0 (column didn't exist) | **292** |
+| Lynceus high-confidence export records | 146 | **178** (+32 from CP39 — the Flock-hunt rows whose identifier_type maps to a Lynceus pattern survive the §4.4 mapping; the rest of the 124 lifts are DROPPED at §4.4 for type-mapping reasons unchanged by CP39) |
+| Lynceus standard export records | 592 | 592 (unchanged — the +124 lifted rows were either already in standard export or DROPPED at §4.4) |
+| Lynceus CSV export records | 41,508 | 41,508 (gains `severity` column) |
+
+### Technical notes
+
+- Schema migration `0031_cp39_severity_column_flock_carveout.sql`. Pattern: SQLite table-rebuild (CP21 cumulative-full-enum). All prior `CHECK` constraints carried forward verbatim.
+- Bible amendment: CP39 in `docs/engineering/BIBLE_AMENDMENTS.md` (the §7.5 floor carve-out rule + the CP38 precedence sub-clause + the false-positive handling).
+- Audit anchor: `extraction_runs.id=127` (full dispatch JSON in `notes`).
+- Pre-action backup: `db/argus.db.pre_mig0031_20260530T151838Z.bak` (project's internal archive).
 
 ## v1.6.2 — 2026-05-29
 

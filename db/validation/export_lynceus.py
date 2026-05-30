@@ -252,6 +252,38 @@ PI_SELF_EXCLUDE_OUIS: frozenset[str] = frozenset(
 # any mismatch).
 EXCLUDED_SOURCE_TYPES: frozenset[str] = frozenset({"inferred", "crowdsourced"})
 
+# CP39 §7.5 carve-out — named Flock-hunt project source URL patterns.
+# Rows whose source_url contains any of these substrings bypass the
+# EXCLUDED_SOURCE_TYPES gate. Rationale (v1.6.2.1 board ratification): these
+# upstream projects have shipped releases with active users, which is
+# sufficient external verification for high-confidence-export admission even
+# though source_type stays honest (`crowdsourced`/`inferred`/`academic`).
+# Named and bounded — does NOT open the floor for arbitrary crowdsourced
+# rows. See `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 39.
+# Coordinated sibling: `coverage_matrix.py` must use the identical set (the
+# `_reconcile` map-vs-writer cross-check halts on any divergence).
+CP39_FLOCK_HUNT_CARVEOUT_URL_PATTERNS: tuple[str, ...] = (
+    "deflock.me",
+    "MaxwellDPS/Flock-You",
+    "colonelpanichacks/flock-you",
+    "GainSec/Flock-Safety-Trap",
+    "GainSec/anti-crime-ecosystem-research",
+    "GainSec/flock-safety-falcon",
+    "DeflockJoplin/flock-you",
+    "EthanThePhoenix38/flock-you",
+    "FoggedLens/deflock-app",
+    "NSM-Barii",
+    "flock-back",
+)
+
+
+def _cp39_flock_hunt_carveout(source_url: str | None) -> bool:
+    """Return True iff the row qualifies for the CP39 §7.5 carve-out."""
+    if not source_url:
+        return False
+    return any(p in source_url for p in CP39_FLOCK_HUNT_CARVEOUT_URL_PATTERNS)
+
+
 # §4.4 mac_range expansion ceiling.
 MAC_RANGE_EXPANSION_CEILING = 256
 
@@ -573,7 +605,11 @@ def _classify_row(
     # passes inferred/crowdsourced through. Mirrors
     # `coverage_matrix.py::_assign_drop_bin`'s identical late-priority gate.
     if apply_excluded_source_type and row.source_type in EXCLUDED_SOURCE_TYPES:
-        return "excluded_source_type", []
+        # CP39 §7.5 carve-out: rows from named Flock-hunt project sources
+        # bypass the EXCLUDED_SOURCE_TYPES gate. See module-level constant
+        # CP39_FLOCK_HUNT_CARVEOUT_URL_PATTERNS for the named set.
+        if not _cp39_flock_hunt_carveout(row.source_url):
+            return "excluded_source_type", []
 
     pattern_type = IDENTIFIER_TYPE_TO_PATTERN_TYPE.get(row.identifier_type)
     if pattern_type is None:

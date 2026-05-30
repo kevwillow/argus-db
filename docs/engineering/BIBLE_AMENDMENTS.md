@@ -5322,3 +5322,76 @@ Verified pre- and post-write: §4.4 maps `ssid_pattern → (DROPPED)` ("Lynceus 
 - Parent ruling: [MAC-273](/MAC/issues/MAC-273) Step-2.3 (5 Wave-K rows: ids 39582/39583/39610/39613/41839).
 - Predecessor CP: CP19 (§8.2 `crowdsourced`/`inferred` high-confidence-export exclusion); §4.4 `ssid_pattern` DROP.
 - Sibling memory: [[reference_ssid_pattern_excluded_from_both_lynceus_exports]], [[feedback_flockyou_ssid_pattern_policy_split]], [[feedback_bible_amendment_downstream_consumer_audit]].
+
+## Correction Pass 39 — `severity` column + §7.5 floor carve-out for named Flock-hunt projects (mig-0031) — **RATIFIED** (board narrow plan)
+
+**Date:** 2026-05-30
+**Migration:** `0031_cp39_severity_column_flock_carveout.sql` (schema_version 30 → 31; +1 column `severity` on `identifiers`, optional enum `high`/`medium`/`low`/NULL)
+**Origin:** [MAC-292](/MAC/issues/MAC-292) board comment `6611f673` re: promoting crowdsourced Flock-hunt data into HIGH-conf export. Split to research-then-propose child [MAC-305](/MAC/issues/MAC-305); board ratified the narrow plan at [MAC-292 comment `61b382a3`](/MAC/issues/MAC-292#comment-61b382a3-bee5-46c1-ade1-ba33d39c2ad5) 2026-05-30T15:17Z.
+**Authority:** Board (operator `ve8D79nSrERcuRYUzld9JyB4lXghkKhx`), ratification chain `6611f673` → `8de80bbc` → `b4a3cf35` → `b07c5132` → `61b382a3`. CEO-proposed plan at [comment `e0a9fc98`](/MAC/issues/MAC-292#comment-e0a9fc98-0ccb-46da-87a8-c7628a6995f6).
+**Status:** **RATIFIED** at this commit. Schema mig-0031 + 4-step data-pass landed in this commit; bible amendment landed in same commit per [[feedback_bible_amendment_downstream_consumer_audit]].
+
+#### Rule (durable §7.5 carve-out + new severity axis)
+
+**(1) New axis — `identifiers.severity`** is an optional enum (`high` / `medium` / `low` / NULL) capturing **surveillance-impact class**, orthogonal to `confidence` (which captures identifier-veracity at intake). Confidence governs export-floor membership; severity is a downstream-consumer-side classification. Default NULL — narrow scope this cycle (Flock-vendor and Flock-hunt-source attestation only); future cycles may backfill other categories as orthogonal CPs.
+
+**(2) §7.5 floor carve-out — "named Flock-hunt project" sub-class.** Rows whose `source_url` maps to one of the named Flock-hunt project source-ids (sids 6 DeFlock, 15 NSM-Barii, 16 MaxwellDPS/Flock-You-Android, 20 colonelpanichacks/flock-you, 33 GainSec/Flock-Safety-Trap-Shooter, 38 DeflockJoplin/flock-you fork, 39 EthanThePhoenix38/flock-you-camera-detector, 40 FoggedLens/deflock-app, 41 GainSec/anti-crime-ecosystem-research, 42 GainSec/flock-safety-falcon-sparrow-alpr-edl-firehose) are **admitted at confidence ≥85 with severity='high'** when manufacturer = `Flock Safety` (canonical or normalized) or the row content is otherwise Flock-Safety-attributable. The `source_type` column remains its honest `crowdsourced` / `inferred` / `academic` value (no relabeling); the §7.5 amendment is the *exception rule*, not a relabel.
+
+**(3) Verification rationale (board narrow plan).** The Flock-hunt projects' release maturity + active user base is sufficient external attestation for these named sources. Standard §7.5 floor (`excludes crowdsourced/inferred sources`) does not apply to this named sub-class. The carve-out is **named and bounded** — it does not open the floor for arbitrary crowdsourced lifts elsewhere; admitting additional sub-classes requires a future CP.
+
+#### Sub-rule clarifications (caught at apply-time)
+
+**CP38 precedence — no implicit override.** Rows previously demoted under CP38 (third-party crowdsourced-detection-app `ssid_pattern`s for non-Flock vendors — Sierra Wireless / Cradlepoint / DJI / Parrot / Skydio / Autel Robotics / Grayshift / Magnet Forensics / MSAB / Oxygen Forensics, 19 rows at ids 35591–35604 + 39582 + 39583 + 39610 + 39613 + 41839) **retain CP38's `inferred/50` classification AND keep `severity=NULL`**. CP38's "third-party-inference about OTHER vendors" rule is durable and supersedes CP39's source-based carve-out for any row CP38 explicitly demoted. The CP39 SQL initially over-scoped via source_url filter and was corrected pre-commit (paste-not-cite verification caught it; reverted before bible amendment landed).
+
+**False-positive handling.** The LIKE-match on `Flock` as a manufacturer substring caught one IEEE OUI registry attribution to `Flock Audio Inc.` (id=11240, mac_range `8c:1f:64:57:4/36`) — a pro audio company unrelated to Flock Safety surveillance. Excluded from CP39 carve-out at apply-time; severity=NULL retained.
+
+**Manufacturer normalization sub-pass.** 67 rows previously labeled with lowercase `flock_safety` (almost all from `crt.sh` cert-transparency queries against `flocksafety.com`) renamed to canonical `Flock Safety` (manufacturers.id=1). 39 NULL-manufacturer chipset_codename rows from sid=42 (Qualcomm Snapdragon family APQ/MDM/MSM) attributed to `Flock Safety` per board narrow-plan "else Flock Safety" branch; underlying chipset vendor captured in `notes` for a future Qualcomm-admission CP.
+
+#### Applied write summary
+
+- **mig-0031** schema_version 30 → 31; `identifiers` table rebuild adds `severity TEXT CHECK(severity IN ('high','medium','low') OR severity IS NULL)`; index `idx_identifiers_severity` added.
+- **Data pass — 1 extraction_runs anchor (id=127)** capturing full audit metadata (rule body, ratification chain, pre-action backup sha256, expected-mutation breakdown, CP38-conflict-revert addendum, false-positive-revert addendum).
+- **Manufacturer normalization (67):** `flock_safety` → `Flock Safety` (canonical id=1).
+- **NULL-mfr attribution (39):** sid=42 Qualcomm Snapdragon chipset_codenames → `Flock Safety` (per board narrow-plan "else" branch); Qualcomm chipset family captured in notes.
+- **Confidence lift (124):** sub-70 rows from Flock-hunt sids (6/15/16/20/33/38/39/40/41/42) where the row is Flock-Safety-attributable → confidence=85; 19 CP38-conflict rows excluded (reverted to confidence=50 per CP38 precedence).
+- **Severity tag (292):** Flock-Safety-attributable rows + partner/LE-context rows from Flock-hunt sources → severity='high'; 19 CP38-conflict rows + 1 false-positive (Flock Audio Inc.) excluded.
+
+#### Counts (paste-not-cite from live DB post-apply)
+
+- `schema_version` row count: 31 (was 30).
+- active identifiers total: **41,508** (unchanged — labeling/lift only, no INSERT/DELETE).
+- manufacturer = `Flock Safety` (canonical) post-normalization: **231** (was 125; +67 from `flock_safety` normalize + 39 from NULL-mfr attribution).
+- manufacturer = `flock_safety` (lowercase) remaining: **0**.
+- severity = `high` total: **292** (231 Flock Safety + 61 partner/LE-context: SoundThinking 32, Hikvision 8, Sierra Wireless 6, Dahua 6, DJI 5, Cradlepoint 5, Axon 4, Parrot 2, Motorola Solutions 2, Grayshift 2, Skydio 1, Qsic 1, Oxygen Forensics 1, Magnet Forensics 1, MSAB 1, Cellebrite 1, Axis Communications 1, Autel Robotics 1).
+- sub-70 Flock-Safety rows remaining: **0** (was 126 across 9 Flock-hunt sids; 124 lifted to ≥85; 19 retained at 50 per CP38 precedence; net Flock-Safety lift = 124).
+- CP38-demoted 19 rows post-correction: `confidence=50 AND severity=NULL` (CP38 classification preserved unchanged).
+
+#### §11 envelope
+
+- **#1 no fabrication** — no rows synthesized; all 312 LIKE-matched rows pre-existed in v1.6.2; this is a labeling/lift pass plus 1 schema column add.
+- **#7 provenance** — `source_url` untouched on every row; `notes` mutation is additive only (CP39 audit markers appended; existing notes preserved verbatim).
+- **#8 confidence-preservation** — 19 CP38-conflict rows retained at 50; the 124 lifted rows carry a `confidence_history`-equivalent in their CP39 audit-marker (notes captures the pre-lift value).
+- **#11 amendment-log discipline** — this stanza IS the amendment-log entry; landed in the same coordinated commit as the write (no silent CP). Paired downstream-consumer touches: CHANGELOG v1.6.2.1 entry, DATA_DICTIONARY schema 30→31 + `severity` column documentation, README export-line wording refresh.
+- **#13 SAR-18 parity** — `severity` is annotation-only (not a classifier predicate); does not affect Lynceus export classifier semantics directly; export-shape change is the addition of a `severity` field on exported rows.
+
+#### Export impact
+
+- `argus_export_high_confidence.json` count: 146 → **178** (`+32` net — the Flock-hunt rows whose identifier_type maps to a Lynceus pattern survive §4.4; the remainder of the 124 lifted rows are DROPPED at §4.4 for type-mapping reasons unchanged by CP39, e.g., `chipset_codename`/`product_family_codename`/`gpt_partition_uuid` have no Lynceus scanner shape). Each exported row carries a new `severity` field (`"high"` for the 292 Flock-attested rows; `null` otherwise).
+- `argus_export.json` (standard, ≥30): includes the 124 newly-lifted rows + the `severity` field on each row; count delta = same +124 entering the standard tier.
+- `argus_export.csv` (full dump, 41,508 rows): adds `severity` column; values populated for 292 rows.
+- `argus_export_behavioral_signatures.json`: byte-stable (`behavioral_signatures` table did not gain a severity column this CP; future CP can add parity if board directs).
+
+#### Verification (paste-not-cite from live DB at apply-time)
+
+- Pre-action backup: `db/argus.db.pre_mig0031_20260530T151838Z.bak`; sha256 `eb05bdb817130036cd9aebe4130503b98772bab7b4df4401f760e93064006dce`.
+- `PRAGMA integrity_check` = `ok` (re-verified post-data-pass).
+- `PRAGMA foreign_key_check` = clean (re-verified post-data-pass).
+- `extraction_runs.id=127` carries the full audit JSON including CP38-conflict-revert addendum and false-positive-revert addendum (visible via `sqlite3 db/argus.db "SELECT notes FROM extraction_runs WHERE id = 127"`).
+
+#### Cross-references
+
+- Parent dispatch: [MAC-292](/MAC/issues/MAC-292) board comments `6611f673` / `b4a3cf35` / `b07c5132` / `61b382a3`; CEO plan `e0a9fc98`; verification baseline `62ace6c4`.
+- Execution home: [MAC-305](/MAC/issues/MAC-305).
+- Predecessor CP: CP38 (the durable third-party-detection-app demotion rule); CP19 (the §8.2 crowdsourced/inferred high-confidence-export exclusion); CP21 (cumulative-full-enum migration pattern).
+- Sibling memory: [[feedback_high_confidence_export_floor]], [[feedback_bible_amendment_downstream_consumer_audit]], [[feedback_ratification_options_verify_live_state]], [[feedback_flockyou_ssid_pattern_policy_split]].
+- Future CP carry-forwards: (a) Qualcomm manufacturer-lexicon admission (currently 39 chipset_codenames attributed to Flock Safety with notes-captured chipset-family for future re-attribution); (b) `behavioral_signatures` severity-column parity (if board direction warrants); (c) broader severity-axis backfill across categories (board-gated, not in CP39 scope).

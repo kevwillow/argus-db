@@ -43,7 +43,7 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 146 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources. |
+| `exports/argus_export_high_confidence.json` | 178 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources EXCEPT for the CP39 §7.5 carve-out for named Flock-hunt project sources (see `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 39). Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
 | `exports/argus_export.json` | 592 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
 | `exports/argus_export.csv` | 41,508 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 125 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
