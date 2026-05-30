@@ -20,7 +20,9 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## v1.6.2 — 2026-05-29
 
-A **correctness pass** over the v1.6.0 data ship. **No schema migration, no new sources, no new manufacturers** — the schema version stays at 30 and the source / manufacturer counts stay at 74 / 126. Two surgical mutations against the v1.6.0 corpus.
+This release adds **116 net-new identifiers** to the v1.6.0 corpus — deepening identifier coverage for existing surveillance-camera vendors (Hikvision, Uniview, Reolink, Bosch Security Systems, Verkada, Hanwha Vision, Dahua, Axis Communications, Avigilon, Eagle Eye Networks, Milestone, Rhombus, FLIR, WatchGuard Video) and the surveillance-camera SoC supply chain (HiSilicon, Texas Instruments, Ambarella, Novatek) across firmware build strings, chipset codenames, vendor-controlled hostnames, FCC equipment-class codes, network-discovery patterns, and other identifier types. The release also strips 36 documentation-pattern placeholder rows from the prior Wave G/H v1 CCTV integration.
+
+**No schema migration, no new sources, no new manufacturers** — the new identifiers landed under existing source coverage (vendor portals + cert-transparency queries + FCC equipment-grantee filings + NVD CVE entries + companion-app APK extracts + IEEE OUI + web.archive.org), so schema stays at 30 and source / manufacturer counts stay at 74 / 126.
 
 ### What changed
 
