@@ -49,6 +49,7 @@ By the numbers, compared with the previous release:
 - The latest bible amendments remain CP37 (the `network_surveillance` device category, schema-mutating at v1.6.0) and CP38 (the FlockYou crowdsourced-SSID reconcile, data-only at v1.6.0). No new CP entries this release.
 - Full amendment records remain in the engineering bible (`docs/engineering/BIBLE_AMENDMENTS.md`).
 - Backup of the pre-strip database snapshot is captured in `extraction_runs.id=126` (`notes.backup_sha256`); the on-disk backup file is held in the project's internal archive (not in the canonical source tree).
+- The 116 corrected-promote candidates this cycle were initially surfaced by a trial run of the Hermes / minimax m2.7 extraction tooling; the final records landed through the canonical extraction → validate → promotion pipeline.
 
 ## v1.6.1 — 2026-05-25
 
