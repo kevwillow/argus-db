@@ -1,3 +1,5 @@
+ARGUS IS IN ACTIVE DEVELOPMENT AND IS NOT COMPLETE. MAY NOT BE 100% ACCURATE AND MAY CONTAIN ANAMOLIES AS OF 6/1/26.
+
 # Argus
 
 > Open-source database of surveillance equipment identifiers
