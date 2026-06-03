@@ -24,9 +24,9 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.2:
+At v1.6.3:
 
-- **41,508 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.)
+- **41,508 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.). Unchanged from v1.6.2: v1.6.3 is a notes/severity/code-correctness cycle (CP40+CP41+CP42 §1+§2), not a row-shape change.
 - **126 manufacturers** — surveillance vendors classified by what they make
 - **74 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
 - **17 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, etc.)
@@ -43,7 +43,7 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 178 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources EXCEPT for the CP39 §7.5 carve-out for named Flock-hunt project sources (see `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 39). Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export_high_confidence.json` | 159 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources EXCEPT for the CP39 §7.5 carve-out for named Flock-hunt project sources (see `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 39), with the CP40 Lynceus chip-vendor OUI remediation applied (37-row FP slice flipped out of `severity='high'`). Each row carries a `severity` field (`"high"` for Flock-attested rows post-CP40 remediation, `null` otherwise). |
 | `exports/argus_export.json` | 592 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
 | `exports/argus_export.csv` | 41,508 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 125 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
@@ -86,14 +86,16 @@ Coverage is intentionally narrow at the per-category baseline — Argus has 126 
 
 ## Most recent release
 
-**v1.6.2** is a correctness-pass over the v1.6.0 data ship. No schema migration, no new sources or manufacturers — the schema version stays at 30 and the source / manufacturer counts stay at 74 / 126. Two surgical mutations against the v1.6.0 corpus:
+**v1.6.3** is a notes / severity / code-correctness cycle on top of the v1.6.2 ship plus the v1.6.2.1 narrow-fork content rolled in per the board's "hold and push as v1.6.3" directive. Schema version advances 30 → 31 (the `identifiers.severity` column added by v1.6.2.1's mig-0031 CP39 is now the v1.6.3 ship schema). Source / manufacturer counts stay at 74 / 126. Active identifier count is unchanged at 41,508 — v1.6.3 is data-truth-preserving at the identifier-row level (no INSERT / DELETE; the cycle is column-add, notes-backfill, and consumer-export-correctness):
 
-- **+116 corrected Phase-6 promotes** (MAC-288) — Wave G/H Phase-6 re-promotion landed 116 net-new identifiers in id range `[42593, 42708]` plus 8 confidence lifts on previously-staged rows, all citing the MAC-288 ratification in `notes.corroborations`.
-- **−36 §11 #1 strip** (MAC-291) — 36 placeholder / documentation-pattern rows from the Wave G/H v1 CCTV integration were demoted via self-loop `superseded_by = id` with a `notes.strip_audit` audit object. Distribution: 18 OUI placeholders (`00:00:00` ×15, `01:01:01` ×2, `ff:ff:ff` ×1) + 18 NDPP placeholders (`224.0.0.251` ×3, `8000` ×12, `1900` ×2, `5353` ×1). The 36 rows are excluded from all three Lynceus consumer exports.
+- **CP40 — Lynceus chip-vendor OUI remediation (MAC-309).** A Lynceus-Warden field-finder run on 2026-06-02 surfaced that 37 rows in the CP39-lifted Flock-hunt cohort were Wi-Fi chip-vendor OUIs misclassified as Flock-attested. CP40 lands an apply-time post-mutation that flips that slice out of `severity='high'` (CP39's narrow-scope baseline 292 → 255 active high-severity rows post-CP40). The remediation uses an in-flight migration with a `notes.cp40_marker` audit anchor.
+- **CP41 — §11 #20 ratification + Avigilon/Pelco arm-flip paper-trail closure (MAC-301).** §11 #20 codifies the Operator-DML-override pattern (n=2 minimum reached at v1.6.0; structurally an §11 sub-rule, not a new CP slot's data mutation). Sibling backfill on `manufacturers.notes.arm_flip_history` for id=6 (Avigilon) + id=254 (Pelco) closes the paper-trail loop the originals left open at admission time.
+- **CP42 §1+§2 — export-correctness fixes (MAC-300).** §1 restores the `imei_tac` DROP disposition in `db/validation/export_lynceus.py` §4.4 consumer mapping (the §4.4 mapping had been mis-annotated). §2 restores the CP35 §215 supersedure: the `DROPPED_REASONS` identity-keyed convention had been overwritten by a positional-key regression; CP42 §2 restores it.
+- **Rolled-in v1.6.2.1 narrow-fork content (CP39).** The `identifiers.severity` column + the §7.5 Flock-hunt floor carve-out for named Flock-hunt project sources (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar) originally landed at commit `233a634` 2026-06-03 and were held per the board's "hold and push as 1.6.3" directive. v1.6.3 ships them as part of the v1.6.3 stack.
 
-Net active identifier delta vs v1.6.0: **41,428 → 41,508** (+80 net). v1.6.0 itself (the underlying data ship) expanded the corpus across six device-category cohorts (face_recog, spyware/offensive, lawful-intercept / network-surveillance, forensic, counter-UAS, Flipper-adhoc) and admitted CISA KEV as the 74th source.
+Net active identifier delta vs v1.6.2: **41,508 → 41,508** (0 net; v1.6.3 is a column-add + notes-backfill + code-correctness cycle). Net `severity='high'` delta: 0 → 292 (CP39 narrow-scope landing) → 255 (CP40 Lynceus FP-slice removed).
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the version-by-version history, and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the formal change record (Correction Pass 37 + Correction Pass 38; CP37 — `network_surveillance` device_category; CP38 — FlockYou crowdsourced-ssid reconcile).
+See [`CHANGELOG.md`](CHANGELOG.md) for the version-by-version history, and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the formal change record (Correction Pass 39 + 40 + 41 + 42 §1 + 42 §2; CP39 — severity column + Flock-hunt floor carve-out; CP40 — Lynceus chip-vendor OUI remediation; CP41 — §11 #20 ratification + Avigilon/Pelco arm-flip backfill; CP42 §1 — `imei_tac` Lynceus §4.4 disposition; CP42 §2 — `DROPPED_REASONS` identity-keyed convention restored).
 
 ## Quickstart
 
@@ -120,7 +122,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.2).
+- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.3).
 - [`CREDITS.md`](CREDITS.md) — per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) — developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) — how Argus integrates sources, confidence model, dedup logic.

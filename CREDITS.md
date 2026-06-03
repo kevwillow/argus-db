@@ -532,6 +532,10 @@ provenance, PII discipline, promotion-gate provenance,
 confidence-band ceilings, and the Feist facts-only doctrine) for
 contribution discipline.
 
+### v1.6.3 field-finder credit — Lynceus-Warden (downstream consumer)
+
+**Lynceus-Warden** ([github.com/kevwillow/lynceus-warden](https://github.com/kevwillow/lynceus-warden)) surfaced the **chip-vendor OUI misclassification finding** that drove CP40 (Lynceus chip-vendor OUI remediation) on **2026-06-02**. A field-finder run against the v1.6.2.1 `argus_export_high_confidence.json` (post-CP39 narrow-fork lift) flagged 37 rows in the CP39-lifted Flock-hunt cohort as Wi-Fi chip-vendor OUIs — that is, OUIs assigned to general-purpose Wi-Fi chipset manufacturers whose hardware is observed inside a Flock device but is NOT specific to Flock as a vendor. Lifting those rows to `severity='high'` (per the CP39 §7.5 floor carve-out) over-attributed Wi-Fi chip-vendor identifiers to Flock surveillance, generating an unbounded false-positive risk for downstream Lynceus consumers. The finding routed via the MAC-309 dispatch ([omnibus comment `e4ddd1b3`](/MAC/issues/MAC-309#comment-e4ddd1b3-e311-4d3c-a05d-6ad718a1f970)); CP40 (Option 1 with CP39-marker in-flight migration form) lands the apply-time post-mutation that flips that slice out of `severity='high'`. The downstream-consumer-as-field-finder pattern is the inverse of the canonical producer-consumer relationship — Lynceus consumes Argus's exports, and in this cycle it returned a structural-class finding back upstream that no internal validator surface would have caught (the misclassification is only visible from the consumer's per-row deployment lens). The pattern is codified at [[reference_lynceus_handoff_v1_4_1]] (downstream-consumer field-finder feedback loop precedent established at v1.4.1; v1.6.3 is its first cross-CP-cycle invocation).
+
 ---
 
 ## Canonical sources

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "argus_version": "31",
-    "exported_at": "2026-06-03T03:31:55Z",
+    "exported_at": "2026-06-03T16:50:47Z",
     "record_count": 592,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
@@ -57,7 +57,8 @@
       "vendor_controlled_hostname_deprecated": 4,
       "fcc_grantee_code": 29,
       "equipment_class_code": 6,
-      "NDPP_pending_lynceus_v0_3_scanner_support": 11,
+      "network_discovery_protocol_pattern": 11,
+      "imei_tac": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,

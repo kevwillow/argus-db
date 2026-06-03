@@ -14,9 +14,45 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
-## [Unreleased]
+## v1.6.3 — 2026-06-03
 
-(No unreleased changes since v1.6.2.1.)
+A **notes / severity / code-correctness ship** layered on top of the v1.6.2 corpus. **No INSERT/DELETE on `identifiers` this cycle** — every change is column-add, notes-backfill, or consumer-export-correctness. The v1.6.2.1 narrow-fork content (CP39 severity column + Flock-hunt floor carve-out) is rolled in per the board's "hold and push as v1.6.3" directive; v1.6.2.1 was never separately tagged. Active identifier count stays at **41,508**; schema_version advances **30 → 31** (the mig-0031 column add from v1.6.2.1 is the v1.6.3 ship schema).
+
+### What's new
+
+- **CP40 — Lynceus chip-vendor OUI remediation (MAC-309).** A Lynceus-Warden field-finder run on 2026-06-02 surfaced that 37 rows in the CP39-lifted Flock-hunt cohort were Wi-Fi chip-vendor OUIs misclassified as Flock-attested. CP40 (Option 1 with CP39-marker in-flight migration form) flips that slice out of `severity='high'`; an apply-time post-mutation anchored at `notes.cp40_marker` records the remediation. The `severity='high'` cohort moves from the CP39 narrow-scope landing of 292 active rows → 255 active rows post-CP40.
+- **CP41 — §11 #20 ratification + Avigilon/Pelco arm-flip paper-trail closure (MAC-301).** §11 #20 codifies the **Operator-DML-override pattern** as load-bearing bible-text (mandatory per-statement authorization, single-statement scope, drift-remediation-only, mandatory pre/post-state capture, mandatory backup file + sha, mandatory cross-reference in handoff, read-only thereafter). Sibling backfill on `manufacturers.notes.arm_flip_history` for id=6 (Avigilon) and id=254 (Pelco) closes the paper-trail loop those arm-flips left open at original admission time. The CP41 apply-time correction (γ → γ″ rephrase) refines descriptive-vs-load-bearing token discipline inline at the amendment-log entry.
+- **CP42 §1+§2 — Export-correctness fixes (MAC-300).** §1 restores the canonical `imei_tac` DROP disposition in `db/validation/export_lynceus.py` §4.4 consumer mapping (the §4.4 entry had been mis-annotated). §2 restores CP35 §215's `DROPPED_REASONS` identity-keyed convention (a positional-key regression had overwritten it). Both ship as a single coordinated CP slot with two sub-sections.
+- **Rolled-in v1.6.2.1 narrow-fork content (CP39).** The `identifiers.severity` column (`high`/`medium`/`low`/`NULL`) + the §7.5 Flock-hunt floor carve-out for named Flock-hunt project sources (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar — 10 named sources) originally landed at commit `233a634` 2026-06-03 and were held per board "hold and push as 1.6.3" directive. v1.6.3 ships them as part of the v1.6.3 stack. See the v1.6.2.1 section below for the full narrow-scope detail.
+
+### Schema
+
+- **mig-0031** (`identifiers.severity` column add) is the v1.6.3 ship anchor — already documented at v1.6.2.1, but re-mentioned here because v1.6.2.1 was never separately tagged; the v1.6.3 stack is its first public ship cycle.
+- **No additional migrations this cycle.** CP40 / CP41 / CP42 §1 / CP42 §2 are all data / notes / code mutations, not schema mutations. The migration ledger stays at **0001 through 0031**.
+
+### Data
+
+- **`identifiers` active:** 41,508 (unchanged from v1.6.2; no INSERT/DELETE this cycle).
+- **`identifiers` total:** 41,890 (unchanged).
+- **`severity='high'` cohort:** 0 (pre-v1.6.2.1, column didn't exist) → 292 (CP39 narrow-scope landing at v1.6.2.1) → **255** (post-CP40 Lynceus chip-vendor OUI remediation; −37 net).
+- **`manufacturers.notes.arm_flip_history` backfill:** 2 rows (id=6 Avigilon + id=254 Pelco) per CP41.
+- **`sources`:** 74 (unchanged). **`manufacturers`:** 126 (unchanged). **`behavioral_signatures`:** 201 (unchanged).
+- **Lynceus high-confidence export records:** 146 (v1.6.2 baseline) → 178 (v1.6.2.1 CP39 narrow-fork lift) → **159** (v1.6.3 ship, post-CP40 chip-vendor remediation).
+- **Lynceus standard export records:** 592 (unchanged).
+- **Behavioral signatures export records:** 125 (unchanged).
+
+### Bible amendments
+
+- **CP40** (`docs/engineering/BIBLE_AMENDMENTS.md:5400`) — Identifier-specificity gate on §7.5 floor carve-outs (chip-vendor OUI remediation).
+- **CP41** (`docs/engineering/BIBLE_AMENDMENTS.md:5472`) — §11 #18 ratification → ratified as §11 #20 + Avigilon/Pelco arm-flip paper-trail closure.
+- **CP42 §1** (`docs/engineering/BIBLE_AMENDMENTS.md:5546`) — `imei_tac` Lynceus §4.4 consumer-side disposition restoration.
+- **CP42 §2** (`docs/engineering/BIBLE_AMENDMENTS.md:5569`) — CP35 §215 supersedure: `DROPPED_REASONS` identity-keyed convention restored.
+
+### Halts encountered
+
+- **MAC-301 dispatch slot-name staleness.** The original MAC-301 dispatch named §11 #18-pending as the bible-amendment slot; the live amendment landed as §11 #20 per CP32 §7 (sibling stacking shifted the §11 sub-rule numbering between dispatch authoring and apply-time). Resolved at apply-time by inline rephrase; flagged at CP41 ratification.
+- **MAC-301 post-commit backfill predicate γ → γ″ rephrase.** CP41 apply-time descriptive-vs-load-bearing token discipline refined inline at BIBLE_AMENDMENTS.md:5523-5531 (the predicate text shifted from load-bearing to descriptive form to match the actual backfill scope).
+- **MAC-300 CP-slot collision with MAC-301.** Sibling-stacked dispatches race-authored the same CP slot (MAC-300 had targeted CP41; MAC-301 reached the slot first). Resolved by CP-slot reservation: MAC-300 → CP42 §1+§2; MAC-301 keeps CP41. See [[feedback_cp_number_collision_check_before_landing]] for the discipline.
 
 ## v1.6.2.1 — 2026-05-30
 

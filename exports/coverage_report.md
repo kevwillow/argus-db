@@ -52,7 +52,7 @@ Read-only pass. No identifier mutations. §8.3 dedup is closed at Step-5 (MAC-42
 
 ## §6.1 Coverage matrix (rows × cols)
 
-Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `identifier_type` enum (27 values: 9 from migration 0001 + 3 from migration 0009 / CP13 — `ble_local_name`, `ble_characteristic`, `product_family_codename` — Wave G structural fidelity, all DROPPED-class for Lynceus + CP16 cluster from migrations 0011/0013/0014: 3 MAP — `ble_manufacturer_id`, `drone_id_prefix`, `wifi_aware_service_name` — and 41 DROPPED). Cells show `n` only; per-source-type breakdown + confidence distribution in the cell-detail table below.
+Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `identifier_type` enum (27 values: 9 from migration 0001 + 3 from migration 0009 / CP13 — `ble_local_name`, `ble_characteristic`, `product_family_codename` — Wave G structural fidelity, all DROPPED-class for Lynceus + CP16 cluster from migrations 0011/0013/0014: 3 MAP — `ble_manufacturer_id`, `drone_id_prefix`, `wifi_aware_service_name` — and 42 DROPPED). Cells show `n` only; per-source-type breakdown + confidence distribution in the cell-detail table below.
 
 | device_category \ identifier_type | oui | mac | mac_range | bssid | ssid_exact | ssid_pattern | ble_uuid | ble_service | device_fingerprint | ble_local_name | ble_characteristic | product_family_codename | ble_manufacturer_id | drone_id_prefix | wifi_aware_service_name | icao_24bit_address | rf_channel | burst_cadence_ms | bandwidth_mhz | device_class_id | rf_burst_duration | rf_protocol_constant | wifi_ie_element_id | bluetooth_le_pdu_type | wifi_frame_control_subtype | wifi_nan_param_signature | alpr_model | **row total** |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -18837,7 +18837,8 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `vendor_controlled_hostname_deprecated` (§4.4 CP16) | 4 |
 | `fcc_grantee_code` (§4.4 CP16) | 29 |
 | `equipment_class_code` (§4.4 CP16) | 6 |
-| `NDPP_pending_lynceus_v0_3_scanner_support` (§4.4 CP16) | 11 |
+| `network_discovery_protocol_pattern` (§4.4 CP16) | 11 |
+| `imei_tac` (§4.4 CP16) | 0 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
 | `below_confidence_threshold` (§7.5) | 0 |
 | `excluded_source_type` (§7.5 CP19) | 0 |
@@ -18897,7 +18898,8 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `vendor_controlled_hostname_deprecated` (§4.4 CP16) | 4 |
 | `fcc_grantee_code` (§4.4 CP16) | 29 |
 | `equipment_class_code` (§4.4 CP16) | 6 |
-| `NDPP_pending_lynceus_v0_3_scanner_support` (§4.4 CP16) | 11 |
+| `network_discovery_protocol_pattern` (§4.4 CP16) | 11 |
+| `imei_tac` (§4.4 CP16) | 0 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
 | `below_confidence_threshold` (§7.5) | 51 |
 | `excluded_source_type` (§7.5 CP19) | 336 |
@@ -18962,7 +18964,8 @@ Pre-tally source: MAC-45 `coverage_matrix_report.json` (`drop_tally_standard` + 
 | chipset_codename (§4.4 mig0019) | 16 |
 | firmware_build_string (§4.4 mig0019) | 19 |
 | firmware_build_uuid (§4.4 mig0019) | 1 |
-| NDPP_pending_lynceus_v0_3_scanner_support (§4.4 CP35) | 11 |
+| network_discovery_protocol_pattern (§4.4 CP35) | 11 |
+| imei_tac (§4.4 CP42 §1) | 0 |
 | self_exclude_oui (§8.4 / §11 #12) | 0 |
 | below_confidence_threshold (§7.5) | 0 |
 | excluded_source_type (§7.5 CP19) | 0 |
@@ -19016,7 +19019,8 @@ Pre-tally source: MAC-45 `coverage_matrix_report.json` (`drop_tally_standard` + 
 | chipset_codename (§4.4 mig0019) | 16 |
 | firmware_build_string (§4.4 mig0019) | 19 |
 | firmware_build_uuid (§4.4 mig0019) | 1 |
-| NDPP_pending_lynceus_v0_3_scanner_support (§4.4 CP35) | 11 |
+| network_discovery_protocol_pattern (§4.4 CP35) | 11 |
+| imei_tac (§4.4 CP42 §1) | 0 |
 | self_exclude_oui (§8.4 / §11 #12) | 0 |
 | below_confidence_threshold (§7.5) | 51 |
 | excluded_source_type (§7.5 CP19) | 336 |
@@ -19027,10 +19031,10 @@ Pre-tally source: MAC-45 `coverage_matrix_report.json` (`drop_tally_standard` + 
 
 ### MAC-45 ↔ Step-6 cross-check
 
-- MAC-45 `drop_tally_standard.bins` = {"NDPP_pending_lynceus_v0_3_scanner_support": 11, "alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 0, "ble_adv_interval": 0, "ble_characteristic": 13, "ble_company_id": 2, "ble_local_name": 21, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "ble_service_uuid": 122, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 16, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 6, "excluded_source_type": 0, "fcc_grantee_code": 29, "firmware_branded_string": 29, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 17, "frequency_band": 32, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "network_endpoint": 3410, "operator_profile": 3, "oversized_mac_range": 28, "procurement_only": 6, "product_family_codename": 254, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 18, "unknown_category": 33329, "vendor_cloud_endpoint_url": 1, "vendor_controlled_hostname": 3151, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 592 (reconciles 41508).
-- Step-6 `argus_export.json._meta.dropped_in_export` = {"NDPP_pending_lynceus_v0_3_scanner_support": 11, "alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 0, "ble_adv_interval": 0, "ble_characteristic": 13, "ble_company_id": 2, "ble_local_name": 21, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "ble_service_uuid": 122, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 16, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 6, "excluded_source_type": 0, "fcc_grantee_code": 29, "firmware_branded_string": 29, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 17, "frequency_band": 32, "geographic_scope_mismatch": 0, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "network_endpoint": 3410, "operator_profile": 3, "oversized_mac_range": 28, "procurement_only": 6, "product_family_codename": 254, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 18, "unknown_category": 33329, "vendor_cloud_endpoint_url": 1, "vendor_controlled_hostname": 3151, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 592 (reconciles 41508).
-- MAC-45 `drop_tally_high_confidence.bins` = {"NDPP_pending_lynceus_v0_3_scanner_support": 11, "alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 51, "ble_adv_interval": 0, "ble_characteristic": 13, "ble_company_id": 2, "ble_local_name": 21, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "ble_service_uuid": 122, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 16, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 6, "excluded_source_type": 336, "fcc_grantee_code": 29, "firmware_branded_string": 29, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 17, "frequency_band": 32, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "network_endpoint": 3410, "operator_profile": 3, "oversized_mac_range": 28, "procurement_only": 6, "product_family_codename": 254, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 18, "unknown_category": 33329, "vendor_cloud_endpoint_url": 1, "vendor_controlled_hostname": 3151, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 205 (reconciles 41508).
-- Step-6 `argus_export_high_confidence.json._meta.dropped_in_export` = {"NDPP_pending_lynceus_v0_3_scanner_support": 11, "alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 51, "ble_adv_interval": 0, "ble_characteristic": 13, "ble_company_id": 2, "ble_local_name": 21, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "ble_service_uuid": 122, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 16, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 6, "excluded_source_type": 336, "fcc_grantee_code": 29, "firmware_branded_string": 29, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 17, "frequency_band": 32, "geographic_scope_mismatch": 46, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "network_endpoint": 3410, "operator_profile": 3, "oversized_mac_range": 28, "procurement_only": 6, "product_family_codename": 254, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 18, "unknown_category": 33329, "vendor_cloud_endpoint_url": 1, "vendor_controlled_hostname": 3151, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 159 (reconciles 41508).
+- MAC-45 `drop_tally_standard.bins` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 0, "ble_adv_interval": 0, "ble_characteristic": 13, "ble_company_id": 2, "ble_local_name": 21, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "ble_service_uuid": 122, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 16, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 6, "excluded_source_type": 0, "fcc_grantee_code": 29, "firmware_branded_string": 29, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 17, "frequency_band": 32, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3410, "operator_profile": 3, "oversized_mac_range": 28, "procurement_only": 6, "product_family_codename": 254, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 18, "unknown_category": 33329, "vendor_cloud_endpoint_url": 1, "vendor_controlled_hostname": 3151, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 592 (reconciles 41508).
+- Step-6 `argus_export.json._meta.dropped_in_export` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 0, "ble_adv_interval": 0, "ble_characteristic": 13, "ble_company_id": 2, "ble_local_name": 21, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "ble_service_uuid": 122, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 16, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 6, "excluded_source_type": 0, "fcc_grantee_code": 29, "firmware_branded_string": 29, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 17, "frequency_band": 32, "geographic_scope_mismatch": 0, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3410, "operator_profile": 3, "oversized_mac_range": 28, "procurement_only": 6, "product_family_codename": 254, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 18, "unknown_category": 33329, "vendor_cloud_endpoint_url": 1, "vendor_controlled_hostname": 3151, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 592 (reconciles 41508).
+- MAC-45 `drop_tally_high_confidence.bins` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 51, "ble_adv_interval": 0, "ble_characteristic": 13, "ble_company_id": 2, "ble_local_name": 21, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "ble_service_uuid": 122, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 16, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 6, "excluded_source_type": 336, "fcc_grantee_code": 29, "firmware_branded_string": 29, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 17, "frequency_band": 32, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3410, "operator_profile": 3, "oversized_mac_range": 28, "procurement_only": 6, "product_family_codename": 254, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 18, "unknown_category": 33329, "vendor_cloud_endpoint_url": 1, "vendor_controlled_hostname": 3151, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 205 (reconciles 41508).
+- Step-6 `argus_export_high_confidence.json._meta.dropped_in_export` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 51, "ble_adv_interval": 0, "ble_characteristic": 13, "ble_company_id": 2, "ble_local_name": 21, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "ble_service_uuid": 122, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 16, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 6, "excluded_source_type": 336, "fcc_grantee_code": 29, "firmware_branded_string": 29, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 17, "frequency_band": 32, "geographic_scope_mismatch": 46, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3410, "operator_profile": 3, "oversized_mac_range": 28, "procurement_only": 6, "product_family_codename": 254, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 18, "unknown_category": 33329, "vendor_cloud_endpoint_url": 1, "vendor_controlled_hostname": 3151, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 159 (reconciles 41508).
 - Conclusion: per-bin equality + per-row `drop_assignments` equality verified by `_reconcile()` for both files; halts at 0.
 
 ## §6.3 distribution summary (Step-6 layer over the matrix)
@@ -19662,3 +19666,25 @@ These items were flagged by the MAC-45 coverage matrix as CP5 board-class but ar
 | CSV (full canonical) | `argus/exports/argus_export.csv` | 41508 | 41508 |
 | Coverage matrix (MAC-45) | `extraction_outputs/mac45/coverage_matrix.md` | (matrix) | 41508 |
 
+<!-- BEGIN behavioral_signatures section (CP18) -->
+
+## Behavioral-signatures export reconciliation (§9 item 9, CP18)
+
+Sibling export `argus_export_behavioral_signatures.json` per §7.5 CP18.
+`argus_run_id`: `28e57d53-32e6-5026-9a04-267feaafcd82` (deterministic UUID5; stable across re-runs).
+
+- Source record count: **201** (rows in `behavioral_signatures` table)
+- Confidence threshold: **≥ 70**
+- Exported entries: **125** (in `argus_export_behavioral_signatures.json`)
+
+### Dropped from sibling export
+
+| Bin | Count |
+|---|---|
+| `below_confidence_threshold` | 76 |
+| `unknown_category` | 0 |
+| **TOTAL DROPPED** | **76** |
+
+Reconciliation: 201 source − 76 dropped = 125 entries ✓
+
+<!-- END behavioral_signatures section (CP18) -->

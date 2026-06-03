@@ -16,7 +16,7 @@ Read-only pass. No identifier mutations. §8.3 dedup is closed at Step-5 (MAC-42
 
 ## §6.1 Coverage matrix (rows × cols)
 
-Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `identifier_type` enum (27 values: 9 from migration 0001 + 3 from migration 0009 / CP13 — `ble_local_name`, `ble_characteristic`, `product_family_codename` — Wave G structural fidelity, all DROPPED-class for Lynceus + CP16 cluster from migrations 0011/0013/0014: 3 MAP — `ble_manufacturer_id`, `drone_id_prefix`, `wifi_aware_service_name` — and 41 DROPPED). Cells show `n` only; per-source-type breakdown + confidence distribution in the cell-detail table below.
+Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `identifier_type` enum (27 values: 9 from migration 0001 + 3 from migration 0009 / CP13 — `ble_local_name`, `ble_characteristic`, `product_family_codename` — Wave G structural fidelity, all DROPPED-class for Lynceus + CP16 cluster from migrations 0011/0013/0014: 3 MAP — `ble_manufacturer_id`, `drone_id_prefix`, `wifi_aware_service_name` — and 42 DROPPED). Cells show `n` only; per-source-type breakdown + confidence distribution in the cell-detail table below.
 
 | device_category \ identifier_type | oui | mac | mac_range | bssid | ssid_exact | ssid_pattern | ble_uuid | ble_service | device_fingerprint | ble_local_name | ble_characteristic | product_family_codename | ble_manufacturer_id | drone_id_prefix | wifi_aware_service_name | icao_24bit_address | rf_channel | burst_cadence_ms | bandwidth_mhz | device_class_id | rf_burst_duration | rf_protocol_constant | wifi_ie_element_id | bluetooth_le_pdu_type | wifi_frame_control_subtype | wifi_nan_param_signature | alpr_model | **row total** |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -18801,7 +18801,8 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `vendor_controlled_hostname_deprecated` (§4.4 CP16) | 4 |
 | `fcc_grantee_code` (§4.4 CP16) | 29 |
 | `equipment_class_code` (§4.4 CP16) | 6 |
-| `NDPP_pending_lynceus_v0_3_scanner_support` (§4.4 CP16) | 11 |
+| `network_discovery_protocol_pattern` (§4.4 CP16) | 11 |
+| `imei_tac` (§4.4 CP16) | 0 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
 | `below_confidence_threshold` (§7.5) | 0 |
 | `excluded_source_type` (§7.5 CP19) | 0 |
@@ -18861,7 +18862,8 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `vendor_controlled_hostname_deprecated` (§4.4 CP16) | 4 |
 | `fcc_grantee_code` (§4.4 CP16) | 29 |
 | `equipment_class_code` (§4.4 CP16) | 6 |
-| `NDPP_pending_lynceus_v0_3_scanner_support` (§4.4 CP16) | 11 |
+| `network_discovery_protocol_pattern` (§4.4 CP16) | 11 |
+| `imei_tac` (§4.4 CP16) | 0 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
 | `below_confidence_threshold` (§7.5) | 51 |
 | `excluded_source_type` (§7.5 CP19) | 336 |
