@@ -1,7 +1,0 @@
-value: https://atom.io/download/atom-shellv5.1.1/node-v5.1.1.tar.gz
-value_class: update_endpoint_url
-cohort_label: D_drone_firmware_tooling
-source_file_relative: app_DJIEngine_DJIBrowser_node.dll.txt
-source_line: 610
----source_excerpt (<=200 chars verbatim)---
-https://atom.io/download/atom-shellv5.1.1/node-v5.1.1.tar.gz

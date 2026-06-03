@@ -1,7 +1,0 @@
-value: iVMS
-value_class: product_family
-cohort_label: F_sanctioned_vendor
-source_file_relative: full_installer_strings.txt
-source_line: 1168
----source_excerpt (<=200 chars verbatim)---
-\iVMS-4200 Client\Client\maintain\Setup.xml.benchmark

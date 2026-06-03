@@ -1,7 +1,0 @@
-value: http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd
-value_class: update_endpoint_url
-cohort_label: D_drone_firmware_tooling
-source_file_relative: app_DJIEngine_DJIBrowser_DJIBrowser.exe.txt
-source_line: 67751
----source_excerpt (<=200 chars verbatim)---
-http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd

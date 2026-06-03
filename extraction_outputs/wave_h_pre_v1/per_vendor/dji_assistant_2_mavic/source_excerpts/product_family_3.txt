@@ -1,7 +1,0 @@
-value: Phantom
-value_class: product_family
-cohort_label: D_drone_firmware_tooling
-source_file_relative: app_DJIEngine_DJIBrowser_DJIBrowser.exe.txt
-source_line: 61825
----source_excerpt (<=200 chars verbatim)---
-Phantom 336CX/C3
