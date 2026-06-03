@@ -5395,3 +5395,75 @@ Verified pre- and post-write: §4.4 maps `ssid_pattern → (DROPPED)` ("Lynceus 
 - Predecessor CP: CP38 (the durable third-party-detection-app demotion rule); CP19 (the §8.2 crowdsourced/inferred high-confidence-export exclusion); CP21 (cumulative-full-enum migration pattern).
 - Sibling memory: [[feedback_high_confidence_export_floor]], [[feedback_bible_amendment_downstream_consumer_audit]], [[feedback_ratification_options_verify_live_state]], [[feedback_flockyou_ssid_pattern_policy_split]].
 - Future CP carry-forwards: (a) Qualcomm manufacturer-lexicon admission (currently 39 chipset_codenames attributed to Flock Safety with notes-captured chipset-family for future re-attribution); (b) `behavioral_signatures` severity-column parity (if board direction warrants); (c) broader severity-axis backfill across categories (board-gated, not in CP39 scope).
+
+
+### CP40 — Identifier-specificity gate on §7.5 floor carve-outs (2026-06-02)
+
+**Trigger:** Lynceus-Warden field finding on Flock Safety `oui` cohort (MAC-309
+comment 9311bcd5) — 37 of 38 active rows were crowdsourced /24 chip-vendor blocks
+(Liteon, Espressif, Samsung, USI, Silicon Labs) verbatim from
+`colonelpanichacks/flock-you` and `EthanThePhoenix38/flock-you-camera-detector`,
+admitted under CP39 §7.5 floor carve-out on upstream-project-verification
+grounds. CP39's verification axis was silent on identifier-specificity; the
+Lynceus FP demonstrates the gap empirically.
+
+**Rule (sub-clause to CP39 §7.5):** The §7.5 floor carve-out admits a
+crowdsourced-tier source ONLY when identifier breadth ≤ deployment specificity.
+Specifically:
+
+  1. `identifier_type='oui'` admissions under §7.5 from `source_type IN
+     ('crowdsourced','inferred')` MUST carry
+     `notes.crowdsourced_breadth_tier='chip_vendor_oui_24'` (or finer-grained
+     breadth-tier when applicable) AND severity-cap at `medium` regardless of
+     CP39's confidence baseline; the §7.5 baseline confidence floor (≥70) is
+     LOWERED to 60 for chip_vendor_oui_24 admissions.
+
+  2. `source_type='primary_registry'` (IEEE-anchored OUIs) is EXEMPT — primary
+     registry attribution is identifier-specific by construction.
+
+  3. The breadth-tier annotation MUST be set at the same write that admits the
+     row, not retroactively, except for the one-time MAC-309 remediation sweep
+     codified in this CP.
+
+**Precedence:** CP40 does NOT revoke CP39. CP39 governs the upstream-project
+verification axis; CP40 governs the identifier-specificity axis. Both must
+clear for §7.5 admission.
+
+**Backsweep authority:** This CP authorizes the 37-row MAC-309 remediation as
+the closing case for pre-CP40 chip-vendor /24 admissions; no further
+retroactive breadth-tier writes without a new CP.
+
+**Apply-time clarification (one-time, MAC-309 sweep):** Of the 37 remediation
+rows, 18 (ids 22810–22827, the sid=39 EthanThePhoenix38/flock-you-camera-detector
+and sid=20 colonelpanichacks/flock-you wave-A cohort) carried a CP39 audit
+marker in non-strict-JSON text-suffix shape — verbatim ` | cp39_conf_lift:65->85
+(Flock-hunt source carve-out, extraction_runs.id=126)` appended after a JSON
+object literal, json_valid()=0. To clear the json_set strict-JSON precondition
+on these rows, the 18 markers were migrated in-flight from text-suffix to
+canonical JSON property `$.cp39_audit = {"confidence_lift": {"from": 65, "to":
+85}, "basis": "flock_hunt_carveout", "extraction_runs_id": 126}`. Suffix
+content preserved byte-faithfully under the new property shape; no CP39 audit
+anchor lost (provenance §11 #11). The other ~106 CP39 text-suffix rows
+outside MAC-309's 37-row scope are NOT migrated by this CP; any broader
+CP39-marker-to-JSON sweep requires a separate CP, tracked as a v1.6.3+
+carry-forward in PLANNED_AND_FUTURE_UPDATES.md.
+
+**Downstream-consumer note:** High-confidence export drops by 36 rows (37
+sub-70 admissions vs 1 retained @ b4:1e:52 conf=85); see MAC-309 Validator
+report.
+
+**Apply-time correction (one-time, MAC-309 sweep):** The 37 demoted rows split
+by `identifiers.geographic_scope` into two cohorts: Cohort A (19 rows, ids
+22810–22828, `geographic_scope='US'`) were all in the pre-MAC-311
+high_confidence export and dropped on remediation; Cohort B (18 rows, ids
+35618–35635, `geographic_scope=NULL`) were already CP7-filtered out of
+high_confidence pre-MAC-311 and contribute zero high_conf-export delta. Realized
+high-confidence export delta is therefore **-19** (178 → 159), not -36 as the
+above prediction-of-record asserts. The DB-side mutation count (37 rows demoted
+to confidence=60 / severity=NULL, breadth_tier set; 1 anchor retained at
+b4:1e:52 conf=85) is unchanged and matches the prediction. The Cohort B
+`geographic_scope=NULL` shape is itself a downstream data-quality question
+(sid=39 / sid=20 FlockYou wave-A US-deployed surveillance rows missing
+`geographic_scope='US'`) tracked as a v1.6.3+ carry-forward in
+PLANNED_AND_FUTURE_UPDATES.md; NOT amended under CP40 (would be §11 #1
+scope expansion).

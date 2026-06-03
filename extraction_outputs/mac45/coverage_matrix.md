@@ -38,7 +38,7 @@ Rows = `device_category` enum (12 values, migration 0001 verbatim). Cols = `iden
 
 | device_category | identifier_type | n | n_by_source_type | min_conf | max_conf | median_conf | row_ids |
 |---|---|---|---|---|---|---|---|
-| `alpr` | `oui` | 38 | crowdsourced=37, primary_registry=1 | 70 | 85 | 85.0 | 449, 22810, 22811, 22812, 22813, 22814, 22815, 22816 … +30 |
+| `alpr` | `oui` | 38 | crowdsourced=37, primary_registry=1 | 60 | 85 | 60.0 | 449, 22810, 22811, 22812, 22813, 22814, 22815, 22816 … +30 |
 | `alpr` | `mac` | 4 | crowdsourced=4 | 70 | 85 | 85.0 | 1, 22807, 22808, 22809 |
 | `alpr` | `mac_range` | 1 | primary_registry=1 | 90 | 90 | 90 | 12906 |
 | `alpr` | `ssid_exact` | 3 | crowdsourced=3 | 85 | 85 | 85 | 22908, 22909, 22910 |
@@ -18863,11 +18863,11 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `equipment_class_code` (§4.4 CP16) | 6 |
 | `NDPP_pending_lynceus_v0_3_scanner_support` (§4.4 CP16) | 11 |
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
-| `below_confidence_threshold` (§7.5) | 14 |
+| `below_confidence_threshold` (§7.5) | 51 |
 | `excluded_source_type` (§7.5 CP19) | 336 |
-| **sum(bins)** | **41266** |
-| **survivors → eligible entries** | **242** |
-| **reconciliation** | **41508 − 41266 = 242** ✅ |
+| **sum(bins)** | **41303** |
+| **survivors → eligible entries** | **205** |
+| **reconciliation** | **41508 − 41303 = 205** ✅ |
 
 
 ### mac_range secondary-constraint note (CP5 board-class)
