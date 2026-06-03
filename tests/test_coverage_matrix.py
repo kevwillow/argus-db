@@ -218,10 +218,19 @@ def test_drop_bin_oversized_mac_range() -> None:
     assert _assign_drop_bin(r, EXPORT_STANDARD_FLOOR, drop_pi_self_exclude=False) == "oversized_mac_range"
 
 
-def test_drop_bin_undersized_mac_range_survives() -> None:
-    """40-bit prefix (10 hex chars) = 256 entries, right at the §4.4 ceiling."""
+# Updated per SAR-18 (MAC-232 Step 9, 2026-05-22): mac_range DROP is unconditional; size=256 now drops, not survives. Preserved as boundary regression guard.
+def test_drop_bin_size_256_mac_range_drops_per_sar18() -> None:
+    """40-bit prefix (10 hex chars) = 256 entries, right at the §4.4 ceiling.
+
+    Pre-SAR-18 the predicate was `> MAC_RANGE_EXPANSION_CEILING` strict-greater-than,
+    so a size-256 row (Eagle Eye Networks id=9404, the SAR-18 driving case) escaped
+    drop. SAR-18 (MAC-232 Step 9) made the mac_range DROP unconditional in both
+    classifiers; until CP34 §4.4 ships mac_range expansion in Lynceus v0.3, every
+    mac_range row — including the size-256 boundary — routes to
+    `oversized_mac_range`. Kept as the boundary regression guard.
+    """
     r = _row(identifier="aa:bb:cc:dd:ee", identifier_type="mac_range", device_category="alpr")
-    assert _assign_drop_bin(r, EXPORT_STANDARD_FLOOR, drop_pi_self_exclude=False) is None
+    assert _assign_drop_bin(r, EXPORT_STANDARD_FLOOR, drop_pi_self_exclude=False) == "oversized_mac_range"
 
 
 def test_drop_bin_self_exclude_only_drops_in_high_conf() -> None:
