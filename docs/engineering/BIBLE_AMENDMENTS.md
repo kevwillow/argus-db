@@ -5467,3 +5467,47 @@ b4:1e:52 conf=85) is unchanged and matches the prediction. The Cohort B
 `geographic_scope='US'`) tracked as a v1.6.3+ carry-forward in
 PLANNED_AND_FUTURE_UPDATES.md; NOT amended under CP40 (would be §11 #1
 scope expansion).
+
+
+## Correction Pass 42 §1 — `imei_tac` Lynceus §4.4 consumer-side disposition (MAC-300, CP33 §7 carry-forward closure) — **RATIFIED**
+
+**Issue**: [MAC-300](/MAC/issues/MAC-300) — `tests/test_export_lynceus.py::test_type_mapping_covers_every_identifier_type` failing because `imei_tac` has no entry in `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (MAP) or `DROPPED_REASONS` (DROP).
+
+**Authority chain**:
+- CP33 §2.2 (gate G-C, board-ratified) admitted `imei_tac` schema-side only — forward-compatible identifier_type CHECK enum slot opens for future v1.5.x cohort backfill from GSMA-derivative sources; no row-level promotion gated on the migration.
+- CP33 §7 backlog enumerates 7 CP34-pending candidates; `imei_tac` §4.4 consumer-side MAP-or-DROP is NOT among them (verified by ExtractionWorker [MAC-300 comment 7ffcb80f](/MAC/issues/MAC-300#comment-7ffcb80f-990f-4c13-b6f7-5f2fe9589dff) §"Fix #1").
+- CP-slot collision arbitration at [MAC-300 comment `f0680f59`](/MAC/issues/MAC-300#comment-f0680f59-cd04-4754-94ce-128c33e1f654) ratified Option A: MAC-300 work lands at CP42, MAC-301 keeps CP41 (richer cross-ref surface; DB-baked at `manufacturers.notes.arm_flip_history` on id=6 + id=254 + PROJECT_BIBLE.md §11 #20 prose).
+- CP42 §1 closes the §4.4 consumer-side gap.
+
+**Decision**: DROP.
+
+**Rationale** (CP35 NDPP §4.4 precedent — MAC-255):
+IMEI/TAC values are GSMA Type Allocation Code registry metadata, not RF-broadcast wire patterns. Lynceus's passive-scanner architecture observes only over-the-air wire patterns (BLE / Wi-Fi / cellular broadcast frames). IMEI/TAC values do not surface on any observable wire format — they live in the GSMA TAC registry and only appear inside encrypted/authenticated GSMA control-plane messages. A MAP-side `pattern_type` would require a new Lynceus scanner pathway outside the v1.6.3 ship-gate scope (cross-repo coordination + GSMA control-plane decryption capability not in the v0.x roadmap).
+
+Per CP35 §215 precedent: DROP-with-reason preserves the canonical schema slot for future v1.5.x cohort backfill (CP33 §2.2 forward-compatible language), while keeping cross-repo scope respected at the v1.6.3 ship-gate.
+
+**Implementation**:
+- `db/validation/export_lynceus.py`: add `DROPPED_REASONS["imei_tac"] = "imei_tac"` (identity-keyed per the convention CP42 §2 restores).
+- Add sibling-dict entry `DROPPED_REASONS_RATIONALE["imei_tac"] = "GSMA Type Allocation Code registry metadata; not RF-broadcast wire pattern observable by Lynceus passive scanners (CP35 NDPP §4.4 precedent)"`.
+- Future-admission gate: any future re-classification (DROP → MAP) requires a new CP slot with paired Lynceus-side scanner pathway documentation.
+
+
+## Correction Pass 42 §2 — CP35 §215 supersedure: `DROPPED_REASONS` identity-keyed convention restored (MAC-300) — **RATIFIED**
+
+**Issue**: [MAC-300](/MAC/issues/MAC-300) — `tests/test_export_lynceus.py::test_type_mapping_drops_match_44_verbatim` failing because `DROPPED_REASONS["network_discovery_protocol_pattern"] = "NDPP_pending_lynceus_v0_3_scanner_support"` violates the test's canonical invariant `DROPPED_REASONS[k] == k`.
+
+**Authority chain**:
+- CP35 §215 (MAC-255) ratified the descriptive bin_label `NDPP_pending_lynceus_v0_3_scanner_support` as "the first DROPPED_REASONS entry whose bin_label differs from the identifier_type string".
+- SAR-18 (MAC-232 Step 9, board ratification 2026-05-22, comment [`d5de106b`](/MAC/issues/MAC-232#comment-d5de106b)) imposes classifier-predicate parity between `db/validation/coverage_matrix.py::_classify_row` and `db/validation/export_lynceus.py::_classify_row`.
+- Tension surfaced at MAC-292 Phase D REPORT as CP-cand 6 ([MAC-300](/MAC/issues/MAC-300)) — the SAR-18 parity discipline implies bin_label parity through the classifier-output contract.
+- CP-slot collision arbitration at [MAC-300 comment `f0680f59`](/MAC/issues/MAC-300#comment-f0680f59-cd04-4754-94ce-128c33e1f654) ratified Option A: MAC-300 work lands at CP42, MAC-301 keeps CP41.
+
+**Decision**: restore identity-keyed convention (`DROPPED_REASONS[k] == k` invariant universal across all entries). Descriptive rationale moves to a sibling `DROPPED_REASONS_RATIONALE` dict at the same scope.
+
+**Effect on CP35 §215**: the "first entry whose bin_label differs" precedent is superseded. All `DROPPED_REASONS` entries — including the NDPP entry CP35 introduced and the `imei_tac` entry CP42 §1 admits — follow identity-keyed convention. CP35's substantive ratification (option-(b) DROP for NDPP per cross-repo-scope-respecting Lynceus v0.3 scanner pathway argument) is intact; only the bin_label-shape sub-decision is amended.
+
+**Implementation**:
+- `db/validation/export_lynceus.py`: change `DROPPED_REASONS["network_discovery_protocol_pattern"]` from `"NDPP_pending_lynceus_v0_3_scanner_support"` to `"network_discovery_protocol_pattern"` (identity-keyed).
+- Add sibling-dict entry `DROPPED_REASONS_RATIONALE["network_discovery_protocol_pattern"] = "Awaiting Lynceus v0.3 scanner_support for network_discovery_protocol_pattern matching (CP35 §215 cross-repo scope)"`.
+- `db/validation/coverage_matrix.py`: mirror the identity-keyed `DROPPED_REASONS["network_discovery_protocol_pattern"]` change verbatim — SAR-18 parity gate requires byte-identical `DROPPED_REASONS` mapping between the two classifiers.
+- All future `DROPPED_REASONS` additions follow identity-keyed convention + paired `DROPPED_REASONS_RATIONALE` entry.
