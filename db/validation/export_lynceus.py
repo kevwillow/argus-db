@@ -202,17 +202,44 @@ DROPPED_REASONS: dict[str, str] = {
     # carve-out.
     "fcc_grantee_code": "fcc_grantee_code",  # FCC EAS grantee code — regulatory entity ID; not RF-broadcast wire pattern
     "equipment_class_code": "equipment_class_code",  # FCC EAS equipment-class code — regulatory ID; not RF-broadcast wire pattern
-    # CP35 (mig-0028 / MAC-255) — NDPP §4.4 disposition. Option (b) DROP
-    # ratified at MAC-255 (option (a) MAP would require sibling Lynceus v0.3
-    # scanner work for a new `discovery_protocol_signature` pattern_type,
-    # cross-repo coordination outside the v1.5.3 ship-gate scope). 18 NDPP
-    # rows preserved in canonical `identifiers` for future export-time
-    # admission once Lynceus v0.3 ships. Bin_label `NDPP_pending_lynceus_v0_3_scanner_support`
-    # carries the pending-rationale verbatim per the CP35 ratification dispatch;
-    # this is the first DROPPED_REASONS entry whose bin_label differs from
-    # the identifier_type string (all prior entries are identity-keyed). Mirrors
-    # CP16 default DROP posture (12 DROPPED vs 3 MAP for CP14 cluster).
-    "network_discovery_protocol_pattern": "NDPP_pending_lynceus_v0_3_scanner_support",
+    # CP35 (mig-0028 / MAC-255) — NDPP §4.4 ratified DROP (option (b)). CP42 §2
+    # (MAC-300, 2026-06-03) supersedes CP35 §215's descriptive-bin_label
+    # sub-decision: the identity-keyed convention (DROPPED_REASONS[k] == k)
+    # is restored universally. CP35's substantive ratification (DROP for NDPP
+    # per cross-repo-scope-respecting Lynceus v0.3 scanner pathway argument)
+    # is intact; only the bin_label shape is amended. Descriptive rationale
+    # moves to the sibling DROPPED_REASONS_RATIONALE dict below.
+    "network_discovery_protocol_pattern": "network_discovery_protocol_pattern",
+    # CP42 §1 (MAC-300, 2026-06-03) — imei_tac §4.4 consumer-side DROP
+    # (analogue to CP35 NDPP). IMEI/TAC values are GSMA Type Allocation Code
+    # registry metadata, not RF-broadcast wire patterns observable by
+    # Lynceus's passive-scanner architecture. CP33 §2.2 (gate G-C) admitted
+    # the schema-side slot forward-compatibly with zero promoted rows; CP42
+    # §1 closes the §4.4 consumer-side gap with a DROP-with-reason entry,
+    # preserving the canonical schema slot for future v1.5.x cohort backfill.
+    "imei_tac": "imei_tac",
+}
+
+
+# CP42 §2 (MAC-300, 2026-06-03) — sibling rationale dict. DROPPED_REASONS keys
+# stay identity-keyed (bin_label == identifier_type); the descriptive "why
+# DROPPED" rationale for entries that carry one (NDPP, imei_tac) lives here.
+# Audit-trail use only — not consulted by the classifier (`_classify_row`
+# returns `DROPPED_REASONS[identifier_type]` and never reads this dict).
+# Future DROPPED_REASONS additions that need a non-trivial rationale beyond
+# the inline DROPPED_REASONS comment SHOULD add a paired entry here for the
+# §4.4 audit-trail.
+DROPPED_REASONS_RATIONALE: dict[str, str] = {
+    "network_discovery_protocol_pattern": (
+        "Awaiting Lynceus v0.3 scanner_support for "
+        "network_discovery_protocol_pattern matching "
+        "(CP35 §215 cross-repo scope)"
+    ),
+    "imei_tac": (
+        "GSMA Type Allocation Code registry metadata; not RF-broadcast wire "
+        "pattern observable by Lynceus passive scanners (CP35 NDPP §4.4 "
+        "precedent)"
+    ),
 }
 
 # §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
@@ -919,11 +946,14 @@ def _build_export(
         # See DROPPED_REASONS for rationale.
         "fcc_grantee_code": 0,
         "equipment_class_code": 0,
-        # CP35 (mig-0028 / MAC-255) — NDPP §4.4 ratified DROP. Bin_label is
-        # the pending-rationale string (not the identifier_type) per CP35
-        # dispatch; the bins dict keys must match DROPPED_REASONS values
-        # one-to-one or `bins[drop_bin] += 1` would KeyError.
-        "NDPP_pending_lynceus_v0_3_scanner_support": 0,
+        # CP35 (mig-0028 / MAC-255) — NDPP §4.4 ratified DROP. Identity-keyed
+        # per CP42 §2 (MAC-300) supersedure of CP35 §215's descriptive-bin_label
+        # sub-decision; rationale lives in DROPPED_REASONS_RATIONALE.
+        "network_discovery_protocol_pattern": 0,
+        # CP42 §1 (MAC-300) — imei_tac §4.4 consumer-side DROP. See
+        # DROPPED_REASONS_RATIONALE for the GSMA Type Allocation Code
+        # registry-metadata rationale.
+        "imei_tac": 0,
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,
@@ -1063,12 +1093,14 @@ def _build_coverage_report_md(
             ("chipset_codename (§4.4 mig0019)", bins["chipset_codename"]),
             ("firmware_build_string (§4.4 mig0019)", bins["firmware_build_string"]),
             ("firmware_build_uuid (§4.4 mig0019)", bins["firmware_build_uuid"]),
-            # CP35 (mig-0028 / MAC-255) — NDPP ratified DROP. Bin label is the
-            # pending-rationale string verbatim per CP35 dispatch.
+            # CP35 (mig-0028 / MAC-255) — NDPP ratified DROP. Identity-keyed
+            # per CP42 §2 (MAC-300) supersedure of CP35 §215.
             (
-                "NDPP_pending_lynceus_v0_3_scanner_support (§4.4 CP35)",
-                bins["NDPP_pending_lynceus_v0_3_scanner_support"],
+                "network_discovery_protocol_pattern (§4.4 CP35)",
+                bins["network_discovery_protocol_pattern"],
             ),
+            # CP42 §1 (MAC-300) — imei_tac §4.4 consumer-side DROP.
+            ("imei_tac (§4.4 CP42 §1)", bins["imei_tac"]),
             ("self_exclude_oui (§8.4 / §11 #12)", bins["self_exclude_oui"]),
             ("below_confidence_threshold (§7.5)", bins["below_confidence_threshold"]),
             ("excluded_source_type (§7.5 CP19)", bins["excluded_source_type"]),
