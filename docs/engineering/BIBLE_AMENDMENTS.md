@@ -5019,7 +5019,7 @@ At each future DML-authorized dispatch:
 
 **Origin:** Wave G/H v1 integration (MAC-239), Gate I-5 ratification 2026-05-23 — operator DEFER to next CP34 cycle. Draft language pre-authored by prior CEO pass at `~/argus-internal/wave_g_h_v1_integration/handoff/proposed_bible_amendment_additions.md`; this entry stages the draft into canonical bible-amendments file.
 **Authority:** Board comment `50ffacc8` (2026-05-23) — "Gate I-5 — DEFER to next CP34 cycle; stage proposed_bible_amendment_additions.md entry with n=2 evidence + draft language."
-**Status:** **DRAFT — §11 #18-pending.** Bible HEAD `PROJECT_BIBLE.md` §11 NOT amended by this entry — that's CP34 ratification scope.
+**Status:** **RATIFIED as §11 #20** at commit <RATIFICATION_COMMIT_HASH>. Originally drafted as `§11 #18-pending` per Gate I-5 (MAC-239 board comment `50ffacc8`, 2026-05-23); slot shifted from #18 to #20 at apply-time per CP32 §7 (Dispatch plan-input HALT-fast-path, 2026-05-21) and CP32 §10 (export-time post-condition guard, 2026-05-21) having claimed slots #18 and #19 between staging and ratification. See CP41 entry's "Apply-time correction" paragraph for full slot-shift forensics. Apply-time-correction discipline per [[feedback_apply_time_correction_when_prediction_diverges_from_reality]]: staging-body draft text below (line 5026+) preserved verbatim with original `#18` self-name; readers cross-reference via this status line for canonical slot.
 
 ### Draft language for §11 (to be ratified at next CP34)
 
@@ -5469,6 +5469,78 @@ PLANNED_AND_FUTURE_UPDATES.md; NOT amended under CP40 (would be §11 #1
 scope expansion).
 
 
+## Correction Pass 41 — §11 #18 ratification + Avigilon/Pelco arm-flip paper-trail closure (MAC-301)
+
+**Date:** 2026-06-03
+**Commit:** `<RATIFICATION_COMMIT_HASH>` on `main` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]; backfilled in follow-up commit per existing dispatch cadence).
+**Origin:** [MAC-301](/MAC/issues/MAC-301) — FIX SOON: Avigilon arm-flip paper-trail gaps surfaced at MAC-292 Phase D REPORT as CP-cand 5. Three paper-trail gaps tracked in the issue body: (Gap 1) §11 #18 staging entry stuck in DRAFT despite CP34 → CP40 having shipped; (Gap 2) Avigilon audit doc absent on disk at the staging-block-cited path; (Gap 3) `manufacturers.notes.arm_flip_history` JSON absent on id=6 and id=254 despite §11 #18 protocol-step-4 requiring per-row pre/post-state capture.
+**Authority:** Board ratification at MAC-301 disambiguation comment [`56c89cc8`](/MAC/issues/MAC-301#comment-56c89cc8-b4d7-4a4a-abe3-1cec445f5237) (2026-06-03) — option (a) RATIFIED (append §11 #20 with mechanical apply-time reformat); supersedes the staging-block self-name `§11 #18-pending`.
+**Status:** **RATIFIED** at this commit. Pre-mutation safety: PROJECT_BIBLE.md §11 head-count re-verified at HEAD `1468964` (runs #1–#19 with CP32 §7 (#18) and CP32 §10 (#19) shipped 2026-05-21; next free slot = #20); manufacturers id=6 and id=254 pre-state confirmed (`is_arm=1, parent_manufacturer_id=3, query_default='hidden_arm', json_valid(notes)=1, arm_flip_history IS NULL`); pre-mutation DB backup `db/argus.db.pre_mac301_ratification_20260603T053500Z` (sha256 byte-match against `db/argus.db` at apply-time).
+
+### Scope
+
+CP41 lands three coordinated discipline-class corrections in a single bundled amendment:
+
+1. **§11 #20 ratification (Gap 1 close).** The Operator-authorized in-cycle DML override pattern staged at `BIBLE_AMENDMENTS.md:5018-5085` as `§11 #18-pending` (MAC-239 Gate I-5 deferral, 2026-05-23) is ratified at the live canonical slot `§11 #20`. The staging-body draft text at lines 5026-5051 is transcribed verbatim into `PROJECT_BIBLE.md` §11 as the new numbered entry #20, with the only content-touching edit being the mechanical token rewrite `> **#18 — Operator-authorized in-cycle DML override.**` → `20. **Operator-authorized in-cycle DML override.**` (and structural `>`-blockquote-prefix strip to numbered-list format). The seven internal sub-clauses (1-7) preserve verbatim as a nested sub-list under #20. Slot shift from #18 → #20 forensics: see "Apply-time correction" paragraph below.
+
+2. **Gap 2 disposition — Avigilon + Pelco audit-doc compliance gap recorded.** The Avigilon audit doc cited at `BIBLE_AMENDMENTS.md:5058` and :5079 as `~/argus-internal/wave_g_h_v1_track_a/OPERATOR_AUTHORIZED_OVERRIDE_AVIGILON_ARM_PATCH.md` is absent on disk at apply-time (verified via `find ~/argus-internal -name '*AVIGILON*' -o -name '*operator_authorized*'` returning zero matches). The Pelco override doc (evidence row 1) is similarly absent — it predates the canonical OPERATOR_AUTHORIZED_OVERRIDE_<TOPIC>.md template and was never lifted into the canonical worktree. Per the issue's Gap-2 fix-shape clause: *"If unrecoverable, log a §11 #18 protocol-step-4 compliance gap explicitly in BIBLE_AMENDMENTS.md so future audit reads find the gap honestly."* This CP entry IS that compliance-gap log. The per-row `arm_flip_history` JSON on id=6 and id=254 (Gap 3 close, below) carries `audit_doc_status` and `backup_ref_note` fields that record the audit-doc absence at the row level for forensic-query parity. **The Avigilon DB-side mutation IS validated** by the pre-patch backup `db/argus.db.pre_avigilon_arm_patch_20260522T220908Z` (verified present on disk at MAC-301 Phase A.1; pre-state captured: `is_arm=0, parent_manufacturer_id=NULL, query_default='visible'`); the audit-doc absence is a documentation gap, not a DB-mutation-validity gap. The Pelco DB-side pre-patch backup is also absent on disk — captured here as a forensic-completeness note, not a re-open of the Pelco arm-tag DML itself (which landed under valid operator authority per evidence row 1).
+
+3. **Gap 3 close — `manufacturers.notes.arm_flip_history` backfill (id=6 Avigilon + id=254 Pelco).** Single-row UPDATE on each of `manufacturers.id=6` and `manufacturers.id=254` adding a `notes.arm_flip_history` JSON array carrying: `applied_utc` (with `applied_utc_precision` honesty marker — `"exact"` for Avigilon's session-captured timestamp; `"approximate_hour"` for Pelco's staging-block `~17Z` precision with `applied_utc_note` recording the precision-loss reason); `from_state` and `to_state` capturing the (is_arm, parent_manufacturer_id, query_default) pre/post tuple; `authority='operator_in_session_reply'`; `session_id` (the Avigilon `session-1779485836426`; `NULL` for Pelco with `session_id_note` recording the absence reason); `dispatch_ref` (Avigilon `wave_g_h_v1_track_a`; Pelco `wave_v1_5_session_2_g_a_arm_under_msi`); `bible_staging_ref` preserving the staging-block self-name `BIBLE_AMENDMENTS.md §11 #18 evidence row 2` (and row 1 for Pelco) per the apply-time-correction discipline; `bible_ref` adding the canonical forward pointer `PROJECT_BIBLE.md §11 #20` per CEO disambiguation augmentation; `audit_doc_ref`, `audit_doc_status`, `backup_ref` capturing the per-row audit-doc + backup-doc paper-trail; and `mac_301_close=true` as a sweep_event marker. This per-row audit JSON is now the canonical per-row evidence of the arm-flip provenance, parity-matching the existing `notes.recategorization_history` discipline pattern on id=6.
+
+### Acceptance criteria (MAC-301 issue body, all met at this commit)
+
+- §11 #18 ratification scheduled — **DONE** (this CP IS the ratification; landed at canonical slot §11 #20 not §11 #18 per apply-time-correction below).
+- Audit doc located/restored OR compliance-gap entry landed in BIBLE_AMENDMENTS.md — **DONE via compliance-gap path** (audit doc unrecoverable; Gap 2 disposition above is the explicit compliance-gap log).
+- `manufacturers.notes.arm_flip_history` JSON backfilled on id=6 (and id=254 sibling) per §11 #18 audit-doc canonical shape — **DONE** (Phase B.2 apply, post-state verified via `json_valid(notes)=1` + `json_extract(notes,'$.arm_flip_history[0].applied_utc')` returning the expected timestamps + `bible_ref` returning `PROJECT_BIBLE.md §11 #20` on both rows).
+
+### Cross-references and §11 envelope compliance
+
+- **#1 no fabrication** — no `identifiers` rows synthesized; no `manufacturers` rows created; this is a per-row `notes` JSON-key addition + a per-file bible-section addition. The arm_flip_history JSON carries only fields whose values are either captured-verbatim from prior provenance (Avigilon timestamp + session ID + audit-doc path; Pelco staging-block evidence row) OR honestly-marked as approximate / absent (Pelco applied_utc_precision; Pelco session_id_note; audit_doc_status).
+- **#7 provenance** — `source_url` untouched on every row; `notes` mutation is additive (json_set adds the new key; existing notes keys preserved verbatim; pre/post-state diff isolated to the new key). The CP41 entry IS the per-CP amendment-log audit trail for the schema-truth-level change.
+- **#8 confidence-preservation** — no confidence column touched (the `manufacturers` table has no confidence column; the `identifiers` rows whose vendor attribution is via `manufacturer_id=6` or `manufacturer_id=254` are not touched).
+- **#11 amendment-log discipline** — this CP41 stanza IS the amendment-log entry; landed in the same coordinated commit as both the PROJECT_BIBLE.md §11 #20 insertion AND the DB UPDATE on id=6/id=254. The MAC-301 dispatch + this CP entry together satisfy the discipline.
+- **#18 → #20 (the entry being ratified by this very CP)** — the apply-time enforcement of the protocol IS the closure of the Gap 1 / Gap 3 work; future operator-DML-overrides cite §11 #20 (per canonical slot) and `BIBLE_AMENDMENTS.md` "Correction Pass 41" (per amendment-log entry) interchangeably.
+
+### Files / rows touched
+
+- `docs/engineering/PROJECT_BIBLE.md` — §11 numbered list extended by one entry (#20); CP table-of-contents impact zero (§11 is enumerated inline, not via TOC index). Line count delta: +12 (one block + closing parenthetical reference back to this CP41 entry).
+- `docs/engineering/BIBLE_AMENDMENTS.md` — (a) line 5022 status flip from DRAFT to RATIFIED-as-§11-#20 with slot-shift apologia inline; (b) this CP41 entry appended at end of file. Line count delta: +1 net at line 5022 (single-line replacement); +N for the appended CP41 entry.
+- `db/argus.db` — `manufacturers.notes` UPDATE on 2 rows (id=6, id=254); no other table touched; `schema_version` UNTOUCHED (this is a notes-JSON-shape extension, not a schema migration — consistent with the CP24 sub-rule precedent for row-local audit-on-notes vs schema-migration trigger thresholds).
+
+### Downstream consumer audit (per [[feedback_bible_amendment_downstream_consumer_audit]])
+
+- **Schema-truth queries against `manufacturers.notes`** — any forensic query of the shape `SELECT json_extract(notes,'$.arm_flip_history[0].applied_utc') FROM manufacturers WHERE is_arm=1` now surfaces the Avigilon + Pelco arm-flip provenance with timestamps + audit-doc-status. Pre-CP41, the query returned NULL on both rows. The other 6 active `is_arm=1` rows (Parrot Automotive id=222 + the 5 v1.6.0 CP31 arm-splits Grayshift + 4 Anduril) continue to return NULL for `arm_flip_history` — they are NOT Operator-DML-override-class rows (Parrot landed via mig-0025 schema-migration-class authority; the 5 v1.6.0 CP31 rows landed via mig-0025-class CP31 §4.6 schema-migration authority via dispatch ratification, not in-cycle override). The `arm_flip_history` key is intentionally Operator-DML-override-class-scoped; absence on non-override-class rows is correct.
+- **Export shape** — `argus_export.json` / `argus_export.csv` / `argus_export_high_confidence.json` byte-stable (these exports project `identifiers` rows, not `manufacturers.notes`). `argus_export_behavioral_signatures.json` byte-stable. No export consumer-side change.
+- **DATA_DICTIONARY.md** — §3 (manufacturers schema) section already enumerates 8 arm rows including Avigilon at line 7, line 82 (table form), and line 222 (§4.4 narrative). The CP41 work closes the audit-trail gap behind those existing enumerations; no DATA_DICTIONARY edit required at this CP.
+- **CHANGELOG.md** — paired entry to land alongside this CP at the v1.6.3 cycle close; entry text: "CP41 — MAC-301 §11 #18 → §11 #20 ratification + Avigilon/Pelco arm_flip_history backfill". Bumps schema_version disposition row in the changelog frontmatter NONE (no schema migration).
+- **CREDITS.md** — §1 hub-and-spoke arm-rows enumeration ALREADY carries the Avigilon attribution verbatim per the issue body's forensic finding (`"Avigilon (id=6) under Motorola Solutions (id=3) — arm-split landed post-v1.5.0 per CP33 §7 v1.5.x/v1.6.0 arm-split backlog disposition"`); no edit required at this CP.
+- **PROJECT_STATE.md** — heartbeat-style; next heartbeat picks up the CP41 close as the v1.6.3 in-flight delta. No CP-time edit required.
+
+### Apply-time correction
+
+At ratification this entry's canonical §11 slot resolved to **§11 #20**, not §11 #18 as the staging block at `BIBLE_AMENDMENTS.md:5018-5085` predicted. CP32 §7 (Dispatch plan-input sandbox-absence HALT-fast-path, 2026-05-21) and CP32 §10 (export-time generator post-condition guard, 2026-05-21) had claimed slots #18 and #19 between staging-block authorship (MAC-239, 2026-05-23 — staging carried `§11 #18-pending` based on the staging-block-authoring CEO's then-stale snapshot of §11) and this MAC-301 ratification (2026-06-03). The "Append `#18` body" / "as new entry #18" wording in the MAC-301 Phase B.1 dispatch was likewise a dispatch-author-side staleness on the §11 head count; the dispatch's coexisting "appended after the highest existing #N enumeration" clause was the binding one and resolved to #20 at apply-time. CP41 prose body above preserved verbatim per [[feedback_apply_time_correction_when_prediction_diverges_from_reality]]; the slot shift is recorded here without editing the ratified body. Cross-references: the JSON `arm_flip_history` blocks on `manufacturers.notes` (id=6 + id=254) carry both `bible_staging_ref` (staging-block #18 self-name, frozen) and `bible_ref` (canonical §11 #20) for forward forensic resolution. The Operator-DML-override pattern itself is unchanged by the slot shift; only the enumeration label differs.
+
+### Post-commit backfill obligations
+
+Two post-commit token replacements land in a follow-on `--amend`-free new commit per existing dispatch cadence (mirrors the §11 #11 self-binding pattern):
+
+1. `BIBLE_AMENDMENTS.md` line 5022 — replace `<RATIFICATION_COMMIT_HASH>` with this CP41's ratification commit hash.
+2. `BIBLE_AMENDMENTS.md` "Correction Pass 41" header block — replace `<RATIFICATION_COMMIT_HASH>` (this CP entry's own commit-ledger token) with the same hash.
+3. `BIBLE_AMENDMENTS.md` line 5085 (§11 #11 self-binding pending block within the §11 #18-pending staging) — populate per the staging block's own "Currently UNRATIFIED — no commit, no binding" placeholder with the same hash, satisfying the §11 #11 self-binding discipline.
+
+The §11 #18-staging "open question" at line 5072 (audit-doc template standardization) is NOT in CP41 scope — it remains open for a future operator decision; CP41 closes the ratification + backfill work without prejudice to the template-standardization question.
+
+### Cross-references
+
+- Parent dispatch: [MAC-301](/MAC/issues/MAC-301); CEO disambiguation [`56c89cc8`](/MAC/issues/MAC-301#comment-56c89cc8-b4d7-4a4a-abe3-1cec445f5237).
+- Staging block (preserved verbatim, no in-place edit): `BIBLE_AMENDMENTS.md:5018-5086`.
+- DB backup (Avigilon): `db/argus.db.pre_avigilon_arm_patch_20260522T220908Z` (pre-existing on disk).
+- DB backup (CP41 pre-mutation): `db/argus.db.pre_mac301_ratification_20260603T053500Z` (sha256 byte-match captured at apply-time).
+- Predecessor CP for the n=2 evidence basis: CP31 §4.6 (Parrot Automotive id=222 schema-migration-class arm precedent); CP33 §3.2 (Pelco arm-under-MSI G-A ratification 2026-05-22).
+- Sibling memory: [[feedback_apply_time_correction_when_prediction_diverges_from_reality]] (governs the staging-body preservation discipline), [[feedback_ceo_cite_verification_mechanical_match]] (governs the pre-write anchor re-verification at HEAD `1468964`), [[feedback_bible_amendment_downstream_consumer_audit]] (governs the downstream-consumer audit above).
+- Future CP carry-forwards: (a) audit-doc template standardization (staging block "open question for operator at codification time" — DEFERRED at this CP, no template imposed yet); (b) Pelco audit-doc reconstruction from staging-block evidence (deferred — Gap-2 compliance-gap log above is sufficient closure under MAC-301 acceptance criteria); (c) operator-DML-override `_operator_authorized_overrides_log.md` canonical-worktree adoption (staging-block cross-reference; not in CP41 scope).
+
+
 ## Correction Pass 42 §1 — `imei_tac` Lynceus §4.4 consumer-side disposition (MAC-300, CP33 §7 carry-forward closure) — **RATIFIED**
 
 **Issue**: [MAC-300](/MAC/issues/MAC-300) — `tests/test_export_lynceus.py::test_type_mapping_covers_every_identifier_type` failing because `imei_tac` has no entry in `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (MAP) or `DROPPED_REASONS` (DROP).
@@ -5511,3 +5583,4 @@ Per CP35 §215 precedent: DROP-with-reason preserves the canonical schema slot f
 - Add sibling-dict entry `DROPPED_REASONS_RATIONALE["network_discovery_protocol_pattern"] = "Awaiting Lynceus v0.3 scanner_support for network_discovery_protocol_pattern matching (CP35 §215 cross-repo scope)"`.
 - `db/validation/coverage_matrix.py`: mirror the identity-keyed `DROPPED_REASONS["network_discovery_protocol_pattern"]` change verbatim — SAR-18 parity gate requires byte-identical `DROPPED_REASONS` mapping between the two classifiers.
 - All future `DROPPED_REASONS` additions follow identity-keyed convention + paired `DROPPED_REASONS_RATIONALE` entry.
+

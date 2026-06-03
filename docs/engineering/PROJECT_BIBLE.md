@@ -1048,6 +1048,18 @@ These are hard rules. Violating any of these is a stop-the-line event.
 
 19. **§11 #3 export-time generator post-condition guard pattern (CP32 §10 — 2026-05-21).** Export generators MUST include post-condition guards for hard-rule-bound content shapes. Canonical template: `_assert_no_email_pii(path)` per MAC-217 implementation at 6 emission call sites covering all 3 Lynceus export shapes × the both-floors-applied audit. The guard runs AFTER the export file is written, re-reads the file, and raises `Halt` if any post-write content violates the hard-rule predicate (in the canonical case, regex-detected email PII). **Forward-looking sub-rule:** any §11 hard-rule that constrains export content shape SHOULD have a paired `_assert_no_<rule>_<violation>(path)` post-condition guard at every emission call site. Defense-in-depth rationale: prior PII-bounded checks lived at the row-classification gate (`_classify_row` → drop bin), which is necessary but not sufficient — a bug in the classification gate or a future code-path that bypasses the gate (e.g., a custom export) would leak PII. The post-condition guard catches both classification-gate bugs AND new-code-path bypasses. Code pattern reference: `db/validation/export_lynceus.py` post commit `50b8232` (MAC-217 PII-strip + §11 #3 export guard landing). This is the first framework-level export-time generator post-condition guard codification; sibling-class hard-rules (§11 #12 OUI ban, §11 #13 unknown-category, §11 #14 procurement-only) are candidates for the same defense-in-depth pattern as future audit-discipline strengthens them.
 
+20. **Operator-authorized in-cycle DML override.** When dispatch §0 baseline verification surfaces a drift that should-have-shipped in a prior v1.5.x patch and the in-flight cycle's §11 envelope is read-only (no schema migration, no `identifiers` writes), the operator may authorize a single-statement DML override against the canonical DB via in-session reply. The pattern is constrained as follows:
+
+    1. **Authorization is per-statement and per-session.** Pre-authorization is not permitted. The operator must reply in the active dispatch session with explicit "patch it" (or equivalent) intent.
+    2. **Single-statement scope.** Multi-DML batches require dispatch-class authorization (a new dispatch with explicit DML scope), not in-cycle override.
+    3. **Drift-remediation only.** The override must address a baseline-drift discovered at §0 verification; it is not a vehicle for new feature work.
+    4. **Mandatory pre-state and post-state capture** in an audit doc named `OPERATOR_AUTHORIZED_OVERRIDE_<TOPIC>.md` in the cycle's worktree. Must include the verbatim SQL, the row(s) affected, pre-state, post-state, and operator authorization timestamp.
+    5. **Mandatory pre-patch backup.** Snapshot the canonical DB to `argus.db.pre_<topic>_<UTC-timestamp>` with sha256 captured.
+    6. **Mandatory cross-reference in cycle handoff.** The cycle's `INTEGRATION_HANDOFF.md` and any session-summary doc must cite the override audit doc as `operator_authorized_exception[]`.
+    7. **Read-only thereafter.** After the override executes, the cycle returns to read-only DB posture for the remainder of the run.
+
+    (CP41 — 2026-06-03, MAC-301; staged at BIBLE_AMENDMENTS.md §11 #18-pending per MAC-239 Gate I-5 deferral 2026-05-23; ratified at this slot — see BIBLE_AMENDMENTS.md "Correction Pass 41" for slot-shift forensics.)
+
 ---
 
 ## 12. Open Questions
