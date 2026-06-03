@@ -144,7 +144,7 @@ The test suite is the highest-fidelity verification that the install works end-t
 
 (Or activate the venv first via `source .venv/bin/activate` and then run `pytest tests/ -q`.)
 
-At HEAD `def7b95` (v1.6.2 ship): **520 passed, 1 skipped, 3 failed.** The 3 failing tests are known classifier-predicate-parity surfaces tracked separately (`test_drop_bin_undersized_mac_range_survives`, `test_type_mapping_covers_every_identifier_type`, `test_type_mapping_drops_match_44_verbatim`) — they reflect a post-CP34/MAC-291 drop-bin label drift in the export classifier and an `imei_tac` identifier_type missing from the `IDENTIFIER_TYPE_TO_PATTERN_TYPE` / `DROPPED_REASONS` table. If you see additional failures beyond these 3, the install has drifted from the verified ship state — file an issue with the test name + traceback.
+Expected at v1.6.3 ship (CP42 close): **523 passed, 1 skipped, 0 failed.** If you see any failures, the install has drifted from the verified ship state — file an issue with the test name + traceback.
 
 ## §8. Downstream consumption pattern (Lynceus / Rayhunter / other scanners)
 
