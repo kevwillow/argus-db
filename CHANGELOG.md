@@ -14,6 +14,37 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.4 — 2026-06-05
+
+A **notes / data ship** layered on top of v1.6.3 — a single Correction Pass (CP43) that selectively reverts CP40 for one negative-evidence-validated /24 OUI cohort. **No INSERT/DELETE and no schema migration this cycle**; the only DB mutation is a confidence/severity flip plus an additive `notes` marker on 19 rows, landed in v1.6.4 Stage 1 (commit `3b6eb32`). Active identifier count stays at **41,508**; schema_version stays **31**.
+
+### What's new
+
+- **CP43 — Selective revert of CP40 for the EthanThePhoenix38 Cohort A (MAC-309 Path II).** Board Path-II ratification ([MAC-309](/MAC/issues/MAC-309) comment `e8cd574e`, after CEO research report `eab3639e`) re-examined CP40's `chip_vendor_oui_24` demotion in light of (a) Lynceus's UX update now displaying the matched OUI alongside the Flock label in notifications — closing the disambiguation gap that triggered the original Lynceus-Warden FP report — and (b) the empirical negative-evidence curation discipline on source sid=39 (EthanThePhoenix38/flock-you-camera-detector). The 19 Cohort A rows (ids 22810-22828, `geographic_scope='US'`) move from CP40's conf=60 / severity=NULL state back to **conf=85 / severity='high'**, with `notes.crowdsourced_breadth_tier='chip_vendor_oui_24'` PRESERVED and a new `notes.cp43_basis='path_ii_negative_evidence_curation_with_lynceus_disambiguation'` marker appended (CP40 history retained additively alongside). Cohort B (ids 35618-35635, sid=20 colonelpanichacks/flock-you, `geographic_scope=NULL`) stays under CP40 §1 — explicitly out of scope.
+- **Apply-time invariant (load-bearing).** CP43's confidence promotion depends on Lynceus's OUI-in-notification UX. If Lynceus regresses that UX (drops the OUI display so users see only the bare vendor label), the original CP40 false-positive concern returns and **CP43 must be re-examined**. This invariant is carried in CHANGELOG, CREDITS, and `docs/engineering/BIBLE_AMENDMENTS.md`.
+
+### Schema
+
+- **No migrations this cycle.** CP43 is a notes / data mutation only. The migration ledger stays at **0001 through 0031**; schema_version stays **31**.
+
+### Data
+
+- **`identifiers` active:** 41,508 (unchanged; no INSERT/DELETE this cycle).
+- **`identifiers` total:** 41,890 (unchanged).
+- **`severity='high'` cohort:** 255 (v1.6.3 ship) → **274** (post-CP43; +19 Cohort A rows re-promoted).
+- **`sources`:** 74 (unchanged). **`manufacturers`:** 126 (unchanged). **`behavioral_signatures`:** 201 (unchanged).
+- **Lynceus high-confidence export records:** 159 (v1.6.3 ship) → **178** (post-CP43; +19, exactly ids 22810-22828; CP7 `geographic_scope='US'` filter unchanged).
+- **Lynceus standard export records:** 592 (unchanged — the 19 rows already cleared the conf≥30 floor at conf=60, so standard-export membership is unaffected).
+- **Behavioral signatures export records:** 125 (unchanged).
+
+### Bible amendments
+
+- **CP43** (`docs/engineering/BIBLE_AMENDMENTS.md:5589`) — Selective revert of CP40 for negative-evidence-validated /24 OUI cohorts (Cohort A re-promotion; Cohort B retained under CP40).
+
+### Halts encountered
+
+- None. v1.6.4 Stage 1 (the 19-row DB mutation) landed at commit `3b6eb32` and was independently corroborated by the Validator ([MAC-318](/MAC/issues/MAC-318) — 8/8 read-only battery PASS against HEAD `3b6eb32`) before this Stage 2 docs / export work began.
+
 ## v1.6.3 — 2026-06-03
 
 A **notes / severity / code-correctness ship** layered on top of the v1.6.2 corpus. **No INSERT/DELETE on `identifiers` this cycle** — every change is column-add, notes-backfill, or consumer-export-correctness. The v1.6.2.1 narrow-fork content (CP39 severity column + Flock-hunt floor carve-out) is rolled in per the board's "hold and push as v1.6.3" directive; v1.6.2.1 was never separately tagged. Active identifier count stays at **41,508**; schema_version advances **30 → 31** (the mig-0031 column add from v1.6.2.1 is the v1.6.3 ship schema).

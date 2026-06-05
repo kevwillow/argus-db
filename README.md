@@ -26,7 +26,7 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 At v1.6.3:
 
-- **41,508 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.). Unchanged from v1.6.2: v1.6.3 is a notes/severity/code-correctness cycle (CP40+CP41+CP42 §1+§2), not a row-shape change.
+- **41,508 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.). Unchanged through v1.6.4: v1.6.3 was a notes/severity/code-correctness cycle (CP40+CP41+CP42 §1+§2) and v1.6.4 is a single notes/data Correction Pass (CP43), neither a row-shape change.
 - **126 manufacturers** — surveillance vendors classified by what they make
 - **74 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
 - **17 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, etc.)
@@ -43,7 +43,7 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 159 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources EXCEPT for the CP39 §7.5 carve-out for named Flock-hunt project sources (see `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 39), with the CP40 Lynceus chip-vendor OUI remediation applied (37-row FP slice flipped out of `severity='high'`). Each row carries a `severity` field (`"high"` for Flock-attested rows post-CP40 remediation, `null` otherwise). |
+| `exports/argus_export_high_confidence.json` | 178 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources EXCEPT for the CP39 §7.5 carve-out for named Flock-hunt project sources (see `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 39), with the CP40 Lynceus chip-vendor OUI remediation applied and the CP43 selective revert of CP40 re-promoting the 19 EthanThePhoenix38 Cohort A rows to `severity='high'` (159 → 178; see Correction Pass 43). Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
 | `exports/argus_export.json` | 592 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
 | `exports/argus_export.csv` | 41,508 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 125 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
@@ -85,6 +85,10 @@ Argus covers surveillance equipment used by US law enforcement and adjacent oper
 Coverage is intentionally narrow at the per-category baseline — Argus has 126 vendors, but most categories have 3-13 vendors in the lexicon, not hundreds. Expansion comes via community contributions and future research waves.
 
 ## Most recent release
+
+**v1.6.4** is a single-Correction-Pass notes / data cycle on top of v1.6.3. **CP43 (MAC-309 Path II)** selectively reverts CP40 for one cohort: the 19 EthanThePhoenix38 Cohort A rows (ids 22810-22828, source sid=39, `geographic_scope='US'`) move from CP40's conf=60 / `severity=NULL` state back to **conf=85 / `severity='high'`**. The revert is justified by (a) Lynceus's notification UX now displaying the matched OUI alongside the Flock label — closing the disambiguation gap that drove the original chip-vendor FP report — and (b) the empirical negative-evidence curation discipline on sid=39. The `notes.crowdsourced_breadth_tier='chip_vendor_oui_24'` tier is PRESERVED on each row and a `notes.cp43_basis` marker is appended additively (CP40 history retained). **Apply-time invariant:** CP43's promotion depends on the Lynceus OUI-in-notification UX; if Lynceus drops that display, CP43 must be re-examined. Schema version stays **31** (no migration — CP43 is notes / data only); active identifier count stays **41,508** (the change is an UPDATE on 19 rows, no INSERT / DELETE). The `severity='high'` cohort moves 255 → **274** (+19); the high-confidence Lynceus export moves 159 → **178** (+19, exactly the Cohort A set; CP7 US filter unchanged). Cohort B (ids 35618-35635, sid=20, `geographic_scope=NULL`) stays under CP40 — explicitly out of scope, carried forward. See [`CHANGELOG.md`](CHANGELOG.md) v1.6.4 and `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 43.
+
+### Prior release — v1.6.3
 
 **v1.6.3** is a notes / severity / code-correctness cycle on top of the v1.6.2 ship plus the v1.6.2.1 narrow-fork content rolled in per the board's "hold and push as v1.6.3" directive. Schema version advances 30 → 31 (the `identifiers.severity` column added by v1.6.2.1's mig-0031 CP39 is now the v1.6.3 ship schema). Source / manufacturer counts stay at 74 / 126. Active identifier count is unchanged at 41,508 — v1.6.3 is data-truth-preserving at the identifier-row level (no INSERT / DELETE; the cycle is column-add, notes-backfill, and consumer-export-correctness):
 

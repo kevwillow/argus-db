@@ -144,7 +144,7 @@ The test suite is the highest-fidelity verification that the install works end-t
 
 (Or activate the venv first via `source .venv/bin/activate` and then run `pytest tests/ -q`.)
 
-Expected at v1.6.3 ship (CP42 close): **523 passed, 1 skipped, 0 failed.** If you see any failures, the install has drifted from the verified ship state — file an issue with the test name + traceback.
+Expected at v1.6.4 ship (CP43 close): **522 passed, 2 skipped, 0 failed.** (The v1.6.3 ship line was 523 passed / 1 skipped; the +1 skip is the `tests/test_vendor_name_disambig.py` MAC-39 smoke check, which skips because the `extraction_outputs/mac39/` artifact directory was removed by the v1.6.3 repo-hygiene cleanup commit `817c475` — the test now self-skips when the artifact is absent, exactly as in a fresh clone. The other skip is the always-skipped `tests/test_vendor_docs_extractor.py` Step-1 batch smoke check, whose `raw/vendor_docs/` batch is never tracked. CP43 itself touches no test fixtures.) If you see any **failures**, the install has drifted from the verified ship state — file an issue with the test name + traceback.
 
 ## §8. Downstream consumption pattern (Lynceus / Rayhunter / other scanners)
 
