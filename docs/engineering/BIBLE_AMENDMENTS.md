@@ -5586,3 +5586,51 @@ Per CP35 §215 precedent: DROP-with-reason preserves the canonical schema slot f
 - `db/validation/coverage_matrix.py`: mirror the identity-keyed `DROPPED_REASONS["network_discovery_protocol_pattern"]` change verbatim — SAR-18 parity gate requires byte-identical `DROPPED_REASONS` mapping between the two classifiers.
 - All future `DROPPED_REASONS` additions follow identity-keyed convention + paired `DROPPED_REASONS_RATIONALE` entry.
 
+### CP43 — Selective revert of CP40 for negative-evidence-validated /24 OUI cohorts (2026-06-05)
+
+**Trigger:** Board Path-II ratification at MAC-309 comment e8cd574e (after CEO
+research report eab3639e) — empirical re-examination of CP40's chip_vendor_oui_24
+demotion in light of (a) Lynceus's UX update displaying the matched OUI alongside
+the Flock label in notifications (closing the disambiguation gap that triggered
+the Lynceus-Warden FP report), and (b) source curation discipline distinction
+between the two CP40-demoted cohorts.
+
+**Rule (narrowing CP40 §1):** §7.5 floor carve-out admissions under CP40 §1 may
+be promoted to confidence=85 severity='high' when ALL of the following hold:
+
+  1. Source curation includes empirical negative-evidence validation
+     (sources.notes documenting fork_disposition or equivalent curation
+     discipline that subtracts OUIs based on observed non-target matches);
+  2. `identifiers.geographic_scope='US'` (canonical Lynceus deployment tier;
+     other geographic_scope values stay under default CP40 §1 calibration);
+  3. The breadth-tier annotation `notes.crowdsourced_breadth_tier='chip_vendor_oui_24'`
+     is PRESERVED on the row — downstream consumers (Lynceus UI in particular)
+     must surface this tier to enable user-side disambiguation.
+
+**Backsweep authority:** This CP authorizes a one-time selective revert of the
+19 Cohort A rows (ids 22810-22828, source_id=39 EthanThePhoenix38/flock-you-camera-detector,
+geographic_scope='US') from CP40's conf=60 severity=NULL state back to conf=85
+severity='high', with `notes.crowdsourced_breadth_tier` PRESERVED and a new
+`notes.cp43_basis='path_ii_negative_evidence_curation_with_lynceus_disambiguation'`
+marker appended.
+
+**Out of scope:** The 18 Cohort B rows (ids 35618-35635, source_id=20
+colonelpanichacks/flock-you, geographic_scope=NULL) remain under CP40 §1 §2
+discipline at conf=60 severity=NULL. Cohort B's geographic_scope=NULL backfill
+is a separate concern tracked under PLANNED v1.6.3+ §"FlockYou wave-A
+uppercase-OUI geographic_scope=NULL" carry-forward.
+
+**Precedence:** CP43 narrows but does NOT revoke CP40. CP40 retains force for
+chip_vendor_oui_24 admissions that lack empirical negative-evidence curation
+OR have geographic_scope ≠ 'US'. Both must clear for §7.5 conf=85 admission
+under the narrowed rule.
+
+**Apply-time invariant:** Lynceus's OUI-in-notification UX is a load-bearing
+dependency of CP43's confidence promotion. If Lynceus regresses this UX (drops
+the OUI display, so users see only the bare vendor label), CP43 must be
+re-examined — without disambiguation context, the original CP40 FP concern
+returns. CHANGELOG and CREDITS for v1.6.4 carry this invariant note.
+
+**Downstream-consumer note:** High-confidence export gains 19 rows (159 → 178);
+exports/argus_export.json gains them at conf=85 from conf=60 (same row set,
+elevated tier); CP7 geographic_scope='US' filter unchanged.
