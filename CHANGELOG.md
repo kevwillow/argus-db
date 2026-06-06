@@ -14,6 +14,38 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.6 — 2026-06-06
+
+A **data ship** layered on top of v1.6.4 (v1.6.5 skipped — board version numbering): the first net-INSERT cycle since the Wave-J era. [MAC-321](/MAC/issues/MAC-321) "6.6 NEW DATA GOAL" promoted **+208** validator-clean, registry-sourced identifiers harvested by a board-run Claude Code scrape (WS-1 zero-friction registry pulls + a Dahua/Axis firmware binwalk). Active identifier count **41,508 → 41,716**. **No schema migration** (schema_version stays **31**), **0 new `identifier_type` slots**, **0 new sources** (74), **0 new manufacturers** (126 — all 33 attributed vendors already registered). Operator-ratified at the Phase-D gate ([MAC-321](/MAC/issues/MAC-321) decision card `24a9de82`, option `approve_clean`) under the v1.6.2-style gated discipline (independent CEO re-validation against the live DB; backup-first apply; push operator-gated).
+
+### What's new
+
+- **MAC-321 WS-1 promotion (+208).** Net-new public-registry identifiers, each carrying `source_url` + extraction method + `last_verified`, deduped against live canonical (0 collisions), confidence bands §8.2-conformant (`primary_registry` 80–85, `regulatory` 88–90, `manufacturer_doc` 85). By type: `oui` **+133** (444→577), `mac_range` **+19** (17,806→17,825), `fcc_grantee_code` **+44** (95→139), `vendor_controlled_hostname` **+5** (12,055→12,060), `firmware_sha256_hash` **+3** (17→20), `product_family_codename` **+2** (265→267), `firmware_branded_string` **+2** (30→32). Top vendors: Hikvision, Dahua, Hanwha, Trimble, Bosch Security, Uniview, Axon, Samsara, Verkada, Avigilon. Applied via `db/validation/mac321_v166_promote.py`; `extraction_runs` id **128**.
+- **Firmware binwalk (5 of the 12 firmware-attached rows).** A public Dahua IPC-HX5X3X "Rhea" build + Dahua Eos4 + Axis 206W firmware were `binwalk`/`unsquashfs`'d read-only; the **3 `firmware_sha256_hash` rows retain SHA-256 provenance and the binaries are not committed** (gitignored working data). Hardcoded `easy4ip.com` / `cpplusddns.com` / `axiscam.net` hostnames + `Rhea`/`Eos4` codenames extracted. No DRM circumvention (the obfuscated 2025 build was **not** bypassed).
+- **Governance dispositions (operator-ratified):** **Cisco Meraki ×57 OUIs excluded** — vendor-wide registrant spans MV cameras + MR/MS/MX networking; cannot isolate the surveillance line (existing §8.4 multi-purpose-vendor discipline). New-vendor **+1,112** (15 surveillance brands + 13 SoC component vendors + 860 Reolink firmware hashes) **deferred to v1.6.7** pending manufacturer registration + a component-vendor attribution policy + a Reolink-volume decision. Deferrals confirmed: `cid` (0 surveillance registrants), `matter_vendor_id` (full 432-vendor DCL pull → ~2 adjacent, already covered), Nordic GATT vocab, USB/PCI capture VIDs (skip-and-surface).
+
+### Schema
+
+- **No migrations this cycle.** Migration ledger stays **0001 through 0031**; schema_version stays **31**. All 7 promoted `identifier_type`s and 3 `source_type`s use existing CHECK-enum slots.
+
+### Data
+
+- **`identifiers` active:** 41,508 → **41,716** (+208 INSERT).
+- **`identifiers` total:** 41,890 → **42,098**.
+- **`sources`:** 74 (unchanged). **`manufacturers`:** 126 (unchanged). **`behavioral_signatures`:** 201 (unchanged).
+- **Lynceus high-confidence export records:** 178 → **305** (+127).
+- **Lynceus standard export records:** 592 → **719** (+127).
+- **Behavioral signatures export records:** 125 (unchanged).
+- **Export-delta re-derivation note (load-bearing).** The Lynceus export delta is **+127, not +152**, and is derived from the **regenerated files**, not a projection. Of the 152 Lynceus-mappable rows (133 `oui` + 19 `mac_range`): 127 `oui` land; **6 `oui` drop** as `device_category='unknown'` (§8.4 / §11 #13 unknown-category carveout); **all 19 `mac_range` drop** because §4.4 maps `mac_range → None` (expand-if-≤256-MACs else `oversized_mac_range`) and every range is a 28-bit block (≫256). The pre-ratification dry-run's "19 mac_range → mac / +152" was incorrect on the `mac_range` mapping; the canonical **+208** promote is unaffected. The 44 `fcc_grantee_code` + 5 `vendor_controlled_hostname` + 3 `firmware_sha256_hash` + 2 `product_family_codename` + 2 `firmware_branded_string` are Argus-internal (not in the Lynceus `{mac,oui,ssid,ble_uuid}` schema); all 208 appear in the full CSV export (41,716 rows).
+
+### Bible amendments
+
+- **None this cycle (bible read-only per dispatch).** No new rule was introduced — the Meraki exclusion applies existing §8.4 multi-purpose-vendor discipline and the deferrals are scheduling, not doctrine. **CP candidate flagged (not written):** a §4.4 clarification that `mac_range` promotions do not contribute to the Lynceus watchlist (expand-or-drop), so registry-OUI cycles should project Lynceus deltas from concrete-category `oui` rows only.
+
+### Halts encountered
+
+- **None.** Independent re-validation, backup-first apply, coverage-matrix + export regen all clean (export worker's MAC-45 reconciliation: 0 halts).
+
 ## v1.6.4 — 2026-06-05
 
 A **notes / data ship** layered on top of v1.6.3 — a single Correction Pass (CP43) that selectively reverts CP40 for one negative-evidence-validated /24 OUI cohort. **No INSERT/DELETE and no schema migration this cycle**; the only DB mutation is a confidence/severity flip plus an additive `notes` marker on 19 rows, landed in v1.6.4 Stage 1 (commit `3b6eb32`). Active identifier count stays at **41,508**; schema_version stays **31**.
