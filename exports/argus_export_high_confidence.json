@@ -1,22 +1,22 @@
 {
   "_meta": {
     "argus_version": "31",
-    "exported_at": "2026-06-05T03:56:25Z",
-    "record_count": 178,
+    "exported_at": "2026-06-06T16:49:54Z",
+    "record_count": 305,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "3c723baa-dbb9-5733-b411-fbda682d2eb6",
-    "source_record_count": 41508,
+    "argus_run_id": "a98275fa-197e-575a-9bf9-7d1b63416887",
+    "source_record_count": 41716,
     "dropped_in_export": {
-      "unknown_category": 33329,
+      "unknown_category": 33343,
       "ssid_pattern": 18,
       "device_fingerprint": 6,
       "ble_local_name": 21,
       "ble_characteristic": 13,
-      "product_family_codename": 254,
-      "oversized_mac_range": 28,
+      "product_family_codename": 256,
+      "oversized_mac_range": 44,
       "icao_24bit_address": 2,
       "rf_channel": 24,
       "burst_cadence_ms": 0,
@@ -38,11 +38,11 @@
       "x509_cert_sha256_prefix": 255,
       "ble_adv_interval": 0,
       "ble_payload_offset": 0,
-      "firmware_sha256_hash": 17,
+      "firmware_sha256_hash": 20,
       "network_endpoint": 3410,
       "firmware_image_variant": 3,
       "qualcomm_chip_format_id": 1,
-      "firmware_branded_string": 29,
+      "firmware_branded_string": 31,
       "asdstan_message_type": 7,
       "asdstan_enum_value": 18,
       "dji_protocol_struct_format": 2,
@@ -52,10 +52,10 @@
       "firmware_build_uuid": 1,
       "windows_installer_productcode_vendor_registered": 2,
       "windows_com_clsid_vendor_registered": 1,
-      "vendor_controlled_hostname": 3151,
+      "vendor_controlled_hostname": 3156,
       "vendor_cloud_endpoint_url": 1,
       "vendor_controlled_hostname_deprecated": 4,
-      "fcc_grantee_code": 29,
+      "fcc_grantee_code": 68,
       "equipment_class_code": 6,
       "network_discovery_protocol_pattern": 11,
       "imei_tac": 0,
@@ -80,6 +80,12 @@
       "argus_record_id": "0071d25f2613f37b"
     },
     {
+      "pattern": "24:48:45",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "03bb5ecf7bc6e5c2"
+    },
+    {
       "pattern": "14:5a:fc",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -92,10 +98,22 @@
       "argus_record_id": "05daa54a13cc6f18"
     },
     {
+      "pattern": "ac:b9:2f",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "07bf3de4ee758b1a"
+    },
+    {
       "pattern": "1787F01BM",
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
       "argus_record_id": "07fed1b848044dae"
+    },
+    {
+      "pattern": "8c:1d:55",
+      "pattern_type": "oui",
+      "description": "Hanwha Vision cctv_camera",
+      "argus_record_id": "08403228f71e8350"
     },
     {
       "pattern": "50:13:9d",
@@ -164,6 +182,18 @@
       "argus_record_id": "0e6ef5183f5a20a6"
     },
     {
+      "pattern": "00:23:bd",
+      "pattern_type": "oui",
+      "description": "Digital Ally body_cam",
+      "argus_record_id": "0ffbaf67fb800117"
+    },
+    {
+      "pattern": "38:af:29",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "10433edaf8e2d2d6"
+    },
+    {
       "pattern": "00:24:37",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
@@ -176,10 +206,40 @@
       "argus_record_id": "108e8f0bd4b6da48"
     },
     {
+      "pattern": "80:f5:ae",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "117365aa7e94e77a"
+    },
+    {
+      "pattern": "14:a7:8b",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "11b1343ce8e78b0b"
+    },
+    {
+      "pattern": "e4:24:6c",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "131398074b017f80"
+    },
+    {
       "pattern": "4c:cc:34",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "13fd07260e6f48dc"
+    },
+    {
+      "pattern": "a4:4b:d9",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "141d9a0fc33b204f"
+    },
+    {
+      "pattern": "24:b1:05",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "14a6d91063c0e241"
     },
     {
       "pattern": "1587A0510001TBT",
@@ -188,10 +248,28 @@
       "argus_record_id": "150f53c8e8e78fb6"
     },
     {
+      "pattern": "8c:e9:b4",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "1522700c4fd5aa29"
+    },
+    {
+      "pattern": "3c:e3:6b",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "16e55d3326889e08"
+    },
+    {
       "pattern": "10:74:6f",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "16f810b92a2695b1"
+    },
+    {
+      "pattern": "e0:ba:ad",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "177f83a6ba08ef72"
     },
     {
       "pattern": "00:a0:d5",
@@ -200,16 +278,40 @@
       "argus_record_id": "18004a32f2123e7a"
     },
     {
+      "pattern": "04:ee:cd",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "18fb1c9808c2351c"
+    },
+    {
       "pattern": "00:18:85",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "1a12b495b1e624d6"
     },
     {
+      "pattern": "8c:22:d2",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "1b00ec21a996b4bd"
+    },
+    {
+      "pattern": "9c:14:63",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "1c24701c69aa5b76"
+    },
+    {
       "pattern": "90:3a:e6",
       "pattern_type": "oui",
       "description": "Parrot drone",
       "argus_record_id": "1c452b196c10dab1"
+    },
+    {
+      "pattern": "40:7a:a4",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "1d6c8f38cbb67cc0"
     },
     {
       "pattern": "1581F5BK",
@@ -236,6 +338,12 @@
       "argus_record_id": "219fd3f03346950a"
     },
     {
+      "pattern": "a4:29:02",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "2297bf72ec08a533"
+    },
+    {
       "pattern": "e8ccbb38-9532-46a8-9fe5-1814df172e6f",
       "pattern_type": "ble_uuid",
       "description": "Flock Safety alpr",
@@ -248,16 +356,46 @@
       "argus_record_id": "244ce9a1646a5443"
     },
     {
+      "pattern": "80:be:af",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "24878ec45c235a6e"
+    },
+    {
       "pattern": "9c:5a:8a",
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "26c3eded4bd7bdc1"
     },
     {
+      "pattern": "e0:ca:3c",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "282d2fbc725db511"
+    },
+    {
+      "pattern": "c4:79:05",
+      "pattern_type": "oui",
+      "description": "Uniview cctv_camera",
+      "argus_record_id": "294df3732b98a779"
+    },
+    {
       "pattern": "1581F446",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "2a33ba6feaf10a21"
+    },
+    {
+      "pattern": "d4:e8:53",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "2a90e0263a10e616"
+    },
+    {
+      "pattern": "88:26:3f",
+      "pattern_type": "oui",
+      "description": "Uniview cctv_camera",
+      "argus_record_id": "2ceebd367edaf6d6"
     },
     {
       "pattern": "1581F4Z4",
@@ -278,6 +416,18 @@
       "argus_record_id": "2e1cf293f5fd507c"
     },
     {
+      "pattern": "98:f9:cc",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "2e31366af1bfff20"
+    },
+    {
+      "pattern": "3c:da:6d",
+      "pattern_type": "oui",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "2f84ee7aa5852583"
+    },
+    {
       "pattern": "48:1c:b9",
       "pattern_type": "oui",
       "description": "DJI drone",
@@ -290,10 +440,22 @@
       "argus_record_id": "3132922d9f70ec89"
     },
     {
+      "pattern": "c8:a7:02",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "3279d2f1029e0f69"
+    },
+    {
       "pattern": "1581F6MK",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "3378cee9e936f3e8"
+    },
+    {
+      "pattern": "08:cc:81",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "33d15630fe38ead1"
     },
     {
       "pattern": "1588E040505",
@@ -306,6 +468,12 @@
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "352ca48cb7f2e84e"
+    },
+    {
+      "pattern": "fc:9f:fd",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "3593e4290f1ab9df"
     },
     {
       "pattern": "e4:aa:ea",
@@ -344,6 +512,12 @@
       "argus_record_id": "38e6567e2e06fac2"
     },
     {
+      "pattern": "8c:e7:48",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "3af533072b5b0746"
+    },
+    {
       "pattern": "00:06:ec",
       "pattern_type": "oui",
       "description": "Harris persistent_surveillance",
@@ -380,10 +554,34 @@
       "argus_record_id": "448af7459a52e1cc"
     },
     {
+      "pattern": "e0:a7:00",
+      "pattern_type": "oui",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "448e6c9ff9823098"
+    },
+    {
+      "pattern": "00:02:d1",
+      "pattern_type": "oui",
+      "description": "Vivotek cctv_camera",
+      "argus_record_id": "45d7cbd90069d70f"
+    },
+    {
+      "pattern": "34:09:62",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "45e77b7317b6b5ce"
+    },
+    {
       "pattern": "4c:43:f6",
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "47f7062efe51278d"
+    },
+    {
+      "pattern": "ec:a9:71",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "48f6c47f9459f5e2"
     },
     {
       "pattern": "1644FMD4300000001",
@@ -392,10 +590,34 @@
       "argus_record_id": "4a13334e9a6c575c"
     },
     {
+      "pattern": "3c:1b:f8",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4b4885b3df2452cb"
+    },
+    {
+      "pattern": "00:58:28",
+      "pattern_type": "oui",
+      "description": "Axon body_cam",
+      "argus_record_id": "4b8530a9130e0df5"
+    },
+    {
       "pattern": "1748FEV3HMA",
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
       "argus_record_id": "4b9424d14d84cd92"
+    },
+    {
+      "pattern": "80:48:9f",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4cb772e7536d6f04"
+    },
+    {
+      "pattern": "80:7c:62",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4d23946a0b38eea0"
     },
     {
       "pattern": "1869DGIM2",
@@ -422,6 +644,12 @@
       "argus_record_id": "50894ea2e4d6f1e4"
     },
     {
+      "pattern": "0c:75:d2",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "50a76915d48036d0"
+    },
+    {
       "pattern": "1767CSRH801191425",
       "pattern_type": "drone_id_prefix",
       "description": "SkyRanger / SkyRaider drone",
@@ -446,6 +674,24 @@
       "argus_record_id": "52f6bf7990060f7a"
     },
     {
+      "pattern": "4c:62:df",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "540aeb87474dbf1f"
+    },
+    {
+      "pattern": "84:9a:40",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "54439bd204a957fd"
+    },
+    {
+      "pattern": "a0:ff:0c",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "54ef3b548cdef9b2"
+    },
+    {
       "pattern": "48:2c:ea",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
@@ -464,6 +710,24 @@
       "argus_record_id": "58156e31b1fdfc1f"
     },
     {
+      "pattern": "ec:c8:9c",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "5941a34036f695cb"
+    },
+    {
+      "pattern": "c0:51:7e",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "5a098365a86e1f86"
+    },
+    {
+      "pattern": "e0:da:dc",
+      "pattern_type": "oui",
+      "description": "Kenwood police_radio",
+      "argus_record_id": "5a0a2d56e7f96aeb"
+    },
+    {
       "pattern": "b4:1e:52",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -480,6 +744,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Zephyr Systems drone",
       "argus_record_id": "5b8b12afae01b312"
+    },
+    {
+      "pattern": "e4:d5:8b",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "5bc587a7ef8446e9"
     },
     {
       "pattern": "178852",
@@ -518,6 +788,30 @@
       "argus_record_id": "60c559cafa28b2d1"
     },
     {
+      "pattern": "54:8c:81",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "610800a1c406a722"
+    },
+    {
+      "pattern": "74:3f:c2",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "61370d1aaf6bd9f9"
+    },
+    {
+      "pattern": "f4:b1:c2",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "628c69bdf83c3a18"
+    },
+    {
+      "pattern": "f8:4d:fc",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "62ea9c3fb5cd6a57"
+    },
+    {
       "pattern": "28:a3:31",
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
@@ -534,6 +828,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "PARROT drone",
       "argus_record_id": "6598b0e099cd320b"
+    },
+    {
+      "pattern": "c0:39:5a",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "65e76c30754b8890"
     },
     {
       "pattern": "04:0d:84",
@@ -578,10 +878,22 @@
       "argus_record_id": "6b281f228c552457"
     },
     {
+      "pattern": "98:df:82",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "6c4b29db1a087054"
+    },
+    {
       "pattern": "90:35:ea",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "6dcc7e8573a2ae85"
+    },
+    {
+      "pattern": "44:b4:23",
+      "pattern_type": "oui",
+      "description": "Hanwha Vision cctv_camera",
+      "argus_record_id": "6e91b7f316081490"
     },
     {
       "pattern": "1581F45T",
@@ -596,16 +908,58 @@
       "argus_record_id": "6f8dd52534dd3c19"
     },
     {
+      "pattern": "00:c0:d4",
+      "pattern_type": "oui",
+      "description": "Axon body_cam",
+      "argus_record_id": "70a8b92f6030302d"
+    },
+    {
+      "pattern": "84:94:59",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "7176df154dbe22c8"
+    },
+    {
       "pattern": "70:c9:4e",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "718f398306ff65de"
     },
     {
+      "pattern": "40:ac:bf",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "71d8c6eb639bc16b"
+    },
+    {
+      "pattern": "bc:5e:33",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "71ecc067771452a6"
+    },
+    {
+      "pattern": "bc:32:5f",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "738089cd483a968e"
+    },
+    {
+      "pattern": "08:54:11",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "73b260794aea3158"
+    },
+    {
       "pattern": "1774FREM1010000",
       "pattern_type": "drone_id_prefix",
       "description": "UAS drone",
       "argus_record_id": "745f2f3dcbcae376"
+    },
+    {
+      "pattern": "c4:aa:c4",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "74be3d327efe50da"
     },
     {
       "pattern": "17444",
@@ -644,16 +998,52 @@
       "argus_record_id": "777ba58a5fbbcdc9"
     },
     {
+      "pattern": "6c:1c:71",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "790e03065831b42a"
+    },
+    {
       "pattern": "17906070",
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
       "argus_record_id": "796411da44a1d51e"
     },
     {
+      "pattern": "e0:2e:fe",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "797eadd8848e754e"
+    },
+    {
       "pattern": "179060702",
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
       "argus_record_id": "7aa408d8a277935a"
+    },
+    {
+      "pattern": "bc:29:78",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "7abecee537e9904b"
+    },
+    {
+      "pattern": "58:03:fb",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "7b675ce9ce7e921a"
+    },
+    {
+      "pattern": "b4:4c:3b",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "7bced46b9420d42a"
+    },
+    {
+      "pattern": "08:3b:c1",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "7c9e3274c68208de"
     },
     {
       "pattern": "1c:34:f1",
@@ -668,10 +1058,34 @@
       "argus_record_id": "7dea9c3aa868a56f"
     },
     {
+      "pattern": "5c:f5:1a",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "7fe24ec08f58b939"
+    },
+    {
+      "pattern": "5c:34:5b",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "808bdadf13233a81"
+    },
+    {
       "pattern": "1587A5400024GH",
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
       "argus_record_id": "8161bb6838bb9d9e"
+    },
+    {
+      "pattern": "cc:13:f3",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "827a4c1601e9f9a2"
+    },
+    {
+      "pattern": "00:09:18",
+      "pattern_type": "oui",
+      "description": "Hanwha Vision cctv_camera",
+      "argus_record_id": "82afe2f9d182b44e"
     },
     {
       "pattern": "1644FMD4100000007",
@@ -680,10 +1094,22 @@
       "argus_record_id": "82e68bb270cfe01d"
     },
     {
+      "pattern": "bc:9b:5e",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "830490616132ed00"
+    },
+    {
       "pattern": "00:1f:92",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "83e56c1f08115ba8"
+    },
+    {
+      "pattern": "74:c9:29",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "846705b6aa2073c4"
     },
     {
       "pattern": "1644FMD4E1VA0000",
@@ -692,16 +1118,46 @@
       "argus_record_id": "84d8e579e9475fe9"
     },
     {
+      "pattern": "e4:30:22",
+      "pattern_type": "oui",
+      "description": "Hanwha Vision cctv_camera",
+      "argus_record_id": "85e72731590fd4b4"
+    },
+    {
+      "pattern": "bc:ad:28",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "87856b96e2c68ae7"
+    },
+    {
       "pattern": "1863FPEG8218",
       "pattern_type": "drone_id_prefix",
       "description": "XAG drone",
       "argus_record_id": "879372e972382bf1"
     },
     {
+      "pattern": "fc:db:21",
+      "pattern_type": "oui",
+      "description": "Samsara automotive_telematics",
+      "argus_record_id": "87fcd374188f2ba7"
+    },
+    {
       "pattern": "1581F5FH",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "8970272d88daaa74"
+    },
+    {
+      "pattern": "34:4c:c8",
+      "pattern_type": "oui",
+      "description": "Echodyne drone_detect",
+      "argus_record_id": "8a30c57328625faa"
+    },
+    {
+      "pattern": "6c:f1:7e",
+      "pattern_type": "oui",
+      "description": "Uniview cctv_camera",
+      "argus_record_id": "8b0f35f2151ea3f9"
     },
     {
       "pattern": "1798F1132400",
@@ -714,6 +1170,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
       "argus_record_id": "8dddb2aea51a2fb2"
+    },
+    {
+      "pattern": "fc:5f:49",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "8e7100bec5260a6f"
     },
     {
       "pattern": "60:60:1f",
@@ -740,6 +1202,12 @@
       "argus_record_id": "90777ea2398443fb"
     },
     {
+      "pattern": "68:6d:bc",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "9140fb0380c358e5"
+    },
+    {
       "pattern": "17906080",
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
@@ -752,6 +1220,12 @@
       "argus_record_id": "952a78335403460b"
     },
     {
+      "pattern": "d4:43:0e",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "955c1e5a43ba840a"
+    },
+    {
       "pattern": "1889ERP1100",
       "pattern_type": "drone_id_prefix",
       "description": "WISPR drone",
@@ -762,6 +1236,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "970892ed3abaff14"
+    },
+    {
+      "pattern": "64:db:8b",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "982f0481e7c60063"
     },
     {
       "pattern": "00000000-0000-1000-1b7f-430ea194e6cf",
@@ -782,10 +1262,22 @@
       "argus_record_id": "9a9fe61cadafd8f9"
     },
     {
+      "pattern": "48:ea:63",
+      "pattern_type": "oui",
+      "description": "Uniview cctv_camera",
+      "argus_record_id": "9e1c7b10a0c866fd"
+    },
+    {
       "pattern": "58:00:e3:c8:69:66",
       "pattern_type": "mac",
       "description": "Flock Safety alpr",
       "argus_record_id": "9ef19e99e8f2bf48"
+    },
+    {
+      "pattern": "dc:d2:6a",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "9f1610a42e1f3129"
     },
     {
       "pattern": "1587A05",
@@ -824,10 +1316,34 @@
       "argus_record_id": "a324b45c330bc306"
     },
     {
+      "pattern": "10:12:fb",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a950fe125ae6ddc7"
+    },
+    {
+      "pattern": "f8:ce:07",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "aa828ffc8c6f7c13"
+    },
+    {
       "pattern": "17906090",
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
       "argus_record_id": "ab906ca2c4ac9c71"
+    },
+    {
+      "pattern": "24:0f:9b",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "aceca23e093aa5ab"
+    },
+    {
+      "pattern": "30:dd:aa",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "ad4cf183de671e96"
     },
     {
       "pattern": "1748CLTC",
@@ -836,10 +1352,28 @@
       "argus_record_id": "ae00e7e7711ee581"
     },
     {
+      "pattern": "e4:e6:6c",
+      "pattern_type": "oui",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "af853b0d2bbacfbf"
+    },
+    {
       "pattern": "9c:2f:9d:1a:c0:03",
       "pattern_type": "mac",
       "description": "Flock Safety alpr",
       "argus_record_id": "afcb7d370b76f04e"
+    },
+    {
+      "pattern": "cc:47:bd",
+      "pattern_type": "oui",
+      "description": "Rhombus Systems cctv_camera",
+      "argus_record_id": "b12d9744ecf76ce1"
+    },
+    {
+      "pattern": "00:bc:99",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "b273e5fb2c2e8f6c"
     },
     {
       "pattern": "1787F07BM",
@@ -854,6 +1388,18 @@
       "argus_record_id": "b5dd85cdbeb03302"
     },
     {
+      "pattern": "24:32:ae",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "bae55efb1c0f5ef8"
+    },
+    {
+      "pattern": "94:e1:ac",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "bdee42c12beb5050"
+    },
+    {
       "pattern": "e8:27:25",
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
@@ -866,10 +1412,28 @@
       "argus_record_id": "bec4da78009bc0c5"
     },
     {
+      "pattern": "48:78:5b",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "bfbd95573b762e1c"
+    },
+    {
+      "pattern": "4c:f5:dc",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "bff10a071d7fb49c"
+    },
+    {
       "pattern": "1668BS20",
       "pattern_type": "drone_id_prefix",
       "description": "Skydio drone",
       "argus_record_id": "c126fe1d66424b05"
+    },
+    {
+      "pattern": "4c:1f:86",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "c4204745fcff47f5"
     },
     {
       "pattern": "94:08:53",
@@ -890,6 +1454,12 @@
       "argus_record_id": "c82ae36849a49fef"
     },
     {
+      "pattern": "84:70:03",
+      "pattern_type": "oui",
+      "description": "Axon body_cam",
+      "argus_record_id": "c98dbb6938962160"
+    },
+    {
       "pattern": "1581F08Q3",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -902,10 +1472,34 @@
       "argus_record_id": "cb4c74698628ede3"
     },
     {
+      "pattern": "a4:a4:59",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "cc9ae08602b198c7"
+    },
+    {
       "pattern": "f8:40:68",
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "ccbe7f8e094c1ed2"
+    },
+    {
+      "pattern": "88:de:39",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "ccf82c1021987a7c"
+    },
+    {
+      "pattern": "e8:a0:ed",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "cd0c320ba8891c5f"
+    },
+    {
+      "pattern": "a4:d5:c2",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "ceb6f9c04e0554e4"
     },
     {
       "pattern": "1787F05BM",
@@ -914,10 +1508,34 @@
       "argus_record_id": "cedf9891ae71781d"
     },
     {
+      "pattern": "24:52:6a",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "cfd0cccaf1a19196"
+    },
+    {
       "pattern": "1596F35",
       "pattern_type": "drone_id_prefix",
       "description": "Dronetag drone",
       "argus_record_id": "d06ea18f60b1f866"
+    },
+    {
+      "pattern": "bc:ba:c2",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d0bd67e3f86468fc"
+    },
+    {
+      "pattern": "dc:07:f8",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d230d45c3b42f794"
+    },
+    {
+      "pattern": "2c:a5:9c",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d2b54c06eb60159d"
     },
     {
       "pattern": "d4:11:d6",
@@ -938,16 +1556,46 @@
       "argus_record_id": "d3d7435f125dce2a"
     },
     {
+      "pattern": "64:fd:29",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "d4743d62379c60fe"
+    },
+    {
+      "pattern": "a4:14:37",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d4d0d3dd8cefc1c6"
+    },
+    {
+      "pattern": "50:e5:38",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d4d84a7c780d9f2c"
+    },
+    {
       "pattern": "1748CLTC82",
       "pattern_type": "drone_id_prefix",
       "description": "EVO Lite drone",
       "argus_record_id": "d5e89b1358e8855d"
     },
     {
+      "pattern": "24:28:fd",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d6f3d7d3ff77f166"
+    },
+    {
       "pattern": "1587A051000075Y",
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
       "argus_record_id": "d9dc189420ddf7ad"
+    },
+    {
+      "pattern": "08:a1:89",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "da02abe044afa7a1"
     },
     {
       "pattern": "1866ASDD000",
@@ -992,6 +1640,24 @@
       "argus_record_id": "e1b5d4dcc06bc8a6"
     },
     {
+      "pattern": "44:a6:42",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "e1c38dd506ca4c8e"
+    },
+    {
+      "pattern": "98:8b:0a",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "e218e98b85a9c489"
+    },
+    {
+      "pattern": "08:ed:ed",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "e279f350247e4678"
+    },
+    {
       "pattern": "1581F5YH",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -1010,6 +1676,12 @@
       "argus_record_id": "e42c67030014e18e"
     },
     {
+      "pattern": "fc:b6:9d",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "e42fe3fb86db5644"
+    },
+    {
       "pattern": "1792C000000",
       "pattern_type": "drone_id_prefix",
       "description": "uAvionix drone",
@@ -1022,10 +1694,58 @@
       "argus_record_id": "e4fb964f328c8b50"
     },
     {
+      "pattern": "e0:df:13",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "e5a45f040fdd99ac"
+    },
+    {
+      "pattern": "fc:7d:6c",
+      "pattern_type": "oui",
+      "description": "Hanwha Vision cctv_camera",
+      "argus_record_id": "e5a983a933038c01"
+    },
+    {
+      "pattern": "0c:fa:22",
+      "pattern_type": "oui",
+      "description": "Flipper Devices Inc. hacking_tool",
+      "argus_record_id": "e6b81bce3e1c2ccb"
+    },
+    {
       "pattern": "a0:14:3d",
       "pattern_type": "oui",
       "description": "Parrot drone",
       "argus_record_id": "e6f69467b726c22c"
+    },
+    {
+      "pattern": "58:50:ed",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "e6f82cec1f31ad2c"
+    },
+    {
+      "pattern": "c0:6d:ed",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "e72646d02ac255f3"
+    },
+    {
+      "pattern": "a8:ca:87",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "e7bc0e3ee7a101f3"
+    },
+    {
+      "pattern": "98:9d:e5",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "e884fd21047d873d"
+    },
+    {
+      "pattern": "4c:99:e8",
+      "pattern_type": "oui",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "e8a45e5cf67e59dc"
     },
     {
       "pattern": "1863FPEG8219",
@@ -1088,6 +1808,12 @@
       "argus_record_id": "efe1bee911f951d9"
     },
     {
+      "pattern": "98:f1:12",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "f032fd6afafb222b"
+    },
+    {
       "pattern": "1596A34",
       "pattern_type": "drone_id_prefix",
       "description": "Dronetag drone",
@@ -1106,16 +1832,46 @@
       "argus_record_id": "f328f535d79393e4"
     },
     {
+      "pattern": "04:03:12",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "f38c9944bff9a46b"
+    },
+    {
+      "pattern": "18:80:25",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "f3f2fb1a6ea89823"
+    },
+    {
+      "pattern": "28:ea:5b",
+      "pattern_type": "oui",
+      "description": "Samsara automotive_telematics",
+      "argus_record_id": "f3ff1b2d55db94c2"
+    },
+    {
       "pattern": "00:17:f3",
       "pattern_type": "oui",
       "description": "Harris persistent_surveillance",
       "argus_record_id": "f7818dc81f66d28a"
     },
     {
+      "pattern": "ac:cb:51",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "f7adcc5e684e2866"
+    },
+    {
       "pattern": "00:00:c3",
       "pattern_type": "oui",
       "description": "Harris persistent_surveillance",
       "argus_record_id": "f7e1c05b9ea4dbd3"
+    },
+    {
+      "pattern": "44:47:cc",
+      "pattern_type": "oui",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "f8ac9acae142c2df"
     },
     {
       "pattern": "b8:a4:4f",
@@ -1128,6 +1884,12 @@
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "fa714fb1bf249f86"
+    },
+    {
+      "pattern": "00:90:b8",
+      "pattern_type": "oui",
+      "description": "Rohde & Schwarz imsi_catcher",
+      "argus_record_id": "faa980ee8bacc032"
     },
     {
       "pattern": "f0:82:c0",
