@@ -14,9 +14,9 @@ ARGUS IS IN ACTIVE DEVELOPMENT AND IS NOT COMPLETE. MAY NOT BE 100% ACCURATE AND
 
 ## What is Argus
 
-Argus tracks the model numbers, MAC ranges, FCC grantee codes, hostnames, certificate identifiers, and BLE company IDs of surveillance equipment used by US law enforcement and adjacent operators — like **Hikvision CCTV cameras**, **Cellebrite forensic extraction devices**, **Anduril counter-drone systems**, **Flock Safety license plate readers**, **Geotab fleet telematics**, **Rohde & Schwarz IMSI catchers**, and dozens of other surveillance vendor categories.
+Argus tracks the model numbers, MAC ranges, FCC grantee codes, hostnames, certificate identifiers, and BLE company IDs of surveillance equipment used by US law enforcement and adjacent operators. That includes **Hikvision CCTV cameras**, **Cellebrite forensic extraction devices**, **Anduril counter-drone systems**, **Flock Safety license plate readers**, **Geotab fleet telematics**, **Rohde & Schwarz IMSI catchers**, and dozens of other surveillance vendor categories.
 
-It's a database, not a real-time monitor. Argus enumerates the wireless and regulatory fingerprints of fixed and mobile surveillance equipment so that downstream tools — Lynceus, Rayhunter, or any other RF scanner — can alert when a matching device is detected nearby. Every entry is derived from public sources: regulatory registries, public-records procurement data, open-source intelligence repositories, manufacturer documentation, and academic research.
+Argus is a database rather than a real-time monitor. It lists the wireless and regulatory fingerprints of fixed and mobile surveillance equipment so that downstream tools (Lynceus, Rayhunter, or any other RF scanner) can alert when a matching device is detected nearby. Every entry comes from public sources: regulatory registries, public-records procurement data, open-source intelligence repositories, manufacturer documentation, and academic research.
 
 Tools to surveil people are abundant; tools to detect surveillance are not. The asymmetry favors the surveillor. Argus narrows the gap by making vendor identifiers queryable in a single place with full provenance for every row.
 
@@ -24,16 +24,16 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.3:
+At v1.6.6:
 
-- **41,716 active canonical identifiers** — the things you actually query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, etc.). v1.6.6 is the first net-INSERT cycle since the Wave-J era: it adds **+208 registry-sourced identifiers** (MAC-321) drawn from public IEEE OUI/MA-L/M/S, FCC EAS grantee, and fccid.io registries plus an authorized read-only Dahua/Axis firmware binwalk, lifting active identifiers 41,508 → 41,716 with no schema change. (The prior several cycles were row-shape-preserving: v1.6.3 was a notes/severity/code-correctness cycle (CP40+CP41+CP42 §1+§2) and v1.6.4 was a single notes/data Correction Pass (CP43), neither a row-shape change.)
+- **41,716 active canonical identifiers** — the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release added 208 of these from public registry and firmware sources; see the release notes below for the breakdown.
 - **126 manufacturers** — surveillance vendors classified by what they make
 - **74 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
 - **17 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, etc.)
 - **58 identifier types** — the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
 - **201 behavioral signatures** — cellular-control-plane patterns associated with IMSI-catcher detection
 
-An *identifier* is a piece of data that uniquely identifies a vendor's hardware on a wire or radio band — like an OUI (the first 24 bits of a MAC address that maps to a manufacturer), a BLE service UUID broadcast by a device, an FCC grantee code on a regulatory filing, or a hostname embedded in a vendor's companion app. When a downstream scanner observes one of these in the wild, it can use Argus to identify what vendor and what device category produced it.
+An *identifier* is a piece of data that pinpoints a vendor's hardware on a wire or radio band: an OUI (the first 24 bits of a MAC address, which maps to a manufacturer), a BLE service UUID broadcast by a device, an FCC grantee code on a regulatory filing, or a hostname embedded in a vendor's companion app. When a downstream scanner observes one of these in the wild, it can use Argus to identify what vendor and what device category produced it.
 
 A *manufacturer* is a vendor that ships surveillance equipment. A *device category* is the kind of equipment (ALPR, body cam, etc.). A *source* is a public dataset that contributed observations to Argus.
 
@@ -43,7 +43,7 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 305 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced/inferred sources EXCEPT for the CP39 §7.5 carve-out for named Flock-hunt project sources (see `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 39), with the CP40 Lynceus chip-vendor OUI remediation applied and the CP43 selective revert of CP40 re-promoting the 19 EthanThePhoenix38 Cohort A rows to `severity='high'` (159 → 178; see Correction Pass 43). v1.6.6 adds **+127** from the MAC-321 WS-1 OUI promotion — 127 concrete-category OUI rows landing (178 → 305); the 6 unknown-category OUIs stay out per the §8.4 unknown-category carve-out, and all 19 new mac_range rows stay out per the §4.4 mac_range expand-or-drop rule. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export_high_confidence.json` | 305 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
 | `exports/argus_export.json` | 719 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
 | `exports/argus_export.csv` | 41,716 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 125 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
@@ -82,28 +82,19 @@ Argus covers surveillance equipment used by US law enforcement and adjacent oper
 - Real-time deployment status. Argus tells you what an identifier *is*; not whether it's currently deployed near you. That's the downstream scanner's job.
 - Vendors whose surveillance offering isn't public-record attestable. If we can't trace it back to a citable source, it doesn't ship.
 
-Coverage is intentionally narrow at the per-category baseline — Argus has 126 vendors, but most categories have 3-13 vendors in the lexicon, not hundreds. Expansion comes via community contributions and future research waves.
+Coverage is intentionally narrow per category. Argus has 126 vendors, but most categories list 3-13 vendors, not hundreds. Expansion comes from community contributions and future research.
 
 ## Most recent release
 
-**v1.6.6** is the first net-INSERT data ship since the Wave-J era — a **+208 active-identifier** registry-and-firmware enrichment cycle on top of v1.6.4 (v1.6.5 was skipped per board numbering; v1.6.6 stacks directly on v1.6.4). The +208 came from a board-run Claude Code scrape of public registries (IEEE OUI/MA-L/M/S, the FCC EAS grantee dataset, fccid.io) plus a read-only Dahua/Axis firmware binwalk — public / OSINT / authorized sources only, no active probing. Active identifiers move **41,508 → 41,716**; total identifiers move 41,890 → 42,098 (demoted/superseded stays 382). Schema version is **unchanged at 31** (no migration — this is a data-only INSERT cycle); source count (74), manufacturer count (126), and behavioral-signature count (201) are all unchanged. The +208 lands across seven identifier types — `oui` 444 → 577, `mac_range` 17,806 → 17,825, `fcc_grantee_code` 95 → 139, `vendor_controlled_hostname` 12,055 → 12,060, `firmware_sha256_hash` 17 → 20, `product_family_codename` 265 → 267, and `firmware_branded_string` 30 → 32. On the consumer side, the Lynceus high-confidence export moves **178 → 305** (+127 concrete-category OUI rows from the MAC-321 WS-1 promotion; the 6 unknown-category OUIs and all 19 new `mac_range` rows are held out per the §8.4 unknown-category carve-out and §4.4 mac_range expand-or-drop rule respectively), the standard export moves 592 → 719 (+127), and the CSV full export tracks all 41,716 active rows; the behavioral export stays 125. **Governance:** Cisco Meraki's 57 OUIs were EXCLUDED as a multi-purpose vendor under §8.4, and a separate new-vendor batch (+1,112) was DEFERRED to v1.6.7. v1.6.6 was operator-ratified at the **MAC-321 Phase-D** gate (`approve_clean`). See [`CHANGELOG.md`](CHANGELOG.md) v1.6.6 and `docs/engineering/BIBLE_AMENDMENTS.md` for the formal record.
+**v1.6.6** is the most recent release, and the first in a while to add new identifiers. It brings in **208 new active identifiers** (the active count moves 41,508 → 41,716), drawn from public registries (the IEEE OUI allocation lists, the FCC grantee dataset, and fccid.io) plus a read-only analysis of Dahua and Axis camera firmware. Every source was public, open, or authorized; nothing came from probing live devices. The database structure is unchanged (schema version stays 31), and the source count (74), manufacturer count (126), and behavioral-signature count (201) all hold steady. For anyone running a scanner, the high-confidence export grows from 178 to 305 entries and the standard export from 592 to 719; the behavioral-signatures export stays at 125. A larger batch of new vendors is queued for the next release. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` for the full record.
 
 ### Prior release — v1.6.4
 
-**v1.6.4** is a single-Correction-Pass notes / data cycle on top of v1.6.3. **CP43 (MAC-309 Path II)** selectively reverts CP40 for one cohort: the 19 EthanThePhoenix38 Cohort A rows (ids 22810-22828, source sid=39, `geographic_scope='US'`) move from CP40's conf=60 / `severity=NULL` state back to **conf=85 / `severity='high'`**. The revert is justified by (a) Lynceus's notification UX now displaying the matched OUI alongside the Flock label — closing the disambiguation gap that drove the original chip-vendor FP report — and (b) the empirical negative-evidence curation discipline on sid=39. The `notes.crowdsourced_breadth_tier='chip_vendor_oui_24'` tier is PRESERVED on each row and a `notes.cp43_basis` marker is appended additively (CP40 history retained). **Apply-time invariant:** CP43's promotion depends on the Lynceus OUI-in-notification UX; if Lynceus drops that display, CP43 must be re-examined. Schema version stays **31** (no migration — CP43 is notes / data only); active identifier count at the v1.6.4 ship was **41,508** (the change was an UPDATE on 19 rows, no INSERT / DELETE). The `severity='high'` cohort moves 255 → **274** (+19); the high-confidence Lynceus export moved 159 → **178** (+19, exactly the Cohort A set; CP7 US filter unchanged). Cohort B (ids 35618-35635, sid=20, `geographic_scope=NULL`) stays under CP40 — explicitly out of scope, carried forward. See [`CHANGELOG.md`](CHANGELOG.md) v1.6.4 and `docs/engineering/BIBLE_AMENDMENTS.md` Correction Pass 43.
+**v1.6.4** was a data-correction release on top of v1.6.3. It added no new identifiers (the active count stayed at 41,508). Instead it restored 19 license-plate-reader rows to high confidence after an earlier release had downgraded them, once the Lynceus scanner began showing the matched hardware ID alongside the Flock label. The high-confidence export grew from 159 to 178 entries as a result, and the schema version stayed at 31. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
 ### Prior release — v1.6.3
 
-**v1.6.3** is a notes / severity / code-correctness cycle on top of the v1.6.2 ship plus the v1.6.2.1 narrow-fork content rolled in per the board's "hold and push as v1.6.3" directive. Schema version advances 30 → 31 (the `identifiers.severity` column added by v1.6.2.1's mig-0031 CP39 is now the v1.6.3 ship schema). Source / manufacturer counts stay at 74 / 126. Active identifier count is unchanged at 41,508 — v1.6.3 is data-truth-preserving at the identifier-row level (no INSERT / DELETE; the cycle is column-add, notes-backfill, and consumer-export-correctness):
-
-- **CP40 — Lynceus chip-vendor OUI remediation (MAC-309).** A Lynceus-Warden field-finder run on 2026-06-02 surfaced that 37 rows in the CP39-lifted Flock-hunt cohort were Wi-Fi chip-vendor OUIs misclassified as Flock-attested. CP40 lands an apply-time post-mutation that flips that slice out of `severity='high'` (CP39's narrow-scope baseline 292 → 255 active high-severity rows post-CP40). The remediation uses an in-flight migration with a `notes.cp40_marker` audit anchor.
-- **CP41 — §11 #20 ratification + Avigilon/Pelco arm-flip paper-trail closure (MAC-301).** §11 #20 codifies the Operator-DML-override pattern (n=2 minimum reached at v1.6.0; structurally an §11 sub-rule, not a new CP slot's data mutation). Sibling backfill on `manufacturers.notes.arm_flip_history` for id=6 (Avigilon) + id=254 (Pelco) closes the paper-trail loop the originals left open at admission time.
-- **CP42 §1+§2 — export-correctness fixes (MAC-300).** §1 restores the `imei_tac` DROP disposition in `db/validation/export_lynceus.py` §4.4 consumer mapping (the §4.4 mapping had been mis-annotated). §2 restores the CP35 §215 supersedure: the `DROPPED_REASONS` identity-keyed convention had been overwritten by a positional-key regression; CP42 §2 restores it.
-- **Rolled-in v1.6.2.1 narrow-fork content (CP39).** The `identifiers.severity` column + the §7.5 Flock-hunt floor carve-out for named Flock-hunt project sources (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar) originally landed at commit `233a634` 2026-06-03 and were held per the board's "hold and push as 1.6.3" directive. v1.6.3 ships them as part of the v1.6.3 stack.
-
-Net active identifier delta vs v1.6.2: **41,508 → 41,508** (0 net; v1.6.3 is a column-add + notes-backfill + code-correctness cycle). Net `severity='high'` delta: 0 → 292 (CP39 narrow-scope landing) → 255 (CP40 Lynceus FP-slice removed).
-
-See [`CHANGELOG.md`](CHANGELOG.md) for the version-by-version history, and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the formal change record (Correction Pass 39 + 40 + 41 + 42 §1 + 42 §2; CP39 — severity column + Flock-hunt floor carve-out; CP40 — Lynceus chip-vendor OUI remediation; CP41 — §11 #20 ratification + Avigilon/Pelco arm-flip backfill; CP42 §1 — `imei_tac` Lynceus §4.4 disposition; CP42 §2 — `DROPPED_REASONS` identity-keyed convention restored).
+**v1.6.3** was a correctness and cleanup release. It added a `severity` field to each identifier and fixed several issues in how the export files are generated, but it did not change the identifier count (still 41,508). The schema version moved from 30 to 31 to record the new field. See [`CHANGELOG.md`](CHANGELOG.md) and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) for the full breakdown.
 
 ## Quickstart
 
@@ -114,7 +105,7 @@ python3 argus_cli.py status                        # show DB path, schema versio
 python3 argus_cli.py query e4:aa:ea:80:a1:9b       # lookup a Flock Safety ALPR MAC
 ```
 
-The repo ships with `db/argus.db` and the export files already populated; the read-path needs no `pip install`. See [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) for fresh-DB rebuild from migrations, source-ingest pipeline dependencies, and optional API keys.
+The repo ships with `db/argus.db` and the export files already populated, so reading the data needs no `pip install`. See [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) for rebuilding the database from scratch, the source-ingest pipeline dependencies, and optional API keys.
 
 ## How to contribute
 
@@ -130,13 +121,13 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.3).
+- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.6).
 - [`CREDITS.md`](CREDITS.md) — per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) — developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) — how Argus integrates sources, confidence model, dedup logic.
 - [`docs/engineering/DATA_DICTIONARY.md`](docs/engineering/DATA_DICTIONARY.md) — schema reference for every table, column, enum value.
 - [`docs/engineering/PROJECT_BIBLE.md`](docs/engineering/PROJECT_BIBLE.md) — formal canonical specification.
-- [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) — append-only amendment log (Correction Pass + SAR entries).
+- [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) — append-only log of changes to the project's rules.
 
 ## Downstream consumers
 
@@ -169,17 +160,17 @@ Every active identifier traces back to:
 3. **A `confidence` integer** in 0-99 with corroboration-lift math when independent second sources arrive
 4. **Per-row `notes` JSON** carrying license posture, promotion-time citation, and audit-trail anchors
 
-**No fabrication.** If a source doesn't yield concrete evidence, the answer is "no record" — not "plausible record." See [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) §7 for the full discipline.
+**No fabrication.** If a source doesn't yield concrete evidence, the answer is "no record," not "plausible record." See [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) §7 for the full discipline.
 
 ---
 
 ## How I built this
 
-Argus is the result of many long days and longer nights of iterative work across multiple machines — Windows dev boxes for some scraping and analysis work, Linux dev machines and a Linux server for the database, orchestration, and most agent work. The build process spans research, scraping, validation, schema design, license posture, discipline framework, and the audit trail that backs every promotion. The substantive growth from a 514-row baseline to over 41,000 active identifiers happened across roughly five-plus weeks of compressed work; the architectural framework that makes those promotions trustworthy took longer.
+Argus is the result of many long days and longer nights of iterative work across multiple machines: Windows dev boxes for some scraping and analysis, Linux dev machines and a Linux server for the database, orchestration, and most agent work. The build spans research, scraping, validation, schema design, license posture, the discipline framework, and the audit trail that backs every entry. The dataset grew from a 514-row baseline to over 41,000 active identifiers across roughly five-plus weeks of compressed work; the framework that makes those entries trustworthy took longer.
 
 ### Operator-led orchestration
 
-I plan and orchestrate this project myself, using Claude chat as a strategic-planning collaborator, paperclipai as the agent orchestration layer, and Claude Code as the execution agent across multiple specialist roles (extraction worker, source worker, validator, database architect, orchestrator). I have final decision authority on everything that lands in this repo. Strategic direction, architectural decisions, source-admission disputes, license posture, schema changes, and discipline-framework evolution are all operator-ratified before they commit.
+I plan and orchestrate this project myself, using Claude chat as a strategic-planning collaborator, paperclipai as the agent orchestration layer, and Claude Code as the execution agent across several specialist roles (data extraction, source gathering, validation, schema design, and overall coordination). I have final decision authority on everything that lands in this repo. Strategic direction, architectural decisions, source-admission disputes, license posture, schema changes, and discipline-framework evolution are all operator-ratified before they commit.
 
 The AI agents are highly capable executors with substantial scoping autonomy inside the constraints I set. They surface findings, propose decompositions, escalate when something needs ratification, and run extensive verification work I couldn't do at scale manually. But they don't decide canonical contract. I do.
 
@@ -189,13 +180,13 @@ This was not vibe-coded. Argus has 38 documented amendments to its canonical con
 
 Two areas surfaced data that wasn't otherwise aggregated anywhere queryable:
 
-**Vendor app decompilation.** I downloaded Android APKs of setup and admin apps published by surveillance-equipment vendors (Flock Safety, Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot) and analyzed the binaries for embedded identifier patterns — BLE service UUIDs, MAC address prefixes, vendor-specific protocol fields, default device names. Vendor setup apps need to recognize and connect to their own equipment, so they ship with the identifiers needed to do that. Decompiling public app-store binaries surfaced this information directly. This is legal reverse-engineering of publicly-distributed software under 17 USC §1201(j) + 37 CFR §201.40(b), but it required actually doing the work rather than waiting for vendors to publish identifier schemas (they don't).
+**Vendor app decompilation.** I downloaded Android APKs of setup and admin apps published by surveillance-equipment vendors (Flock Safety, Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot) and analyzed the binaries for embedded identifier patterns: BLE service UUIDs, MAC address prefixes, vendor-specific protocol fields, and default device names. Vendor setup apps need to recognize and connect to their own equipment, so they ship with the identifiers needed to do that. Decompiling public app-store binaries surfaced this information directly. This is legal reverse-engineering of publicly-distributed software under 17 USC §1201(j) + 37 CFR §201.40(b), but it required doing the work rather than waiting for vendors to publish identifier schemas (they don't).
 
 **GitHub researcher-repo aggregation.** Surveillance equipment has been studied by independent researchers for years — drone RID protocol work (alphafox02/DragonSync), cellular intercept detection (EFForg/rayhunter), BLE stalking-tracker research (seemoo-lab/AirGuard), FAA Remote ID database mirrors (jlrjr's wrapper), and more. The data exists across these projects but had never been pulled into a single queryable database with provenance discipline. Argus aggregates it: every identifier traces back to the specific researcher repo, the specific commit, the specific file path, with proper attribution under the original licenses. This is meta-research synthesis rather than primary discovery, but it makes a large amount of distributed researcher work actually usable.
 
 ### The discipline framework
 
-The most substantive thing I built isn't the database. It's the framework that makes the database verifiable.
+The most substantial thing I built is the framework that makes the database verifiable, more than the database itself.
 
 Every active identifier carries source attribution, confidence scoring, source-type classification, and a chain of corroboration. The framework includes hard rules that prevent fabrication (every identifier must trace to a concrete public source), PII discipline (individual-attributed registrations stay held, not promoted), and downstream-consumer protection (downstream scanners receive only high-confidence canonical data). The framework evolved with the work — each substantive amendment is documented with case studies showing what went wrong (or could have gone wrong) and why the rule exists.
 
@@ -205,7 +196,7 @@ Building this with AI tools is what made it possible at the scale and velocity i
 
 ## Support the Project
 
-This project was built as a hobby by one person, a couple computers, and a couple of LLMs. It burned through quite a bit of token cost and mass amounts of personal time — but it was worth it. If Argus saves you some time or you just think it's cool, consider tossing a few sats my way. No pressure, but coffee and compute aren't free.
+This project was built as a hobby by one person, a couple of computers, and a couple of LLMs. It burned through a fair bit of token cost and a lot of personal time, but it was worth it. If Argus saves you some time, or you just think it's cool, consider tossing a few sats my way. No pressure, but coffee and compute aren't free.
 
 - **Star this repo** — it's free and it helps others find the project
 - **Submit an issue or PR** — bug reports and feature ideas welcome

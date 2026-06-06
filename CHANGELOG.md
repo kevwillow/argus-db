@@ -16,11 +16,11 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ## v1.6.6 — 2026-06-06
 
-A **data ship** layered on top of v1.6.4 (v1.6.5 skipped — board version numbering): the first net-INSERT cycle since the Wave-J era. [MAC-321](/MAC/issues/MAC-321) "6.6 NEW DATA GOAL" promoted **+208** validator-clean, registry-sourced identifiers harvested by a board-run Claude Code scrape (WS-1 zero-friction registry pulls + a Dahua/Axis firmware binwalk). Active identifier count **41,508 → 41,716**. **No schema migration** (schema_version stays **31**), **0 new `identifier_type` slots**, **0 new sources** (74), **0 new manufacturers** (126 — all 33 attributed vendors already registered). Operator-ratified at the Phase-D gate ([MAC-321](/MAC/issues/MAC-321) decision card `24a9de82`, option `approve_clean`) under the v1.6.2-style gated discipline (independent CEO re-validation against the live DB; backup-first apply; push operator-gated).
+A **data release** layered on top of v1.6.4 (v1.6.5 was skipped in the version numbering). It promoted **+208** validated, registry-sourced identifiers gathered from public registry pulls plus a firmware unpack of Dahua and Axis devices. Active identifier count **41,508 → 41,716**. **No schema migration** (schema_version stays **31**), **0 new `identifier_type` slots**, **0 new sources** (74), **0 new manufacturers** (126 — all 33 attributed vendors were already registered). The release was operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
 
 ### What's new
 
-- **MAC-321 WS-1 promotion (+208).** Net-new public-registry identifiers, each carrying `source_url` + extraction method + `last_verified`, deduped against live canonical (0 collisions), confidence bands §8.2-conformant (`primary_registry` 80–85, `regulatory` 88–90, `manufacturer_doc` 85). By type: `oui` **+133** (444→577), `mac_range` **+19** (17,806→17,825), `fcc_grantee_code` **+44** (95→139), `vendor_controlled_hostname` **+5** (12,055→12,060), `firmware_sha256_hash` **+3** (17→20), `product_family_codename` **+2** (265→267), `firmware_branded_string` **+2** (30→32). Top vendors: Hikvision, Dahua, Hanwha, Trimble, Bosch Security, Uniview, Axon, Samsara, Verkada, Avigilon. Applied via `db/validation/mac321_v166_promote.py`; `extraction_runs` id **128**.
+- **Registry promotion (+208).** Net-new public-registry identifiers, each carrying `source_url` + extraction method + `last_verified`, deduped against the live database (0 collisions), confidence bands §8.2-conformant (`primary_registry` 80–85, `regulatory` 88–90, `manufacturer_doc` 85). By type: `oui` **+133** (444→577), `mac_range` **+19** (17,806→17,825), `fcc_grantee_code` **+44** (95→139), `vendor_controlled_hostname` **+5** (12,055→12,060), `firmware_sha256_hash` **+3** (17→20), `product_family_codename` **+2** (265→267), `firmware_branded_string` **+2** (30→32). Top vendors: Hikvision, Dahua, Hanwha, Trimble, Bosch Security, Uniview, Axon, Samsara, Verkada, Avigilon.
 - **Firmware binwalk (5 of the 12 firmware-attached rows).** A public Dahua IPC-HX5X3X "Rhea" build + Dahua Eos4 + Axis 206W firmware were `binwalk`/`unsquashfs`'d read-only; the **3 `firmware_sha256_hash` rows retain SHA-256 provenance and the binaries are not committed** (gitignored working data). Hardcoded `easy4ip.com` / `cpplusddns.com` / `axiscam.net` hostnames + `Rhea`/`Eos4` codenames extracted. No DRM circumvention (the obfuscated 2025 build was **not** bypassed).
 - **Governance dispositions (operator-ratified):** **Cisco Meraki ×57 OUIs excluded** — vendor-wide registrant spans MV cameras + MR/MS/MX networking; cannot isolate the surveillance line (existing §8.4 multi-purpose-vendor discipline). New-vendor **+1,112** (15 surveillance brands + 13 SoC component vendors + 860 Reolink firmware hashes) **deferred to v1.6.7** pending manufacturer registration + a component-vendor attribution policy + a Reolink-volume decision. Deferrals confirmed: `cid` (0 surveillance registrants), `matter_vendor_id` (full 432-vendor DCL pull → ~2 adjacent, already covered), Nordic GATT vocab, USB/PCI capture VIDs (skip-and-surface).
 
@@ -40,20 +40,20 @@ A **data ship** layered on top of v1.6.4 (v1.6.5 skipped — board version numbe
 
 ### Bible amendments
 
-- **None this cycle (bible read-only per dispatch).** No new rule was introduced — the Meraki exclusion applies existing §8.4 multi-purpose-vendor discipline and the deferrals are scheduling, not doctrine. **CP candidate flagged (not written):** a §4.4 clarification that `mac_range` promotions do not contribute to the Lynceus watchlist (expand-or-drop), so registry-OUI cycles should project Lynceus deltas from concrete-category `oui` rows only.
+- **None this cycle.** No new rule was introduced — the Meraki exclusion applies the existing §8.4 multi-purpose-vendor discipline, and the deferrals are scheduling, not doctrine. **Possible future clarification flagged (not yet written):** a §4.4 note that `mac_range` promotions do not add to the Lynceus watchlist (they are expanded or dropped), so registry-OUI cycles should project Lynceus changes from concrete-category `oui` rows only.
 
 ### Halts encountered
 
-- **None.** Independent re-validation, backup-first apply, coverage-matrix + export regen all clean (export worker's MAC-45 reconciliation: 0 halts).
+- **None.** The independent re-validation, backup-first apply, and the coverage-matrix and export regeneration all came back clean (0 halts).
 
 ## v1.6.4 — 2026-06-05
 
-A **notes / data ship** layered on top of v1.6.3 — a single Correction Pass (CP43) that selectively reverts CP40 for one negative-evidence-validated /24 OUI cohort. **No INSERT/DELETE and no schema migration this cycle**; the only DB mutation is a confidence/severity flip plus an additive `notes` marker on 19 rows, landed in v1.6.4 Stage 1 (commit `3b6eb32`). Active identifier count stays at **41,508**; schema_version stays **31**.
+A **notes / data update** layered on top of v1.6.3: a single correction that restores a higher confidence level and `severity='high'` to one validated group of 19 identifiers, reversing a down-weighting from the previous release. **No records were added or removed, and there was no schema migration this cycle**; the only change is a confidence and severity adjustment plus an added `notes` marker on those 19 rows, landed at commit `3b6eb32`. Active identifier count stays at **41,508**; schema_version stays **31**.
 
 ### What's new
 
-- **CP43 — Selective revert of CP40 for the EthanThePhoenix38 Cohort A (MAC-309 Path II).** Board Path-II ratification ([MAC-309](/MAC/issues/MAC-309) comment `e8cd574e`, after CEO research report `eab3639e`) re-examined CP40's `chip_vendor_oui_24` demotion in light of (a) Lynceus's UX update now displaying the matched OUI alongside the Flock label in notifications — closing the disambiguation gap that triggered the original Lynceus-Warden FP report — and (b) the empirical negative-evidence curation discipline on source sid=39 (EthanThePhoenix38/flock-you-camera-detector). The 19 Cohort A rows (ids 22810-22828, `geographic_scope='US'`) move from CP40's conf=60 / severity=NULL state back to **conf=85 / severity='high'**, with `notes.crowdsourced_breadth_tier='chip_vendor_oui_24'` PRESERVED and a new `notes.cp43_basis='path_ii_negative_evidence_curation_with_lynceus_disambiguation'` marker appended (CP40 history retained additively alongside). Cohort B (ids 35618-35635, sid=20 colonelpanichacks/flock-you, `geographic_scope=NULL`) stays under CP40 §1 — explicitly out of scope.
-- **Apply-time invariant (load-bearing).** CP43's confidence promotion depends on Lynceus's OUI-in-notification UX. If Lynceus regresses that UX (drops the OUI display so users see only the bare vendor label), the original CP40 false-positive concern returns and **CP43 must be re-examined**. This invariant is carried in CHANGELOG, CREDITS, and `docs/engineering/BIBLE_AMENDMENTS.md`.
+- **Restored confidence for the EthanThePhoenix38 detection data.** A follow-up review re-examined the earlier `chip_vendor_oui_24` down-weighting in light of two things: (a) a Lynceus interface update that now shows the matched OUI alongside the Flock label in alerts, which closes the ambiguity that prompted the original false-positive report; and (b) careful curation of the source data from the EthanThePhoenix38/flock-you-camera-detector project, which removed false positives. The 19 rows (ids 22810-22828, `geographic_scope='US'`) move from the earlier conf=60 / severity=NULL state back to **conf=85 / severity='high'**, keeping the existing `notes.crowdsourced_breadth_tier='chip_vendor_oui_24'` value and adding a new `notes.cp43_basis='path_ii_negative_evidence_curation_with_lynceus_disambiguation'` marker (the earlier history is retained alongside it). A second group (ids 35618-35635, from the colonelpanichacks/flock-you source, `geographic_scope=NULL`) keeps the earlier down-weighting and was deliberately left out of scope.
+- **Important dependency.** This confidence restoration depends on the Lynceus interface continuing to show the matched OUI in alerts. If that display is dropped so users see only the bare vendor label, the original false-positive concern returns and **this change must be re-examined**. This caveat is recorded in the changelog, CREDITS, and `docs/engineering/BIBLE_AMENDMENTS.md`.
 
 ### Schema
 
@@ -75,18 +75,18 @@ A **notes / data ship** layered on top of v1.6.3 — a single Correction Pass (C
 
 ### Halts encountered
 
-- None. v1.6.4 Stage 1 (the 19-row DB mutation) landed at commit `3b6eb32` and was independently corroborated by the Validator ([MAC-318](/MAC/issues/MAC-318) — 8/8 read-only battery PASS against HEAD `3b6eb32`) before this Stage 2 docs / export work began.
+- None. The 19-row change landed at commit `3b6eb32` and passed an independent read-only verification battery (8/8) against that commit before the documentation and export work began.
 
 ## v1.6.3 — 2026-06-03
 
-A **notes / severity / code-correctness ship** layered on top of the v1.6.2 corpus. **No INSERT/DELETE on `identifiers` this cycle** — every change is column-add, notes-backfill, or consumer-export-correctness. The v1.6.2.1 narrow-fork content (CP39 severity column + Flock-hunt floor carve-out) is rolled in per the board's "hold and push as v1.6.3" directive; v1.6.2.1 was never separately tagged. Active identifier count stays at **41,508**; schema_version advances **30 → 31** (the mig-0031 column add from v1.6.2.1 is the v1.6.3 ship schema).
+A **notes, severity, and code-correctness update** layered on top of the v1.6.2 data. **No records were added or removed from `identifiers` this cycle** — every change is a column addition, a notes update, or a consumer-export fix. It also includes the v1.6.2.1 content (the new severity column and the Flock-hunt floor carve-out), which had been held back and never separately tagged. Active identifier count stays at **41,508**; schema_version advances **30 → 31** (the column added in v1.6.2.1 is the schema this release ships).
 
 ### What's new
 
-- **CP40 — Lynceus chip-vendor OUI remediation (MAC-309).** A Lynceus-Warden field-finder run on 2026-06-02 surfaced that 37 rows in the CP39-lifted Flock-hunt cohort were Wi-Fi chip-vendor OUIs misclassified as Flock-attested. CP40 (Option 1 with CP39-marker in-flight migration form) flips that slice out of `severity='high'`; an apply-time post-mutation anchored at `notes.cp40_marker` records the remediation. The `severity='high'` cohort moves from the CP39 narrow-scope landing of 292 active rows → 255 active rows post-CP40.
-- **CP41 — §11 #20 ratification + Avigilon/Pelco arm-flip paper-trail closure (MAC-301).** §11 #20 codifies the **Operator-DML-override pattern** as load-bearing bible-text (mandatory per-statement authorization, single-statement scope, drift-remediation-only, mandatory pre/post-state capture, mandatory backup file + sha, mandatory cross-reference in handoff, read-only thereafter). Sibling backfill on `manufacturers.notes.arm_flip_history` for id=6 (Avigilon) and id=254 (Pelco) closes the paper-trail loop those arm-flips left open at original admission time. The CP41 apply-time correction (γ → γ″ rephrase) refines descriptive-vs-load-bearing token discipline inline at the amendment-log entry.
-- **CP42 §1+§2 — Export-correctness fixes (MAC-300).** §1 restores the canonical `imei_tac` DROP disposition in `db/validation/export_lynceus.py` §4.4 consumer mapping (the §4.4 entry had been mis-annotated). §2 restores CP35 §215's `DROPPED_REASONS` identity-keyed convention (a positional-key regression had overwritten it). Both ship as a single coordinated CP slot with two sub-sections.
-- **Rolled-in v1.6.2.1 narrow-fork content (CP39).** The `identifiers.severity` column (`high`/`medium`/`low`/`NULL`) + the §7.5 Flock-hunt floor carve-out for named Flock-hunt project sources (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar — 10 named sources) originally landed at commit `233a634` 2026-06-03 and were held per board "hold and push as 1.6.3" directive. v1.6.3 ships them as part of the v1.6.3 stack. See the v1.6.2.1 section below for the full narrow-scope detail.
+- **Chip-vendor OUI correction.** A field-finder run on 2026-06-02 found that 37 rows in the lifted Flock-hunt group were Wi-Fi chip-vendor OUIs wrongly marked as Flock-attested. This change moves those rows out of `severity='high'`, with a `notes.cp40_marker` value recording the correction. The `severity='high'` group moves from 292 active rows down to 255.
+- **Documented the operator-override rule and closed two vendor paper-trails.** A new rule in the project spec governs how an operator may make a single manual database correction to fix drift: it must be individually authorized, limited to one statement, captured before and after, backed up with a checksum, cross-referenced in the handoff, and read-only afterward. Separately, the `manufacturers.notes.arm_flip_history` records for Avigilon (id=6) and Pelco (id=254) were filled in to document ownership changes that were left unrecorded when those vendors were first added.
+- **Export-correctness fixes.** Two fixes to the Lynceus export code (`db/validation/export_lynceus.py`): the first restores the correct handling that drops `imei_tac` rows from the consumer mapping (a mis-annotation had changed it); the second restores the identity-keyed `DROPPED_REASONS` convention after a regression had overwritten it with positional keys.
+- **Included the v1.6.2.1 content.** The new `identifiers.severity` column (`high`/`medium`/`low`/`NULL`) and the §7.5 floor carve-out for named Flock-hunting project sources (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar — 10 named sources) first landed at commit `233a634` on 2026-06-03 and were held back; v1.6.3 is their first public ship. See the v1.6.2.1 section below for the full detail.
 
 ### Schema
 
@@ -113,9 +113,9 @@ A **notes / severity / code-correctness ship** layered on top of the v1.6.2 corp
 
 ### Halts encountered
 
-- **MAC-301 dispatch slot-name staleness.** The original MAC-301 dispatch named §11 #18-pending as the bible-amendment slot; the live amendment landed as §11 #20 per CP32 §7 (sibling stacking shifted the §11 sub-rule numbering between dispatch authoring and apply-time). Resolved at apply-time by inline rephrase; flagged at CP41 ratification.
-- **MAC-301 post-commit backfill predicate γ → γ″ rephrase.** CP41 apply-time descriptive-vs-load-bearing token discipline refined inline at BIBLE_AMENDMENTS.md:5523-5531 (the predicate text shifted from load-bearing to descriptive form to match the actual backfill scope).
-- **MAC-300 CP-slot collision with MAC-301.** Sibling-stacked dispatches race-authored the same CP slot (MAC-300 had targeted CP41; MAC-301 reached the slot first). Resolved by CP-slot reservation: MAC-300 → CP42 §1+§2; MAC-301 keeps CP41. See [[feedback_cp_number_collision_check_before_landing]] for the discipline.
+- **Amendment-slot numbering shift.** A bible amendment was first drafted for one rule slot (§11 #18) but landed at another (§11 #20) because other amendments claimed the intervening numbers first. It was corrected when the amendment was applied.
+- **Wording correction in an amendment.** A clause in the same amendment was reworded when applied so its text matched the actual scope of the change.
+- **Amendment-numbering collision.** Two separate changes were drafted against the same amendment number; the conflict was resolved by giving them distinct numbers.
 
 ## v1.6.2.1 — 2026-05-30
 
@@ -133,7 +133,7 @@ A **schema-bump patch** that adds a new optional `severity` column to the `ident
 
 ### What stayed the same (intentional)
 
-- **CP38 takes precedence on third-party detection patterns.** 19 `ssid_pattern` rows that CP38 (v1.6.0) demoted to `inferred/50` because they're third-party detection guesses about *other* vendors (Sierra Wireless, Cradlepoint, DJI, Parrot, Skydio, Autel, Grayshift, Magnet Forensics, MSAB, Oxygen Forensics) **retain their `inferred/50` classification AND keep `severity=NULL`** — even though they live in a Flock-hunting repo. The CP39 carve-out is for Flock-Safety-attributable data, not for arbitrary content hosted in those repos.
+- **Earlier re-labeling takes precedence on third-party detection patterns.** 19 `ssid_pattern` rows that an earlier release (v1.6.0) re-labeled as `inferred/50` because they're third-party detection guesses about *other* vendors (Sierra Wireless, Cradlepoint, DJI, Parrot, Skydio, Autel, Grayshift, Magnet Forensics, MSAB, Oxygen Forensics) **keep their `inferred/50` classification AND keep `severity=NULL`** — even though they live in a Flock-hunting repository. This release's carve-out is for Flock-Safety-attributable data, not for arbitrary content hosted in those repositories.
 - **False-positive caught.** One IEEE OUI row attributed to `Flock Audio Inc.` (a pro audio company, unrelated to Flock Safety surveillance) was excluded from the carve-out and the severity tag.
 
 ### By the numbers, compared with v1.6.2
@@ -153,22 +153,22 @@ A **schema-bump patch** that adds a new optional `severity` column to the `ident
 
 ### Technical notes
 
-- Schema migration `0031_cp39_severity_column_flock_carveout.sql`. Pattern: SQLite table-rebuild (CP21 cumulative-full-enum). All prior `CHECK` constraints carried forward verbatim.
+- Schema migration `0031_cp39_severity_column_flock_carveout.sql`. Pattern: SQLite table-rebuild. All prior `CHECK` constraints carried forward verbatim.
 - Bible amendment: CP39 in `docs/engineering/BIBLE_AMENDMENTS.md` (the §7.5 floor carve-out rule + the CP38 precedence sub-clause + the false-positive handling).
-- Audit anchor: `extraction_runs.id=127` (full dispatch JSON in `notes`).
+- Audit record: the change is logged in the `extraction_runs` table.
 - Pre-action backup: `db/argus.db.pre_mig0031_20260530T151838Z.bak` (project's internal archive).
 
 ## v1.6.2 — 2026-05-29
 
-This release adds **116 net-new identifiers** to the v1.6.0 corpus — deepening identifier coverage for existing surveillance-camera vendors (Hikvision, Uniview, Reolink, Bosch Security Systems, Verkada, Hanwha Vision, Dahua, Axis Communications, Avigilon, Eagle Eye Networks, Milestone, Rhombus, FLIR, WatchGuard Video) and the surveillance-camera SoC supply chain (HiSilicon, Texas Instruments, Ambarella, Novatek) across firmware build strings, chipset codenames, vendor-controlled hostnames, FCC equipment-class codes, network-discovery patterns, and other identifier types. The release also strips 36 documentation-pattern placeholder rows from the prior Wave G/H v1 CCTV integration.
+This release adds **116 net-new identifiers** to the v1.6.0 corpus — deepening identifier coverage for existing surveillance-camera vendors (Hikvision, Uniview, Reolink, Bosch Security Systems, Verkada, Hanwha Vision, Dahua, Axis Communications, Avigilon, Eagle Eye Networks, Milestone, Rhombus, FLIR, WatchGuard Video) and the surveillance-camera SoC supply chain (HiSilicon, Texas Instruments, Ambarella, Novatek) across firmware build strings, chipset codenames, vendor-controlled hostnames, FCC equipment-class codes, network-discovery patterns, and other identifier types. The release also removes 36 documentation-pattern placeholder rows from the earlier CCTV integration.
 
 **No schema migration, no new sources, no new manufacturers** — the new identifiers landed under existing source coverage (vendor portals + cert-transparency queries + FCC equipment-grantee filings + NVD CVE entries + companion-app APK extracts + IEEE OUI + web.archive.org), so schema stays at 30 and source / manufacturer counts stay at 74 / 126.
 
 ### What changed
 
-- **Corrected promotion of 116 identifiers (MAC-279 Phase 6).** A revisited 116-row promotion landed in identifier id range `[42593, 42708]`, plus 8 confidence- or provenance-only lifts on previously-staged rows (two true cross-source corroboration lifts: id=27468 85→90, id=29328 90→95; six provenance-only lifts holding their prior confidence). The original Phase 5 emission would have over-lifted one row above the per-source confidence ceiling for `manufacturer_app` evidence; a mechanical cite-re-verification against the bible caught it, and the corrected pipeline held the disposition. Every lifted row carries an audit note citing the MAC-288 ratification.
+- **Corrected promotion of 116 identifiers.** A revisited 116-row promotion landed in identifier id range `[42593, 42708]`, plus 8 confidence- or provenance-only lifts on previously-staged rows (two true cross-source corroboration lifts: id=27468 85→90, id=29328 90→95; six provenance-only lifts holding their prior confidence). An earlier version of this promotion would have lifted one row above the per-source confidence ceiling for `manufacturer_app` evidence; a mechanical re-verification against the spec caught it, and the corrected pipeline held the disposition. Every lifted row carries an audit note recording the correction.
 
-- **Placeholder strip of 36 Wave G/H v1 CCTV rows (MAC-291).** 36 documentation-pattern rows from the Wave G/H v1 CCTV integration were demoted via a self-loop on `superseded_by` with a structured audit object. Distribution: 18 OUI placeholders (`00:00:00` ×15, `01:01:01` ×2, `ff:ff:ff` ×1) plus 18 network-discovery-protocol-pattern placeholders (`224.0.0.251` ×3, `1900` ×2, `5353` ×1, `8000` ×12). All 36 rows are excluded from every Lynceus consumer export.
+- **Removal of 36 placeholder CCTV rows.** 36 documentation-pattern rows from the earlier CCTV integration were demoted (marked as superseded) with a structured audit record. Distribution: 18 OUI placeholders (`00:00:00` ×15, `01:01:01` ×2, `ff:ff:ff` ×1) plus 18 network-discovery-protocol-pattern placeholders (`224.0.0.251` ×3, `1900` ×2, `5353` ×1, `8000` ×12). All 36 rows are excluded from every Lynceus consumer export.
 
 By the numbers, compared with the previous release:
 
@@ -188,9 +188,9 @@ By the numbers, compared with the previous release:
 ### Technical notes
 
 - Schema version stays at 30. No migrations.
-- The latest bible amendments remain CP37 (the `network_surveillance` device category, schema-mutating at v1.6.0) and CP38 (the FlockYou crowdsourced-SSID reconcile, data-only at v1.6.0). No new CP entries this release.
+- The latest bible amendments remain the `network_surveillance` device-category addition (schema-changing, at v1.6.0) and the FlockYou crowdsourced-SSID reconciliation (data-only, at v1.6.0). No new amendments this release.
 - Full amendment records remain in the engineering bible (`docs/engineering/BIBLE_AMENDMENTS.md`).
-- Backup of the pre-strip database snapshot is captured in `extraction_runs.id=126` (`notes.backup_sha256`); the on-disk backup file is held in the project's internal archive (not in the canonical source tree).
+- A backup of the pre-removal database snapshot is recorded in the `extraction_runs` table (`notes.backup_sha256`); the backup file itself is held in the project's internal archive, not in the public source tree.
 - The 116 corrected-promote candidates this cycle were initially surfaced by a trial run of the Hermes / minimax m2.7 extraction tooling; the final records landed through the canonical extraction → validate → promotion pipeline.
 
 ## v1.6.1 — 2026-05-25

@@ -14,8 +14,8 @@ Concrete examples of what's in the lexicon:
 
 - **Hikvision** and **Dahua** — Chinese CCTV camera giants whose equipment is widely deployed across US law enforcement (and is the subject of the NDAA §889 federal procurement ban). Their NDAA attribution carries through into Argus.
 - **Cellebrite** — Israeli forensic device-extraction vendor whose UFED tools are used to extract data from seized phones.
-- **Anduril Industries** — counter-drone systems sold to CBP and DoD; admitted at v1.5.0 as a multi-product hub with several arm-split candidates queued for future versions.
-- **Flock Safety** — automated license plate reader (ALPR) cameras deployed across thousands of US municipalities; the e4:aa:ea:80:a1:9b MAC is row id=1 in the canonical database (the first identifier Argus ever attested).
+- **Anduril Industries** — counter-drone systems sold to CBP and DoD; added at v1.5.0, with several of its product lines set to be split into separate entries in future versions.
+- **Flock Safety** — automated license plate reader (ALPR) cameras deployed across thousands of US municipalities; its e4:aa:ea:80:a1:9b MAC was the very first identifier Argus recorded.
 - **Geotab**, **Verizon Connect**, **Samsara**, **Motive**, **Lytx**, **Omnitracs** — fleet telematics vendors that produce vehicle-tracking devices used in both commercial fleets and police vehicle deployments.
 - **Rohde & Schwarz** — German signals-intelligence vendor whose products include IMSI catchers and adjacent cellular intercept equipment.
 - **Elbit Systems of America**, **General Atomics**, **TCOM**, **Persistent Surveillance Systems** — aerostat and persistent aerial surveillance platforms.
@@ -36,15 +36,15 @@ Argus ships four export files alongside the source SQLite database. Pick the one
 
 This is the strict export. It only contains rows where:
 
-- The `confidence` score is **at least 70 on a 0-99 scale** (the high-confidence cutoff codified at §7.5 of the project bible, `PROJECT_BIBLE.md` line 664; never ≥80).
+- The `confidence` score is **at least 70 on a 0-99 scale** (the high-confidence cutoff).
 - The source isn't `crowdsourced` or `inferred` — community researcher repositories and cohort-prediction admissions are excluded from this export to keep the false-positive rate low.
-- The `device_category` isn't `unknown` — multi-purpose vendors that can't cleanly map to a single surveillance category (e.g., Northrop Grumman, Lockheed Martin) are excluded by design (§11 #13 hard rule).
+- The `device_category` isn't `unknown` — multi-purpose vendors that don't map cleanly to a single surveillance category (for example, Northrop Grumman or Lockheed Martin) are excluded by design.
 
 **Use this export when:** you're feeding a runtime scanner (Lynceus) that's going to alert on matches. You want the false-positive rate to be as close to zero as feasible.
 
 ### `exports/argus_export.json` (592 rows at v1.6.2)
 
-The standard export. Same shape as the high-confidence export but with a looser confidence floor (≥30) and the US-scope filter applied (CP7 + CP11 dual-artifact contract).
+The standard export. Same shape as the high-confidence export, but with a looser confidence floor (≥30) and a US-scope filter applied.
 
 **Use this export when:** you want broader scanner coverage and you're willing to accept more false positives, or you're doing analytical work where you want to see the medium-confidence rows.
 
@@ -58,7 +58,7 @@ The rich-import export. All active rows, including the `device_category='unknown
 
 ### `exports/argus_export_behavioral_signatures.json` (125 rows at v1.6.2)
 
-The sibling export for cellular-band scanners. Where the other three exports key on wire-observable patterns (MACs, OUIs, BLE UUIDs, etc.), this one keys on cellular-control-plane behavioral patterns associated with IMSI-catcher detection. Rayhunter consumes this format. Drawn from 201 active `behavioral_signatures` rows at v1.6.2 ship; the 76 row drop reflects the `below_confidence_threshold` + `unknown_category` drop-bucket reconciliation.
+The sibling export for cellular-band scanners. Where the other three exports key on wire-observable patterns (MACs, OUIs, BLE UUIDs, and the like), this one keys on cellular-control-plane behavioral patterns associated with IMSI-catcher detection. Rayhunter consumes this format. It draws from the 201 active behavioral-signature patterns; the 125 that meet the threshold rules ship in this export.
 
 ### What each row represents
 
@@ -81,8 +81,8 @@ Every row in the JSON exports carries a stable shape:
 - **`description`** is a human-readable label — usually "Vendor Name — model or category context".
 - **`argus_record_id`** is a 16-hex-character stable identifier. It survives source-attribution changes, confidence drift, and most schema migrations. Bind to this when you need to track a specific row across export versions.
 - **`confidence`** is the 0-99 confidence score. ≥70 = strong attribution from at least one canonical source. ≥85 = cross-corroborated by independent second source.
-- **`device_category`** is what kind of equipment this is (`alpr`, `imsi_catcher`, `body_cam`, `drone`, `cctv_camera`, `persistent_surveillance`, `through_wall_radar`, `gps_tracker`, `network_surveillance` (added at v1.6.2 / CP37 for lawful-intercept / monitoring-center vendors), etc. — **17 values total at v1.6.2**, of which 16 carry promoted rows).
-- **`source_type`** is the source-class band (`primary_registry`, `regulatory`, `academic`, `manufacturer_doc`, `manufacturer_app`, `crowdsourced`, `inferred`, `judicial_filing`, `disclosure_filing`, `procurement_disclosure`, etc. — **13 values total at v1.6.2** on both `identifiers` and `sources` after the CP36 dual-table parity close). Different bands have different confidence ceilings.
+- **`device_category`** is what kind of equipment this is (`alpr`, `imsi_catcher`, `body_cam`, `drone`, `cctv_camera`, `persistent_surveillance`, `through_wall_radar`, `gps_tracker`, `network_surveillance` (added at v1.6.2 for lawful-intercept and monitoring-center vendors), and others — **17 values total at v1.6.2**, of which 16 carry promoted rows).
+- **`source_type`** is the source-class band (`primary_registry`, `regulatory`, `academic`, `manufacturer_doc`, `manufacturer_app`, `crowdsourced`, `inferred`, `judicial_filing`, `disclosure_filing`, `procurement_disclosure`, and others — **13 values total at v1.6.2** on both the `identifiers` and `sources` tables). Different bands have different confidence ceilings.
 
 ---
 
@@ -118,7 +118,7 @@ You're researching what surveillance equipment a specific agency has procured.
 3. Cross-reference the vendor names against the `manufacturers` table to see which surveillance-equipment vendors that agency has procured from.
 4. Pull `deployment_observations` for any direct deployment evidence (camera locations, ALPR placements) — note the `LICENSE` column on each row; commercial use of CC-BY-NC-SA-4.0 rows (EFF Atlas of Surveillance) requires honoring the non-commercial clause.
 
-For Lynceus-specific integration shapes (file paths, refresh cadence, `severity_overrides.yaml`), the integration handoff bundle is referenced from [`engineering/BIBLE_AMENDMENTS.md`](engineering/BIBLE_AMENDMENTS.md) (Correction Pass 7-11 + SAR-10).
+For Lynceus-specific integration shapes (file paths, refresh cadence, `severity_overrides.yaml`), see the integration handoff notes referenced from [`engineering/BIBLE_AMENDMENTS.md`](engineering/BIBLE_AMENDMENTS.md).
 
 ---
 
@@ -126,15 +126,15 @@ For Lynceus-specific integration shapes (file paths, refresh cadence, `severity_
 
 Argus is canonical-enrichment-strong and deployment-detection-modest. Here's what that means in practice.
 
-**The lexicon is comprehensive.** At v1.6.2 there are **126 manufacturers** in the canonical curated list (`manufacturers` table; was 92 at v1.5.0 ship — net +34 across the v1.5.x → v1.6.x cycles). Every major surveillance category (ALPR, IMSI catchers, body cams, drones, CCTV, ankle monitors, fleet telematics, counter-drone, persistent surveillance, through-wall radar, gunshot detection, face recognition, forensic extraction, and lawful-intercept / network surveillance — added as a discrete `device_category` at v1.6.2 / CP37) has multiple representative vendors. The cohort_prediction wave at v1.5.0 specifically targeted under-represented categories — counter-UAS went from 4 to 13+ vendors, fleet telematics from 0 to 6, etc.; the Wave K admission at v1.6.0 / v1.6.2 added Pen-Link / SS8 Networks / Cognyte / Utimaco LIMS / Polaris Wireless / Trovicor under the new `network_surveillance` category.
+**The lexicon is comprehensive.** At v1.6.2 there are **126 manufacturers** in the curated list (up from 92 at the v1.5.0 release). Every major surveillance category has multiple representative vendors: ALPR, IMSI catchers, body cams, drones, CCTV, ankle monitors, fleet telematics, counter-drone, persistent surveillance, through-wall radar, gunshot detection, face recognition, forensic extraction, and lawful-intercept / network surveillance (added as its own category at v1.6.2). An earlier expansion targeted under-represented categories: counter-drone vendors went from 4 to 13+, and fleet telematics from 0 to 6. A later round added Pen-Link, SS8 Networks, Cognyte, Utimaco LIMS, Polaris Wireless, and Trovicor under the new `network_surveillance` category.
 
-**The deployment-detection surface is still modest.** Most identifiers in the canonical state are **FCC grantee codes**, **vendor-controlled hostnames**, **certificate SAN entries from crt.sh CT logs**, and **IEEE OUI allocations** — they confirm "this vendor exists and ships product" but they don't give a runtime scanner a wire-observable signature to alert on. The most-deployment-actionable identifier classes — full MACs, BSSIDs, SSID patterns, BLE service UUIDs, drone Remote-ID prefixes — represent a smaller fraction of the database. That gap is being closed by companion-app static-analysis waves (Wave G/H/I) but progress is per-cycle and per-vendor.
+**The deployment-detection surface is still modest.** Most identifiers in the canonical state are **FCC grantee codes**, **vendor-controlled hostnames**, **certificate SAN entries from crt.sh CT logs**, and **IEEE OUI allocations** — they confirm "this vendor exists and ships product" but they don't give a runtime scanner a wire-observable signature to alert on. The most-deployment-actionable identifier classes — full MACs, BSSIDs, SSID patterns, BLE service UUIDs, drone Remote-ID prefixes — represent a smaller fraction of the database. That gap is closing through ongoing companion-app analysis, but progress comes vendor by vendor.
 
 **Why this is:** the most directly-deployable identifiers (BLE UUIDs, BSSIDs, SSID patterns) typically come from vendor companion-app decompilation, which is permitted but labor-intensive. Argus has decompiled the companion apps for Flock Safety, Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot, and a handful of others. There are many more vendors whose apps haven't been analyzed yet — that's where future research waves will land their gains.
 
-**Coverage by category is uneven.** ALPR coverage is deep (DeFlock contributed 101,597 deployment observations). IMSI catcher behavioral signature coverage is moderate (201 patterns, mostly from the Marlin academic foundation). CCTV camera vendor coverage is broad but mostly at the FCC grantee + corporate-entity level, not the per-model-MAC level. Counter-drone coverage is broad at the vendor level (11 admitted at v1.5.0) but thin at the identifier level — these are mostly DoD/CBP suppliers without consumer-facing companion apps to decompile.
+**Coverage by category is uneven.** ALPR coverage is deep (DeFlock contributed 101,597 deployment observations). IMSI catcher behavioral signature coverage is moderate (201 patterns, mostly from the Marlin academic foundation). CCTV camera vendor coverage is broad but mostly at the FCC grantee + corporate-entity level, not the per-model-MAC level. Counter-drone coverage is broad at the vendor level (11 vendors as of v1.5.0) but thin at the identifier level, since these are mostly DoD and CBP suppliers without consumer-facing apps to decompile.
 
-**Geographic scope is US-centric.** Argus's source admission process applies a US-scope filter at the export level (CP7) and prioritizes US-anchored sources (FCC EAS, FAA, SAM.gov, USAspending.gov, SEC EDGAR, US state Secretary-of-State registries). International vendors are admitted when they ship to US law enforcement (Hikvision, Dahua, Cellebrite, Rohde & Schwarz, Elbit, Parrot, DJI), but the deployment data is primarily US.
+**Geographic scope is US-centric.** Argus's source-admission process applies a US-scope filter at the export level and prioritizes US-anchored sources (FCC EAS, FAA, SAM.gov, USAspending.gov, SEC EDGAR, and US state Secretary-of-State registries). International vendors are included when they ship to US law enforcement (Hikvision, Dahua, Cellebrite, Rohde & Schwarz, Elbit, Parrot, DJI), but the deployment data is primarily US.
 
 ---
 
@@ -144,9 +144,9 @@ A few things Argus is deliberately not:
 
 - **Not a real-time monitor.** Argus is the lexicon; the scanner is the monitor. If you want to know whether there's a Hikvision camera 30 meters from you right now, you need a scanner like Lynceus with Argus's exports loaded as its watchlist. Argus alone can't tell you what's nearby.
 - **Not a "spy on my neighbor" tool.** Every row in the canonical database is keyed to *vendor and equipment category*, not to *individuals or specific deployments*. We can tell you that a given FCC grantee code maps to "Flock Safety, ALPR" — we don't track which neighborhoods Flock has cameras deployed in.
-- **Not a deanonymization tool.** Argus has a strict no-PII discipline (§11 #3 of the project bible). Officer names, badge numbers, home addresses, registered-agent-with-residential-address entries — all excluded by default. Class B sustained holds exist for ambiguous cases where individual-shaped names lack corporate-entity confirmation.
+- **Not a deanonymization tool.** Argus has a strict no-PII rule. Officer names, badge numbers, home addresses, and registered agents listed at a residential address are all excluded by default. Ambiguous cases, where a name might belong to a person rather than a company, are held back rather than published.
 - **Not exhaustive.** With **126 manufacturers** in the canonical curated list and **41,508 active identifiers** at v1.6.2 ship (vs 92 / 35,812 at v1.5.0), we miss many surveillance vendors that ship to US LE. Notable gaps include some smaller regional ALPR vendors, many of the long tail of body-cam OEMs, and most non-US drone vendors. Coverage expansion happens via community contribution and per-cycle research waves.
-- **Not a fabrication machine.** If we don't have a citable public source for an identifier, the answer is "no record" — not "plausible record." The discipline framework actively prevents AI-agent-driven fabrication; every promotion gates through a structural-anchor attestation requirement.
+- **Not a fabrication machine.** If we don't have a citable public source for an identifier, the answer is "no record" — not "plausible record." The discipline framework prevents AI-driven fabrication; every entry must clear a source-attestation check before it is published.
 - **Not authoritative for vendor disputes.** Vendors who disagree with their inclusion or categorization can open a GitHub issue. Argus's doctrinal grounding is *Feist v. Rural Telephone Service* (factual data not copyrightable) + 17 USC §1201(j) (security research exemption) + 37 CFR §201.40(b) + nominative fair use.
 
 ---
@@ -154,12 +154,12 @@ A few things Argus is deliberately not:
 ## 6. Where to learn more
 
 - [`../README.md`](../README.md) — Project overview, headline metrics, downstream consumer architecture.
-- [`../CHANGELOG.md`](../CHANGELOG.md) — Version-by-version release history (v1.0.0 through v1.6.2).
+- [`../CHANGELOG.md`](../CHANGELOG.md) — Version-by-version release history (v1.0.0 through v1.6.6).
 - [`../CREDITS.md`](../CREDITS.md) — Per-source attribution, per-vendor canonical lexicon, license posture for downstream consumers.
 - [`engineering/METHODOLOGY.md`](engineering/METHODOLOGY.md) — How source admissions work, confidence model, dedup logic, provenance discipline.
 - [`engineering/DATA_DICTIONARY.md`](engineering/DATA_DICTIONARY.md) — Schema reference (every table, column, enum value).
 - [`engineering/PROJECT_BIBLE.md`](engineering/PROJECT_BIBLE.md) — Formal canonical specification (the source-of-truth at any disagreement).
-- [`engineering/BIBLE_AMENDMENTS.md`](engineering/BIBLE_AMENDMENTS.md) — Append-only amendment log (Correction Pass + SAR entries; case studies).
+- [`engineering/BIBLE_AMENDMENTS.md`](engineering/BIBLE_AMENDMENTS.md) — Append-only log of changes to the project's rules, with case studies.
 - [`engineering/SETUP.md`](engineering/SETUP.md) — Developer setup (clone, verify, run migrations, regenerate exports).
 
 ---
@@ -168,12 +168,12 @@ A few things Argus is deliberately not:
 
 External contribution is welcome. The discipline framework is documented in [`engineering/PROJECT_BIBLE.md`](engineering/PROJECT_BIBLE.md); the layered amendments are in [`engineering/BIBLE_AMENDMENTS.md`](engineering/BIBLE_AMENDMENTS.md). Concrete contribution paths:
 
-- **New identifier rows.** Submit a GitHub PR adding `raw_observations` rows that cite a concrete file-path source URL (not a bare repo URL). The promotion gate from `raw_observations` to canonical `identifiers` is structural-anchor + confidence-band ceiling per the source_type involved.
-- **New sources.** Open a GitHub issue proposing the source. Argus distinguishes 13 source_type bands; each has a different confidence ceiling. Crowdsourced GitHub repositories are admitted under the Feist facts-only regime (NO_LICENSE_DECLARED permitted; compilation arrangement NOT republished).
-- **New device categories or identifier types.** Schema-impacting changes coordinate with the amendment process — every new `device_category` or `identifier_type` value pairs with a Correction Pass entry and a schema migration.
+- **New identifier rows.** Submit a GitHub PR adding `raw_observations` rows that cite a concrete file-path source URL (not a bare repo URL). Before a row becomes a canonical identifier, it must trace to that cited source and clear the confidence ceiling for its source type.
+- **New sources.** Open a GitHub issue proposing the source. Argus distinguishes 13 source_type bands; each has a different confidence ceiling. Crowdsourced GitHub repositories are accepted under the Feist facts-only regime (NO_LICENSE_DECLARED permitted; compilation arrangement NOT republished).
+- **New device categories or identifier types.** Schema-impacting changes coordinate with the amendment process: every new `device_category` or `identifier_type` value pairs with an amendment-log entry and a schema update.
 - **Vendor attribution disputes.** Open a GitHub issue. Argus's discipline framework supports retroactive recategorization, supersession with audit trail, and per-row reclassification when new evidence arrives. The audit-trail tables (`source_reclassifications`, `confidence_history` in `notes`, `corroboration_chain` in `notes`) make every change reversible.
 - **Test the exports.** Pull the JSON and CSV exports and run them against your own scanner setup. If you find a false positive, open an issue with the `argus_record_id`, your observed environment, and any context that helps determine whether the row should be demoted or kept.
 
-For the formal specification of the contribution discipline (every contribution must trace to a concrete source URL with no PII, every promotion gates on band-ceiling + corroboration math, every schema change pairs with a `BIBLE_AMENDMENTS.md` entry), see [`engineering/PROJECT_BIBLE.md`](engineering/PROJECT_BIBLE.md) §11.
+For the formal specification of the contribution discipline (every contribution must trace to a concrete source URL with no PII, every promotion gates on band-ceiling + corroboration math, every schema change pairs with a `BIBLE_AMENDMENTS.md` entry), see [`engineering/PROJECT_BIBLE.md`](engineering/PROJECT_BIBLE.md).
 
 For developer environment setup (cloning, running migrations, regenerating exports, running the test suite), see [`engineering/SETUP.md`](engineering/SETUP.md).
