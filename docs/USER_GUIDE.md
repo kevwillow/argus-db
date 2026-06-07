@@ -154,7 +154,7 @@ A few things Argus is deliberately not:
 ## 6. Where to learn more
 
 - [`../README.md`](../README.md) — Project overview, headline metrics, downstream consumer architecture.
-- [`../CHANGELOG.md`](../CHANGELOG.md) — Version-by-version release history (v1.0.0 through v1.6.6).
+- [`../CHANGELOG.md`](../CHANGELOG.md) — Version-by-version release history (v1.0.0 through v1.6.5).
 - [`../CREDITS.md`](../CREDITS.md) — Per-source attribution, per-vendor canonical lexicon, license posture for downstream consumers.
 - [`engineering/METHODOLOGY.md`](engineering/METHODOLOGY.md) — How source admissions work, confidence model, dedup logic, provenance discipline.
 - [`engineering/DATA_DICTIONARY.md`](engineering/DATA_DICTIONARY.md) — Schema reference (every table, column, enum value).

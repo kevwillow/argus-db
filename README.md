@@ -24,7 +24,7 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.6:
+At v1.6.5:
 
 - **41,716 active canonical identifiers** — the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release added 208 of these from public registry and firmware sources; see the release notes below for the breakdown.
 - **126 manufacturers** — surveillance vendors classified by what they make
@@ -86,7 +86,7 @@ Coverage is intentionally narrow per category. Argus has 126 vendors, but most c
 
 ## Most recent release
 
-**v1.6.6** is the most recent release, and the first in a while to add new identifiers. It brings in **208 new active identifiers** (the active count moves 41,508 → 41,716), drawn from public registries (the IEEE OUI allocation lists, the FCC grantee dataset, and fccid.io) plus a read-only analysis of Dahua and Axis camera firmware. Every source was public, open, or authorized; nothing came from probing live devices. The database structure is unchanged (schema version stays 31), and the source count (74), manufacturer count (126), and behavioral-signature count (201) all hold steady. For anyone running a scanner, the high-confidence export grows from 178 to 305 entries and the standard export from 592 to 719; the behavioral-signatures export stays at 125. A larger batch of new vendors is queued for the next release. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` for the full record.
+**v1.6.5** is the most recent release, and the first in a while to add new identifiers. It brings in **208 new active identifiers** (the active count moves 41,508 → 41,716), drawn from public registries (the IEEE OUI allocation lists, the FCC grantee dataset, and fccid.io) plus a read-only analysis of Dahua and Axis camera firmware. Every source was public, open, or authorized; nothing came from probing live devices. The database structure is unchanged (schema version stays 31), and the source count (74), manufacturer count (126), and behavioral-signature count (201) all hold steady. For anyone running a scanner, the high-confidence export grows from 178 to 305 entries and the standard export from 592 to 719; the behavioral-signatures export stays at 125. A larger batch of new vendors is queued for the next release. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` for the full record.
 
 ### Prior release — v1.6.4
 
@@ -121,7 +121,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.6).
+- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.5).
 - [`CREDITS.md`](CREDITS.md) — per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) — developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) — how Argus integrates sources, confidence model, dedup logic.
