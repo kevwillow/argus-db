@@ -343,7 +343,7 @@ class ActiveRow:
     device_category: str
     manufacturer: str | None
     model: str | None
-    confidence: int
+    confidence: int | None  # MAC-336: NULL for rows staged without a §8.2 ceiling
     source_type: str
     source_url: str
     source_excerpt: str | None
@@ -622,8 +622,18 @@ def _classify_row(
         and row.identifier in PI_SELF_EXCLUDE_OUIS
     ):
         return "self_exclude_oui", []
-    # §7.5 — confidence floor.
-    if row.confidence < confidence_threshold:
+    # §7.5 — confidence floor. A NULL confidence (e.g. the Gate-1 v3 / MAC-334
+    # promotions staged without a §8.2 ceiling assignment) is treated as below
+    # ANY floor and binned `below_confidence_threshold`. The None-guard is the
+    # gate-level fix (NOT a load-time coercion): it excludes NULL-confidence
+    # rows from the confidence-gated JSON exports WITHOUT mutating
+    # `row.confidence`, so the rich-import CSV keeps the confidence column
+    # faithful to the DB (empty/NULL, not `0`). This mirrors
+    # `coverage_matrix.py`'s NULL→0 load-coercion at the *classification*
+    # layer — both modules bin a NULL-confidence row as
+    # `below_confidence_threshold`, so `_reconcile` agrees (it halts on any
+    # divergence). MAC-336.
+    if row.confidence is None or row.confidence < confidence_threshold:
         return "below_confidence_threshold", []
     # CP19 (§7.5) — high-conf-only source_type exclusion. A row reaching this
     # gate has cleared every prior static filter (incl. CP18's ≥70 floor for

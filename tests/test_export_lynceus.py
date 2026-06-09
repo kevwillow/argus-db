@@ -259,6 +259,40 @@ def test_classify_below_confidence_floor_30() -> None:
     assert bin_label == "below_confidence_threshold"
 
 
+def test_classify_null_confidence_is_below_threshold_both_floors() -> None:
+    """MAC-336 regression: a NULL `confidence` row reaching the §7.5 confidence
+    gate must bin as `below_confidence_threshold`, NOT raise ``TypeError``.
+
+    The 185 Gate-1 v3 / MAC-334 promotions were staged without a §8.2 ceiling
+    (``confidence IS NULL``) and were the first active rows to exercise the
+    ``None < int`` comparison at the classify gate. The None-guard treats NULL
+    as below ANY floor — verified for both the standard (≥30) and
+    high-confidence (≥70) thresholds. Mirrors `coverage_matrix.py`'s NULL→0
+    classification so `_reconcile` agrees on the bin.
+    """
+
+    # A ble_uuid row with a concrete (non-`unknown`) device_category clears
+    # every prior static gate (type maps to a pattern_type; category is not
+    # `unknown`; source_type is not procurement/excluded) and reaches the
+    # confidence floor — exactly the path the 11 active NULL-conf ble_uuid
+    # rows take. Pre-fix this raised TypeError.
+    for threshold in (30, 70):
+        bin_label, entries = _classify_row(
+            _row(
+                identifier="0000fe9f-0000-1000-8000-00805f9b34fb",
+                identifier_type="ble_uuid",
+                device_category="automotive_telematics",
+                manufacturer="Acme",
+                confidence=None,
+            ),
+            confidence_threshold=threshold,
+            apply_pi_self_exclude=(threshold == 70),
+            apply_excluded_source_type=(threshold == 70),
+        )
+        assert bin_label == "below_confidence_threshold"
+        assert entries == []
+
+
 def test_classify_pi_self_exclude_only_for_high_conf_file() -> None:
     """The Pi-OUI ban is only applied to the high-confidence file per §11 #12.
     The standard file lets the OUI through with description noting informational status."""
@@ -1462,6 +1496,111 @@ def test_csv_description_matches_json_description_single_source_of_truth(
             matched += 1
     # Wave-A Flock MAC survives to JSON; assert at least one match made.
     assert matched >= 1
+
+
+def _make_null_conf_synthetic_db(tmp_path: Path) -> Path:
+    """MAC-336 fixture: one normal surviving row + one NULL-confidence row.
+
+    Row 2 mirrors the 11 active Gate-1 v3 / MAC-334 `ble_uuid` promotions that
+    were staged without a §8.2 ceiling: a concrete-category, non-procurement
+    row whose ONLY disqualifier is `confidence IS NULL`. Pre-fix it crashed the
+    writer; post-fix it must (a) appear in the full CSV with an EMPTY confidence
+    cell, and (b) be excluded from both gated JSON feeds.
+    """
+
+    db_path = tmp_path / "argus.db"
+    con = sqlite3.connect(str(db_path))
+    con.executescript(SCHEMA_DDL)
+    con.execute(
+        "INSERT INTO identifiers (id, identifier, identifier_type, "
+        "device_category, manufacturer, confidence, source_url, source_type, "
+        "geographic_scope) "
+        "VALUES (1, 'aa:bb:cc:dd:ee:01', 'mac', 'alpr', 'Flock Safety', "
+        "80, 'http://e', 'manufacturer_doc', 'US')"
+    )
+    con.execute(
+        "INSERT INTO identifiers (id, identifier, identifier_type, "
+        "device_category, manufacturer, confidence, source_url, source_type, "
+        "geographic_scope) "
+        "VALUES (2, '0000fe9f-0000-1000-8000-00805f9b34fb', 'ble_uuid', "
+        "'automotive_telematics', 'Acme', NULL, 'http://e', "
+        "'manufacturer_doc', 'US')"
+    )
+    con.commit()
+    con.close()
+    return db_path
+
+
+def _make_null_conf_synthetic_mac45(tmp_path: Path) -> tuple[Path, Path]:
+    """MAC-45 reconciliation map for the NULL-confidence fixture: row 2 bins as
+    `below_confidence_threshold` in both files (matching the NULL→0 classify of
+    `coverage_matrix.py`)."""
+
+    matrix_md_path = tmp_path / "coverage_matrix.md"
+    matrix_md_path.write_text("# matrix seed\n", encoding="utf-8")
+    report_path = tmp_path / "coverage_matrix_report.json"
+    bins = {
+        "unknown_category": 0,
+        "procurement_only": 0,
+        "self_exclude_oui": 0,
+        "below_confidence_threshold": 1,
+        "oversized_mac_range": 0,
+        "ssid_pattern": 0,
+        "device_fingerprint": 0,
+        "geographic_scope_mismatch": 0,
+    }
+    tally = {
+        "drop_assignments": {"2": "below_confidence_threshold"},
+        "bins": bins,
+        "survivors": 1,
+        "reconciles": 2,
+    }
+    report_path.write_text(
+        json.dumps(
+            {
+                "drop_tally_standard": json.loads(json.dumps(tally)),
+                "drop_tally_high_confidence": json.loads(json.dumps(tally)),
+            }
+        ),
+        encoding="utf-8",
+    )
+    return report_path, matrix_md_path
+
+
+def test_null_confidence_row_csv_empty_and_excluded_from_gated(tmp_path: Path) -> None:
+    """MAC-336 end-to-end regression: a `confidence IS NULL` active row must NOT
+    crash the writer, must ride the full CSV with an EMPTY confidence cell (NOT
+    ``0``), and must be excluded from both confidence-gated JSON feeds."""
+
+    db_path = _make_null_conf_synthetic_db(tmp_path)
+    report_path, matrix_md_path = _make_null_conf_synthetic_mac45(tmp_path)
+    exports_dir = tmp_path / "exports"
+    # Pre-fix this `run()` raised TypeError on row 2's None < threshold compare.
+    run(
+        db_path=db_path,
+        exports_dir=exports_dir,
+        coverage_matrix_report_path=report_path,
+        coverage_matrix_md_path=matrix_md_path,
+    )
+
+    # CSV: both rows present; the NULL-confidence row's cell is EMPTY, not "0".
+    _, csv_rows = _read_cp11_csv(exports_dir / "argus_export.csv")
+    by_id = {row["id"]: row for row in csv_rows}
+    assert set(by_id) == {"1", "2"}
+    assert by_id["2"]["confidence"] == "", (
+        "NULL confidence must serialize as an empty CSV cell, not coerced to 0"
+    )
+    assert by_id["1"]["confidence"] == "80"
+
+    # Gated JSON feeds: row 2's SAR-10 id is absent from both.
+    null_arid = _sar10_hash("ble_uuid", "0000fe9f-0000-1000-8000-00805f9b34fb")
+    surviving_arid = _sar10_hash("mac", "aa:bb:cc:dd:ee:01")
+    for fname in ("argus_export.json", "argus_export_high_confidence.json"):
+        payload = json.loads((exports_dir / fname).read_text())
+        arids = {e["argus_record_id"] for e in payload["entries"]}
+        assert null_arid not in arids, f"NULL-conf row leaked into {fname}"
+        assert surviving_arid in arids, f"surviving row missing from {fname}"
+        assert payload["_meta"]["dropped_in_export"]["below_confidence_threshold"] == 1
 
 
 def test_coverage_report_has_lynceus_dual_artifact_section(tmp_path: Path) -> None:
