@@ -1,14 +1,14 @@
 {
   "_meta": {
     "argus_version": "31",
-    "exported_at": "2026-06-11T02:02:17Z",
+    "exported_at": "2026-06-11T04:03:02Z",
     "record_count": 322,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "652cfcd4-c90b-5cf4-b0ff-e21ea022c954",
-    "source_record_count": 42923,
+    "argus_run_id": "ac27b85a-b8ad-555f-8bb5-4098fc7da33a",
+    "source_record_count": 43002,
     "dropped_in_export": {
       "unknown_category": 33351,
       "ssid_pattern": 18,
@@ -47,7 +47,7 @@
       "asdstan_enum_value": 18,
       "dji_protocol_struct_format": 2,
       "gpt_partition_uuid": 3,
-      "chipset_codename": 16,
+      "chipset_codename": 95,
       "firmware_build_string": 19,
       "firmware_build_uuid": 1,
       "windows_installer_productcode_vendor_registered": 2,
