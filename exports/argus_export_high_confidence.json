@@ -1,22 +1,22 @@
 {
   "_meta": {
     "argus_version": "31",
-    "exported_at": "2026-06-09T22:44:25Z",
-    "record_count": 305,
+    "exported_at": "2026-06-11T02:02:17Z",
+    "record_count": 322,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "ceabbd71-aef7-5dfa-93f0-1dc59f33abea",
-    "source_record_count": 41901,
+    "argus_run_id": "652cfcd4-c90b-5cf4-b0ff-e21ea022c954",
+    "source_record_count": 42923,
     "dropped_in_export": {
-      "unknown_category": 33343,
+      "unknown_category": 33351,
       "ssid_pattern": 18,
       "device_fingerprint": 6,
       "ble_local_name": 21,
       "ble_characteristic": 13,
       "product_family_codename": 280,
-      "oversized_mac_range": 44,
+      "oversized_mac_range": 47,
       "icao_24bit_address": 2,
       "rf_channel": 24,
       "burst_cadence_ms": 0,
@@ -38,11 +38,11 @@
       "x509_cert_sha256_prefix": 255,
       "ble_adv_interval": 0,
       "ble_payload_offset": 0,
-      "firmware_sha256_hash": 20,
+      "firmware_sha256_hash": 880,
       "network_endpoint": 3411,
       "firmware_image_variant": 3,
       "qualcomm_chip_format_id": 1,
-      "firmware_branded_string": 31,
+      "firmware_branded_string": 142,
       "asdstan_message_type": 7,
       "asdstan_enum_value": 18,
       "dji_protocol_struct_format": 2,
@@ -55,7 +55,7 @@
       "vendor_controlled_hostname": 3259,
       "vendor_cloud_endpoint_url": 2,
       "vendor_controlled_hostname_deprecated": 4,
-      "fcc_grantee_code": 113,
+      "fcc_grantee_code": 136,
       "equipment_class_code": 6,
       "network_discovery_protocol_pattern": 11,
       "imei_tac": 0,
@@ -144,6 +144,12 @@
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
       "argus_record_id": "0b76b79ee41e4454"
+    },
+    {
+      "pattern": "a8:dc:5a",
+      "pattern_type": "oui",
+      "description": "Digital Watchdog cctv_camera",
+      "argus_record_id": "0bdc0ea088dc73ef"
     },
     {
       "pattern": "1581F5FK",
@@ -308,6 +314,12 @@
       "argus_record_id": "1c452b196c10dab1"
     },
     {
+      "pattern": "00:1b:d8",
+      "pattern_type": "oui",
+      "description": "Teledyne FLIR cctv_camera",
+      "argus_record_id": "1d3790c15c6e02f5"
+    },
+    {
       "pattern": "40:7a:a4",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -360,6 +372,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "24878ec45c235a6e"
+    },
+    {
+      "pattern": "00:10:be",
+      "pattern_type": "oui",
+      "description": "March Networks cctv_camera",
+      "argus_record_id": "2696d9e7b079decd"
     },
     {
       "pattern": "9c:5a:8a",
@@ -452,6 +470,12 @@
       "argus_record_id": "3378cee9e936f3e8"
     },
     {
+      "pattern": "00:0f:7c",
+      "pattern_type": "oui",
+      "description": "ACTi cctv_camera",
+      "argus_record_id": "33c85b959c645c2e"
+    },
+    {
       "pattern": "08:cc:81",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -504,6 +528,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Drone Defence drone",
       "argus_record_id": "37d874d245cbbac7"
+    },
+    {
+      "pattern": "ec:71:db",
+      "pattern_type": "oui",
+      "description": "Reolink cctv_camera",
+      "argus_record_id": "38c4f74ddde48c4b"
     },
     {
       "pattern": "1587A051000152S",
@@ -758,6 +788,12 @@
       "argus_record_id": "5c81e2e758befad5"
     },
     {
+      "pattern": "00:1f:54",
+      "pattern_type": "oui",
+      "description": "Lorex (Dahua OEM) cctv_camera",
+      "argus_record_id": "5c9301df572ebbaa"
+    },
+    {
       "pattern": "1748CJD2",
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
@@ -872,6 +908,12 @@
       "argus_record_id": "69deceaa2e9a639b"
     },
     {
+      "pattern": "00:13:56",
+      "pattern_type": "oui",
+      "description": "Teledyne FLIR cctv_camera",
+      "argus_record_id": "6a8e165b75ff809c"
+    },
+    {
       "pattern": "17207",
       "pattern_type": "drone_id_prefix",
       "description": "Leica Geosystems AG drone",
@@ -936,6 +978,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "71ecc067771452a6"
+    },
+    {
+      "pattern": "bc:51:fe",
+      "pattern_type": "oui",
+      "description": "Swann cctv_camera",
+      "argus_record_id": "7282462c13b9a135"
     },
     {
       "pattern": "bc:32:5f",
@@ -1160,10 +1208,22 @@
       "argus_record_id": "8b0f35f2151ea3f9"
     },
     {
+      "pattern": "00:03:c5",
+      "pattern_type": "oui",
+      "description": "Mobotix cctv_camera",
+      "argus_record_id": "8b240a3ad909ab11"
+    },
+    {
       "pattern": "1798F1132400",
       "pattern_type": "drone_id_prefix",
       "description": "Sentera drone",
       "argus_record_id": "8b4c4b0cdefe9b3a"
+    },
+    {
+      "pattern": "00:65:1e",
+      "pattern_type": "oui",
+      "description": "Amcrest cctv_camera",
+      "argus_record_id": "8b9e5c15186c8ca9"
     },
     {
       "pattern": "179060902",
@@ -1230,6 +1290,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "WISPR drone",
       "argus_record_id": "963af54f43ea3736"
+    },
+    {
+      "pattern": "9c:8e:cd",
+      "pattern_type": "oui",
+      "description": "Amcrest cctv_camera",
+      "argus_record_id": "96adf4c25895f64c"
     },
     {
       "pattern": "1581F1ZN",
@@ -1320,6 +1386,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "a950fe125ae6ddc7"
+    },
+    {
+      "pattern": "00:13:e2",
+      "pattern_type": "oui",
+      "description": "GeoVision cctv_camera",
+      "argus_record_id": "a9885a22bc965ed3"
     },
     {
       "pattern": "f8:ce:07",
@@ -1434,6 +1506,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "c4204745fcff47f5"
+    },
+    {
+      "pattern": "a0:60:32",
+      "pattern_type": "oui",
+      "description": "Amcrest cctv_camera",
+      "argus_record_id": "c49333a6c5160b10"
     },
     {
       "pattern": "94:08:53",
@@ -1826,6 +1904,12 @@
       "argus_record_id": "f19a37e67f649f82"
     },
     {
+      "pattern": "5c:f2:07",
+      "pattern_type": "oui",
+      "description": "Speco Technologies cctv_camera",
+      "argus_record_id": "f1de5ff7936e3931"
+    },
+    {
       "pattern": "0c:9a:e6",
       "pattern_type": "oui",
       "description": "DJI drone",
@@ -1848,6 +1932,12 @@
       "pattern_type": "oui",
       "description": "Samsara automotive_telematics",
       "argus_record_id": "f3ff1b2d55db94c2"
+    },
+    {
+      "pattern": "d4:2d:c5",
+      "pattern_type": "oui",
+      "description": "i-PRO (Panasonic) cctv_camera",
+      "argus_record_id": "f48e1de2e6bf2fba"
     },
     {
       "pattern": "00:17:f3",
@@ -1892,10 +1982,22 @@
       "argus_record_id": "faa980ee8bacc032"
     },
     {
+      "pattern": "00:40:7f",
+      "pattern_type": "oui",
+      "description": "Teledyne FLIR cctv_camera",
+      "argus_record_id": "fc8c7a30ce583c15"
+    },
+    {
       "pattern": "f0:82:c0",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "ff5981ab6c873540"
+    },
+    {
+      "pattern": "00:12:81",
+      "pattern_type": "oui",
+      "description": "March Networks cctv_camera",
+      "argus_record_id": "ffb2eeb99fd8c259"
     }
   ]
 }
