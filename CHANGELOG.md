@@ -14,6 +14,71 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.7 — 2026-06-12
+
+A **data release** layered on top of v1.6.6. It admits **+290** identifiers across two cohorts: the R2 SoC chipset set held back from v1.6.6, and the Flock / cop-car Android-app static-analysis cluster. Active identifier count **42,923 → 43,213**. **No schema migration** (schema_version stays **31**), **+14 manufacturers** (141 → 155), **+10 sources** (76 → 86). The Lynceus JSON feeds hold flat (high-confidence **322**, standard **736**) because every new row is an Argus-internal type — `chipset_codename`, `vendor_controlled_hostname`, `network_endpoint` — outside the Lynceus `{mac, oui, ssid, ble_uuid}` watchlist schema; all 290 land in the full CSV (43,213 rows). Both cohorts were operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
+
+### What's new
+
+- **R2 SoC chipset batch (+79).** Gate-1C of the R2 cohort, board-ruled Option A (MAC-345). 13 silicon component vendors register as a distinct `component_vendor` category, kept separate from end-product OEMs: HiSilicon, Rockchip, Ambarella, SigmaStar, Goke, Fullhan, Ingenic, Novatek, Anyka, Allwinner, GrainMedia, Xiongmai, Texas Instruments. **79 net-new `chipset_codename` rows** promote from the OpenIPC firmware corpus (90 staged minus 11 build-flavor variants), sourced `crowdsourced` / tier-2. Board approval `9e011eb8`; shipped first as the untagged increment `e1e2fae`.
+- **Flock / cop-car APK cluster (+211).** Vendor mobile apps for the surveillance and fleet-telematics vendors, fetched with a headless browser (real Chromium against the public app mirrors, no credentials, no anti-bot circumvention) and static-analyzed with `apk_harness.py` (MAC-348 / MAC-349 / MAC-350). **+211 net-new** after an exact-match dedup against 15,942 live host / endpoint / UUID values: 47 `vendor_controlled_hostname` + 164 `network_endpoint`, all confidence 70 / `manufacturer_app`. By vendor: Verizon Connect 83, Samsara 38, Flock Safety 36, Fleetio 29, Axon 13, SoundThinking 6, Motorola Solutions 6. **Fleetio** registers as a new manufacturer (id 325). The set includes the Flock Safety app `com.flocksafety.sweetwater` itself. Board approval `ba63493f`.
+- **BLE UUID discipline.** The harness flagged 81 raw 128-bit strings as candidate `ble_service_uuid` rows. A GATT-context trace dropped all 81 for this release: a raw string match is not a device-pairing UUID without a real `BluetoothGattService` bind. The cross-vendor `258eafa5-…` value, present in six unrelated vendor apps, is excluded by name. The drop ledger ships at `exports/v1.6.7_admission_exclusion_record.md`. A later trace confirmed two Axon UUIDs with genuine GATT context; those land in a follow-up increment, not here.
+- **§7.5 hygiene.** One employee email and eight credential-bearing URLs found in the binaries were dropped, never staged. No secret values surfaced.
+
+### Schema
+
+- **No migrations this cycle.** Migration ledger stays **0001 through 0031**; schema_version stays **31**. The `component_vendor` manufacturer category, the `manufacturer_app` source tier, and the `chipset_codename` / `network_endpoint` identifier types all use existing slots.
+
+### Data
+
+- **`identifiers` active:** 42,923 → **43,213** (+290: SoC +79, APK +211).
+- **`identifiers` total:** 43,305 → **43,595**.
+- **`manufacturers`:** 141 → **155** (+14: 13 `component_vendor` + Fleetio).
+- **`sources`:** 76 → **86** (+10: OpenIPC firmware for the SoC batch; 2 vendor-direct + 7 apkcombo for the APK cluster).
+- **`behavioral_signatures` export records:** 125 (unchanged).
+- **Lynceus high-confidence export records:** 322 (unchanged). **Standard export records:** 736 (unchanged).
+- **Export-membership note (load-bearing).** Every v1.6.7 row sits outside the Lynceus `{mac, oui, ssid, ble_uuid}` schema: `chipset_codename` carries `geographic_scope=global`, and the APK hosts and endpoints are not Lynceus identifier classes. The US-filtered JSON feeds hold at 322 / 736; all 290 appear in `argus_export.csv` (43,213 rows).
+
+### Bible amendments
+
+- **None ratified this cycle.** **CP45** (cross-vendor BLE exclusion) was drafted: a BLE UUID seen across unrelated vendor apps is shared-SDK evidence, not a per-vendor device identifier, so it does not admit without per-vendor GATT confirmation. Its ratification and ledger entry are deferred to a follow-up increment.
+
+### Halts encountered
+
+- **None blocking.** The apkcombo `com.evidence.flex` 410 (a delisted Axon Fleet variant) was logged as an honest-absence. The GATT-context trace, the backup-first apply, and the export regeneration came back clean.
+
+## v1.6.6 — 2026-06-11
+
+A **data release** layered on top of v1.6.5. It covers two waves admitted in the same cycle: the Wave WideNet acquisition pass and the R2 new-vendor cohort that v1.6.5 deferred. Active identifier count **41,716 → 42,923** (+1,207). **No schema migration** (schema_version stays **31**), **+15 manufacturers** (126 → 141 — the first net-new manufacturers in several releases), **+2 sources** (74 → 76). Both waves were operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
+
+### What's new
+
+- **Wave WideNet acquisition (+185).** A registry-and-acquisition pass over certificate-transparency logs, FCC filings, and vendor mobile surfaces (MAC-329): 45 `fcc_grantee_code` + 24 `product_family_codename` + 11 `ble_uuid` + 103 `vendor_controlled_hostname` (Cellebrite, Oxygen Forensics, Eagle Eye, recovered with a per-row CT-log provenance triple) + 2 endpoint rows (WatchGuard, Reveal). Two sources register: `certspotter` (`primary_registry`, RFC 6962 CT logs) and `fcc.report` (`regulatory`). The 185 rows admit at **confidence=NULL** pending a later corroboration pass; the export pipeline gained a None-guard at the confidence gate so the NULL-confidence rows carry through cleanly (`38467df`, MAC-336). 27 rows were rejected to `conflicts` rather than promoted: 25 false-positive FCC grantee codes and 2 Motorola consumer OUIs.
+- **R2 new-vendor cohort, Gate-1A + Gate-1B (+1,022).** The new-vendor data deferred from v1.6.5 (MAC-339 / MAC-341). **15 surveillance brands register** as manufacturers — ACTi, Amcrest, Brivo, Digital Watchdog, GeoVision, HID Global, Lorex, March Networks, Mobotix, Openpath, Reolink, Speco, Swann, Teledyne FLIR, i-PRO — unlocking **51 registry rows** (20 `oui` + 3 `mac_range` + 28 `fcc_grantee_code`). **Reolink firmware** lands at full volume: 860 `firmware_sha256_hash` + 111 `firmware_branded_string`, each with a SHA-256 and provenance from the `reolink-fw-archive` `pak_info.json`. Board approval `06436619`. The SoC component-vendor batch (90 `chipset_codename`) stayed held this release pending the board's component-vendor category ruling; it ships in v1.6.7.
+
+### Schema
+
+- **No migrations this cycle.** Migration ledger stays **0001 through 0031**; schema_version stays **31**. All admitted `identifier_type`s use existing CHECK-enum slots.
+
+### Data
+
+- **`identifiers` active:** 41,716 → **42,923** (+1,207: WideNet +185, R2 +1,022).
+- **`identifiers` total:** 42,098 → **43,305**.
+- **`manufacturers`:** 126 → **141** (+15 surveillance brands).
+- **`sources`:** 74 → **76** (+2: `certspotter`, `fcc.report`).
+- **`conflicts`:** 36 → **63** (+27 WideNet rejections, not promoted).
+- **`behavioral_signatures` export records:** 125 (unchanged).
+- **Lynceus high-confidence export records:** 305 → **322** (+17). **Standard export records:** 719 → **736** (+17).
+- **Export-membership note.** The +17 to both Lynceus feeds comes from the R2 registry `oui` rows, which are Lynceus-mappable. The WideNet rows do not reach the feeds: they admit at confidence=NULL, and their `vendor_controlled_hostname` / `fcc_grantee_code` / `product_family_codename` types sit outside the Lynceus `{mac, oui, ssid, ble_uuid}` schema. All 1,207 appear in `argus_export.csv` (42,923 rows).
+
+### Bible amendments
+
+- **None ratified this cycle.** The manufacturer admissions apply the existing §8 registration discipline; the WideNet rejections apply the existing SAR false-positive rules. No new doctrine was introduced.
+
+### Halts encountered
+
+- **One, resolved.** The export `None < int` confidence-gate crash surfaced when the 185 NULL-confidence WideNet rows first reached `export_lynceus.py` — the prior active set carried no NULL-confidence rows. A None-guard at the §7.5 classify gate plus two regression tests fixed it (MAC-336, `38467df`) before the release shipped. The backup-first apply and export regeneration otherwise came back clean.
+
 ## v1.6.5 — 2026-06-06
 
 A **data release** layered on top of v1.6.4. It promoted **+208** validated, registry-sourced identifiers gathered from public registry pulls plus a firmware unpack of Dahua and Axis devices. Active identifier count **41,508 → 41,716**. **No schema migration** (schema_version stays **31**), **0 new `identifier_type` slots**, **0 new sources** (74), **0 new manufacturers** (126 — all 33 attributed vendors were already registered). The release was operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
