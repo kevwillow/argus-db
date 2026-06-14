@@ -1,0 +1,3433 @@
+{
+  "_meta": {
+    "issue": "MAC-406",
+    "cohort": "MAC-393 wave-2 cohort 4 — Consumer smart lock",
+    "harvest_input": "MAC-397 (CTO-ratified) + operator_review/MAC-393/c4_smartlock/harvest.md + extraction_outputs/mac393_c4_smartlock/sources.json",
+    "scope": "EXTRACTION ONLY — candidates for CTO verify -> DBArchitect ingest. No DB write / migration / export regen / push. db/argus.db opened mode=ro.",
+    "taxonomy_one_way_door": "device_category 'smart_lock' does NOT exist (verified count=0). Every candidate is PROPOSED smart_lock + category_pending_board_ratification. Mint-vs-map is a board one-way-door at the ingest gate.",
+    "confidence_bands": "§8.2 — manufacturer_app/manufacturer_doc 75-90 (APK GATT); primary_registry 70-85 (IEEE OUI). Single-source staging (§11 #8).",
+    "export_note": "§11 #13 — every smart_lock row is export-banned until the category is minted; ingest+regen is therefore gated on the board taxonomy decision.",
+    "excerpt_max_chars": 200,
+    "pii_redaction_count": 0,
+    "pii_note": "SAR-5 / §11 #3 — company legal-entity names + IEEE registry addresses only; person-name regex applied. APK deliverable carries UUID byte-forms + dex locations + sha256 pins only (§11 #15 facts-only); no APK code copied.",
+    "cross_vendor_rule": "§11 #21 / CP44 — a custom-128 UUID present in >=2 of the 4 unrelated vendor APKs is a shared chipset/BLE-SDK magnet -> excluded (cited co-occurrence, not from memory).",
+    "wyze_ruling": "MAC-397 ruling 2 — Wyze company-level OUI/ID NOT promoted (already cctv_camera). com.hualai SKIPPED per ruling 3 (do-not-double-promote collision).",
+    "typing_quirk": "MAC-397 ruling 4 — 0xFE24/0xFCF4/0xFD7B/0xFCBF are 16-bit service UUIDs but stored under identifier_type='ble_company_id' (pre-existing bulk-load artifact). Noted, NOT 'fixed' here."
+  },
+  "counts": {
+    "oui_candidates": 6,
+    "oui_promote": 2,
+    "oui_flagged_ambiguous": 4,
+    "custom_128bit_distinct_across_4_apks": 96,
+    "cross_vendor_magnets": 17,
+    "vendor_unique_128bit": 79,
+    "vendor_unique_excluded_sdk_or_placeholder": 14,
+    "genuine_vendor_distinct_gatt": 65,
+    "gatt_clean_promote": 54,
+    "gatt_flagged_ambiguous": 11,
+    "ble_registry_net_new": 0,
+    "total_promote_candidates": 56
+  },
+  "oui_candidates": [
+    {
+      "identifier": "10:a4:50",
+      "identifier_type": "oui",
+      "device_category": "smart_lock",
+      "manufacturer": "Kwikset",
+      "model": null,
+      "confidence": 85,
+      "band": "primary_registry",
+      "band_ceiling": 85,
+      "disposition": "promote",
+      "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+      "source_excerpt": "MA-L,10A450,Kwikset,110 Sargent Dr. New Haven CT US 06511",
+      "raw_payload": {
+        "doc_kind": "ieee_oui_csv",
+        "line_number": 22910,
+        "registry_class": "MA-L",
+        "vendor_doc_sha256_link": "fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe"
+      },
+      "source_row_key": "34be2913db23fcb6e5d10805bedfc975104d5512e6c6584fe231f010c262e7f6",
+      "geographic_scope": "global",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "laa_bit": "laa_bit_clear (globally-administered IEEE OUI)",
+        "known_fake_check": "pass (not in §7.3 known-fake/doc ranges)",
+        "caveat": "Pure-play residential lock brand (Kwikset Halo/SmartCode/Aura); clean smart_lock attribution."
+      }
+    },
+    {
+      "identifier": "b0:44:9c",
+      "identifier_type": "oui",
+      "device_category": "smart_lock",
+      "manufacturer": "Assa Abloy AB - Yale",
+      "model": null,
+      "confidence": 82,
+      "band": "primary_registry",
+      "band_ceiling": 85,
+      "disposition": "promote",
+      "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+      "source_excerpt": "MA-L,B0449C,Assa Abloy AB - Yale,Nordenskiöldsgatan 8B (5tr) Malmö  SE 211 19",
+      "raw_payload": {
+        "doc_kind": "ieee_oui_csv",
+        "line_number": 31906,
+        "registry_class": "MA-L",
+        "vendor_doc_sha256_link": "fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe"
+      },
+      "source_row_key": "9806e2d3edc98a33bfc473440c955dd38654978cc18d147ac64c0d83b9bacded",
+      "geographic_scope": "global",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "laa_bit": "laa_bit_clear (globally-administered IEEE OUI)",
+        "known_fake_check": "pass (not in §7.3 known-fake/doc ranges)",
+        "caveat": "Yale residential (cohort vendor 'Yale Assure'); Yale also makes commercial hardware."
+      }
+    },
+    {
+      "identifier": "98:1b:b5",
+      "identifier_type": "oui",
+      "device_category": "smart_lock",
+      "manufacturer": "ASSA ABLOY Korea Co., Ltd iRevo",
+      "model": null,
+      "confidence": 45,
+      "band": "primary_registry",
+      "band_ceiling": 85,
+      "disposition": "flagged_ambiguous",
+      "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+      "source_excerpt": "MA-L,981BB5,\"ASSA ABLOY Korea Co., Ltd iRevo\",\"10F of JEI PLATZ Bldg., 186, Gasandigital-ro, Geumcheon-gu Seoul  KR 08502 \"",
+      "raw_payload": {
+        "doc_kind": "ieee_oui_csv",
+        "line_number": 1480,
+        "registry_class": "MA-L",
+        "vendor_doc_sha256_link": "fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe"
+      },
+      "source_row_key": "13c8619e711e4f972ed3839f922b544ab4b16d9ed7d4345f22d6078a90781f3f",
+      "geographic_scope": "global",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "laa_bit": "laa_bit_clear (globally-administered IEEE OUI)",
+        "known_fake_check": "pass (not in §7.3 known-fake/doc ranges)",
+        "caveat": "ASSA ABLOY Korea residential-lock subsidiary; not a cohort vendor and not product-anchored in the cleared slate -> recat candidate, ambiguous.",
+        "ambiguous_extraction": true
+      }
+    },
+    {
+      "identifier": "14:a1:bf",
+      "identifier_type": "oui",
+      "device_category": "smart_lock",
+      "manufacturer": "ASSA ABLOY Korea Co., Ltd Unilock",
+      "model": null,
+      "confidence": 45,
+      "band": "primary_registry",
+      "band_ceiling": 85,
+      "disposition": "flagged_ambiguous",
+      "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+      "source_excerpt": "MA-L,14A1BF,\"ASSA ABLOY Korea Co., Ltd Unilock\",\"10f of JEI PLATZ Bldg., 186, Gasandigital 1-ro Geumcheon-gu Seoul KR 08502 \"",
+      "raw_payload": {
+        "doc_kind": "ieee_oui_csv",
+        "line_number": 25247,
+        "registry_class": "MA-L",
+        "vendor_doc_sha256_link": "fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe"
+      },
+      "source_row_key": "027b48379fc29dd597452431b0a6232ac662f7679834f1c8547a2488a16e766c",
+      "geographic_scope": "global",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "laa_bit": "laa_bit_clear (globally-administered IEEE OUI)",
+        "known_fake_check": "pass (not in §7.3 known-fake/doc ranges)",
+        "caveat": "ASSA ABLOY Korea subsidiary (Unilock); not a cohort vendor and not product-anchored -> ambiguous.",
+        "ambiguous_extraction": true
+      }
+    },
+    {
+      "identifier": "00:17:7a",
+      "identifier_type": "oui",
+      "device_category": "smart_lock",
+      "manufacturer": "ASSA ABLOY AB",
+      "model": null,
+      "confidence": 40,
+      "band": "primary_registry",
+      "band_ceiling": 85,
+      "disposition": "flagged_ambiguous",
+      "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+      "source_excerpt": "MA-L,00177A,ASSA ABLOY AB,Theres Svenssons gata 15 Goteborg  SE 41755",
+      "raw_payload": {
+        "doc_kind": "ieee_oui_csv",
+        "line_number": 20764,
+        "registry_class": "MA-L",
+        "vendor_doc_sha256_link": "fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe"
+      },
+      "source_row_key": "ead14f80bebb069875932aff48b2e4a36de4fadd801ef704af3bf270cb34d562",
+      "geographic_scope": "global",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "laa_bit": "laa_bit_clear (globally-administered IEEE OUI)",
+        "known_fake_check": "pass (not in §7.3 known-fake/doc ranges)",
+        "caveat": "Parent conglomerate OUI (commercial + consumer door hardware); company-level, not product-anchored to consumer smart_lock.",
+        "ambiguous_extraction": true
+      }
+    },
+    {
+      "identifier": "dc:c0:eb",
+      "identifier_type": "oui",
+      "device_category": "smart_lock",
+      "manufacturer": "ASSA ABLOY CÔTE PICARDE",
+      "model": null,
+      "confidence": 40,
+      "band": "primary_registry",
+      "band_ceiling": 85,
+      "disposition": "flagged_ambiguous",
+      "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+      "source_excerpt": "MA-L,DCC0EB,ASSA ABLOY CÔTE PICARDE,rue Alexandre Fichet Oust-Marest  FR 80460",
+      "raw_payload": {
+        "doc_kind": "ieee_oui_csv",
+        "line_number": 10936,
+        "registry_class": "MA-L",
+        "vendor_doc_sha256_link": "fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe"
+      },
+      "source_row_key": "13fb593fbdb99aa4fc3d7d40ae35b8a7983e84aa4f4e74470d117d17af812f95",
+      "geographic_scope": "global",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "laa_bit": "laa_bit_clear (globally-administered IEEE OUI)",
+        "known_fake_check": "pass (not in §7.3 known-fake/doc ranges)",
+        "caveat": "ASSA ABLOY France door-hardware division; not clearly a consumer smart lock -> ambiguous.",
+        "ambiguous_extraction": true
+      }
+    }
+  ],
+  "gatt_candidates": [
+    {
+      "identifier": "4d050010-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "4D050010-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "4D050010-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "d6c50b31f457b1ebb26fc4a473af80bb51e6267196326d85c129be9c13991587",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050011-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "4D050011-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "4D050011-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "686635849287356aef126a1d03598b31da359d507cd32678bd421ba59b143a89",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050012-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050012-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050012-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "e55be4470977539859579b966201bba91d74ad7b9af6758ebde6b624d6b3df72",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050013-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050013-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050013-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "69284ffe74850350b29d284ae8db49142a5e590b6fbc6e270a91e972e5652cdc",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050014-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050014-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050014-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "7363706ed67c2d16d6af7b5cff730a16daf6f20b5617921f1086000b8fcafa85",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050015-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050015-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050015-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "6410496b21ff875797d296d94b676ac552fbcd7281726ecc60617b5c06715ea3",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050017-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "4D050017-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "4D050017-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "38144a58331b2339067473a2b25ce898f1479276b803e28fc70753566c45516a",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050018-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050018-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050018-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "2740748bea2364639a69c9b4b90c250125b7032636dd469bae13de58cd353771",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050019-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050019-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050019-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "673c34c4f5756bb7e80052dda4bf524b0af9281e9278b9d60e83c3a32012b048",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050070-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050070-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050070-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "11e79d3644c13ea471009d6e6585969ccfa08ba32b3bd9df9ed446c8342d7190",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050071-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050071-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050071-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "7479ceaa8d00cac83306ab0a5788849ad258b820b6aa6bdb0b26b2ad9a3b5dbf",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050080-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050080-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050080-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "2bf0f69fd81028a61d59ac12f53e93704f7d59e252d808f05c512455b64d7484",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050081-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050081-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050081-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "7d1c7191ccd504bdd10ef44cef9b016870b3e877ab71e2e4dcc6042052242da1",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050082-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050082-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050082-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "1accaf4691da4cff060ff59c8dc487ca073a313e12ff6310c5b1b88356065b07",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050083-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050083-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050083-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "1a64415a4efa014eccfee320b79da0768943fc98c22bee6137d6fbdc0bd2b29b",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050084-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050084-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050084-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "2aab72b9fcb7fe55064dd8b6d799ffa8968e3c6559980027e9e6485445e3ebec",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050090-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050090-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050090-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "5ac4647fe81574faf845f75b59394cae91982c4b2c9f160a9f758e77624fa6e1",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050091-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050091-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050091-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "5c1433797cf4eede3f75ddc3efc53fe4d44342212c1b678f5e15ce603ef6c4de",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d050092-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "4D050092-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "4D050092-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "b8e284fee9de5b816333d3a3a5b7fd992d7338ae62abe968f71918907f22b19b",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d0500a0-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "4D0500A0-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "4D0500A0-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "17fefd96c48f0ae395bf18d49e9ca239d060b2fd78130b7b5297a865f88bed0f",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d0500a1-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "4D0500A1-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "4D0500A1-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "6870215357c9273598817ac2c38f3dc92984b594e785bb1874fb2e96a94f63e6",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "4d0500a2-766c-42c4-8944-42bc98fc2d09",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "4D0500A2-766C-42C4-8944-42BC98FC2D09",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "4D0500A2-766C-42C4-8944-42BC98FC2D09",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "07e6759720bdff3fa285bf88beae5342cb8e901c5b5f9caf2aa9b7e7849fd039",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "d4305c76-7a89-4990-9395-9e054e1b4cd3",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "D4305C76-7A89-4990-9395-9E054E1B4CD3",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "D4305C76-7A89-4990-9395-9E054E1B4CD3",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "c2b8123aa7710715e12620dcd4059fbd25e2f0ea85738a0f95cfa8d1fd118754",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "ce85ad03-0f20-4aed-abe5-b7407dd7cacc",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Schlage",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/#com.allegion.leopard.apk!classes2.dex",
+      "source_excerpt": "ce85ad03-0f20-4aed-abe5-b7407dd7cacc",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.allegion.leopard.apk!classes2.dex",
+        "byte_form": "ce85ad03-0f20-4aed-abe5-b7407dd7cacc",
+        "apk_sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+        "package": "com.allegion.leopard"
+      },
+      "source_row_key": "88377d8a588a68931a69ea4531922d271514f3c1c4cb2b4faae43d963744f320",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "1030e062-0ebe-11e5-a5c2-0619f8945a4f",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes4.dex",
+      "source_excerpt": "1030e062-0ebe-11e5-a5c2-0619f8945a4f",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes4.dex",
+        "byte_form": "1030e062-0ebe-11e5-a5c2-0619f8945a4f",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "27bb54e781b4dd02bd9c0a03a23fc1918b0f7f516939b96cce5cd6f167e74ae0",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "1bd19c14-b78a-4e0f-aeb5-8e0352bac382",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "1bd19c14-b78a-4e0f-aeb5-8e0352bac382",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "1bd19c14-b78a-4e0f-aeb5-8e0352bac382",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "960cc00b1e1a37451aee720ba477402efe49e97ffde64c1b2ce12274ff8b2339",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "279f9dab-79be-4663-af1d-24407347af13",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "279f9dab-79be-4663-af1d-24407347af13",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "279f9dab-79be-4663-af1d-24407347af13",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "da27feff21f363e67f533c078fb625d874e4e7d0bdac631ff76e832963a22233",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "52e4c6be-0f96-425c-8900-ddcef680f636",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "52e4c6be-0f96-425c-8900-ddcef680f636",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "52e4c6be-0f96-425c-8900-ddcef680f636",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "b762f1234dcdca72f341894826f562614d623c15f315ea2edef95859175ae161",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "52e4c6be-0f96-425c-8910-ddcef680f636",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "52e4c6be-0f96-425c-8910-ddcef680f636",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "52e4c6be-0f96-425c-8910-ddcef680f636",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "f246ddff36bd769b6771ad8eb7a985d55e71a299563b63e5108a8983db7666c0",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "52e4c6be-0f96-425c-8920-ddcef680f636",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "52e4c6be-0f96-425c-8920-ddcef680f636",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "52e4c6be-0f96-425c-8920-ddcef680f636",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "81d853e6c1aea657336e3000799a65788bc2fe24e1b41e0826b42a3ee1a489df",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "567d7f2d-270a-438a-a785-f0af12ad8312",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes4.dex",
+      "source_excerpt": "567d7f2d-270a-438a-a785-f0af12ad8312",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes4.dex",
+        "byte_form": "567d7f2d-270a-438a-a785-f0af12ad8312",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "a27a93ce69ee1b3a888e4cfbcfcbcea0a29daa1ee4ab161930f176d560b2c20b",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "6aa5711b-0376-44f1-bca1-8647b48bdb55",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "6aa5711b-0376-44f1-bca1-8647b48bdb55",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "6aa5711b-0376-44f1-bca1-8647b48bdb55",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "1cfc075230b708fc219aa46740efe856f609a8b7a97537f7a8915ec71e14fdbc",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "6e04eae1-ed32-4fc6-8977-a882b581f021",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes5.dex",
+      "source_excerpt": "6e04eae1-ed32-4fc6-8977-a882b581f021",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes5.dex",
+        "byte_form": "6e04eae1-ed32-4fc6-8977-a882b581f021",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "b2fe794056b62de0918c25e8eb72641fdee7bdd3d9c4b64977337534fed10b66",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "9a04f079-9840-4286-ab92-e65be0885f95",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes6.dex",
+      "source_excerpt": "9a04f079-9840-4286-ab92-e65be0885f95",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes6.dex",
+        "byte_form": "9a04f079-9840-4286-ab92-e65be0885f95",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "24ca93f946fefcac43d222c324dd50af3c4c0560f6336971804026f85b968f02",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "a86abc2d-d44c-442e-99f7-80059a873e36",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "a86abc2d-d44c-442e-99f7-80059a873e36",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "a86abc2d-d44c-442e-99f7-80059a873e36",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "21feceebee2e8590137f03dc8ccae10025d96ab743f41d08fb22b34504840395",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "e295c550-69d0-11e4-b116-123b93f75cba",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "E295C550-69D0-11E4-B116-123B93F75CBA",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "E295C550-69D0-11E4-B116-123B93F75CBA",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "96639dea933a8184eda6b0090b7f38923ede31c02667d02a67f8ce899220f112",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "e295c551-69d0-11e4-b116-123b93f75cba",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "E295C551-69D0-11E4-B116-123B93F75CBA",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "E295C551-69D0-11E4-B116-123B93F75CBA",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "8933025a1c774f30fbdff0195ee352773af5942e8901c7ca67afaca88dbbc930",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "e295c552-69d0-11e4-b116-123b93f75cba",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "E295C552-69D0-11E4-B116-123B93F75CBA",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "E295C552-69D0-11E4-B116-123B93F75CBA",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "75d0a491bf84b89d8b6613daa9783ddd538d996ec7a021f6f5775ac9a77be5b7",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "e295c553-69d0-11e4-b116-123b93f75cba",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "E295C553-69D0-11E4-B116-123B93F75CBA",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "E295C553-69D0-11E4-B116-123B93F75CBA",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "7ef2659446e8993b33ea4354ebf11f2902b81bda5542238ee81acd557ac7ca22",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "e295c554-69d0-11e4-b116-123b93f75cba",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "E295C554-69D0-11E4-B116-123B93F75CBA",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "E295C554-69D0-11E4-B116-123B93F75CBA",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "95cb5278f034bc01a93ec317c22dd14bc8398b188d91e9d54204bc6c44c44f2c",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes6.dex",
+      "source_excerpt": "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes6.dex",
+        "byte_form": "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "d51960092c3667ecd0e975e0b0e7dad79a75215f77e2a17720d3a6d6f0958cdf",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 80,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "Vendor-distinct GATT UUID (appears only in this vendor's lock app)."
+      }
+    },
+    {
+      "identifier": "0000d0ff-3c17-d293-8e48-14fe2e4da212",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "0000d0ff-3c17-d293-8e48-14fe2e4da212",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "0000d0ff-3c17-d293-8e48-14fe2e4da212",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "509f1ec54601d921e076d102289ee105112c6f6ff02b0e05fe379714f0691db4",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "01ff5550-ba5e-f4ee-5ca1-eb1e5e4b1ce0",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes6.dex",
+      "source_excerpt": "01FF5550-BA5E-F4EE-5CA1-EB1E5E4B1CE0",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes6.dex",
+        "byte_form": "01FF5550-BA5E-F4EE-5CA1-EB1E5E4B1CE0",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "b51c3cc6cb6a1b515904ba1492b407101dd15e3d086a4fac8a05103244959e8b",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "01ff5551-ba5e-f4ee-5ca1-eb1e5e4b1ce0",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes6.dex",
+      "source_excerpt": "01FF5551-BA5E-F4EE-5CA1-EB1E5E4B1CE0",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes6.dex",
+        "byte_form": "01FF5551-BA5E-F4EE-5CA1-EB1E5E4B1CE0",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "7c18c3369a1b9341fdaabdd46b495e670e03490e37367f280448ea758871b65b",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "01ff5552-ba5e-f4ee-5ca1-eb1e5e4b1ce0",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes6.dex",
+      "source_excerpt": "01FF5552-BA5E-F4EE-5CA1-EB1E5E4B1CE0",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes6.dex",
+        "byte_form": "01FF5552-BA5E-F4EE-5CA1-EB1E5E4B1CE0",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "97b737a6d3da2f734251e8de5285908ed3b031d9796bf90d2924e83a7f8a8ff5",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "1fa97d5b-bb68-499e-ac1d-de8771c9348d",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes7.dex",
+      "source_excerpt": "1fa97d5b-bb68-499e-ac1d-de8771c9348d",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes7.dex",
+        "byte_form": "1fa97d5b-bb68-499e-ac1d-de8771c9348d",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "adb10301ac476c21e33ee7aa5a998def502d6df8ef1eea0bb842eddef955019a",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "2c8f61da-1064-43e5-ab7e-520ea9f4dd4c",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes7.dex",
+      "source_excerpt": "2c8f61da-1064-43e5-ab7e-520ea9f4dd4c",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes7.dex",
+        "byte_form": "2c8f61da-1064-43e5-ab7e-520ea9f4dd4c",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "349efbe21585f21b15fc7f45b5c507f10ac50199b96255906aca9790958af6a4",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "7617daa5-71fd-5a85-8f94-e28d735ce9f4",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "7617daa5-71fd-5a85-8f94-e28d735ce9f4",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "7617daa5-71fd-5a85-8f94-e28d735ce9f4",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "38e739e0d8e388a5d7408fd5d9883d9749526ba6135f94abb318de44f1c44047",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "a142addb-f878-4d30-ae05-09518c49578a",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes7.dex",
+      "source_excerpt": "a142addb-f878-4d30-ae05-09518c49578a",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes7.dex",
+        "byte_form": "a142addb-f878-4d30-ae05-09518c49578a",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "166fbda6ac90118ad19d6bfca14ab0f37625c832587550f5d21d42863d933cde",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "b73c1927-6e64-46a3-8ce7-650ebf9afd03",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes6.dex",
+      "source_excerpt": "b73c1927-6e64-46a3-8ce7-650ebf9afd03",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes6.dex",
+        "byte_form": "b73c1927-6e64-46a3-8ce7-650ebf9afd03",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "6f101e42a03449653f996f6bbf20b6a64e3be7388da3c1a5eccd23ef16e693fb",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "c08a25d7-35e6-592c-b7ad-43acc8d1d1c8",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "c08a25d7-35e6-592c-b7ad-43acc8d1d1c8",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "c08a25d7-35e6-592c-b7ad-43acc8d1d1c8",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "c23cd96c1664f0f2a6169eefd36e9b8bdefd51d0414c873baa529a3ff77b97a1",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "c977f87a-1d61-4f52-a7f1-ee6a270cb6e9",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes7.dex",
+      "source_excerpt": "c977f87a-1d61-4f52-a7f1-ee6a270cb6e9",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes7.dex",
+        "byte_form": "c977f87a-1d61-4f52-a7f1-ee6a270cb6e9",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "0bea001df1280b0ac3bdc0375fd59cad54540ed6696860543bdb65fdfd8f75e5",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "d96b40b7-092b-5cd1-a59f-9af80c337eba",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "d96b40b7-092b-5cd1-a59f-9af80c337eba",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "d96b40b7-092b-5cd1-a59f-9af80c337eba",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "055d35efe6920283e3a2aecf2602209c994b4d0e4927a0a9c434ef335eb2c35c",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    },
+    {
+      "identifier": "f03d385e-a731-5605-b15d-037f6da6097f",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "f03d385e-a731-5605-b15d-037f6da6097f",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "f03d385e-a731-5605-b15d-037f6da6097f",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "160ad259c31f0420b31d68b7c7079b174b79118a3ec54a3acd6665f9a4ad083b",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 78,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "promote",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "service_vs_characteristic": "undetermined (GATT role not asserted from dex strings — §11 #1 conservative)",
+        "caveat": "U-tec 'Xthings Home' app may cover multiple U-tec product lines; UUID is vendor-distinct but the product-within-vendor is not certain."
+      }
+    }
+  ],
+  "flagged_ambiguous": [
+    {
+      "identifier": "bb392ec0-8d4d-11e0-a896-0002a5d5c51b",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes8.dex",
+      "source_excerpt": "bb392ec0-8d4d-11e0-a896-0002a5d5c51b",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes8.dex",
+        "byte_form": "bb392ec0-8d4d-11e0-a896-0002a5d5c51b",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "8ff676e0c8b2429095d8866d0de5ac31b6b332ab9af118a6a1e8e7026df67296",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 00:02:a5:d5:c5:1b = a globally-administered (real) OUI used across a paired family -> possible copied/sample service"
+      }
+    },
+    {
+      "identifier": "bd4ac610-0b45-11e3-8ffd-0800200c9a66",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "BD4AC610-0B45-11E3-8FFD-0800200C9A66",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "BD4AC610-0B45-11E3-8FFD-0800200C9A66",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "c7bc6eaaa762ba234db1edda6bbfbe9d765030ccbf93878d9e06cc46cd09a41a",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 08:00:20:0c:9a:66 = Sun Microsystems OUI (the java.util.UUID javadoc / Android-BLE-tutorial sample node) -> likely boilerplate, not a vendor-generated service"
+      }
+    },
+    {
+      "identifier": "bd4ac611-0b45-11e3-8ffd-0800200c9a66",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "BD4AC611-0B45-11E3-8FFD-0800200C9A66",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "BD4AC611-0B45-11E3-8FFD-0800200C9A66",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "1d1981d87328e1416df00fede6df47e73e377970f5d8fe779f5f236dd7bc4f46",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 08:00:20:0c:9a:66 = Sun Microsystems OUI (the java.util.UUID javadoc / Android-BLE-tutorial sample node) -> likely boilerplate, not a vendor-generated service"
+      }
+    },
+    {
+      "identifier": "bd4ac612-0b45-11e3-8ffd-0800200c9a66",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "BD4AC612-0B45-11E3-8FFD-0800200C9A66",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "BD4AC612-0B45-11E3-8FFD-0800200C9A66",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "a7c023bdef7a5c3e039b96869a5a08a9904cfa8150b354dc91db7d0a5fc9b3eb",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 08:00:20:0c:9a:66 = Sun Microsystems OUI (the java.util.UUID javadoc / Android-BLE-tutorial sample node) -> likely boilerplate, not a vendor-generated service"
+      }
+    },
+    {
+      "identifier": "bd4ac613-0b45-11e3-8ffd-0800200c9a66",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "BD4AC613-0B45-11E3-8FFD-0800200C9A66",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "BD4AC613-0B45-11E3-8FFD-0800200C9A66",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "6490f26f3cc3e787df334b6807d90338318811bf2b0095aeab3b72eb36cdd928",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 08:00:20:0c:9a:66 = Sun Microsystems OUI (the java.util.UUID javadoc / Android-BLE-tutorial sample node) -> likely boilerplate, not a vendor-generated service"
+      }
+    },
+    {
+      "identifier": "bd4ac614-0b45-11e3-8ffd-0800200c9a66",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes3.dex",
+      "source_excerpt": "BD4AC614-0B45-11E3-8FFD-0800200C9A66",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "BD4AC614-0B45-11E3-8FFD-0800200C9A66",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "11ac5d1fe2806d9f81383e45c4a4aaba69df1c9c1034de8ebee04376b6e54bb0",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 08:00:20:0c:9a:66 = Sun Microsystems OUI (the java.util.UUID javadoc / Android-BLE-tutorial sample node) -> likely boilerplate, not a vendor-generated service"
+      }
+    },
+    {
+      "identifier": "bd4ac615-0b45-11e3-8ffd-0800200c9a66",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes5.dex",
+      "source_excerpt": "bd4ac615-0b45-11e3-8ffd-0800200c9a66",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes5.dex",
+        "byte_form": "bd4ac615-0b45-11e3-8ffd-0800200c9a66",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "facd1cbc41d3ef093c791fa26b4adbc2ca0494cb365fc2aeb6cd2936cd7c14a4",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 08:00:20:0c:9a:66 = Sun Microsystems OUI (the java.util.UUID javadoc / Android-BLE-tutorial sample node) -> likely boilerplate, not a vendor-generated service"
+      }
+    },
+    {
+      "identifier": "bd4ac616-0b45-11e3-8ffd-0800200c9a66",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes5.dex",
+      "source_excerpt": "bd4ac616-0b45-11e3-8ffd-0800200c9a66",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes5.dex",
+        "byte_form": "bd4ac616-0b45-11e3-8ffd-0800200c9a66",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "9570b349450a192bfd9464d4640def7f2ba2fa9d2675fdfda23abd59030707c0",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 08:00:20:0c:9a:66 = Sun Microsystems OUI (the java.util.UUID javadoc / Android-BLE-tutorial sample node) -> likely boilerplate, not a vendor-generated service"
+      }
+    },
+    {
+      "identifier": "c06c8400-8e06-11e0-9cb6-0002a5d5c51b",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes8.dex",
+      "source_excerpt": "c06c8400-8e06-11e0-9cb6-0002a5d5c51b",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes8.dex",
+        "byte_form": "c06c8400-8e06-11e0-9cb6-0002a5d5c51b",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "e3f0200e13c8761fe200bd20f21a7d99efa0f2807f3a472de71eb784574da62c",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "v1 UUID node 00:02:a5:d5:c5:1b = a globally-administered (real) OUI used across a paired family -> possible copied/sample service"
+      }
+    },
+    {
+      "identifier": "73631912-6965-6e65-7269-736669727374",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "73631912-6965-6E65-7269-736669727374",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "73631912-6965-6E65-7269-736669727374",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "9a886d69f94311de7bf65cc784b061e6b4d97fb97536f435f98bf1407b2ab82c",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "ASCII-embedded UUID (suffix decodes to ASCII text) -> sentinel/sample-like, not a confirmed vendor GATT UUID"
+      }
+    },
+    {
+      "identifier": "73632b12-6965-6e65-7269-736669727374",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "73632B12-6965-6E65-7269-736669727374",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "73632B12-6965-6E65-7269-736669727374",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "417f077a18a8ecef3595ef4beea2ee9e2601a21b5573186bd5b61a066fa2b50f",
+      "geographic_scope": "global",
+      "device_category": "smart_lock",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 90,
+      "disposition": "flagged_ambiguous",
+      "notes": {
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "ambiguous_extraction": true,
+        "caveat": "ASCII-embedded UUID (suffix decodes to ASCII text) -> sentinel/sample-like, not a confirmed vendor GATT UUID"
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "identifier": "00000000-0000-0000-0000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes2.dex",
+      "source_excerpt": "00000000-0000-0000-0000-000000000000",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes2.dex",
+        "byte_form": "00000000-0000-0000-0000-000000000000",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "e844e1a0da79f0ccf0b5cf12a012ff55c2411041497c8bee91b997b3dfcd7e96",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "August",
+        "Kwikset",
+        "Schlage",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "94905c8395a10c7e249fc2d1568c8ca91835fa62bc81ba7671b6a3c2f51964ad",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "258eafa5-e914-47da-95ca-c5ab0dc85b11",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "98b031a9d5452f2908b73740d2baf6f6de45eba268bf0f2d160d5c908cc9ad76",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "August",
+        "Kwikset",
+        "Schlage",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "515d6767-01b7-49e5-8273-c8d11b0f331d",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "515d6767-01b7-49e5-8273-c8d11b0f331d",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "515d6767-01b7-49e5-8273-c8d11b0f331d",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "af004d0a4b6154f4b25711852b3431d079b6a82f6ab6471163bb2105e84ebad6",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Schlage"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "6E400001-B5A3-F393-E0A9-E50E24DCCA9E",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "6E400001-B5A3-F393-E0A9-E50E24DCCA9E",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "ab5df34edf2bc416ce24e061d64e27d5beedb4e99faa828b156e54cbfd2af24d",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "6E400002-B5A3-F393-E0A9-E50E24DCCA9E",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "6E400002-B5A3-F393-E0A9-E50E24DCCA9E",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "01f5ab590f74cbf012be84aa7f33683da0dc5595bd3086187a013bac41f975b3",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "6E400003-B5A3-F393-E0A9-E50E24DCCA9E",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "6E400003-B5A3-F393-E0A9-E50E24DCCA9E",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "ecc428ccdb6a642607770ce0078c4e7b8eb6f63629bde5384e04a43ebaec62ff",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "8d53dc1d-1db7-4cd3-868b-8a527460aa84",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes2.dex",
+      "source_excerpt": "8D53DC1D-1DB7-4CD3-868B-8A527460AA84",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes2.dex",
+        "byte_form": "8D53DC1D-1DB7-4CD3-868B-8A527460AA84",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "bf1bc7577572decc8ef7fa895d14b6c381e7a541e0ef3d96364c6a37b4ceaff3",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "984227f3-34fc-4045-a5d0-2c581f81a153",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "984227f3-34fc-4045-a5d0-2c581f81a153",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "984227f3-34fc-4045-a5d0-2c581f81a153",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "4606b06ee72c7c643e2d4b5447dceaad8ed562aa01291abf370eadda22b11e84",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "da2e7828-fbce-4e01-ae9e-261174997c48",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes2.dex",
+      "source_excerpt": "DA2E7828-FBCE-4E01-AE9E-261174997C48",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes2.dex",
+        "byte_form": "DA2E7828-FBCE-4E01-AE9E-261174997C48",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "2b9b6c6561a9447835e74b67e10a34f89e62ee245cd23636d54887269e902202",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc0-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "f000ffc0-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "f000ffc0-0451-4000-b000-000000000000",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "d13d3cba5345585d453c1a2030a4d7582abb4b58a9658e4329afe1005b5e58c6",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc1-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "f000ffc1-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "f000ffc1-0451-4000-b000-000000000000",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "01d04526a6719bde0082b911abd3ba3aacb4d2554c041573abb7be974c5216d2",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc2-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "f000ffc2-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "f000ffc2-0451-4000-b000-000000000000",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "a1f8953df04425654fb152caed3bfd7d43255e7a369d3e19c2b7b257348597ea",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc3-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "f000ffc3-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "f000ffc3-0451-4000-b000-000000000000",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "b5b09b0f47ad5a1d35f0e566c62fee8ad04ac255c6cbe2a5c7a033242788a124",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc4-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "f000ffc4-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "f000ffc4-0451-4000-b000-000000000000",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "048201a447fb41a78584f86096f1a8d5ec2a5f54c45542c28cd110e953a7bb98",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc5-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes3.dex",
+      "source_excerpt": "f000ffc5-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes3.dex",
+        "byte_form": "f000ffc5-0451-4000-b000-000000000000",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "f68bf2024025650cfe3155888ce75f766c8ffabaeb0645d53321cf0a3e638dce",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f7bf3564-fb6d-4e53-88a4-5e37e0326063",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Kwikset",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/#classes.dex",
+      "source_excerpt": "f7bf3564-fb6d-4e53-88a4-5e37e0326063",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes.dex",
+        "byte_form": "f7bf3564-fb6d-4e53-88a4-5e37e0326063",
+        "apk_sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+        "package": "com.kwikset.blewifi"
+      },
+      "source_row_key": "b1939748d2dcb2cdfba9b8c0d942ea50528e43962490fde419a53603ede02688",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "00000000-0000-0000-0000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Schlage",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/#com.allegion.leopard.apk!classes4.dex",
+      "source_excerpt": "00000000-0000-0000-0000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.allegion.leopard.apk!classes4.dex",
+        "byte_form": "00000000-0000-0000-0000-000000000000",
+        "apk_sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+        "package": "com.allegion.leopard"
+      },
+      "source_row_key": "bf8f473be45b2585396cdafd59a94499bbb1f2563b39828bf989de5edc55a19d",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "August",
+        "Kwikset",
+        "Schlage",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "00000014-0000-1000-8000-0026bb765291",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Schlage",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/#com.allegion.leopard.apk!classes2.dex",
+      "source_excerpt": "00000014-0000-1000-8000-0026bb765291",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.allegion.leopard.apk!classes2.dex",
+        "byte_form": "00000014-0000-1000-8000-0026bb765291",
+        "apk_sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+        "package": "com.allegion.leopard"
+      },
+      "source_row_key": "dfabd4f6b502d1cd7e091bf9cf8804a291f15c50c9eed114c9cee90f7d01d9a6",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "apple_homekit_ecosystem",
+      "detail": "apple_homekit_ecosystem: HomeKit accessory base 0026bb765291 (cross-vendor)"
+    },
+    {
+      "identifier": "258eafa5-e914-47da-95ca-c5ab0dc85b11",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Schlage",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/#com.allegion.leopard.apk!classes4.dex",
+      "source_excerpt": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.allegion.leopard.apk!classes4.dex",
+        "byte_form": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+        "apk_sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+        "package": "com.allegion.leopard"
+      },
+      "source_row_key": "d489b2db102fd3cf69118a0191c5292fc8732dca43478401b25abb8e998f0a03",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "August",
+        "Kwikset",
+        "Schlage",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "486f6d65-6b69-7400-0000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Schlage",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/#com.allegion.leopard.apk!classes2.dex",
+      "source_excerpt": "486f6d65-6b69-7400-0000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.allegion.leopard.apk!classes2.dex",
+        "byte_form": "486f6d65-6b69-7400-0000-000000000000",
+        "apk_sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+        "package": "com.allegion.leopard"
+      },
+      "source_row_key": "fd1cc7e9b09aed433a275b8d125bd321ced250c7fd69a9aefdb999813ed3a46e",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "apple_homekit_ecosystem",
+      "detail": "apple_homekit_ecosystem: ASCII 'Homekit' marker, not a vendor GATT UUID"
+    },
+    {
+      "identifier": "515d6767-01b7-49e5-8273-c8d11b0f331d",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Schlage",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/#com.allegion.leopard.apk!classes2.dex",
+      "source_excerpt": "515d6767-01b7-49e5-8273-c8d11b0f331d",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.allegion.leopard.apk!classes2.dex",
+        "byte_form": "515d6767-01b7-49e5-8273-c8d11b0f331d",
+        "apk_sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+        "package": "com.allegion.leopard"
+      },
+      "source_row_key": "e12eec35d7d11c58bea908a212aea4d114263bc1e9a4401d0828c579455bea4d",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Schlage"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "d861b25a-1edf-11eb-adc1-0242ac120002",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Schlage",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/#com.allegion.leopard.apk!classes2.dex",
+      "source_excerpt": "d861b25a-1edf-11eb-adc1-0242ac120002",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.allegion.leopard.apk!classes2.dex",
+        "byte_form": "d861b25a-1edf-11eb-adc1-0242ac120002",
+        "apk_sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+        "package": "com.allegion.leopard"
+      },
+      "source_row_key": "b2074704a299ef8e48e3dab941b41fd0080ad68ed2e1abdd0f5fdbc2daed60c3",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "non_ble_docker_v1_uuid",
+      "detail": "non_ble_docker_v1_uuid: node 02:42:ac:12:00:02 (Docker default bridge MAC)"
+    },
+    {
+      "identifier": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Schlage",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/#com.allegion.leopard.apk!classes2.dex",
+      "source_excerpt": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.allegion.leopard.apk!classes2.dex",
+        "byte_form": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+        "apk_sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+        "package": "com.allegion.leopard"
+      },
+      "source_row_key": "82ca16610b44193f99892f11c91688b341ad79270a26f7b57b6e10fb23689123",
+      "geographic_scope": "global",
+      "disposition": "rejected_conflict",
+      "reason": "known_fake_pattern",
+      "detail": "known_fake_pattern: all-F placeholder"
+    },
+    {
+      "identifier": "00000000-0000-0000-0000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes6.dex",
+      "source_excerpt": "00000000-0000-0000-0000-000000000000",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes6.dex",
+        "byte_form": "00000000-0000-0000-0000-000000000000",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "7fb0c748559f3523e74568677a0cd572a95ebdf64a97585c00b88a340b026f8b",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "August",
+        "Kwikset",
+        "Schlage",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "258eafa5-e914-47da-95ca-c5ab0dc85b11",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "August",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/#classes7.dex",
+      "source_excerpt": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+      "raw_payload": {
+        "doc_kind": "apk",
+        "dex_entry": "classes7.dex",
+        "byte_form": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+        "apk_sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+        "package": "com.august.luna"
+      },
+      "source_row_key": "4acab876eb436b363334adfaf0fd13ee6479c93ab7ee5e699faaaecba4041e38",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "August",
+        "Kwikset",
+        "Schlage",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "00000000-0000-0000-0000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes4.dex",
+      "source_excerpt": "00000000-0000-0000-0000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes4.dex",
+        "byte_form": "00000000-0000-0000-0000-000000000000",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "6348c9973a1c5df7d3200e336152efb03811324b329f86a2ebeeaffd697332d8",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "August",
+        "Kwikset",
+        "Schlage",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "00010203-0405-0607-0809-0a0b0c0d1910",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "00010203-0405-0607-0809-0A0B0C0D1910",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "00010203-0405-0607-0809-0A0B0C0D1910",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "2937156bea5e3106525334fd9db0367023a2752ade3e31fe5fafb97428c9770a",
+      "geographic_scope": "global",
+      "disposition": "rejected_conflict",
+      "reason": "known_fake_pattern",
+      "detail": "known_fake_pattern: monotonic sequential-byte placeholder"
+    },
+    {
+      "identifier": "00010203-0405-0607-0809-0a0b0c0d1912",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "00010203-0405-0607-0809-0a0b0c0d1912",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "00010203-0405-0607-0809-0a0b0c0d1912",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "1d48c1504c62a19492bdd6940a68845509e5e7a3abeb6f43d94ad1ea7300c2af",
+      "geographic_scope": "global",
+      "disposition": "rejected_conflict",
+      "reason": "known_fake_pattern",
+      "detail": "known_fake_pattern: monotonic sequential-byte placeholder"
+    },
+    {
+      "identifier": "00010203-0405-0607-0809-0a0b0c0d2b10",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "00010203-0405-0607-0809-0A0B0C0D2B10",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "00010203-0405-0607-0809-0A0B0C0D2B10",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "fcade7ac1585abfba4318041511159baf9fd42f16b105f4f24769558f47375b6",
+      "geographic_scope": "global",
+      "disposition": "rejected_conflict",
+      "reason": "known_fake_pattern",
+      "detail": "known_fake_pattern: monotonic sequential-byte placeholder"
+    },
+    {
+      "identifier": "00010203-0405-0607-0809-0a0b0c0d2b11",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "00010203-0405-0607-0809-0A0B0C0D2B11",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "00010203-0405-0607-0809-0A0B0C0D2B11",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "056b4baa9c5d76fa00d580d23eb06cbd9dc41ea8c814eba349370544ef903d66",
+      "geographic_scope": "global",
+      "disposition": "rejected_conflict",
+      "reason": "known_fake_pattern",
+      "detail": "known_fake_pattern: monotonic sequential-byte placeholder"
+    },
+    {
+      "identifier": "00010203-0405-0607-0809-0a0b0c0d2b12",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "00010203-0405-0607-0809-0a0b0c0d2b12",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "00010203-0405-0607-0809-0a0b0c0d2b12",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "489cecfa0aeaee99842033be88cb57dfc6b163d3b9879fe909b4b911a2983529",
+      "geographic_scope": "global",
+      "disposition": "rejected_conflict",
+      "reason": "known_fake_pattern",
+      "detail": "known_fake_pattern: monotonic sequential-byte placeholder"
+    },
+    {
+      "identifier": "1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "1d14d6ee-fd63-4fa1-bfa4-8f47b42119f0",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "e74c9db3f4875e3392c39c39a310d1c3c89b22749984642a27a3b002fdd45bd4",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "258eafa5-e914-47da-95ca-c5ab0dc85b11",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes8.dex",
+      "source_excerpt": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes8.dex",
+        "byte_form": "258EAFA5-E914-47DA-95CA-C5AB0DC85B11",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "6aa28965fc484ee93d85f6166b4c8879b7391aca3a8f6a48bf584cbecbed1cb3",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "August",
+        "Kwikset",
+        "Schlage",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "6e400001-b5a3-f393-e0a9-e50e24dcca1e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "6e400001-b5a3-f393-e0a9-e50e24dcca1e",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "6e400001-b5a3-f393-e0a9-e50e24dcca1e",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "a896b2045823e0e1fb57047b9b1070acda989de206caccb077e635207651532f",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "bundled_sdk_nordic_uart",
+      "detail": "bundled_sdk_nordic_uart: Nordic NUS base 6e40000x-b5a3-f393-e0a9-e50e24dcca**"
+    },
+    {
+      "identifier": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes6.dex",
+      "source_excerpt": "6E400001-B5A3-F393-E0A9-E50E24DCCA9E",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes6.dex",
+        "byte_form": "6E400001-B5A3-F393-E0A9-E50E24DCCA9E",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "6386b82a51dda63bcac8ceb499b94f5728fb5139ef6baeb6b486e875c5373552",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "6e400002-b5a3-f393-e0a9-e50e24dcca1e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "6e400002-b5a3-f393-e0a9-e50e24dcca1e",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "6e400002-b5a3-f393-e0a9-e50e24dcca1e",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "48c22472f4ce55d21ebc6b2735331f84bd5186c281f70db83f0a2342eed52364",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "bundled_sdk_nordic_uart",
+      "detail": "bundled_sdk_nordic_uart: Nordic NUS base 6e40000x-b5a3-f393-e0a9-e50e24dcca**"
+    },
+    {
+      "identifier": "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes6.dex",
+      "source_excerpt": "6E400002-B5A3-F393-E0A9-E50E24DCCA9E",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes6.dex",
+        "byte_form": "6E400002-B5A3-F393-E0A9-E50E24DCCA9E",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "5d4dbf7e96496e4c00183dc704601feb3f6971734a579ecb315e44c9a1ee12b3",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "6e400003-b5a3-f393-e0a9-e50e24dcca1e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "6e400003-b5a3-f393-e0a9-e50e24dcca1e",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "6e400003-b5a3-f393-e0a9-e50e24dcca1e",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "bb81f743e432d927a6ad7de77f0b3ed961c943165a0d4e13a24f7e5e83d28411",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "bundled_sdk_nordic_uart",
+      "detail": "bundled_sdk_nordic_uart: Nordic NUS base 6e40000x-b5a3-f393-e0a9-e50e24dcca**"
+    },
+    {
+      "identifier": "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes6.dex",
+      "source_excerpt": "6E400003-B5A3-F393-E0A9-E50E24DCCA9E",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes6.dex",
+        "byte_form": "6E400003-B5A3-F393-E0A9-E50E24DCCA9E",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "f8737534722e7e9d48b13b8c85d0d429c37cdd57e936a1edf11d1035afafde0a",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "84ce5c4e-1349-1192-9262-0242ac120002",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes3.dex",
+      "source_excerpt": "84ce5c4e-1349-1192-9262-0242ac120002",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes3.dex",
+        "byte_form": "84ce5c4e-1349-1192-9262-0242ac120002",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "6da31a67b12ebae55ca4ac5e941f0d8ef8604664bb5ef8ab881c264a5e52a636",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "non_ble_docker_v1_uuid",
+      "detail": "non_ble_docker_v1_uuid: node 02:42:ac:12:00:02 (Docker default bridge MAC)"
+    },
+    {
+      "identifier": "84ce7201-1349-1192-9262-0242ac120002",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes3.dex",
+      "source_excerpt": "84CE7201-1349-1192-9262-0242AC120002",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes3.dex",
+        "byte_form": "84CE7201-1349-1192-9262-0242AC120002",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "7e3521b13136d39441fe8fe24fccf9e0a40e4a7ab39680b879e17bd7b26ecc35",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "non_ble_docker_v1_uuid",
+      "detail": "non_ble_docker_v1_uuid: node 02:42:ac:12:00:02 (Docker default bridge MAC)"
+    },
+    {
+      "identifier": "8d53dc1d-1db7-4cd3-868b-8a527460aa84",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "8D53DC1D-1DB7-4CD3-868B-8A527460AA84",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "8D53DC1D-1DB7-4CD3-868B-8A527460AA84",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "0b9a37f78dc8974470abfdaee23ce7bf6038ceeb0151d9406a5d211115e5f04d",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "984227f3-34fc-4045-a5d0-2c581f81a153",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "984227f3-34fc-4045-a5d0-2c581f81a153",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "984227f3-34fc-4045-a5d0-2c581f81a153",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "dcd54715723e73a270ec456b54576a81bea2afed11d6434435931ad81a08d0a1",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "da2e7828-fbce-4e01-ae9e-261174997c48",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "DA2E7828-FBCE-4E01-AE9E-261174997C48",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "DA2E7828-FBCE-4E01-AE9E-261174997C48",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "f66a100e392d2d7ff448dc809b311535e8805cb41529322f2e6bc524dc5705f0",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc0-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes3.dex",
+      "source_excerpt": "f000ffc0-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes3.dex",
+        "byte_form": "f000ffc0-0451-4000-b000-000000000000",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "cf81aca15f94b5168cd2de51a6fc68fc87c581a6c325a28118bd75296f2d2965",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc1-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes3.dex",
+      "source_excerpt": "f000ffc1-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes3.dex",
+        "byte_form": "f000ffc1-0451-4000-b000-000000000000",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "5c98617fb21896503618cf483265a5c5a4351984deb0bad021b349d5bbc2720d",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc2-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes3.dex",
+      "source_excerpt": "f000ffc2-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes3.dex",
+        "byte_form": "f000ffc2-0451-4000-b000-000000000000",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "9d8ff371511345efbd3bd283675194ed4b261ba1e7e4539238314c177cab9895",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc3-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "f000ffc3-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "f000ffc3-0451-4000-b000-000000000000",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "be3150997f807f3f39516fccd53b7720c56307c8dffbae051141cb2434ec2a5f",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc4-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "f000ffc4-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "f000ffc4-0451-4000-b000-000000000000",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "935f7b7e4c381b05e82daaff8352a96574d28203dd55f707e350fdd169d625e7",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f000ffc5-0451-4000-b000-000000000000",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes3.dex",
+      "source_excerpt": "f000ffc5-0451-4000-b000-000000000000",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes3.dex",
+        "byte_form": "f000ffc5-0451-4000-b000-000000000000",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "220ef6af04b054cbdd19f8eaa0912a7e734785711191890b810924e207363f37",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    },
+    {
+      "identifier": "f7bf3564-fb6d-4e53-88a4-5e37e0326063",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Ultraloq",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/#com.utec.utec.apk!classes5.dex",
+      "source_excerpt": "f7bf3564-fb6d-4e53-88a4-5e37e0326063",
+      "raw_payload": {
+        "doc_kind": "xapk",
+        "dex_entry": "com.utec.utec.apk!classes5.dex",
+        "byte_form": "f7bf3564-fb6d-4e53-88a4-5e37e0326063",
+        "apk_sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+        "package": "com.utec.utec"
+      },
+      "source_row_key": "9b2ce4b67c9d54e6b633020f1aad5fbd6693d0d3d4430d38cab84a4a669c73da",
+      "geographic_scope": "global",
+      "disposition": "excluded",
+      "reason": "cross_vendor_sdk_magnet",
+      "co_occurrence_vendors": [
+        "Kwikset",
+        "Ultraloq"
+      ],
+      "detail": "appears in >=2 unrelated vendor APKs -> shared chipset/BLE-SDK magnet (§11 #21 / CP44 cited co-occurrence)"
+    }
+  ],
+  "held_recat_candidates": [
+    {
+      "label": "U-tec Group (Ultraloq maker)",
+      "identifier": "0c:7f:ed:8/28",
+      "db_rows": [
+        [
+          7200,
+          "0c:7f:ed:8/28",
+          "mac_range",
+          "unknown",
+          "U-tec Group Inc."
+        ]
+      ],
+      "note": "id7200 mac_range unknown -> strong recat candidate (pure-play lock maker)."
+    },
+    {
+      "label": "Spectrum Brands (Kwikset parent)",
+      "identifier": "70:b3:d5:25:4/36",
+      "db_rows": [
+        [
+          21039,
+          "70:b3:d5:25:4/36",
+          "mac_range",
+          "unknown",
+          "Spectrum Brands"
+        ]
+      ],
+      "note": "id21039 mac_range unknown -> recat candidate; multi-division caveat (batteries/pet/hardware)."
+    },
+    {
+      "label": "ASSA ABLOY(GuangZhou) Smart Technology",
+      "identifier": "e8:6c:c7:1/28",
+      "db_rows": [
+        [
+          9448,
+          "e8:6c:c7:1/28",
+          "mac_range",
+          "unknown",
+          "ASSA ABLOY(GuangZhou) Smart Technology Co., Ltd"
+        ]
+      ],
+      "note": "id9448 mac_range unknown -> recat candidate; ASSA manufacturing arm."
+    },
+    {
+      "label": "Allegion PLC (Schlage parent)",
+      "identifier": "fa:14:66",
+      "db_rows": [
+        [
+          37014,
+          "fa:14:66",
+          "oui",
+          "unknown",
+          "Allegion PLC"
+        ]
+      ],
+      "note": "id37014 oui unknown -> recat candidate (held from a prior load; not in current snapshot)."
+    },
+    {
+      "label": "Wyze Labs (do-not-double-promote)",
+      "identifier": "a4:da:22:2/28",
+      "db_rows": [
+        [
+          9748,
+          "a4:da:22:2/28",
+          "mac_range",
+          "unknown",
+          "Wyze Labs Inc"
+        ]
+      ],
+      "wyze_cctv_oui_ids": [
+        [
+          44484,
+          "2c:aa:8e",
+          "cctv_camera",
+          "Wyze Labs"
+        ],
+        [
+          44485,
+          "7c:78:b2",
+          "cctv_camera",
+          "Wyze Labs"
+        ],
+        [
+          44486,
+          "80:48:2c",
+          "cctv_camera",
+          "Wyze Labs"
+        ],
+        [
+          44487,
+          "d0:3f:27",
+          "cctv_camera",
+          "Wyze Labs"
+        ],
+        [
+          44488,
+          "f0:c8:8b",
+          "cctv_camera",
+          "Wyze Labs"
+        ]
+      ],
+      "note": "MAC-397 ruling 2: Wyze OUIs id44484-88 are already cctv_camera. NO Wyze company-level OUI/ID candidate emitted; company-level OUI cannot be split Lock vs Cam without a product-level cite (which we do not have)."
+    }
+  ],
+  "ble_registry_held": [
+    {
+      "label": "August Home company-id",
+      "identifier": "0x01D1",
+      "stored_as": "ble_manufacturer_id",
+      "db_rows": [
+        [
+          4507,
+          "0x01D1",
+          "ble_manufacturer_id",
+          "unknown",
+          "August Home, Inc"
+        ]
+      ]
+    },
+    {
+      "label": "Yale company-id",
+      "identifier": "0x0BDE",
+      "stored_as": "ble_manufacturer_id",
+      "db_rows": [
+        [
+          2106,
+          "0x0BDE",
+          "ble_manufacturer_id",
+          "unknown",
+          "Yale"
+        ]
+      ]
+    },
+    {
+      "label": "Allegion company-id (Schlage parent)",
+      "identifier": "0x013B",
+      "stored_as": "ble_manufacturer_id",
+      "db_rows": [
+        [
+          4648,
+          "0x013B",
+          "ble_manufacturer_id",
+          "unknown",
+          "Allegion"
+        ]
+      ]
+    },
+    {
+      "label": "Wyze Labs company-id",
+      "identifier": "0x0870",
+      "stored_as": "ble_manufacturer_id",
+      "db_rows": [
+        [
+          2926,
+          "0x0870",
+          "ble_manufacturer_id",
+          "unknown",
+          "Wyze Labs, Inc"
+        ]
+      ]
+    },
+    {
+      "label": "Spectrum Brands company-id (Kwikset parent)",
+      "identifier": "0x0356",
+      "stored_as": "ble_manufacturer_id",
+      "db_rows": [
+        [
+          4155,
+          "0x0356",
+          "ble_manufacturer_id",
+          "unknown",
+          "Spectrum Brands, Inc."
+        ]
+      ]
+    },
+    {
+      "label": "ASSA ABLOY company-id",
+      "identifier": "0x012E",
+      "stored_as": "ble_manufacturer_id",
+      "db_rows": [
+        [
+          4661,
+          "0x012E",
+          "ble_manufacturer_id",
+          "unknown",
+          "ASSA ABLOY"
+        ]
+      ]
+    },
+    {
+      "label": "August Home 16-bit service UUID 0xFE24",
+      "identifier": "0xFE24",
+      "stored_as": "ble_company_id (TYPING QUIRK)",
+      "db_rows": [
+        [
+          37938,
+          "0xfe24",
+          "ble_company_id",
+          "unknown",
+          "August Home Inc"
+        ]
+      ]
+    },
+    {
+      "label": "Allegion 16-bit service UUID 0xFCF4",
+      "identifier": "0xFCF4",
+      "stored_as": "ble_company_id (TYPING QUIRK)",
+      "db_rows": [
+        [
+          38239,
+          "0xfcf4",
+          "ble_company_id",
+          "unknown",
+          "Allegion"
+        ]
+      ]
+    },
+    {
+      "label": "WYZE LABS 16-bit service UUID 0xFD7B",
+      "identifier": "0xFD7B",
+      "stored_as": "ble_company_id (TYPING QUIRK)",
+      "db_rows": [
+        [
+          38104,
+          "0xfd7b",
+          "ble_company_id",
+          "unknown",
+          "WYZE LABS, INC."
+        ]
+      ]
+    },
+    {
+      "label": "ASSA ABLOY 16-bit service UUID 0xFCBF",
+      "identifier": "0xFCBF",
+      "stored_as": "ble_company_id (TYPING QUIRK)",
+      "db_rows": [
+        [
+          38291,
+          "0xfcbf",
+          "ble_company_id",
+          "unknown",
+          "ASSA ABLOY Opening Solutions Sweden AB"
+        ]
+      ]
+    }
+  ]
+}
