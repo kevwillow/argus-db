@@ -1,0 +1,258 @@
+{
+  "_meta": {
+    "issue": "MAC-403",
+    "cohort": "MAC-393 wave-2 cohort 3 — Bluetooth tracker",
+    "harvest_input": "MAC-396 (CTO-ratified) + extraction_outputs/mac393_c3_bletracker/{leads,sources}.json",
+    "scope": "EXTRACTION ONLY — candidates for CTO review -> DBArchitect ingest. No DB write / migration / export regen / push. db/argus.db opened mode=ro.",
+    "device_category": "bluetooth_tracker (exported category; promotion is a CEO one-way door at ship gate)",
+    "apk_enrichment_authorization": "CTO-authorized exactly two apps (Pebblebee + Cube); Atuvos/Nutale/KeySmart NOT authorized (Apple-piggyback cross-vendor).",
+    "excerpt_max_chars": 200,
+    "pii_redaction_count": 0,
+    "pii_note": "No person-PII surfaced. Deliverable carries UUID values + company legal-entity names + class/UUID facts + sha256 pins only (§11 #3 / §11 #15). No APK code copied.",
+    "tagfinder_note": "tagfinder (sid29) company-id table is FABRICATED (every contested mapping collides with an unrelated SIG name) -> behavioral-only, never an identifier corroborator.",
+    "export_meaningfulness": "A promoted Pebblebee 0xFA25 row WOULD reach the Lynceus feed (bluetooth_tracker is exported, wave-1 MAC-387/388) -> ingest+regen is a CEO one-way door (mirrors cohort-1 MAC-373)."
+  },
+  "candidates": [
+    {
+      "value": "0000fa25-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "bluetooth_tracker",
+      "manufacturer": "Pebblebee",
+      "band": "crowdsourced",
+      "confidence": 65,
+      "band_ceiling": 75,
+      "source_sid": 24,
+      "source_markers": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/PebbleBee.kt",
+        "line": 214,
+        "excerpt": "val offlineFindingServiceUUID: ParcelUuid = ParcelUuid.fromString(\"0000FA25-0000-1000-8000-00805F9B34FB\")",
+        "artifact_sha256": "14100da0f7d4e33cd0c945182671276e82769e195e5de4dbfcd70d65d6ebab3c"
+      },
+      "db_presence": "net-new",
+      "corroboration": "SINGLE-SOURCE (AirGuard sid24, crowdsourced). NOT SIG-registered (absent from member_uuids.yaml -> Pebblebee-proprietary 16-bit UUID). CTO-authorized Pebblebee APK enrichment ATTEMPTED (com.pebblebee.pebblebeeplus v2.2.3, sha 76b5879...) -> 0xFA25 NOT present in app dex -> NO §8.3 value-level lift. Stays single-source <=75 (honest outcome).",
+      "caveats": [
+        "Connectable SOUND / offline-finding GATT service (AirGuard ScanFilter serviceUuid at PebbleBee.kt:197-200) -> advertised by offline-finding units but observed on CONNECT, not guaranteed in passive adv.",
+        "Paired char 0x2C02 (PebbleBee.kt:190) is SIG-standard 'UGT Features' (characteristic_uuids.yaml:1377) -> NOT vendor-distinct; explicitly NOT promoted.",
+        "Pebble Technology (smartwatch) rows id4624/id9839/id37761 are a DIFFERENT company; do not conflate."
+      ]
+    }
+  ],
+  "rejected_fabrications": [
+    {
+      "value": "0x0183",
+      "claimed_vendor": "Pebblebee",
+      "identifier_type": "ble_company_id",
+      "disposition": "REJECTED (not staged)",
+      "reason": "FABRICATED — authoritative SIG company_identifiers.yaml 0x0183='Walt Disney'.",
+      "source_markers": {
+        "artifact": "raw/tagfinder/20260613T203034Z_tagfinder.py",
+        "line": 154,
+        "excerpt": "0x0183: \"PEBBLEBEE\","
+      },
+      "sig_authority": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+        "line": 10833,
+        "excerpt": "- value: 0x0183"
+      }
+    },
+    {
+      "value": "0x022A",
+      "claimed_vendor": "Nutale",
+      "identifier_type": "ble_company_id",
+      "disposition": "REJECTED (not staged)",
+      "reason": "FABRICATED — authoritative SIG company_identifiers.yaml 0x022A='Stamer Musikanlagen GMBH'.",
+      "source_markers": {
+        "artifact": "raw/tagfinder/20260613T203034Z_tagfinder.py",
+        "line": 151,
+        "excerpt": "0x022A: \"Nutale\","
+      },
+      "sig_authority": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+        "line": 10389,
+        "excerpt": "- value: 0x022A"
+      }
+    }
+  ],
+  "excluded_cross_vendor": [
+    {
+      "value": "0000feaa-0000-1000-8000-00805f9b34fb",
+      "short": "0xFEAA",
+      "vendor": "Google FMD / Eddystone",
+      "disposition": "EXCLUDED — cross-vendor ecosystem service, already held (wave-1 ruling)",
+      "held_as": "ble_company_id id37808 (Google LLC)",
+      "source_markers": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/GoogleFindMyNetwork.kt",
+        "line": 212,
+        "excerpt": "val offlineFindingServiceUUID: ParcelUuid = ParcelUuid.fromString(\"0000FEAA-0000-1000-8000-00805F9B34FB\")"
+      },
+      "db_presence": "[]"
+    },
+    {
+      "value": "0000fd44-0000-1000-8000-00805f9b34fb",
+      "short": "0xFD44",
+      "vendor": "Apple Find My",
+      "disposition": "EXCLUDED — cross-vendor ecosystem service, already held (wave-1 ruling)",
+      "held_as": "ble_service_uuid id22876 (bluetooth_tracker) / id38159 ble_company_id",
+      "source_markers": null,
+      "db_presence": "[(22876, 'ble_service_uuid', 'bluetooth_tracker', None)]"
+    },
+    {
+      "value": "0000004c-0000-1000-8000-00805f9b34fb",
+      "short": "0x004C",
+      "vendor": "Apple",
+      "disposition": "EXCLUDED — cross-vendor ecosystem service, already held (wave-1 ruling)",
+      "held_as": "ble_company_id id568 / id22842",
+      "source_markers": null,
+      "db_presence": "[]"
+    },
+    {
+      "value": "0000fe59-0000-1000-8000-00805f9b34fb",
+      "short": "0xFE59",
+      "vendor": "Nordic Semiconductor (DFU)",
+      "disposition": "EXCLUDED — cross-vendor ecosystem service, already held (wave-1 ruling)",
+      "held_as": "wave-1 excluded cross-vendor chipset DFU service",
+      "source_markers": null,
+      "db_presence": "[]"
+    }
+  ],
+  "apk_enrichment": {
+    "pebblebee": {
+      "vendor": "Pebblebee",
+      "package": "com.pebblebee.pebblebeeplus",
+      "version": "2.2.3",
+      "artifact": "raw/vendor_apps/pebblebee/com.pebblebee.pebblebeeplus/2.2.3/pebblebee.xapk",
+      "sha256": "76b587956b610911652dd5d0602252d733a6834cbf75d3d2a8d2ad0ff02bc855",
+      "doc_kind": "xapk",
+      "source_url": "https://apkcombo.com/pebblebee/com.pebblebee.pebblebeeplus/download/apk",
+      "fetch_method": "apkcombo->pureapk XAPK via headless chromium (Cloudflare-gated); facts-only",
+      "target": "corroborate Pebblebee ble_service_uuid 0xFA25",
+      "fa25_present_in_app_dex": false,
+      "uuid_2c02_present_in_app_dex": false,
+      "outcome": "NOT CORROBORATED — 0xFA25 absent from app dex string pool. App uses standard SIG services + 11 custom 128-bit GATT UUIDs (Nordic BLE-library provisioning/config). 0xFA25 stays SINGLE-SOURCE <=75; no §8.3 lift. Valid honest outcome per MAC-403 brief.",
+      "sig16_service_uuids_in_app": [
+        "00000000-0000-1000-8000-00805f9b34fb",
+        "00001801-0000-1000-8000-00805f9b34fb",
+        "0000180f-0000-1000-8000-00805f9b34fb",
+        "00002902-0000-1000-8000-00805f9b34fb",
+        "00002a05-0000-1000-8000-00805f9b34fb",
+        "00002a19-0000-1000-8000-00805f9b34fb"
+      ],
+      "custom_128bit_uuids_in_app": [
+        "16ed6993-c4ce-4e5f-86a7-944073af9adc",
+        "1b6f9b2e-3946-452e-ad91-e463737b8bc6",
+        "3ea7eb25-6cce-43ae-8e6d-1fe5d27f6ac1",
+        "8d53dc1d-1db7-4cd3-868b-8a527460aa84",
+        "95ed6082-b8e9-46e8-a73f-ff56f00f5d9d",
+        "b37e6d8f-1eb1-45bb-9b0d-1a0934da8f15",
+        "b411b465-e01c-4cce-8002-7d744c782cd3",
+        "d0bf0a10-2d0a-407e-91e2-a18917d5e164",
+        "da2e7828-fbce-4e01-ae9e-261174997c48",
+        "ec104bd6-0f40-4072-8f66-dae50c22f79b",
+        "ed7df348-6b11-4a49-b035-74a716b5c96f"
+      ]
+    },
+    "cube": {
+      "vendor": "Cube",
+      "package": "com.blueskyhomesales.cube",
+      "version": "latest",
+      "artifact": "raw/vendor_apps/cube/com.blueskyhomesales.cube/latest/cube.xapk",
+      "sha256": "af6e7ce474ce1a0b00ba226d6d84cb447e16f88ab5c378c567b5797c2d158e63",
+      "doc_kind": "apk",
+      "source_url": "https://apkcombo.com/cube-tracker/com.blueskyhomesales.cube/download/apk",
+      "fetch_method": "apkcombo->pureapk APK via headless chromium (Cloudflare-gated); facts-only",
+      "target": "verify 0x03EE=='CUBE TECHNOLOGIES' tracker + surface Cube-distinct GATT service UUID",
+      "is_cube_tracker_product": true,
+      "is_nbiot_cellular_tracker": true,
+      "company_id_03ee_present_in_app": false,
+      "outcome": "0x03EE NOT present in Cube app (company-id 1006 hits are dex bytecode offsets, not manufacturer company-ids) -> 'CUBE TECHNOLOGIES' (id4010) NOT demonstrably the Cube tracker -> NO 0x03EE recat. Product is an NB-IoT CELLULAR GPS tracker (NORDIC_NBTRACKER_PROFILE); BLE is local-config only. BLE UUID surface is bundled-SDK (Nordic DFU + TI-OAD 0xF000 range + SIG-standard) -> no clean Cube-distinct advertised service UUID -> NO candidate (§11 #1 conservative).",
+      "sig16_service_uuids_in_app": [
+        "00000001-0000-1000-8000-00805f9b34fb",
+        "00000002-0000-1000-8000-00805f9b34fb",
+        "00000003-0000-1000-8000-00805f9b34fb",
+        "000008f0-0000-1000-8000-00805f9b34fb",
+        "00001801-0000-1000-8000-00805f9b34fb",
+        "00001802-0000-1000-8000-00805f9b34fb",
+        "00001803-0000-1000-8000-00805f9b34fb",
+        "0000180a-0000-1000-8000-00805f9b34fb",
+        "0000180d-0000-1000-8000-00805f9b34fb",
+        "0000180f-0000-1000-8000-00805f9b34fb",
+        "00001814-0000-1000-8000-00805f9b34fb",
+        "00002902-0000-1000-8000-00805f9b34fb",
+        "00002a05-0000-1000-8000-00805f9b34fb",
+        "00002a06-0000-1000-8000-00805f9b34fb",
+        "00002a19-0000-1000-8000-00805f9b34fb",
+        "00002a24-0000-1000-8000-00805f9b34fb",
+        "00002a26-0000-1000-8000-00805f9b34fb",
+        "00002a28-0000-1000-8000-00805f9b34fb",
+        "00002a29-0000-1000-8000-00805f9b34fb",
+        "00002a37-0000-1000-8000-00805f9b34fb",
+        "00002a38-0000-1000-8000-00805f9b34fb",
+        "00002a53-0000-1000-8000-00805f9b34fb",
+        "00002a54-0000-1000-8000-00805f9b34fb",
+        "0000f000-0000-1000-8000-00805f9b34fb",
+        "0000f002-0000-1000-8000-00805f9b34fb",
+        "0000f003-0000-1000-8000-00805f9b34fb",
+        "0000f004-0000-1000-8000-00805f9b34fb",
+        "0000f00a-0000-1000-8000-00805f9b34fb",
+        "0000f010-0000-1000-8000-00805f9b34fb",
+        "0000f020-0000-1000-8000-00805f9b34fb",
+        "0000f800-0000-1000-8000-00805f9b34fb",
+        "0000f802-0000-1000-8000-00805f9b34fb",
+        "0000f803-0000-1000-8000-00805f9b34fb",
+        "0000f804-0000-1000-8000-00805f9b34fb",
+        "0000f80a-0000-1000-8000-00805f9b34fb",
+        "0000fef5-0000-1000-8000-00805f9b34fb",
+        "0000ff01-0000-1000-8000-00805f9b34fb",
+        "0000ff02-0000-1000-8000-00805f9b34fb",
+        "0000fff0-0000-1000-8000-00805f9b34fb",
+        "0000fff4-0000-1000-8000-00805f9b34fb",
+        "0000fff5-0000-1000-8000-00805f9b34fb"
+      ],
+      "custom_128bit_uuids_in_app": [
+        "00000000-0000-0000-0000-00000000fff3",
+        "02f00000-0000-0000-0000-00000000fe00",
+        "02f00000-0000-0000-0000-00000000ff01",
+        "02f00000-0000-0000-0000-00000000ff02",
+        "0783b03e-8535-b5a0-7140-a304d2495cb8",
+        "0783b03e-8535-b5a0-7140-a304d2495cba",
+        "10000000-ffff-ffff-ffff-000000000001",
+        "258eafa5-e914-47da-95ca-c5ab0dc85b11",
+        "457871e8-d516-4ca1-9116-57d0b17b9cb2",
+        "457871e8-d516-4ca1-9116-57d0b17ba090",
+        "5f78df94-798c-46f5-990a-b3eb6a065c88",
+        "5f78df94-798c-46f5-990a-b3eb6a06c0b0",
+        "6c53db25-47a1-45fe-a022-7c92fb334fd4",
+        "6c53db25-47a1-45fe-a022-7c92fb336050",
+        "724249f0-5ec3-4b5f-8804-42345af04030",
+        "724249f0-5ec3-4b5f-8804-42345af08651",
+        "8082caa8-41a6-4021-91c6-56f9b9542010",
+        "8082caa8-41a6-4021-91c6-56f9b954cc34",
+        "9d84b9a3-000c-49d8-9183-855b673f8070",
+        "9d84b9a3-000c-49d8-9183-855b673fda31"
+      ]
+    }
+  },
+  "flagged_for_cto": [
+    {
+      "flag": "pebblebee_custom_gatt_uuids_not_authorized",
+      "detail": "Pebblebee app carries 11 custom 128-bit GATT UUIDs (config/provisioning via Nordic BLE library). The MAC-403 Pebblebee APK authorization was CORROBORATION-ONLY (0xFA25); harvesting these as new identifiers would expand scope. Surfaced for potential future CTO authorization. Connectable services (not passive adv); DB-presence unchecked.",
+      "values": [
+        "16ed6993-c4ce-4e5f-86a7-944073af9adc",
+        "1b6f9b2e-3946-452e-ad91-e463737b8bc6",
+        "3ea7eb25-6cce-43ae-8e6d-1fe5d27f6ac1",
+        "8d53dc1d-1db7-4cd3-868b-8a527460aa84",
+        "95ed6082-b8e9-46e8-a73f-ff56f00f5d9d",
+        "b37e6d8f-1eb1-45bb-9b0d-1a0934da8f15",
+        "b411b465-e01c-4cce-8002-7d744c782cd3",
+        "d0bf0a10-2d0a-407e-91e2-a18917d5e164",
+        "da2e7828-fbce-4e01-ae9e-261174997c48",
+        "ec104bd6-0f40-4072-8f66-dae50c22f79b",
+        "ed7df348-6b11-4a49-b035-74a716b5c96f"
+      ]
+    },
+    {
+      "flag": "cube_is_nbiot_cellular_gps_tracker",
+      "detail": "Cube (cube.tech / com.blueskyhomesales.cube) is an NB-IoT cellular GPS tracker, NOT a BLE Find-My beacon. Mirrors the cohort-2 GPS-tracker finding (~0 RF/BLE export surface). No vendor-distinct BLE identifier; 0x03EE link unproven and stays held@unknown."
+    }
+  ]
+}
