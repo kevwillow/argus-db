@@ -14,6 +14,41 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.8 — 2026-06-14
+
+A **data release** on top of v1.6.7, and the widest-net sourcing cycle the project has run (MAC-362 / MAC-363). It admits **81 net-new identifiers** across five device cohorts plus a deferred-revival cleanup, and it withdraws 25 bad OUIs that had been shipping in the standard feed. Active identifier count moves **43,213 → 43,123**, because the cleanup outweighs the admissions. **No schema migration** (schema_version stays **31**), **+1 manufacturer** (155 → 156, Qualcomm), **+9 sources** (86 → 95). The Lynceus high-confidence feed grows **322 → 348**, the standard feed **736 → 737**, and the behavioral-signatures feed **125 → 132**. Every identifier traces to a quotable public source (IEEE OUI registry, Bluetooth SIG assigned numbers, FCC filings, APK static analysis, academic Find-My teardowns); none came from model memory. The board approved the push (approval `1598798c`) after an independent re-verification against the live database, a backup-first apply per cohort, and an operator-gated fast-forward.
+
+### What's new
+
+- **Consumer surveillance OUIs (+26, the feed-additive cohort).** Ring/Amazon, Wyze, Arlo, and Blink doorbell and camera MAC prefixes register as 26 net-new `oui` rows (ids 44471-44496), confidence 85, category `cctv_camera`. These are the only rows that reach the runtime Lynceus feeds this cycle, so a scanner now alerts on a nearby Ring or Wyze camera by its OUI. Doorbells land as `cctv_camera` for now; a dedicated `video_doorbell` subtype is queued (MAC-381).
+- **Bluetooth trackers and stalkerware (+41, captured, feed-visibility queued).** AirTag, Tile, Samsung SmartTag, and Chipolo register 41 net-new BLE rows (36 `ble_service_uuid`, 3 `ble_characteristic`, 2 `ble_uuid`) from OpenHaystack and peer-reviewed Find-My teardowns plus Bluetooth-SIG company-ID `0x004C`. We declined the Apple MFi, Tile SDK, and Samsung SmartThings Find click-through licenses and stayed on the facts-only academic path. These land export-suppressed (`device_category='unknown'`); their feed-visibility ships in a dedicated fast-follow (MAC-387) so the new tracker category lands under the settled BLE export map.
+- **ALPR and cop-car (+14).** Flock, Motorola/Vigilant, Genetec, and adjacent license-plate-reader vendors contribute 6 `ssid_pattern`, 5 `fcc_grantee_code`, and 3 `equipment_class_code` rows from APK package-ids and FCC filings, extending the v1.6.7 Flock/cop-car teardown method. All are Argus-internal types outside the Lynceus `{mac, oui, ssid, ble_uuid}` schema, so they sit in the CSV, not the JSON feeds.
+- **Drones, body cams, and DeFlock (no net-new identifiers).** The drone cohort (DJI/Parrot/Skydio/Autel/Anduril) added 3 sources, 5 behavioral signatures, and a 13-row FCC-band reclassification, with no new identifier values. The body-cam and acoustic cohort (Axon/Motorola/ShotSpotter/Getac) confirmed zero net-new admissible surface, since all four vendors already carry coverage from prior waves. The DeFlock coordinate tier (sid 6, ODbL-1.0) was probed read-only and held: it is structurally coordinate-only, carries no Kismet-visible identifier, and stays in `deployment_observations` rather than crossing the ODbL share-alike door.
+- **Deferred-revival cleanup.** Correctness fixes from the FoggedLens, OpenIPC, and MAC-337 revival pass: a source license correction (sid-86 to MIT), a FoggedLens source row, a Coban grantee re-attribution, and a 39-row Qualcomm `chipset_codename` re-attribution that registers Qualcomm as a manufacturer (id 326). All are export-DROPPED registry hygiene.
+- **Standard-feed hygiene (−25 OUIs).** The cleanup withdrew 23 known-fake, locally-administered, and multicast OUIs that had been live in the standard feed (MAC-385) and corrected 2 cohort-2 mis-attributions (MAC-375). Withdrawing bad data is why the standard feed moves only +1 net against +26 admissions.
+
+### Schema
+
+- **No migrations this cycle.** Migration ledger stays **0001 through 0031**; schema_version stays **31**. The new cohorts use existing identifier-type and category slots. The `bluetooth_tracker` category mint waits for the MAC-387 fast-follow.
+
+### Data
+
+- **`identifiers` active:** 43,213 → **43,123** (−90: +81 net-new admissions, outweighed by ~173 supersessions from the MAC-385 known-fake collapse-and-withdraw and the MAC-375 correction).
+- **`identifiers` total:** 43,595 → **43,678** (+83).
+- **`manufacturers`:** 155 → **156** (+1, Qualcomm).
+- **`sources`:** 86 → **95** (+9: academic Find-My and OpenHaystack for trackers, drone vendor and FAA-RID, consumer mirrors, FoggedLens).
+- **`behavioral_signatures` export records:** 125 → **132** (+7, drone footprints).
+- **Lynceus high-confidence export records:** 322 → **348** (+26 consumer-camera OUIs at confidence 85). **Standard export records:** 736 → **737** (+26 consumer, −23 MAC-385, −2 MAC-375). **CSV:** 43,123 rows, matching the active count.
+- **Export-membership note (load-bearing).** Only the 26 consumer-camera OUIs reach the US-filtered JSON feeds. The 41 BLE-tracker rows stay export-suppressed pending MAC-387; the ALPR `ssid_pattern` / `fcc_grantee_code` / `equipment_class_code`, the drone `fcc_grantee_code`, and the revival `chipset_codename` rows are Argus-internal types outside the Lynceus schema. All admitted rows appear in `argus_export.csv`.
+
+### Bible amendments
+
+- **CP44, cross-vendor-constant exclusion gate (§11 #21).** One consolidated correction pass folding the earlier provisional CP44/CP45 work: a constant that shows up across unrelated vendor apps (the `0xFE59` / `258eafa5-…` class) is not a single-vendor device signature, so it is excluded by name. Committed `8a4fab3`.
+
+### Halts encountered
+
+- **None.** Each cohort applied backup-first with an independent re-verification, and the validator battery (including lookup-tuple uniqueness) passed on every promotion batch. The 311 MB pre-apply database snapshots were caught outside `.gitignore` at the ship-gate and excluded before any commit.
+
 ## v1.6.7 — 2026-06-12
 
 A **data release** layered on top of v1.6.6. It admits **+290** identifiers across two cohorts: the R2 SoC chipset set held back from v1.6.6, and the Flock / cop-car Android-app static-analysis cluster. Active identifier count **42,923 → 43,213**. **No schema migration** (schema_version stays **31**), **+14 manufacturers** (141 → 155), **+10 sources** (76 → 86). The Lynceus JSON feeds hold flat (high-confidence **322**, standard **736**) because every new row is an Argus-internal type — `chipset_codename`, `vendor_controlled_hostname`, `network_endpoint` — outside the Lynceus `{mac, oui, ssid, ble_uuid}` watchlist schema; all 290 land in the full CSV (43,213 rows). Both cohorts were operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
