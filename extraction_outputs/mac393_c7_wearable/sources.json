@@ -1,0 +1,120 @@
+{
+  "cohort": "c7_wearable",
+  "issue": "MAC-400",
+  "parent": "MAC-393",
+  "phase": "harvest",
+  "stage_only": true,
+  "generated_utc": "2026-06-14T17:16Z",
+  "device_category": {
+    "proposed": "wearable",
+    "exists_in_db": false,
+    "in_check_enum": false,
+    "db_count": 0,
+    "disposition": "category_pending_board_ratification",
+    "one_way_door": true,
+    "privacy_sensitivity_note": "Continuous-broadcast wearables identify a PERSON more than a device (heart rate, sleep, location-by-proximity). Board must weigh privacy before minting. Argus scope is equipment, not people (Bible §11 #3) — these identifiers are device/vendor identifiers (company-ids, service UUIDs), no person-PII harvested."
+  },
+  "identifier_types_in_scope": ["ble_company_id", "ble_service_uuid"],
+  "vendors_in_scope": ["Fitbit", "Garmin", "Whoop", "Oura", "Galaxy Watch (Samsung)"],
+  "headline": "RECAT-ONLY cohort: net-new = 0 across BOTH in-scope identifier_types. Every Garmin/Oura/Samsung BT SIG identifier is ALREADY HELD (company-ids under ble_manufacturer_id; member service UUIDs under ble_company_id short-form, Samsung's also under ble_service_uuid 128-bit). Fitbit + Whoop are ABSENT from the BT SIG registry entirely (honest zero). Mirrors MAC-397/398: BT SIG 16-bit is fully bulk-loaded.",
+  "sources": [
+    {
+      "name": "Bluetooth SIG — company_identifiers.yaml",
+      "band": "primary_registry",
+      "source_url": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+      "sha256": "51b1ea7ddf98906df1538af7406dd7bea7c905a7d2f5cebcf4eb63c72447b5a0",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "license_posture": "BT SIG public assigned-numbers registry — pre-cleared primary_registry (source-triage §1/§7). Factual company-id->name mapping (§11 #16 Feist: facts extractable). Same file sha as c6 (MAC-399).",
+      "line_count": 11954,
+      "yield": "5 ble_company_id leads (Garmin/Oura x2/Samsung/Samsung-SDS) — ALL already held under ble_manufacturer_id"
+    },
+    {
+      "name": "Bluetooth SIG — member_uuids.yaml (16-bit member service UUIDs)",
+      "band": "primary_registry",
+      "source_url": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+      "sha256": "42478df3da88f890d80d2a4ac46e01657c9515434c3ebae8ad72e8d921b55bf2",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "license_posture": "BT SIG public assigned-numbers registry — pre-cleared primary_registry (source-triage §1/§7). NOTE: file carries the standard BT SIG PCLA 'provided AS IS' header (lines 1-12); the data (uuid->member-name) is factual and extractable per §11 #16. CTO pre-cleared BT SIG assigned numbers as primary_registry.",
+      "line_count": 1446,
+      "yield": "12 ble_service_uuid leads (Garmin 1 / Oura 2 / Samsung 9) — ALL already held"
+    },
+    {
+      "name": "FCC EAS direct (grantee + equipment-class)",
+      "band": "primary_registry",
+      "source_url": "https://apps.fcc.gov/oetcf/eas/reports/GenericSearch.cfm",
+      "sha256": null,
+      "last_fetched_at": null,
+      "license_posture": "FCC public registry (NOT fccid.io — §8.2). Direct host only.",
+      "status": "BLOCKED_HOST_UNREACHABLE",
+      "probe_log": "logs/mac393_c7_wearable_fcc_eas_probe_20260614T171530Z.log",
+      "probe_result": "apps.fcc.gov -> http_code=000 curl_rc=92; www.fcc.gov/oet/ea/fccid -> http_code=000 curl_rc=92; data.fcc.gov -> 200 (not EAS); control google.com -> 301 (network OK). Reproduces MAC-395/397/398/399.",
+      "yield": "0 — host unreachable; AND out-of-scope for this cohort: FCC EAS yields fcc_grantee_code + equipment_class_code, neither in cohort-7 identifier_types, and both export-dropped per MAC-395. Completeness gap, not a feed-blocker."
+    }
+  ],
+  "leads": {
+    "ble_company_id": {
+      "net_new": 0,
+      "already_held": 5,
+      "store_note": "BT SIG company identifiers are stored in db/argus.db under identifier_type='ble_manufacturer_id' (MAC-371/MAC-398 ruling), NOT 'ble_company_id'. Presence checked across all types.",
+      "items": [
+        {"vendor": "Garmin", "value": "0x0087", "source_file": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml", "source_line": 11563, "source_excerpt": "name: 'Garmin International, Inc.'", "value_excerpt": "- value: 0x0087", "db_presence": "ALREADY_HELD", "db_id": 4821, "db_type": "ble_manufacturer_id", "db_category": "unknown"},
+        {"vendor": "Oura", "value": "0x0304", "source_file": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml", "source_line": 9781, "source_excerpt": "name: 'Oura Health Ltd'", "value_excerpt": "- value: 0x0304", "db_presence": "ALREADY_HELD", "db_id": 4227, "db_type": "ble_manufacturer_id", "db_category": "unknown"},
+        {"vendor": "Oura", "value": "0x02B2", "source_file": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml", "source_line": 10012, "source_excerpt": "name: 'Oura Health Oy'", "value_excerpt": "- value: 0x02B2", "db_presence": "ALREADY_HELD", "db_id": 4304, "db_type": "ble_manufacturer_id", "db_category": "unknown"},
+        {"vendor": "Samsung (Galaxy Watch maker)", "value": "0x0075", "source_file": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml", "source_line": 11611, "source_excerpt": "name: 'Samsung Electronics Co. Ltd.'", "value_excerpt": "- value: 0x0075", "db_presence": "ALREADY_HELD", "db_id": 4837, "db_type": "ble_manufacturer_id", "db_category": "unknown", "caveat": "CONGLOMERATE — Samsung Electronics company-id spans phones/TVs/SmartThings/SmartTag/Galaxy Watch. NOT a wearable-specific id. Do not attribute to Galaxy Watch alone."},
+        {"vendor": "Samsung SDS (completeness)", "value": "0x02DE", "source_file": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml", "source_line": 9886, "source_excerpt": "name: 'Samsung SDS Co., Ltd.'", "value_excerpt": "- value: 0x02DE", "db_presence": "ALREADY_HELD", "db_id": 4262, "db_type": "ble_manufacturer_id", "db_category": "unknown", "caveat": "Samsung SDS = enterprise/IT subsidiary, NOT the Galaxy Watch division. Recorded for completeness; likely FP for wearable."}
+      ]
+    },
+    "ble_service_uuid": {
+      "net_new": 0,
+      "already_held": 12,
+      "store_note": "BT SIG 16-bit member UUIDs are held BOTH as ble_company_id short-form (0xNNNN) and (for Samsung) as ble_service_uuid 128-bit (0000nnnn-0000-1000-8000-00805f9b34fb). Garmin/Oura member UUIDs present only in short-form.",
+      "items": [
+        {"vendor": "Garmin", "value": "0xFE1F", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 474, "source_excerpt": "name: \"Garmin International, Inc.\"", "value_excerpt": "- uuid: 0xFE1F", "db_presence": "ALREADY_HELD", "db_id_short": 37943, "db_type_short": "ble_company_id", "db_id_128bit": null, "db_category": "unknown"},
+        {"vendor": "Oura", "value": "0xFDB1", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 690, "source_excerpt": "name: Oura Health Ltd", "value_excerpt": "- uuid: 0xFDB1", "db_presence": "ALREADY_HELD", "db_id_short": 38051, "db_type_short": "ble_company_id", "db_id_128bit": null, "db_category": "unknown"},
+        {"vendor": "Oura", "value": "0xFDB0", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 692, "source_excerpt": "name: Oura Health Ltd", "value_excerpt": "- uuid: 0xFDB0", "db_presence": "ALREADY_HELD", "db_id_short": 38052, "db_type_short": "ble_company_id", "db_id_128bit": null, "db_category": "unknown"},
+        {"vendor": "Samsung", "value": "0xFDDB", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 610, "source_excerpt": "name: \"Samsung Electronics Co., Ltd.\"", "value_excerpt": "- uuid: 0xFDDB", "db_presence": "ALREADY_HELD", "db_id_short": 38011, "db_type_short": "ble_company_id", "db_id_128bit": 44444, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker", "caveat": "Samsung Find-My/SmartTag ecosystem UUID, held as bluetooth_tracker — NOT Galaxy Watch."},
+        {"vendor": "Samsung", "value": "0xFD7E", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 790, "source_excerpt": "name: \"Samsung Electronics Co., Ltd.\"", "value_excerpt": "- uuid: 0xFD7E", "db_presence": "ALREADY_HELD", "db_id_short": 38101, "db_type_short": "ble_company_id", "db_id_128bit": 44445, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker"},
+        {"vendor": "Samsung", "value": "0xFD6C", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 826, "source_excerpt": "name: \"Samsung Electronics Co., Ltd.\"", "value_excerpt": "- uuid: 0xFD6C", "db_presence": "ALREADY_HELD", "db_id_short": 38119, "db_type_short": "ble_company_id", "db_id_128bit": 44446, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker"},
+        {"vendor": "Samsung", "value": "0xFD69", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 832, "source_excerpt": "name: \"Samsung Electronics Co., Ltd\"", "value_excerpt": "- uuid: 0xFD69", "db_presence": "ALREADY_HELD", "db_id_short": 38122, "db_type_short": "ble_company_id", "db_id_128bit": 44447, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker"},
+        {"vendor": "Samsung", "value": "0xFD5A", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 862, "source_excerpt": "name: \"Samsung Electronics Co., Ltd.\"", "value_excerpt": "- uuid: 0xFD5A", "db_presence": "ALREADY_HELD", "db_id_short": 38137, "db_type_short": "ble_company_id", "db_id_128bit": 22864, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker", "caveat": "This is the canonical Samsung SmartTag service UUID (MAC-389 ruled it discriminating). bluetooth_tracker, NOT wearable."},
+        {"vendor": "Samsung", "value": "0xFD59", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 864, "source_excerpt": "name: \"Samsung Electronics Co., Ltd.\"", "value_excerpt": "- uuid: 0xFD59", "db_presence": "ALREADY_HELD", "db_id_short": 38138, "db_type_short": "ble_company_id", "db_id_128bit": 44448, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker"},
+        {"vendor": "Samsung", "value": "0xFD4B", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 892, "source_excerpt": "name: \"Samsung Electronics Co., Ltd.\"", "value_excerpt": "- uuid: 0xFD4B", "db_presence": "ALREADY_HELD", "db_id_short": 38152, "db_type_short": "ble_company_id", "db_id_128bit": 44449, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker"},
+        {"vendor": "Samsung", "value": "0xFD1D", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 984, "source_excerpt": "name: \"Samsung Electronics Co., Ltd\"", "value_excerpt": "- uuid: 0xFD1D", "db_presence": "ALREADY_HELD", "db_id_short": 38198, "db_type_short": "ble_company_id", "db_id_128bit": 44450, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker"},
+        {"vendor": "Samsung", "value": "0xFC91", "source_file": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "source_line": 1260, "source_excerpt": "name: \"Samsung Electronics Co., Ltd.\"", "value_excerpt": "- uuid: 0xFC91", "db_presence": "ALREADY_HELD", "db_id_short": 38336, "db_type_short": "ble_company_id", "db_id_128bit": 44451, "db_type_128bit": "ble_service_uuid", "db_category_128bit": "bluetooth_tracker"}
+      ]
+    }
+  },
+  "absent_vendors": {
+    "Fitbit": {
+      "status": "ABSENT_FROM_BT_SIG",
+      "company_identifiers_yaml_hits": 0,
+      "member_uuids_yaml_hits": 0,
+      "note": "No 'Fitbit' entry in either BT SIG file. Fitbit is owned by Google (2021 acquisition); 'Google LLC' (cid 0x00E0-class) and 'Google' are present but cross-attributing Google's company-id to Fitbit is a hub-and-spoke over-attribution (§8.3/§11 #8) — NOT asserted. Surfacing Fitbit's own proprietary GATT would require a companion-APK teardown, which is OUT of cohort-7's §8 source slate (BT SIG + FCC EAS only)."
+    },
+    "Whoop": {
+      "status": "ABSENT_FROM_BT_SIG",
+      "company_identifiers_yaml_hits": 0,
+      "member_uuids_yaml_hits": 0,
+      "note": "No 'Whoop' entry in either BT SIG file. WHOOP Inc is not a BT SIG member under its own name in this snapshot. Same APK-teardown caveat as Fitbit; out of §8 source slate."
+    }
+  },
+  "fp_and_do_not_promote": [
+    "Samsung member UUIDs (0xFDDB/FD7E/FD6C/FD69/FD5A/FD59/FD4B/FD1D/FC91) are Samsung Find-My-Network / SmartTag ecosystem UUIDs, correctly held as bluetooth_tracker — NOT Galaxy Watch wearable. Do NOT recat to wearable.",
+    "Samsung company-id 0x0075 is conglomerate-wide (phones/TV/SmartThings/SmartTag/watch). MAC-398 already touched Samsung SmartThings (24:fd:5b OUI). Not a wearable-specific id.",
+    "Samsung SDS 0x02DE = enterprise IT subsidiary, not the watch division.",
+    "Google LLC company-id is NOT to be attributed to Fitbit (hub-and-spoke)."
+  ],
+  "recat_surface_for_board": {
+    "note": "Net-new=0, so nothing to promote. The cohort-7 VALUE is a candidate RECAT (if board mints 'wearable'). The genuinely wearable-vendor identifiers currently at device_category='unknown': Garmin 0x0087 (id4821) + 0xFE1F (id37943); Oura 0x0304 (id4227), 0x02B2 (id4304), 0xFDB1 (id38051), 0xFDB0 (id38052). These 6 are the clean wearable recat candidates. Recat + mint are one-way-door ingest-gate decisions, NOT this harvest.",
+    "do_not_recat": "The 9 Samsung member-UUID rows held as bluetooth_tracker (and Samsung company-ids) — leave as-is."
+  },
+  "hard_gate_compliance": {
+    "s11_1_cite_paste": "Every lead traces to a pinned BT SIG yaml line (file+sha256+line+literal excerpt). Nothing from memory. Fitbit/Whoop absence is a grep=0 fact, not an assertion.",
+    "s11_15_apk": "No APKs pulled — cohort-7 §8 source slate is BT SIG + FCC EAS only (no companion APKs listed). raw/ is gitignored (.gitignore:5) regardless.",
+    "s11_16_license": "Only pre-cleared primary_registry (BT SIG). member_uuids.yaml PCLA header noted; data is factual per Feist. No new restrictive/share-alike source encountered.",
+    "s8_2_fcc": "FCC attempted DIRECT only (apps.fcc.gov). fccid.io/fcc.report NOT used. Host unreachable; logged.",
+    "s11_3_pii": "Only legal-entity vendor names + BT SIG numeric ids. No person-PII. FCC applicant PII n/a (host unreachable).",
+    "s11_13_taxonomy": "Proposed 'wearable' + category_pending_board_ratification + privacy flag surfaced to board. Nothing staged as promotable.",
+    "no_db_write": "db/argus.db opened mode=ro for presence only. No write, no ingest, no push."
+  }
+}
