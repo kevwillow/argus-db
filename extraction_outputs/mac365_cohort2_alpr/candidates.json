@@ -1,0 +1,633 @@
+{
+  "_meta": {
+    "issue": "MAC-372",
+    "parent": "MAC-363",
+    "worker": "ExtractionWorker (1347736c)",
+    "scope": "EXTRACTION ONLY \u2014 candidates only; no DB write/ingest/migration/export/push",
+    "input": "MAC-365 harvest manifest (CTO-verified)",
+    "pii_redaction_count": 10,
+    "pii_note": "FCC contact_name suppressed (\u00a711#3 / SAR-5); only code/name/city/state surfaced",
+    "counts": {
+      "identifier_candidates_total": 21,
+      "net_new": 16,
+      "already_in_db": 5,
+      "behavioral_signatures": 2,
+      "by_type_net_new": {
+        "ssid_pattern": 8,
+        "fcc_grantee_code": 5,
+        "equipment_class_code": 3
+      },
+      "db_oui_misattributions": 4,
+      "grantee_conflicts": 1
+    },
+    "db_conflicts_for_remediation": {
+      "oui_misattributions": [
+        {
+          "oui": "00:0E:8E",
+          "db_id": "id=35586",
+          "db_says": "Sierra Wireless",
+          "db_confidence": 90,
+          "ieee_says": "SparkLAN Communications",
+          "recommendation": "id=35586 labels 'Sierra Wireless' (conf 90, crowdsourced) but IEEE says 'SparkLAN Communications'. Sourced from sid16 hardcoded list (OUI-not-bulk violation already in DB). RECOMMEND DBArchitect re-attribute to IEEE ground truth or supersede; re-eval confidence."
+        },
+        {
+          "oui": "00:11:75",
+          "db_id": "id=35587",
+          "db_says": "Sierra Wireless",
+          "db_confidence": 90,
+          "ieee_says": "Intel Corporation",
+          "recommendation": "id=35587 labels 'Sierra Wireless' (conf 90, crowdsourced) but IEEE says 'Intel Corporation'. Sourced from sid16 hardcoded list (OUI-not-bulk violation already in DB). RECOMMEND DBArchitect re-attribute to IEEE ground truth or supersede; re-eval confidence."
+        },
+        {
+          "oui": "00:10:8B",
+          "db_id": "id=35589",
+          "db_says": "Cradlepoint",
+          "db_confidence": 85,
+          "ieee_says": "LASERANIMATION SOLLINGER GMBH",
+          "recommendation": "id=35589 labels 'Cradlepoint' (conf 85, crowdsourced) but IEEE says 'LASERANIMATION SOLLINGER GMBH'. Sourced from sid16 hardcoded list (OUI-not-bulk violation already in DB). RECOMMEND DBArchitect re-attribute to IEEE ground truth or supersede; re-eval confidence."
+        },
+        {
+          "oui": "EC:F4:51",
+          "db_id": "id=35590",
+          "db_says": "Cradlepoint",
+          "db_confidence": 85,
+          "ieee_says": "Arcadyan Corporation",
+          "recommendation": "id=35590 labels 'Cradlepoint' (conf 85, crowdsourced) but IEEE says 'Arcadyan Corporation'. Sourced from sid16 hardcoded list (OUI-not-bulk violation already in DB). RECOMMEND DBArchitect re-attribute to IEEE ground truth or supersede; re-eval confidence."
+        }
+      ],
+      "grantee_misattributions": [
+        {
+          "value": "NCV",
+          "conflict": "MIS-ATTRIBUTION: existing id=42948 labels NCV 'Vigilant Solutions'/'alpr' but frozen FCC sid7 = 'Vigilant Systems Inc' (Klamath Falls OR) != Vigilant Solutions. Verify (ruling)."
+        }
+      ],
+      "note": "EXTRACTION-ONLY surfaced these; NOT fixed here (no DB write). DBArchitect/Validator remediation \u2014 \u00a711 #1/#7/#8."
+    },
+    "needs_new_source_rows": {
+      "app:com.vigilant.solutions.mobilecompanion": {
+        "proposed_name": "Vigilant Mobile Companion (LEARN) com.vigilant.solutions.mobilecompanion 1.1.180312.1100",
+        "source_type": "manufacturer_app",
+        "sha256": "a627e3fa9191689c42e3e688c9600440a2bb3360e8beba26981c65fa4b0fad44"
+      },
+      "app:ai.rekor.rekorblue": {
+        "proposed_name": "Rekor Blue ai.rekor.rekorblue 1.5.92.0",
+        "source_type": "manufacturer_app",
+        "sha256": "5993cfff6c90e0f1e4a8f1e2e4a332f2e6e687117a303bdb5b6afe54ebca88cb"
+      }
+    }
+  },
+  "candidates": [
+    {
+      "identifier_type": "ssid_pattern",
+      "value": "(?i)^vigilant[_-]?.*",
+      "source_sid": 16,
+      "source_url": "https://github.com/MaxwellDPS/Flock-You-Android/blob/b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt#L95",
+      "relative_path": "raw/flock_you_family/20260613T204753Z/_extracted/sid16__MaxwellDPS_Flock-You-Android__b3a203027689/Flock-You-Android-b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt",
+      "proposed_confidence_ceiling": 75,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": "Motorola Solutions",
+      "device_category": "alpr",
+      "cite_excerpt": "pattern = \"(?i)^vigilant[_-]?.*\",",
+      "notes": "researcher-authored detection regex (single-source, sid16 crowdsourced); NOT a confirmed broadcast observation. Export-DROPPED from both Lynceus exports per \u00a74.4 (no regex v0.2).",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": 75
+    },
+    {
+      "identifier_type": "ssid_pattern",
+      "value": "(?i)^genetec[_-]?.*",
+      "source_sid": 16,
+      "source_url": "https://github.com/MaxwellDPS/Flock-You-Android/blob/b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt#L331",
+      "relative_path": "raw/flock_you_family/20260613T204753Z/_extracted/sid16__MaxwellDPS_Flock-You-Android__b3a203027689/Flock-You-Android-b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt",
+      "proposed_confidence_ceiling": 75,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": "Genetec",
+      "device_category": "alpr",
+      "cite_excerpt": "pattern = \"(?i)^genetec[_-]?.*\",",
+      "notes": "researcher-authored detection regex (single-source, sid16 crowdsourced); NOT a confirmed broadcast observation. Export-DROPPED from both Lynceus exports per \u00a74.4 (no regex v0.2).",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": 75
+    },
+    {
+      "identifier_type": "ssid_pattern",
+      "value": "(?i)^autovu[_-]?.*",
+      "source_sid": 16,
+      "source_url": "https://github.com/MaxwellDPS/Flock-You-Android/blob/b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt#L339",
+      "relative_path": "raw/flock_you_family/20260613T204753Z/_extracted/sid16__MaxwellDPS_Flock-You-Android__b3a203027689/Flock-You-Android-b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt",
+      "proposed_confidence_ceiling": 75,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": "Genetec",
+      "device_category": "alpr",
+      "cite_excerpt": "pattern = \"(?i)^autovu[_-]?.*\",",
+      "notes": "researcher-authored detection regex (single-source, sid16 crowdsourced); NOT a confirmed broadcast observation. Export-DROPPED from both Lynceus exports per \u00a74.4 (no regex v0.2).",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": 75
+    },
+    {
+      "identifier_type": "ssid_pattern",
+      "value": "(?i)^elsag.*",
+      "source_sid": 16,
+      "source_url": "https://github.com/MaxwellDPS/Flock-You-Android/blob/b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/DetectionPatterns.kt#L2308",
+      "relative_path": "raw/flock_you_family/20260613T204753Z/_extracted/sid16__MaxwellDPS_Flock-You-Android__b3a203027689/Flock-You-Android-b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/DetectionPatterns.kt",
+      "proposed_confidence_ceiling": 75,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": "Leonardo DRS",
+      "device_category": "alpr",
+      "cite_excerpt": "wifiPatterns = listOf(\"(?i)^elsag.*\"),",
+      "notes": "researcher-authored detection regex (single-source, sid16 crowdsourced); NOT a confirmed broadcast observation. Export-DROPPED from both Lynceus exports per \u00a74.4 (no regex v0.2).",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": 75
+    },
+    {
+      "identifier_type": "ssid_pattern",
+      "value": "(?i)^alpr[_-]?.*",
+      "source_sid": 16,
+      "source_url": "https://github.com/MaxwellDPS/Flock-You-Android/blob/b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt#L79",
+      "relative_path": "raw/flock_you_family/20260613T204753Z/_extracted/sid16__MaxwellDPS_Flock-You-Android__b3a203027689/Flock-You-Android-b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt",
+      "proposed_confidence_ceiling": 75,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": null,
+      "device_category": "alpr",
+      "cite_excerpt": "pattern = \"(?i)^alpr[_-]?.*\",",
+      "notes": "researcher-authored detection regex (single-source, sid16 crowdsourced); NOT a confirmed broadcast observation. Export-DROPPED from both Lynceus exports per \u00a74.4 (no regex v0.2).",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": 75
+    },
+    {
+      "identifier_type": "ssid_pattern",
+      "value": "(?i)^lpr[_-]?cam.*",
+      "source_sid": 16,
+      "source_url": "https://github.com/MaxwellDPS/Flock-You-Android/blob/b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt#L87",
+      "relative_path": "raw/flock_you_family/20260613T204753Z/_extracted/sid16__MaxwellDPS_Flock-You-Android__b3a203027689/Flock-You-Android-b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt",
+      "proposed_confidence_ceiling": 75,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": null,
+      "device_category": "alpr",
+      "cite_excerpt": "pattern = \"(?i)^lpr[_-]?cam.*\",",
+      "notes": "researcher-authored detection regex (single-source, sid16 crowdsourced); NOT a confirmed broadcast observation. Export-DROPPED from both Lynceus exports per \u00a74.4 (no regex v0.2).",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": 75
+    },
+    {
+      "identifier_type": "ssid_pattern",
+      "value": "(?i)^penguin[_-]?.*",
+      "source_sid": 16,
+      "source_url": "https://github.com/MaxwellDPS/Flock-You-Android/blob/b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt#L59",
+      "relative_path": "raw/flock_you_family/20260613T204753Z/_extracted/sid16__MaxwellDPS_Flock-You-Android__b3a203027689/Flock-You-Android-b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt",
+      "proposed_confidence_ceiling": 75,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": "Penguin",
+      "device_category": "unknown",
+      "cite_excerpt": "pattern = \"(?i)^penguin[_-]?.*\",",
+      "notes": "WEAK/UNCITED vendor sourcing in repo (ruling #8) \u2014 UNVERIFIED. Second independent source REQUIRED before promotion. researcher-authored detection regex (single-source, sid16 crowdsourced); NOT a confirmed broadcast observation. Export-DROPPED from both Lynceus exports per \u00a74.4 (no regex v0.2).",
+      "conflict_note": "unverified_vendor_sourcing \u2014 manifest flagged Penguin/Pigvision",
+      "needs_new_source_row": null,
+      "recommend_confidence": 40
+    },
+    {
+      "identifier_type": "ssid_pattern",
+      "value": "(?i)^pigvision[_-]?.*",
+      "source_sid": 16,
+      "source_url": "https://github.com/MaxwellDPS/Flock-You-Android/blob/b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt#L69",
+      "relative_path": "raw/flock_you_family/20260613T204753Z/_extracted/sid16__MaxwellDPS_Flock-You-Android__b3a203027689/Flock-You-Android-b3a2030276895ebf2439ad30724cace10de9c506/app/src/main/java/com/flockyou/data/model/SsidPatterns.kt",
+      "proposed_confidence_ceiling": 75,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": "Pigvision",
+      "device_category": "unknown",
+      "cite_excerpt": "pattern = \"(?i)^pigvision[_-]?.*\",",
+      "notes": "WEAK/UNCITED vendor sourcing in repo (ruling #8) \u2014 UNVERIFIED. Second independent source REQUIRED before promotion. researcher-authored detection regex (single-source, sid16 crowdsourced); NOT a confirmed broadcast observation. Export-DROPPED from both Lynceus exports per \u00a74.4 (no regex v0.2).",
+      "conflict_note": "unverified_vendor_sourcing \u2014 manifest flagged Penguin/Pigvision",
+      "needs_new_source_row": null,
+      "recommend_confidence": 40
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "VTF",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "net-new",
+      "source_lens": "registration",
+      "manufacturer": "Remington Elsag",
+      "device_category": "alpr",
+      "cite_excerpt": "\"VTF\",\"Remington Elsag Law Enforcement Systems\",Brewster, New York, United States (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). ALPR-relevant \u2014 ELSAG LE ALPR grantee (Brewster NY)",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2AKB2",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "net-new",
+      "source_lens": "registration",
+      "manufacturer": "Leonardo",
+      "device_category": "alpr",
+      "cite_excerpt": "\"2AKB2\",\"LEONARDO S.p.a.\",Roma, Italy (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). Leonardo S.p.a. \u2014 ELSAG/ALPR parent (Roma)",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2ATWB",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "net-new",
+      "source_lens": "registration",
+      "manufacturer": "Leonardo",
+      "device_category": "alpr",
+      "cite_excerpt": "\"2ATWB\",\"Leonardo S.p.a.\",Roma, Italy (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). Leonardo S.p.a. second grantee (Roma)",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2ANPO",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "net-new",
+      "source_lens": "registration",
+      "manufacturer": "Nordic Semiconductor",
+      "device_category": "unknown",
+      "cite_excerpt": "\"2ANPO\",\"Nordic Semiconductor ASA\",Trondheim, Norway (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). BLE chipmaker \u00a711#10 multi-purpose (Trondheim)",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "WCB",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "net-new",
+      "source_lens": "registration",
+      "manufacturer": "SQF Trading Co.",
+      "device_category": "unknown",
+      "cite_excerpt": "\"WCB\",\"SQF TRADING CO.,LTD.\",Shenzhen, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). WiFi/BT module maker \u2014 NOT LiteOn (Shenzhen); discrepancy flag",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2ANC5",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "already_in_db:id=42875",
+      "source_lens": "registration",
+      "manufacturer": "Avigilon",
+      "device_category": "cctv_camera",
+      "cite_excerpt": "\"2ANC5\",\"Avigilon Corporation\",Vancouver, Canada (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). already fcc_grantee_code id in DB",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "ABZ",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "already_in_db:id=35686",
+      "source_lens": "registration",
+      "manufacturer": "Motorola Solutions",
+      "device_category": "unknown",
+      "cite_excerpt": "\"ABZ\",\"Motorola Solutions, Inc.\",Schaumburg, Illinois, United States (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). already fcc_grantee_code id in DB",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "N7N",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "already_in_db:id=35695",
+      "source_lens": "registration",
+      "manufacturer": "Sierra Wireless",
+      "device_category": "unknown",
+      "cite_excerpt": "\"N7N\",\"Sierra Wireless Inc.\",Richmond, BC, Canada (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). already fcc_grantee_code id in DB; Flock Falcon V2 modem grantee",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "UXX",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "already_in_db:id=35725",
+      "source_lens": "registration",
+      "manufacturer": "Cradlepoint",
+      "device_category": "unknown",
+      "cite_excerpt": "\"UXX\",\"Cradlepoint, Inc.\",Boise, Idaho, United States (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). already fcc_grantee_code id in DB",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "NCV",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "already_in_db:id=42948",
+      "source_lens": "registration",
+      "manufacturer": "Vigilant Systems Inc",
+      "device_category": "unknown",
+      "cite_excerpt": "\"NCV\",\"Vigilant Systems Inc\",Klamath Falls, Oregon, United States (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state only). frozen FCC = Vigilant Systems Inc / Klamath Falls OR",
+      "conflict_note": "MIS-ATTRIBUTION: existing id=42948 labels NCV 'Vigilant Solutions'/'alpr' but frozen FCC sid7 = 'Vigilant Systems Inc' (Klamath Falls OR) != Vigilant Solutions. Verify (ruling).",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "equipment_class_code",
+      "value": "VTFADM3",
+      "source_sid": 85,
+      "source_url": "https://fcc.report/FCC-ID/VTF/ADM3",
+      "relative_path": "sid85 fcc.report (live listing this run; exhibit not fetched)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "net-new",
+      "source_lens": "registration",
+      "manufacturer": "Remington Elsag",
+      "device_category": "alpr",
+      "cite_excerpt": "FCC ID VTFADM3 \u2014 Remington Elsag \u2014 NEW DEVICE filed 2009-11-25 (grantee VTF)",
+      "notes": "equipment-class code + frequency band = HONEST-ABSENCE (not on fcc.report listing page; FCC EAS grant exhibit unreached). Remington Elsag ALPR device; FCC ID confirmed on fcc.report/FCC-ID/VTF",
+      "conflict_note": "",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "equipment_class_code",
+      "value": "N7NRC76B",
+      "source_sid": 85,
+      "source_url": "https://fcc.report/FCC-ID/N7N/RC76B",
+      "relative_path": "sid85 fcc.report (live listing this run; exhibit not fetched)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": "Sierra Wireless",
+      "device_category": "unknown",
+      "cite_excerpt": "FCC ID N7NRC76B \u2014 Sierra Wireless \u2014 NEW DEVICE filed 2020-02-05 (grantee N7N)",
+      "notes": "equipment-class code + frequency band = HONEST-ABSENCE (not on fcc.report listing page; FCC EAS grant exhibit unreached). Sierra RC76B LTE Cat-4 module \u2014 embedded in Flock Falcon V2 (teardown obs, ryanohoro.com/cehrp.org). Multi-purpose module \u00a711#10 -> unknown, not alpr.",
+      "conflict_note": "paired with fcc_grantee_code N7N per \u00a711#7; component-module, NOT a Flock-own identifier",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    },
+    {
+      "identifier_type": "equipment_class_code",
+      "value": "N7NRC76C",
+      "source_sid": 85,
+      "source_url": "https://fcc.report/FCC-ID/N7N/RC76C",
+      "relative_path": "sid85 fcc.report (live listing this run; exhibit not fetched)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "net-new",
+      "source_lens": "observation",
+      "manufacturer": "Sierra Wireless",
+      "device_category": "unknown",
+      "cite_excerpt": "FCC ID N7NRC76C \u2014 Sierra Wireless \u2014 NEW DEVICE filed 2022-06-30 (grantee N7N)",
+      "notes": "equipment-class code + frequency band = HONEST-ABSENCE (not on fcc.report listing page; FCC EAS grant exhibit unreached). Sierra RC76C LTE module; successor of RC76B. Multi-purpose \u00a711#10 -> unknown.",
+      "conflict_note": "paired with fcc_grantee_code N7N per \u00a711#7; component-module, NOT a Flock-own identifier",
+      "needs_new_source_row": null,
+      "recommend_confidence": null
+    }
+  ],
+  "behavioral_signatures": [
+    {
+      "signature_name": "ALPR plate scan -> cloud upload -> hotlist hit-alert (Vigilant LEARN companion)",
+      "device_category": "alpr",
+      "cellular_generation": null,
+      "source_ref": "needs_new_source_row:app:com.vigilant.solutions.mobilecompanion",
+      "relative_path": "raw/vendor_apps/vigilant/com.vigilant.solutions.mobilecompanion/1.1.180312.1100/a627e3fa9191689c42e3e688c9600440a2bb3360e8beba26981c65fa4b0fad44.apk",
+      "evidence": [
+        {
+          "locus": "Lcom/vigilant/solutions/communicate/MCLPScanUpload;",
+          "note": "LP (license-plate) scan -> upload"
+        },
+        {
+          "locus": "Lcom/vigilant/solutions/communicate/LEARNInterface;",
+          "note": "uploads detections to Vigilant LEARN cloud"
+        },
+        {
+          "locus": "Lcom/vigilant/solutions/datastruct/VHitAlertInfo;",
+          "note": "hit-alert on hotlist match"
+        },
+        {
+          "locus": "Lcom/vigilant/solutions/xml/VHotlistAlertParser;",
+          "note": "hotlist (BOLO) alert parsing"
+        },
+        {
+          "locus": "Lcom/vigilant/solutions/datastruct/VAddHotPlateRequest;",
+          "note": "hot-plate (watchlist) management"
+        }
+      ],
+      "proposed_confidence_ceiling": 80,
+      "notes": "manufacturer_app installer/operator cohort; class descriptors re-grepped from gitignored DEX (decompiled source NOT committed, \u00a711#15).",
+      "apk_evidence_check": "verified"
+    },
+    {
+      "signature_name": "ALPR plate recognition (OpenALPR) -> hotlist sync/match (Rekor Blue)",
+      "device_category": "alpr",
+      "cellular_generation": null,
+      "source_ref": "needs_new_source_row:app:ai.rekor.rekorblue",
+      "relative_path": "raw/vendor_apps/rekor/ai.rekor.rekorblue/1.5.92.0/5993cfff6c90e0f1e4a8f1e2e4a332f2e6e687117a303bdb5b6afe54ebca88cb.apk",
+      "evidence": [
+        {
+          "locus": "Lai/rekor/openalpr/AlprResultListener;",
+          "note": "OpenALPR plate-recognition result callback"
+        },
+        {
+          "locus": "Lai/rekor/openalpr/alprstream/model/AlprBestPlate;",
+          "note": "best-plate selection from ALPR stream"
+        },
+        {
+          "locus": "Lai/rekor/rekorblue/databinding/ActivityScanBinding;",
+          "note": "scan activity"
+        },
+        {
+          "locus": "hotlist_entry",
+          "note": "DROP TABLE IF EXISTS hotlist_entry \u2014 local hotlist DB"
+        },
+        {
+          "locus": "Hotlist syncing complete",
+          "note": "hotlist sync log string"
+        }
+      ],
+      "proposed_confidence_ceiling": 80,
+      "notes": "manufacturer_app; OpenALPR JNI engine (com/openalpr/jni). Class descriptors re-grepped from gitignored DEX (not committed, \u00a711#15).",
+      "apk_evidence_check": "verified"
+    }
+  ],
+  "oui_dispositions": [
+    {
+      "oui": "00:0E:8E",
+      "flock_you_claims": "Sierra Wireless",
+      "ieee_authoritative": "SparkLAN Communications, Inc.\",\"3Fl . , No. 246, Sec. 1, Neihu Road., Neihu Chiu, Taipei  TW 114 ",
+      "repo_matches_ieee": false,
+      "db_presence": "id=35586",
+      "db_manufacturer": "Sierra Wireless",
+      "db_confidence": 90,
+      "db_source_type": "crowdsourced",
+      "repo_flag": "REPO MIS-ATTRIBUTION \u2014 flock-you says Sierra Wireless, IEEE says SparkLAN Communications. OUI-not-bulk validated.",
+      "DB_MIS_ATTRIBUTION": "id=35586 labels 'Sierra Wireless' (conf 90, crowdsourced) but IEEE says 'SparkLAN Communications'. Sourced from sid16 hardcoded list (OUI-not-bulk violation already in DB). RECOMMEND DBArchitect re-attribute to IEEE ground truth or supersede; re-eval confidence."
+    },
+    {
+      "oui": "00:11:75",
+      "flock_you_claims": "Sierra Wireless",
+      "ieee_authoritative": "Intel Corporation, 5200 NE ELAM YOUNG PARKWAY HIllsboro OR US 97124",
+      "repo_matches_ieee": false,
+      "db_presence": "id=35587",
+      "db_manufacturer": "Sierra Wireless",
+      "db_confidence": 90,
+      "db_source_type": "crowdsourced",
+      "repo_flag": "REPO MIS-ATTRIBUTION \u2014 flock-you says Sierra Wireless, IEEE says Intel Corporation. OUI-not-bulk validated.",
+      "DB_MIS_ATTRIBUTION": "id=35587 labels 'Sierra Wireless' (conf 90, crowdsourced) but IEEE says 'Intel Corporation'. Sourced from sid16 hardcoded list (OUI-not-bulk violation already in DB). RECOMMEND DBArchitect re-attribute to IEEE ground truth or supersede; re-eval confidence."
+    },
+    {
+      "oui": "00:14:3E",
+      "flock_you_claims": "Sierra Wireless",
+      "ieee_authoritative": "AirLink Communications, Inc.\",3159 Corporate Place Hayward CA US 94545",
+      "repo_matches_ieee": true,
+      "db_presence": "id=35588",
+      "db_manufacturer": "Sierra Wireless",
+      "db_confidence": 90,
+      "db_source_type": "crowdsourced",
+      "lineage_note": "AirLink Communications acquired by Sierra Wireless (2007) \u2014 Sierra Wireless AirLink product line; defensible lineage.",
+      "disposition": "already_in_db, IEEE-consistent; sid16 adds observation-lens device-role only; 0 net-new"
+    },
+    {
+      "oui": "00:A0:D5",
+      "flock_you_claims": "Sierra Wireless",
+      "ieee_authoritative": "Sierra Wireless, ULC\",13811 Wireless Way Richmond RICHMOND B.C. CA V6V 3A4",
+      "repo_matches_ieee": true,
+      "db_presence": "id=453",
+      "db_manufacturer": "Sierra Wireless",
+      "db_confidence": 90,
+      "db_source_type": "primary_registry",
+      "disposition": "already_in_db, IEEE-consistent; sid16 adds observation-lens device-role only; 0 net-new"
+    },
+    {
+      "oui": "00:30:44",
+      "flock_you_claims": "Cradlepoint",
+      "ieee_authoritative": "CradlePoint, Inc\",\"1100 W. Idaho Street, Suite 800 Boise ID US 83702-5389 ",
+      "repo_matches_ieee": true,
+      "db_presence": "id=455",
+      "db_manufacturer": "Cradlepoint",
+      "db_confidence": 95,
+      "db_source_type": "primary_registry",
+      "disposition": "already_in_db, IEEE-consistent; sid16 adds observation-lens device-role only; 0 net-new"
+    },
+    {
+      "oui": "00:10:8B",
+      "flock_you_claims": "Cradlepoint",
+      "ieee_authoritative": "LASERANIMATION SOLLINGER GMBH,CRELLESTR. 19/20 D 10827 BERLIN  DE",
+      "repo_matches_ieee": false,
+      "db_presence": "id=35589",
+      "db_manufacturer": "Cradlepoint",
+      "db_confidence": 85,
+      "db_source_type": "crowdsourced",
+      "repo_flag": "REPO MIS-ATTRIBUTION \u2014 flock-you says Cradlepoint, IEEE says LASERANIMATION SOLLINGER GMBH. OUI-not-bulk validated.",
+      "DB_MIS_ATTRIBUTION": "id=35589 labels 'Cradlepoint' (conf 85, crowdsourced) but IEEE says 'LASERANIMATION SOLLINGER GMBH'. Sourced from sid16 hardcoded list (OUI-not-bulk violation already in DB). RECOMMEND DBArchitect re-attribute to IEEE ground truth or supersede; re-eval confidence."
+    },
+    {
+      "oui": "EC:F4:51",
+      "flock_you_claims": "Cradlepoint",
+      "ieee_authoritative": "Arcadyan Corporation,\"No.8, Sec.2, Guangfu Rd. Hsinchu City Hsinchu TW 30071 ",
+      "repo_matches_ieee": false,
+      "db_presence": "id=35590",
+      "db_manufacturer": "Cradlepoint",
+      "db_confidence": 85,
+      "db_source_type": "crowdsourced",
+      "repo_flag": "REPO MIS-ATTRIBUTION \u2014 flock-you says Cradlepoint, IEEE says Arcadyan Corporation. OUI-not-bulk validated.",
+      "DB_MIS_ATTRIBUTION": "id=35590 labels 'Cradlepoint' (conf 85, crowdsourced) but IEEE says 'Arcadyan Corporation'. Sourced from sid16 hardcoded list (OUI-not-bulk violation already in DB). RECOMMEND DBArchitect re-attribute to IEEE ground truth or supersede; re-eval confidence."
+    },
+    {
+      "oui": "F4:CE:36",
+      "flock_you_claims": "Nordic Semiconductor",
+      "ieee_authoritative": "Nordic Semiconductor ASA,Otto Nielsens veg 12 Trondheim  NO NO-7052",
+      "repo_matches_ieee": true,
+      "db_presence": "absent",
+      "db_manufacturer": null,
+      "db_confidence": null,
+      "db_source_type": null,
+      "disposition": "IEEE-confirmed but absent from DB; registry-gap (sid1/2/3 bulk territory, \u00a711#10 multi-purpose); not emitted"
+    },
+    {
+      "oui": "C0:A5:3E",
+      "flock_you_claims": "Nordic Semiconductor",
+      "ieee_authoritative": "Apple, Inc.\",1 Infinite Loop Cupertino CA US 95014",
+      "repo_matches_ieee": false,
+      "db_presence": "absent",
+      "db_manufacturer": null,
+      "db_confidence": null,
+      "db_source_type": null,
+      "repo_flag": "REPO MIS-ATTRIBUTION \u2014 flock-you says Nordic Semiconductor, IEEE says Apple. OUI-not-bulk validated.",
+      "disposition": "IEEE-confirmed but absent from DB; registry-gap (sid1/2/3 bulk territory, \u00a711#10 multi-purpose); not emitted"
+    },
+    {
+      "oui": "F0:5C:D5",
+      "flock_you_claims": "Nordic Semiconductor",
+      "ieee_authoritative": "Apple, Inc.\",1 Infinite Loop Cupertino CA US 95014",
+      "repo_matches_ieee": false,
+      "db_presence": "absent",
+      "db_manufacturer": null,
+      "db_confidence": null,
+      "db_source_type": null,
+      "repo_flag": "REPO MIS-ATTRIBUTION \u2014 flock-you says Nordic Semiconductor, IEEE says Apple. OUI-not-bulk validated.",
+      "disposition": "IEEE-confirmed but absent from DB; registry-gap (sid1/2/3 bulk territory, \u00a711#10 multi-purpose); not emitted"
+    }
+  ],
+  "honest_absences": [
+    "ELSAG/Leonardo \u2014 no public ALPR Android app (patrol-car hardware + web EOC); only FCC grantee (VTF/2AKB2) + sid16 SSID regex.",
+    "Rekor Scout \u2014 desktop/Linux agent + web dashboard, no Android app.",
+    "Vigilant CarDetector (standalone) \u2014 folded into Vigilant Mobile Companion; no standalone package.",
+    "Genetec own-FCC grantee \u2014 absent from frozen sid7 set (post-2021-03-22 freeze gap); AutoVu SharpV/Cloudrunner FCC IDs not surfaced.",
+    "APK BLE service UUIDs \u2014 0 clean vendor UUIDs across all 6 ALPR APKs. Every 128-bit UUID found is a cross-vendor SDK/framework constant (258eafa5 = board-ruled drop MAC-348/350, re-confirmed in rekor+avigilon\u00d72; c06c8400/bb392ec0/9a04f079/e2719d58/edef8ba9 each appear in 2-3 unrelated vendor apps). No BluetoothGattService device binding -> none emitted (\u00a711#1).",
+    "APK default SSID patterns \u2014 0; Cloudrunner installer's only WiFi/SSID strings are WebRTC/Android-framework (org.webrtc.NetworkMonitorAutoDetect), no vendor literal.",
+    "Genetec + Avigilon behavioral signatures \u2014 apps obfuscated (Genetec) / server-side ALPR analytic not in mobile app (Avigilon ACC video viewer); no behavioral pattern extractable.",
+    "Nordic OUI F4:CE:36 \u2014 IEEE-confirmed Nordic but ABSENT from DB; multi-purpose chipmaker (\u00a711#10) + OUI-not-bulk (source from sid1/2/3 IEEE bulk, not sid16). Registry-gap flagged, NOT a cohort-2 candidate."
+  ]
+}

@@ -1,0 +1,1074 @@
+{
+  "_meta": {
+    "issue": "MAC-371",
+    "cohort": "MAC-363 cohort 1 \u2014 BLE trackers / stalkerware",
+    "harvest_input": "MAC-364#document-harvest (CTO-verified)",
+    "harvest_ts_utc": "20260613T203034Z",
+    "scope": "EXTRACTION ONLY \u2014 candidates for CTO review -> DBArchitect ingest. No DB write/migration/export/push.",
+    "targets": [
+      "AirTag",
+      "Tile",
+      "Samsung SmartTag/SmartTag2",
+      "Chipolo"
+    ],
+    "device_category_note": "All cohort rows map to device_category='unknown' (\u00a72.1 has no tracker/stalkerware value); \u00a711 #13 Lynceus-export carveout applies. Not minted here.",
+    "laa_bit_note": "SAR-1 LAA-bit N/A \u2014 zero MAC candidates (OUI/MAC lens out of scope per MAC-371 ruling; trackers use rotating private addresses).",
+    "pii_redaction_count": 0,
+    "pii_note": "Zero PII in candidate values. PETS author emails (lines 43/47) deliberately NOT cited per SAR-5/\u00a711#3.",
+    "needs_new_source_rows": [
+      {
+        "academic_key": "academic:openhaystack-8d214aa",
+        "proposed_name": "seemoo-lab/openhaystack firmware @ 8d214aa",
+        "url": "https://github.com/seemoo-lab/openhaystack/tree/8d214aa",
+        "license_posture": "AGPL-3.0_declared"
+      },
+      {
+        "academic_key": "academic:pets-2021-0045",
+        "proposed_name": "PETS 2021 \u2014 Who Can Find My Devices? (Heinrich/Stute/Kornhuber/Hollick)",
+        "url": "https://doi.org/10.2478/popets-2021-0045",
+        "license_posture": "CC-BY"
+      },
+      {
+        "academic_key": "academic:usenix-2210.14702",
+        "proposed_name": "USENIX Security '24 \u2014 Samsung OF analysis (Yu/Henderson/Tiu/Haines, ANU)",
+        "url": "https://arxiv.org/abs/2210.14702",
+        "license_posture": "academic"
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "value": "0x004C",
+      "identifier_type": "ble_manufacturer_id",
+      "vendor": "Apple, Inc.",
+      "device_product": "AirTag / Find My ecosystem",
+      "source_sid": 34,
+      "corroborating_sids": [
+        24
+      ],
+      "confidence_basis": "SIG company_identifiers.yaml (primary_registry, \u00a78.2 70-85; existing canonical row conf 85). AirGuard (sid 24) uses equivalent short company 0x4C in AirTag/AppleDevice/AppleFindMy scan filters. tagfinder(29) also maps 0x004C->Apple but flagged unverified per \u00a77 (informational, not +5).",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+        "line": 11727,
+        "excerpt": "  - value: 0x004C\n    name: 'Apple, Inc.'"
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": true
+    },
+    {
+      "value": "0x067C",
+      "identifier_type": "ble_manufacturer_id",
+      "vendor": "Tile, Inc.",
+      "device_product": "Tile tracker",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG company_identifiers.yaml (primary_registry). Single SIG issuer; AirGuard filters Tile by serviceData not company-id, so no company-id corroboration.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+        "line": 7290,
+        "excerpt": "  - value: 0x067C\n    name: 'Tile, Inc.'"
+      },
+      "conflict_note": "tagfinder TRACKING_DEVICE_TYPES['TILE'].company_id=0x02D0 (unverified; tagfinder's own table maps 0x02D0->'Tile' but SIG assigns 0x02D0 elsewhere). SIG 0x067C wins per \u00a77.",
+      "needs_new_source_row": null,
+      "already_in_db": true
+    },
+    {
+      "value": "0x08C3",
+      "identifier_type": "ble_manufacturer_id",
+      "vendor": "CHIPOLO d.o.o.",
+      "device_product": "Chipolo tracker",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG company_identifiers.yaml (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+        "line": 5643,
+        "excerpt": "  - value: 0x08C3\n    name: 'CHIPOLO d.o.o.'"
+      },
+      "conflict_note": "tagfinder TRACKING_DEVICE_TYPES['CHIPOLO'].company_id=0x0131 (unverified; tagfinder's own COMPANY_IDENTIFIERS maps 0x0131->'Cypress Semiconductor', confirming unreliability). SIG 0x08C3 wins per \u00a77.",
+      "needs_new_source_row": null,
+      "already_in_db": true
+    },
+    {
+      "value": "0x0075",
+      "identifier_type": "ble_manufacturer_id",
+      "vendor": "Samsung Electronics Co. Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG company_identifiers.yaml (primary_registry). tagfinder(29) agrees 0x0075->Samsung (informational only, tagfinder unverified per \u00a77). AirGuard filters Samsung by serviceData 0xFD5A.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+        "line": 11610,
+        "excerpt": "  - value: 0x0075\n    name: 'Samsung Electronics Co. Ltd.'"
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": true
+    },
+    {
+      "value": "0x02DE",
+      "identifier_type": "ble_manufacturer_id",
+      "vendor": "Samsung SDS Co., Ltd.",
+      "device_product": "Samsung SDS (secondary Samsung entity)",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG company_identifiers.yaml (primary_registry). Secondary Samsung corporate entity; single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+        "line": 9885,
+        "excerpt": "  - value: 0x02DE\n    name: 'Samsung SDS Co., Ltd.'"
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": true
+    },
+    {
+      "value": "0000fed4-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 119,
+        "excerpt": " - uuid: 0xFED4\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fed3-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 121,
+        "excerpt": " - uuid: 0xFED3\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fed2-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 123,
+        "excerpt": " - uuid: 0xFED2\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fed1-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 125,
+        "excerpt": " - uuid: 0xFED1\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fed0-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 127,
+        "excerpt": " - uuid: 0xFED0\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fecf-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 129,
+        "excerpt": " - uuid: 0xFECF\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fece-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 131,
+        "excerpt": " - uuid: 0xFECE\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fecd-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 133,
+        "excerpt": " - uuid: 0xFECD\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fecc-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 135,
+        "excerpt": " - uuid: 0xFECC\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fecb-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 137,
+        "excerpt": " - uuid: 0xFECB\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000feca-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 139,
+        "excerpt": " - uuid: 0xFECA\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fec9-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 141,
+        "excerpt": " - uuid: 0xFEC9\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fec8-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 143,
+        "excerpt": " - uuid: 0xFEC8\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fec7-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 145,
+        "excerpt": " - uuid: 0xFEC7\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fe8b-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 261,
+        "excerpt": " - uuid: 0xFE8B\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fe8a-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 263,
+        "excerpt": " - uuid: 0xFE8A\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fe25-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 461,
+        "excerpt": " - uuid: 0xFE25\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd6f-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 819,
+        "excerpt": " - uuid: 0xFD6F\n   name: \"Apple, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fe13-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 497,
+        "excerpt": " - uuid: 0xFE13\n   name: Apple Inc."
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd44-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple service UUID (primary_registry). tagfinder(29) also lists 0000FD44 'Apple Nearby' / Find-My UUID set (informational, unverified per \u00a77).",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 905,
+        "excerpt": " - uuid: 0xFD44\n   name: Apple Inc."
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": true
+    },
+    {
+      "value": "0000fd43-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 907,
+        "excerpt": " - uuid: 0xFD43\n   name: Apple Inc."
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fcb2-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 1195,
+        "excerpt": " - uuid: 0xFCB2\n   name: Apple Inc."
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fca0-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 1231,
+        "excerpt": " - uuid: 0xFCA0\n   name: Apple Inc."
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fc94-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple BLE service namespace",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Apple-assigned service UUID (primary_registry, \u00a78.2 70-85). Full Apple SIG member set per ratified \u00a7B.2 scope; not all are AirTag-specific.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 1253,
+        "excerpt": " - uuid: 0xFC94\n   name: Apple Inc."
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000feed-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Tile, Inc.",
+      "device_product": "Tile offline-finding service",
+      "source_sid": 34,
+      "corroborating_sids": [
+        24
+      ],
+      "confidence_basis": "SIG member_uuids.yaml + AirGuard Tile.kt offlineFindingServiceUUID 0xFEED (value-level \u00a78.3, 2 issuers). tagfinder also lists FEED (informational).",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 71,
+        "excerpt": " - uuid: 0xFEED\n   name: \"Tile, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000feec-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Tile, Inc.",
+      "device_product": "Tile service",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Tile-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 73,
+        "excerpt": " - uuid: 0xFEEC\n   name: \"Tile, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd84-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Tile, Inc.",
+      "device_product": "Tile service",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Tile-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 777,
+        "excerpt": " - uuid: 0xFD84\n   name: \"Tile, Inc.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fe33-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "CHIPOLO d.o.o.",
+      "device_product": "Chipolo offline-finding service",
+      "source_sid": 34,
+      "corroborating_sids": [
+        24
+      ],
+      "confidence_basis": "SIG member_uuids.yaml + AirGuard Chipolo.kt offlineFindingServiceUUID 0xFE33 (value-level \u00a78.3, 2 issuers).",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 433,
+        "excerpt": " - uuid: 0xFE33\n   name: CHIPOLO d.o.o."
+      },
+      "conflict_note": "tagfinder maps Chipolo service-UUID to FEE1/FEE0 (unverified, not in SIG/AirGuard). SIG+AirGuard 0xFE33 wins per \u00a77.",
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fe65-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "CHIPOLO d.o.o.",
+      "device_product": "Chipolo service",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Chipolo-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 337,
+        "excerpt": " - uuid: 0xFE65\n   name: CHIPOLO d.o.o."
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fddb-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Samsung-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 609,
+        "excerpt": " - uuid: 0xFDDB\n   name: \"Samsung Electronics Co., Ltd.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd7e-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Samsung-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 789,
+        "excerpt": " - uuid: 0xFD7E\n   name: \"Samsung Electronics Co., Ltd.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd6c-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Samsung-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 825,
+        "excerpt": " - uuid: 0xFD6C\n   name: \"Samsung Electronics Co., Ltd.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd69-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Samsung-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 831,
+        "excerpt": " - uuid: 0xFD69\n   name: \"Samsung Electronics Co., Ltd\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd5a-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [
+        24,
+        "academic:usenix-2210.14702"
+      ],
+      "confidence_basis": "SIG member_uuids.yaml + AirGuard SamsungTracker.kt offlineFindingServiceUUID 0xFD5A + USENIX'24 'FD5A for registered tags' / Command Service (value-level \u00a78.3, 3 independent issuers).",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 861,
+        "excerpt": " - uuid: 0xFD5A\n   name: \"Samsung Electronics Co., Ltd.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": true
+    },
+    {
+      "value": "0000fd59-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [
+        "academic:usenix-2210.14702"
+      ],
+      "confidence_basis": "SIG member_uuids.yaml + USENIX'24 'FD59 for non-registered tags' / Onboarding Service (value-level \u00a78.3, 2 independent issuers).",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 863,
+        "excerpt": " - uuid: 0xFD59\n   name: \"Samsung Electronics Co., Ltd.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd4b-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Samsung-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 891,
+        "excerpt": " - uuid: 0xFD4B\n   name: \"Samsung Electronics Co., Ltd.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fd1d-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Samsung-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 983,
+        "excerpt": " - uuid: 0xFD1D\n   name: \"Samsung Electronics Co., Ltd\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fc91-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "Galaxy SmartTag / SmartTag2",
+      "source_sid": 34,
+      "corroborating_sids": [],
+      "confidence_basis": "SIG member_uuids.yaml Samsung-assigned service UUID (primary_registry). Single SIG issuer.",
+      "cite": {
+        "artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+        "line": 1259,
+        "excerpt": " - uuid: 0xFC91\n   name: \"Samsung Electronics Co., Ltd.\""
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "0000fe59-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "device_product": "SmartTag DFU service (firmware update)",
+      "source_sid": "academic:usenix-2210.14702",
+      "corroborating_sids": [],
+      "confidence_basis": "USENIX'24 \u00a7E.3 'DFU Service Service UUID FE59 is a part of the nRF52833 Buttonless Secure DFU service'. Single academic issuer; cross-vendor (Nordic) per conflict_note.",
+      "cite": {
+        "artifact": "raw/find_my_papers/20260613T203034Z_samsung.txt",
+        "line": 270,
+        "excerpt": "  2. The protocol for tags in the connected mode (\u00a73.2). This           DFU Service Service UUID FE59 is a part of the nRF52833"
+      },
+      "conflict_note": "0xFE59 is assigned in SIG member_uuids.yaml to 'Nordic Semiconductor ASA' \u2014 the nRF52833 Buttonless Secure DFU service shared across ALL nRF52833 devices, NOT a Samsung-exclusive signal. USENIX'24 describes the SmartTag USING this service (the tag runs on nRF52833). Cross-vendor chipset constant; Validator should decide attribution (chipset signal vs Samsung-SmartTag).",
+      "needs_new_source_row": {
+        "academic_key": "academic:usenix-2210.14702",
+        "proposed_name": "USENIX Security '24 \u2014 Samsung OF analysis (Yu/Henderson/Tiu/Haines, ANU)",
+        "url": "https://arxiv.org/abs/2210.14702",
+        "license_posture": "academic"
+      },
+      "already_in_db": false
+    },
+    {
+      "value": "7dfc9000-7d1c-4951-86aa-8d9728f8d66c",
+      "identifier_type": "ble_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "AirTag sound service",
+      "source_sid": 24,
+      "corroborating_sids": [],
+      "confidence_basis": "AirGuard AirTag.kt AIR_TAG_SOUND_SERVICE (crowdsourced sid 24, \u00a78.2 50-75). tagfinder(29) lists truncated '7DFC9000' (prefix agreement, informational).",
+      "cite": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/AirTag.kt",
+        "line": 134,
+        "excerpt": "        private val AIR_TAG_SOUND_SERVICE = UUID.fromString(\"7DFC9000-7D1C-4951-86AA-8D9728F8D66C\")"
+      },
+      "conflict_note": "Live DB has MALFORMED tagfinder-sourced row '7dfc9000-0000-1000-8000-00805f9b34fb' (sid 29, conf 65): the 32-bit prefix 7DFC9000 was wrongly base-expanded as if a SIG short UUID. The TRUE 128-bit custom UUID is this value. Recommend DBArchitect supersede the malformed row. (Same defect on 7dfc9001/9002/9003.)",
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "87290102-3c51-43b1-a1a9-11b9dc38478b",
+      "identifier_type": "ble_uuid",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple Find My accessory \u2014 generic-access service",
+      "source_sid": 24,
+      "corroborating_sids": [],
+      "confidence_basis": "AirGuard AppleFindMy.kt GATT_GENERIC_ACCESS_SERVICE (crowdsourced sid 24). Third-party Find My accessory custom service UUID.",
+      "cite": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/AppleFindMy.kt",
+        "line": 189,
+        "excerpt": "        private val GATT_GENERIC_ACCESS_SERVICE = UUID.fromString(\"87290102-3C51-43B1-A1A9-11B9DC38478B\")"
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "7dfc9001-7d1c-4951-86aa-8d9728f8d66c",
+      "identifier_type": "ble_characteristic",
+      "vendor": "Apple, Inc.",
+      "device_product": "AirTag sound characteristic",
+      "source_sid": 24,
+      "corroborating_sids": [],
+      "confidence_basis": "AirGuard AirTag.kt sound characteristic (crowdsourced sid 24). ble_characteristic is analytical-only (export-DROPPED per CP13).",
+      "cite": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/AirTag.kt",
+        "line": 136,
+        "excerpt": "            UUID.fromString(\"7DFC9001-7D1C-4951-86AA-8D9728F8D66C\")"
+      },
+      "conflict_note": "Live DB has MALFORMED tagfinder row '7dfc9001-0000-1000-8000-00805f9b34fb' (sid 29). True 128-bit form is this. Recommend supersession.",
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "4f860003-943b-49ef-bed4-2f730304427a",
+      "identifier_type": "ble_characteristic",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple Find My accessory \u2014 sound characteristic",
+      "source_sid": 24,
+      "corroborating_sids": [],
+      "confidence_basis": "AirGuard AppleFindMy.kt sound characteristic (crowdsourced sid 24). Analytical-only (CP13).",
+      "cite": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/AppleFindMy.kt",
+        "line": 185,
+        "excerpt": "            UUID.fromString(\"4F860003-943B-49EF-BED4-2F730304427A\")"
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    },
+    {
+      "value": "6aa50003-6352-4d57-a7b4-003a416fbb0b",
+      "identifier_type": "ble_characteristic",
+      "vendor": "Apple, Inc.",
+      "device_product": "Apple Find My accessory \u2014 device-name characteristic",
+      "source_sid": 24,
+      "corroborating_sids": [],
+      "confidence_basis": "AirGuard AppleFindMy.kt GATT_DEVICE_NAME_CHARACTERISTIC (crowdsourced sid 24). Analytical-only (CP13).",
+      "cite": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/AppleFindMy.kt",
+        "line": 190,
+        "excerpt": "        private val GATT_DEVICE_NAME_CHARACTERISTIC = UUID.fromString(\"6AA50003-6352-4D57-A7B4-003A416FBB0B\")"
+      },
+      "conflict_note": null,
+      "needs_new_source_row": null,
+      "already_in_db": false
+    }
+  ],
+  "behavioral_signatures_candidates": [
+    {
+      "signature_name": "apple_offline_finding_adv_filter",
+      "cellular_generation": null,
+      "device_category": "unknown",
+      "vendor": "Apple, Inc.",
+      "description": "Apple Offline-Finding manufacturer-data scan filter: company 0x4C, data prefix 0x12 0x19 0x10 / mask 0xFF 0x00 0x18 (all Apple devices); offline-only mask 0xFF 0xFF 0x18.",
+      "evidence_json": {
+        "company_id": "0x4C",
+        "data": [
+          "0x12",
+          "0x19",
+          "0x10"
+        ],
+        "mask": [
+          "0xFF",
+          "0x00",
+          "0x18"
+        ],
+        "offline_only_mask": [
+          "0xFF",
+          "0xFF",
+          "0x18"
+        ]
+      },
+      "source_sid": 24,
+      "source_file_relative": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/AirTag.kt",
+      "source_line": 144,
+      "corroborating_sids": [
+        "academic:openhaystack-8d214aa",
+        "academic:pets-2021-0045"
+      ],
+      "needs_new_source_row": null,
+      "cite": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/AirTag.kt",
+        "line": 144,
+        "excerpt": "                    // byteArrayOf((0x12).toByte(), (0x19).toByte(), (0x10).toByte()),"
+      },
+      "cto_confirm": "behavioral_signatures table shape per \u00a75 (migration 0010) \u2014 CTO to confirm before DBArchitect ingest"
+    },
+    {
+      "signature_name": "airtag_offline_finding_adv_layout",
+      "cellular_generation": null,
+      "device_category": "unknown",
+      "vendor": "Apple, Inc.",
+      "description": "AirTag/OF advertisement byte layout: adv_data_length 0x1E, type 0xFF, company 0x004C, OF type 0x12 (registered)/0x07 (unregistered), payload_length 0x19, status byte offset 6, public-key offset 7 (len 22-23, EC P-224), crypto counter offset 31.",
+      "evidence_json": {
+        "adv_data_length": "0x1E",
+        "adv_data_type": "0xFF",
+        "company_id": "0x004C",
+        "registered_payload_type": "0x12",
+        "unregistered_payload_type": "0x07",
+        "payload_length": "0x19",
+        "status_byte_offset": 6,
+        "public_key_offset": 7,
+        "public_key_length": 23,
+        "crypto_counter_offset": 31
+      },
+      "source_sid": 29,
+      "source_file_relative": "raw/tagfinder/20260613T203034Z_tagfinder.py",
+      "source_line": 278,
+      "corroborating_sids": [
+        "academic:openhaystack-8d214aa",
+        "academic:pets-2021-0045"
+      ],
+      "needs_new_source_row": null,
+      "cite": {
+        "artifact": "raw/tagfinder/20260613T203034Z_tagfinder.py",
+        "line": 278,
+        "excerpt": "AIRTAG_ADV_FORMAT = {"
+      },
+      "cto_confirm": "behavioral_signatures table shape per \u00a75 (migration 0010) \u2014 CTO to confirm before DBArchitect ingest"
+    },
+    {
+      "signature_name": "apple_offline_finding_status_bits",
+      "cellular_generation": null,
+      "device_category": "unknown",
+      "vendor": "Apple, Inc.",
+      "description": "AirTag manufacturer-data status byte bit semantics: 0x01 Separated from owner, 0x02 Play Sound, 0x04 Lost Mode.",
+      "evidence_json": {
+        "0x01": "Separated from owner",
+        "0x02": "Play Sound",
+        "0x04": "Lost Mode"
+      },
+      "source_sid": 29,
+      "source_file_relative": "raw/tagfinder/20260613T203034Z_tagfinder.py",
+      "source_line": 264,
+      "corroborating_sids": [],
+      "needs_new_source_row": null,
+      "cite": {
+        "artifact": "raw/tagfinder/20260613T203034Z_tagfinder.py",
+        "line": 264,
+        "excerpt": "    0x01: \"Separated from owner\","
+      },
+      "cto_confirm": "behavioral_signatures table shape per \u00a75 (migration 0010) \u2014 CTO to confirm before DBArchitect ingest"
+    },
+    {
+      "signature_name": "samsung_smarttag_lostmode_status_bits",
+      "cellular_generation": null,
+      "device_category": "unknown",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "description": "Samsung SmartTag lost-mode status bits 5-7: 001 Premature lost, 010 Lost, 011 Overmature lost, 100 Paired-one, 101 Connected-one, 110 Connected-two.",
+      "evidence_json": {
+        "001": "Premature lost",
+        "010": "Lost",
+        "011": "Overmature lost",
+        "100": "Paired with one device",
+        "101": "Connected to one device",
+        "110": "Connected to two devices"
+      },
+      "source_sid": "academic:usenix-2210.14702",
+      "source_file_relative": "raw/find_my_papers/20260613T203034Z_samsung.txt",
+      "source_line": 457,
+      "corroborating_sids": [],
+      "needs_new_source_row": {
+        "academic_key": "academic:usenix-2210.14702",
+        "proposed_name": "USENIX Security '24 \u2014 Samsung OF analysis (Yu/Henderson/Tiu/Haines, ANU)",
+        "url": "https://arxiv.org/abs/2210.14702",
+        "license_posture": "academic"
+      },
+      "cite": {
+        "artifact": "raw/find_my_papers/20260613T203034Z_samsung.txt",
+        "line": 457,
+        "excerpt": "               001 (1)      Premature lost mode                          of unique privacy IDs called the privacy ID pool. This set is"
+      },
+      "cto_confirm": "behavioral_signatures table shape per \u00a75 (migration 0010) \u2014 CTO to confirm before DBArchitect ingest"
+    },
+    {
+      "signature_name": "tile_offline_finding_servicedata_filter",
+      "cellular_generation": null,
+      "device_category": "unknown",
+      "vendor": "Tile, Inc.",
+      "description": "Tile offline-finding scan filter: serviceData 0x02 0x00 / mask 0xFF 0xFF on service UUID 0xFEED.",
+      "evidence_json": {
+        "service_uuid": "0000FEED",
+        "service_data": [
+          "0x02",
+          "0x00"
+        ],
+        "mask": [
+          "0xFF",
+          "0xFF"
+        ]
+      },
+      "source_sid": 24,
+      "source_file_relative": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/Tile.kt",
+      "source_line": 27,
+      "corroborating_sids": [],
+      "needs_new_source_row": null,
+      "cite": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/Tile.kt",
+        "line": 27,
+        "excerpt": "                    byteArrayOf((0x02).toByte(), (0x00).toByte()),"
+      },
+      "cto_confirm": "behavioral_signatures table shape per \u00a75 (migration 0010) \u2014 CTO to confirm before DBArchitect ingest"
+    },
+    {
+      "signature_name": "samsung_smarttag_servicedata_filter",
+      "cellular_generation": null,
+      "device_category": "unknown",
+      "vendor": "Samsung Electronics Co., Ltd.",
+      "description": "Samsung SmartTag offline-finding scan filter: serviceData 0x10 / mask 0xF8 on service UUID 0xFD5A.",
+      "evidence_json": {
+        "service_uuid": "0000FD5A",
+        "service_data": [
+          "0x10"
+        ],
+        "mask": [
+          "0xF8"
+        ]
+      },
+      "source_sid": 24,
+      "source_file_relative": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/SamsungTracker.kt",
+      "source_line": 44,
+      "corroborating_sids": [],
+      "needs_new_source_row": null,
+      "cite": {
+        "artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/SamsungTracker.kt",
+        "line": 44,
+        "excerpt": "                    byteArrayOf((0x10).toByte()),"
+      },
+      "cto_confirm": "behavioral_signatures table shape per \u00a75 (migration 0010) \u2014 CTO to confirm before DBArchitect ingest"
+    }
+  ]
+}

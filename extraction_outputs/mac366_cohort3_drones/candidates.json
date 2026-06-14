@@ -1,0 +1,598 @@
+{
+  "_meta": {
+    "issue": "MAC-374",
+    "parent": "MAC-363",
+    "cohort": "Cohort 3 \u2014 Drones",
+    "worker": "ExtractionWorker (1347736c)",
+    "scope": "EXTRACTION ONLY \u2014 candidates only; no DB write/ingest/migration/export/push/CP",
+    "input": "MAC-366 harvest manifest (CTO-verified)",
+    "framing": "EXPANSION not greenfield \u2014 0 net-new identifier VALUES; contribution is corroboration/footprint + DB-conflict surfacing + behavioral signatures",
+    "pii_redaction_count": 22,
+    "pii_note": "FCC contact_name + mailing_address + po_box + zip NEVER read (\u00a711 #3 / SAR-5); only grantee_code/name/city/state/country surfaced. Frozen CSV stays external/gitignored.",
+    "fcc_csv_verified": true,
+    "counts": {
+      "identifier_candidates_total": 14,
+      "net_new_identifier_values": 0,
+      "already_in_db": 14,
+      "by_type": {
+        "ble_manufacturer_id": 2,
+        "ble_company_id": 1,
+        "fcc_grantee_code": 11
+      },
+      "behavioral_signatures": 5,
+      "db_conflicts_hard": 3,
+      "db_conflicts_soft": 4,
+      "recategorizations_recommended": 6,
+      "faa_rid_crossref_vendors": 3
+    },
+    "db_conflicts_for_remediation": {
+      "note": "EXTRACTION-ONLY surfaced these; NOT fixed here (no DB write). DBArchitect/Validator remediation \u2014 \u00a711 #1/#7/#8.",
+      "fcc_grantee_misattributions": [
+        {
+          "severity": "HARD",
+          "code": "CMJ",
+          "db_id": 42883,
+          "db_says": "manufacturer='Autel Robotics' category='drone' conf=88 source_type='regulatory'",
+          "frozen_fcc_truth": "Autel Corporation (Glendale, California, United States)",
+          "issue": "DB attributes CMJ to drone vendor 'Autel Robotics'/'drone' but the frozen sid-7 grantee is 'Autel Corporation' (Autel Corporation (Glendale CA) = AUTOMOTIVE diagnostics \u2014 NOT Autel Robotics.). \u00a711 #1/#7/#8 mis-attribution.",
+          "recommendation": "DBArchitect/Validator: re-attribute or supersede; re-eval confidence."
+        },
+        {
+          "severity": "OK-ABSENT",
+          "code": "HDF",
+          "db_id": null,
+          "db_says": "absent (no fcc_grantee_code row)",
+          "frozen_fcc_truth": "Autelca Ltd (CH-3073 Gimligen-Berne, Switzerland)",
+          "issue": "FP correctly NOT minted as a grantee_code (Autelca Ltd (Switzerland) \u2014 unrelated.).",
+          "recommendation": "none \u2014 honest absence preserved."
+        },
+        {
+          "severity": "OK-ABSENT",
+          "code": "DJI",
+          "db_id": null,
+          "db_says": "absent (no fcc_grantee_code row)",
+          "frozen_fcc_truth": "Seragen Diagnostics (Indianapolis, Indiana, United States)",
+          "issue": "FP correctly NOT minted as a grantee_code (Literal grantee code 'DJI' = Seragen Diagnostics (medical) \u2014 NOT the drone maker.).",
+          "recommendation": "none \u2014 honest absence preserved."
+        },
+        {
+          "severity": "HARD",
+          "code": "WQ8",
+          "db_id": 42898,
+          "db_says": "manufacturer='Autel Robotics' category='drone' conf=88 source_type='regulatory'",
+          "frozen_fcc_truth": "Autel Intelligent Tech. Corp., Ltd. (Shenzhen, China)",
+          "issue": "DB attributes WQ8 to drone vendor 'Autel Robotics'/'drone' but the frozen sid-7 grantee is 'Autel Intelligent Tech. Corp., Ltd.' (Autel Intelligent (diagnostics parent) \u2014 NOT the drone arm.). \u00a711 #1/#7/#8 mis-attribution.",
+          "recommendation": "DBArchitect/Validator: re-attribute or supersede; re-eval confidence."
+        },
+        {
+          "severity": "HARD",
+          "code": "XPR",
+          "db_id": 42899,
+          "db_says": "manufacturer='Autel Robotics' category='drone' conf=88 source_type='regulatory'",
+          "frozen_fcc_truth": "Autel Intelligent Technology Co.,Ltd (Shenzhen, China)",
+          "issue": "DB attributes XPR to drone vendor 'Autel Robotics'/'drone' but the frozen sid-7 grantee is 'Autel Intelligent Technology Co.,Ltd' (Autel Intelligent (diagnostics parent) \u2014 NOT the drone arm.). \u00a711 #1/#7/#8 mis-attribution.",
+          "recommendation": "DBArchitect/Validator: re-attribute or supersede; re-eval confidence."
+        },
+        {
+          "severity": "SOFT",
+          "code": "RKU",
+          "db_id": 42954,
+          "db_says": "manufacturer='Parrot' category='drone' conf=None source_type='crowdsourced'",
+          "frozen_fcc_truth": "PARROT (Paris, France)",
+          "issue": "DB labels RKU 'Parrot'/'drone'. Manufacturer=Parrot is defensible (corporate group) but the CTO ruling lists RKU as an exclusion-FP ('PARROT', PARROT legacy entity \u2014 not the drone arm.); device_category='drone' is questionable.",
+          "recommendation": "DBArchitect/Validator: review device_category vs exclusion-FP ruling."
+        },
+        {
+          "severity": "SOFT",
+          "code": "RKX",
+          "db_id": 42955,
+          "db_says": "manufacturer='Parrot' category='drone' conf=None source_type='regulatory'",
+          "frozen_fcc_truth": "PARROT (Paris, France)",
+          "issue": "DB labels RKX 'Parrot'/'drone'. Manufacturer=Parrot is defensible (corporate group) but the CTO ruling lists RKX as an exclusion-FP ('PARROT', PARROT legacy entity \u2014 not the drone arm.); device_category='drone' is questionable.",
+          "recommendation": "DBArchitect/Validator: review device_category vs exclusion-FP ruling."
+        },
+        {
+          "severity": "SOFT",
+          "code": "CHK",
+          "db_id": 42935,
+          "db_says": "manufacturer='Parrot' category='drone' conf=None source_type='crowdsourced'",
+          "frozen_fcc_truth": "Parrot Electronics Ltd (Chai Wan, Hong Kong)",
+          "issue": "DB labels CHK 'Parrot'/'drone'. Manufacturer=Parrot is defensible (corporate group) but the CTO ruling lists CHK as an exclusion-FP ('Parrot Electronics Ltd', Parrot Electronics HK \u2014 not the drone arm.); device_category='drone' is questionable.",
+          "recommendation": "DBArchitect/Validator: review device_category vs exclusion-FP ruling."
+        },
+        {
+          "severity": "SOFT",
+          "code": "XNP",
+          "db_id": 42957,
+          "db_says": "manufacturer='Parrot' category='drone' conf=None source_type='crowdsourced'",
+          "frozen_fcc_truth": "Parrot's Technology GmbH (Zug, Switzerland)",
+          "issue": "DB labels XNP 'Parrot'/'drone'. Manufacturer=Parrot is defensible (corporate group) but the CTO ruling lists XNP as an exclusion-FP ('Parrot's Technology GmbH', Parrot's Technology GmbH (Zug) \u2014 not the drone arm.); device_category='drone' is questionable.",
+          "recommendation": "DBArchitect/Validator: review device_category vs exclusion-FP ruling."
+        }
+      ],
+      "fcc_grantee_recategorizations": [
+        {
+          "code": "2AHAN",
+          "db_id": 37138,
+          "db_state": "manufacturer='DJI' category='unknown' conf=75 source_type='crowdsourced'",
+          "frozen_fcc": "SZ DJI Software Technology Co., Ltd. (Shenzhen, China)",
+          "recommendation": "re-categorize device_category 'unknown'\u2192'drone' and lift to primary_registry band (frozen sid-7 = CTO-verified DJI drone-arm). \u00a711 #8: needs Validator/DBArchitect, not staged here."
+        },
+        {
+          "code": "2AHAY",
+          "db_id": 37142,
+          "db_state": "manufacturer='DJI' category='unknown' conf=75 source_type='crowdsourced'",
+          "frozen_fcc": "SZ DJI BaiWang Technology Co.,Ltd (Shenzhen, China)",
+          "recommendation": "re-categorize device_category 'unknown'\u2192'drone' and lift to primary_registry band (frozen sid-7 = CTO-verified DJI drone-arm). \u00a711 #8: needs Validator/DBArchitect, not staged here."
+        },
+        {
+          "code": "2ANDR",
+          "db_id": 37173,
+          "db_state": "manufacturer='DJI' category='unknown' conf=75 source_type='crowdsourced'",
+          "frozen_fcc": "SZ DJI Osmo Technology Co.,Ltd. (Guangming District, Shenzhen, China)",
+          "recommendation": "re-categorize device_category 'unknown'\u2192'drone' and lift to primary_registry band (frozen sid-7 = CTO-verified DJI drone-arm). \u00a711 #8: needs Validator/DBArchitect, not staged here."
+        },
+        {
+          "code": "2AS9V",
+          "db_id": 37174,
+          "db_state": "manufacturer='DJI' category='unknown' conf=75 source_type='crowdsourced'",
+          "frozen_fcc": "SZ DJI TECHNOLOGY CO. LTD (Nanshan, Shenzen, Guangdong, China)",
+          "recommendation": "re-categorize device_category 'unknown'\u2192'drone' and lift to primary_registry band (frozen sid-7 = CTO-verified DJI drone-arm). \u00a711 #8: needs Validator/DBArchitect, not staged here."
+        },
+        {
+          "code": "2AS9W",
+          "db_id": 37175,
+          "db_state": "manufacturer='DJI' category='unknown' conf=75 source_type='crowdsourced'",
+          "frozen_fcc": "SZ DJI TECHNOLOGY CO. LTD (Nanshan, Shenzen, Guangdong, China)",
+          "recommendation": "re-categorize device_category 'unknown'\u2192'drone' and lift to primary_registry band (frozen sid-7 = CTO-verified DJI drone-arm). \u00a711 #8: needs Validator/DBArchitect, not staged here."
+        },
+        {
+          "code": "2AS9X",
+          "db_id": 37176,
+          "db_state": "manufacturer='DJI' category='unknown' conf=75 source_type='crowdsourced'",
+          "frozen_fcc": "SZ DJI TECHNOLOGY CO. LTD (Nanshan, Shenzen, Guangdong, China)",
+          "recommendation": "re-categorize device_category 'unknown'\u2192'drone' and lift to primary_registry band (frozen sid-7 = CTO-verified DJI drone-arm). \u00a711 #8: needs Validator/DBArchitect, not staged here."
+        }
+      ]
+    },
+    "needs_new_source_rows": {
+      "app:com.skydio.r3": {
+        "proposed_name": "Skydio (com.skydio.r3@24.10.48)",
+        "source_type": "manufacturer_app",
+        "sha256": "af538197b7a1116ee1b86d607e716583c16978c0673cc5f4890dbbb108b61b11",
+        "note": "XAPK split bundle; base com.skydio.r3.apk"
+      },
+      "app:com.skydio.enterprise": {
+        "proposed_name": "Skydio Enterprise (com.skydio.enterprise@24.10.48)",
+        "source_type": "manufacturer_app",
+        "sha256": "4bfb561d07c5f57ce3f81b9e7be7d4b31c5d0fd6a71e810b00519cf58d95818c",
+        "note": "XAPK split bundle; shares jcabremoteid module with r3"
+      },
+      "app:com.autel.explorer": {
+        "proposed_name": "Autel Explorer (com.autel.explorer@V1.0.1.45)",
+        "source_type": "manufacturer_app",
+        "sha256": "02eb9df046016fe338371afd64aff00849f1d90a1384302361dc3dab1737700f",
+        "note": "plain APK; the ONLY Autel drone companion (ruling 3)"
+      },
+      "note": "DJI (sid 71) / Parrot (sid 70) apps + SIG (34) / FCC (7) / FAA (36) / opendroneid (19) / dji_droneid (28) source rows already exist \u2014 extend footprint."
+    }
+  },
+  "candidates": [
+    {
+      "identifier_type": "ble_manufacturer_id",
+      "value": "0x08AA",
+      "source_sid": 34,
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml#L5715",
+      "relative_path": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml#L5715-5716",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=2872",
+      "source_lens": "registration",
+      "export_membership": "ble_manufacturer_id MAP\u2192exported BUT device_category='unknown' \u2192 \u00a711 #13 unknown_category ban \u2192 NOT in either feed",
+      "manufacturer": "DJI",
+      "device_category": "unknown",
+      "cite_excerpt": "- value: 0x08AA / name: 'SZ DJI TECHNOLOGY CO.,LTD' (SIG company_identifiers.yaml L5715-5716)",
+      "notes": "SIG-registered DJI manufacturer-id; corroborates existing primary_registry row.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "ble_manufacturer_id",
+      "value": "0x0043",
+      "source_sid": 34,
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml#L11754",
+      "relative_path": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml#L11754-11755",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=4884",
+      "source_lens": "registration",
+      "export_membership": "ble_manufacturer_id MAP\u2192exported BUT device_category='unknown' \u2192 \u00a711 #13 unknown_category ban \u2192 NOT in either feed",
+      "manufacturer": "Parrot",
+      "device_category": "unknown",
+      "cite_excerpt": "- value: 0x0043 / name: 'PARROT AUTOMOTIVE SAS' (SIG company_identifiers.yaml L11754-11755)",
+      "notes": "Ruling 1 entity-split: SIG registrant = PARROT AUTOMOTIVE SAS (car-infotainment); the drone-arm FCC grantee is 2AG6I PARROT DRONE SAS. Read 'Parrot (corporate group)' with automotive-entity caveat. Hub-and-spoke != \u00a78.3 value corroboration.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "ble_company_id",
+      "value": "67",
+      "source_sid": 70,
+      "source_url": "https://apkpure.com/freeflight-6/com.parrot.freeflight6",
+      "relative_path": "(existing DB row \u2014 Parrot FreeFlight app, source 70)",
+      "proposed_confidence_ceiling": 85,
+      "db_presence": "already_in_db:id=23052",
+      "source_lens": "registration",
+      "export_membership": "ble_company_id MAP\u2192ble_manufacturer_id; device_category='drone' \u2192 REACHES export (conf 85)",
+      "manufacturer": "Parrot",
+      "device_category": "drone",
+      "cite_excerpt": "ble_company_id 67 = decimal(0x0043) Parrot \u2014 existing exported row id=23052",
+      "notes": "MAC-360 flagged: 67 is the decimal form of SIG 0x0043; recommend normalize 67\u21920x0043 at promotion (\u00a74.3, Phase-5). Cross-ref ble_manufacturer_id 0x0043 (id 4884).",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2ATQR",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=42862",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "Skydio",
+      "device_category": "drone",
+      "cite_excerpt": "\"2ATQR\",\"Skydio, Inc.\",REDWOOD CITY, California, United States (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). Skydio drone-arm grantee.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2AGNT",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=42873",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "Autel Robotics Co.",
+      "device_category": "drone",
+      "cite_excerpt": "\"2AGNT\",\"Autel Robotics Co., Ltd.\",Shenzhen, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). Autel Robotics drone-arm grantee (ruling 3 \u2014 the ONLY Autel drone grantee).",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2AG6I",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=42871",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "PARROT DRONE SAS",
+      "device_category": "drone",
+      "cite_excerpt": "\"2AG6I\",\"PARROT DRONE SAS\",Paris, France (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). Parrot drone-arm grantee (ruling 1 \u2014 distinct entity from SIG registrant).",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2AHAN",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=37138",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "SZ DJI Software Technology Co.",
+      "device_category": "drone",
+      "cite_excerpt": "\"2AHAN\",\"SZ DJI Software Technology Co., Ltd.\",Shenzhen, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). DJI Software Technology.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2AHAY",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=37142",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "SZ DJI BaiWang Technology Co.",
+      "device_category": "drone",
+      "cite_excerpt": "\"2AHAY\",\"SZ DJI BaiWang Technology Co.,Ltd\",Shenzhen, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). DJI BaiWang.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2ANDR",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=37173",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "SZ DJI Osmo Technology Co.",
+      "device_category": "drone",
+      "cite_excerpt": "\"2ANDR\",\"SZ DJI Osmo Technology Co.,Ltd.\",Guangming District, Shenzhen, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). DJI Osmo.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2AS9V",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=37174",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "SZ DJI TECHNOLOGY CO. LTD",
+      "device_category": "drone",
+      "cite_excerpt": "\"2AS9V\",\"SZ DJI TECHNOLOGY CO. LTD\",Nanshan, Shenzen, Guangdong, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). DJI Technology.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2AS9W",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=37175",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "SZ DJI TECHNOLOGY CO. LTD",
+      "device_category": "drone",
+      "cite_excerpt": "\"2AS9W\",\"SZ DJI TECHNOLOGY CO. LTD\",Nanshan, Shenzen, Guangdong, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). DJI Technology.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "2AS9X",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=37176",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "SZ DJI TECHNOLOGY CO. LTD",
+      "device_category": "drone",
+      "cite_excerpt": "\"2AS9X\",\"SZ DJI TECHNOLOGY CO. LTD\",Nanshan, Shenzen, Guangdong, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). DJI Technology.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "QT9",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=42892",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "DJI Innovations Technology Co.",
+      "device_category": "drone",
+      "cite_excerpt": "\"QT9\",\"DJI Innovations Technology Co., Ltd.\",Shenzhen, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). DJI Innovations.",
+      "conflict_note": ""
+    },
+    {
+      "identifier_type": "fcc_grantee_code",
+      "value": "SS3",
+      "source_sid": 7,
+      "source_url": "https://opendata.fcc.gov/Engineering/FCC-EAS-Grantee-Codes/3b3k-34jp",
+      "relative_path": "sid7 frozen CSV (sha256 5cd60fbe8654\u2026, external/gitignored)",
+      "proposed_confidence_ceiling": 90,
+      "db_presence": "already_in_db:id=42893",
+      "source_lens": "registration",
+      "export_membership": "fcc_grantee_code = DROPPED per \u00a74.4 (regulatory entity ID, not RF-broadcast wire pattern) \u2192 EXPORT-EXCLUDED both feeds",
+      "manufacturer": "SZ DJI TECHNOLOGY CO.",
+      "device_category": "drone",
+      "cite_excerpt": "\"SS3\",\"SZ DJI TECHNOLOGY CO., LTD\",Nanshan District, Shenzhen, Guangdong, China (FCC EAS frozen 2021-03-22)",
+      "notes": "PII-stripped (code/name/city/state/country only). DJI Technology.",
+      "conflict_note": ""
+    }
+  ],
+  "behavioral_signatures": [
+    {
+      "signature_name": "ASTM F3411 / ASD-STAN Remote-ID broadcast \u2014 Wi-Fi (Beacon vendor-specific IE + NaN) carrying CTA-2063-A serial",
+      "device_category": "drone",
+      "cellular_generation": null,
+      "source_ref": 19,
+      "relative_path": "raw/drone_remoteid_family/20260613T210813Z/opendroneid.h",
+      "evidence": [
+        {
+          "locus": "opendroneid.h L125",
+          "note": "ID-type enum SERIAL_NUMBER=1 / CAA_REGISTRATION_ID=2 / UTM_ASSIGNED_UUID=3 / SPECIFIC_SESSION_ID=4"
+        },
+        {
+          "locus": "opendroneid.h L24",
+          "note": "ODID_ID_SIZE 20 (UASID field)"
+        },
+        {
+          "locus": "opendroneid.h L289",
+          "note": "ODID_BasicID_data { UAType; IDType; char UASID[ODID_ID_SIZE+1]; }"
+        },
+        {
+          "locus": "opendroneid-core-c/libopendroneid/wifi.c append_tlv(...,0x03,...)",
+          "note": "Wi-Fi Alliance OUI + oui_type 0x13 vendor IE; CTA-2063 identifier appended as TLV type 0x03 (structural \u2014 encoder)"
+        }
+      ],
+      "proposed_confidence_ceiling": 75,
+      "source_lens": "structural",
+      "notes": "Structural authority for the on-air Remote-ID beacon (ruling 5b). The per-vendor UASID *value* is the drone serial (drone_id_prefix layer), NOT from this header. Behavioral pattern, not an identifier value.",
+      "apk_evidence_check": "n/a_structural"
+    },
+    {
+      "signature_name": "ASTM Remote-ID broadcast \u2014 Bluetooth 4 Legacy / BT5 Long-Range advertisement (ODID message pack)",
+      "device_category": "drone",
+      "cellular_generation": null,
+      "source_ref": 19,
+      "relative_path": "raw/drone_remoteid_family/20260613T210813Z/opendroneid.h",
+      "evidence": [
+        {
+          "locus": "opendroneid.h #define ODID_MESSAGE_SIZE 25",
+          "note": "25-byte ODID message; BT4 legacy adv (service data) / BT5 ext adv"
+        },
+        {
+          "locus": "opendroneid.h L289",
+          "note": "ODID_BasicID message structure"
+        }
+      ],
+      "proposed_confidence_ceiling": 75,
+      "source_lens": "structural",
+      "notes": "BT advert transport for the same ODID Basic-ID. Receiver-side parsing in sid 25 receiver-android / sid 26 wireshark-dissector / sid 27 RemoteIDReceiver.",
+      "apk_evidence_check": "n/a_structural"
+    },
+    {
+      "signature_name": "DJI legacy proprietary DroneID \u2014 OFDM RF frame (2.4 GHz, ~600 ms burst, 9 OFDM symbols) carrying serial + GPS + operator location",
+      "device_category": "drone",
+      "cellular_generation": null,
+      "source_ref": 28,
+      "relative_path": "raw/drone_remoteid_family/20260613T210813Z/dji_droneid_README.md",
+      "evidence": [
+        {
+          "locus": "dji_droneid_README.md \u2014 'signal of interest is in 2.4 GHz \u2026 every 600 ms \u2026 10 MHz wide (15.36 MHz with guard carriers)'",
+          "note": "RF-layer burst cadence + bandwidth"
+        },
+        {
+          "locus": "dji_droneid_README.md \u2014 center freqs 2.4595 / 2.4445 / 2.4295 / 2.4145 GHz",
+          "note": "DroneID hopping channels"
+        },
+        {
+          "locus": "dji_droneid_README.md \u2014 '9 OFDM symbols \u2026 ZC sequence \u2026 scrambler'",
+          "note": "OFDM frame structure (proprietary, pre-ASTM)"
+        }
+      ],
+      "proposed_confidence_ceiling": 70,
+      "source_lens": "structural",
+      "notes": "Ruling 5b: DJI's LEGACY DroneID is an OFDM RF frame, DISTINCT from the ASTM Remote-ID beacon. Decoded payload (serial / lat-lon / operator loc) is an RF-layer extraction target, not a BT/WiFi beacon. No IQ sample shipped.",
+      "apk_evidence_check": "n/a_structural"
+    },
+    {
+      "signature_name": "Skydio Remote-ID \u2014 broadcast (ASTM via on-board QCA/Qualcomm radio) + Network Remote-ID (cloud session auth) companion-app pattern",
+      "device_category": "drone",
+      "cellular_generation": null,
+      "source_ref": "needs_new_source_row:app:com.skydio.r3",
+      "relative_path": "raw/vendor_apps/skydio/com.skydio.r3/24.10.48/af538197b7a1116ee1b86d607e716583c16978c0673cc5f4890dbbb108b61b11.xapk",
+      "evidence": [
+        {
+          "locus": "Lcom/skydio/jcabremoteid/...",
+          "note": "dedicated Remote-ID module (jcabremoteid, 81 DEX refs)"
+        },
+        {
+          "locus": "Lcom/skydio/jcabremoteid/auth/JcabRemoteIdRequest;",
+          "note": "Network Remote-ID auth request (cloud session)"
+        },
+        {
+          "locus": "Lcom/skydio/pbtypes/qca_stats/RemoteIdStatusProto;",
+          "note": "QCA (Qualcomm Atheros) chipset Remote-ID status telemetry (241 refs)"
+        },
+        {
+          "locus": "Lcom/skydio/aircam/remoteid/RidAuthFragment;",
+          "note": "in-app Remote-ID auth/registration UI"
+        }
+      ],
+      "proposed_confidence_ceiling": 75,
+      "source_lens": "observation",
+      "notes": "Class descriptors re-grepped from gitignored XAPK base DEX (decompiled source NOT committed, \u00a711 #15). Skydio supports both broadcast + Network RID.",
+      "apk_evidence_check": "verified"
+    },
+    {
+      "signature_name": "Autel drone companion \u2014 Wi-Fi AP join (SSIDConnection) + MAVLink control-link pattern (EVO/Dragonfish family)",
+      "device_category": "drone",
+      "cellular_generation": null,
+      "source_ref": "needs_new_source_row:app:com.autel.explorer",
+      "relative_path": "raw/vendor_apps/autel/com.autel.explorer/V1.0.1.45/02eb9df046016fe338371afd64aff00849f1d90a1384302361dc3dab1737700f.apk",
+      "evidence": [
+        {
+          "locus": "Lcom/autel/sdk10/AutelNet/AutelDsp/wifi/connection/SSIDConnection;",
+          "note": "joins the drone's Wi-Fi AP by SSID (runtime SSID, not hardcoded literal)"
+        },
+        {
+          "locus": "AutelSSIDConnectionInterface$OnSSIDConnectionlistener",
+          "note": "SSID connection lifecycle callbacks"
+        },
+        {
+          "locus": "AutelMavlinkCore",
+          "note": "MAVLink control link over the Wi-Fi AP"
+        }
+      ],
+      "proposed_confidence_ceiling": 75,
+      "source_lens": "observation",
+      "notes": "Class descriptors re-grepped from gitignored APK DEX (\u00a711 #15). No hardcoded default-SSID literal surfaced (AutelNet/AutelNet2 are SDK package names, not broadcast SSIDs) \u2192 no ssid_pattern candidate.",
+      "apk_evidence_check": "verified"
+    }
+  ],
+  "faa_rid_crossrefs": [
+    {
+      "vendor": "skydio",
+      "rid_doc_count": 8,
+      "total_items": 8,
+      "models": [
+        "2 SDRC2V1",
+        "2+ SDR35V1",
+        "2+ SDR35V2",
+        "R10 SDR5PC",
+        "X10E SR47P",
+        "X2E SDR21V1",
+        "X2E SDR21V2"
+      ],
+      "crossref_to": "drone_id_prefix 1668B (Skydio CTA-2063-A)",
+      "disposition": "attribution + cross-ref only (ruling 5) \u2014 makeName/model NOT promoted as identifier values; the on-air ID is the CTA-2063-A serial."
+    },
+    {
+      "vendor": "autel",
+      "rid_doc_count": 22,
+      "total_items": 22,
+      "models": [
+        "Autel Alpha",
+        "Dragonfish Lite",
+        "Dragonfish Pro",
+        "Dragonfish Standard",
+        "EVO II",
+        "EVO II V3",
+        "EVO Lite",
+        "EVO Lite+",
+        "EVO Max",
+        "EVO Nano",
+        "EVO Nano+",
+        "MDX-1"
+      ],
+      "crossref_to": "drone_id_prefix 1748C (Autel Robotics CTA-2063-A)",
+      "disposition": "attribution + cross-ref only (ruling 5) \u2014 makeName/model NOT promoted as identifier values; the on-air ID is the CTA-2063-A serial."
+    },
+    {
+      "vendor": "parrot",
+      "rid_doc_count": 3,
+      "total_items": 3,
+      "models": [
+        "ANAFI Ai",
+        "ANAFI USA",
+        "PARROT ANAFI UKR GOV"
+      ],
+      "crossref_to": "drone_id_prefix (Parrot ANAFI family)",
+      "disposition": "attribution + cross-ref only (ruling 5) \u2014 makeName/model NOT promoted as identifier values; the on-air ID is the CTA-2063-A serial."
+    }
+  ],
+  "honest_absences": [
+    "Anduril \u2014 no public companion APK (military UAS) AND 0 grantees in the 2021-03-22 frozen FCC set AND 0 FAA RID DOC rows (totalItems=0). Any Anduril coverage needs a live post-2021 fcc.report/fccid.io hunt = a Phase-3 dispatch, NOT this stage (ruling 11).",
+    "Skydio + Autel \u2014 NO Bluetooth-SIG company-id (ruling 2). 0 hits across all SIG files; their BLE adverts (if any) ride a chipset/module vendor id. No SIG id minted.",
+    "Skydio/Autel/DJI-app/Parrot-app BLE service UUIDs \u2014 0 clean vendor UUIDs. Every 128-bit UUID in the APK/XAPK DEX is a cross-vendor SDK constant: 258EAFA5 (board-dropped MAC-348/350), edef8ba9 / 9a04f079 (Nordic DFU), c06c8400 / bb392ec0 (TI base 0002a5d5c51b), and a single 01ead4a5 (no BluetoothGattService binding, not cross-vendor \u2014 ambiguous config GUID). No vendor GATT service binding \u2192 none emitted (\u00a711 #1).",
+    "No net-new drone_id_prefix. The only repo prefix value, 1581F6BV (DragonSync tests/generate_scenario.py:52 + test_refactor_scenario.json), is a SYNTHETIC TEST FIXTURE (\u00a711 #1 bars promotion). kismet_targets.txt is empty (example-comments only); the faa-rid-lookup submodule was not cloned. Skydio (1668B*) / Autel (1748C*) / DJI (1581F*) prefix families are already in DB.",
+    "FCC grantee\u2192FCC-ID\u2192equipment-class drill-down (ruling 12) \u2014 no sid 51/52/85 drone grantee pages were fetched this harvest (the only fcc.report artifacts on disk are MAC-367 WatchGuard). Honest-absence: this worker does NOT live-fetch (\u00a711 #6 / SAR-4 \u2014 Source Worker's robots-routed job). 0 equipment_class_code candidates.",
+    "Grantee-code FPs correctly ABSENT from DB: HDF (Autelca, Switzerland) absent; literal code 'DJI' = Seragen Diagnostics NOT minted as a grantee_code (the product_family_codename='DJI' id=42971 is an unrelated judicial_filing artifact, different identifier_type).",
+    "'Autel Sky' (newer Autel drone app) \u2014 unconfirmed on the apkcombo mirror; not asserted (ruling 11).",
+    "No default SSID literal in the Autel or Skydio APKs \u2014 connection logic reads the SSID at runtime; no hardcoded vendor SSID pattern \u2192 0 ssid_pattern candidates."
+  ]
+}

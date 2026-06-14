@@ -1,0 +1,741 @@
+{
+ "_meta": {
+  "issue": "MAC-376",
+  "parent": "MAC-363",
+  "cohort": "Cohort 5 \u2014 Consumer surveillance",
+  "worker": "ExtractionWorker (1347736c)",
+  "scope": "EXTRACTION ONLY \u2014 candidates only; no DB write/ingest/migration/export/push/CP",
+  "input": "MAC-368 harvest manifest (CTO-verified, hash-matched)",
+  "framing": "narrow scoped expansion \u2014 export-meaningful net-new surface is the Wi-Fi OUI side only; BLE SIG-ids + FCC grantees are already-in-db reference/attribution",
+  "artifact_sha_verified": {
+   "sig_company_identifiers.yaml": "51b1ea7d\u2026",
+   "ieee_oui.csv": "fad18e77\u2026",
+   "fcc_grantee_full.json": "5f56afcd\u2026"
+  },
+  "pii_redaction_count": 0,
+  "pii_note": "FCC frozen JSON is grantee_code/grantee_name only (already PII-stripped, \u00a711 #3/SAR-5); no contact/address columns present or surfaced. No live fccid.io drill (Phase-3).",
+  "integrity_catches": [
+   "Arlo Technology exact-match OUI count = 3 (NOT CTO-headline 4); ARLOTTO COMNET 00E0F2 (Taiwan) is a substring trap, not Arlo.",
+   "70B3D5C4B = ANKER-EAST (St Petersburg RU), NOT eufy/Anker Innovations; eufy has ZERO own OUI (strengthens ruling 3).",
+   "Blink by Amazon (5 MA-L OUIs) = pure-play surveillance sub-brand inside the Amazon mixed-use block -> cohort-clean, promotable.",
+   "Wyze MA-M A4DA222 already in DB as mac_range a4:da:22:2/28 (id 9748) -> excluded from net-new oui (type-collision dup).",
+   "device_category 'doorbell' absent from \u00a72.1 enum -> Ring/Blink video doorbells map to cctv_camera; taxonomy gap flagged."
+  ],
+  "counts": {
+   "net_new_oui_total": 26,
+   "pure_play_oui_candidates": 27,
+   "sig_company_ids_already_in_db": 8,
+   "fcc_grantee_codes_already_in_db": 9,
+   "mixed_use_oui_unscoped": 382,
+   "behavioral_signatures": 1
+  },
+  "confidence_band": "\u00a78.2 primary_registry single-source 70\u201385, ceiling 85 (IEEE OUI)"
+ },
+ "candidates": [
+  {
+   "identifier_type": "oui",
+   "value": "00B463",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,00B463,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "187F88",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,187F88,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "242BD6",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,242BD6,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "343EA4",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,343EA4,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "50E467",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,50E467,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "54E019",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,54E019,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "5C475E",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,5C475E,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "649A63",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,649A63,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "90486C",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,90486C,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "9C7613",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,9C7613,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "AC9FC3",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,AC9FC3,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "C4DBAD",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,C4DBAD,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "CC3BFB",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Ring LLC')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Ring",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,CC3BFB,Ring LLC (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "2CAA8E",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Wyze Labs Inc')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Wyze Labs",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,2CAA8E,Wyze Labs Inc (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "7C78B2",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Wyze Labs Inc')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Wyze Labs",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,7C78B2,Wyze Labs Inc (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "80482C",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Wyze Labs Inc')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Wyze Labs",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,80482C,Wyze Labs Inc (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "D03F27",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Wyze Labs Inc')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Wyze Labs",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,D03F27,Wyze Labs Inc (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "F0C88B",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Wyze Labs Inc')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Wyze Labs",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,F0C88B,Wyze Labs Inc (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "A4DA222",
+   "source_sid": 2,
+   "source_url": "https://standards-oui.ieee.org/oui28/mam.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_mam.csv (MA-M org='Wyze Labs Inc')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "already_in_db:mac_range:id=9748:a4:da:22:2/28",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Wyze Labs",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-M,A4DA222,Wyze Labs Inc (IEEE MA-M registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": "Wyze MA-M A4DA222 already in DB as mac_range a4:da:22:2/28 -> excluded from net-new"
+  },
+  {
+   "identifier_type": "oui",
+   "value": "486264",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Arlo Technology')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Arlo Technologies",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,486264,Arlo Technology (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "A41162",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Arlo Technology')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Arlo Technologies",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,A41162,Arlo Technology (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "FC9C98",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Arlo Technology')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Arlo Technologies",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,FC9C98,Arlo Technology (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "3CA070",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Blink by Amazon')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Blink (Amazon)",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,3CA070,Blink by Amazon (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "70AD43",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Blink by Amazon')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Blink (Amazon)",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,70AD43,Blink by Amazon (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "741348",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Blink by Amazon')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Blink (Amazon)",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,741348,Blink by Amazon (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "74AB93",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Blink by Amazon')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Blink (Amazon)",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,74AB93,Blink by Amazon (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  },
+  {
+   "identifier_type": "oui",
+   "value": "F074C1",
+   "source_sid": 1,
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+   "relative_path": "raw/ieee_oui/20260613T203034Z_oui.csv (MA-L org='Blink by Amazon')",
+   "proposed_confidence_ceiling": 85,
+   "db_presence": "net-new",
+   "source_lens": "registration",
+   "export_membership": "oui -> exported (export_lynceus.py:93); primary_registry passes EXCLUDED_SOURCE_TYPES; device_category=cctv_camera passes \u00a711 #13; geographic_scope='global' passes CP7 -> IN FEED",
+   "manufacturer": "Blink (Amazon)",
+   "device_category": "cctv_camera",
+   "cite_excerpt": "MA-L,F074C1,Blink by Amazon (IEEE MA-L registry)",
+   "notes": "Pure-play surveillance vendor; OUI cohort-clean. Per-SKU (camera vs doorbell vs chime) split is NOT OUI-resolvable without observed per-MAC data (Phase-3 deployment lane). `doorbell` absent from \u00a72.1 enum -> cctv_camera.",
+   "conflict_note": ""
+  }
+ ],
+ "sig_company_id_reference": [
+  {
+   "value": "0x0171",
+   "name": "Amazon.com Services LLC",
+   "yaml_line": 10884,
+   "db_presence": "already_in_db:id=4595:device_category=unknown:primary_registry",
+   "export_membership": "ble_manufacturer_id MAP->exported BUT device_category='unknown' -> \u00a711 #13 ban -> NOT in feed",
+   "disposition": "setup-transient already-present; do NOT re-promote/enrich"
+  },
+  {
+   "value": "0x018E",
+   "name": "Google LLC",
+   "yaml_line": 10806,
+   "db_presence": "already_in_db:id=4569:device_category=unknown:primary_registry",
+   "export_membership": "ble_manufacturer_id MAP->exported BUT device_category='unknown' -> \u00a711 #13 ban -> NOT in feed",
+   "disposition": "setup-transient already-present; do NOT re-promote/enrich"
+  },
+  {
+   "value": "0x00E0",
+   "name": "Google",
+   "yaml_line": 11301,
+   "db_presence": "already_in_db:id=4734:device_category=unknown:primary_registry",
+   "export_membership": "ble_manufacturer_id MAP->exported BUT device_category='unknown' -> \u00a711 #13 ban -> NOT in feed",
+   "disposition": "setup-transient already-present; do NOT re-promote/enrich"
+  },
+  {
+   "value": "0x01B5",
+   "name": "Nest Labs Inc.",
+   "yaml_line": 10698,
+   "db_presence": "already_in_db:id=4533:device_category=unknown:primary_registry",
+   "export_membership": "ble_manufacturer_id MAP->exported BUT device_category='unknown' -> \u00a711 #13 ban -> NOT in feed",
+   "disposition": "setup-transient already-present; do NOT re-promote/enrich"
+  },
+  {
+   "value": "0x0CC2",
+   "name": "Anker Innovations Limited",
+   "yaml_line": 2769,
+   "db_presence": "already_in_db:id=1891:device_category=unknown:primary_registry",
+   "export_membership": "ble_manufacturer_id MAP->exported BUT device_category='unknown' -> \u00a711 #13 ban -> NOT in feed",
+   "disposition": "setup-transient already-present; do NOT re-promote/enrich"
+  },
+  {
+   "value": "0x0870",
+   "name": "Wyze Labs, Inc",
+   "yaml_line": 5877,
+   "db_presence": "already_in_db:id=2926:device_category=unknown:primary_registry",
+   "export_membership": "ble_manufacturer_id MAP->exported BUT device_category='unknown' -> \u00a711 #13 ban -> NOT in feed",
+   "disposition": "setup-transient already-present; do NOT re-promote/enrich"
+  },
+  {
+   "value": "0x0C19",
+   "name": "Arlo Technologies, Inc.",
+   "yaml_line": 3249,
+   "db_presence": "already_in_db:id=2051:device_category=unknown:primary_registry",
+   "export_membership": "ble_manufacturer_id MAP->exported BUT device_category='unknown' -> \u00a711 #13 ban -> NOT in feed",
+   "disposition": "setup-transient already-present; do NOT re-promote/enrich"
+  },
+  {
+   "value": "0x0446",
+   "name": "NETGEAR, Inc.",
+   "yaml_line": 8889,
+   "db_presence": "already_in_db:id=3930:device_category=unknown:primary_registry",
+   "export_membership": "ble_manufacturer_id MAP->exported BUT device_category='unknown' -> \u00a711 #13 ban -> NOT in feed",
+   "disposition": "setup-transient already-present; do NOT re-promote/enrich"
+  }
+ ],
+ "fcc_grantee_reference": [
+  {
+   "vendor": "Ring",
+   "grantee_code": "2AEUP",
+   "grantee_name": "Ring LLC",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  },
+  {
+   "vendor": "Wyze",
+   "grantee_code": "2AUIU",
+   "grantee_name": "Wyze Labs, Inc.",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  },
+  {
+   "vendor": "Wyze",
+   "grantee_code": "2AUJY",
+   "grantee_name": "Wyze Labs, Inc",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  },
+  {
+   "vendor": "Anker/eufy",
+   "grantee_code": "2AB7K",
+   "grantee_name": "Anker Technology Co., Limited",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  },
+  {
+   "vendor": "Anker/eufy",
+   "grantee_code": "2AOKB",
+   "grantee_name": "Anker Innovations Limited",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  },
+  {
+   "vendor": "Arlo",
+   "grantee_code": "2APLE",
+   "grantee_name": "Arlo Technologies, Inc.",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  },
+  {
+   "vendor": "Netgear",
+   "grantee_code": "PY3",
+   "grantee_name": "Netgear Incorporated",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  },
+  {
+   "vendor": "Google",
+   "grantee_code": "A4R",
+   "grantee_name": "Google LLC",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  },
+  {
+   "vendor": "Google",
+   "grantee_code": "ZQA",
+   "grantee_name": "Google LLC",
+   "db_presence": "already_in_fcc_grantees",
+   "lens": "registration",
+   "export_membership": "fcc_grantees lane (not Lynceus identifier feed)"
+  }
+ ],
+ "play_listing_facts": [
+  {
+   "package_id": "com.ringapp",
+   "og_title": "Ring - Always Home - Apps on Google Play",
+   "relative_path": "raw/vendor_apps/ring/com.ringapp/_listing/20260613T213612Z_play.html",
+   "kind": "facts-only metadata (no promotable identifier_type)"
+  },
+  {
+   "package_id": "com.hualai",
+   "og_title": "Wyze - Never Wonder - Apps on Google Play",
+   "relative_path": "raw/vendor_apps/wyze/com.hualai/_listing/20260613T213612Z_play.html",
+   "kind": "facts-only metadata (no promotable identifier_type)"
+  },
+  {
+   "package_id": "com.oceanwing.battery.cam",
+   "og_title": "eufy - Apps on Google Play",
+   "relative_path": "raw/vendor_apps/eufy/com.oceanwing.battery.cam/_listing/20260613T213612Z_play.html",
+   "kind": "facts-only metadata (no promotable identifier_type)"
+  },
+  {
+   "package_id": "com.arlo.app",
+   "og_title": "Arlo Secure: Home Security - Apps on Google Play",
+   "relative_path": "raw/vendor_apps/arlo/com.arlo.app/_listing/20260613T213612Z_play.html",
+   "kind": "facts-only metadata (no promotable identifier_type)"
+  },
+  {
+   "package_id": "com.nest.android",
+   "og_title": "Nest - Apps on Google Play",
+   "relative_path": "raw/vendor_apps/google_nest/com.nest.android/_listing/20260613T213612Z_play.html",
+   "kind": "facts-only metadata (no promotable identifier_type)"
+  },
+  {
+   "package_id": "com.google.android.apps.chromecast.app",
+   "og_title": "Google Home - Apps on Google Play",
+   "relative_path": "raw/vendor_apps/google_nest/com.google.android.apps.chromecast.app/_listing/20260613T213612Z_play.html",
+   "kind": "facts-only metadata (no promotable identifier_type)"
+  }
+ ],
+ "play_listing_404": [
+  {
+   "package_id": "com.obsidian.v4",
+   "bytes": 1673,
+   "disposition": "honest-404 retired package; do NOT chase"
+  },
+  {
+   "package_id": "com.netgear.android",
+   "bytes": 1673,
+   "disposition": "honest-404 retired package; do NOT chase"
+  }
+ ],
+ "behavioral_signatures": [
+  {
+   "signature_name": "Consumer-cam Wi-Fi SoftAP onboarding -> persistent vendor-OUI station MAC (setup-transient AP, durable STA)",
+   "device_category": "cctv_camera",
+   "cellular_generation": null,
+   "source_ref": null,
+   "relative_path": null,
+   "evidence": [
+    {
+     "locus": "MAC-368 harvest structural-fit finding (CEO directive)",
+     "note": "Consumer doorbell/cam BLE is vendor-keyed but EPHEMERAL (provisioning/setup-mode only, dormant after pairing), structurally unlike Cohort-1 24/7 trackers. Durable cohort surface = the Wi-Fi station MAC under the vendor OUI."
+    }
+   ],
+   "proposed_confidence_ceiling": null,
+   "source_lens": "structural",
+   "notes": "Setup-transient. The literal SoftAP SSID convention (Ring-XXXX / Wyze_XXXX / eufy-XXXX) is NOT in any fetched artifact (no APK teardown) -> value is honest-absence; ssid_pattern is export-banned (\u00a74.4). Phase-3 SSID-pattern lead.",
+   "apk_evidence_check": "n/a_no_apk_binary_fetched",
+   "export_excluded": true
+  }
+ ],
+ "tally": {
+  "pure_play": {
+   "Ring": {
+    "exact_org_name": "Ring LLC",
+    "total_blocks": 13,
+    "net_new_oui": 13,
+    "already_in_db": 0,
+    "device_category": "cctv_camera"
+   },
+   "Wyze Labs": {
+    "exact_org_name": "Wyze Labs Inc",
+    "total_blocks": 6,
+    "net_new_oui": 5,
+    "already_in_db": 1,
+    "device_category": "cctv_camera"
+   },
+   "Arlo Technologies": {
+    "exact_org_name": "Arlo Technology",
+    "total_blocks": 3,
+    "net_new_oui": 3,
+    "already_in_db": 0,
+    "device_category": "cctv_camera"
+   },
+   "Blink (Amazon)": {
+    "exact_org_name": "Blink by Amazon",
+    "total_blocks": 5,
+    "net_new_oui": 5,
+    "already_in_db": 0,
+    "device_category": "cctv_camera"
+   }
+  },
+  "mixed_use": {
+   "Amazon": {
+    "exact_org_name": "Amazon Technologies Inc.",
+    "total_blocks": 198,
+    "tied_to_surveillance_sku": 0,
+    "unscoped": 198,
+    "note": "Echo/Fire/Kindle/Eero/Pixel/Chromecast/routers span; not all surveillance (\u00a72.1). No FCC-ID exhibit fetched this stage -> 0 OUIs tie to a camera SKU -> all left UNSCOPED."
+   },
+   "Google": {
+    "exact_org_name": "Google, Inc.",
+    "total_blocks": 106,
+    "tied_to_surveillance_sku": 0,
+    "unscoped": 106,
+    "note": "Echo/Fire/Kindle/Eero/Pixel/Chromecast/routers span; not all surveillance (\u00a72.1). No FCC-ID exhibit fetched this stage -> 0 OUIs tie to a camera SKU -> all left UNSCOPED."
+   },
+   "Netgear": {
+    "exact_org_name": "NETGEAR",
+    "total_blocks": 76,
+    "tied_to_surveillance_sku": 0,
+    "unscoped": 76,
+    "note": "Echo/Fire/Kindle/Eero/Pixel/Chromecast/routers span; not all surveillance (\u00a72.1). No FCC-ID exhibit fetched this stage -> 0 OUIs tie to a camera SKU -> all left UNSCOPED."
+   },
+   "Nest Labs": {
+    "exact_org_name": "Nest Labs Inc.",
+    "total_blocks": 2,
+    "tied_to_surveillance_sku": 0,
+    "unscoped": 2,
+    "note": "Echo/Fire/Kindle/Eero/Pixel/Chromecast/routers span; not all surveillance (\u00a72.1). No FCC-ID exhibit fetched this stage -> 0 OUIs tie to a camera SKU -> all left UNSCOPED."
+   }
+  }
+ },
+ "net_new_oui_total": 26
+}
