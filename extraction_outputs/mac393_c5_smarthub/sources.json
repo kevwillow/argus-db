@@ -1,0 +1,87 @@
+{
+  "cohort": "mac393_c5_smarthub",
+  "issue": "MAC-398",
+  "phase": "harvest",
+  "worker": "SourceWorker",
+  "generated_utc": "2026-06-14T17:05:00Z",
+  "stage_only": true,
+  "db_writes": 0,
+  "proposed_device_category": ["smart_home_hub", "voice_assistant"],
+  "taxonomy_note": "NEITHER 'smart_home_hub' NOR 'voice_assistant' exists (confirmed: SELECT count(*) WHERE device_category=... = 0 for both). Any lead would be tagged proposed 'smart_home_hub'/'voice_assistant' + notes.category_pending_board_ratification. Minting is a board one-way-door at the ingest gate (source-triage §6/§9). Until minted, every lead hits the §11 #13 unknown-export ban.",
+  "identifier_types_in_scope": ["oui", "ble_service_uuid", "ble_company_id"],
+  "vendors": ["Amazon Echo/Alexa", "Google Nest Hub", "Apple HomePod", "Samsung SmartThings hub"],
+  "headline": "Cohort-5 vendors are the four LARGEST multi-purpose consumer-electronics OUI holders on the IEEE registry (Apple 1513, Samsung 953, Amazon 205, Google 106 OUI rows). The DOMINANT ruling here is §11 #10 (do NOT categorize at OUI level for multi-purpose vendors): all 2,748 net-new parent-company OUIs span phones/tablets/TVs/laptops/watches/earbuds/routers and are NOT separable to the hub/voice-assistant SKU -> bulk OUI promotion = 0. The CP10 narrow-read carve-out (single-product-line §2.1 vendors) does NOT apply. The ONLY cleanly-attributable OUI candidate is the pure-play smart-home-hub brand SmartThings, Inc. (24:fd:5b, NET-NEW). Nest Labs (2 NET-NEW OUIs) is brand-scoped but still multi-product (Hub vs Cam vs Thermostat). BLE net-new = 0 (BT SIG registry fully bulk-loaded; many vendor member-UUIDs already categorized bluetooth_tracker via cohort-3 -> recat-to-hub would COLLIDE).",
+  "sources": [
+    {
+      "name": "IEEE OUI registry (MA-L / MA-M / MA-S)",
+      "source_url": "https://standards-oui.ieee.org/oui/oui.csv ; https://standards-oui.ieee.org/oui28/mam.csv ; https://standards-oui.ieee.org/oui36/oui36.csv",
+      "local_artifact": "raw/ieee_oui/20260613T203034Z_{oui.csv,mam.csv,oui36.csv} (gitignored under raw/)",
+      "sha256": "oui.csv=fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe; mam.csv=6051d83628de28e1cf844f7a9efb91941212dc2d9e30911cbe4b2311933d7556; oui36.csv=ed33886b9f56b087aa72c8c6a0681d27bd6dd4fec807af49bd79f77c2b9a3414",
+      "band": "primary_registry",
+      "license_posture": "IEEE public OUI registry; factual assignment data (§8.2 primary_registry, 70-85 single-source).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T17:00:00Z",
+      "yield": "Parent-vendor OUI rows (quote-aware org-name match): Amazon 205 (MA-L 201 + MA-M 1 + MA-S 3; 198 net-new, 7 held [5 Blink->cctv_camera id44492-96, 2 Amazon->unknown wireshark-load id36735/36862]); Google 106 (all MA-L; 106 net-new, 0 held); Apple 1513 (all MA-L; 1493 net-new, 20 held->unknown wireshark-load); Samsung 953 (all MA-L; 951 net-new, 2 prefix-overlap artifacts). ALL 2748 parent net-new OUIs are §11 #10-BANNED for OUI-level smart_home_hub/voice_assistant categorization (multi-purpose vendors). CLEAN NET-NEW (pure-play / brand-scoped subsidiary, attributable): 'SmartThings, Inc.' 24:FD:5B (oui.csv L10918, MA-L) -> cleanest single hub candidate (Samsung-owned pure-play smart-home-hub brand; SmartThings Hub IS the cohort device). 'Nest Labs Inc.' 64:16:66 (L18082) + 18:B4:30 (L33862) -> NET-NEW, brand-scoped but multi-product (Nest Hub=cohort device; Nest Cam=cctv_camera; Nest Thermostat) -> caveat. DOUBLE-PROMOTION GUARD (task-requested): Ring 13 OUIs (id44471-83) + Blink 5 OUIs (id44492-96) already device_category='cctv_camera' (wave-1 MAC-378) -> do NOT promote to hub. FP (name collision, NOT Amazon Ring): 'Ring Solutions' B0:09:DA (L10191, Malvern PA); 'RING ACCESS, INC.' 00:40:40 (L30036, legacy ~1980s-era OUI block, San Carlos CA, decades before Amazon Ring founded 2013) -> reject."
+    },
+    {
+      "name": "Bluetooth SIG - Assigned Numbers: Company Identifiers",
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml",
+      "local_artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml (gitignored under raw/)",
+      "sha256": "51b1ea7ddf98906df1538af7406dd7bea7c905a7d2f5cebcf4eb63c72447b5a0",
+      "band": "primary_registry",
+      "license_posture": "BT SIG public registry; factual (§8.2 primary_registry, 70-85 single-source).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T17:00:00Z",
+      "yield": "Vendor company-IDs (ALL already HELD as device_category='unknown' bulk-load -> recat candidates, net-new=0): 'Amazon.com Services LLC' 0x0171 (L10884, id4595); 'Google LLC' 0x018E (L10806, id4569); 'Google' 0x00E0 (L11301, id4734); 'Nest Labs Inc.' 0x01B5 (L10698, id4533); 'Samsung Electronics Co. Ltd.' 0x0075 (L11610, id4837); 'Samsung SDS Co., Ltd.' 0x02DE (L9885, id4262 = Samsung enterprise access-control/door-lock arm, cohort-4-adjacent NOT hub); 'Apple, Inc.' 0x004C (L11727, id22841/22842/568 = the cross-everything Apple Continuity/HomeKit/AirDrop ID, NOT HomePod-specific). FP/reject (name collision): 'NeST' 0x039A (L9372, id4091) != Google 'Nest Labs Inc.' 0x01B5 -- distinct entity."
+    },
+    {
+      "name": "Bluetooth SIG - Assigned Numbers: 16-bit Member UUIDs",
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml",
+      "local_artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml (gitignored under raw/)",
+      "sha256": "42478df3da88f890d80d2a4ac46e01657c9515434c3ebae8ad72e8d921b55bf2",
+      "band": "primary_registry",
+      "license_posture": "BT SIG public registry (§8.2 primary_registry).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T17:00:00Z",
+      "yield": "Vendor 16-bit member/service UUIDs (ALL already HELD -> recat candidates, net-new=0). KEY: a large block is ALREADY device_category='bluetooth_tracker' (cohort-3 MAC-388/389 Find-My/SmartTag ecosystem) -> recat-to-hub would COLLIDE (do-not-double-promote, like Wyze in c4): Apple 0xFED4..0xFEC7 / 0xFE8B / 0xFE8A / 0xFE25 / 0xFE13 / 0xFD44 / 0xFD43 / 0xFCB2 / 0xFCA0 / 0xFC94 (all -> bluetooth_tracker, id44416-44438); Samsung 0xFDDB / 0xFD7E / 0xFD6C / 0xFD69 / 0xFD5A / 0xFD59 / 0xFD4B / 0xFD1D / 0xFC91 (-> bluetooth_tracker, id44444-51). Held-unknown block: many Google LLC service UUIDs (0xFEF4/FEF3/FED8/FEAA/FEA0/FE9F/FE56/FE55/FE50/FE2C/FE27/FE26/FE19/FDF0/FDE2/FD96/FD8C/FD87/FD63/FD62/FD36/FCF1/FCCF/FCB1/FC73/FC56/FC3E); Nest Labs 0xFEB0/0xFEAF (id37802/37803); Amazon 0xFE15/0xFE03/0xFE00/0xFCDC + 'Amazon Lab126' 0xFD41 (id37953/37971/37974/38263/38162). CROSS-VENDOR ECOSYSTEM FP-MAGNETS flagged per source-triage §4 wave-1 ruling (0xFE59/0xFD6F precedent): 0xFD6F Apple (L819, id44433=unknown) = Exposure Notification (Apple+Google co-owned, already MAC-390 FP-magnet); 0xFE9F Google (L221, id22878=unknown) = Google Nearby; 0xFEAA Google (L203, id37808) = Eddystone open beacon standard. These are NOT hub-specific -> exclude from any hub recat."
+    },
+    {
+      "name": "FCC EAS (Equipment Authorization System) direct - ATTEMPTED, HOST UNREACHABLE",
+      "source_url": "https://apps.fcc.gov/oetcf/eas/reports/GenericSearch.cfm ; https://www.fcc.gov/oet/ea/fccid",
+      "local_artifact": null,
+      "band": "primary_registry",
+      "license_posture": "Pre-cleared primary_registry, FCC-direct NOT fccid.io (§8.2). SKIPPED: host unreachable (apps.fcc.gov -> HTTP 000, www.fcc.gov/oet -> HTTP 000, probed 2026-06-14T17:00Z). Reproduces the cohort-2 (MAC-395) and cohort-4 (MAC-397) FCC-EAS-direct-unreachable finding. NON-BLOCKING for cohort-5: fcc_grantee_code / equipment_class_code are NOT in cohort-5's identifier_type scope (scope = oui / ble_service_uuid / ble_company_id); FCC would have been corroboration-only. fccid.io is forbidden (§8.2) so not substituted.",
+      "last_fetched_at": "2026-06-14T17:00:00Z",
+      "yield": "0 (host unreachable; out of identifier-type scope for c5)."
+    },
+    {
+      "name": "Manufacturer setup-guide docs (Echo/Alexa, Nest Hub, HomePod, SmartThings)",
+      "source_url": "vendor public setup pages (manufacturer_doc band, pre-cleared per source-triage §6)",
+      "local_artifact": null,
+      "band": "manufacturer_doc",
+      "license_posture": "Pre-cleared manufacturer_doc (§8.2 75-90). No new restrictive license.",
+      "last_fetched_at": null,
+      "yield": "0 NET-NEW in-scope (oui / ble_service_uuid / ble_company_id) identifiers. Setup-guide docs corroborate the cohort framing (these devices are microphone-bearing hubs/voice-assistants set up via a companion app + BLE setup beacon), but the BLE setup-beacon service UUIDs they reference are exactly the BT SIG member_uuids already HELD above -- no NEW registry identifier. Any SSID-pattern setup-AP lead (e.g. an Echo config-AP broadcast) is (a) OUT of cohort-5's identifier_type scope, (b) requires a fetched+cite-pasted source (NOT asserted from memory per §11 #1), and (c) would need WiGLE confirmation (Phase 3) -> DEFERRED, not staged, not fabricated."
+    }
+  ],
+  "honest_absences": [
+    "smart_home_hub AND voice_assistant device_categories do NOT exist (count=0 both). Taxonomy one-way-door -> board mint-vs-map at ingest gate (source-triage §6/§9).",
+    "OUI net-new promotable surface = effectively 1 clean (SmartThings 24:fd:5b) + 2 caveated (Nest Labs). The 2,748 parent-company net-new OUIs (Amazon/Google/Apple/Samsung) are §11 #10-banned (multi-purpose vendors) -> NOT promotable at OUI level. This is the structural inverse of cohort-4 (where pure-play lock vendors had clean OUIs).",
+    "BLE net-new = 0: entire BT SIG 16-bit registry is bulk-loaded (715 ble_company_id + 3969 ble_manufacturer_id + ble_service_uuid rows). Every cohort-vendor company-ID and member-UUID is already HELD. Same pattern as cohort-3 (MAC-396), cohort-4 (MAC-397), wave-1 cohort-5 (MAC-368).",
+    "Companion APKs are NOT in cohort-5's cleared source slate (source-triage §6 lists IEEE OUI + FCC EAS direct + BT SIG + setup-guide docs only; companion APKs were cohort-4-specific in §5). Did NOT pull APKs -> stayed within §6 authorization. If the board wants the Echo/HomePod/Nest-Hub/SmartThings companion-app GATT surface (as cohort-4 got for locks), that is a CTO->CEO scope-expansion request, flagged below, NOT actioned here.",
+    "Apple HomePod / Amazon Echo / Google Nest Hub have NO own pure-play OUI distinct from the parent (unlike SmartThings). The hub SKU shares the parent's giant multi-purpose OUI pool -> un-attributable at OUI level."
+  ],
+  "flagged_for_cto": [
+    "TAXONOMY ONE-WAY-DOOR (x2 proposed categories): neither 'smart_home_hub' nor 'voice_assistant' exists. Board must decide (a) mint one/both vs map-to-existing, AND (b) which device-class the cohort vendors map to. Until then all leads are §11 #13 export-banned. CTO -> CEO.",
+    "§11 #10 IS THE DOMINANT RULING: Amazon/Google/Apple/Samsung are the textbook multi-purpose vendors (Apple 1513 OUIs span iPhone/iPad/Mac/Watch/AirPods/AppleTV/HomePod). NONE of the 2,748 net-new parent OUIs is promotable at OUI level. CP10 narrow-read carve-out does NOT apply (these are not single-product-line §2.1 vendors). Recommend: do NOT bulk-promote parent OUIs under any category.",
+    "CLEANEST (and nearly ONLY) promotable lead: SmartThings, Inc. 24:fd:5b (oui, NET-NEW, MA-L). Pure-play smart-home-hub brand; the SmartThings Hub is the literal cohort device. Strong smart_home_hub candidate IF the category is minted.",
+    "Nest Labs Inc. 64:16:66 + 18:b4:30 (oui, NET-NEW): brand-scoped but multi-product. Nest Hub = cohort device, but Nest Cam = cctv_camera and Nest Thermostat = neither. OUI cannot be split Hub-vs-Cam -> caveat; needs product anchor or stays unclean. ALSO overlaps the cctv_camera lane (double-promotion guard with any future Nest Cam OUI work).",
+    "DOUBLE-PROMOTION GUARD (task-requested, FIRES): Ring 13 OUIs (id44471-83) + Blink 5 OUIs (id44492-96) are already device_category='cctv_camera' (wave-1 MAC-378). Ring/Blink are camera/doorbell brands, NOT hubs/voice-assistants -> they belong to cctv_camera, do NOT recat to hub. The 2 'Ring'-named net-new IEEE rows are name-collision FPs (Ring Solutions=Malvern PA; RING ACCESS=legacy 00:40:40 block) -> reject.",
+    "BLE recat-COLLISION (do-not-double-promote, like Wyze in c4): ~19 Apple+Samsung member-UUIDs are ALREADY device_category='bluetooth_tracker' (cohort-3 Find-My/SmartTag, id44416-51). These are phone/tracker ecosystem UUIDs, NOT hub-specific. Recat-to-hub would collide AND mis-attribute. Recommend NO BLE recat for cohort-5.",
+    "CROSS-VENDOR ECOSYSTEM FP-MAGNETS (per source-triage §4 wave-1 0xFE59/0xFD6F ruling): 0xFD6F Apple=Exposure Notification (Apple+Google), 0xFE9F Google=Nearby, 0xFEAA Google=Eddystone. Exclude from any recat.",
+    "FP catch: BT SIG company-id 0x039A 'NeST' != Google 'Nest Labs Inc.' 0x01B5 (distinct entity). Samsung SDS 0x02DE = Samsung's access-control/door-lock arm (cohort-4 smart_lock-adjacent), NOT a hub.",
+    "FCC EAS direct unreachable (HTTP 000) - reproduces MAC-395/MAC-397. Non-blocking for c5 (FCC identifier types out of scope). Standing infra issue.",
+    "OPTIONAL scope-expansion request: if the board wants real net-new identifiers for HomePod/Echo/Nest-Hub (which have NO pure-play OUI and only held-unknown BLE), the only net-new surface would be companion-app GATT teardown (com.amazon.dee.app / Google Home / Apple Home / SmartThings app), which is NOT in cohort-5's §6 cleared slate. Requires CTO->CEO authorization to add the APK source class (mirrors cohort-4 §5). NOT actioned.",
+    "No NEW restrictive/share-alike source and no ToS-forbidden source encountered. All cohort-5 §6 slate classes (IEEE OUI, BT SIG, FCC, setup-guide docs) are pre-cleared. No new one-way-door. PII (§11 #3): only company legal-entity names + public registry addresses; no person-PII; FCC applicant PII n/a (host unreachable)."
+  ]
+}
