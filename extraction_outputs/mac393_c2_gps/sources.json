@@ -1,0 +1,127 @@
+{
+  "cohort": "MAC-393 c2 - Covert / personal GPS trackers (anti-stalking)",
+  "issue": "MAC-395",
+  "worker": "SourceWorker",
+  "phase": "harvest (STAGE ONLY - no DB write, no ingest, no push)",
+  "device_category": "gps_tracker (exists, 122 rows) - distinct from automotive_telematics (379 rows); annotate to avoid cross-category collision",
+  "generated_at": "2026-06-14T15:51:00Z",
+  "headline": "Cohort-2 PRIMARY net-new surface (FCC grantee + equipment-class codes at primary_registry band) is BLOCKED: the FCC EAS direct host (apps.fcc.gov / www.fcc.gov) is UNREACHABLE from this runner (4 routes time out; google.com=200; data.fcc.gov=200 but hosts no EAS). Reachable sources harvested instead: companion APKs (manufacturer_app) + vendor-direct docs. Devices are cellular cloud-clients -> BLE/OUI surface is FP/framework-dominated (no clean net-new vendor BLE service UUID or ble_company_id). None of the 8 named retail vendors are held in the DB (existing gps_tracker rows are offender-monitoring/ankle-monitor class: BI/Attenti/STOP/Track Group/Sentinel).",
+  "sources_mined": [
+    {
+      "source_name": "Vendor companion apps - Google Play / App Store listings (vendor-direct package-id attestation)",
+      "source_type": "manufacturer_app (listing-level)",
+      "license_posture": "store-listing facts (package id + developer) cite-pasted from vendor-direct store pages; APK binaries handled per manufacturer_app §11 #15 facts-only",
+      "fetched_at": "2026-06-14T15:51:00Z",
+      "yield": "13 vendor-direct companion-app package ids across all 8 named vendors (all NET-NEW); 2 third-party/unofficial SpyTec apps excluded",
+      "package_ids": {
+        "LandAirSea": [
+          {"pkg": "com.landairsea.silvercloud", "app": "SilverCloud", "url": "https://play.google.com/store/apps/details?id=com.landairsea.silvercloud", "db_presence": "net-new"},
+          {"pkg": "com.landairsea.las", "app": "LandAirSea", "url": "https://play.google.com/store/apps/details?id=com.landairsea.las", "db_presence": "net-new"}
+        ],
+        "Tracki": [
+          {"pkg": "com.trackimo.android.tracki", "app": "Tracki GPS", "url": "https://play.google.com/store/apps/details?id=com.trackimo.android.tracki", "db_presence": "net-new", "apk_fetched": true}
+        ],
+        "SpyTec": [
+          {"pkg": "com.pastel.sgigps", "app": "Hapn (formerly Spytec)", "url": "https://spytec.com/pages/the-app ; https://play.google.com/store/apps/details?id=com.pastel.sgigps", "db_presence": "net-new"},
+          {"pkg": "com.pastel.spytecgps", "app": "Spytec (older)", "url": "https://apkcombo.com/spytec/com.pastel.spytecgps/", "db_presence": "net-new"}
+        ],
+        "Optimus": [
+          {"pkg": "com.optimus.pro.android", "app": "Optimus Tracking Pro", "url": "https://play.google.com/store/apps/details?id=com.optimus.pro.android", "db_presence": "net-new"},
+          {"pkg": "com.optimus", "app": "Optimus", "url": "https://play.google.com/store/apps/details?id=com.optimus", "db_presence": "net-new"}
+        ],
+        "Americaloc": [
+          {"pkg": "com.americaloc.americaloc", "app": "Americaloc Tracking - Viewer", "url": "https://play.google.com/store/apps/details?id=com.americaloc.americaloc", "db_presence": "net-new"},
+          {"pkg": "com.americaloc.celltracker", "app": "Americaloc Go", "url": "https://play.google.com/store/apps/details?id=com.americaloc.celltracker", "db_presence": "net-new"}
+        ],
+        "Vyncs": [
+          {"pkg": "com.vyncssocial4", "app": "Vyncs: Connected Car OBD", "url": "https://play.google.com/store/apps/details?id=com.vyncssocial4", "db_presence": "net-new", "note": "OBD-II 4G LTE dongle - automotive_telematics-adjacent; annotate per source-triage §3 cross-category note"}
+        ],
+        "Bouncie": [
+          {"pkg": "com.taillight.bouncie", "app": "Bouncie (dev: Tail Light, LLC)", "url": "https://play.google.com/store/apps/details?id=com.taillight.bouncie", "db_presence": "net-new", "apk_fetched": true, "note": "OBD-II 4G LTE dongle - automotive_telematics-adjacent"}
+        ],
+        "BrickHouse": [
+          {"pkg": "com.brickhousesecurity.brickhouseLocateGPS", "app": "Brickhouse Locate GPS", "url": "https://play.google.com/store/apps/details?id=com.brickhousesecurity.brickhouseLocateGPS", "db_presence": "net-new"},
+          {"pkg": "com.brickhousesecurity.tracking", "app": "BrickHouse BPS", "url": "https://play.google.com/store/apps/details?id=com.brickhousesecurity.tracking", "db_presence": "net-new"}
+        ]
+      }
+    },
+    {
+      "source_name": "Tracki GPS companion APK (empirical BLE-surface characterization)",
+      "source_type": "manufacturer_app",
+      "source_url": "https://apkcombo.com/tracki-gps/com.trackimo.android.tracki/",
+      "package_id": "com.trackimo.android.tracki",
+      "version": "1.0.1067-PROD (vc 202311269)",
+      "file_ext": "apk (XAPK bundle: base + config.armeabi_v7a + config.tvdpi)",
+      "byte_count": 43690950,
+      "sha256": "b4c6d0428a95d9b3f7773f05798d0c0caf9687ab1e6033fe34c2e6d5fa39c839",
+      "rel_path": "raw/vendor_apps/tracki/com.trackimo.android.tracki/1.0.1067-PROD/b4c6d0428a95d9b3f7773f05798d0c0caf9687ab1e6033fe34c2e6d5fa39c839.apk",
+      "license_posture": "manufacturer_app §11 #15 facts-only; raw binary gitignored (raw/ never committed); decompile in /tmp/mac393_c2_scratch (never committed)",
+      "fetched_at": "2026-06-14T15:51:00Z",
+      "mirror": "apkcombo.com",
+      "yield": "BLE code present (trackimo/android/ble/* incl. Google SampleGattAttributes boilerplate; 32 BLE indicators; 16 distinct 128-bit UUIDs) but FP/standard-dominated. Cloud hosts confirm Tracki = Trackimo lineage.",
+      "caveat": "No clean vendor-specific net-new BLE service UUID or ble_company_id. UUID set = 7 SIG-standard (DIS 0x180a, HRS 0x180d, SPP 0x1101, CCCD 0x2902, 0x2a29, 0x2a37) + null UUID + cross-vendor FP magnet 258EAFA5-... (also in c1 spycam apps) + library/framework singletons. See leads.json ble_service_uuid for full triage."
+    },
+    {
+      "source_name": "Bouncie companion APK (empirical BLE-surface characterization, 2nd ODM/form-factor)",
+      "source_type": "manufacturer_app",
+      "source_url": "https://apkcombo.com/bouncie/com.taillight.bouncie/",
+      "package_id": "com.taillight.bouncie",
+      "version": "4.23.4",
+      "file_ext": "apk (XAPK bundle: base + config.arm64_v8a + config.en + config.mdpi)",
+      "byte_count": 108590343,
+      "sha256": "077bc27328cbc77eddc593abc44d6a4927aa3cdb0aca6672bcd28cac1dceefb4",
+      "rel_path": "raw/vendor_apps/bouncie/com.taillight.bouncie/4.23.4/077bc27328cbc77eddc593abc44d6a4927aa3cdb0aca6672bcd28cac1dceefb4.apk",
+      "license_posture": "manufacturer_app §11 #15 facts-only; raw binary gitignored; decompile in /tmp/mac393_c2_scratch (never committed)",
+      "fetched_at": "2026-06-14T15:51:00Z",
+      "mirror": "apkcombo.com",
+      "yield": "Minimal BLE (7 indicators; 3 UUIDs: null + cross-vendor FP 258EAFA5-... + 1 library singleton 69a6de76-...). Cloud hosts: tloapi.taillight.com, www.bouncie.com (Tail Light LLC backend).",
+      "caveat": "No clean vendor-specific net-new BLE identifier. Confirms cohort pattern: cellular cloud-client devices, FP/framework-dominated BLE surface."
+    },
+    {
+      "source_name": "LandAirSea 54 vendor-direct Declaration of Conformity (PDF) + product page",
+      "source_type": "manufacturer_doc",
+      "source_url": "https://landairsea.com/products/landairsea-54 ; https://cdn.shopify.com/s/files/1/0505/8337/1972/files/082823_LandAirSea_54_CE_DoC_US.pdf",
+      "license_posture": "manufacturer_doc (vendor-hosted on LandAirSea's own Shopify CDN) - facts-only",
+      "fetched_at": "2026-06-14T15:51:00Z",
+      "rel_path": "raw/vendor_docs/landairsea/082823_LandAirSea_54_CE_DoC_US.pdf (sha256 b9774bfeaae319dcac1be96804be87491e856e88f8c065f0d4c632e686dc292e)",
+      "yield": "Connectivity characterization: '4G LTE + Satellite', NO Bluetooth/BLE/WiFi (cellular-only). DoC carries EN 62368-1:2014+A11:2017 + EN 50665:2017 (CE/RED), Product Model(s): 54.",
+      "caveat": "Vendor DoC is CE/EU-only - contains NO FCC ID and NO grantee code. Confirms these consumer GPS-tracker vendors do NOT publish FCC IDs vendor-direct; the FCC ID lives only on the device label + FCC EAS (blocked) + forbidden aggregators."
+    }
+  ],
+  "sources_flagged": [
+    {
+      "source_name": "FCC EAS direct (apps.fcc.gov / www.fcc.gov Equipment Authorization System Generic Search)",
+      "disposition": "BLOCKED - HOST UNREACHABLE (hard blocker for the cohort PRIMARY net-new surface)",
+      "intended_band": "primary_registry (grantee code + equipment_class_code) - §8.2 issuer-of-record",
+      "evidence": "curl sandboxed -> http 000 (HTTP/2 INTERNAL_ERROR); curl --http1.1 -> timeout @30s; curl sandbox-off www.fcc.gov + apps.fcc.gov -> timeout @15s x2; control google.com -> 200 in 0.36s; WebFetch -> timeout @60s; data.fcc.gov -> 200 but hosts NO EAS (/api/eas, /eas, /api all 404). See logs/mac393_c2_gps_fcc_eas_unreachable_20260614T153756Z.log.",
+      "blocks": "fcc_grantee_code (primary_registry band) AND equipment_class_code entirely (equipment class lives only in the EAS grant record / grant PDF on apps.fcc.gov).",
+      "unblock_owner_action": "CTO/CEO: (a) retry EAS-direct from a US-reachable host/proxy, OR (b) authorize manufacturer_doc-band substitution for grantee codes (vendor / reproduced manuals) - a source-band decision above SourceWorker's authority. Per §7.2 do-not-retry-forever: stopped after 4 distinct routes failed."
+    },
+    {
+      "source_name": "fccid.io (sid=51) + fcc.report + manuals.plus/manualslib/device.report (FCC aggregators / reproduced manuals)",
+      "disposition": "NOT MINED (forbidden / not used for promotion)",
+      "license_posture": "fccid.io = crowdsourced/forbidden per §8.2 (hard gate: FCC-direct NOT fccid.io); fcc.report = same aggregator class; manuals.plus/manualslib/device.report = third-party manual reproductions",
+      "reason": "Hard gate §8.2 forbids lifting FCC data from the aggregator. FCC IDs that surfaced in web-search snippets sourced from these are recorded ONLY as flagged vendor-relationship intelligence (see ODM_grantee_intelligence below), NOT cite-pasted, NOT promoted."
+    },
+    {
+      "source_name": "com.spytecclient.android (GPS SpyTec by SecurVision.fr) + com.spytec_gps_gl300_guide.bashar_almansy",
+      "disposition": "EXCLUDED (third-party / unofficial - not vendor-authored)",
+      "reason": "SecurVision.fr is a French reseller app, not SpyTec/Pastel official; the *_guide.* app is a fan 'guide'. SpyTec official = com.pastel.* (Hapn/Spytec). Excluded to avoid mis-attribution."
+    }
+  ],
+  "ODM_grantee_intelligence": {
+    "note": "FLAGGED INTELLIGENCE ONLY - values observed in web-search snippets sourced from forbidden FCC aggregators (fccid.io/fcc.report). NOT cite-pasted, NOT promoted. The clean source (FCC EAS direct) is BLOCKED; vendor-direct docs do not publish FCC IDs (LandAirSea DoC = CE-only). These are leads for the CTO to chase once EAS-direct is reachable. Central finding: every retail GPS-tracker brand is rebadged ODM hardware -> retail brand != FCC grantee.",
+    "leads": [
+      {"retail_brand": "SpyTec GL300", "grantee_code": "YQD", "grantee_legal_name": "Queclink Wireless Solutions Co., Ltd.", "fcc_id_seen": "YQD-GL300", "clean_source_status": "EAS-direct BLOCKED; aggregator-only"},
+      {"retail_brand": "Americaloc GL300W", "grantee_code": "YQD", "grantee_legal_name": "Queclink Wireless Solutions Co., Ltd.", "fcc_id_seen": "YQD-GL300W", "clean_source_status": "EAS-direct BLOCKED; aggregator-only"},
+      {"retail_brand": "LandAirSea 54", "grantee_code": "XMR", "grantee_legal_name": "(ODM - unconfirmed)", "fcc_id_seen": "XMR201707BG96", "clean_source_status": "EAS-direct BLOCKED; vendor DoC=CE-only; aggregator/device-label-photo only"},
+      {"retail_brand": "Bouncie (213N OBD)", "grantee_code": "S8U", "grantee_legal_name": "Sinocastel Co., Ltd.", "fcc_id_seen": "S8U213N", "clean_source_status": "EAS-direct BLOCKED; aggregator-only; TENTATIVE (device-model link not vendor-confirmed)"},
+      {"retail_brand": "Tracki / Trackimo", "grantee_code": "2AAI6", "grantee_legal_name": "Trackimo INC", "fcc_id_seen": "2AAI6-TRKM010", "clean_source_status": "EAS-direct BLOCKED; aggregator-only"}
+    ],
+    "db_presence_of_ODMs": "Queclink already held in DB: id 1489 (0x0E61, ble_manufacturer_id, device_category=unknown) + id 6236 (d0:9f:d9:8/28, mac_range, unknown). Sinocastel/Trackimo: NOT held. Retail brands (SpyTec/Americaloc/LandAirSea/Bouncie/Tracki): all NET-NEW."
+  },
+  "advisory_findings": [
+    "Cross-cohort BLE FP magnet CONFIRMED: 258EAFA5-E914-47DA-95CA-C5AB0DC85B11 appears in c1 spycam apps (leads.json EXCLUDE list) AND Tracki (classes6.dex) AND Bouncie (classes6.dex) = 3 distinct vendor contexts. Strengthens the cross-vendor-service-UUID exclusion ruling (wave-1 0xFE59/0xFD6F precedent). Recommend ExtractionWorker/Validator hold this on the standing cross-vendor exclude list.",
+    "ODM-grantee convergence: SpyTec + Americaloc both rebadge Queclink GL300-series (grantee YQD). Queclink already carries a held BLE manufacturer id 0x0E61 (unknown category) + mac_range d0:9f:d9:8/28 (unknown). If EAS-direct is unblocked, the YQD grantee + GL300 equipment-class would anchor multiple retail brands at once and could justify a §8.4 model-level category lift for the existing Queclink rows."
+  ]
+}

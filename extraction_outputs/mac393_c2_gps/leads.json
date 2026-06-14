@@ -1,0 +1,47 @@
+{
+  "cohort": "MAC-393 c2 - Covert / personal GPS trackers (anti-stalking)",
+  "issue": "MAC-395",
+  "phase": "harvest leads (STAGE ONLY) - NOT final candidate rows; ExtractionWorker expands + FP-triages",
+  "generated_at": "2026-06-14T15:51:00Z",
+  "counts_by_identifier_type": {
+    "companion_app_package_id": {"leads": 13, "clean": true, "db_presence": "all NET-NEW", "note": "not a brief-listed identifier_type; the APK substrate for the BLE/oui surface"},
+    "ble_service_uuid": {"distinct_values": 18, "clean_netnew_candidates": 0, "note": "Tracki 16 + Bouncie 3 (258EAFA5 shared) - ~all SIG-standard / null / cross-vendor-FP / library; NO clean vendor-specific service UUID. Defer FP-triage to ExtractionWorker."},
+    "ble_company_id": {"leads": 0, "note": "no manufacturerSpecificData company-id literal surfaced in the 2 decompiled apps"},
+    "oui_cellular_module": {"leads": 0, "note": "cellular module OUI (Quectel/SIMCom/u-blox/Sinocastel) is not derivable from the cloud-client app; needs device teardown or FCC internal photos (EAS blocked)"},
+    "fcc_grantee_code": {"clean_leads": 0, "flagged_intelligence": 5, "note": "PRIMARY surface BLOCKED - FCC EAS direct unreachable; 5 ODM grantee values are aggregator-only flagged intelligence, NOT promoted (see sources.json ODM_grantee_intelligence)"},
+    "equipment_class_code": {"leads": 0, "note": "BLOCKED entirely - equipment class lives only in the EAS grant record on apps.fcc.gov (unreachable)"},
+    "bonus_vendor_cloud_endpoint": {"leads": 11, "clean": true, "db_presence": "all NET-NEW", "note": "OUT-OF-BRIEF-SCOPE identifier types (vendor_controlled_hostname / network_endpoint not in MAC-395 brief) - recorded as bonus; CTO scope decision"}
+  },
+  "companion_app_package_ids": "see sources.json sources_mined[0].package_ids (13 across 8 vendors, all vendor-direct, all NET-NEW)",
+  "ble_service_uuid_leads": {
+    "source": "manufacturer_app static decompile (§11 #15 facts-only); raw APKs gitignored, decompile in /tmp scratch",
+    "tracki": {
+      "apk": "com.trackimo.android.tracki 1.0.1067-PROD (sha256 b4c6d042...)",
+      "ble_package_present": "trackimo/android/ble/{BluetoothLE,BluetoothLeService,DeviceScanActivity,SampleGattAttributes,...} - NOTE: SampleGattAttributes = Google BluetoothLeGatt sample boilerplate (Heart-Rate sample UUIDs); BLE code is largely sample/framework-derived",
+      "uuids_sig_standard_FP": ["00001101-0000-1000-8000-00805F9B34FB (SPP)", "0000180a-... (Device Information Service)", "0000180d-... (Heart Rate Service - sample)", "00002902-... (CCCD)", "00002a29-... (Manufacturer Name String)", "00002a37-... (Heart Rate Measurement - sample)"],
+      "uuids_null_FP": ["00000000-0000-0000-0000-000000000000"],
+      "uuids_cross_vendor_FP_EXCLUDE": ["258EAFA5-E914-47DA-95CA-C5AB0DC85B11 (classes6.dex; also in c1 spycam apps + Bouncie -> 3-vendor cross-context magnet)"],
+      "uuids_library_or_candidate_DEFER": ["8ce255c0-200a-11e0-ac64-0800200c9a66", "9a04f079-9840-4286-ab92-e65be0885f95", "943f9b0f-73c8-4435-8801-0260db687f05", "ac865694-bcbf-4fc5-b3b7-379dfc3e81db", "aff9ffc1-3c99-41cf-bf43-c9aef0c31ffa", "24ea1a55-5e97-4ed4-a92f-6cef09c8861a", "e2719d58-a985-b3c9-781a-b030af78d30e", "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed"],
+      "candidate_assessment": "library/framework-shaped (appear in third-party-lib dex; no Trackimo-branded service-name binding surfaced). ExtractionWorker FP-triage required; expected net-new clean = 0."
+    },
+    "bouncie": {
+      "apk": "com.taillight.bouncie 4.23.4 (sha256 077bc273...)",
+      "uuids_null_FP": ["00000000-0000-0000-0000-000000000000"],
+      "uuids_cross_vendor_FP_EXCLUDE": ["258EAFA5-E914-47DA-95CA-C5AB0DC85B11 (classes6.dex)"],
+      "uuids_library_or_candidate_DEFER": ["69a6de76-bb44-47e3-e053-5b8c7c11a4d1 (singleton; library-shaped)"],
+      "candidate_assessment": "no clean vendor-specific service UUID; cloud-client OBD device"
+    }
+  },
+  "bonus_vendor_cloud_endpoints": {
+    "note": "OUT-OF-BRIEF-SCOPE (brief lists fcc_grantee_code/equipment_class_code/ble_*/oui only). Recorded for thoroughness; cite-pasted from APK dex string pool (manufacturer_app). All NET-NEW (DB-presence 0). CTO decides whether ExtractionWorker promotes vendor_controlled_hostname/network_endpoint for this cohort.",
+    "tracki": ["app.tracki.com", "api.geo.tracki.com", "geo.tracki.com", "omni.tracki.com", "help.tracki.com", "www.tracki.com", "app.trackimo.com", "plus.trackimo.com"],
+    "bouncie": ["tloapi.taillight.com", "www.bouncie.com"],
+    "staging_excluded": ["api.dev.tracki.com", "dev.tracki.com", "stg.tracki.com", "stg.trackimo.com", "vf.tracki.com (excluded: dev/staging hosts)"]
+  },
+  "fcc_grantee_code_flagged_intelligence": "see sources.json ODM_grantee_intelligence.leads (5 ODM grantee values, aggregator-only, NOT promoted, EAS-direct BLOCKED)",
+  "db_presence_baseline": {
+    "named_retail_vendors_held": 0,
+    "existing_gps_tracker_rows": "122 rows = offender-monitoring/ankle-monitor class (BI Incorporated, Attenti, STOP, Track Group, Sentinel Offender Services) - structurally distinct from consumer/covert GPS trackers",
+    "ODMs_held": "Queclink: id 1489 (0x0E61 ble_manufacturer_id, unknown) + id 6236 (d0:9f:d9:8/28 mac_range, unknown). Sinocastel/Trackimo: 0."
+  }
+}
