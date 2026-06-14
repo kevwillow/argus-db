@@ -24,12 +24,12 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.8:
+At v1.6.9:
 
-- **43,123 active canonical identifiers** — the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release admitted 81 net-new across five device cohorts and withdrew 25 bad OUIs from the standard feed; see the release notes below for the breakdown.
+- **43,123 active canonical identifiers** — the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.9) is the BLE-tracker fast-follow: it mints the `bluetooth_tracker` category and makes 46 captured tracker rows export-visible, with no net-new identifiers; see the release notes below for the breakdown.
 - **156 manufacturers** — surveillance vendors classified by what they make
 - **95 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
-- **17 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, etc.)
+- **18 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, etc.)
 - **58 identifier types** — the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
 - **214 behavioral signatures** — cellular-control-plane patterns associated with IMSI-catcher detection
 
@@ -43,8 +43,8 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 348 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
-| `exports/argus_export.json` | 737 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export_high_confidence.json` | 351 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export.json` | 900 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
 | `exports/argus_export.csv` | 43,123 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
@@ -86,7 +86,11 @@ Coverage is intentionally narrow per category. Argus has 156 vendors, but most c
 
 ## Most recent release
 
-**v1.6.8** is the most recent release, the widest-net sourcing cycle the project has run. It admits **81 net-new identifiers** across five device cohorts (Bluetooth trackers and stalkerware, ALPR and cop-car, drones, body cams and acoustic, consumer surveillance) plus a deferred-revival cleanup, and it withdraws 25 bad OUIs that had been shipping in the standard feed. The active count moves 43,213 → 43,123, because the known-fake cleanup outweighs the admissions. Every identifier traces to a public source: the IEEE OUI registry, Bluetooth SIG assigned numbers, FCC filings, vendor APK static analysis, and peer-reviewed Find-My teardowns. Nothing came from probing live devices or from model memory. The schema stays at 31. The source count moves 86 → 95, the manufacturer count 155 → 156 (Qualcomm). For a scanner operator, the high-confidence export grows 322 → 348 (the 26 new consumer-camera OUIs from Ring, Wyze, Arlo, and Blink) and the standard export 736 → 737; the behavioral-signatures export grows 125 → 132. The Bluetooth-tracker rows land captured but export-suppressed, since their feed-visibility ships in a fast-follow once the tracker category is minted. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` for the full record.
+**v1.6.9** is the most recent release — the dedicated BLE-tracker fast-follow (MAC-387) promised in the v1.6.8 notes. It mints a durable `bluetooth_tracker` device category (the first schema migration since 0031, schema_version 31 → 32) and makes the board's #1 cohort export-visible: 46 captured tracker rows (AirTag, Tile, Samsung SmartTag, Chipolo, AirGuard) move out of the export-suppressed `unknown` bin, and the ratified MAC-359 `ble_service_uuid → ble_uuid` export map is absorbed so BLE service UUIDs reach the Lynceus feeds for the first time. **No new identifiers are sourced** — every value already landed in v1.6.8 and traces to OpenHaystack, peer-reviewed Find-My teardowns, and Bluetooth-SIG `0x004C`; this cycle is categorization and export-visibility only. The active identifier count, manufacturers, and sources are unchanged (43,123 active, 156, 95). For a scanner operator, the standard export grows 737 → 900 and the high-confidence export 348 → 351, as the BLE service-UUID map surfaces 163 previously-dropped rows (`ble_uuid` feed entries 8 → 171). One false-positive — the Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor magnet — was caught in validation and held at `unknown`, absent from both feeds. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` (CP45) for the full record.
+
+### Prior release — v1.6.8
+
+**v1.6.8** was the widest-net sourcing cycle the project has run: **81 net-new identifiers** across five device cohorts (Bluetooth trackers and stalkerware, ALPR and cop-car, drones, body cams and acoustic, consumer surveillance) plus a deferred-revival cleanup, with 25 bad OUIs withdrawn from the standard feed (active 43,213 → 43,123). The 26 consumer-camera OUIs (Ring, Wyze, Arlo, Blink) grew the high-confidence export 322 → 348; the Bluetooth-tracker rows landed captured-but-suppressed, with their feed-visibility deferred to the v1.6.9 fast-follow above. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
 ### Prior release — v1.6.7
 
@@ -121,7 +125,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.8).
+- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.9).
 - [`CREDITS.md`](CREDITS.md) — per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) — developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) — how Argus integrates sources, confidence model, dedup logic.

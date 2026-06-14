@@ -14,6 +14,38 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.9 — 2026-06-14
+
+A **data-shape release** on top of v1.6.8 — the dedicated BLE-tracker fast-follow promised in the v1.6.8 notes (MAC-387). It does three coupled things: mints a durable `bluetooth_tracker` device category (the project's first schema migration since 0031), recategorizes the 46 captured tracker rows out of the export-suppressed `unknown` bin, and absorbs the ratified MAC-359 `ble_service_uuid → ble_uuid` export MAP so BLE service UUIDs reach the Lynceus feeds for the first time. **No new identifiers are sourced** — every value already landed in v1.6.8 and traces to its cohort-1 artifact (OpenHaystack, peer-reviewed Find-My teardowns, Bluetooth-SIG `0x004C`); this cycle is categorization + export-visibility only. schema_version moves **31 → 32**; manufacturers, sources, and the active identifier count are unchanged (43,123 active). The standard Lynceus feed grows **737 → 900** and the high-confidence feed **348 → 351**, as the BLE service-UUID map surfaces 163 previously-dropped rows (feed `ble_uuid` entries 8 → 171). One false-positive was caught and held during validation — the Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor magnet — recategorized back to `unknown` so it reaches neither feed.
+
+### What's new
+
+- **`bluetooth_tracker` is now a durable export category.** The board's #1 cohort — AirTag, Tile, Samsung SmartTag, Chipolo, and the AirGuard Find-My accessory UUIDs — is now export-visible. 46 rows move `unknown → bluetooth_tracker`: the 41 cohort-1 net-new from v1.6.8 (ids 44416–44456) plus 6 prior tagfinder service-UUID rows that belong (Samsung `0xfd5a`, Tile `0xfdcd`, Apple Find My `7dfc9002`/`7dfc9003`/`74278bda`/`0xfd44`), minus the `0xFD6F` false-positive. A scanner now alerts on a nearby AirTag or SmartTag by its BLE service UUID.
+- **BLE service UUIDs reach the feed (MAC-359 map absorbed).** The ratified §4.4 `ble_service_uuid → ble_uuid` alias-collapse (CP21), parked since its draft, ships here because it is load-bearing for tracker visibility. Feed `ble_uuid` entries move 8 → 171. The symmetric `ble_company_id → ble_manufacturer_id` map (MAC-360) stays HELD on an unresolved id4884 collision and does **not** ride this release.
+- **False-positive hygiene.** Validation flagged `0xFD6F` (id 44433) — the Apple/Google Exposure-Notification service UUID, a cross-vendor magnet that would fire on unrelated contact-tracing hardware — and held it at `unknown` (MAC-390), so it is absent from both feeds. The `0x0075`/`0x02d0` company-ID-as-service-UUID corruptions and the `0xfe9f` Google-assigned UUID were excluded from the tracker set up front.
+
+### Schema
+
+- **Migration `0032` (CP45) — first since 0031.** Extends the `device_category` CHECK enum **+1 value `bluetooth_tracker`** on both host tables (`identifiers` + `behavioral_signatures`), preserving the CP32/CP33 dual-table parity invariant. schema_version **31 → 32**.
+
+### Data
+
+- **`identifiers` active:** 43,123 → **43,123** (no change — 46 rows recategorized `unknown → bluetooth_tracker`; no admissions or withdrawals).
+- **`identifiers` total:** **43,678** (no change).
+- **device categories:** 17 → **18** (+`bluetooth_tracker`).
+- **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change).
+- **Lynceus standard feed:** 737 → **900** (+163, BLE service-UUID surfacing). **high-confidence feed:** 348 → **351** (+3). **behavioral-signatures feed:** **132** (no change).
+
+### Bible amendments
+
+- **CP45** — mints `device_category='bluetooth_tracker'` (taxonomy +1, dual-table); narrows the §11 #13 `unknown`-category export ban to exclude this promoting category; absorbs the MAC-359 `ble_service_uuid → ble_uuid` export MAP. CP45 is the next-free slot above landed CP44 (the MAC-351 cross-vendor draft was folded into CP44, freeing the CP45 number); the CP46/CP47 references remain the MAC-359/MAC-360 draft reservations — MAC-359 is absorbed here, MAC-360 stays parked.
+
+### Halts encountered
+
+- None. The `0xFD6F` false-positive was caught by the Validator assertion battery (not a halt) and remediated via recategorization (MAC-390) plus an authoritative export re-regen and delta-verify (MAC-391).
+
+---
+
 ## v1.6.8 — 2026-06-14
 
 A **data release** on top of v1.6.7, and the widest-net sourcing cycle the project has run (MAC-362 / MAC-363). It admits **81 net-new identifiers** across five device cohorts plus a deferred-revival cleanup, and it withdraws 25 bad OUIs that had been shipping in the standard feed. Active identifier count moves **43,213 → 43,123**, because the cleanup outweighs the admissions. **No schema migration** (schema_version stays **31**), **+1 manufacturer** (155 → 156, Qualcomm), **+9 sources** (86 → 95). The Lynceus high-confidence feed grows **322 → 348**, the standard feed **736 → 737**, and the behavioral-signatures feed **125 → 132**. Every identifier traces to a quotable public source (IEEE OUI registry, Bluetooth SIG assigned numbers, FCC filings, APK static analysis, academic Find-My teardowns); none came from model memory. The board approved the push (approval `1598798c`) after an independent re-verification against the live database, a backup-first apply per cohort, and an operator-gated fast-forward.

@@ -1,20 +1,21 @@
 {
   "_meta": {
-    "argus_version": "31",
-    "exported_at": "2026-06-14T02:38:20Z",
-    "record_count": 348,
+    "argus_version": "32",
+    "exported_at": "2026-06-14T05:32:23Z",
+    "record_count": 351,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "db313df2-cf67-559c-b16e-f982f6b3c4b4",
+    "argus_run_id": "e48bfd05-f376-56a1-976c-009204e1e462",
     "source_record_count": 43123,
     "dropped_in_export": {
-      "unknown_category": 33396,
+      "unknown_category": 33350,
+      "generic_reserved_uuid": 1,
       "ssid_pattern": 24,
       "device_fingerprint": 6,
       "ble_local_name": 21,
-      "ble_characteristic": 14,
+      "ble_characteristic": 17,
       "product_family_codename": 156,
       "oversized_mac_range": 47,
       "icao_24bit_address": 2,
@@ -30,7 +31,6 @@
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_service_uuid": 121,
       "ble_company_id": 2,
       "frequency_band": 32,
       "ble_protocol_byte": 0,
@@ -61,9 +61,9 @@
       "imei_tac": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 43,
-      "excluded_source_type": 336,
-      "geographic_scope_mismatch": 21
+      "below_confidence_threshold": 53,
+      "excluded_source_type": 337,
+      "geographic_scope_mismatch": 170
     }
   },
   "entries": [
@@ -1322,6 +1322,12 @@
       "argus_record_id": "8fe4e5a016255a7e"
     },
     {
+      "pattern": "2320ae58-8394-4652-95f7-0a872ac0958f",
+      "pattern_type": "ble_uuid",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "900fcda11f9778fc"
+    },
+    {
       "pattern": "f4d4dbf5-ba4b-40db-9a44-f8395f3728cf",
       "pattern_type": "vendor_document_uuid_cloud_reference",
       "description": "DJI drone",
@@ -1530,6 +1536,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
       "argus_record_id": "b4e7964b29533d0f"
+    },
+    {
+      "pattern": "d54ace3f-8e27-4718-aa17-019f0e318e14",
+      "pattern_type": "ble_uuid",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "b4ede32c5ad9f722"
     },
     {
       "pattern": "00:12:1c",
@@ -1782,6 +1794,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "d6f3d7d3ff77f166"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
     },
     {
       "pattern": "d0:3f:27",

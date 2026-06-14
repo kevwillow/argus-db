@@ -5742,3 +5742,104 @@ number = **`§11 #21`** (next-free above landed `§11 #20`; `#19` unused).
 before any canonical write (`258eafa5` at Gate-2; `0xFE59` at MAC-371 D3, 0 rows live), so
 ratifying CP44 moves **zero** rows in any export feed. It is a forward-binding admission
 discipline, not a data change.
+
+### CP45 — `device_category='bluetooth_tracker'` (taxonomy +1, dual-table) + §11 #13 promoting-category carve-out narrowing; absorbs the MAC-359 `ble_service_uuid → ble_uuid` export MAP (2026-06-13)
+
+> **Staged (NOT yet ratified):** authored by the DBArchitect at MAC-388 (child of
+> MAC-387) as a staged write — **NO push, NO authoritative export-regen** (the
+> Validator owns the battery + regen; CTO+CEO gate the commit). Migration applied
+> to `db/argus.db` (gitignored); code + this ledger entry staged in the working
+> tree. Pending CTO re-verify + CEO ship-gate ratification.
+
+**Slot disposition.** Latest **landed** CP at author time = **CP44** (the
+cross-vendor-constant exclusion gate, §11 #21, MAC-386 commit `8a4fab3`). The
+MAC-351 cross-vendor draft was provisionally numbered CP45 but was **folded into
+the consolidated CP44** per CP44's own Slot-disposition ("no separate CP45 lands
+for it") — which **frees the CP45 slot**. The MAC-321 WS-1 soft-reservation of a
+CP44-tied `mig-0032 identifier_type`-template explicitly recorded "Migration 0032
+/ CP44 NOT consumed"; CP numbers assign at land-time as next-free, the
+cross-vendor gate took CP44, so this taxonomy migration (**file 0032**) takes the
+next-free CP = **CP45**. Re-ran the apply-time collision check against both header
+forms (`### CP45` / `## Correction Pass 45`) across the working tree at author
+time: the only CP45 references are CP44's collision-check prose and the
+**superseded** untracked `operator_review/MAC-351/*CP45*DRAFT.md` (folded into
+CP44) — slot confirmed free. Known ledger-vs-file offset preserved: file 0032 /
+CP45 / `schema_version` row 32 (cf. mig-0025=CP31, mig-0030=CP37).
+
+**Trigger.** MAC-363 cohort-1 (BLE item-finder trackers) ingested 41 net-new rows
+(MAC-371 extraction / MAC-373 ingest, ids 44416–44456) plus 6 prior tagfinder
+tracker rows (22864 Samsung SmartTag `0xfd5a`, 22865 Tile `0xfdcd`, 22873/22874
+Apple Find My `7dfc9002`/`7dfc9003`, 22875 Apple `74278bda…`, 22876 Apple
+`0xfd44`) that all carried `device_category='unknown'` (OUI-level multi-purpose
+discipline / §11 #13) for want of a model-level category value. The cohort's
+service-UUID / Find-My / SmartTag attribution **is** the model-level evidence
+(§8.4 hardware-anchor sub-rule), but the §2.1/§4.1 `device_category` enum had no
+value to promote them into.
+
+**Rule (Part A — schema).** Migration `0032_cp45_device_category_bluetooth_tracker`
+extends the `device_category` CHECK enum **+1 value `bluetooth_tracker`** on
+**BOTH** `identifiers` AND `behavioral_signatures` (CP32/CP33/CP37 dual-table
+parity invariant; SQLite table-rebuild pattern, reproduced from the LIVE post-0031
+sqlite_master so the CP39 `severity` column + `idx_identifiers_severity` are
+carried verbatim — NOT copied from mig-0030). `schema_version` 31 → 32. Adds ZERO
+rows. The canonical `db/schema_post_*.sql` files are **frozen audit artifacts**
+(header: "AUDIT ARTIFACT only — NOT a migration. Reproduce via: migrations 0001 →
+0016"), last maintained at mig-0016; every enum-extending migration since
+(0023/0026/0027/0028/0030) carried its enum in the migration file alone, so repo
+parity is satisfied by migration 0032 itself (editing a `schema_version=16`
+artifact would corrupt it).
+
+**Rule (Part B — recategorize, identifiers only).** The 47 CTO-cite-verified rows
+above (42 `ble_service_uuid` + 2 `ble_uuid` + 3 `ble_characteristic`) are
+recategorized `unknown → bluetooth_tracker`, with a JSON property-merged
+`notes.mac387_recategorize` marker (CP40 / MAC-380 convention — JSON-merge, not
+text-suffix). `behavioral_signatures` has no tracker rows (0 recategorized there;
+the enum extension is parity-only). **Documented exclusions (NOT touched):**
+`44414` (`0x0075`) + `44415` (`0x02d0`) = company-IDs base-expanded as service
+UUIDs (MAC-358 split artifacts entangled with the parked bundle); `22878`
+(`0xfe9f`) = BT-SIG-assigned to Google, claim-vs-assignment conflict → HOLD.
+
+**§11 #13 carve-out narrowing (PROMOTING category).** `bluetooth_tracker` is a
+PROMOTING `device_category` (parity with the CP37 `network_surveillance`
+precedent): rows recategorized out of `unknown` into it are **no longer barred by
+the §11 #13 unknown-category Lynceus export ban**. Export eligibility still
+requires the §4.4 type-map and the confidence / source / CP7-geographic gates;
+this CP does not relax any of those. No new §11 hard-rule number is minted (this
+is a narrowing of the existing §11 #13, not a new rule).
+
+**Rule (Part C — MAC-359 `ble_service_uuid → ble_uuid` export MAP absorbed; CP21,
+NOT a new CP).** To make the 42 svc_uuid tracker rows (and all other
+promoting-category `ble_service_uuid` rows) reach the feed, the MAC-359 change is
+re-derived cleanly into `db/validation/export_lynceus.py` +
+`db/validation/coverage_matrix.py` (NOT `stash pop` — the parked stash interleaves
+MAC-359 and MAC-360): `ble_service_uuid` moves from `DROPPED_REASONS` to
+`IDENTIFIER_TYPE_TO_PATTERN_TYPE` as `ble_uuid` (the **already-board-ratified
+CP21** §4.4 alias-collapse, PROJECT_BIBLE.md:278, board sign-off `e246a32a`), plus
+the `generic_reserved_uuid` value-suppression set (`0000ffff-…`, MAC-359 / CEO
+Ruling 3) mirrored byte-for-byte across both modules with its coverage drop-bin.
+**CP-reconciliation (do-not-double-mint):** the parked bundle documented MAC-359
+as a standalone **"CP46"** (chosen when CP44/CP45 were reserved-unlanded at
+MAC-359 author time) and MAC-360 as "CP47"; those draft slot numbers are now
+**stale** (CP44 landed at MAC-386; CP45 = this entry). The MAC-359 code change
+implements the **existing CP21** MAP + CEO Ruling 3 — **no separate CP46 lands**;
+the parked "CP46" draft is superseded by this absorption. **MAC-360
+(`ble_company_id → ble_manufacturer_id`) stays HELD/DROPPED** (id4884); its
+"CP47" draft slot is likewise not consumed and rides its own future ratification.
+
+**Downstream-consumer note (export-MEANINGFUL — Validator owns the authoritative
+regen + delta-verify; CEO owns the push-gate).** A scratch/dry-run two-step regen
+(coverage_matrix → report → export, isolated in /tmp; shipped
+`argus_export*.json`/CSV and `extraction_outputs/mac45/*` left untouched)
+reconciles with **0 halts** at `schema_version=32`. Standard-feed `ble_uuid`
+pattern_type rises **8 → 172 (+164)** = the MAC-359 CP21 MAP lifting all
+promoting-category `ble_service_uuid` rows already in the DB (cctv_camera 88,
+gunshot_detect 29, hacking_tool 2, police_radio 1, ≈+122 — the figure MAC-359
+itself projected) **plus** the 42 newly-`bluetooth_tracker` svc_uuid rows (Part B),
+net of conf/geo gates. Of the 47 recategorized rows, 44 reach the scratch feed (42
+`ble_service_uuid` + 2 `ble_uuid`); the 3 `ble_characteristic` rows (44454–56)
+correctly stay DROPPED (CP13 — Lynceus discovers by service UUID, not
+characteristic). The `0000ffff-…` police_radio row (id 23051, conf 75) — which the
+MAP would otherwise have surfaced as an FP — is correctly withheld in the new
+`generic_reserved_uuid` bin (1 row). `ble_company_id` stays in the drop tally (2
+rows). Pushing the regenerated feed is a one-way door reserved to the CEO at the
+MAC-362 ship-gate.

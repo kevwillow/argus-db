@@ -1,20 +1,21 @@
 {
   "_meta": {
-    "argus_version": "31",
-    "exported_at": "2026-06-14T02:38:20Z",
-    "record_count": 737,
+    "argus_version": "32",
+    "exported_at": "2026-06-14T05:32:23Z",
+    "record_count": 900,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "db313df2-cf67-559c-b16e-f982f6b3c4b4",
+    "argus_run_id": "e48bfd05-f376-56a1-976c-009204e1e462",
     "source_record_count": 43123,
     "dropped_in_export": {
-      "unknown_category": 33396,
+      "unknown_category": 33350,
+      "generic_reserved_uuid": 1,
       "ssid_pattern": 24,
       "device_fingerprint": 6,
       "ble_local_name": 21,
-      "ble_characteristic": 14,
+      "ble_characteristic": 17,
       "product_family_codename": 156,
       "oversized_mac_range": 47,
       "icao_24bit_address": 2,
@@ -30,7 +31,6 @@
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_service_uuid": 121,
       "ble_company_id": 2,
       "frequency_band": 32,
       "ble_protocol_byte": 0,
@@ -80,6 +80,12 @@
       "argus_record_id": "004dd89eb82e57b5"
     },
     {
+      "pattern": "00003203-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "0056abda88eead83"
+    },
+    {
       "pattern": "1812FNX30",
       "pattern_type": "drone_id_prefix",
       "description": "Ascent AeroSystems drone",
@@ -122,6 +128,12 @@
       "argus_record_id": "03cce0106e92d5ae"
     },
     {
+      "pattern": "0000fe25-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "04d20dbd1827e144"
+    },
+    {
       "pattern": "14:5a:fc",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -138,6 +150,18 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aurelia drone",
       "argus_record_id": "0680a811442e6c14"
+    },
+    {
+      "pattern": "88a570cc-f103-4d0b-b41e-014203163326",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "06e46f6876b5e496"
+    },
+    {
+      "pattern": "88a570cc-f103-4d0b-b41e-014203163326",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "06e46f6876b5e496"
     },
     {
       "pattern": "ac:b9:2f",
@@ -174,6 +198,18 @@
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
       "argus_record_id": "08ba884cc4bbaa57"
+    },
+    {
+      "pattern": "7dfc9000-7d1c-4951-86aa-8d9728f8d66c",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "0a1fe1b4e98429f7"
+    },
+    {
+      "pattern": "0000fec9-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "0a41c7185fb3d33c"
     },
     {
       "pattern": "1587A540002APD",
@@ -242,10 +278,22 @@
       "argus_record_id": "0ca8d3bc83ca8639"
     },
     {
+      "pattern": "00003002-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "0cba031fb7d34feb"
+    },
+    {
       "pattern": "1581F4BN",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "0d8a34e130a69e94"
+    },
+    {
+      "pattern": "0000fe33-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "CHIPOLO d.o.o. bluetooth_tracker",
+      "argus_record_id": "0ddeb8b1e46375ac"
     },
     {
       "pattern": "38:5b:44",
@@ -356,6 +404,12 @@
       "argus_record_id": "108e8f0bd4b6da48"
     },
     {
+      "pattern": "0000fd5a-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Unattributed identifier",
+      "argus_record_id": "10c1ee4515a47e7a"
+    },
+    {
       "pattern": "80:f5:ae",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -464,10 +518,22 @@
       "argus_record_id": "168cbb456f48a1a8"
     },
     {
+      "pattern": "0000fd43-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "16ae7d8a032c2185"
+    },
+    {
       "pattern": "3c:e3:6b",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
       "argus_record_id": "16e55d3326889e08"
+    },
+    {
+      "pattern": "0000fd1d-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsung Electronics Co., Ltd. bluetooth_tracker",
+      "argus_record_id": "16eb4cb45f6879ef"
     },
     {
       "pattern": "10:74:6f",
@@ -516,6 +582,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "194d9f49a643d762"
+    },
+    {
+      "pattern": "0000fd84-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Tile, Inc. bluetooth_tracker",
+      "argus_record_id": "19f320a532779224"
     },
     {
       "pattern": "00:18:85",
@@ -632,6 +704,12 @@
       "argus_record_id": "1edc2e02e6fa45a2"
     },
     {
+      "pattern": "00003101-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "1f3afaa1201c0a8b"
+    },
+    {
       "pattern": "1581F5BK",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -648,6 +726,30 @@
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "1fa5fbb43d52f144"
+    },
+    {
+      "pattern": "8a1d1027-ac73-4cd7-a851-cb8aff0c6494",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "1fd2e00b748b7cae"
+    },
+    {
+      "pattern": "8a1d1027-ac73-4cd7-a851-cb8aff0c6494",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "1fd2e00b748b7cae"
+    },
+    {
+      "pattern": "8a1d1027-ac73-4cd7-a851-cb8aff0c6494",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "1fd2e00b748b7cae"
+    },
+    {
+      "pattern": "8a1d1027-ac73-4cd7-a851-cb8aff0c6494",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "1fd2e00b748b7cae"
     },
     {
       "pattern": "1898B003000G0",
@@ -692,6 +794,12 @@
       "argus_record_id": "220ba1457f5d711d"
     },
     {
+      "pattern": "0000fd6c-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsung Electronics Co., Ltd. bluetooth_tracker",
+      "argus_record_id": "222a9d3a3d665623"
+    },
+    {
       "pattern": "50:e4:67",
       "pattern_type": "oui",
       "description": "Ring cctv_camera",
@@ -714,6 +822,18 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "22af7a665109b7c1"
+    },
+    {
+      "pattern": "0000fecc-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "232efab03a39e1d7"
+    },
+    {
+      "pattern": "00003202-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "243b87f01f228160"
     },
     {
       "pattern": "e8ccbb38-9532-46a8-9fe5-1814df172e6f",
@@ -768,6 +888,24 @@
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "26c3eded4bd7bdc1"
+    },
+    {
+      "pattern": "53272adb-37be-4ccb-b8d4-991bbc675bb1",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "26d24538cf9d6465"
+    },
+    {
+      "pattern": "53272adb-37be-4ccb-b8d4-991bbc675bb1",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "26d24538cf9d6465"
+    },
+    {
+      "pattern": "53272adb-37be-4ccb-b8d4-991bbc675bb1",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "26d24538cf9d6465"
     },
     {
       "pattern": "19069B040140",
@@ -908,6 +1046,12 @@
       "argus_record_id": "2e6795f3d4246ae6"
     },
     {
+      "pattern": "00003505-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "2e96eefdb7b86ca9"
+    },
+    {
       "pattern": "3c:da:6d",
       "pattern_type": "oui",
       "description": "Tiandy cctv_camera",
@@ -918,6 +1062,12 @@
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "2f9cbce9ff782549"
+    },
+    {
+      "pattern": "0000330a-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "2fbcd2cc56fb93b4"
     },
     {
       "pattern": "E8:D0:FC",
@@ -954,6 +1104,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Bwine drone",
       "argus_record_id": "3035e4603c2c804b"
+    },
+    {
+      "pattern": "0000fd4b-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsung Electronics Co., Ltd. bluetooth_tracker",
+      "argus_record_id": "30d20e5a635e7685"
     },
     {
       "pattern": "1801BDV",
@@ -1034,6 +1190,18 @@
       "argus_record_id": "34f81cf9bf2a3ba0"
     },
     {
+      "pattern": "7634ec5f-11ac-4d0f-ac92-2fe172437739",
+      "pattern_type": "ble_uuid",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "34f9384703f05015"
+    },
+    {
+      "pattern": "7634ec5f-11ac-4d0f-ac92-2fe172437739",
+      "pattern_type": "ble_uuid",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "34f9384703f05015"
+    },
+    {
       "pattern": "58:8e:81",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -1070,6 +1238,12 @@
       "argus_record_id": "3680762fce7effc7"
     },
     {
+      "pattern": "0000fc94-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "36bcfd4be3c760d9"
+    },
+    {
       "pattern": "1871C00000000",
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
@@ -1092,6 +1266,12 @@
       "pattern_type": "oui",
       "description": "Harris persistent_surveillance",
       "argus_record_id": "374727b9c4420369"
+    },
+    {
+      "pattern": "00003102-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "3766156576e9b721"
     },
     {
       "pattern": "1892CF11S2P0000",
@@ -1130,10 +1310,22 @@
       "argus_record_id": "39b60b488cecc04c"
     },
     {
+      "pattern": "00003201-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "3a97ed96fd464f40"
+    },
+    {
       "pattern": "8c:e7:48",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "3af533072b5b0746"
+    },
+    {
+      "pattern": "00003001-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "3af58e1843c27d10"
     },
     {
       "pattern": "1892CF22A238000",
@@ -1184,6 +1376,12 @@
       "argus_record_id": "3c4c94c8be703b8d"
     },
     {
+      "pattern": "87290102-3c51-43b1-a1a9-11b9dc38478b",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "3c757814051dc8b4"
+    },
+    {
       "pattern": "1748CH",
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
@@ -1208,6 +1406,12 @@
       "argus_record_id": "3e8522eb51ef9578"
     },
     {
+      "pattern": "00003308-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "3fe915cea1686a3a"
+    },
+    {
       "pattern": "19069B060",
       "pattern_type": "drone_id_prefix",
       "description": "Aurelia drone",
@@ -1218,6 +1422,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Zephyr Systems drone",
       "argus_record_id": "409d66886fa7fce6"
+    },
+    {
+      "pattern": "0000fece-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "40dd5d7d5aeba106"
     },
     {
       "pattern": "179061002",
@@ -1244,6 +1454,12 @@
       "argus_record_id": "4315e83f628347ca"
     },
     {
+      "pattern": "0000fe65-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "CHIPOLO d.o.o. bluetooth_tracker",
+      "argus_record_id": "4341bd0ad42a41f5"
+    },
+    {
       "pattern": "1865CHS600D",
       "pattern_type": "drone_id_prefix",
       "description": "Holy Stone drone",
@@ -1260,6 +1476,12 @@
       "pattern_type": "oui",
       "description": "Verkada cctv_camera",
       "argus_record_id": "448e6c9ff9823098"
+    },
+    {
+      "pattern": "00003303-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "454a026e3548c689"
     },
     {
       "pattern": "00:02:d1",
@@ -1284,6 +1506,54 @@
       "pattern_type": "drone_id_prefix",
       "description": "Bwine drone",
       "argus_record_id": "471f71f7b1e55272"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4773f2a43713ccc5"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4773f2a43713ccc5"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4773f2a43713ccc5"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4773f2a43713ccc5"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4773f2a43713ccc5"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4773f2a43713ccc5"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4773f2a43713ccc5"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "4773f2a43713ccc5"
     },
     {
       "pattern": "00:F4:8D",
@@ -1340,6 +1610,54 @@
       "argus_record_id": "4a13334e9a6c575c"
     },
     {
+      "pattern": "bb0990cc-5e84-4503-a438-a0138df04bd5",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "4a4f3c58c539a345"
+    },
+    {
+      "pattern": "bb0990cc-5e84-4503-a438-a0138df04bd5",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "4a4f3c58c539a345"
+    },
+    {
+      "pattern": "bb0990cc-5e84-4503-a438-a0138df04bd5",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "4a4f3c58c539a345"
+    },
+    {
+      "pattern": "bb0990cc-5e84-4503-a438-a0138df04bd5",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "4a4f3c58c539a345"
+    },
+    {
+      "pattern": "bb0990cc-5e84-4503-a438-a0138df04bd5",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "4a4f3c58c539a345"
+    },
+    {
+      "pattern": "bb0990cc-5e84-4503-a438-a0138df04bd5",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "4a4f3c58c539a345"
+    },
+    {
+      "pattern": "bb0990cc-5e84-4503-a438-a0138df04bd5",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "4a4f3c58c539a345"
+    },
+    {
+      "pattern": "bb0990cc-5e84-4503-a438-a0138df04bd5",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "4a4f3c58c539a345"
+    },
+    {
       "pattern": "1869CF11GM3",
       "pattern_type": "drone_id_prefix",
       "description": "Ruko drone",
@@ -1380,6 +1698,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "WISPR drone",
       "argus_record_id": "4c2ffc898634f54e"
+    },
+    {
+      "pattern": "0000fd44-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Unattributed identifier",
+      "argus_record_id": "4c7bb36a27ae3ffb"
     },
     {
       "pattern": "80:48:9f",
@@ -1538,6 +1862,18 @@
       "argus_record_id": "540be52b9e8446d8"
     },
     {
+      "pattern": "e7acfed7-4196-43a7-89b6-3512ebbeff19",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "543a855c6ebec2b7"
+    },
+    {
+      "pattern": "e7acfed7-4196-43a7-89b6-3512ebbeff19",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "543a855c6ebec2b7"
+    },
+    {
       "pattern": "84:9a:40",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -1554,6 +1890,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "54ef3b548cdef9b2"
+    },
+    {
+      "pattern": "8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000",
+      "pattern_type": "ble_uuid",
+      "description": "Flipper Devices Inc. hacking_tool",
+      "argus_record_id": "54f9422558c4b7e2"
     },
     {
       "pattern": "48:2c:ea",
@@ -1590,6 +1932,18 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "5941a34036f695cb"
+    },
+    {
+      "pattern": "00003304-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "5951fb14df1f3fd1"
+    },
+    {
+      "pattern": "00003204-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "598985e4d988a7bf"
     },
     {
       "pattern": "1596F3348945804F6041",
@@ -1772,6 +2126,24 @@
       "argus_record_id": "62ea9c3fb5cd6a57"
     },
     {
+      "pattern": "eb3e0af3-57f4-4789-ab55-86508580296a",
+      "pattern_type": "ble_uuid",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "62f887d3dba15edf"
+    },
+    {
+      "pattern": "eb3e0af3-57f4-4789-ab55-86508580296a",
+      "pattern_type": "ble_uuid",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "62f887d3dba15edf"
+    },
+    {
+      "pattern": "eb3e0af3-57f4-4789-ab55-86508580296a",
+      "pattern_type": "ble_uuid",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "62f887d3dba15edf"
+    },
+    {
       "pattern": "1869CF11GM20000",
       "pattern_type": "drone_id_prefix",
       "description": "Ruko drone",
@@ -1820,6 +2192,12 @@
       "argus_record_id": "66f6f18221b0fb84"
     },
     {
+      "pattern": "0000fed2-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "672643c4e02d68b8"
+    },
+    {
       "pattern": "04:0d:84",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -1854,6 +2232,12 @@
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
       "argus_record_id": "68946bf61c2cabb9"
+    },
+    {
+      "pattern": "0000fed3-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "68bdebd08ffadfca"
     },
     {
       "pattern": "ec:72:f7",
@@ -2084,6 +2468,12 @@
       "argus_record_id": "744d16eaa1bb2619"
     },
     {
+      "pattern": "0000fcb2-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "744e0e607fd75ae4"
+    },
+    {
       "pattern": "1774FREM1010000",
       "pattern_type": "drone_id_prefix",
       "description": "UAS drone",
@@ -2118,6 +2508,12 @@
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "759d22ae8c310a68"
+    },
+    {
+      "pattern": "0000fe8a-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "76527b188382e6ed"
     },
     {
       "pattern": "Flock-*",
@@ -2198,6 +2594,24 @@
       "argus_record_id": "79a4e0fad1f4f751"
     },
     {
+      "pattern": "5a8a3ad7-78a2-4a6b-b713-946637f7f554",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "79a5c95afeb19178"
+    },
+    {
+      "pattern": "5a8a3ad7-78a2-4a6b-b713-946637f7f554",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "79a5c95afeb19178"
+    },
+    {
+      "pattern": "0000fe8b-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "79df670638ee6c48"
+    },
+    {
       "pattern": "179060702",
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
@@ -2220,6 +2634,12 @@
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
       "argus_record_id": "7bced46b9420d42a"
+    },
+    {
+      "pattern": "0000fecb-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "7c14c54a3282b3c6"
     },
     {
       "pattern": "08:3b:c1",
@@ -2288,6 +2708,18 @@
       "argus_record_id": "7ff5bfa9c2df8583"
     },
     {
+      "pattern": "0000fd59-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsung Electronics Co., Ltd. bluetooth_tracker",
+      "argus_record_id": "80330f302ffaba9a"
+    },
+    {
+      "pattern": "0000fecf-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "8081fb5e9c268b15"
+    },
+    {
       "pattern": "5c:34:5b",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -2316,6 +2748,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Skydio drone",
       "argus_record_id": "81b5b66cfee35ad4"
+    },
+    {
+      "pattern": "0000feca-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "81be22f34bb1e794"
     },
     {
       "pattern": "2111FP702524B2",
@@ -2456,6 +2894,12 @@
       "argus_record_id": "88e997679363019a"
     },
     {
+      "pattern": "00003309-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "894450825172c86b"
+    },
+    {
       "pattern": "1581F5FH",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -2522,10 +2966,22 @@
       "argus_record_id": "8b4c4b0cdefe9b3a"
     },
     {
+      "pattern": "f85299bc-d1b3-11f0-9b91-0242ac11000d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "8b56b9ac80053e6c"
+    },
+    {
       "pattern": "00:65:1e",
       "pattern_type": "oui",
       "description": "Amcrest cctv_camera",
       "argus_record_id": "8b9e5c15186c8ca9"
+    },
+    {
+      "pattern": "00003501-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "8bcfd6e5c128eab0"
     },
     {
       "pattern": "1817913",
@@ -2538,6 +2994,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Gleesfun drone",
       "argus_record_id": "8d2b6577754817d2"
+    },
+    {
+      "pattern": "00003103-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "8d42a3a96558f4e3"
     },
     {
       "pattern": "3c:a0:70",
@@ -2556,6 +3018,18 @@
       "pattern_type": "drone_id_prefix",
       "description": "Microdrones drone",
       "argus_record_id": "8e0cd9d9e65b7b7e"
+    },
+    {
+      "pattern": "bf38d296-fae7-31c8-bfd4-3f60ca5a52e6",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "8e10bb5ccd66f042"
+    },
+    {
+      "pattern": "bf38d296-fae7-31c8-bfd4-3f60ca5a52e6",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "8e10bb5ccd66f042"
     },
     {
       "pattern": "1785C000000001000",
@@ -2618,6 +3092,12 @@
       "argus_record_id": "8ffcd1838743e65a"
     },
     {
+      "pattern": "2320ae58-8394-4652-95f7-0a872ac0958f",
+      "pattern_type": "ble_uuid",
+      "description": "Motorola Solutions police_radio",
+      "argus_record_id": "900fcda11f9778fc"
+    },
+    {
       "pattern": "f4d4dbf5-ba4b-40db-9a44-f8395f3728cf",
       "pattern_type": "vendor_document_uuid_cloud_reference",
       "description": "DJI drone",
@@ -2640,6 +3120,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Veeniix drone",
       "argus_record_id": "909878716ccc3be4"
+    },
+    {
+      "pattern": "00001000-7475-7961-626c-636f6e666967",
+      "pattern_type": "ble_uuid",
+      "description": "Tiandy (Tuya/Tuyabec BLE config) cctv_camera",
+      "argus_record_id": "90b9d24cab65590c"
     },
     {
       "pattern": "1973FR1M2K23",
@@ -2810,6 +3296,12 @@
       "argus_record_id": "99696ff1930ae2c6"
     },
     {
+      "pattern": "0000fed0-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "9a81f4d600080342"
+    },
+    {
       "pattern": "1787F06BM",
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
@@ -2852,16 +3344,40 @@
       "argus_record_id": "9d25c176ecd3159c"
     },
     {
+      "pattern": "0000fec8-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "9d3a020227aba3e7"
+    },
+    {
       "pattern": "48:ea:63",
       "pattern_type": "oui",
       "description": "Uniview cctv_camera",
       "argus_record_id": "9e1c7b10a0c866fd"
     },
     {
+      "pattern": "f7fe7e93-f741-4c06-bbc8-f4989d4d94d0",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "9e4e7b49a392273d"
+    },
+    {
+      "pattern": "f7fe7e93-f741-4c06-bbc8-f4989d4d94d0",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "9e4e7b49a392273d"
+    },
+    {
       "pattern": "58:00:e3:c8:69:66",
       "pattern_type": "mac",
       "description": "Flock Safety alpr",
       "argus_record_id": "9ef19e99e8f2bf48"
+    },
+    {
+      "pattern": "00003302-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "9ef928e97c40ef7e"
     },
     {
       "pattern": "dc:d2:6a",
@@ -2874,6 +3390,42 @@
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
       "argus_record_id": "9f1687bf88211d17"
+    },
+    {
+      "pattern": "1aa0ec25-954c-4e73-8371-386f9b8184a1",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "9f4902b793b8121d"
+    },
+    {
+      "pattern": "1aa0ec25-954c-4e73-8371-386f9b8184a1",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "9f4902b793b8121d"
+    },
+    {
+      "pattern": "1aa0ec25-954c-4e73-8371-386f9b8184a1",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "9f4902b793b8121d"
+    },
+    {
+      "pattern": "1aa0ec25-954c-4e73-8371-386f9b8184a1",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "9f4902b793b8121d"
+    },
+    {
+      "pattern": "1aa0ec25-954c-4e73-8371-386f9b8184a1",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "9f4902b793b8121d"
+    },
+    {
+      "pattern": "1aa0ec25-954c-4e73-8371-386f9b8184a1",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "9f4902b793b8121d"
     },
     {
       "pattern": "1748CNAC823",
@@ -2948,6 +3500,18 @@
       "argus_record_id": "a3eb7b932fd226c8"
     },
     {
+      "pattern": "9782022b-32ca-4346-832e-779db180cf4b",
+      "pattern_type": "ble_uuid",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "a3ef6e82854985a0"
+    },
+    {
+      "pattern": "9782022b-32ca-4346-832e-779db180cf4b",
+      "pattern_type": "ble_uuid",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "a3ef6e82854985a0"
+    },
+    {
       "pattern": "1894AL5DCX999",
       "pattern_type": "drone_id_prefix",
       "description": "Drone-Clone Xperts drone",
@@ -2966,6 +3530,42 @@
       "argus_record_id": "a70c8d52b8607622"
     },
     {
+      "pattern": "9188040d-6c67-4c5b-b112-36a304b66dad",
+      "pattern_type": "ble_uuid",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "a7635998b4f7d1a4"
+    },
+    {
+      "pattern": "9188040d-6c67-4c5b-b112-36a304b66dad",
+      "pattern_type": "ble_uuid",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "a7635998b4f7d1a4"
+    },
+    {
+      "pattern": "9188040d-6c67-4c5b-b112-36a304b66dad",
+      "pattern_type": "ble_uuid",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "a7635998b4f7d1a4"
+    },
+    {
+      "pattern": "9188040d-6c67-4c5b-b112-36a304b66dad",
+      "pattern_type": "ble_uuid",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "a7635998b4f7d1a4"
+    },
+    {
+      "pattern": "9188040d-6c67-4c5b-b112-36a304b66dad",
+      "pattern_type": "ble_uuid",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "a7635998b4f7d1a4"
+    },
+    {
+      "pattern": "9188040d-6c67-4c5b-b112-36a304b66dad",
+      "pattern_type": "ble_uuid",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "a7635998b4f7d1a4"
+    },
+    {
       "pattern": "1872CV11AR",
       "pattern_type": "drone_id_prefix",
       "description": "Veeniix drone",
@@ -2976,6 +3576,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aurelia drone",
       "argus_record_id": "a80e66ed05c2c3b9"
+    },
+    {
+      "pattern": "00003307-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "a849cb7aa95a4749"
     },
     {
       "pattern": "1656DTYR10MBD000",
@@ -3018,6 +3624,54 @@
       "pattern_type": "oui",
       "description": "GeoVision cctv_camera",
       "argus_record_id": "a9885a22bc965ed3"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b3",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a9c06d160f8c4358"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b3",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a9c06d160f8c4358"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b3",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a9c06d160f8c4358"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b3",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a9c06d160f8c4358"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b3",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a9c06d160f8c4358"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b3",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a9c06d160f8c4358"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b3",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a9c06d160f8c4358"
+    },
+    {
+      "pattern": "af20fbac-2518-4998-9af7-af42540731b3",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "a9c06d160f8c4358"
     },
     {
       "pattern": "1581F0M6",
@@ -3080,6 +3734,12 @@
       "argus_record_id": "ad310baa3d8baadd"
     },
     {
+      "pattern": "00003504-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "ad46c5db7e997075"
+    },
+    {
       "pattern": "30:dd:aa",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -3102,6 +3762,18 @@
       "pattern_type": "drone_id_prefix",
       "description": "Holy Stone drone",
       "argus_record_id": "ae23d7adadc99ab0"
+    },
+    {
+      "pattern": "00003402-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "ae2d600b0dacdb40"
+    },
+    {
+      "pattern": "0000feec-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Tile, Inc. bluetooth_tracker",
+      "argus_record_id": "ae897d4835d67592"
     },
     {
       "pattern": "19375114",
@@ -3188,6 +3860,24 @@
       "argus_record_id": "b4e7964b29533d0f"
     },
     {
+      "pattern": "d54ace3f-8e27-4718-aa17-019f0e318e14",
+      "pattern_type": "ble_uuid",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "b4ede32c5ad9f722"
+    },
+    {
+      "pattern": "d54ace3f-8e27-4718-aa17-019f0e318e14",
+      "pattern_type": "ble_uuid",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "b4ede32c5ad9f722"
+    },
+    {
+      "pattern": "d54ace3f-8e27-4718-aa17-019f0e318e14",
+      "pattern_type": "ble_uuid",
+      "description": "Dahua cctv_camera",
+      "argus_record_id": "b4ede32c5ad9f722"
+    },
+    {
       "pattern": "1863F251",
       "pattern_type": "drone_id_prefix",
       "description": "XAG drone",
@@ -3204,6 +3894,12 @@
       "pattern_type": "oui",
       "description": "Unattributed identifier",
       "argus_record_id": "b5dd85cdbeb03302"
+    },
+    {
+      "pattern": "0000fdcd-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Unattributed identifier",
+      "argus_record_id": "b64b22816cf24db7"
     },
     {
       "pattern": "1935C4831B7",
@@ -3228,6 +3924,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aerostar Dynamics drone",
       "argus_record_id": "b7c6ddd63a71c99a"
+    },
+    {
+      "pattern": "00003502-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "b7d3a205c99e4862"
     },
     {
       "pattern": "1892CF11S237000",
@@ -3272,6 +3974,12 @@
       "argus_record_id": "ba3d1dbaea586f1d"
     },
     {
+      "pattern": "0000fec7-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "ba785d23590e8651"
+    },
+    {
       "pattern": "24:32:ae",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -3300,6 +4008,12 @@
       "pattern_type": "ssid",
       "description": "Flipper Devices Inc. hacking_tool",
       "argus_record_id": "be182f5105ad2f04"
+    },
+    {
+      "pattern": "00003205-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "be390196d7beb25d"
     },
     {
       "pattern": "e8:27:25",
@@ -3350,6 +4064,12 @@
       "argus_record_id": "c07d2959627c49fd"
     },
     {
+      "pattern": "0000fe13-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "c0c548b2b57de37f"
+    },
+    {
       "pattern": "A2ZD46",
       "pattern_type": "drone_id_prefix",
       "description": "A2Z drone",
@@ -3366,6 +4086,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Skydio drone",
       "argus_record_id": "c126fe1d66424b05"
+    },
+    {
+      "pattern": "00003306-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "c16719af8dbaff55"
     },
     {
       "pattern": "2146BF33000000",
@@ -3494,16 +4220,34 @@
       "argus_record_id": "c82ae36849a49fef"
     },
     {
+      "pattern": "00003301-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "c87bd8cc14e0bcc2"
+    },
+    {
       "pattern": "181792",
       "pattern_type": "drone_id_prefix",
       "description": "Freefly Systems drone",
       "argus_record_id": "c89e377014bbb852"
     },
     {
+      "pattern": "00003401-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "c8a2e78a03e6de80"
+    },
+    {
       "pattern": "f0:c8:8b",
       "pattern_type": "oui",
       "description": "Wyze Labs cctv_camera",
       "argus_record_id": "c8aaa346315214f9"
+    },
+    {
+      "pattern": "00003080-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flipper Devices Inc. hacking_tool",
+      "argus_record_id": "c8d916985df872ed"
     },
     {
       "pattern": "16416",
@@ -3528,6 +4272,12 @@
       "pattern_type": "oui",
       "description": "Axon body_cam",
       "argus_record_id": "c98dbb6938962160"
+    },
+    {
+      "pattern": "0000fd69-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsung Electronics Co., Ltd. bluetooth_tracker",
+      "argus_record_id": "c9b28f3ceae752cd"
     },
     {
       "pattern": "2095FH05",
@@ -3584,6 +4334,12 @@
       "argus_record_id": "ce410a025cfea1da"
     },
     {
+      "pattern": "0000fc91-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsung Electronics Co., Ltd. bluetooth_tracker",
+      "argus_record_id": "ceab2da92db55ebe"
+    },
+    {
       "pattern": "a4:d5:c2",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -3618,6 +4374,18 @@
       "pattern_type": "oui",
       "description": "Avigilon cctv_camera",
       "argus_record_id": "cfdb3f5717736a8b"
+    },
+    {
+      "pattern": "78988e14-2cba-4b69-a0f0-c89b31e3db1d",
+      "pattern_type": "ble_uuid",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "d052176e17839272"
+    },
+    {
+      "pattern": "78988e14-2cba-4b69-a0f0-c89b31e3db1d",
+      "pattern_type": "ble_uuid",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "d052176e17839272"
     },
     {
       "pattern": "1596F35",
@@ -3692,6 +4460,12 @@
       "argus_record_id": "d2b6c45e2583546d"
     },
     {
+      "pattern": "0000fed1-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "d2c2859ff1ace3c0"
+    },
+    {
       "pattern": "1894DRAZRXDCX000",
       "pattern_type": "drone_id_prefix",
       "description": "Drone-Clone Xperts drone",
@@ -3726,6 +4500,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "d389d39cd548b554"
+    },
+    {
+      "pattern": "00003403-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "d3a371f33381e450"
     },
     {
       "pattern": "1849E074B839",
@@ -3810,6 +4590,66 @@
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
       "argus_record_id": "d7cb2bcc1dc6c4b8"
+    },
+    {
+      "pattern": "00003305-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "d7fd071117ce9d8c"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
+    },
+    {
+      "pattern": "f6ec37db-bda1-46ec-a43a-6d86de88561d",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "d8262380d0f525b4"
     },
     {
       "pattern": "d0:3f:27",
@@ -3914,6 +4754,12 @@
       "argus_record_id": "dd9b9f36bd8d3ca3"
     },
     {
+      "pattern": "0000fed4-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "ddcd5135b51293ce"
+    },
+    {
       "pattern": "17056PS00",
       "pattern_type": "drone_id_prefix",
       "description": "Pyka drone",
@@ -3930,6 +4776,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Aurelia drone",
       "argus_record_id": "dead3a5939d933b8"
+    },
+    {
+      "pattern": "4b5868d0-63be-11f0-8000-aa1d8e44bfb4",
+      "pattern_type": "ble_uuid",
+      "description": "Hikvision cctv_camera",
+      "argus_record_id": "dedc9e7d5b53ce6c"
     },
     {
       "pattern": "1748CHL7823",
@@ -3950,6 +4802,12 @@
       "argus_record_id": "dfa85d4ec7994f32"
     },
     {
+      "pattern": "7dfc9002-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Unattributed identifier",
+      "argus_record_id": "e04aaade85d5d3ff"
+    },
+    {
       "pattern": "1787F04BM",
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
@@ -3960,6 +4818,18 @@
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "e06bf6303331d4cc"
+    },
+    {
+      "pattern": "87749df4-7ccf-48f8-aa87-704bad0e0e16",
+      "pattern_type": "ble_uuid",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "e0b14e592ee028d6"
+    },
+    {
+      "pattern": "87749df4-7ccf-48f8-aa87-704bad0e0e16",
+      "pattern_type": "ble_uuid",
+      "description": "Avigilon cctv_camera",
+      "argus_record_id": "e0b14e592ee028d6"
     },
     {
       "pattern": "20499AP00000",
@@ -4130,6 +5000,12 @@
       "argus_record_id": "e6f82cec1f31ad2c"
     },
     {
+      "pattern": "0000feed-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Tile, Inc. bluetooth_tracker",
+      "argus_record_id": "e7142eaf9f7671b1"
+    },
+    {
       "pattern": "c0:6d:ed",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -4184,10 +5060,34 @@
       "argus_record_id": "ea2ef90f8728ffdf"
     },
     {
+      "pattern": "0000fecd-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "ea8bc4e669d91dde"
+    },
+    {
+      "pattern": "db231d97-107c-4292-a036-78a491c2fe06",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "eab3a2a8cc21ec10"
+    },
+    {
+      "pattern": "db231d97-107c-4292-a036-78a491c2fe06",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "eab3a2a8cc21ec10"
+    },
+    {
       "pattern": "1863FPEG8219",
       "pattern_type": "drone_id_prefix",
       "description": "XAG drone",
       "argus_record_id": "eabc1b042e9c9507"
+    },
+    {
+      "pattern": "74278bda-b644-4520-8f0c-720eaf059935",
+      "pattern_type": "ble_uuid",
+      "description": "Unattributed identifier",
+      "argus_record_id": "ebd37cfb7df847af"
     },
     {
       "pattern": "1701ASPR1431121",
@@ -4200,6 +5100,12 @@
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "ec251088bab72011"
+    },
+    {
+      "pattern": "00003503-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "eca4a86334180d42"
     },
     {
       "pattern": "18077455",
@@ -4244,6 +5150,12 @@
       "argus_record_id": "eea6f74486eea9c0"
     },
     {
+      "pattern": "00003004-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SoundThinking gunshot_detect",
+      "argus_record_id": "ef1cd465d0f04914"
+    },
+    {
       "pattern": "Flock-230503",
       "pattern_type": "ssid",
       "description": "Flock Safety gunshot_detect",
@@ -4254,6 +5166,12 @@
       "pattern_type": "ssid",
       "description": "Flock Safety alpr",
       "argus_record_id": "ef29f65fa5ed8a78"
+    },
+    {
+      "pattern": "7dfc9003-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Unattributed identifier",
+      "argus_record_id": "ef8783d2fef9fdc4"
     },
     {
       "pattern": "1668BE10JA00",
@@ -4352,6 +5270,18 @@
       "argus_record_id": "f4c69500809c796e"
     },
     {
+      "pattern": "0000fca0-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Apple, Inc. bluetooth_tracker",
+      "argus_record_id": "f583c28cffb075cd"
+    },
+    {
+      "pattern": "0000fddb-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsung Electronics Co., Ltd. bluetooth_tracker",
+      "argus_record_id": "f587915e314f3714"
+    },
+    {
       "pattern": "19027N0000",
       "pattern_type": "drone_id_prefix",
       "description": "Elsight Ltd. drone",
@@ -4418,6 +5348,18 @@
       "argus_record_id": "fa714fb1bf249f86"
     },
     {
+      "pattern": "962ba181-4591-404a-833e-46d6aae2967e",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "fa7fd48f5caa7c4c"
+    },
+    {
+      "pattern": "962ba181-4591-404a-833e-46d6aae2967e",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "fa7fd48f5caa7c4c"
+    },
+    {
       "pattern": "00:90:b8",
       "pattern_type": "oui",
       "description": "Rohde & Schwarz imsi_catcher",
@@ -4428,6 +5370,24 @@
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
       "argus_record_id": "fad8a168c3efe8e8"
+    },
+    {
+      "pattern": "103d9fa3-fbb5-46ae-87e5-18d43978b593",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "fb1ce883eb52ee93"
+    },
+    {
+      "pattern": "103d9fa3-fbb5-46ae-87e5-18d43978b593",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "fb1ce883eb52ee93"
+    },
+    {
+      "pattern": "103d9fa3-fbb5-46ae-87e5-18d43978b593",
+      "pattern_type": "ble_uuid",
+      "description": "Axis Communications cctv_camera",
+      "argus_record_id": "fb1ce883eb52ee93"
     },
     {
       "pattern": "18918ZL0000",
@@ -4452,6 +5412,24 @@
       "pattern_type": "oui",
       "description": "Teledyne FLIR cctv_camera",
       "argus_record_id": "fc8c7a30ce583c15"
+    },
+    {
+      "pattern": "dbf464c1-b43c-4966-bd11-67eb3e5bca27",
+      "pattern_type": "ble_uuid",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "fcaa1b7746a4c583"
+    },
+    {
+      "pattern": "dbf464c1-b43c-4966-bd11-67eb3e5bca27",
+      "pattern_type": "ble_uuid",
+      "description": "Tiandy cctv_camera",
+      "argus_record_id": "fcaa1b7746a4c583"
+    },
+    {
+      "pattern": "0000fd7e-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsung Electronics Co., Ltd. bluetooth_tracker",
+      "argus_record_id": "fe5a8177d6721c9c"
     },
     {
       "pattern": "19069B020239",

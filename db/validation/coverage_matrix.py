@@ -147,7 +147,13 @@ DROPPED_REASONS: dict[str, str] = {
     # export_lynceus.py::DROPPED_REASONS verbatim — the reconcile gate at
     # export_lynceus.py::_reconcile requires byte-identical parity.
     "ble_protocol_byte_table": "ble_protocol_byte_table",
-    "ble_service_uuid": "ble_service_uuid",
+    # `ble_service_uuid` removed at MAC-359 (absorbed MAC-388) — now a §4.4 MAP
+    # survivor (→ ble_uuid, CP21 alias-collapse). SAR-18 parity: export_lynceus.py
+    # IDENTIFIER_TYPE_TO_PATTERN_TYPE carries the MAP entry; neither module keeps
+    # a ble_service_uuid drop bin. Bins here auto-derive from
+    # DROPPED_REASONS.values(), so removal is sufficient.
+    # `ble_company_id` STAYS DROPPED — MAC-360 (→ ble_manufacturer_id) is HELD
+    # (id4884); keep this key until that ratification lands.
     "ble_company_id": "ble_company_id",
     "frequency_band": "frequency_band",
     "ble_protocol_byte": "ble_protocol_byte",
@@ -242,6 +248,17 @@ PI_SELF_EXCLUDE_OUIS: frozenset[str] = frozenset(
 # The standard export (≥30 floor) retains them — they remain useful for
 # wider-net rich-import consumers.
 EXCLUDED_SOURCE_TYPES: frozenset[str] = frozenset({"inferred", "crowdsourced"})
+
+# §4.4 generic/reserved BLE-UUID export suppression (MAC-359, CEO Ruling 3;
+# absorbed at MAC-388). MUST mirror
+# `export_lynceus.py::GENERIC_RESERVED_UUID_SUPPRESS` byte-for-byte:
+# `_assign_drop_bin` and `export_lynceus.py::_classify_row` both bin a matching
+# row as `generic_reserved_uuid` at the identical priority (after the §4.4
+# type-drops, before the confidence/source gates), so `_reconcile`'s per-row
+# map-vs-writer cross-check agrees. Do NOT update one module without the other.
+GENERIC_RESERVED_UUID_SUPPRESS: frozenset[str] = frozenset(
+    {"0000ffff-0000-1000-8000-00805f9b34fb"}
+)
 
 # CP39 §7.5 carve-out — must mirror `export_lynceus.py` constant of the same
 # name. The two modules cross-check at `_reconcile`-time and halt on any
@@ -348,6 +365,9 @@ class DropBinTally:
     confidence_floor: int
     drop_pi_self_exclude: bool
     unknown_category: int
+    # §4.4 (MAC-359; absorbed MAC-388) — generic/reserved BLE-UUID value
+    # suppression bin.
+    generic_reserved_uuid: int
     procurement_only: int
     self_exclude_oui: int
     below_confidence_threshold: int
@@ -620,6 +640,13 @@ def _assign_drop_bin(
     # values are the bin labels.
     if row.identifier_type in DROPPED_REASONS:
         return DROPPED_REASONS[row.identifier_type]
+    # §4.4 (MAC-359 CEO Ruling 3; absorbed MAC-388) — generic/reserved BLE-UUID
+    # value suppression. Mirrors `export_lynceus.py::_classify_row` at the
+    # identical priority (after the §4.4 type-drops, before the Pi self-exclude /
+    # confidence gates) so the per-row drop_assignments map reconciles with the
+    # writer.
+    if row.identifier in GENERIC_RESERVED_UUID_SUPPRESS:
+        return "generic_reserved_uuid"
     if drop_pi_self_exclude and matches_pi_self_exclude(
         row.identifier, row.identifier_type
     ):
@@ -648,6 +675,8 @@ def _compute_drop_tally(
 ) -> DropBinTally:
     bins: dict[str, int] = {
         "unknown_category": 0,
+        # §4.4 (MAC-359; absorbed MAC-388) — generic/reserved BLE-UUID bin.
+        "generic_reserved_uuid": 0,
         "procurement_only": 0,
         "self_exclude_oui": 0,
         "below_confidence_threshold": 0,
@@ -687,6 +716,7 @@ def _compute_drop_tally(
         confidence_floor=confidence_floor,
         drop_pi_self_exclude=drop_pi_self_exclude,
         unknown_category=bins["unknown_category"],
+        generic_reserved_uuid=bins["generic_reserved_uuid"],
         procurement_only=bins["procurement_only"],
         self_exclude_oui=bins["self_exclude_oui"],
         below_confidence_threshold=bins["below_confidence_threshold"],
@@ -714,6 +744,7 @@ def _check_halts(
     # Reconciliation arithmetic — defense in depth.
     standard_sum = (
         standard.unknown_category
+        + standard.generic_reserved_uuid  # §4.4 (MAC-359; absorbed MAC-388)
         + standard.procurement_only
         + standard.self_exclude_oui
         + standard.below_confidence_threshold
@@ -739,6 +770,7 @@ def _check_halts(
         )
     high_conf_sum = (
         high_conf.unknown_category
+        + high_conf.generic_reserved_uuid  # §4.4 (MAC-359; absorbed MAC-388)
         + high_conf.procurement_only
         + high_conf.self_exclude_oui
         + high_conf.below_confidence_threshold
@@ -893,6 +925,8 @@ def report_to_dict(report: CoverageMatrixReport) -> dict:
 def _drop_tally_to_dict(t: DropBinTally) -> dict:
     bins: dict[str, int] = {
         "unknown_category": t.unknown_category,
+        # §4.4 (MAC-359; absorbed MAC-388) — generic/reserved BLE-UUID bin.
+        "generic_reserved_uuid": t.generic_reserved_uuid,
         "procurement_only": t.procurement_only,
         "self_exclude_oui": t.self_exclude_oui,
         "below_confidence_threshold": t.below_confidence_threshold,
@@ -1145,6 +1179,7 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
         lines.append("")
         bins_table = [
             ("`unknown_category` (§11 #13)", tally.unknown_category),
+            ("`generic_reserved_uuid` (§4.4 MAC-359)", tally.generic_reserved_uuid),
             ("`procurement_only` (§11 #14)", tally.procurement_only),
             ("`device_fingerprint` (§4.4)", tally.device_fingerprint),
             ("`ssid_pattern` (§4.4)", tally.ssid_pattern),

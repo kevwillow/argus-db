@@ -97,6 +97,17 @@ IDENTIFIER_TYPE_TO_PATTERN_TYPE: dict[str, str | None] = {
     "ssid_pattern": None,  # DROPPED per §4.4 (no regex in Lynceus v0.2)
     "ble_uuid": "ble_uuid",
     "ble_service": "ble_uuid",
+    # CP21 (§4.4) — alias-collapse to existing `ble_uuid` per the CP13
+    # `ble_service → ble_uuid` precedent (BLE service UUIDs ARE UUIDs for
+    # Lynceus). Ratified in the PROJECT_BIBLE.md §4.4 mapping table (CP21 /
+    # MAC-101 board sign-off e246a32a) but never implemented in this writer —
+    # the DROPPED_REASONS entry below carried a stale "awaiting §4.4 alias
+    # confirm" comment. MAC-359 closed the code-vs-Bible gap; absorbed here at
+    # MAC-388 (parent MAC-387) — MAC-359 half ONLY (the symmetric MAC-360
+    # `ble_company_id` half stays HELD/DROPPED, id4884). CP-ref is the existing
+    # CP21 (NOT a new CP — the parked-bundle "CP46" draft slot is superseded by
+    # this absorption; see BIBLE_AMENDMENTS CP45 reconciliation note).
+    "ble_service_uuid": "ble_uuid",  # MAP — CP21 alias-collapse (MAC-359, absorbed at MAC-388)
     "mac_range": None,  # expand or DROP per §4.4 (≤256 → expand else drop)
     "device_fingerprint": None,  # DROPPED per §4.4
     # CP13 (§4.4) — Wave G analytical-only types. All three are DROPPED-class:
@@ -149,8 +160,12 @@ DROPPED_REASONS: dict[str, str] = {
     # "carried in canonical DB but not in Lynceus pattern table v0.1"
     # disposition as the CP16 cluster.
     "ble_protocol_byte_table": "ble_protocol_byte_table",  # Sub-protocol byte table; not wire-pattern
-    "ble_service_uuid": "ble_service_uuid",  # Service-uuid variant of ble_service; awaiting §4.4 alias confirm
-    "ble_company_id": "ble_company_id",  # Company-id variant of ble_manufacturer_id; awaiting §4.4 alias confirm
+    # `ble_service_uuid` MOVED to IDENTIFIER_TYPE_TO_PATTERN_TYPE (MAP → ble_uuid)
+    # at MAC-359 — CP21 §4.4 alias-collapse, code-vs-Bible gap closed (absorbed
+    # at MAC-388). No drop bin retained for it (see bins dict below).
+    # `ble_company_id` STAYS DROPPED — MAC-360 (→ ble_manufacturer_id) is HELD
+    # (id4884); do NOT move it without that ratification.
+    "ble_company_id": "ble_company_id",  # Company-id variant of ble_manufacturer_id; MAC-360 HELD/DROPPED
     "frequency_band": "frequency_band",  # Parametric (GSM900/DCS1800/etc.) — not wire-pattern
     "ble_protocol_byte": "ble_protocol_byte",  # Sub-field byte — too coarse for Lynceus match
     "operator_profile": "operator_profile",  # G-17 corporate operator entity — analytical-only
@@ -310,6 +325,24 @@ def _cp39_flock_hunt_carveout(source_url: str | None) -> bool:
         return False
     return any(p in source_url for p in CP39_FLOCK_HUNT_CARVEOUT_URL_PATTERNS)
 
+
+# §4.4 generic/reserved BLE-UUID export suppression (MAC-359, CEO Ruling 3;
+# absorbed at MAC-388 / MAC-387). Value-keyed (not type-keyed) suppression of
+# structurally non-discriminating UUIDs that survive the §4.4
+# `ble_service_uuid -> ble_uuid` MAP but are false-positive magnets at Lynceus.
+# Policy-consistent with the existing §4.4 "overly-coarse" DROP rationale (cf.
+# `wifi_ie_element_id`): a reserved / placeholder SIG UUID carries near-zero
+# match discrimination and would fire on unrelated multi-vendor hardware.
+# Currently: SIG 16-bit 0xFFFF (`0000ffff-...`), reserved/placeholder, observed
+# multi-vendor (id 23051, Motorola Solutions WAVE APK). Suppressing at export
+# keeps the real canonical row intact (no DB deletion) while withholding it from
+# the consumer feed; the drop is counted in the `generic_reserved_uuid` bin
+# (visible in the coverage report — no silent suppression). Coordinated sibling:
+# `coverage_matrix.py::GENERIC_RESERVED_UUID_SUPPRESS` must use the identical set
+# (the `_reconcile` map-vs-writer cross-check halts on any divergence).
+GENERIC_RESERVED_UUID_SUPPRESS: frozenset[str] = frozenset(
+    {"0000ffff-0000-1000-8000-00805f9b34fb"}
+)
 
 # §4.4 mac_range expansion ceiling.
 MAC_RANGE_EXPANSION_CEILING = 256
@@ -615,6 +648,14 @@ def _classify_row(
     # Out of CP16 scope.
     if row.identifier_type in DROPPED_REASONS:
         return DROPPED_REASONS[row.identifier_type], []
+    # §4.4 (MAC-359 CEO Ruling 3; absorbed at MAC-388) — generic/reserved
+    # BLE-UUID suppression. Sits AFTER the §4.4 type-drops and BEFORE the
+    # confidence/source gates: the drop reason is structural (a reserved,
+    # non-discriminating UUID value), not confidence- or source-based, so it
+    # must attribute regardless of those. `coverage_matrix.py::_assign_drop_bin`
+    # carries the identical gate at the identical priority (reconcile parity).
+    if row.identifier in GENERIC_RESERVED_UUID_SUPPRESS:
+        return "generic_reserved_uuid", []
     # §8.4 / §11 #12 — Pi self-exclude OUI list (high-confidence file only).
     if (
         apply_pi_self_exclude
@@ -891,6 +932,9 @@ def _build_export(
 
     bins: dict[str, int] = {
         "unknown_category": 0,
+        # §4.4 (MAC-359; absorbed at MAC-388) — generic/reserved BLE-UUID
+        # value-suppression bin.
+        "generic_reserved_uuid": 0,
         "ssid_pattern": 0,
         "device_fingerprint": 0,
         # CP13 (§4.4) — Wave G analytical-only types (DROPPED-class).
@@ -919,8 +963,9 @@ def _build_export(
         # Migration 0018 / SAR-13 §S.3 — 14 net-new identifier_types from MAC-109.
         # See DROPPED_REASONS for rationale.
         "ble_protocol_byte_table": 0,
-        "ble_service_uuid": 0,
-        "ble_company_id": 0,
+        # "ble_service_uuid" removed at MAC-359 (absorbed MAC-388) — now
+        # MAP→ble_uuid (CP21), no drop bin.
+        "ble_company_id": 0,  # MAC-360 HELD — stays DROPPED
         "frequency_band": 0,
         "ble_protocol_byte": 0,
         "operator_profile": 0,
@@ -1060,6 +1105,7 @@ def _build_coverage_report_md(
     def fmt_bin_table(bins: dict[str, int], label: str, threshold: int) -> str:
         bin_rows = [
             ("unknown_category (§11 #13)", bins["unknown_category"]),
+            ("generic_reserved_uuid (§4.4 MAC-359)", bins["generic_reserved_uuid"]),
             ("procurement_only (§11 #14)", bins["procurement_only"]),
             ("device_fingerprint (§4.4)", bins["device_fingerprint"]),
             ("ssid_pattern (§4.4)", bins["ssid_pattern"]),
@@ -1082,7 +1128,7 @@ def _build_coverage_report_md(
             ("alpr_model (§4.4 CP16)", bins["alpr_model"]),
             # Migration 0018 / SAR-13 §S.3 — MAC-109 vocab-extension cluster.
             ("ble_protocol_byte_table (§4.4 mig0018)", bins["ble_protocol_byte_table"]),
-            ("ble_service_uuid (§4.4 mig0018)", bins["ble_service_uuid"]),
+            # ble_service_uuid removed at MAC-359 (absorbed MAC-388) — now MAP→ble_uuid (CP21); no drop bin.
             ("ble_company_id (§4.4 mig0018)", bins["ble_company_id"]),
             ("frequency_band (§4.4 mig0018)", bins["frequency_band"]),
             ("ble_protocol_byte (§4.4 mig0018)", bins["ble_protocol_byte"]),
