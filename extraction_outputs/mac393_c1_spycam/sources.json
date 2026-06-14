@@ -1,0 +1,126 @@
+{
+ "cohort": "MAC-393 c1 - Covert / hidden WiFi cameras (spy cams)",
+ "worker": "SourceWorker",
+ "phase": "harvest (STAGE ONLY)",
+ "device_category": "cctv_camera (exists)",
+ "generated_at": "2026-06-14T15:25:19Z",
+ "sources_mined": [
+  {
+   "source_name": "IEEE OUI registry (MA-L / MA-M / MA-S)",
+   "source_type": "primary_registry",
+   "source_url": "https://standards-oui.ieee.org/oui/oui.csv ; /oui/mam.csv ; /oui/oui36.csv",
+   "license_posture": "public domain registry data (IEEE registration authority)",
+   "fetched_at": "2026-06-13T20:30:34Z (on-disk corpus, re-used)",
+   "files": {
+    "oui.csv": "raw/ieee_oui/20260613T203034Z_oui.csv (sha256 fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe)",
+    "mam.csv": "raw/ieee_oui/20260613T203034Z_mam.csv (sha256 6051d83628de28e1cf844f7a9efb91941212dc2d9e30911cbe4b2311933d7556)",
+    "oui36.csv": "raw/ieee_oui/20260613T203034Z_oui36.csv (sha256 ed33886b9f56b087aa72c8c6a0681d27bd6dd4fec807af49bd79f77c2b9a3414)"
+   },
+   "yield": "22 net-new SoC-vendor OUIs (Allwinner/Ambarella/Goke/HiSilicon/Ingenic/MStar/Novatek/Rockchip/SigmaStar)",
+   "caveat": "multi-purpose SoC vendors -> OUI-level device_category stays 'unknown' (\u00a78.4) -> \u00a711#13 export-banned absent model-level evidence."
+  },
+  {
+   "source_name": "OpenIPC firmware corpus",
+   "source_type": "manufacturer_doc/crowdsourced (binary-anchor)",
+   "source_url": "https://github.com/OpenIPC/firmware @ fdae8bdddc163b6ff817a07c16a7634c466d7442",
+   "license_posture": "MIT (repo LICENSE, (c)2021 OpenIPC) - permissive, \u00a711#16 facts-only clean",
+   "fetched_at": "2026-06-13T21:54:46Z (catalog) + 2026-06-14 (6 representative defconfigs re-fetched this run)",
+   "files": {
+    "soc_vendor_map": "raw/openipc/20260613T215446Z/firmware/_derived_soc_vendor_map.json (121 defconfigs)",
+    "sample_defconfigs": "raw/openipc/.../br-ext-chip-{anyka,ingenic,sigmastar,hisilicon,goke,novatek}/configs/*_lite_defconfig"
+   },
+   "yield": "96 distinct SoC chipset codenames across 13 vendors",
+   "caveat": "86/96 ALREADY HELD as chipset_codename/cctv_camera; the 10 'net-new' are OpenIPC build-flavor suffixes (_neo/_dev/_glibc/_original), NOT distinct silicon -> genuine net-new ~= 0."
+  },
+  {
+   "source_name": "V380 Pro companion APK",
+   "source_type": "manufacturer_app",
+   "source_url": "https://apkcombo.com/v380-pro/com.macrovideo.v380pro/",
+   "package_id": "com.macrovideo.v380pro",
+   "version": "2.2.61 (vc201)",
+   "file_ext": "apks",
+   "byte_count": 336636054,
+   "sha256": "c92ad8ecad0c43bff01023596fc41fb710b917cf7c2b727cc28298e94f016c99",
+   "rel_path": "raw/vendor_apps/v380/com.macrovideo.v380pro/2.2.61/c92ad8ecad0c43bff01023596fc41fb710b917cf7c2b727cc28298e94f016c99.apks",
+   "license_posture": "manufacturer_app \u00a711#15 facts-only; raw binary gitignored (raw/ never committed)",
+   "fetched_at": "2026-06-14T15:25:19Z",
+   "mirror": "apkcombo.com (apkpure blocked 403)"
+  },
+  {
+   "source_name": "iCSee companion APK",
+   "source_type": "manufacturer_app",
+   "source_url": "https://apkcombo.com/icsee/com.xm.csee/",
+   "package_id": "com.xm.csee",
+   "version": "(versionName blank; vc78532)",
+   "file_ext": "apks",
+   "byte_count": 210985231,
+   "sha256": "4734e9579bfc37dff971e8a58773d12714a0f9bf24c9a5ca5e62d5d8a3b1b4aa",
+   "rel_path": "raw/vendor_apps/icsee/com.xm.csee/unknown/4734e9579bfc37dff971e8a58773d12714a0f9bf24c9a5ca5e62d5d8a3b1b4aa.apks",
+   "license_posture": "manufacturer_app \u00a711#15 facts-only; raw binary gitignored (raw/ never committed)",
+   "fetched_at": "2026-06-14T15:25:19Z",
+   "mirror": "apkcombo.com (apkpure blocked 403)"
+  },
+  {
+   "source_name": "CamHi Pro companion APK",
+   "source_type": "manufacturer_app",
+   "source_url": "https://apkcombo.com/camhipro/com.hichip.campro/",
+   "package_id": "com.hichip.campro",
+   "version": "3.1.98 (vc698)",
+   "file_ext": "apk",
+   "byte_count": 90050882,
+   "sha256": "59b0bd4ef32f25ee4cff03ae351eaf2cdb0ea420046a924aafdd16b97ebdac2c",
+   "rel_path": "raw/vendor_apps/camhi/com.hichip.campro/3.1.98/59b0bd4ef32f25ee4cff03ae351eaf2cdb0ea420046a924aafdd16b97ebdac2c.apk",
+   "license_posture": "manufacturer_app \u00a711#15 facts-only; raw binary gitignored (raw/ never committed)",
+   "fetched_at": "2026-06-14T15:25:19Z",
+   "mirror": "apkcombo.com (apkpure blocked 403)"
+  },
+  {
+   "source_name": "HDMiniCam companion APK",
+   "source_type": "manufacturer_app",
+   "source_url": "https://apkcombo.com/hdminicam/com.g_zhang.HDMiniCam/",
+   "package_id": "com.g_zhang.HDMiniCam",
+   "version": "1.7.6",
+   "file_ext": "apk",
+   "byte_count": 7715062,
+   "sha256": "128bb0655f6c192d7cab867280f088649a50659370679eacb000a71ad61e832a",
+   "rel_path": "raw/vendor_apps/hdminicam/com.g_zhang.HDMiniCam/1.7.6/128bb0655f6c192d7cab867280f088649a50659370679eacb000a71ad61e832a.apk",
+   "license_posture": "manufacturer_app \u00a711#15 facts-only; raw binary gitignored (raw/ never committed)",
+   "fetched_at": "2026-06-14T15:25:19Z",
+   "mirror": "apkcombo.com (apkpure blocked 403)"
+  }
+ ],
+ "sources_flagged": [
+  {
+   "source_name": "dropkick.sh (JulianOliver)",
+   "source_url": "https://github.com/JulianOliver/dropkick.sh",
+   "disposition": "HELD / NOT MINED",
+   "license_posture": "GPL-3.0 (restrictive/share-alike)",
+   "reason": "\u00a711#16 + source-triage \u00a70/\u00a71: GPL/AGPL/CC-BY-SA sources are HELD; worker STOPS and flags; CTO escalates to CEO before sourcing. No facts extracted, nothing cite-pasted from it.",
+   "fetched_at": "2026-06-14T15:25:19Z"
+  },
+  {
+   "source_name": "flock-you family (local corpus)",
+   "source_url": "raw/flock_you_family/20260613T204753Z/",
+   "disposition": "NOT APPLICABLE to cohort-1",
+   "license_posture": "mixed (vetted prior waves)",
+   "reason": "Flock Safety ALPR-specific (RAVEN/FALCON device configs); not consumer spy-cam SSID data. Out of cohort-1 scope.",
+   "fetched_at": "2026-06-14T15:25:19Z"
+  },
+  {
+   "source_name": "LookCam (com.view.ppcs) / YsxLite (com.ysxlite.cam)",
+   "source_url": "https://apkcombo.com/lookcam/com.view.ppcs/ ; https://apkcombo.com/ysxlite/com.ysxlite.cam/",
+   "disposition": "FETCH-DEFERRED (not blocking)",
+   "license_posture": "manufacturer_app (same posture as fetched apps)",
+   "reason": "apkcombo serves these via lazy per-variant XHR (no inline r2 link); 4 of 6 named apps fetched cover all major distinct P2P SDK families (Macrovideo/Xiongmai/HiChip/g_zhang). Recoverable in ExtractionWorker phase via the variant endpoint.",
+   "fetched_at": "2026-06-14T15:25:19Z"
+  },
+  {
+   "source_name": "routersploit P2P_wificam (threat9)",
+   "source_url": "https://github.com/threat9/routersploit",
+   "disposition": "NOT MINED",
+   "license_posture": "BSD-ish but ACTIVE-ATTACK TOOLING",
+   "reason": "\u00a711#5: no active-attack tooling guidance. Exploit framework; not an identification source.",
+   "fetched_at": "2026-06-14T15:25:19Z"
+  }
+ ]
+}

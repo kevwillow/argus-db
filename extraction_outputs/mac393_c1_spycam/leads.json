@@ -1,0 +1,134 @@
+[
+ {
+  "identifier_type": "ssid_pattern",
+  "value": "V380_*",
+  "vendor": "Macrovideo / V380",
+  "source": "V380 Pro APK",
+  "source_location": "raw/vendor_apps/v380/com.macrovideo.v380pro/2.2.61/c92ad8ecad0c43bff01023596fc41fb710b917cf7c2b727cc28298e94f016c99.apks::classes*.dex (string pool)",
+  "source_excerpt": "V380_  /  V380_Pro  (string literals); soft-AP config token 'ABL_NETWORK_SOFTAP_CFG'; SDK prefix 'MVSPT_*'; helper 'parseDeviceIDFormAPName()'",
+  "band": "manufacturer_app 70-85 (default-SSID sub-band)",
+  "db_presence": "NET-NEW (no V380* in identifiers)",
+  "notes": "Soft-AP pairing SSID family. Vendor setup guidance separately documents the AP labeled 'MV'+deviceID; APK confirms V380_ literal + MacroVideo (MV) SDK origin."
+ },
+ {
+  "identifier_type": "ssid_pattern",
+  "value": "iCSee*  /  XM (Xiongmai) device-ID AP",
+  "vendor": "Xiongmai / iCSee",
+  "source": "iCSee APK",
+  "source_location": "raw/vendor_apps/icsee/com.xm.csee/unknown/4734e9579bfc37dff971e8a58773d12714a0f9bf24c9a5ca5e62d5d8a3b1b4aa.apks::classes*.dex (string pool)",
+  "source_excerpt": "iCSee ; iCSee-alexa ; getICSEEHOME_NAME ; backend host m.xm030.com ; XMWifiManager / XMBleManager classes",
+  "band": "manufacturer_app 70-85",
+  "db_presence": "NET-NEW (no iCSee* in identifiers)",
+  "notes": "Xiongmai (XM) P2P SDK. iCSee app drives AP/soundwave + BLE pairing (XMBleManager). Device-side AP commonly device-ID-named; prefix family to confirm at WiGLE."
+ },
+ {
+  "identifier_type": "ssid_pattern",
+  "value": "IPCAM-*",
+  "vendor": "HiChip / CamHi",
+  "source": "CamHi Pro APK",
+  "source_location": "raw/vendor_apps/camhi/com.hichip.campro/3.1.98/59b0bd4ef32f25ee4cff03ae351eaf2cdb0ea420046a924aafdd16b97ebdac2c.apk::classes*.dex (string pool)",
+  "source_excerpt": "IPCAM ; IPCAM- ; CamHipro-%04d ; HiGetIPCAM ; soft-AP gateway http://192.168.55.1:15555/liteos/param.cgi?cmd=setwifiinfo&-ssid=",
+  "band": "manufacturer_app 70-85",
+  "db_presence": "NET-NEW (no IPCAM/CamHipro in identifiers)",
+  "notes": "HiChip HIP2P SDK. 'IPCAM-' soft-AP prefix + 'CamHipro-%04d' device-name generator. Gateway 192.168.55.1."
+ },
+ {
+  "identifier_type": "ssid_pattern",
+  "value": "HDMiniCam / HHMiniCam / iMiniCam / HCAM / CBHCAM",
+  "vendor": "g_zhang white-label",
+  "source": "HDMiniCam APK",
+  "source_location": "raw/vendor_apps/hdminicam/com.g_zhang.HDMiniCam/1.7.6/128bb0655f6c192d7cab867280f088649a50659370679eacb000a71ad61e832a.apk::classes*.dex (string pool)",
+  "source_excerpt": "HDMiniCam ; HHMiniCam ; iMiniCam ; MiniCam ; HCAM ; CBHCAM ; native cfg 'GET /set_wifi.cgi?encrypt=3&ssid=%s&wpa_psk=%s'",
+  "band": "manufacturer_app 70-85",
+  "db_presence": "NET-NEW",
+  "notes": "g_zhang/ESNAPP SDK. App-level device-brand tokens; see ESNAPP_* family list for the full white-label brand set (separate lead)."
+ },
+ {
+  "identifier_type": "ssid_pattern_family",
+  "value": "ESNAPP_* device-brand family (61 brands)",
+  "vendor": "g_zhang / HDMiniCam SDK",
+  "source": "HDMiniCam APK",
+  "source_location": "raw/vendor_apps/hdminicam/com.g_zhang.HDMiniCam/1.7.6/128bb0655f6c192d7cab867280f088649a50659370679eacb000a71ad61e832a.apk::classes*.dex (string pool)",
+  "source_excerpt": "ESNAPP_<BRAND> enum tokens: ACEHOME, BABYLEAF, BABYLOOK, BLACKLENS, BVCAM, CAMSDG, CBHCAM, CLEANCAM, DREAMPLUG, DREYCAM, ESMAR, EUROSPY, \u2026 (full list in esnapp_family member)",
+  "band": "manufacturer_app 70-85 (device_type_enum_value class, cf. \u00a78.2 CP17)",
+  "db_presence": "NET-NEW (none in identifiers)",
+  "notes": "White-label spy-cam brands the SDK supports (e.g. MATECAM, EUROSPY, BVCAM, SPYSITE, SKYEYE, BLACKLENS). Candidate broadcast-SSID-prefix families for the CTO WiGLE confirmation pass. Full 61-brand list in ssid_pattern_family.json."
+ },
+ {
+  "identifier_type": "firmware_branded_string",
+  "value": "/liteos/param.cgi?cmd=setwifiinfo (LiteOS cam)",
+  "vendor": "HiChip / CamHi",
+  "source": "CamHi Pro APK",
+  "source_location": "raw/vendor_apps/camhi/com.hichip.campro/3.1.98/59b0bd4ef32f25ee4cff03ae351eaf2cdb0ea420046a924aafdd16b97ebdac2c.apk::classes*.dex",
+  "source_excerpt": "http://192.168.55.1:15555/liteos/param.cgi?cmd=setwifiinfo&-ssid=",
+  "band": "manufacturer_app 70-85",
+  "db_presence": "NET-NEW",
+  "notes": "LiteOS firmware soft-AP wifi-config endpoint; firmware-branded."
+ },
+ {
+  "identifier_type": "firmware_branded_string",
+  "value": "/set_wifi.cgi?encrypt=3&ssid= (mini-cam fw)",
+  "vendor": "g_zhang / HDMiniCam",
+  "source": "HDMiniCam APK",
+  "source_location": "raw/vendor_apps/hdminicam/com.g_zhang.HDMiniCam/1.7.6/128bb0655f6c192d7cab867280f088649a50659370679eacb000a71ad61e832a.apk::lib/*/*.so",
+  "source_excerpt": "GET /set_wifi.cgi?encrypt=3&ssid=%s&wpa_psk=%s HTTP/1.1",
+  "band": "manufacturer_app 70-85",
+  "db_presence": "NET-NEW",
+  "notes": "Native-lib firmware wifi-config endpoint."
+ },
+ {
+  "identifier_type": "softap_gateway_ip(context)",
+  "value": "192.168.55.1",
+  "vendor": "CamHi",
+  "source": "CamHi APK",
+  "source_location": "raw/vendor_apps/camhi/com.hichip.campro/3.1.98/59b0bd4ef32f25ee4cff03ae351eaf2cdb0ea420046a924aafdd16b97ebdac2c.apk::strings",
+  "source_excerpt": "192.168.55.1",
+  "band": "context-only (not a promotable identifier)",
+  "db_presence": "n/a",
+  "notes": "Soft-AP default gateway during pairing; supports device-class fingerprint, not a standalone identifier."
+ },
+ {
+  "identifier_type": "softap_gateway_ip(context)",
+  "value": "192.168.10.1",
+  "vendor": "iCSee",
+  "source": "iCSee APK",
+  "source_location": "raw/vendor_apps/icsee/com.xm.csee/unknown/4734e9579bfc37dff971e8a58773d12714a0f9bf24c9a5ca5e62d5d8a3b1b4aa.apks::strings",
+  "source_excerpt": "192.168.10.1",
+  "band": "context-only (not a promotable identifier)",
+  "db_presence": "n/a",
+  "notes": "Soft-AP default gateway during pairing; supports device-class fingerprint, not a standalone identifier."
+ },
+ {
+  "identifier_type": "softap_gateway_ip(context)",
+  "value": "192.168.10.1 / 192.168.11.1",
+  "vendor": "HDMiniCam",
+  "source": "HDMiniCam APK",
+  "source_location": "raw/vendor_apps/hdminicam/com.g_zhang.HDMiniCam/1.7.6/128bb0655f6c192d7cab867280f088649a50659370679eacb000a71ad61e832a.apk::strings",
+  "source_excerpt": "192.168.10.1 / 192.168.11.1",
+  "band": "context-only (not a promotable identifier)",
+  "db_presence": "n/a",
+  "notes": "Soft-AP default gateway during pairing; supports device-class fingerprint, not a standalone identifier."
+ },
+ {
+  "identifier_type": "softap_gateway_ip(context)",
+  "value": "192.168.1.1 / 192.168.123.1",
+  "vendor": "V380",
+  "source": "V380 APK",
+  "source_location": "raw/vendor_apps/v380/com.macrovideo.v380pro/2.2.61/c92ad8ecad0c43bff01023596fc41fb710b917cf7c2b727cc28298e94f016c99.apks::strings",
+  "source_excerpt": "192.168.1.1 / 192.168.123.1",
+  "band": "context-only (not a promotable identifier)",
+  "db_presence": "n/a",
+  "notes": "Soft-AP default gateway during pairing; supports device-class fingerprint, not a standalone identifier."
+ },
+ {
+  "identifier_type": "ble_service_uuid",
+  "value": "(candidates - mostly framework/cross-vendor FP)",
+  "vendor": "multiple",
+  "source": "all 4 APKs",
+  "source_location": "classes*.dex + lib/*.so",
+  "source_excerpt": "cross-vendor cluster (EXCLUDE): 258eafa5-e914-47da-95ca-c5ab0dc85b11, 629a824d-c717-4ba5-bc0f-3f3968554d01, 478cb909-6ad1-4e12-84cc-b3629a789f93 (each in >=2 different-vendor apps); known-fake aaaaaaaa-...; std SIG GATT 0000xxxx-0000-1000-8000-00805f9b34fb. Vendor-specific singletons: icsee 4ab9421d-661b-4e0a-a840-95e06516da84 / 68ebda22-9cbd-423f-98ce-78f571b6308b ; v380 d861b25a-1edf-11eb-adc1-0242ac120002 ; camhi ff9a3f03-56ef-4613-bdd5-5a41c1d07246",
+  "band": "manufacturer_app 80-95 IF vendor-specific & corroborated; FP-class otherwise",
+  "db_presence": "not checked per-value (defer to ExtractionWorker)",
+  "notes": "FLAG: cross-vendor UUIDs EXCLUDED per wave-1 0xFE59 ruling + \u00a78.4/SAR-11. Only the per-app singletons are candidate vendor UUIDs; require ExtractionWorker FP-triage before any promotion."
+ }
+]

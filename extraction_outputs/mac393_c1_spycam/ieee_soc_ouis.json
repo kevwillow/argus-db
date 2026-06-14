@@ -1,0 +1,178 @@
+[
+ {
+  "vendor_key": "Allwinner",
+  "registry": "MA-L",
+  "oui": "DC446D",
+  "org": "Allwinner Technology Co., Ltd",
+  "raw_line": "MA-L,DC446D,\"Allwinner Technology Co., Ltd\",\"No.9 Technology Road 2, High-Tech Zone Zhuhai Guangdong CN 519085 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "SigmaStar",
+  "registry": "MA-L",
+  "oui": "009D85",
+  "org": "Sigmastar Technology Ltd.",
+  "raw_line": "MA-L,009D85,Sigmastar Technology Ltd.,\"No. 1, HoZan Road, Tong'an District X iamen Fujian Province CN 361100 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Allwinner",
+  "registry": "MA-L",
+  "oui": "A017F1",
+  "org": "Allwinner Technology Co., Ltd",
+  "raw_line": "MA-L,A017F1,\"Allwinner Technology Co., Ltd\",\"No.9 Technology Road 2, High-Tech Zone Zhuhai Guangdong CN 519085 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Allwinner",
+  "registry": "MA-L",
+  "oui": "A8F1B2",
+  "org": "Allwinner Technology Co., Ltd",
+  "raw_line": "MA-L,A8F1B2,\"Allwinner Technology Co., Ltd\",\"No.9 Technology Road 2, High-Tech Zone Zhuhai Guangdong CN 519085 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "SigmaStar",
+  "registry": "MA-L",
+  "oui": "241407",
+  "org": "Xiamen Sigmastar Technology Ltd.",
+  "raw_line": "MA-L,241407,Xiamen Sigmastar Technology Ltd.,\"15th Floor ,Unit A,Chuangxin Building, Software Park, Xiamen Torch Hi-Tech Industrial Development Zone, Xiamen,China Xiamen Fujian CN 361005 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Goke",
+  "registry": "MA-L",
+  "oui": "3CB53D",
+  "org": "HUNAN GOKE MICROELECTRONICS CO.,LTD",
+  "raw_line": "MA-L,3CB53D,\"HUNAN GOKE MICROELECTRONICS CO.,LTD\",\"No.9, East 10th Road(South), Xingsha, Changsha Changsha HUNAN CN 410131  \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "SigmaStar",
+  "registry": "MA-L",
+  "oui": "507B91",
+  "org": "Sigmastar Technology Ltd.",
+  "raw_line": "MA-L,507B91,Sigmastar Technology Ltd.,\"No. 1, HoZan Road, Tong'an District X iamen Fujian Province CN 361100 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "SigmaStar",
+  "registry": "MA-L",
+  "oui": "D07CB2",
+  "org": "Sigmastar Technology Ltd.",
+  "raw_line": "MA-L,D07CB2,Sigmastar Technology Ltd.,\"No. 1, HoZan Road, Tong'an District X iamen Fujian Province CN 361100 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Ingenic",
+  "registry": "MA-L",
+  "oui": "D03110",
+  "org": "Ingenic Semiconductor Co.,Ltd",
+  "raw_line": "MA-L,D03110,\"Ingenic Semiconductor Co.,Ltd\",\"Room 108,Building A,Information Center Zhongguancun Software Park 8 Dongbeiwang West Road,Haidain District Beijing  CN 100193 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Allwinner",
+  "registry": "MA-L",
+  "oui": "189E2D",
+  "org": "Allwinner Technology Co., Ltd",
+  "raw_line": "MA-L,189E2D,\"Allwinner Technology Co., Ltd\",\"No.9 Technology Road 2, High-Tech Zone Zhuhai Guangdong CN 519085 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "HiSilicon",
+  "registry": "MA-L",
+  "oui": "848A59",
+  "org": "Hisilicon Technologies Co., Ltd",
+  "raw_line": "MA-L,848A59,\"Hisilicon Technologies Co., Ltd\",Longgang District Shenzhen Guandong CN 518129 ",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "SigmaStar",
+  "registry": "MA-L",
+  "oui": "14C9CF",
+  "org": "Sigmastar Technology Ltd.",
+  "raw_line": "MA-L,14C9CF,Sigmastar Technology Ltd.,\"No. 1, HoZan Road, Tong'an District X iamen Fujian Province CN 361100 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Allwinner",
+  "registry": "MA-L",
+  "oui": "2C572C",
+  "org": "Allwinner Technology Co., Ltd",
+  "raw_line": "MA-L,2C572C,\"Allwinner Technology Co., Ltd\",\"No.9 Technology Road 2, High-Tech Zone Zhuhai Guangdong CN 519085 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Novatek",
+  "registry": "MA-L",
+  "oui": "38EC11",
+  "org": "Novatek Microelectronics Corp.",
+  "raw_line": "MA-L,38EC11,Novatek Microelectronics Corp.,\"No.1-2 Innovation Rd I., Hsinchu  TW 300 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "MStar",
+  "registry": "MA-L",
+  "oui": "0014B9",
+  "org": "MSTAR SEMICONDUCTOR",
+  "raw_line": "MA-L,0014B9,MSTAR SEMICONDUCTOR,11-13 rue Ren\u00e9 Jacques Issy les Moulineaux  FR 92130 ",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Allwinner",
+  "registry": "MA-L",
+  "oui": "60C22A",
+  "org": "Allwinner Technology Co., Ltd",
+  "raw_line": "MA-L,60C22A,\"Allwinner Technology Co., Ltd\",\"No.9 Technology Road 2, High-Tech Zone Zhuhai Guangdong CN 519085 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "SigmaStar",
+  "registry": "MA-M",
+  "oui": "6095CE6",
+  "org": "Xiamen Sigmastar Technology Ltd.",
+  "raw_line": "MA-M,6095CE6,Xiamen Sigmastar Technology Ltd.,\"15th Floor ,Unit A,Chuangxin Building, Software Park, Xiamen Torch Hi-Tech Industrial Development Zone, Xiamen,China Xiamen Fujian CN 361005 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "MStar",
+  "registry": "MA-M",
+  "oui": "F0D7AFA",
+  "org": "MSTAR TECHNOLOGIES,INC",
+  "raw_line": "MA-M,F0D7AFA,\"MSTAR TECHNOLOGIES,INC\",#998 West Wenyi Road Hangzhou Zhejiang CN 310012 ",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Rockchip",
+  "registry": "MA-M",
+  "oui": "10DCB69",
+  "org": "Fuzhou Rockchip Electronics Co.,Ltd",
+  "raw_line": "MA-M,10DCB69,\"Fuzhou Rockchip Electronics Co.,Ltd\",\"No. 18 Building, A District, No.89,software Boulevard Fuzhou,Fujian,PRC Fuzhou FuJian CN 350003 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "MStar",
+  "registry": "MA-S",
+  "oui": "8C1F64AE2",
+  "org": "Jiangsu Yi Rong Mstar Technology Ltd.",
+  "raw_line": "MA-S,8C1F64AE2,Jiangsu Yi Rong Mstar Technology Ltd.,\"Building 1-4, No. 9, Yongfu Road, Dafeng Economic Development Zone,  Yancheng City Jiangsu CN 224199 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "MStar",
+  "registry": "MA-S",
+  "oui": "8C1F645F4",
+  "org": "Jiangsu Yi Rong Mstar Technology Ltd.",
+  "raw_line": "MA-S,8C1F645F4,Jiangsu Yi Rong Mstar Technology Ltd.,\"Building 1-4, No. 9, Yongfu Road, Dafeng Economic Development Zone,  Yancheng City Jiangsu CN 224199 \"",
+  "db_presence": []
+ },
+ {
+  "vendor_key": "Ambarella",
+  "registry": "MA-S",
+  "oui": "8C1F64C31",
+  "org": "Ambarella Inc.",
+  "raw_line": "MA-S,8C1F64C31,Ambarella Inc.,Santa Clara office 3101 Jay Street Santa Clara CA US 95054 ",
+  "db_presence": []
+ }
+]

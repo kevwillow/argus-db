@@ -1,0 +1,674 @@
+[
+ {
+  "vendor": "allwinner",
+  "chipset_codename": "v83x",
+  "path": "br-ext-chip-allwinner/configs/v83x_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "allwinner",
+  "chipset_codename": "v851s",
+  "path": "br-ext-chip-allwinner/configs/v851s_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ambarella",
+  "chipset_codename": "s2l22m",
+  "path": "br-ext-chip-ambarella/configs/s2l22m_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ambarella",
+  "chipset_codename": "s2l33m",
+  "path": "br-ext-chip-ambarella/configs/s2l33m_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ambarella",
+  "chipset_codename": "s3l",
+  "path": "br-ext-chip-ambarella/configs/s3l_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "anyka",
+  "chipset_codename": "ak3916ev300",
+  "path": "br-ext-chip-anyka/configs/ak3916ev300_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "anyka",
+  "chipset_codename": "ak3918ev300",
+  "path": "br-ext-chip-anyka/configs/ak3918ev300_lite_defconfig",
+  "has_local_bytes": true,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8833v100",
+  "path": "br-ext-chip-fullhan/configs/fh8833v100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8852v100",
+  "path": "br-ext-chip-fullhan/configs/fh8852v100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8852v200",
+  "path": "br-ext-chip-fullhan/configs/fh8852v200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8852v210",
+  "path": "br-ext-chip-fullhan/configs/fh8852v210_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8856v100",
+  "path": "br-ext-chip-fullhan/configs/fh8856v100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8856v200",
+  "path": "br-ext-chip-fullhan/configs/fh8856v200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8856v210",
+  "path": "br-ext-chip-fullhan/configs/fh8856v210_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8858v200",
+  "path": "br-ext-chip-fullhan/configs/fh8858v200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "fullhan",
+  "chipset_codename": "fh8858v210",
+  "path": "br-ext-chip-fullhan/configs/fh8858v210_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7102",
+  "path": "br-ext-chip-goke/configs/gk7102_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7102s",
+  "path": "br-ext-chip-goke/configs/gk7102s_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7201v200",
+  "path": "br-ext-chip-goke/configs/gk7201v200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7202v300",
+  "path": "br-ext-chip-goke/configs/gk7202v300_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7205v200",
+  "path": "br-ext-chip-goke/configs/gk7205v200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7205v200_original",
+  "path": "br-ext-chip-goke/configs/gk7205v200_original_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7205v210",
+  "path": "br-ext-chip-goke/configs/gk7205v210_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7205v300",
+  "path": "br-ext-chip-goke/configs/gk7205v300_lite_defconfig",
+  "has_local_bytes": true,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7205v500",
+  "path": "br-ext-chip-goke/configs/gk7205v500_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "goke",
+  "chipset_codename": "gk7605v100",
+  "path": "br-ext-chip-goke/configs/gk7605v100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "grainmedia",
+  "chipset_codename": "gm8135",
+  "path": "br-ext-chip-grainmedia/configs/gm8135_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "grainmedia",
+  "chipset_codename": "gm8136",
+  "path": "br-ext-chip-grainmedia/configs/gm8136_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516av100",
+  "path": "br-ext-chip-hisilicon/configs/hi3516av100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516av100_neo",
+  "path": "br-ext-chip-hisilicon/configs/hi3516av100_neo_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516av200",
+  "path": "br-ext-chip-hisilicon/configs/hi3516av200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516av200_neo",
+  "path": "br-ext-chip-hisilicon/configs/hi3516av200_neo_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516av300",
+  "path": "br-ext-chip-hisilicon/configs/hi3516av300_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516av300_neo",
+  "path": "br-ext-chip-hisilicon/configs/hi3516av300_neo_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516cv100",
+  "path": "br-ext-chip-hisilicon/configs/hi3516cv100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516cv100_neo",
+  "path": "br-ext-chip-hisilicon/configs/hi3516cv100_neo_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516cv200",
+  "path": "br-ext-chip-hisilicon/configs/hi3516cv200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516cv200_neo",
+  "path": "br-ext-chip-hisilicon/configs/hi3516cv200_neo_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516cv300",
+  "path": "br-ext-chip-hisilicon/configs/hi3516cv300_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516cv300_neo",
+  "path": "br-ext-chip-hisilicon/configs/hi3516cv300_neo_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516cv500",
+  "path": "br-ext-chip-hisilicon/configs/hi3516cv500_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516cv6xx",
+  "path": "br-ext-chip-hisilicon/configs/hi3516cv6xx_ultimate_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516dv100",
+  "path": "br-ext-chip-hisilicon/configs/hi3516dv100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516dv200",
+  "path": "br-ext-chip-hisilicon/configs/hi3516dv200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516dv300",
+  "path": "br-ext-chip-hisilicon/configs/hi3516dv300_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516ev100",
+  "path": "br-ext-chip-hisilicon/configs/hi3516ev100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516ev200",
+  "path": "br-ext-chip-hisilicon/configs/hi3516ev200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516ev300",
+  "path": "br-ext-chip-hisilicon/configs/hi3516ev300_glibc_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516ev300_dev",
+  "path": "br-ext-chip-hisilicon/configs/hi3516ev300_dev_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3516ev300_neo",
+  "path": "br-ext-chip-hisilicon/configs/hi3516ev300_neo_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3518cv100",
+  "path": "br-ext-chip-hisilicon/configs/hi3518cv100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3518ev100",
+  "path": "br-ext-chip-hisilicon/configs/hi3518ev100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3518ev200",
+  "path": "br-ext-chip-hisilicon/configs/hi3518ev200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3518ev201",
+  "path": "br-ext-chip-hisilicon/configs/hi3518ev201_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3518ev300",
+  "path": "br-ext-chip-hisilicon/configs/hi3518ev300_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3519v101",
+  "path": "br-ext-chip-hisilicon/configs/hi3519v101_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3520dv200",
+  "path": "br-ext-chip-hisilicon/configs/hi3520dv200_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3536cv100",
+  "path": "br-ext-chip-hisilicon/configs/hi3536cv100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "hisilicon",
+  "chipset_codename": "hi3536dv100",
+  "path": "br-ext-chip-hisilicon/configs/hi3536dv100_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ingenic",
+  "chipset_codename": "t10",
+  "path": "br-ext-chip-ingenic/configs/t10_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ingenic",
+  "chipset_codename": "t20",
+  "path": "br-ext-chip-ingenic/configs/t20_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ingenic",
+  "chipset_codename": "t21",
+  "path": "br-ext-chip-ingenic/configs/t21_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ingenic",
+  "chipset_codename": "t23",
+  "path": "br-ext-chip-ingenic/configs/t23_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ingenic",
+  "chipset_codename": "t30",
+  "path": "br-ext-chip-ingenic/configs/t30_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ingenic",
+  "chipset_codename": "t31",
+  "path": "br-ext-chip-ingenic/configs/t31_lite_defconfig",
+  "has_local_bytes": true,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ingenic",
+  "chipset_codename": "t31glibc",
+  "path": "br-ext-chip-ingenic/configs/t31glibc_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "NET-NEW"
+ },
+ {
+  "vendor": "ingenic",
+  "chipset_codename": "t40",
+  "path": "br-ext-chip-ingenic/configs/t40_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "novatek",
+  "chipset_codename": "nt98562",
+  "path": "br-ext-chip-novatek/configs/nt98562_lite_defconfig",
+  "has_local_bytes": true,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "novatek",
+  "chipset_codename": "nt98566",
+  "path": "br-ext-chip-novatek/configs/nt98566_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "rockchip",
+  "chipset_codename": "rv1103",
+  "path": "br-ext-chip-rockchip/configs/rv1103_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "rockchip",
+  "chipset_codename": "rv1106",
+  "path": "br-ext-chip-rockchip/configs/rv1106_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "rockchip",
+  "chipset_codename": "rv1109",
+  "path": "br-ext-chip-rockchip/configs/rv1109_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "rockchip",
+  "chipset_codename": "rv1126",
+  "path": "br-ext-chip-rockchip/configs/rv1126_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "msc313e",
+  "path": "br-ext-chip-sigmastar/configs/msc313e_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "msc316dc",
+  "path": "br-ext-chip-sigmastar/configs/msc316dc_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "msc316dm",
+  "path": "br-ext-chip-sigmastar/configs/msc316dm_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc30kd",
+  "path": "br-ext-chip-sigmastar/configs/ssc30kd_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc30kq",
+  "path": "br-ext-chip-sigmastar/configs/ssc30kq_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc325",
+  "path": "br-ext-chip-sigmastar/configs/ssc325_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc325de",
+  "path": "br-ext-chip-sigmastar/configs/ssc325de_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc333",
+  "path": "br-ext-chip-sigmastar/configs/ssc333_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc335",
+  "path": "br-ext-chip-sigmastar/configs/ssc335_lite_defconfig",
+  "has_local_bytes": true,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc335de",
+  "path": "br-ext-chip-sigmastar/configs/ssc335de_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc337",
+  "path": "br-ext-chip-sigmastar/configs/ssc337_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc337de",
+  "path": "br-ext-chip-sigmastar/configs/ssc337de_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc338q",
+  "path": "br-ext-chip-sigmastar/configs/ssc338q_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc377",
+  "path": "br-ext-chip-sigmastar/configs/ssc377_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc377d",
+  "path": "br-ext-chip-sigmastar/configs/ssc377d_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc377de",
+  "path": "br-ext-chip-sigmastar/configs/ssc377de_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc377qe",
+  "path": "br-ext-chip-sigmastar/configs/ssc377qe_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc378de",
+  "path": "br-ext-chip-sigmastar/configs/ssc378de_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "sigmastar",
+  "chipset_codename": "ssc378qe",
+  "path": "br-ext-chip-sigmastar/configs/ssc378qe_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "ti",
+  "chipset_codename": "dm36x",
+  "path": "br-ext-chip-ti/configs/dm36x_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "xiongmai",
+  "chipset_codename": "xm510",
+  "path": "br-ext-chip-xiongmai/configs/xm510_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "xiongmai",
+  "chipset_codename": "xm530",
+  "path": "br-ext-chip-xiongmai/configs/xm530_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ },
+ {
+  "vendor": "xiongmai",
+  "chipset_codename": "xm550",
+  "path": "br-ext-chip-xiongmai/configs/xm550_lite_defconfig",
+  "has_local_bytes": false,
+  "db": "HELD(chipset_codename/cctv_camera:1)"
+ }
+]
