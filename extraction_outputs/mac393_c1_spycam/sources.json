@@ -87,6 +87,36 @@
    "license_posture": "manufacturer_app \u00a711#15 facts-only; raw binary gitignored (raw/ never committed)",
    "fetched_at": "2026-06-14T15:25:19Z",
    "mirror": "apkcombo.com (apkpure blocked 403)"
+  },
+  {
+   "source_name": "LookCam companion APK",
+   "source_type": "manufacturer_app",
+   "source_url": "https://apkcombo.com/lookcam/com.view.ppcs/",
+   "package_id": "com.view.ppcs",
+   "version": "V1.2.9 (vc2026060501)",
+   "file_ext": "apk",
+   "byte_count": 76716636,
+   "sha256": "f90e0b5801f9fb62864eed183f3e7900baef5d5939a066d1ba2c6bb7e2a0f683",
+   "rel_path": "raw/vendor_apps/lookcam/com.view.ppcs/unknown/f90e0b5801f9fb62864eed183f3e7900baef5d5939a066d1ba2c6bb7e2a0f683.apk",
+   "license_posture": "manufacturer_app \u00a711#15 facts-only; raw binary gitignored (raw/ never committed)",
+   "fetched_at": "2026-06-14T21:30:00Z",
+   "mirror": "apkcombo.com -> pureapk CDN (variant /d?u= endpoint resolved via headless browser; apkpure 403)",
+   "yield": "PPCS (CS2 Network) + iLnk P2P SDK (com.tkzn.look_cam.ppcs.*); Ingenic T10/T20/T31 + HiSilicon SoC codenames (already-held); 0 net-new ssid_pattern (cloud-UID P2P, no soft-AP broadcast literal in dex/native); 0 net-new BLE (258eafa5 cross-vendor FP + all-zero)"
+  },
+  {
+   "source_name": "YsxLite companion APK",
+   "source_type": "manufacturer_app",
+   "source_url": "https://apkcombo.com/ysxlite/com.ysxlite.cam/",
+   "package_id": "com.ysxlite.cam",
+   "version": "1.64 (vc64)",
+   "file_ext": "xapk",
+   "byte_count": 96774609,
+   "sha256": "8d63d5b589c8fa310f9e80db276a069c4864069cfaf31d1cf248b8bd631859cf",
+   "rel_path": "raw/vendor_apps/ysxlite/com.ysxlite.cam/unknown/8d63d5b589c8fa310f9e80db276a069c4864069cfaf31d1cf248b8bd631859cf.xapk",
+   "license_posture": "manufacturer_app \u00a711#15 facts-only; raw binary gitignored (raw/ never committed)",
+   "fetched_at": "2026-06-14T21:30:00Z",
+   "mirror": "apkcombo.com -> pureapk CDN (XAPK split bundle; base com.ysxlite.cam.apk)",
+   "yield": "iLnk / Gwell P2P SDK (com.ilnk.service, IlnkApiMgr, edwin_ilnk.db); 0 net-new ssid_pattern (cloud-UID P2P, no soft-AP broadcast literal); BLE: 1 candidate singleton 0781feb2-bf4b-4ff8-be68-9149e288a420 (ExtractionWorker FP-triage); 68ebda22-... now proven CROSS-VENDOR (also in iCSee) -> EXCLUDE"
   }
  ],
  "sources_flagged": [
@@ -109,9 +139,9 @@
   {
    "source_name": "LookCam (com.view.ppcs) / YsxLite (com.ysxlite.cam)",
    "source_url": "https://apkcombo.com/lookcam/com.view.ppcs/ ; https://apkcombo.com/ysxlite/com.ysxlite.cam/",
-   "disposition": "FETCH-DEFERRED (not blocking)",
+   "disposition": "RESOLVED / FETCHED (2026-06-14T21:30Z heartbeat)",
    "license_posture": "manufacturer_app (same posture as fetched apps)",
-   "reason": "apkcombo serves these via lazy per-variant XHR (no inline r2 link); 4 of 6 named apps fetched cover all major distinct P2P SDK families (Macrovideo/Xiongmai/HiChip/g_zhang). Recoverable in ExtractionWorker phase via the variant endpoint.",
+   "reason": "Previously deferred (lazy per-variant XHR). Now FETCHED via apkcombo /d?u= variant endpoint resolved with a headless browser; both decompiled. FINDING: both are cloud-UID P2P families (LookCam=PPCS+iLnk, YsxLite=iLnk/Gwell), NOT soft-AP-SSID-broadcast families -> 0 net-new ssid_pattern. Confirms the cohort-1 SSID surface was already complete with the 4 soft-AP apps. See sources_mined entries.",
    "fetched_at": "2026-06-14T15:25:19Z"
   },
   {

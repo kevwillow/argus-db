@@ -47,6 +47,30 @@
    "sha256": "128bb0655f6c192d7cab867280f088649a50659370679eacb000a71ad61e832a",
    "rel_path": "raw/vendor_apps/hdminicam/com.g_zhang.HDMiniCam/1.7.6/128bb0655f6c192d7cab867280f088649a50659370679eacb000a71ad61e832a.apk",
    "source_url": "https://apkcombo.com/hdminicam/com.g_zhang.HDMiniCam/"
+  },
+  {
+   "app": "LookCam",
+   "vendor": "tkzn / com.view.ppcs (PPCS+iLnk P2P)",
+   "pkg": "com.view.ppcs",
+   "version": "V1.2.9",
+   "versionCode": "2026060501",
+   "ext": "apk",
+   "bytes": 76716636,
+   "sha256": "f90e0b5801f9fb62864eed183f3e7900baef5d5939a066d1ba2c6bb7e2a0f683",
+   "rel_path": "raw/vendor_apps/lookcam/com.view.ppcs/unknown/f90e0b5801f9fb62864eed183f3e7900baef5d5939a066d1ba2c6bb7e2a0f683.apk",
+   "source_url": "https://apkcombo.com/lookcam/com.view.ppcs/"
+  },
+  {
+   "app": "YsxLite",
+   "vendor": "com.ysxlite.cam (iLnk/Gwell P2P)",
+   "pkg": "com.ysxlite.cam",
+   "version": "1.64",
+   "versionCode": "64",
+   "ext": "xapk",
+   "bytes": 96774609,
+   "sha256": "8d63d5b589c8fa310f9e80db276a069c4864069cfaf31d1cf248b8bd631859cf",
+   "rel_path": "raw/vendor_apps/ysxlite/com.ysxlite.cam/unknown/8d63d5b589c8fa310f9e80db276a069c4864069cfaf31d1cf248b8bd631859cf.xapk",
+   "source_url": "https://apkcombo.com/ysxlite/com.ysxlite.cam/"
   }
  ],
  "esnapp_family": [
