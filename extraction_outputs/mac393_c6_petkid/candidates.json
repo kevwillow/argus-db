@@ -1,0 +1,2029 @@
+{
+  "_meta": {
+    "issue": "MAC-411",
+    "cohort": "MAC-393 wave-2 cohort 6 — Pet / kid cellular tracker (stalkerware-adjacent)",
+    "harvest_input": "MAC-399 (CTO-ratified) + operator_review/MAC-393/c6_petkid/harvest.md + extraction_outputs/mac393_c6_petkid/sources.json",
+    "scope": "EXTRACTION ONLY — candidates for CTO verify -> DBArchitect ingest. No DB write / migration / export regen / push. db/argus.db opened mode=ro.",
+    "taxonomy_one_way_door": "device_category 'gps_tracker' exists (122 rows); 'personal_tracker' does NOT (count=0). Every candidate is PROPOSED gps_tracker + notes.subtype='pet_kid_cellular' + category_pending_board_ratification. Board decides at ingest.",
+    "confidence_bands": "§8.2 — manufacturer_app 75-90 floor; brief caps companion-APK single-source UUIDs at <=75 (no family-size inflation, §11 #8). OUI primary_registry pure-play -> 85. local_name behavioral -> 50.",
+    "no_83_lift": "Every lead is single-source (one companion APK). Hub-and-spoke (same vendor across UUID types) is NOT value-level corroboration -> no §8.3 lift.",
+    "fp_triage_method": "baksmali dex disassembly xref (each contested UUID -> defining smali class), re-verified byte-present in the named vendor dex here.",
+    "harvest_singleton_resolution": "5 of the 7 Whistle 'singletons' resolve to genuine vendor SPPLE GATT (WCConstants field names) -> promoted (+5 over harvest's 48). 1 = BT-Classic SDP (flagged), 1 = Microsoft App Center secret (excluded).",
+    "excerpt_max_chars": 200,
+    "pii_redaction_count": 0,
+    "pii_note": "SAR-5 / §11 #3 — company legal-entity names + IEEE registry addresses only; person-name regex applied. APK deliverable carries UUID byte-forms + dex locations + sha256 pins only (§11 #15 facts-only); no APK code copied.",
+    "tile_guard": "Jiobit references Tile 0xFEEC/0xFEED (HELD id44440/44439 bluetooth_tracker, 'Tile, Inc.'). Life360 owns both -> cross-vendor, NEVER re-attributed.",
+    "export_note": "gps_tracker is an exported category; if the board maps c6 to gps_tracker these rows reach the Lynceus feed -> ingest+regen is a CEO one-way door."
+  },
+  "counts": {
+    "ble_service_uuid_promote": 53,
+    "  fi": 23,
+    "  jiobit": 10,
+    "  whistle": 20,
+    "  whistle_singletons_resolved_to_vendor": 5,
+    "ble_service_uuid_flagged_ambiguous": 1,
+    "ble_service_uuid_excluded_fp": 3,
+    "tile_held_cross_vendor": 2,
+    "oui_promote": 1,
+    "ble_local_name_bonus": 5,
+    "ble_company_id_net_new": 0,
+    "harvest_slate_was": 48,
+    "extraction_delta_vs_harvest": 5
+  },
+  "candidates": [
+    {
+      "identifier": "57b40001-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B40001-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40001-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "2217916d5700b5960df04f822ebb7a3f8a6e0235742723f1eed4ad87271397e7",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40002-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B40002-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40002-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "29450140bee8730b31d357840711d97090a82975273ce98d29fc8f8282becebf",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40003-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B40003-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40003-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "1da4018b6d27b6042ca5b52ef61ff028c92935fea1e2c9a2d8a8b0a9630af513",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40006-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B40006-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40006-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "ff046cc2036416cb022824a1d96ce7e04b15552a2a63ae1a41cbe014bb92e895",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40007-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B40007-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40007-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "141031b34faaa1171fb4134113ac2295238d24dd9945493e9b2e74a897476dd0",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b4000c-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B4000C-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B4000C-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "e6a9d5e8f04c007b386e90b0e88a0163e3593332a242bba8b1086b0c1e6363f2",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b4000d-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B4000D-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B4000D-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "90a9c1b29ab89c374b88df222ad49c298ab5ad5114a521223e62fb0aa79ee5df",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40013-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B40013-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40013-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "df41ad811a5ad8d04f3f0f01f653801dd80c48658340b50f6063752db90d6ac9",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40210-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B40210-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40210-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "0329c30af1e6b9aca6b1a74c680647be86ee94d630117cc2b10c3ba31b6e589c",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40211-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B40211-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40211-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "f984b254bc51275a04997e6a717cebfc0f5fe6f6737fee75a74ae3000276d006",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40212-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B40212-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40212-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "298c3139b04684286e797a14f92abf0bba9dd4abeef497ffb074dbb28ef3c2ce",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40213-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B40213-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40213-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "9eed6f3dbb9afd1baef169f0d2ab25a07d066ac89865f6e3f2fd16ad9092059b",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40214-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B40214-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40214-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "df4c67ea17734fd9175adc4f17c20a76d4cb977ad8f256544da728a78bcea2f9",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40215-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B40215-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40215-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "c86d7ec8808b52a259abd46d7f7189ef513791ad614c449407102dc472ca0b46",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40216-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B40216-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40216-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "18e567d3e79d444fcd6b5f75c5e81355f5054a492e2987a6c57ca5b0f034dd21",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b40217-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "57B40217-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B40217-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "aa32d4712461b8e784cff3c7926eff1ca1e981b0dd8342f0eb679a0e0d9da4bb",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b43001-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B43001-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B43001-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "2f9da4a8b3043bc1641fd12683fd1c142e426040bab41c5dba1f40e8cd8b9058",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b43002-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B43002-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B43002-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "b6dd7d3d7e37ed6eddba5df23c93b7ac370298ec47e11d2313c7d67074bc1ddd",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b43003-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B43003-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B43003-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "87c504da1614b08b774fa67c6447f5e99d332c1feb26274945d335c2a4169513",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b43004-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B43004-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B43004-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "9c37233a2f92bca4c467796418d05f5dda0898f617bbec3453d9e1c2e3d0f85c",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b44001-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B44001-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B44001-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "8e7e96dfd065f05e9dfc25184e802d405dc0fb1f85268cc225c96a4266f850a7",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b44022-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B44022-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B44022-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "3892c45f155baf631d479da98ceff7602d0eed7d11fe0d5aa15ef1e1fcde2f61",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "57b44023-2528-d6bc-b043-b49af0ec06c1",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes2.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes2.dex",
+        "byte_form": "57B44023-2528-D6BC-B043-B49AF0EC06C1",
+        "excerpt": "57B44023-2528-D6BC-B043-B49AF0EC06C1"
+      },
+      "source_row_key": "97869a540297b08def0bf821f5c4097ea5803e578955a2e7822dd233291adfad",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "R8-obfuscated app-own classes (o3/h24/ch8/df8/ba7/kf); shared vendor 128-bit base -2528-d6bc-b043-b49af0ec06c1, absent from all third-party library packages (value @ classes2.dex)",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "d8ecdb01-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "d8ecdb01-ddb6-4ffd-8f65-753cb9dc2e8a",
+        "excerpt": "d8ecdb01-ddb6-4ffd-8f65-753cb9dc2e8a"
+      },
+      "source_row_key": "a9c1a305d025489a1bd5e2474f3ad5e962cbb0642e120a07017ff2727e8d4e25",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "d8ecdb02-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "d8ecdb02-ddb6-4ffd-8f65-753cb9dc2e8a",
+        "excerpt": "d8ecdb02-ddb6-4ffd-8f65-753cb9dc2e8a"
+      },
+      "source_row_key": "6e5a5248a1e9e680d11ea5c2b56a25d5c31dd2da8789468102c57895b48d621f",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "d8ecdb03-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "d8ecdb03-ddb6-4ffd-8f65-753cb9dc2e8a",
+        "excerpt": "d8ecdb03-ddb6-4ffd-8f65-753cb9dc2e8a"
+      },
+      "source_row_key": "cbcf5bf44c0a83b2b7efb5391ec127a2c5142b3239af33076188c9ebf166d247",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "d8ecdb05-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "d8ecdb05-ddb6-4ffd-8f65-753cb9dc2e8a",
+        "excerpt": "d8ecdb05-ddb6-4ffd-8f65-753cb9dc2e8a"
+      },
+      "source_row_key": "cc7319bea964b6673dc421c13c0eb638de1dc342ce90c4b996c7aac33dc26231",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "d8ecdb08-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "d8ecdb08-ddb6-4ffd-8f65-753cb9dc2e8a",
+        "excerpt": "d8ecdb08-ddb6-4ffd-8f65-753cb9dc2e8a"
+      },
+      "source_row_key": "731ec7a3e3a8dea3505dceef5b07cddd32c4b127fb117d98cfde7c98fa2f6214",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "d8ecdb09-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "d8ecdb09-ddb6-4ffd-8f65-753cb9dc2e8a",
+        "excerpt": "d8ecdb09-ddb6-4ffd-8f65-753cb9dc2e8a"
+      },
+      "source_row_key": "00d6e6792f99fc0e6774100e94629d3fe41e4010560e2ef0d3fe507d80b8dafb",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "d8ecdb0a-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "d8ecdb0a-ddb6-4ffd-8f65-753cb9dc2e8a",
+        "excerpt": "d8ecdb0a-ddb6-4ffd-8f65-753cb9dc2e8a"
+      },
+      "source_row_key": "f9ded92691f649585e1e8551e3be8a618c0f6f85acd642376541866cc05a94c5",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "d8ecdb0b-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "d8ecdb0b-ddb6-4ffd-8f65-753cb9dc2e8a",
+        "excerpt": "d8ecdb0b-ddb6-4ffd-8f65-753cb9dc2e8a"
+      },
+      "source_row_key": "0a7a58488be0f606dfc04ad3100d6477fdbe91a14284f8362d81da2e194b8b23",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "0000db01-0000-1000-8000-00805f9b34fb",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "0000db01-0000-1000-8000-00805f9b34fb",
+        "excerpt": "0000db01-0000-1000-8000-00805f9b34fb"
+      },
+      "source_row_key": "4c6afd2d8b967e86967c6ff29a1dd5f3ebec8f1d8578dc31ec8f44575caeba21",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "4a000000-0000-1000-8000-00805f4a494f",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Jiobit (Life360, Inc.)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+        "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+        "dex_member": "classes3.dex :: Lae/b;",
+        "byte_form": "4a000000-0000-1000-8000-00805f4a494f",
+        "excerpt": "4a000000-0000-1000-8000-00805f4a494f"
+      },
+      "source_row_key": "1e2c16362755b024c90643fa74e4526bd5774fe6177bae054ff73ae85b36b08d",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "undetermined_r8_obfuscated",
+        "co_location": "Lae/b; @ classes3.dex — R8-obfuscated app-own class Lae/b; co-declares the d8ecdb family + 0xDB01 short + 4a..='JIO'(00805f4a494f) ASCII vendor marker together",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift"
+      }
+    },
+    {
+      "identifier": "00002760-08c2-11e1-9073-0e8ac72e1011",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_SERVICE_AMDTP",
+        "byte_form": "00002760-08c2-11e1-9073-0e8ac72e1011",
+        "excerpt": "00002760-08c2-11e1-9073-0e8ac72e1011"
+      },
+      "source_row_key": "f3d57368644b33a9b8a511ad37ba01e9c7365efe4b5d5212c259815abd6ece70",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "service",
+        "co_location": "UUID_SERVICE_AMDTP @ classes4.dex — Whistle vendor BLE constant UUID_SERVICE_AMDTP",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_SERVICE_AMDTP"
+      }
+    },
+    {
+      "identifier": "00002760-08c2-11e1-9073-0e8ac72e0011",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_AMDTP_DATA_TO_DEVICE",
+        "byte_form": "00002760-08c2-11e1-9073-0e8ac72e0011",
+        "excerpt": "00002760-08c2-11e1-9073-0e8ac72e0011"
+      },
+      "source_row_key": "daa5e18f4160ed62eba8d1d7870a11ef65f54b9ad9ddb87aebc9d6136c25d5c8",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "characteristic",
+        "co_location": "UUID_AMDTP_DATA_TO_DEVICE @ classes4.dex — Whistle vendor BLE constant UUID_AMDTP_DATA_TO_DEVICE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_AMDTP_DATA_TO_DEVICE"
+      }
+    },
+    {
+      "identifier": "00002760-08c2-11e1-9073-0e8ac72e0012",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_AMDTP_DATA_FROM_DEVICE",
+        "byte_form": "00002760-08c2-11e1-9073-0e8ac72e0012",
+        "excerpt": "00002760-08c2-11e1-9073-0e8ac72e0012"
+      },
+      "source_row_key": "3c31b4613842b3d4e336d997d4ee4f44ae8449197bc41a366e4073dd978d9685",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "characteristic",
+        "co_location": "UUID_AMDTP_DATA_FROM_DEVICE @ classes4.dex — Whistle vendor BLE constant UUID_AMDTP_DATA_FROM_DEVICE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_AMDTP_DATA_FROM_DEVICE"
+      }
+    },
+    {
+      "identifier": "00002760-08c2-11e1-9073-0e8ac72e0013",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_AMDTP_ACK",
+        "byte_form": "00002760-08c2-11e1-9073-0e8ac72e0013",
+        "excerpt": "00002760-08c2-11e1-9073-0e8ac72e0013"
+      },
+      "source_row_key": "8a36bde0b7a918af8760997a75ea844b16460ee5bb8e272727ceaa785be50406",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "characteristic",
+        "co_location": "UUID_AMDTP_ACK @ classes4.dex — Whistle vendor BLE constant UUID_AMDTP_ACK",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_AMDTP_ACK"
+      }
+    },
+    {
+      "identifier": "d7895ab1-acc7-4de3-b991-9e825c24c801",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_BLE_BEACON_PRESENCE",
+        "byte_form": "D7895AB1-ACC7-4DE3-B991-9E825C24C801",
+        "excerpt": "D7895AB1-ACC7-4DE3-B991-9E825C24C801"
+      },
+      "source_row_key": "34978037e47a0cfb4f5a89a15096624272de47ca644a8fde018a2a75ce4c988c",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "beacon_adv",
+        "co_location": "UUID_BLE_BEACON_PRESENCE @ classes4.dex — Whistle vendor BLE constant UUID_BLE_BEACON_PRESENCE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_BLE_BEACON_PRESENCE"
+      }
+    },
+    {
+      "identifier": "d7895ab1-acc7-4de3-b991-9e825c24c802",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_BLE_BEACON_LEGACY_DSR",
+        "byte_form": "D7895AB1-ACC7-4DE3-B991-9E825C24C802",
+        "excerpt": "D7895AB1-ACC7-4DE3-B991-9E825C24C802"
+      },
+      "source_row_key": "39682f9adac3bc93dcda257c5998f18b2ba361061a52d41f6173ebeee671d973",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "beacon_adv",
+        "co_location": "UUID_BLE_BEACON_LEGACY_DSR @ classes4.dex — Whistle vendor BLE constant UUID_BLE_BEACON_LEGACY_DSR",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_BLE_BEACON_LEGACY_DSR"
+      }
+    },
+    {
+      "identifier": "d7895ab1-acc7-4de3-b991-9e825c24c804",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_BLE_BEACON_PROX",
+        "byte_form": "D7895AB1-ACC7-4DE3-B991-9E825C24C804",
+        "excerpt": "D7895AB1-ACC7-4DE3-B991-9E825C24C804"
+      },
+      "source_row_key": "ab56a7514f94b182cacec98025e77749f0cc72840c2ffb3bdaa6613e5f6deaa5",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "beacon_adv",
+        "co_location": "UUID_BLE_BEACON_PROX @ classes4.dex — Whistle vendor BLE constant UUID_BLE_BEACON_PROX",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_BLE_BEACON_PROX"
+      }
+    },
+    {
+      "identifier": "d7895ab1-acc7-4de3-b991-9e825c24c809",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_BLE_BEACON_BUTTON_PRESS",
+        "byte_form": "D7895AB1-ACC7-4DE3-B991-9E825C24C809",
+        "excerpt": "D7895AB1-ACC7-4DE3-B991-9E825C24C809"
+      },
+      "source_row_key": "e52d5b18639d201123d0421b1de615ce2bc2c26c115fd3c4a63fa83da442dfb6",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "beacon_adv",
+        "co_location": "UUID_BLE_BEACON_BUTTON_PRESS @ classes4.dex — Whistle vendor BLE constant UUID_BLE_BEACON_BUTTON_PRESS",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_BLE_BEACON_BUTTON_PRESS"
+      }
+    },
+    {
+      "identifier": "d7895ab1-acc7-4de3-b991-9e825c24c80b",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_LEGACY_BUTTON2",
+        "byte_form": "D7895AB1-ACC7-4DE3-B991-9E825C24C80B",
+        "excerpt": "D7895AB1-ACC7-4DE3-B991-9E825C24C80B"
+      },
+      "source_row_key": "c6669c61af822dc3e0327bc592d84d90d121cbf7d3ce05d6355f16fe16cff908",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "beacon_adv",
+        "co_location": "UUID_LEGACY_BUTTON2 @ classes4.dex — Whistle vendor BLE constant UUID_LEGACY_BUTTON2",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_LEGACY_BUTTON2"
+      }
+    },
+    {
+      "identifier": "00c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_ADV_IND_BLANK",
+        "byte_form": "00c8245c-829e-91b9-e34d-c7acb15a89d7",
+        "excerpt": "00c8245c-829e-91b9-e34d-c7acb15a89d7"
+      },
+      "source_row_key": "f72ded4309af1aa0c0615d633415f3a995b88633c1ab1c1ec77a9ee51cda23e7",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "adv_ind",
+        "co_location": "UUID_ADV_IND_BLANK @ classes4.dex — Whistle vendor BLE constant UUID_ADV_IND_BLANK",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_ADV_IND_BLANK"
+      }
+    },
+    {
+      "identifier": "01c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_ADV_IND_LM_AVAILABLE",
+        "byte_form": "01c8245c-829e-91b9-e34d-c7acb15a89d7",
+        "excerpt": "01c8245c-829e-91b9-e34d-c7acb15a89d7"
+      },
+      "source_row_key": "88b67b4dd414a47594c37e1102b16ffc03a972e8e4bd5e66461fd47dbdf9b2e4",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "adv_ind",
+        "co_location": "UUID_ADV_IND_LM_AVAILABLE @ classes4.dex — Whistle vendor BLE constant UUID_ADV_IND_LM_AVAILABLE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_ADV_IND_LM_AVAILABLE"
+      }
+    },
+    {
+      "identifier": "02c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_ADV_IND_DSR",
+        "byte_form": "02c8245c-829e-91b9-e34d-c7acb15a89d7",
+        "excerpt": "02c8245c-829e-91b9-e34d-c7acb15a89d7"
+      },
+      "source_row_key": "37b7085d78871e078e9f19461f701e70946b0261f630214814216fb1505be6be",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "adv_ind",
+        "co_location": "UUID_ADV_IND_DSR @ classes4.dex — Whistle vendor BLE constant UUID_ADV_IND_DSR",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_ADV_IND_DSR"
+      }
+    },
+    {
+      "identifier": "04c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_ADV_IND_PROX",
+        "byte_form": "04c8245c-829e-91b9-e34d-c7acb15a89d7",
+        "excerpt": "04c8245c-829e-91b9-e34d-c7acb15a89d7"
+      },
+      "source_row_key": "7d7b59b812071f16221e31a707c7b781e99e7410f24b7078af255c7ead528434",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "adv_ind",
+        "co_location": "UUID_ADV_IND_PROX @ classes4.dex — Whistle vendor BLE constant UUID_ADV_IND_PROX",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_ADV_IND_PROX"
+      }
+    },
+    {
+      "identifier": "09c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_ADV_IND_BUTTON_PRESS",
+        "byte_form": "09c8245c-829e-91b9-e34d-c7acb15a89d7",
+        "excerpt": "09c8245c-829e-91b9-e34d-c7acb15a89d7"
+      },
+      "source_row_key": "18d41d4be5e03f8dd21d9eaf0af1b000808a0160ea4d81062ad1db495cf817c2",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "adv_ind",
+        "co_location": "UUID_ADV_IND_BUTTON_PRESS @ classes4.dex — Whistle vendor BLE constant UUID_ADV_IND_BUTTON_PRESS",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_ADV_IND_BUTTON_PRESS"
+      }
+    },
+    {
+      "identifier": "11c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: UUID_ADV_IND_BUTTON_PRESS_2",
+        "byte_form": "11c8245c-829e-91b9-e34d-c7acb15a89d7",
+        "excerpt": "11c8245c-829e-91b9-e34d-c7acb15a89d7"
+      },
+      "source_row_key": "6f0e62e8f98ed4de5362567a1586d16a0a44f5554b7d16d355f5a3470449b495",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "adv_ind",
+        "co_location": "UUID_ADV_IND_BUTTON_PRESS_2 @ classes4.dex — Whistle vendor BLE constant UUID_ADV_IND_BUTTON_PRESS_2",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_ADV_IND_BUTTON_PRESS_2"
+      }
+    },
+    {
+      "identifier": "14839ac4-7d7e-415c-9a42-167340cf2339",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_SERVICE_SPPLE",
+        "byte_form": "14839ac4-7d7e-415c-9a42-167340cf2339",
+        "excerpt": "14839ac4-7d7e-415c-9a42-167340cf2339"
+      },
+      "source_row_key": "1d37b483447c4ac19baecbb954d14849edeb4a35a95dab05c5aea5b37b993660",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "service",
+        "co_location": "UUID_SERVICE_SPPLE @ classes4.dex — Whistle vendor BLE constant UUID_SERVICE_SPPLE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_SERVICE_SPPLE",
+        "harvest_singleton_resolved_to_vendor": true,
+        "resolution": "harvest flagged as singleton needing FP-triage; resolved to genuine Whistle SPPLE GATT via WCConstants field name (+over harvest's 48-slate)"
+      }
+    },
+    {
+      "identifier": "0734594a-a8e7-4b1a-a6b1-cd5243059a57",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_SPPLE_DATA_FROM_DEVICE",
+        "byte_form": "0734594a-a8e7-4b1a-a6b1-cd5243059a57",
+        "excerpt": "0734594a-a8e7-4b1a-a6b1-cd5243059a57"
+      },
+      "source_row_key": "ca94e165a77d9748d6b0e618cf9ddbbf9f0bbdad56a57f7fc5cfa53754b1a8d5",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "characteristic",
+        "co_location": "UUID_SPPLE_DATA_FROM_DEVICE @ classes4.dex — Whistle vendor BLE constant UUID_SPPLE_DATA_FROM_DEVICE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_SPPLE_DATA_FROM_DEVICE",
+        "harvest_singleton_resolved_to_vendor": true,
+        "resolution": "harvest flagged as singleton needing FP-triage; resolved to genuine Whistle SPPLE GATT via WCConstants field name (+over harvest's 48-slate)"
+      }
+    },
+    {
+      "identifier": "8b00ace7-eb0b-49b0-bbe9-9aee0a26e1a3",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_SPPLE_DATA_TO_DEVICE",
+        "byte_form": "8b00ace7-eb0b-49b0-bbe9-9aee0a26e1a3",
+        "excerpt": "8b00ace7-eb0b-49b0-bbe9-9aee0a26e1a3"
+      },
+      "source_row_key": "c9b3681a17dc5e728c32c833fc4f463b106ca929a2f4966fa40d0e1ce72952a2",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "characteristic",
+        "co_location": "UUID_SPPLE_DATA_TO_DEVICE @ classes4.dex — Whistle vendor BLE constant UUID_SPPLE_DATA_TO_DEVICE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_SPPLE_DATA_TO_DEVICE",
+        "harvest_singleton_resolved_to_vendor": true,
+        "resolution": "harvest flagged as singleton needing FP-triage; resolved to genuine Whistle SPPLE GATT via WCConstants field name (+over harvest's 48-slate)"
+      }
+    },
+    {
+      "identifier": "e06d5efb-4f4a-45c0-9eb1-371ae5a14ad4",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_SPPLE_CREDITS_FROM_DEVICE",
+        "byte_form": "e06d5efb-4f4a-45c0-9eb1-371ae5a14ad4",
+        "excerpt": "e06d5efb-4f4a-45c0-9eb1-371ae5a14ad4"
+      },
+      "source_row_key": "e17a1674bdc5eaf8eb55f0a2883e6b5d72f0176f274e0aec6f9846158d82a511",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "characteristic",
+        "co_location": "UUID_SPPLE_CREDITS_FROM_DEVICE @ classes4.dex — Whistle vendor BLE constant UUID_SPPLE_CREDITS_FROM_DEVICE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_SPPLE_CREDITS_FROM_DEVICE",
+        "harvest_singleton_resolved_to_vendor": true,
+        "resolution": "harvest flagged as singleton needing FP-triage; resolved to genuine Whistle SPPLE GATT via WCConstants field name (+over harvest's 48-slate)"
+      }
+    },
+    {
+      "identifier": "ba04c4b2-892b-43be-b69c-5d13f2195392",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 75,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "promote",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: UUID_SPPLE_CREDITS_TO_DEVICE",
+        "byte_form": "ba04c4b2-892b-43be-b69c-5d13f2195392",
+        "excerpt": "ba04c4b2-892b-43be-b69c-5d13f2195392"
+      },
+      "source_row_key": "eef437c162fd2fe427eb737c9735ba263b8282e44c55ac740ff78f9993ad1ef9",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "characteristic",
+        "co_location": "UUID_SPPLE_CREDITS_TO_DEVICE @ classes4.dex — Whistle vendor BLE constant UUID_SPPLE_CREDITS_TO_DEVICE",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "UUID_SPPLE_CREDITS_TO_DEVICE",
+        "harvest_singleton_resolved_to_vendor": true,
+        "resolution": "harvest flagged as singleton needing FP-triage; resolved to genuine Whistle SPPLE GATT via WCConstants field name (+over harvest's 48-slate)"
+      }
+    }
+  ],
+  "flagged_ambiguous": [
+    {
+      "identifier": "6cdc3b69-0077-4d0a-b91c-712b2b37775f",
+      "identifier_type": "ble_service_uuid",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 40,
+      "band": "manufacturer_app",
+      "band_ceiling": 75,
+      "disposition": "flagged_ambiguous",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes4.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes4.dex :: LocalManagementSDPUUID",
+        "byte_form": "6CDC3B69-0077-4D0A-B91C-712B2B37775F",
+        "excerpt": "6CDC3B69-0077-4D0A-B91C-712B2B37775F"
+      },
+      "source_row_key": "273d09c051b9bf592e366449ca639068e6da5a82c0c30b168fcca6e18d62a019",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "gatt_role": "bt_classic_sdp",
+        "co_location": "LocalManagementSDPUUID @ classes4.dex — Whistle-owned but a Bluetooth-CLASSIC SDP/RFCOMM service UUID (LocalManagementSDPUUID), NOT a BLE GATT service — tagging it ble_service_uuid would mis-state transport. Board/CTO decides include-as-classic vs exclude.",
+        "single_source": "one companion APK; no §8.3 value-level corroboration lift",
+        "wcconstants_field": "LocalManagementSDPUUID",
+        "transport": "bluetooth_classic_sdp",
+        "ambiguous_extraction": true
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "identifier": "ec6e18c5-7f14-4bdf-9c95-9ead4ebd90f8",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "disposition": "excluded",
+      "reason": "non_ble_sdk_config",
+      "detail": "APP_CENTER_APP_SECRET: BuildConfig.APP_CENTER_APP_SECRET passed to com.microsoft.appcenter.AppCenter.configure() — Microsoft App Center analytics/crash SDK app-secret, NOT a BLE UUID.",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex :: Lcom/whistle/bolt/BuildConfig;",
+        "byte_form": "ec6e18c5-7f14-4bdf-9c95-9ead4ebd90f8",
+        "excerpt": "ec6e18c5-7f14-4bdf-9c95-9ead4ebd90f8"
+      },
+      "db_presence": "[]"
+    },
+    {
+      "identifier": "849f26e2-2df6-11e4-ab12-14109fdc48df",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "AngelSense",
+      "disposition": "excluded",
+      "reason": "non_ble_library",
+      "detail": "Salesforce Marketing Cloud SDK analytics constant (…/analytics/piwama) — not a vendor BLE service UUID. Harvest's AltBeacon/Smartlook guess corrected.",
+      "source_markers": {
+        "apk_sha256": "0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca",
+        "rel_path": "raw/vendor_apps/angelsense/com.angelsense.mobile/4.2.0/0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca.apk",
+        "dex_member": "classes.dex :: Lcom/salesforce/marketingcloud/analytics/piwama/a;",
+        "byte_form": "849f26e2-2df6-11e4-ab12-14109fdc48df",
+        "excerpt": "849f26e2-2df6-11e4-ab12-14109fdc48df"
+      },
+      "db_presence": "[]"
+    },
+    {
+      "identifier": "f6389234-1024-481f-9173-37d9d7f5051f",
+      "identifier_type": "ble_service_uuid",
+      "manufacturer": "AngelSense",
+      "disposition": "excluded",
+      "reason": "non_ble_library",
+      "detail": "Salesforce Marketing Cloud SDK AesCrypto.ENC_TEST_STRING (AES encryption test vector) — not a BLE UUID at all.",
+      "source_markers": {
+        "apk_sha256": "0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca",
+        "rel_path": "raw/vendor_apps/angelsense/com.angelsense.mobile/4.2.0/0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca.apk",
+        "dex_member": "classes.dex :: Lcom/salesforce/marketingcloud/util/AesCrypto;",
+        "byte_form": "F6389234-1024-481F-9173-37D9D7F5051F",
+        "excerpt": "F6389234-1024-481F-9173-37D9D7F5051F"
+      },
+      "db_presence": "[]"
+    }
+  ],
+  "tile_held_cross_vendor": [
+    {
+      "identifier": "0000feec-0000-1000-8000-00805f9b34fb",
+      "short": "Tile 0xFEEC",
+      "disposition": "held_cross_vendor",
+      "reason": "tile_do_not_double_promote",
+      "detail": "Referenced in the Jiobit APK but owned by Tile, Inc. (Life360 owns both). HELD bluetooth_tracker — NEVER re-attributed to Jiobit.",
+      "held_db_rows": [
+        [
+          44440,
+          "0000feec-0000-1000-8000-00805f9b34fb",
+          "ble_service_uuid",
+          "bluetooth_tracker",
+          "Tile, Inc."
+        ]
+      ],
+      "present_in_jiobit_dex": true
+    },
+    {
+      "identifier": "0000feed-0000-1000-8000-00805f9b34fb",
+      "short": "Tile 0xFEED",
+      "disposition": "held_cross_vendor",
+      "reason": "tile_do_not_double_promote",
+      "detail": "Referenced in the Jiobit APK but owned by Tile, Inc. (Life360 owns both). HELD bluetooth_tracker — NEVER re-attributed to Jiobit.",
+      "held_db_rows": [
+        [
+          44439,
+          "0000feed-0000-1000-8000-00805f9b34fb",
+          "ble_service_uuid",
+          "bluetooth_tracker",
+          "Tile, Inc."
+        ]
+      ],
+      "present_in_jiobit_dex": true
+    }
+  ],
+  "fp_magnet_audit": [
+    {
+      "identifier": "258eafa5-e914-47da-95ca-c5ab0dc85b11",
+      "reason": "cross-vendor FP magnet (c1+c2+c6)",
+      "present_in": [
+        "fi",
+        "whistle"
+      ],
+      "promoted": false
+    },
+    {
+      "identifier": "95ed6082-b8e9-46e8-a73f-ff56f00f5d9d",
+      "reason": "androidx.work.Data internal id (not BLE)",
+      "present_in": [
+        "fi"
+      ],
+      "promoted": false
+    },
+    {
+      "identifier": "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
+      "reason": "urn:uuid namespace marker (not BLE)",
+      "present_in": [
+        "fi"
+      ],
+      "promoted": false
+    },
+    {
+      "identifier": "5eb5a37e-b458-11e3-ac11-000c2940e62c",
+      "reason": "beacon-library example region UUID",
+      "present_in": [
+        "jiobit"
+      ],
+      "promoted": false
+    },
+    {
+      "identifier": "b2f7f966-d8cc-11e4-bed1-df8f05be55ba",
+      "reason": "beacon-library example region UUID",
+      "present_in": [
+        "jiobit"
+      ],
+      "promoted": false
+    },
+    {
+      "identifier": "00000000-0000-0000-0000-000000000000",
+      "reason": "null UUID",
+      "present_in": [
+        "fi",
+        "jiobit",
+        "whistle"
+      ],
+      "promoted": false
+    },
+    {
+      "identifier": "00000000-deca-fade-deca-deafdecacafe",
+      "reason": "library placeholder UUID",
+      "present_in": [
+        "whistle"
+      ],
+      "promoted": false
+    },
+    {
+      "identifier": "00ffffff-ffff-ffff-ffff-ffffffffffff",
+      "reason": "all-ones mask/placeholder UUID",
+      "present_in": [
+        "whistle"
+      ],
+      "promoted": false
+    }
+  ],
+  "oui_candidate": {
+    "identifier": "e0:7c:62",
+    "identifier_type": "oui",
+    "device_category": "gps_tracker",
+    "manufacturer": "Whistle Labs, Inc.",
+    "model": null,
+    "confidence": 85,
+    "band": "primary_registry",
+    "band_ceiling": 85,
+    "disposition": "promote",
+    "net_new": true,
+    "source_url": "https://standards-oui.ieee.org/oui/oui.csv",
+    "source_markers": {
+      "doc_kind": "ieee_oui_csv",
+      "line_number": 11633,
+      "registry_class": "MA-L",
+      "vendor_doc_sha256_link": "fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe",
+      "excerpt": "MA-L,E07C62,\"Whistle Labs, Inc.\",\"251 Rhode Island Street, Suite 211 San Francisco CA US 94013 \""
+    },
+    "source_row_key": "47b998cb4f4a7cba79ea68e588f9756127787105540f5b78b144aa023bac09b1",
+    "geographic_scope": "global",
+    "notes": {
+      "subtype": "pet_kid_cellular",
+      "category_pending_board_ratification": true,
+      "net_new_vs_held": "net-new",
+      "laa_bit": "laa_bit_clear (globally-administered IEEE OUI)",
+      "known_fake_check": "pass (not in §7.3 known-fake/doc ranges)",
+      "caveat": "Pure-play pet-tracker vendor OUI; cleanest promotable lead. The device cellular-module OUI is not derivable from the app (FCC EAS blocked) — this is the Whistle Labs IEEE-registered OUI."
+    }
+  },
+  "ble_local_name_bonus": [
+    {
+      "identifier": "fi-db",
+      "identifier_type": "ble_local_name",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 50,
+      "band": "manufacturer_app_behavioral",
+      "band_ceiling": 50,
+      "disposition": "bonus_low_confidence",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "fi-db",
+        "excerpt": "fi-db"
+      },
+      "source_row_key": "2952672fe881eed08247b976b68665ec3199221f415f40467c931ce1830b049b",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "behavioral": true,
+        "caveat": "BLE local-name prefix/advertised-name fragment (DB type ble_local_name, 21 rows). Behavioral/low-confidence; out-of-primary-brief bonus per CTO authorization."
+      }
+    },
+    {
+      "identifier": "fi-backhaul-db",
+      "identifier_type": "ble_local_name",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 50,
+      "band": "manufacturer_app_behavioral",
+      "band_ceiling": 50,
+      "disposition": "bonus_low_confidence",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "fi-backhaul-db",
+        "excerpt": "fi-backhaul-db"
+      },
+      "source_row_key": "fb4d31088b499d044e90eca38ebea83ba7e60124068f1acb6da54c210c798b7d",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "behavioral": true,
+        "caveat": "BLE local-name prefix/advertised-name fragment (DB type ble_local_name, 21 rows). Behavioral/low-confidence; out-of-primary-brief bonus per CTO authorization."
+      }
+    },
+    {
+      "identifier": "fi-walk-",
+      "identifier_type": "ble_local_name",
+      "device_category": "gps_tracker",
+      "manufacturer": "Fi (Barking Labs Corp)",
+      "model": null,
+      "confidence": 50,
+      "band": "manufacturer_app_behavioral",
+      "band_ceiling": 50,
+      "disposition": "bonus_low_confidence",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/#classes.dex",
+      "source_markers": {
+        "apk_sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+        "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+        "dex_member": "classes.dex",
+        "byte_form": "fi-walk-",
+        "excerpt": "fi-walk-"
+      },
+      "source_row_key": "4ae4dda7541d2d0adef3709e3f3fb2d7298ae20d43b0d6d24bdfc8ebc105e7f1",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "behavioral": true,
+        "caveat": "BLE local-name prefix/advertised-name fragment (DB type ble_local_name, 21 rows). Behavioral/low-confidence; out-of-primary-brief bonus per CTO authorization."
+      }
+    },
+    {
+      "identifier": "whistle3",
+      "identifier_type": "ble_local_name",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 50,
+      "band": "manufacturer_app_behavioral",
+      "band_ceiling": 50,
+      "disposition": "bonus_low_confidence",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex",
+        "byte_form": "whistle3",
+        "excerpt": "whistle3"
+      },
+      "source_row_key": "4498db223004a42ad9629d053bc7f9e09fac3b5ea5bd520715e44fd482d33e80",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "behavioral": true,
+        "caveat": "BLE local-name prefix/advertised-name fragment (DB type ble_local_name, 21 rows). Behavioral/low-confidence; out-of-primary-brief bonus per CTO authorization."
+      }
+    },
+    {
+      "identifier": "whistle3_charge",
+      "identifier_type": "ble_local_name",
+      "device_category": "gps_tracker",
+      "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
+      "model": null,
+      "confidence": 50,
+      "band": "manufacturer_app_behavioral",
+      "band_ceiling": 50,
+      "disposition": "bonus_low_confidence",
+      "net_new": true,
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/#classes3.dex",
+      "source_markers": {
+        "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+        "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+        "dex_member": "classes3.dex",
+        "byte_form": "whistle3_charge",
+        "excerpt": "whistle3_charge"
+      },
+      "source_row_key": "acf4d7444fa51ec17348838bb72078e8a96b285b026ddd42e9d5ec4b1d95ae82",
+      "geographic_scope": "global",
+      "notes": {
+        "subtype": "pet_kid_cellular",
+        "category_pending_board_ratification": true,
+        "net_new_vs_held": "net-new",
+        "behavioral": true,
+        "caveat": "BLE local-name prefix/advertised-name fragment (DB type ble_local_name, 21 rows). Behavioral/low-confidence; out-of-primary-brief bonus per CTO authorization."
+      }
+    }
+  ],
+  "ble_company_id_finding": {
+    "net_new": 0,
+    "attempted": true,
+    "evidence": "Lcom/whistle/whistlecore/util/ScanFilterUtils; MANUFACTURER_ID_APPLE:I = 0x4c",
+    "byte_verified": true,
+    "disposition": "EXCLUDED — Whistle's company-id scan machinery targets Apple's iBeacon company id (0x004C / 76), not a Whistle-assigned id. Per MAC-411 brief: exclude non-cohort company-ids. No BT-SIG membership for any cohort vendor under its own name -> ble_company_id net-new = 0."
+  }
+}
