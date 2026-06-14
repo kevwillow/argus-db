@@ -1,0 +1,139 @@
+{
+  "cohort": "mac393_c3_bletracker",
+  "phase": "harvest",
+  "generated_utc": "2026-06-14T16:09:06Z",
+  "device_category": "bluetooth_tracker",
+  "identifier_types_in_scope": ["ble_company_id", "ble_service_uuid"],
+  "counts": {
+    "ble_service_uuid": {"clean_net_new_vendor_distinct": 1, "cross_vendor_excluded": 3, "already_held": 1},
+    "ble_company_id": {"clean_net_new_vendor_distinct": 0, "caveat_unverified_link": 1, "false_rejected": 2},
+    "behavioral_name_leads": 2
+  },
+  "headline": "5 c3 vendors (Pebblebee/Cube/Atuvos/Nutale/KeySmart) are Apple/Google Find-My ECOSYSTEM participants, disambiguated by GATT device-name string (not by distinct BLE company-id/service-uuid). Net-new vendor-distinct identifier surface = exactly ONE: Pebblebee service UUID 0xFA25 (single-source, crowdsourced). No c3 vendor has a SIG-assigned company ID.",
+  "leads": [
+    {
+      "id": "c3-001",
+      "identifier_type": "ble_service_uuid",
+      "value": "0000fa25-0000-1000-8000-00805f9b34fb",
+      "value_short": "0xFA25",
+      "vendor": "Pebblebee",
+      "disposition": "CLEAN net-new vendor-distinct",
+      "db_presence": "NET-NEW (0 rows: grep of identifier for 'FA25' returns only a firmware_sha256_hash substring + a Verizon URL substring, NOT this UUID).",
+      "source": "AirGuard sid24 (crowdsourced, GPL wrapper facts-only)",
+      "source_location": "raw/airguard/.../types/PebbleBee.kt:189 and :214",
+      "source_excerpt": "internal const val PEBBLEBEE_SOUND_SERVICE = \"FA25\"  /  val offlineFindingServiceUUID: ParcelUuid = ParcelUuid.fromString(\"0000FA25-0000-1000-8000-00805F9B34FB\")",
+      "band_ceiling": 75,
+      "corroboration": "single-source; NOT SIG-registered (absent from member_uuids.yaml). NO §8.3 lift available. Pebblebee app teardown recommended to corroborate.",
+      "caveats": [
+        "0xFA25 is the connectable SOUND / offline-finding GATT service — observable on a CONNECTED device, NOT in the passive advertisement. AirGuard uses it as a ScanFilter serviceUuid (PebbleBee.kt:197-200), implying it is also advertised by Pebblebee offline-finding units.",
+        "Paired characteristic PEBBLEBEE_SOUND_CHARACTERISTIC = 0x2C02 (PebbleBee.kt:190) is a SIG-STANDARD characteristic ('UGT Features', characteristic_uuids.yaml:1376) — NOT vendor-distinct; do not promote as a Pebblebee identifier."
+      ]
+    },
+    {
+      "id": "c3-002",
+      "identifier_type": "ble_company_id",
+      "value": "0x03EE",
+      "vendor": "Cube (cube.tech / Cube tracker) — LINK UNVERIFIED",
+      "disposition": "CAVEAT — authoritative SIG assignment exists + ALREADY HELD, but product link unproven",
+      "db_presence": "HELD: identifiers.id=4010, identifier='0x03EE', identifier_type='ble_manufacturer_id', device_category='unknown', manufacturer='CUBE TECHNOLOGIES'.",
+      "source": "BT SIG company_identifiers.yaml (primary_registry)",
+      "source_location": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml:9130",
+      "source_excerpt": "  - value: 0x03EE\\n    name: 'CUBE TECHNOLOGIES'",
+      "band_ceiling": 85,
+      "corroboration": "NONE linking 'CUBE TECHNOLOGIES' (the SIG registrant) to the Cube TRACKER product. Could be an unrelated 'Cube Technologies'.",
+      "caveats": [
+        "Do NOT promote/recat to bluetooth_tracker without a cite-paste tying 0x03EE to the Cube tracker (e.g. Cube companion-app dex or device teardown).",
+        "Sibling 'Cube' registrants are distinct entities, NOT the tracker: 0x08A8 'Shanghai Kfcube Inc' (held id2874), 0x019B 'CUBETECH s.r.o.' (held id4557)."
+      ]
+    },
+    {
+      "id": "c3-003",
+      "identifier_type": "ble_service_uuid",
+      "value": "0000feaa-0000-1000-8000-00805f9b34fb",
+      "value_short": "0xFEAA",
+      "vendor": "Google Find My Device / Eddystone (CROSS-VENDOR)",
+      "disposition": "EXCLUDED per wave-1 cross-vendor ecosystem-service ruling (0xFE59/0xFD6F precedent)",
+      "db_presence": "HELD as ble_company_id id=37808 ('0xfeaa', 'Google LLC', unknown).",
+      "source": "AirGuard sid24",
+      "source_location": "raw/airguard/.../types/GoogleFindMyNetwork.kt:212",
+      "source_excerpt": "val offlineFindingServiceUUID: ParcelUuid = ParcelUuid.fromString(\"0000FEAA-0000-1000-8000-00805F9B34FB\")",
+      "band_ceiling": 0,
+      "corroboration": "This is the SHARED Google-FMD service for ALL FMD trackers (Pebblebee FMD variant, Chipolo, Eufy, Jio, Rolling Square, Hama, Motorola) — vendor is read from the GATT name string, NOT this UUID. Not vendor-distinct → not promotable per c3 ruling.",
+      "caveats": ["Already held; cross-vendor magnet; do not attribute to any single c3 vendor."]
+    },
+    {
+      "id": "c3-004",
+      "identifier_type": "ble_service_uuid",
+      "value": "0000fd44-0000-1000-8000-00805f9b34fb",
+      "value_short": "0xFD44",
+      "vendor": "Apple Find My / Nearby (CROSS-VENDOR)",
+      "disposition": "EXCLUDED per wave-1 cross-vendor ruling; how Atuvos/KeySmart/Nutale/Pebblebee(Apple-variant) broadcast",
+      "db_presence": "HELD: id=22876 ble_service_uuid in bluetooth_tracker; id=22877 ble_service_uuid unknown; id=38159 ble_company_id '0xfd44' Apple. Also Apple company id 0x004C held id568/id22842.",
+      "source": "tagfinder sid29 (informational) + OpenHaystack adv-format (academic)",
+      "source_location": "raw/tagfinder/20260613T203034Z_tagfinder.py:187 ('0000FD44': 'Apple Nearby') ; raw/openhaystack/...Advertisement.swift:38-44 (company ID 0x4c 0x00 / subtype 0x12)",
+      "source_excerpt": "guard payload.subdata(in: 0..<2) == Data([0x4c, 0x00]) else { return nil }  // Apple company ID",
+      "band_ceiling": 0,
+      "corroboration": "Apple ecosystem service; shared by all 'Works with Apple Find My' trackers. Not vendor-distinct.",
+      "caveats": ["Already held; cross-vendor; Atuvos/Nutale/KeySmart broadcast THIS (Apple), not a vendor-distinct UUID → 0 net-new for those three."]
+    },
+    {
+      "id": "c3-005-REJECTED",
+      "identifier_type": "ble_company_id",
+      "value": "0x0183",
+      "vendor": "Pebblebee (tagfinder CLAIM)",
+      "disposition": "FALSE — REJECTED (§11 #1 fabrication catch)",
+      "db_presence": "n/a — not promoted.",
+      "source": "tagfinder sid29 (informational/unverified per §7)",
+      "source_location": "raw/tagfinder/20260613T203034Z_tagfinder.py:154",
+      "source_excerpt": "0x0183: \"PEBBLEBEE\",",
+      "band_ceiling": 0,
+      "corroboration": "CONTRADICTED by authoritative SIG: company_identifiers.yaml 0x0183 = 'Walt Disney'. tagfinder's company-id map is fabricated.",
+      "caveats": ["REJECT. Do not promote. Evidence that tagfinder's company-id table is unreliable (also 0x022A/0x022B/0x010C/0x02D0 all collide with real SIG names)."]
+    },
+    {
+      "id": "c3-006-REJECTED",
+      "identifier_type": "ble_company_id",
+      "value": "0x022A",
+      "vendor": "Nutale (tagfinder CLAIM)",
+      "disposition": "FALSE — REJECTED (§11 #1 fabrication catch)",
+      "db_presence": "n/a — not promoted.",
+      "source": "tagfinder sid29",
+      "source_location": "raw/tagfinder/20260613T203034Z_tagfinder.py:151",
+      "source_excerpt": "0x022A: \"Nutale\",",
+      "band_ceiling": 0,
+      "corroboration": "CONTRADICTED by authoritative SIG: company_identifiers.yaml 0x022A = 'Stamer Musikanlagen GMBH'. REJECT.",
+      "caveats": ["REJECT. Nutale has no SIG company ID; it is an Apple-Find-My piggyback brand."]
+    },
+    {
+      "id": "c3-b001",
+      "identifier_type": "behavioral_name_lead",
+      "value": "PB - <id>",
+      "vendor": "Pebblebee",
+      "disposition": "Behavioral/name lead (NOT an identifier_type in scope) — for §5 behavioral_signatures if ExtractionWorker elects",
+      "db_presence": "not checked as identifier",
+      "source": "AirGuard sid24",
+      "source_location": "raw/airguard/.../types/PebbleBee.kt:308",
+      "source_excerpt": "if (advName != null && advName.startsWith(\"PB - \") && advName.length == 9)",
+      "caveats": ["GATT advertised-name prefix for Pebblebee. Behavioral, not ble_company_id/ble_service_uuid → out of c3 identifier scope; recorded for completeness."]
+    },
+    {
+      "id": "c3-b002",
+      "identifier_type": "behavioral_name_lead",
+      "value": "GATT device-name vendor disambiguation: pebblebee | chipolo | motorola | eufy | jio | rolling square | hama",
+      "vendor": "Google FMD ecosystem (incl. Pebblebee)",
+      "disposition": "Structural finding — FMD trackers share 0xFEAA and are told apart by NAME STRING, not UUID",
+      "db_presence": "n/a",
+      "source": "AirGuard sid24",
+      "source_location": "raw/airguard/.../types/GoogleFindMyNetwork.kt:423-431",
+      "source_excerpt": "name.contains(\"pebblebee\", ignoreCase = true) -> GoogleFindMyNetworkManufacturer.PEBBLEBEE ... name.contains(\"eufy\"...) ... name.contains(\"rolling square\"...) ... name.contains(\"hama\"...)",
+      "caveats": ["This is WHY ble_company_id/ble_service_uuid net-new is ~0 for FMD trackers — the vendor signal lives in the GATT name, not the BLE registry layer."]
+    }
+  ],
+  "db_presence_baseline": {
+    "bluetooth_tracker_category_rows": 46,
+    "bluetooth_tracker_manufacturers": ["Apple, Inc.", "CHIPOLO d.o.o.", "Samsung Electronics Co., Ltd.", "Tile, Inc.", null],
+    "bluetooth_tracker_type_breakdown": {"ble_service_uuid": 41, "ble_characteristic": 3, "ble_uuid": 2},
+    "c3_vendors_in_category": "0 of 5 — Pebblebee/Cube-tracker/Atuvos/Nutale/KeySmart all NET-NEW to bluetooth_tracker.",
+    "pebblebee_name_collision_note": "'Pebble Technology' rows (id4624 0x0154 ble_manufacturer_id, id9839 mac_range, id37761 0xfed9 ble_company_id) = the SMARTWATCH company, NOT Pebblebee the tracker. Do not conflate."
+  }
+}

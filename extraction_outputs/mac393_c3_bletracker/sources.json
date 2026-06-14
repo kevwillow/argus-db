@@ -1,0 +1,93 @@
+{
+  "cohort": "mac393_c3_bletracker",
+  "phase": "harvest",
+  "worker": "SourceWorker",
+  "generated_utc": "2026-06-14T16:09:06Z",
+  "stage_only": true,
+  "db_writes": 0,
+  "note": "Cohort-3 cleared source slate per source-triage §3 = BT SIG assigned numbers/company-IDs (primary_registry) + OpenHaystack/academic Find-My/BLE teardowns. AirGuard(sid24) + tagfinder(sid29) are wave-1 PRE-APPROVED existing sources (crowdsourced), used here facts-only §11#16. raw/ is gitignored (confirmed).",
+  "sources": [
+    {
+      "name": "Bluetooth SIG — Assigned Numbers: Company Identifiers",
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml",
+      "local_artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+      "sha256": "51b1ea7ddf98906df1538af7406dd7bea7c905a7d2f5cebcf4eb63c72447b5a0",
+      "band": "primary_registry",
+      "license_posture": "BT SIG public registry; permissive factual registry (§8.2 primary_registry, 85 single-source).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:09:06Z",
+      "yield": "Cube candidates only: 0x03EE 'CUBE TECHNOLOGIES' (L9130), 0x08A8 'Shanghai Kfcube Inc' (L5722), 0x019B 'CUBETECH s.r.o.' (L10771). Pebblebee / Atuvos / Nutale / KeySmart ABSENT (0 hits) — no SIG company ID."
+    },
+    {
+      "name": "Bluetooth SIG — Assigned Numbers: 16-bit Member UUIDs",
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml",
+      "local_artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+      "sha256": "42478df3da88f890d80d2a4ac46e01657c9515434c3ebae8ad72e8d921b55bf2",
+      "band": "primary_registry",
+      "license_posture": "BT SIG public registry (§8.2 primary_registry).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:09:06Z",
+      "yield": "0xFED9 'Pebble Technology Corporation' (L110, SMARTWATCH — NOT Pebblebee). Tile 0xFEED/0xFEEC (L71/73). Apple block 0xFED4..0xFEC8. Pebblebee 0xFA25 ABSENT — not SIG-registered."
+    },
+    {
+      "name": "Bluetooth SIG — Assigned Numbers: Characteristic UUIDs",
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/uuids/characteristic_uuids.yaml",
+      "local_artifact": "raw/bluetooth_sig/20260613T203034Z_characteristic_uuids.yaml",
+      "sha256": "04549375a4992f9a935a045855e64c13630dab4e2a030314d03a6571d6e85c83",
+      "band": "primary_registry",
+      "license_posture": "BT SIG public registry (§8.2 primary_registry).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:09:06Z",
+      "yield": "0x2C02 = 'UGT Features' (org.bluetooth.characteristic.ugt_features, L1376) — SIG-STANDARD char, so Pebblebee's PEBBLEBEE_SOUND_CHARACTERISTIC reuse of 0x2C02 is NOT vendor-distinct."
+    },
+    {
+      "name": "OpenHaystack — Advertisement.swift (Apple Find My offline-finding adv format)",
+      "source_url": "https://github.com/seemoo-lab/openhaystack/tree/8d214aa",
+      "local_artifact": "raw/openhaystack/20260613T203034Z_Advertisement.swift",
+      "sha256": "b4355385b9ff1eba1adc1acdef961704d2a48d1547ef81ae15088f997a6652bd",
+      "band": "academic",
+      "license_posture": "FLAG: SPDX-License-Identifier: AGPL-3.0-only (L7). Share-alike. NOT a NEW source — wave-1 PRE-APPROVED academic (sid pinned github 8d214aa, MAC-371). Facts-only per §11#16 (protocol adv-format constants are non-copyrightable). No new one-way-door; recorded for transparency.",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:09:06Z",
+      "yield": "Apple Find My adv format: company ID bytes 0x4c 0x00 (=0x004C Apple LE), offline-finding subtype 0x12, subtype length 0x19, 22-byte public key. Cross-vendor Apple ecosystem context — NOT vendor-distinct to the 5 c3 vendors."
+    },
+    {
+      "name": "AirGuard (seemoo-lab/AirGuard) — PebbleBee.kt + GoogleFindMyNetwork.kt device-type detectors",
+      "source_url": "https://github.com/seemoo-lab/AirGuard",
+      "local_artifact": "raw/airguard/app/src/main/java/de/seemoo/at_tracking_detection/database/models/device/types/{PebbleBee.kt,GoogleFindMyNetwork.kt}",
+      "sha256": "PebbleBee.kt=14100da0f7d4e33cd0c945182671276e82769e195e5de4dbfcd70d65d6ebab3c; GoogleFindMyNetwork.kt=51511d8f7bfdb32905051af5fbfd081c4e8af71569edf5fbc3ccdc8f1eda7e5a",
+      "band": "crowdsourced",
+      "license_posture": "GPL-3.0 wrapper. NOT a NEW source — wave-1 PRE-APPROVED as sid 24 (crowdsourced, ≤75). Facts-only per §11#16 (BLE UUID values are facts; no code/arrangement copied).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:09:06Z",
+      "yield": "Pebblebee offlineFindingServiceUUID 0000FA25-... (PebbleBee.kt:189,214) = clean vendor-distinct net-new ble_service_uuid. Google FMD offlineFindingServiceUUID 0000FEAA-... (cross-vendor, EXCLUDED). Name-string vendor disambiguation map (GoogleFindMyNetwork.kt:423-431)."
+    },
+    {
+      "name": "tagfinder.py (BLE tracker scanner) — USED AS NEGATIVE / INTEGRITY CHECK ONLY",
+      "source_url": "https://github.com/<tagfinder>/tagfinder (sid 29)",
+      "local_artifact": "raw/tagfinder/20260613T203034Z_tagfinder.py",
+      "sha256": "0e932a0daef7dc9227e74f912f4c51a28b205966b2dc933032b5ae256a4413ef",
+      "band": "crowdsourced",
+      "license_posture": "MIT (LICENSE present). wave-1 disposition: 'informational/unverified per §7 — NOT a genuine identifier corroborator.'",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:09:06Z",
+      "yield": "INTEGRITY CATCH: tagfinder hardcoded company-id map is FABRICATED — 0x0183='PEBBLEBEE' (L154) but authoritative SIG = Walt Disney; 0x022A='Nutale' (L151) but SIG = Stamer Musikanlagen GMBH; 0x022B='iTag' = SIG Tesla; 0x010C='Chipolo' = SIG Transducers Direct; 0x02D0='Tile' = SIG 3M. EVERY tracker mapping collides with a real SIG assignment — REJECTED, not promoted."
+    },
+    {
+      "name": "Find-My academic teardowns (PETS 2021 popets-2021-0045 + USENIX Sec24 Samsung)",
+      "source_url": "PETS 2021 doi:10.2478/popets-2021-0045 ; USENIX Security 2024 arXiv:2210.14702",
+      "local_artifact": "raw/find_my_papers/{20260613T203034Z_popets-2021-0045.txt,20260613T203034Z_samsung.txt}",
+      "sha256": "(text extractions; PDFs co-located)",
+      "band": "academic",
+      "license_posture": "Peer-reviewed academic (§8.2 academic, 80). Facts-only.",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:09:06Z",
+      "yield": "0 hits for Pebblebee/Cube/Atuvos/Nutale/KeySmart — papers cover Apple AirTag (PETS) + Samsung SmartTag (USENIX), both wave-1 vendors. No c3 vendor-distinct identifiers."
+    }
+  ],
+  "flagged_for_cto": [
+    "OpenHaystack Advertisement.swift = AGPL-3.0-only (SPDX L7). NOT new (wave-1 pre-approved academic); facts-only; recorded for transparency. No escalation needed unless CTO wants OpenHaystack re-classified.",
+    "tagfinder COMPANY_IDENTIFIERS / company maps are FABRICATED and collide with authoritative SIG assignments (Disney/Tesla/3M/Transducers Direct/Stamer). Recommend Validator/ExtractionWorker NEVER treat tagfinder company-id table as an identifier source (behavioral-only per wave-1 §7).",
+    "Companion-APK teardown is OUT of cohort-3 §3 cleared slate (which is BT SIG + academic only) but is globally pre-cleared (§11#15, source-triage §1). RECOMMENDED as a scoped enrichment: (a) Pebblebee app (com.pebblebee.*) to CORROBORATE 0xFA25 → §8.3 value-level lift from a 2nd independent collector; (b) Cube app to VERIFY 0x03EE 'CUBE TECHNOLOGIES' == the Cube tracker product + surface any Cube-distinct GATT service. Out-of-slate → CTO authorize."
+  ]
+}
