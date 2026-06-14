@@ -1,14 +1,14 @@
 {
   "_meta": {
     "argus_version": "31",
-    "exported_at": "2026-06-12T14:46:45Z",
-    "record_count": 125,
+    "exported_at": "2026-06-14T02:38:49Z",
+    "record_count": 132,
     "confidence_threshold": 70,
-    "argus_run_id": "28e57d53-32e6-5026-9a04-267feaafcd82",
-    "source_record_count": 201,
+    "argus_run_id": "260b5777-99c8-5f75-8023-f4012242e7f4",
+    "source_record_count": 214,
     "dropped_in_export": {
       "below_confidence_threshold": 76,
-      "unknown_category": 0
+      "unknown_category": 6
     }
   },
   "entries": [
@@ -45,6 +45,13 @@
       "threshold_json": null,
       "confidence": 85,
       "argus_record_id": "09be8fda5336df26"
+    },
+    {
+      "signature_name": "Autel drone companion — Wi-Fi AP join (SSIDConnection) + MAVLink control-link pattern (EVO/Dragonfish family)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 75,
+      "argus_record_id": "0aaef8278fcdd778"
     },
     {
       "signature_name": "description='DJI Mini 5 (O4)'",
@@ -134,6 +141,13 @@
       },
       "confidence": 80,
       "argus_record_id": "181a6d655f0725cc"
+    },
+    {
+      "signature_name": "ASTM F3411 / ASD-STAN Remote-ID broadcast — Wi-Fi (Beacon vendor-specific IE + NaN) carrying CTA-2063-A serial",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 75,
+      "argus_record_id": "1f88ac3db69df933"
     },
     {
       "signature_name": "Routing Area Update Reject Cause #3",
@@ -546,6 +560,13 @@
       "argus_record_id": "40a317f898949285"
     },
     {
+      "signature_name": "Skydio Remote-ID — broadcast (ASTM via on-board QCA/Qualcomm radio) + Network Remote-ID (cloud session auth) companion-app pattern",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 75,
+      "argus_record_id": "40c60b4a41cdc6bd"
+    },
+    {
       "signature_name": "5776.5 MHz",
       "cellular_generation": null,
       "threshold_json": null,
@@ -640,6 +661,13 @@
       "threshold_json": null,
       "confidence": 85,
       "argus_record_id": "549ad62e4e389c4f"
+    },
+    {
+      "signature_name": "ASTM Remote-ID broadcast — Bluetooth 4 Legacy / BT5 Long-Range advertisement (ODID message pack)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 75,
+      "argus_record_id": "5a7895f0aaa65de2"
     },
     {
       "signature_name": "description='DJI Mini 2 (O2)'",
@@ -942,11 +970,25 @@
       "argus_record_id": "7d29f438cb802406"
     },
     {
+      "signature_name": "ALPR plate scan -> cloud upload -> hotlist hit-alert (Vigilant LEARN companion)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 80,
+      "argus_record_id": "7e7663f639418806"
+    },
+    {
       "signature_name": "10 MHz",
       "cellular_generation": null,
       "threshold_json": null,
       "confidence": 85,
       "argus_record_id": "809c73a8aad40fd7"
+    },
+    {
+      "signature_name": "DJI legacy proprietary DroneID — OFDM RF frame (2.4 GHz, ~600 ms burst, 9 OFDM symbols) carrying serial + GPS + operator location",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 70,
+      "argus_record_id": "846faa63d5a20d31"
     },
     {
       "signature_name": "T-Mobile TMOHS1 (Wingtech-built hotspot, Rayhunter-supported detector)",
@@ -1432,6 +1474,13 @@
       },
       "confidence": 80,
       "argus_record_id": "abdbccc2956d8c39"
+    },
+    {
+      "signature_name": "ALPR plate recognition (OpenALPR) -> hotlist sync/match (Rekor Blue)",
+      "cellular_generation": null,
+      "threshold_json": null,
+      "confidence": 80,
+      "argus_record_id": "b063034ed3fdffca"
     },
     {
       "signature_name": "Service Reject Cause #3",

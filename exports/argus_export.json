@@ -1,21 +1,21 @@
 {
   "_meta": {
     "argus_version": "31",
-    "exported_at": "2026-06-12T14:46:32Z",
-    "record_count": 736,
+    "exported_at": "2026-06-14T02:38:20Z",
+    "record_count": 737,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "2d195164-062a-525b-b275-97ecbff6fcfd",
-    "source_record_count": 43213,
+    "argus_run_id": "db313df2-cf67-559c-b16e-f982f6b3c4b4",
+    "source_record_count": 43123,
     "dropped_in_export": {
-      "unknown_category": 33370,
-      "ssid_pattern": 18,
+      "unknown_category": 33396,
+      "ssid_pattern": 24,
       "device_fingerprint": 6,
       "ble_local_name": 21,
-      "ble_characteristic": 13,
-      "product_family_codename": 280,
+      "ble_characteristic": 14,
+      "product_family_codename": 156,
       "oversized_mac_range": 47,
       "icao_24bit_address": 2,
       "rf_channel": 24,
@@ -30,7 +30,7 @@
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_service_uuid": 122,
+      "ble_service_uuid": 121,
       "ble_company_id": 2,
       "frequency_band": 32,
       "ble_protocol_byte": 0,
@@ -42,7 +42,7 @@
       "network_endpoint": 3564,
       "firmware_image_variant": 3,
       "qualcomm_chip_format_id": 1,
-      "firmware_branded_string": 142,
+      "firmware_branded_string": 141,
       "asdstan_message_type": 7,
       "asdstan_enum_value": 18,
       "dji_protocol_struct_format": 2,
@@ -55,8 +55,8 @@
       "vendor_controlled_hostname": 3298,
       "vendor_cloud_endpoint_url": 2,
       "vendor_controlled_hostname_deprecated": 4,
-      "fcc_grantee_code": 136,
-      "equipment_class_code": 6,
+      "fcc_grantee_code": 137,
+      "equipment_class_code": 7,
       "network_discovery_protocol_pattern": 11,
       "imei_tac": 0,
       "procurement_only": 6,
@@ -386,6 +386,12 @@
       "argus_record_id": "1340df5bd167d85b"
     },
     {
+      "pattern": "18:7f:88",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "1373f8be94c10355"
+    },
+    {
       "pattern": "179158",
       "pattern_type": "drone_id_prefix",
       "description": "Inspired Flight drone",
@@ -656,6 +662,12 @@
       "argus_record_id": "203884302cf02836"
     },
     {
+      "pattern": "90:48:6c",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "208b3b3b5bc57db1"
+    },
+    {
       "pattern": "18136H6E",
       "pattern_type": "drone_id_prefix",
       "description": "Harris Aerial drone",
@@ -678,6 +690,12 @@
       "pattern_type": "oui",
       "description": "Unattributed identifier",
       "argus_record_id": "220ba1457f5d711d"
+    },
+    {
+      "pattern": "50:e4:67",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "227883743cf8f347"
     },
     {
       "pattern": "1871C0000000020",
@@ -762,6 +780,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "282d2fbc725db511"
+    },
+    {
+      "pattern": "54:e0:19",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "2863cf8c1d407326"
     },
     {
       "pattern": "1968FS22220",
@@ -882,72 +906,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Zing Drone Solutions drone",
       "argus_record_id": "2e6795f3d4246ae6"
-    },
-    {
-      "pattern": "02:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2eac18c8565a619f"
-    },
-    {
-      "pattern": "02:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2eac18c8565a619f"
-    },
-    {
-      "pattern": "02:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2eac18c8565a619f"
-    },
-    {
-      "pattern": "02:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2eac18c8565a619f"
-    },
-    {
-      "pattern": "02:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2eac18c8565a619f"
-    },
-    {
-      "pattern": "02:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2eac18c8565a619f"
-    },
-    {
-      "pattern": "01:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2f0c94127d018827"
-    },
-    {
-      "pattern": "01:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2f0c94127d018827"
-    },
-    {
-      "pattern": "01:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2f0c94127d018827"
-    },
-    {
-      "pattern": "01:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2f0c94127d018827"
-    },
-    {
-      "pattern": "01:00:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "2f0c94127d018827"
     },
     {
       "pattern": "3c:da:6d",
@@ -1226,12 +1184,6 @@
       "argus_record_id": "3c4c94c8be703b8d"
     },
     {
-      "pattern": "00:0E:8E",
-      "pattern_type": "oui",
-      "description": "Sierra Wireless automotive_telematics",
-      "argus_record_id": "3d319bc5435f1aa1"
-    },
-    {
       "pattern": "1748CH",
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
@@ -1364,40 +1316,16 @@
       "argus_record_id": "48f6c47f9459f5e2"
     },
     {
+      "pattern": "64:9a:63",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "4909d9d99eecd713"
+    },
+    {
       "pattern": "1871CCRDSE100",
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
       "argus_record_id": "49381ce4939ff07a"
-    },
-    {
-      "pattern": "01:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "49b20836f1d0adc5"
-    },
-    {
-      "pattern": "01:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "49b20836f1d0adc5"
-    },
-    {
-      "pattern": "01:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "49b20836f1d0adc5"
-    },
-    {
-      "pattern": "01:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "49b20836f1d0adc5"
-    },
-    {
-      "pattern": "01:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "49b20836f1d0adc5"
     },
     {
       "pattern": "1748CLT",
@@ -1556,36 +1484,6 @@
       "argus_record_id": "5201622cc47d088f"
     },
     {
-      "pattern": "00:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "52086f8292101b61"
-    },
-    {
-      "pattern": "00:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "52086f8292101b61"
-    },
-    {
-      "pattern": "00:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "52086f8292101b61"
-    },
-    {
-      "pattern": "00:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "52086f8292101b61"
-    },
-    {
-      "pattern": "00:30:00",
-      "pattern_type": "oui",
-      "description": "Tiandy cctv_camera",
-      "argus_record_id": "52086f8292101b61"
-    },
-    {
       "pattern": "70:08:94",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -1614,6 +1512,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Light Quadcopter UAV drone",
       "argus_record_id": "538edd8dbdf4399b"
+    },
+    {
+      "pattern": "74:ab:93",
+      "pattern_type": "oui",
+      "description": "Blink (Amazon) cctv_camera",
+      "argus_record_id": "53be22ea95cc41a2"
     },
     {
       "pattern": "2054AGD980000",
@@ -1730,6 +1634,12 @@
       "argus_record_id": "5b064c08aeac66a6"
     },
     {
+      "pattern": "fc:9c:98",
+      "pattern_type": "oui",
+      "description": "Arlo Technologies cctv_camera",
+      "argus_record_id": "5b57d950e08d5ae7"
+    },
+    {
       "pattern": "1795F350ZS",
       "pattern_type": "drone_id_prefix",
       "description": "Zephyr Systems drone",
@@ -1836,6 +1746,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "61370d1aaf6bd9f9"
+    },
+    {
+      "pattern": "2c:aa:8e",
+      "pattern_type": "oui",
+      "description": "Wyze Labs cctv_camera",
+      "argus_record_id": "616939855485bdd1"
     },
     {
       "pattern": "2129853",
@@ -2282,12 +2198,6 @@
       "argus_record_id": "79a4e0fad1f4f751"
     },
     {
-      "pattern": "00:11:75",
-      "pattern_type": "oui",
-      "description": "Sierra Wireless automotive_telematics",
-      "argus_record_id": "7a2dde34ff8a2d54"
-    },
-    {
       "pattern": "179060702",
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
@@ -2438,6 +2348,12 @@
       "argus_record_id": "82cfe23e465e12d7"
     },
     {
+      "pattern": "cc:3b:fb",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "82d4c8aa1f9d9efc"
+    },
+    {
       "pattern": "1644FMD4100000007",
       "pattern_type": "drone_id_prefix",
       "description": "Microdrones drone",
@@ -2528,6 +2444,12 @@
       "argus_record_id": "87fcd374188f2ba7"
     },
     {
+      "pattern": "a4:11:62",
+      "pattern_type": "oui",
+      "description": "Arlo Technologies cctv_camera",
+      "argus_record_id": "888062d8d226fa7e"
+    },
+    {
       "pattern": "1701D",
       "pattern_type": "drone_id_prefix",
       "description": "Percepto AirMax drone",
@@ -2582,6 +2504,12 @@
       "argus_record_id": "8b21a6e6617fa76f"
     },
     {
+      "pattern": "f0:74:c1",
+      "pattern_type": "oui",
+      "description": "Blink (Amazon) cctv_camera",
+      "argus_record_id": "8b21bc19f126b789"
+    },
+    {
       "pattern": "00:03:c5",
       "pattern_type": "oui",
       "description": "Mobotix cctv_camera",
@@ -2610,6 +2538,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Gleesfun drone",
       "argus_record_id": "8d2b6577754817d2"
+    },
+    {
+      "pattern": "3c:a0:70",
+      "pattern_type": "oui",
+      "description": "Blink (Amazon) cctv_camera",
+      "argus_record_id": "8ddc334330aada58"
     },
     {
       "pattern": "179060902",
@@ -3236,6 +3170,12 @@
       "argus_record_id": "b30910b3a02e4e95"
     },
     {
+      "pattern": "80:48:2c",
+      "pattern_type": "oui",
+      "description": "Wyze Labs cctv_camera",
+      "argus_record_id": "b320bc75c9e70537"
+    },
+    {
       "pattern": "1701DGAS",
       "pattern_type": "drone_id_prefix",
       "description": "Percepto drone",
@@ -3320,6 +3260,18 @@
       "argus_record_id": "b9b9224825a81449"
     },
     {
+      "pattern": "7c:78:b2",
+      "pattern_type": "oui",
+      "description": "Wyze Labs cctv_camera",
+      "argus_record_id": "ba06c58ca7a79d81"
+    },
+    {
+      "pattern": "74:13:48",
+      "pattern_type": "oui",
+      "description": "Blink (Amazon) cctv_camera",
+      "argus_record_id": "ba3d1dbaea586f1d"
+    },
+    {
       "pattern": "24:32:ae",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -3392,6 +3344,12 @@
       "argus_record_id": "bff1fa7f58906ab5"
     },
     {
+      "pattern": "34:3e:a4",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "c07d2959627c49fd"
+    },
+    {
       "pattern": "A2ZD46",
       "pattern_type": "drone_id_prefix",
       "description": "A2Z drone",
@@ -3446,6 +3404,12 @@
       "argus_record_id": "c2acd6548cc417ce"
     },
     {
+      "pattern": "48:62:64",
+      "pattern_type": "oui",
+      "description": "Arlo Technologies cctv_camera",
+      "argus_record_id": "c2b251e931f56414"
+    },
+    {
       "pattern": "188470000",
       "pattern_type": "drone_id_prefix",
       "description": "Workhorse Aero drone",
@@ -3468,6 +3432,12 @@
       "pattern_type": "oui",
       "description": "Amcrest cctv_camera",
       "argus_record_id": "c49333a6c5160b10"
+    },
+    {
+      "pattern": "9c:76:13",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "c49371783f888694"
     },
     {
       "pattern": "1701DGAS00",
@@ -3530,6 +3500,12 @@
       "argus_record_id": "c89e377014bbb852"
     },
     {
+      "pattern": "f0:c8:8b",
+      "pattern_type": "oui",
+      "description": "Wyze Labs cctv_camera",
+      "argus_record_id": "c8aaa346315214f9"
+    },
+    {
       "pattern": "16416",
       "pattern_type": "drone_id_prefix",
       "description": "Applied Aeronautics drone",
@@ -3570,6 +3546,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "cb4c74698628ede3"
+    },
+    {
+      "pattern": "c4:db:ad",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "cc819561ef0d8325"
     },
     {
       "pattern": "a4:a4:59",
@@ -3758,18 +3740,6 @@
       "argus_record_id": "d3d7435f125dce2a"
     },
     {
-      "pattern": "01:02:03",
-      "pattern_type": "oui",
-      "description": "Hikvision cctv_camera",
-      "argus_record_id": "d44ee35f74385077"
-    },
-    {
-      "pattern": "01:02:03",
-      "pattern_type": "oui",
-      "description": "Hikvision cctv_camera",
-      "argus_record_id": "d44ee35f74385077"
-    },
-    {
       "pattern": "1787F03BM23",
       "pattern_type": "drone_id_prefix",
       "description": "Avidrone drone",
@@ -3840,6 +3810,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
       "argus_record_id": "d7cb2bcc1dc6c4b8"
+    },
+    {
+      "pattern": "d0:3f:27",
+      "pattern_type": "oui",
+      "description": "Wyze Labs cctv_camera",
+      "argus_record_id": "d87223bce91bc11a"
     },
     {
       "pattern": "1869AF11P0000",
@@ -4016,6 +3992,12 @@
       "argus_record_id": "e218e98b85a9c489"
     },
     {
+      "pattern": "24:2b:d6",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "e25e837de4bda20b"
+    },
+    {
       "pattern": "08:ed:ed",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -4082,6 +4064,12 @@
       "argus_record_id": "e4939955e30ad104"
     },
     {
+      "pattern": "00:b4:63",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "e4b48861ae8e4073"
+    },
+    {
       "pattern": "9c:2f:9d",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -4092,6 +4080,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
       "argus_record_id": "e509ffb02f607597"
+    },
+    {
+      "pattern": "ac:9f:c3",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "e51db29037bf7fa8"
     },
     {
       "pattern": "1865CHS720G0000",
@@ -4394,6 +4388,12 @@
       "argus_record_id": "f8ac9acae142c2df"
     },
     {
+      "pattern": "70:ad:43",
+      "pattern_type": "oui",
+      "description": "Blink (Amazon) cctv_camera",
+      "argus_record_id": "f90a75439e438fe7"
+    },
+    {
       "pattern": "b8:a4:4f",
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
@@ -4476,6 +4476,12 @@
       "pattern_type": "oui",
       "description": "March Networks cctv_camera",
       "argus_record_id": "ffb2eeb99fd8c259"
+    },
+    {
+      "pattern": "5c:47:5e",
+      "pattern_type": "oui",
+      "description": "Ring cctv_camera",
+      "argus_record_id": "ffea89bd05548e25"
     },
     {
       "pattern": "1972C",

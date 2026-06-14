@@ -90,6 +90,11 @@ extraction_outputs/**/*.pre_*_backup
 db/*_backup*
 db/*_backup*.sha256
 db/argus.db.pre_*
+# Per-dispatch pre-apply DB snapshots (311 MB each) — `argus.db.mac<NNN>_pre_apply_<UTC>[_<sha>].bak`
+# and any `argus.db*.bak` variant. The `db/argus.db.pre_*` rule above does NOT match the
+# `argus.db.mac…_pre_apply` naming, so these slipped past .gitignore (MAC-362 ship-gate landmine).
+db/argus.db*.bak
+db/argus.db.mac*_pre_apply_*
 
 # Cycle-specific raw-snapshot exports (Wave G/H v1 onward). Canonical Lynceus exports remain
 # committed; per-cycle raw snapshots live on disk for next-cycle consumer reference but do not
