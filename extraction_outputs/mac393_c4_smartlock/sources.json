@@ -1,0 +1,116 @@
+{
+  "cohort": "mac393_c4_smartlock",
+  "phase": "harvest",
+  "worker": "SourceWorker",
+  "generated_utc": "2026-06-14T16:30:00Z",
+  "stage_only": true,
+  "db_writes": 0,
+  "proposed_device_category": "smart_lock",
+  "taxonomy_note": "NO existing device_category for consumer smart locks (confirmed: SELECT DISTINCT device_category has no 'smart_lock', count=0). All leads tagged proposed 'smart_lock' + notes.category_pending_board_ratification. Minting smart_lock is a board one-way-door at the ingest gate (source-triage §5/§9). Until minted, every lead would hit the §11 #13 unknown-export ban.",
+  "identifier_types_in_scope": ["ble_service_uuid", "ble_company_id", "oui"],
+  "vendors": ["August", "Yale Assure", "Schlage Encode", "Wyze Lock", "Level", "Kwikset Halo", "Ultraloq"],
+  "note": "Cohort-4 cleared slate per source-triage §5 = Bluetooth SIG (primary_registry) + companion APKs (manufacturer_app, §11 #15 facts-only) + FCC EAS direct (primary_registry) + IEEE OUI (primary_registry). KEY STRUCTURAL FINDING: the entire BT SIG 16-bit registry is ALREADY bulk-loaded into the DB as device_category='unknown' (715 ble_company_id + 3969 ble_manufacturer_id rows) — so every vendor company-ID and 16-bit member/service UUID is already HELD; net-new BLE-registry inserts = 0; the surface there is RECATEGORIZATION (unknown -> smart_lock), gated on the taxonomy mint. The genuine net-new identifier surface is (a) vendor OUIs absent from the DB and (b) proprietary 128-bit GATT service UUIDs from companion-APK teardown.",
+  "sources": [
+    {
+      "name": "IEEE OUI registry (MA-L / MA-M / MA-S)",
+      "source_url": "https://standards-oui.ieee.org/oui/oui.csv ; https://standards-oui.ieee.org/oui28/mam.csv ; https://standards-oui.ieee.org/oui36/oui36.csv",
+      "local_artifact": "raw/ieee_oui/20260613T203034Z_{oui.csv,mam.csv,oui36.csv}",
+      "sha256": "oui.csv=fad18e776a33e445ca3afe6795fc7e8e8ef77e32663db4176ddb3ff3157f68fe; mam.csv=6051d83628de28e1cf844f7a9efb91941212dc2d9e30911cbe4b2311933d7556; oui36.csv=ed33886b9f56b087aa72c8c6a0681d27bd6dd4fec807af49bd79f77c2b9a3414",
+      "band": "primary_registry",
+      "license_posture": "IEEE public OUI registry; factual assignment data (§8.2 primary_registry, 70-85 single-source).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:24:18Z",
+      "yield": "NET-NEW OUIs (absent from DB): Kwikset 10:A4:50 (MA-L, oui.csv); 'Assa Abloy AB - Yale' B0:44:9C (MA-L); 'ASSA ABLOY AB' 00:17:7A (MA-L parent); 'ASSA ABLOY Korea iRevo' 98:1B:B5 (MA-L); 'ASSA ABLOY COTE PICARDE' DC:C0:EB (MA-L); 'ASSA ABLOY Korea Unilock' 14:A1:BF (MA-L). HELD (recat candidates): 'U-tec Group Inc.' 0C:7F:ED:8/28 (MA-M, id7200=Ultraloq maker); 'Spectrum Brands' 70:B3:D5:25:4/36 (MA-S, id21039=Kwikset parent); Wyze Labs 5 OUIs already cctv_camera (id44484-44488), A4:DA:22:2/28 (id9748); 'ASSA ABLOY(GuangZhou) Smart Technology' E8:6C:C7:1/28 (id9448); 'Allegion PLC' FA:14:66 (id37014, oui unknown). FP (name collision, NOT a cohort vendor): 'U-Tech' 70:B3:D5:06:b/36 (id21357, Anyang KR) != 'U-tec Group' (Ultraloq); all 'August*' hits are addresses (August-Thyssen-Str, St Augustine, Augustine Dr, AugustDevices India) NOT August Home."
+    },
+    {
+      "name": "Bluetooth SIG - Assigned Numbers: Company Identifiers",
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml",
+      "local_artifact": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml",
+      "sha256": "51b1ea7ddf98906df1538af7406dd7bea7c905a7d2f5cebcf4eb63c72447b5a0",
+      "band": "primary_registry",
+      "license_posture": "BT SIG public registry; factual (§8.2 primary_registry, 70-85 single-source).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:21:00Z",
+      "yield": "Vendor company-IDs (ALL already HELD as device_category='unknown' bulk-load -> recat candidates, net-new=0): 'August Home, Inc' 0x01D1 (L10621, id4507); 'Yale' 0x0BDE (L3415, id2106); 'Allegion' 0x013B (L11044, id4648 = Schlage parent); 'Wyze Labs, Inc' 0x0870 (L5878, id2926); 'Spectrum Brands, Inc.' 0x0356 (L9565, id4155 = Kwikset parent); 'ASSA ABLOY' 0x012E (L11083, id4661 = Yale/August parent). FP/reject: 'ABUS August Bremicker' 0x0CC4 (L2764, German ABUS != August Home); 'AUTEC Gesellschaft fuer Automationstechnik' 0x09B5 (L4954, German automation != U-tec/Ultraloq); 'Wyzelink Systems Inc.' 0x03D5 (L9202, distinct entity != Wyze Labs); 'LEVEL, s.r.o.' 0x0AE8 (L4099, Czech entity, almost certainly != Level Home/Lock US). ABSENT (no SIG company-ID): Schlage (uses Allegion), Kwikset (uses Spectrum Brands), Ultraloq/U-tec, Level Home."
+    },
+    {
+      "name": "Bluetooth SIG - Assigned Numbers: 16-bit Member UUIDs",
+      "source_url": "https://bitbucket.org/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml",
+      "local_artifact": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml",
+      "sha256": "42478df3da88f890d80d2a4ac46e01657c9515434c3ebae8ad72e8d921b55bf2",
+      "band": "primary_registry",
+      "license_posture": "BT SIG public registry (§8.2 primary_registry).",
+      "last_fetched_at": "2026-06-13T20:30:34Z",
+      "re_read_at": "2026-06-14T16:21:00Z",
+      "yield": "Vendor-distinct 16-bit member/service UUIDs (ALL already HELD as 'unknown' -> recat candidates, net-new=0): 'August Home Inc' 0xFE24 (L464, id37938); 'Allegion' 0xFCF4 (L1066, id38239 = Schlage parent); 'WYZE LABS, INC.' 0xFD7B (L796, id38104); 'ASSA ABLOY Opening Solutions Sweden AB' 0xFCBF (L1170, id38291). NOTE: these four are stored under identifier_type='ble_company_id' in the DB (a pre-existing typing quirk of the bulk-load); they are properly 16-bit service UUIDs. ABSENT: Yale (no own member UUID; uses company-ID 0x0BDE), Kwikset, Ultraloq, Level."
+    },
+    {
+      "name": "Companion APK - August / Yale Access (com.august.luna)",
+      "source_url": "https://apkcombo.com/august-home/com.august.luna/",
+      "local_artifact": "raw/vendor_apps/august/com.august.luna/_unsorted/e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13.apk",
+      "sha256": "e7f7dd9af04da31c4f69dfae54ada84c5f2967367822c8c2f1468b7ba3582e13",
+      "byte_count": 96532898,
+      "band": "manufacturer_app",
+      "license_posture": "Public companion APK (§11 #15 facts-only, raw gitignored). Single-APK; 8 classes*.dex. Note: the Yale Access US app merged into the August app -> covers BOTH August and Yale Assure vendors.",
+      "last_fetched_at": "2026-06-14T16:24:00Z",
+      "yield": "27 non-base 128-bit UUIDs; 26 vendor-unique after cross-vendor exclusion, ALL NET-NEW (none in DB). Candidate August-proprietary GATT families: $E295C550..554-69D0-11E4-B116-123B93F75CBA (5); $BD4AC610..616-0B45-11E3-8FFD-0800200C9A66 (7); $52E4C6BE-0F96-425C-89{0,1,2}0-DDCEF680F636 (3); + singles (1030e062,1bd19c14,279f9dab,567d7f2d,6aa5711b,6e04eae1,9a04f079,a86abc2d,bb392ec0,c06c8400,edef8ba9). ExtractionWorker to separate the genuine lock GATT service/char from any bundled-SDK UUIDs. Excluded cross-vendor magnet present: 258eafa5 (appears in all 4 cohort APKs)."
+    },
+    {
+      "name": "Companion APK - Schlage Home (com.allegion.leopard)",
+      "source_url": "https://apkcombo.com/schlage-home/com.allegion.leopard/",
+      "local_artifact": "raw/vendor_apps/schlage/com.allegion.leopard/_unsorted/fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e.apk",
+      "sha256": "fbc026c088df0fb7a93cb8ed988128231ced5a053a385d4b0fb68a3b3e5ab29e",
+      "byte_count": 114031371,
+      "nested_base_apk": "com.allegion.leopard.apk (99616318 bytes) inside XAPK bundle (+config.arm64_v8a.apk/config.en.apk/config.mdpi.apk/manifest.json)",
+      "band": "manufacturer_app",
+      "license_posture": "Public companion APK, XAPK split bundle (§11 #15 facts-only, raw gitignored). 13 dex in base. Schlage has NO own OUI/SIG-ID -> this APK is the ONLY net-new identifier surface for Schlage Encode/Sense.",
+      "last_fetched_at": "2026-06-14T16:24:00Z",
+      "yield": "Only 1 clean vendor-distinct net-new candidate: ce85ad03-0f20-4aed-abe5-b7407dd7cacc (classes2.dex). Correctly EXCLUDED (cross-vendor/non-BLE): 00000014-0000-1000-8000-0026bb765291 (Apple HomeKit base 0026bb765291); 486f6d65-6b69-7400-... (ASCII 'Homekit'); d861b25a-1edf-11eb-adc1-0242ac120002 (Docker-container-generated v1 UUID, node=02:42:ac:12:00:02 not a BLE service); ffffffff-... (all-Fs placeholder)."
+    },
+    {
+      "name": "Companion APK - Kwikset (com.kwikset.blewifi)",
+      "source_url": "https://apkcombo.com/kwikset/com.kwikset.blewifi/",
+      "local_artifact": "raw/vendor_apps/kwikset/com.kwikset.blewifi/_unsorted/6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751.apk",
+      "sha256": "6c3b74247f8f953ad1d3f2bf9f5bdf2abb3695b4baa371c6db9119e195aeb751",
+      "byte_count": 70053955,
+      "band": "manufacturer_app",
+      "license_posture": "Public companion APK (§11 #15 facts-only, raw gitignored). 3 classes*.dex.",
+      "last_fetched_at": "2026-06-14T16:24:00Z",
+      "yield": "STRONG: a clean Kwikset-proprietary 128-bit GATT profile, ALL NET-NEW: $4D0500{10..15,17,18,19,70,71,80..84,90,91,92,A0,A1,A2}-766C-42C4-8944-42BC98FC2D09 (22 service/characteristic UUIDs sharing the vendor base ...-766c-42c4-8944-42bc98fc2d09) + d4305c76-7a89-4990-9395-9e054e1b4cd3. Excluded cross-vendor (shared with Ultraloq -> Nordic/TI chipset SDK): Nordic UART 6e400001/2/3-...dcca9e; TI OAD f000ffc0..c5-0451-4000-b000-000000000000; Nordic DFU set (1d14d6ee,da2e7828,8d53dc1d,984227f3,515d6767); f7bf3564; + 258eafa5 (all-4 magnet)."
+    },
+    {
+      "name": "Companion APK - Ultraloq / U-tec 'Xthings Home (formerly U home)' (com.utec.utec)",
+      "source_url": "https://apkcombo.com/xthings-home-formerly-u-home/com.utec.utec/",
+      "local_artifact": "raw/vendor_apps/ultraloq/com.utec.utec/_unsorted/1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300.apk",
+      "sha256": "1bf404a8b27706e94e4d35f6c5f942bc705ecf0ad7687843b67cbec545bbf300",
+      "byte_count": 147174546,
+      "nested_base_apk": "com.utec.utec.apk (145409383 bytes) inside XAPK bundle",
+      "band": "manufacturer_app",
+      "license_posture": "Public companion APK, XAPK split bundle (§11 #15 facts-only, raw gitignored). 8 dex in base. U-tec is the maker of Ultraloq.",
+      "last_fetched_at": "2026-06-14T16:24:00Z",
+      "yield": "25 vendor-unique net-new candidates. Vendor-distinct families: 01ff5550/51/52-ba5e-f4ee-5ca1-eb1e5e4b1ce0 (3); 73631912/73632b12-6965-6e65-7269-736669727374 (2); + singles (0000d0ff-3c17-...,1fa97d5b,2c8f61da,7617daa5,a142addb,b73c1927,c08a25d7,c977f87a,d96b40b7,f03d385e). FLAGGED-derived: 6e400001/2/3-b5a3-f393-e0a9-e50e24dcca1e (classes5.dex; Nordic-UART base with last segment ...dcca1e vs standard ...dcca9e = customized/typo'd NUS variant); 00010203-0405-0607-0809-0a0b0c0d{1910,1912,2b10,2b11,2b12} (5; sequential-byte placeholder pattern); 84ce5c4e/84ce7201-1349-1192-9262-0242ac120002 (2; Docker-generated v1 UUIDs, not BLE services). ExtractionWorker to prune flagged subsets."
+    },
+    {
+      "name": "FCC EAS (Equipment Authorization System) direct - ATTEMPTED, HOST UNREACHABLE",
+      "source_url": "https://apps.fcc.gov/oetcf/eas/ ; https://www.fcc.gov/oet/ea/fccid",
+      "local_artifact": null,
+      "band": "primary_registry",
+      "license_posture": "Pre-cleared primary_registry, FCC-direct NOT fccid.io (§8.2). SKIPPED: host unreachable (apps.fcc.gov -> HTTP 401, www.fcc.gov -> 000/timeout, re-confirmed 2026-06-14T16:23Z). This reproduces the cohort-2 (MAC-395) FCC-EAS-direct-unreachable finding. NON-BLOCKING for cohort-4: fcc_grantee_code / equipment_class_code are NOT in cohort-4's identifier_type scope (scope = ble_service_uuid/ble_company_id/oui); FCC would have been corroboration-only here. fccid.io is forbidden (§8.2) so not substituted.",
+      "last_fetched_at": "2026-06-14T16:23:00Z",
+      "yield": "0 (host unreachable; out of identifier-type scope for c4)."
+    }
+  ],
+  "honest_absences": [
+    "Level (Level Lock/Bolt/Touch): NO IEEE OUI, NO BT SIG company-ID, NO 16-bit member UUID, and NOT mirrored on apkcombo (only a game matched 'level lock'). Level is a BLE-only deadbolt with a deliberately minimal registry footprint. 'LEVEL, s.r.o.' 0x0AE8 is a different Czech entity, NOT promoted. Net registry+APK surface for Level = 0.",
+    "August Home: no own IEEE OUI (acquired by ASSA ABLOY; uses Yale/ASSA infra). Has BT SIG company-ID 0x01D1 + UUID 0xFE24 (held-unknown) + a rich APK GATT surface (com.august.luna).",
+    "Schlage: no own IEEE OUI, no own BT SIG company-ID/UUID (uses Allegion parent 0x013B/0xFCF4). Only net-new surface = companion APK (ce85ad03-...)."
+  ],
+  "flagged_for_cto": [
+    "TAXONOMY ONE-WAY-DOOR: device_category 'smart_lock' does not exist (verified count=0). Board must decide mint vs map-to-existing at the ingest gate (source-triage §9). Until then all leads are §11 #13 export-banned.",
+    "BLE-registry net-new = 0: the entire BT SIG 16-bit registry is already bulk-loaded as device_category='unknown' (715 ble_company_id + 3969 ble_manufacturer_id). Every vendor company-ID and 16-bit service-UUID for the 7 vendors is already HELD. The BLE-registry contribution of this cohort is RECATEGORIZATION (unknown -> smart_lock), not insertion. Same pattern flagged in cohort-3 (MAC-396) and cohort-5 (MAC-368).",
+    "Wyze do-not-double-promote: Wyze Labs OUIs 2C:AA:8E/7C:78:B2/80:48:2C/D0:3F:27/F0:C8:8B are already device_category='cctv_camera' (cohort-5 MAC-378, id44484-44488). Wyze company-level OUIs/IDs cannot be cleanly attributed to the Wyze *Lock* vs Wyze *Cam*; recat to smart_lock would collide with the existing camera categorization. Needs product-level cite before any promotion.",
+    "OUI attribution caveat: OUIs are company-level. For pure-play lock vendors (Kwikset 10:A4:50, U-tec/Ultraloq 0C:7F:ED, Yale B0:44:9C) the OUI->smart_lock attribution is reasonably clean. For multi-division entities (Spectrum Brands = batteries/pet/hardware; ASSA ABLOY = commercial+consumer door hardware) it is NOT clean -> those stay caveat unless product-anchored.",
+    "FCC EAS direct unreachable (401/000) - reproduces MAC-395. Non-blocking for c4 (FCC identifier types out of scope). Standing infra issue for any future FCC-dependent cohort.",
+    "No NEW restrictive/share-alike-licensed source and no ToS-forbidden source was encountered. All four slate source classes (IEEE OUI, BT SIG, companion APK, FCC) are pre-cleared per source-triage §5. No new one-way-door."
+  ]
+}
