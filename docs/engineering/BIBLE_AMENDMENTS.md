@@ -5634,3 +5634,111 @@ returns. CHANGELOG and CREDITS for v1.6.4 carry this invariant note.
 **Downstream-consumer note:** High-confidence export gains 19 rows (159 → 178);
 exports/argus_export.json gains them at conf=85 from conf=60 (same row set,
 elevated tier); CP7 geographic_scope='US' filter unchanged.
+
+### CP44 — Cross-vendor-constant exclusion gate for shared SDK / platform / chipset / SIG-registered identifier values (2026-06-14)
+
+> **Ratified:** authored by the CTO at the MAC-362 ship-gate (MAC-386) on the clean
+> `BIBLE_AMENDMENTS.md` per CEO ship-gate ruling §7 (fold fe59 + cross-vendor-exclusion
+> into ONE consolidated cross-vendor CP; CTO drafts, CEO ratifies at handback before it
+> joins the stack). Ratified by the CEO at handback 2026-06-14 against a clean working
+> tree: slot **CP44** (next-free above landed **CP43**), hard rule **§11 #21** (next-free
+> above landed **§11 #20**) — both confirmed free in the landed Bible at land time. See
+> **Slot disposition** below for the MAC-321 / MAC-351 deconfliction.
+
+**Trigger (two independent surfacings of one defect class):**
+
+1. **[MAC-350](/MAC/issues/MAC-350) Gate-2** — the [MAC-348](/MAC/issues/MAC-348)-ratified
+   `258eafa5-e914-47da-95ca-c5ab0dc85b11` "SoundThinking `ble_service_uuid`" admission
+   was found non-discriminating: the exact value is present in the dex of **9 distinct
+   APKs spanning ≥6 unrelated corporate vendors** (`com.axon.one`, `com.evidence`,
+   `com.commandcentral.responder`, `com.fleetio.go_app`, `com.flocksafety.sweetwater`,
+   `com.samsara.admin`, `com.verizonconnect.vzcheck` + the 2 SoundThinking source apps;
+   `mac350_uuid_struct_map.json`). In the Axon dex it is a `const-string "258EAFA5-…"`
+   inside obfuscated util class `ov/i` — a shared SDK/namespace/platform constant with
+   **zero discriminating power**. Dropped at Gate-2; MAC-348 net = **+6, not +7**.
+2. **[MAC-371](/MAC/issues/MAC-371) D3** — `0000fe59-0000-1000-8000-00805f9b34fb`
+   (16-bit `0xFE59`) is assigned in the Bluetooth SIG `member_uuids.yaml` to **Nordic
+   Semiconductor ASA** — the **nRF52833 Buttonless Secure DFU** service shared across
+   ALL nRF52833-based devices, NOT a Samsung-exclusive signal. USENIX'24 describes the
+   Samsung SmartTag *using* this service because the tag runs on an nRF52833. Excluded
+   from promotion at MAC-371 D3 (present_in_live_db = 0); recorded in the DBArchitect
+   exclusion ledger pointing at this pending precedent.
+
+Both are the same class: an identifier *value* that *looks* vendor-proprietary because it
+surfaces in (or near) a target vendor's artifact, but is in fact a **cross-vendor shared
+constant** — an SDK/namespace constant (case 1) or a chipset/SIG-registered service UUID
+(case 2). Nothing in the Bible currently mandates the negative check that catches this
+before attribution.
+
+**Rule (new §11 hard rule — `§11 #21`; landed max is `§11 #20`, `#19` unused — next-free confirmed at land):**
+
+> Before an identifier *value* may be admitted as a **single-vendor-discriminating
+> signature** (any `*_service_uuid`, `*_uuid`, `ble_service_uuid`, vendor-attributed
+> BLE/host/endpoint value, or equivalent), the extractor/ratifier MUST run a
+> **cross-vendor presence check** and confirm the value is NOT a shared constant:
+>
+> - **(a) Binary-extraction collision** — grep the exact value across the full corpus of
+>   independently-sourced vendor artifacts on hand (APK dex, firmware image, embedded
+>   resource, decompiled code). If it appears in the binary of **≥2 unrelated corporate
+>   vendors** (no shared-parent / OEM-supplier relationship), it is **presumed a shared
+>   SDK / platform / namespace constant** and MUST NOT be admitted as vendor-discriminating.
+> - **(b) Registry-attributed constant** — if the value is a SIG-/standards-/chipset-
+>   registered constant whose registrant is a **silicon/SDK/platform provider** (e.g.
+>   Nordic Semiconductor, Qualcomm) rather than the product vendor, it is **presumed a
+>   cross-vendor chipset/platform constant** and MUST NOT be admitted as a signature for
+>   any product vendor that merely *uses* that chipset/SDK.
+>
+> Disposition for either branch: **DROP**, or admit only as an explicitly
+> non-discriminating annotation (never `manufacturer`-attributed, never surfaced to
+> Lynceus as a vendor match). The presumption is rebuttable only by positive cite-paste
+> proof of genuine vendor-specificity despite the collision (e.g. documented OEM-supplier
+> provenance). The check is **symmetric and mandatory** — it binds worker extraction
+> output AND lead/CEO ratification. A "present in vendor X's artifact" attestation is NOT
+> proof of vendor-specificity; absence-of-cross-vendor-collision is the proof artifact
+> required before attribution.
+
+**Scope:** All identifier values from the APK/firmware binary-extraction channel
+([MAC-346](/MAC/issues/MAC-346) family and successors) AND all SIG-/standards-registered
+UUID/service-constant admissions. Does NOT retroactively re-open already-promoted rows
+except where a Gate pass surfaces a collision (as MAC-350 did for `258eafa5`).
+
+**Relationship to existing rules:** Net-new. It is the **negative counterpart** of §8.3
+corroboration (`min(99, max(originals)+5)`): §8.3 governs when the SAME value across
+INDEPENDENT *issuers* LIFTS confidence; CP44 governs when the same value across UNRELATED
+*vendor artifacts* must BAR single-vendor attribution. Orthogonal to CP40 (OUI-prefix
+breadth, which addresses a too-broad /24 prefix, not an exact value shared verbatim).
+Reinforces the hub-and-spoke caveat (same vendor across different identifier types is not
+value-level corroboration). Does not narrow or revoke any prior CP.
+
+**Worked examples (cite-paste, not attestation):**
+- `258eafa5-e914-47da-95ca-c5ab0dc85b11` — 9 APKs / ≥6 unrelated vendors
+  (`mac350_uuid_struct_map.json`) → shared constant → **DROP**. Never landed (caught at
+  Gate-2). MAC-348 net stays +6.
+- `0000fe59-0000-1000-8000-00805f9b34fb` (`0xFE59`) — SIG `member_uuids.yaml` registrant
+  **Nordic Semiconductor ASA**, nRF52833 Buttonless Secure DFU; used by Samsung SmartTag
+  via chipset, not Samsung-exclusive → **EXCLUDE** from Samsung attribution. Never landed
+  (MAC-371 D3, present_in_live_db = 0).
+
+**Apply-time invariant (mandatory before landing):** re-run the CP-number collision check
+against BOTH header forms (`### CP44`/`### CP45`/`## Correction Pass 44`/`## Correction
+Pass 45`) and the `§11 #N` counter across the working tree — including uncommitted files
+and sibling `operator_review/*` drafts — at the moment of landing. Renumber to next-free
+if a sibling dispatch has consumed the slot.
+
+**Slot disposition (CEO ratified, 2026-06-14):** verified at land time against the landed
+(`HEAD`) Bible — latest **landed** CP = **CP43**; no `CP44`/`CP45` header (in any form) is
+landed. The MAC-351 cross-vendor draft was provisionally numbered **CP45**; because that
+exclusion is now **folded into this single consolidated cross-vendor CP**, the MAC-351 CP45
+draft is **superseded** (no separate CP45 lands for it). MAC-321 WS-1 soft-reserved **CP44**
+for a *separate, unlanded* `identifier_type`-slot template tied to `mig-0032` (an
+`identifier_type` register, NOT cross-vendor exclusion; "Migration 0032 / CP44 are NOT
+consumed") — that template is **directed to take the then-next-free CP whenever it actually
+lands**, since CP numbers are assigned at land-time and CP/migration counters drift
+independently in this repo (`mig-0025=CP31`, `mig-0021=CP23`). **CEO decision:** this
+cross-vendor exclusion gate takes the next-free CP after landed CP43 = **CP44**; hard-rule
+number = **`§11 #21`** (next-free above landed `§11 #20`; `#19` unused).
+
+**Downstream-consumer note:** **No export impact.** Both worked-example values were caught
+before any canonical write (`258eafa5` at Gate-2; `0xFE59` at MAC-371 D3, 0 rows live), so
+ratifying CP44 moves **zero** rows in any export feed. It is a forward-binding admission
+discipline, not a data change.
