@@ -129,6 +129,19 @@ def test_whistle_appcenter_secret_excluded_not_ble():
           if e["identifier"].startswith("ec6e18c5")]
     assert len(ac) == 1 and ac[0]["reason"] == "non_ble_sdk_config"
     assert "APP_CENTER_APP_SECRET" in ac[0]["detail"]
+    # the labeled SDK secret value is masked (never committed in full)
+    assert ac[0]["value_redacted"] is True
+    assert "****" in ac[0]["identifier"]
+    assert "****" in ac[0]["source_markers"]["byte_form"]
+    assert p["_meta"]["secret_redaction_count"] == 1
+
+
+@needs_raw
+def test_no_full_appcenter_secret_in_serialized_output():
+    """The full App Center secret value must not appear anywhere in candidates.json."""
+    out = REPO / "extraction_outputs" / "mac393_c6_petkid" / "candidates.json"
+    txt = out.read_text(encoding="utf-8")
+    assert "ec6e18c5-7f14-4bdf-9c95-9ead4ebd90f8" not in txt
 
 
 @needs_raw

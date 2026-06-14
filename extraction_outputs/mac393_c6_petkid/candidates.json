@@ -11,6 +11,8 @@
     "harvest_singleton_resolution": "5 of the 7 Whistle 'singletons' resolve to genuine vendor SPPLE GATT (WCConstants field names) -> promoted (+5 over harvest's 48). 1 = BT-Classic SDP (flagged), 1 = Microsoft App Center secret (excluded).",
     "excerpt_max_chars": 200,
     "pii_redaction_count": 0,
+    "secret_redaction_count": 1,
+    "secret_redaction_note": "1 excluded value (Whistle BuildConfig APP_CENTER_APP_SECRET, a Microsoft App Center SDK app-secret, non-BLE) is value-masked in this deliverable per 'never commit secrets' — the field name + dex class remain as the FP evidence; the value is not staged.",
     "pii_note": "SAR-5 / §11 #3 — company legal-entity names + IEEE registry addresses only; person-name regex applied. APK deliverable carries UUID byte-forms + dex locations + sha256 pins only (§11 #15 facts-only); no APK code copied.",
     "tile_guard": "Jiobit references Tile 0xFEEC/0xFEED (HELD id44440/44439 bluetooth_tracker, 'Tile, Inc.'). Life360 owns both -> cross-vendor, NEVER re-attributed.",
     "export_note": "gps_tracker is an exported category; if the board maps c6 to gps_tracker these rows reach the Lynceus feed -> ingest+regen is a CEO one-way door."
@@ -1689,20 +1691,21 @@
   ],
   "excluded": [
     {
-      "identifier": "ec6e18c5-7f14-4bdf-9c95-9ead4ebd90f8",
+      "identifier": "ec6e18c5-7f14-****-************",
       "identifier_type": "ble_service_uuid",
       "manufacturer": "Whistle Labs, Inc. (Mars Petcare)",
       "disposition": "excluded",
       "reason": "non_ble_sdk_config",
       "detail": "APP_CENTER_APP_SECRET: BuildConfig.APP_CENTER_APP_SECRET passed to com.microsoft.appcenter.AppCenter.configure() — Microsoft App Center analytics/crash SDK app-secret, NOT a BLE UUID.",
+      "value_redacted": true,
       "source_markers": {
         "apk_sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
         "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
         "dex_member": "classes3.dex :: Lcom/whistle/bolt/BuildConfig;",
-        "byte_form": "ec6e18c5-7f14-4bdf-9c95-9ead4ebd90f8",
-        "excerpt": "ec6e18c5-7f14-4bdf-9c95-9ead4ebd90f8"
+        "byte_form": "ec6e18c5-7f14-****-************",
+        "excerpt": "ec6e18c5-7f14-****-************"
       },
-      "db_presence": "[]"
+      "db_presence": "net-new (excluded, not staged)"
     },
     {
       "identifier": "849f26e2-2df6-11e4-ab12-14109fdc48df",
@@ -1711,6 +1714,7 @@
       "disposition": "excluded",
       "reason": "non_ble_library",
       "detail": "Salesforce Marketing Cloud SDK analytics constant (…/analytics/piwama) — not a vendor BLE service UUID. Harvest's AltBeacon/Smartlook guess corrected.",
+      "value_redacted": false,
       "source_markers": {
         "apk_sha256": "0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca",
         "rel_path": "raw/vendor_apps/angelsense/com.angelsense.mobile/4.2.0/0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca.apk",
@@ -1718,7 +1722,7 @@
         "byte_form": "849f26e2-2df6-11e4-ab12-14109fdc48df",
         "excerpt": "849f26e2-2df6-11e4-ab12-14109fdc48df"
       },
-      "db_presence": "[]"
+      "db_presence": "net-new (excluded, not staged)"
     },
     {
       "identifier": "f6389234-1024-481f-9173-37d9d7f5051f",
@@ -1727,6 +1731,7 @@
       "disposition": "excluded",
       "reason": "non_ble_library",
       "detail": "Salesforce Marketing Cloud SDK AesCrypto.ENC_TEST_STRING (AES encryption test vector) — not a BLE UUID at all.",
+      "value_redacted": false,
       "source_markers": {
         "apk_sha256": "0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca",
         "rel_path": "raw/vendor_apps/angelsense/com.angelsense.mobile/4.2.0/0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca.apk",
@@ -1734,7 +1739,7 @@
         "byte_form": "F6389234-1024-481F-9173-37D9D7F5051F",
         "excerpt": "F6389234-1024-481F-9173-37D9D7F5051F"
       },
-      "db_presence": "[]"
+      "db_presence": "net-new (excluded, not staged)"
     }
   ],
   "tile_held_cross_vendor": [

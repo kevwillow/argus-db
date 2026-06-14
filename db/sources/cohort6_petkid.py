@@ -448,23 +448,35 @@ def build() -> dict:
         flagged_ambiguous.append(c)
 
     # ---- (E) excluded FPs (non-BLE library/SDK), with cited co-located class ----
-    def _excl(vendor, uuid, co_token, reason, detail):
+    secret_redactions = 0
+
+    def _excl(vendor, uuid, co_token, reason, detail, mask_secret=False):
+        nonlocal secret_redactions
         scan = scans[vendor]
         dex_entry, byte_form = scan[uuid]
         co_dex = byte_locate(vendor, co_token)
         apk = APKS[vendor]
+        ident, shown = uuid, byte_form
+        if mask_secret:
+            # §11 #3 / "never commit secrets" — this excluded value is a labeled SDK
+            # app-secret. Its exact value is not needed for the FP disposition (the
+            # field name + dex class are the evidence). Mask all but the prefix.
+            secret_redactions += 1
+            mask = uuid[:13] + "-****-************"
+            ident, shown = mask, mask
         return {
-            "identifier": uuid, "identifier_type": "ble_service_uuid",
+            "identifier": ident, "identifier_type": "ble_service_uuid",
             "manufacturer": apk["vendor"], "disposition": "excluded", "reason": reason,
-            "detail": detail,
+            "detail": detail, "value_redacted": mask_secret,
             "source_markers": {"apk_sha256": apk["sha256"], "rel_path": apk["rel_path"],
                                "dex_member": f"{dex_entry} :: {co_token}",
-                               "byte_form": byte_form, "excerpt": clip(byte_form)},
-            "db_presence": str(already_in_db(conn, uuid)) or "net-new",
+                               "byte_form": shown, "excerpt": clip(shown)},
+            "db_presence": "net-new (excluded, not staged)",
         }
 
     for u, (field, klass, reason, detail) in WHISTLE_EXCLUDED_FP.items():
-        excluded.append(_excl("whistle", u, klass, reason, f"{field}: {detail}"))
+        excluded.append(_excl("whistle", u, klass, reason, f"{field}: {detail}",
+                              mask_secret=(reason == "non_ble_sdk_config")))
     for u, (klass, reason, detail) in ANGELSENSE_FP.items():
         excluded.append(_excl("angelsense", u, klass, reason, detail))
 
@@ -618,6 +630,11 @@ def build() -> dict:
                                             "1 = Microsoft App Center secret (excluded).",
             "excerpt_max_chars": MAX_EXCERPT,
             "pii_redaction_count": pii_redactions,
+            "secret_redaction_count": secret_redactions,
+            "secret_redaction_note": "1 excluded value (Whistle BuildConfig APP_CENTER_APP_SECRET, a "
+                                     "Microsoft App Center SDK app-secret, non-BLE) is value-masked in "
+                                     "this deliverable per 'never commit secrets' — the field name + "
+                                     "dex class remain as the FP evidence; the value is not staged.",
             "pii_note": "SAR-5 / §11 #3 — company legal-entity names + IEEE registry addresses only; "
                         "person-name regex applied. APK deliverable carries UUID byte-forms + dex "
                         "locations + sha256 pins only (§11 #15 facts-only); no APK code copied.",
