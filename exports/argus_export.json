@@ -1,21 +1,21 @@
 {
   "_meta": {
     "argus_version": "32",
-    "exported_at": "2026-06-14T05:32:23Z",
-    "record_count": 900,
+    "exported_at": "2026-06-14T23:39:22Z",
+    "record_count": 902,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "e48bfd05-f376-56a1-976c-009204e1e462",
-    "source_record_count": 43123,
+    "argus_run_id": "d8a566e2-dcab-547d-bc28-2a52bd087842",
+    "source_record_count": 43128,
     "dropped_in_export": {
       "unknown_category": 33350,
       "generic_reserved_uuid": 1,
       "ssid_pattern": 24,
       "device_fingerprint": 6,
       "ble_local_name": 21,
-      "ble_characteristic": 17,
+      "ble_characteristic": 20,
       "product_family_codename": 156,
       "oversized_mac_range": 47,
       "icao_24bit_address": 2,
@@ -456,6 +456,12 @@
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "13fd07260e6f48dc"
+    },
+    {
+      "pattern": "41584a41-4e55-5342-5743-444556494345",
+      "pattern_type": "ble_uuid",
+      "description": "Axon body_cam",
+      "argus_record_id": "140a1d4f3e75913e"
     },
     {
       "pattern": "a4:4b:d9",
@@ -3318,6 +3324,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Amazon Prime Air drone",
       "argus_record_id": "9b4dd7e3dfb02e49"
+    },
+    {
+      "pattern": "4d455452-4f50-4f4c-4953-444556494345",
+      "pattern_type": "ble_uuid",
+      "description": "Axon body_cam",
+      "argus_record_id": "9c8fe37423a0a82a"
     },
     {
       "pattern": "1886BSKY200020",

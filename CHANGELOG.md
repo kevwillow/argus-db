@@ -14,6 +14,36 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.10 — 2026-06-14 (PROPOSED — staged, pending board push-gate)
+
+A **data-shape micro-increment** on top of v1.6.9, landing the board-ratified Axon body-cam GATT admission deferred from [MAC-351](/MAC/issues/MAC-351) → [MAC-352](/MAC/issues/MAC-352) (board approval `879bbc33`). It admits **5 net-new identifiers** from a single vendor app (`com.axon.one` v2.2.1, apkcombo, sha256 `8c50b579…`): 2 `ble_service_uuid` (METROPOLISDEVICE, AXJANUSBWCDEVICE) and 3 `ble_characteristic` (`9ec5d2b8-…-b5e1/e2/e3`), all confidence 70, manufacturer Axon (id 15), `device_category=body_cam`. Basis is a client-side GATT def-use trace (CTO-re-verified against the baksmali tree): the 2 services bind via `BluetoothGattService.getUuid()`-vs-field-`k`, the 3 characteristics via `BluetoothGattCharacteristic.getUuid()`-vs-fields-`l/m/n`, all through the same `Lv8/d;`/`Lv8/c;` profile (`com.axon.aec.core`). `RESOLVABLECAMFV1` (`5245534f-…`) stays **DROPPED** (advertised/scan-filter service-data only, no GATT-service binding — deferred to the [MAC-416](/MAC/issues/MAC-416) advertised-service-data admission taxonomy). **No schema migration** (schema_version stays **32**), **no new Correction Pass** (the cross-vendor exclusion gate already landed as CP44 in v1.6.8; all 5 values pass it as single-vendor `com.axon.one`), **no new manufacturer or source** (Axon and the apkcombo source already exist). Active identifier count moves **43,123 → 43,128**; the standard Lynceus feed grows **900 → 902** and the high-confidence feed **351 → 353** as the 2 Axon service UUIDs surface via the settled `ble_service_uuid → ble_uuid` map. The 3 characteristics are stored but Lynceus-dropped (the scanner discovers by service UUID, not characteristic). Staged STAGE-ONLY; the push/tag and final version number are assigned at the board push-gate.
+
+### What's new
+
+- **Axon body-worn camera BLE signatures reach the feed (+2).** The METROPOLIS and AXJANUS service UUIDs — bound as genuine client-side GATT services in the Axon Evidence Capture app, not scan-filter decoys — register as `ble_uuid` feed entries (`description: "Axon body_cam"`). A scanner now alerts on a nearby Axon body cam by its BLE service UUID.
+- **Characteristic triplet captured (+3, not feed-visible).** The 3 GATT characteristics bound under those services land as `ble_characteristic` rows (Lynceus-dropped per CP13 §4.4). They correct a prior shallow pass that wrongly dropped them as "non-BLE".
+
+### Schema
+
+- None. schema_version stays **32**.
+
+### Data
+
+- **`identifiers` active:** 43,123 → **43,128** (+5; 2 `ble_service_uuid` + 3 `ble_characteristic`, all net-new).
+- **`identifiers` total:** 43,678 → **43,683**.
+- **device categories / manufacturers / sources:** unchanged (Axon id 15 + apkcombo source pre-exist).
+- **Lynceus standard feed:** 900 → **902** (+2). **high-confidence feed:** 351 → **353** (+2). **behavioral-signatures feed:** unchanged.
+
+### Bible amendments
+
+- None this increment. The cross-vendor-constant exclusion gate is the already-landed **CP44** (v1.6.8); all 5 values pass it. The positive GATT-binding admission bar is deferred to [MAC-416](/MAC/issues/MAC-416) as one consolidated BLE-UUID admission taxonomy (with the advertised-service-data question). The write is governed meanwhile by CP44 + cite-paste + Validator.
+
+### Halts encountered
+
+- None. The export reconciled cleanly after the SAR-18 sibling coverage-matrix regen (the new `ble_characteristic` drops were registered in the MAC-45 drop_assignments map); 0-regression verified — all 43,678 pre-existing rows byte-identical, export delta exactly +2/−0; §11 #3 PII guards passed at all emit sites.
+
+---
+
 ## v1.6.9 — 2026-06-14
 
 A **data-shape release** on top of v1.6.8 — the dedicated BLE-tracker fast-follow promised in the v1.6.8 notes (MAC-387). It does three coupled things: mints a durable `bluetooth_tracker` device category (the project's first schema migration since 0031), recategorizes the 46 captured tracker rows out of the export-suppressed `unknown` bin, and absorbs the ratified MAC-359 `ble_service_uuid → ble_uuid` export MAP so BLE service UUIDs reach the Lynceus feeds for the first time. **No new identifiers are sourced** — every value already landed in v1.6.8 and traces to its cohort-1 artifact (OpenHaystack, peer-reviewed Find-My teardowns, Bluetooth-SIG `0x004C`); this cycle is categorization + export-visibility only. schema_version moves **31 → 32**; manufacturers, sources, and the active identifier count are unchanged (43,123 active). The standard Lynceus feed grows **737 → 900** and the high-confidence feed **348 → 351**, as the BLE service-UUID map surfaces 163 previously-dropped rows (feed `ble_uuid` entries 8 → 171). One false-positive was caught and held during validation — the Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor magnet — recategorized back to `unknown` so it reaches neither feed.
