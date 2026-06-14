@@ -1,0 +1,161 @@
+{
+  "cohort": "MAC-393 c6 - Pet / kid cellular trackers (stalkerware-adjacent)",
+  "issue": "MAC-399",
+  "worker": "SourceWorker",
+  "phase": "harvest (STAGE ONLY - no DB write, no ingest, no push)",
+  "generated_at": "2026-06-14T17:05:00Z",
+  "device_category": "ROUTING QUESTION (source-triage §7/§9): default proposal route to existing gps_tracker (122 rows) + notes.subtype='pet_kid_cellular' (no mint) OR mint personal_tracker. personal_tracker does NOT exist (verified count=0). Board ingest-gate decision; harvest stages nothing as promoted.",
+  "identifier_types_in_scope": ["fcc_grantee_code", "equipment_class_code", "ble_company_id", "ble_service_uuid", "oui"],
+  "vendors": ["Jiobit", "AngelSense", "Whistle", "Fi"],
+  "headline": "Unlike c2/c5 (FCC-blocked + thin BLE), c6's companion-APK BLE surface is RICH: 3 of the 4 vendors expose clean vendor-proprietary GATT families (all NET-NEW). Fi=23 UUIDs (57b4...-2528-d6bc-b043-b49af0ec06c1), Jiobit=10 (d8ecdb...-ddb6-4ffd-8f65-753cb9dc2e8a + 0xDB01 + 'JIO'-ASCII custom), Whistle=15 across 3 unique-to-Whistle GATT families (multi-generation device line). Plus 1 clean IEEE oui (Whistle Labs E07C62). AngelSense is cellular-only (no clean vendor BLE; 2 library/unattributed UUIDs). PRIMARY FCC surface (grantee + equipment-class at primary_registry) is BLOCKED: FCC EAS direct host unreachable (apps.fcc.gov/www.fcc.gov http 000; data.fcc.gov 200 but no EAS) - reproduces MAC-395/397/398. ble_company_id net-new=0 (no vendor is a BT SIG member under its own name). Double-promotion guard FIRED: Jiobit references Tile UUIDs 0xFEEC/0xFEED (HELD id44440/44439 bluetooth_tracker) - Life360 owns both Jiobit and Tile.",
+  "provenance_pins": {
+    "ieee_oui_csv": {"path": "raw/ieee_oui/20260613T203034Z_oui.csv", "sha256_prefix": "fad18e776a33e445", "band": "primary_registry"},
+    "btsig_company_identifiers": {"path": "raw/bluetooth_sig/20260613T203034Z_company_identifiers.yaml", "sha256_prefix": "51b1ea7ddf98906df153", "band": "primary_registry"},
+    "btsig_member_uuids": {"path": "raw/bluetooth_sig/20260613T203034Z_member_uuids.yaml", "sha256_prefix": "42478df3da88f890d80d", "band": "primary_registry"}
+  },
+  "sources_mined": [
+    {
+      "source_name": "Fi (Barking Labs) companion APK 'Fi - GPS Dog Tracker'",
+      "source_type": "manufacturer_app",
+      "source_url": "https://apkcombo.com/fi-gps-dog-tracker/com.barkinglabs.fi/",
+      "package_id": "com.barkinglabs.fi",
+      "app_label": "Fi",
+      "version": "3.107.0 (versionCode 869)",
+      "developer_legal_name": "Barking Labs Corp",
+      "file_ext": "apk (XAPK bundle: base com.barkinglabs.fi.apk + config.arm64_v8a + config.en + config.hdpi)",
+      "byte_count": 38635764,
+      "sha256": "72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753",
+      "rel_path": "raw/vendor_apps/fi/com.barkinglabs.fi/3.107.0/72bcbcfd9d6f481d037ae99a5a23c26d2f0755f5d8c38d7aed201a27a35ea753.apk",
+      "license_posture": "manufacturer_app §11 #15 facts-only; raw binary gitignored (raw/ in .gitignore:5); dex scanned in /tmp/mac393_c6_scratch (never committed)",
+      "fetched_at": "2026-06-14T16:58:00Z",
+      "mirror": "apkcombo.com",
+      "package_id_cite": "aapt dump badging -> package: name='com.barkinglabs.fi' versionCode='869' versionName='3.107.0'",
+      "yield": "23 NET-NEW vendor ble_service_uuid (57b4XXXX-2528-d6bc-b043-b49af0ec06c1, Fi proprietary GATT base, co-located com/barkinglabs/fi BLE code) + ble_local_name prefixes 'fi-db'/'fi-backhaul-db'/'fi-walk-'.",
+      "fp_excluded": ["258eafa5-e914-47da-95ca-c5ab0dc85b11 (cross-vendor FP magnet, also c1/c2)", "95ed6082-... (androidx.work.Data id)", "edef8ba9-... (urn:uuid namespace)", "Nordic DFU SDK no.nordicsemi.android.dfu v2.11.0 bundled (SDK, not Fi)"]
+    },
+    {
+      "source_name": "Jiobit (Life360) companion APK 'Jiobit'",
+      "source_type": "manufacturer_app",
+      "source_url": "https://apkcombo.com/jiobit-smart-tag/com.jiobit.app/",
+      "package_id": "com.jiobit.app",
+      "app_label": "Jiobit",
+      "version": "1.26.2 (versionCode 210010445)",
+      "developer_legal_name": "Jiobit (Life360, Inc.)",
+      "file_ext": "apk (XAPK bundle: base com.jiobit.app.apk + config splits)",
+      "byte_count": 21083681,
+      "sha256": "767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba",
+      "rel_path": "raw/vendor_apps/jiobit/com.jiobit.app/1.26.2/767e55e406f48f235c2e9d7446beb5b4f945381cddee012a8c99446d538f76ba.apk",
+      "license_posture": "manufacturer_app §11 #15 facts-only; raw binary gitignored; dex scanned in /tmp scratch (never committed)",
+      "fetched_at": "2026-06-14T16:59:00Z",
+      "mirror": "apkcombo.com",
+      "package_id_cite": "aapt dump badging -> package: name='com.jiobit.app' versionCode='210010445' versionName='1.26.2'",
+      "yield": "10 NET-NEW vendor ble_service_uuid: d8ecdb01..0b-ddb6-4ffd-8f65-753cb9dc2e8a (8) + 0000db01-...805f9b34fb (0xDB01 custom short) + 4a000000-0000-1000-8000-00805f4a494f ('JIO'=4a494f ASCII custom). com/jiobit/app BluetoothGattService code.",
+      "fp_excluded": ["0000feec-/0000feed-... = Tile, Inc. (HELD id44440/44439 bluetooth_tracker) - Life360 owns Jiobit+Tile, do-NOT-double-promote", "5eb5a37e-/b2f7f966-... = beacon-library 'Example:' region UUIDs", "00:04:61:02:AA:FF hardcoded MAC = 00:04:61 EPOX Computer Co. (placeholder, NOT Jiobit OUI)"]
+    },
+    {
+      "source_name": "Whistle (Whistle Labs / Mars Petcare) companion APK 'Whistle: Smart Pet Tracker'",
+      "source_type": "manufacturer_app",
+      "source_url": "https://apkcombo.com/whistle-smart-pet-tracker/com.whistle.bolt/",
+      "package_id": "com.whistle.bolt",
+      "app_label": "Whistle",
+      "version": "5.11.0.7264.release/5.11.0 (versionCode 511007264)",
+      "developer_legal_name": "Whistle Labs, Inc.",
+      "file_ext": "apk (direct, classes.dex..classes4.dex)",
+      "byte_count": 147888967,
+      "sha256": "16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac",
+      "rel_path": "raw/vendor_apps/whistle/com.whistle.bolt/5.11.0.7264/16acee8ff4338921ede7069e112750efd7d30d04ec0518f63190b2d011f518ac.apk",
+      "license_posture": "manufacturer_app §11 #15 facts-only; raw binary gitignored; dex scanned in /tmp scratch (never committed)",
+      "fetched_at": "2026-06-14T17:00:00Z",
+      "mirror": "apkcombo.com",
+      "package_id_cite": "aapt dump badging -> package: name='com.whistle.bolt' versionCode='511007264' versionName='5.11.0.7264.release/5.11.0'",
+      "yield": "15 NET-NEW vendor ble_service_uuid across 3 GATT families UNIQUE to Whistle's dex (0 in Fi/Jiobit/AngelSense): 00002760-08c2-11e1-9073-0e8ac72eXXXX (4), XXc8245c-829e-91b9-e34d-c7acb15a89d7 (6), d7895ab1-acc7-4de3-b991-9e825c24c8XX (5). Vendor-owned BLE stack com/whistle/bluetooth/android/WhistleCoreBleUtils + com/whistle/bolt/models/WhistleDevice. ble_local_name 'whistle3'/'whistle3_charge'.",
+      "fp_excluded": ["full SIG 16-bit UUID lookup table bundled (105 x 0000XXXX-0000-1000-8000-00805f9b34fb = standard, not Whistle)", "00000000-... null / 00ffffff-... all-ones mask / 00000000-deca-fade-... placeholder", "withCompanyId/MANUFACTURER_ID_APPLE = scans Apple iBeacon company id, not Whistle's own"],
+      "needs_extraction_fp_triage": ["0734594a-a8e7-4b1a-a6b1-cd5243059a57", "14839ac4-7d7e-415c-9a42-167340cf2339", "6cdc3b69-0077-4d0a-b91c-712b2b37775f", "8b00ace7-eb0b-49b0-bbe9-9aee0a26e1a3", "ba04c4b2-892b-43be-b69c-5d13f2195392", "e06d5efb-4f4a-45c0-9eb1-371ae5a14ad4", "ec6e18c5-7f14-4bdf-9c95-9ead4ebd90f8"]
+    },
+    {
+      "source_name": "AngelSense companion APK 'AngelSense Guardian'",
+      "source_type": "manufacturer_app",
+      "source_url": "https://apkcombo.com/angelsense-guardian/com.angelsense.mobile/",
+      "package_id": "com.angelsense.mobile",
+      "app_label": "AngelSense",
+      "version": "4.2.0 (versionCode 400200004)",
+      "developer_legal_name": "AngelSense",
+      "file_ext": "apk (direct, classes.dex + classes2.dex)",
+      "byte_count": 18669285,
+      "sha256": "0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca",
+      "rel_path": "raw/vendor_apps/angelsense/com.angelsense.mobile/4.2.0/0a49bff48ee2a233d4e961ed5e596b43086cdb404c38085317f3e580b14a13ca.apk",
+      "license_posture": "manufacturer_app §11 #15 facts-only; raw binary gitignored; dex scanned in /tmp scratch (never committed)",
+      "fetched_at": "2026-06-14T16:59:30Z",
+      "mirror": "apkcombo.com",
+      "package_id_cite": "aapt dump badging -> package: name='com.angelsense.mobile' versionCode='400200004' versionName='4.2.0'",
+      "yield": "0 clean net-new vendor BLE. Cellular-only kid/special-needs tracker. Only 2 distinct 128-bit UUIDs (849f26e2-2df6-11e4-ab12-14109fdc48df, f6389234-1024-481f-9173-37d9d7f5051f); AltBeacon library present, 'Region' strings are Smartlook analytics SDK not beacons. Both UUIDs unattributed -> ExtractionWorker FP-triage (likely library). NOT promoted by harvest.",
+      "fp_excluded": ["getWorldManufacturerID/worldManufacturerID = VIN World-Manufacturer-Identifier (automotive/maps lib), NOT BLE company id", "02:00:00:00:00:00 = Android unavailable-MAC placeholder"]
+    }
+  ],
+  "leads_by_identifier_type": {
+    "oui": {
+      "band": "primary_registry (IEEE)",
+      "clean_net_new": [
+        {"value": "E07C62", "org": "Whistle Labs, Inc.", "source": "raw/ieee_oui/20260613T203034Z_oui.csv:11633", "excerpt": "MA-L,E07C62,\"Whistle Labs, Inc.\",\"251 Rhode Island Street, Suite 211 San Francisco CA US 94013 \"", "db_presence": "net-new", "note": "pure-play pet-tracker vendor; the cohort device. Cleanest promotable lead."}
+      ],
+      "fp_rejected": [
+        {"value": "78047A", "org": "Edge Networks LLC", "source": "oui.csv:758", "reason": "street name 'Whistler Hill Lane' name-collision, not the vendor"},
+        {"value": "006061", "org": "WHISTLE COMMUNICATIONS CORP.", "source": "oui.csv:14135", "reason": "1990s Foster City networking company (Marsh Drive), NOT Whistle Labs pet tracker"}
+      ],
+      "absent": "Jiobit / AngelSense / Fi (Barking Labs) have NO IEEE OUI under their own names (cellular cloud-clients; the device OUI belongs to the cellular-module vendor, not derivable from the app)."
+    },
+    "ble_service_uuid": {
+      "band": "manufacturer_app (128-bit vendor GATT, all NET-NEW as values)",
+      "fi_57b4_family": ["57b40001", "57b40002", "57b40003", "57b40006", "57b40007", "57b4000c", "57b4000d", "57b40013", "57b40210", "57b40211", "57b40212", "57b40213", "57b40214", "57b40215", "57b40216", "57b40217", "57b43001", "57b43002", "57b43003", "57b43004", "57b44001", "57b44022", "57b44023"],
+      "fi_base_suffix": "-2528-d6bc-b043-b49af0ec06c1",
+      "jiobit_family": ["d8ecdb01-ddb6-4ffd-8f65-753cb9dc2e8a", "d8ecdb02-ddb6-4ffd-8f65-753cb9dc2e8a", "d8ecdb03-ddb6-4ffd-8f65-753cb9dc2e8a", "d8ecdb05-ddb6-4ffd-8f65-753cb9dc2e8a", "d8ecdb08-ddb6-4ffd-8f65-753cb9dc2e8a", "d8ecdb09-ddb6-4ffd-8f65-753cb9dc2e8a", "d8ecdb0a-ddb6-4ffd-8f65-753cb9dc2e8a", "d8ecdb0b-ddb6-4ffd-8f65-753cb9dc2e8a", "0000db01-0000-1000-8000-00805f9b34fb", "4a000000-0000-1000-8000-00805f4a494f"],
+      "whistle_family_A_2760": ["00002760-08c2-11e1-9073-0e8ac72e0011", "00002760-08c2-11e1-9073-0e8ac72e0012", "00002760-08c2-11e1-9073-0e8ac72e0013", "00002760-08c2-11e1-9073-0e8ac72e1011"],
+      "whistle_family_B_d7895ab1": ["d7895ab1-acc7-4de3-b991-9e825c24c801", "d7895ab1-acc7-4de3-b991-9e825c24c802", "d7895ab1-acc7-4de3-b991-9e825c24c804", "d7895ab1-acc7-4de3-b991-9e825c24c809", "d7895ab1-acc7-4de3-b991-9e825c24c80b"],
+      "whistle_family_C_c8245c": ["00c8245c-829e-91b9-e34d-c7acb15a89d7", "01c8245c-829e-91b9-e34d-c7acb15a89d7", "02c8245c-829e-91b9-e34d-c7acb15a89d7", "04c8245c-829e-91b9-e34d-c7acb15a89d7", "09c8245c-829e-91b9-e34d-c7acb15a89d7", "11c8245c-829e-91b9-e34d-c7acb15a89d7"],
+      "counts": {"fi": 23, "jiobit": 10, "whistle": 15, "angelsense_unattributed": 2, "whistle_singletons_fp_triage": 7},
+      "db_presence": "ALL families net-new (mode=ro confirmed on sampled+endpoint values)"
+    },
+    "ble_company_id": {
+      "band": "primary_registry (BT SIG)",
+      "net_new": 0,
+      "note": "No cohort vendor (Jiobit/AngelSense/Whistle/Fi/Barking Labs/Life360/Mars Petcare) is a BT SIG member under its own name (grep of company_identifiers.yaml empty). Whistle dex has BLE company-id scan machinery (withCompanyId/setManufacturerData/MANUFACTURER_ID_APPLE) but the numeric value is an in-code int constant (not a cite-pasteable string) and references Apple's iBeacon id, not a Whistle-assigned id. Deferred to ExtractionWorker (smali disasm) - NOT asserted here per §11 #1."
+    },
+    "fcc_grantee_code": {"band": "primary_registry (FCC EAS direct)", "status": "BLOCKED - FCC EAS host unreachable", "see": "sources_flagged.fcc_eas"},
+    "equipment_class_code": {"band": "primary_registry (FCC EAS direct)", "status": "BLOCKED - lives only in the EAS grant record (host unreachable)", "see": "sources_flagged.fcc_eas"},
+    "ble_local_name_BONUS_out_of_brief": {
+      "note": "ble_local_name (exists, 21 rows) is NOT in the brief's listed identifier_types but is a real DB type; recorded as bonus leads (like c2's cloud endpoints) for CTO scope decision. All NET-NEW.",
+      "fi": ["fi-db", "fi-backhaul-db", "fi-walk-"],
+      "whistle": ["whistle3", "whistle3_charge"]
+    }
+  },
+  "sources_flagged": [
+    {
+      "id": "fcc_eas",
+      "source_name": "FCC EAS direct (apps.fcc.gov / www.fcc.gov Equipment Authorization System Generic Search)",
+      "disposition": "BLOCKED - HOST UNREACHABLE (blocks the cohort PRIMARY primary_registry surface: fcc_grantee_code + equipment_class_code)",
+      "evidence": "apps.fcc.gov -> http 000 (t=0.27s); www.fcc.gov -> http 000; data.fcc.gov -> 200 but hosts NO EAS; control google.com -> 301. Log: logs/mac393_c6_petkid_fcc_eas_unreachable_20260614T170026Z.log. Reproduces MAC-395/397/398.",
+      "unblock_owner_action": "CTO/CEO: (a) retry EAS-direct from a US-reachable host/proxy, OR (b) authorize manufacturer_doc-band substitution for grantee codes - a source-band decision above SourceWorker's authority. Per §7.2 do-not-retry-forever: stopped.",
+      "feed_impact_note": "Per MAC-395 finding, fcc_grantee_code + equipment_class_code are EXPORT-DROPPED (registry-internal, never reach the Lynceus feed). So this blocker is a COMPLETENESS gap, NOT a feed-blocking one."
+    },
+    {
+      "source_name": "fccid.io / fcc.report / device.report (FCC aggregators)",
+      "disposition": "NOT MINED (forbidden §8.2 - FCC-direct NOT fccid.io)",
+      "reason": "Hard gate. No FCC values lifted from aggregators."
+    }
+  ],
+  "double_promotion_guards": [
+    "Jiobit references Tile UUIDs 0xFEEC (id44440) + 0xFEED (id44439), both HELD bluetooth_tracker / manufacturer 'Tile, Inc.'. Life360 owns BOTH Jiobit and Tile (acquired 2021) -> these are cross-vendor Tile identifiers, do-NOT-re-attribute to Jiobit. Mirrors Wyze (c4) / Ring-Blink (c5) guards."
+  ],
+  "advisory_findings_standing_flock_copcar_note": [
+    "Cross-vendor BLE FP magnet 258eafa5-e914-47da-95ca-c5ab0dc85b11 now confirmed in c1 (spycam) + c2 (Tracki/Bouncie) + c6 (Fi) = 4 vendor contexts. Reinforces the standing cross-vendor-UUID exclude list (wave-1 0xFE59/0xFD6F precedent).",
+    "Corporate-relationship intel (Phase-3 advisory, NOT actioned): Life360 -> Jiobit + Tile (Tile UUIDs in Jiobit app); Mars Petcare -> Whistle Labs; Barking Labs -> Fi. Not a Flock/cop-car cluster vendor, surfaced for completeness only."
+  ],
+  "hard_gate_compliance": {
+    "§11_1_cite_paste": "every lead traces to a pinned artifact: APK sha256+version (aapt) + dex string literal, or oui.csv line. FP collisions cross-checked + rejected. No values from memory.",
+    "§11_15_apk_facts_only": "4 raw APKs under raw/vendor_apps/ (gitignored); dex scanned in /tmp/mac393_c6_scratch (never committed); only values + relative paths recorded.",
+    "§11_16_license": "all sources pre-cleared (manufacturer_app / primary_registry); no restrictive/share-alike source encountered; no new license one-way-door.",
+    "§8.2_fcc_direct": "FCC EAS attempted direct (blocked); fccid.io NOT used.",
+    "§11_3_pii": "only legal-entity developer names (Barking Labs Corp / Whistle Labs Inc / AngelSense / Life360-Jiobit) + IEEE registry company addresses; no person-PII; FCC applicant PII n/a (host unreachable).",
+    "no_db_write": "STAGE ONLY; db/argus.db opened mode=ro for presence checks only; no ingest; no push."
+  }
+}
