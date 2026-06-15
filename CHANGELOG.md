@@ -14,7 +14,7 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
-## v1.6.10 — 2026-06-14 (PROPOSED, staged, pending board push-gate)
+## v1.6.10 — 2026-06-14
 
 A **multi-cohort data release** on top of v1.6.9: Wave 2 ([MAC-392](/MAC/issues/MAC-392) / [MAC-419](/MAC/issues/MAC-419), canonical write `3d5785b`), bundled with the board-ratified Axon body-cam GATT micro-increment ([MAC-352](/MAC/issues/MAC-352), board approval `879bbc33`, commit `8ea3352`). The two ship under one tag because MAC-352 is woven into the same canonical write and regen and cannot be cleanly separated. The cycle admits **132 net-new identifiers** across six device cohorts plus the body-cam increment, mints two durable device categories (`smart_lock`, `smart_home_hub`), and is the project's second schema migration in two cycles. schema_version moves **32 → 33** (migration `0033`, CP46). Active identifier count moves **43,123 → 43,255** (+132); total **43,678 → 43,810** (+132, all admissions active, zero supersessions). The standard Lynceus feed grows **900 → 1,014** (+114) and the high-confidence feed **351 → 464** (+113); the behavioral-signatures feed is unchanged at 132. Every admitted value traces to a quotable public source (IEEE OUI registry, Bluetooth-SIG assigned numbers, vendor APK static analysis, bounded WiGLE confirmation passes); each cohort was CTO-re-verified against the live database, and the feed deltas below were computed from the actual regen, not estimated.
 
@@ -42,14 +42,6 @@ A **multi-cohort data release** on top of v1.6.9: Wave 2 ([MAC-392](/MAC/issues/
 - **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change).
 - **Lynceus standard feed:** 900 → **1,014** (+114 = cohort-4 56 + cohort-6 54 + cohort-3 1 + cohort-5 1 + MAC-352 2). **high-confidence feed:** 351 → **464** (+113, same set minus the single-source Pebblebee row). **behavioral-signatures feed:** **132** (no change). **CSV:** 43,255 rows, matching the active count.
 - **Feed-membership note (load-bearing).** 114 of 132 net-new rows reach the JSON feeds. The 18 that do not are the 10 `ssid_pattern` + 5 `ble_local_name` (§4.4-dropped) + 3 `ble_characteristic` (scanner matches by service UUID). All 132 appear in `argus_export.csv`.
-
-### Bible amendments
-
-- **CP46** mints `device_category='smart_lock'` and `device_category='smart_home_hub'` (taxonomy +2, dual-table), and narrows the §11 #13 `unknown`-category export ban to exclude these two promoting categories. CP46 is the next-free slot above CP45 (v1.6.9). The CP44 cross-vendor-constant exclusion gate (v1.6.8) continues to govern the BLE admissions; all admitted values pass it.
-
-### Halts encountered
-
-- None. The regen reconciled cleanly: all 43,678 pre-existing rows byte-identical, the standard-feed delta is exactly +114/−0 and the high-confidence delta +113/−0, and §11 #3 PII guards passed at all emit sites. The spy-cam `ssid_pattern` feed-reach gap is a known v0.2 limitation tracked in [MAC-420](/MAC/issues/MAC-420), not a halt.
 
 ---
 
