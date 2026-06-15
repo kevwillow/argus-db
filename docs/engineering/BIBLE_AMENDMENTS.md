@@ -5843,3 +5843,70 @@ MAP would otherwise have surfaced as an FP — is correctly withheld in the new
 `generic_reserved_uuid` bin (1 row). `ble_company_id` stays in the drop tally (2
 rows). Pushing the regenerated feed is a one-way door reserved to the CEO at the
 MAC-362 ship-gate.
+
+---
+
+### CP46 — `device_category='smart_lock'` + `'smart_home_hub'` (taxonomy +2, dual-table); §11 #13 promoting-category carve-out parity (2026-06-15)
+
+> **Board-AUTHORIZED ingestion (MAC-419, child of MAC-392).** Gate #2 of 3 cleared:
+> the board accepted the wave-2 pre-ingestion-disposition (MAC-392, rev 2,
+> 2026-06-15 00:10). This entry + migration `0033_cp46_device_category_smart_lock_smart_home_hub.sql`
+> are applied to canonical `db/argus.db` (gitignored) and committed STAGE-ONLY.
+> **NO push, NO tag.** Gate #3 (push to origin/main + Lynceus feed) is CEO-owned
+> and not in MAC-419.
+
+**Slot disposition.** Latest **landed** CP = **CP45** (migration 0032,
+`bluetooth_tracker`, MAC-388). The parked MAC-359 **"CP46"** draft was SUPERSEDED
+into the existing **CP21** `ble_service_uuid → ble_uuid` export MAP — per this
+ledger's CP45 Part-C reconciliation ("**no separate CP46 lands**; the parked 'CP46'
+draft is superseded by this absorption") — which **FREES the CP46 slot**. MAC-360's
+"CP47" draft (`ble_company_id` normalize, STAGED, not landed) and MAC-416's
+anticipated ≥CP48 (§11 #22 BLE-UUID admission taxonomy) are untouched. CP next-free
+verified by direct working-tree read (CP-slot-reservation discipline). `schema_version`
+row = **33** (file 0033). KNOWN LEDGER-VS-FILE OFFSET continues (mig 0033 = CP46).
+
+**Rule (taxonomy +2, dual-table CP32/CP33/CP37/CP45 parity).** Two net-new
+`device_category` values are added to the CHECK enum on **both** host tables
+(`identifiers` + `behavioral_signatures`):
+
+- **`smart_lock`** — consumer/commercial BLE smart locks. Arrives with 56
+  corroborated, byte-faithful net-new identifiers across 4 pure-play lock vendors
+  (Kwikset / Schlage / August-Yale / Ultraloq): 2 `oui` (Kwikset `10:a4:50` @85,
+  Yale `b0:44:9c` @82) + 54 custom-128 `ble_service_uuid` GATT (@78–80). One recat
+  (U-tec `id7200`, mac_range, unknown → smart_lock). Source: MAC-393 cohort-4
+  (MAC-397 harvest → MAC-406 extraction, CTO-ratified).
+- **`smart_home_hub`** — coarse durable home for smart-home hubs; carries the
+  SmartThings hub OUI (`24:fd:5b` @85, primary_registry) and any future hub
+  identifier. Source: MAC-393 cohort-5 (MAC-398, CTO-ratified).
+
+**§11 #13 PROMOTING-category carve-out (parity with CP37 / CP45).** Both new
+categories are PROMOTING categories: rows recategorized/inserted into them are NOT
+barred by the §11 #13 `unknown`-export ban. Export eligibility still requires the
+§4.4 type-map + the confidence / source / CP7-geographic gates (unchanged). No new
+§11 hard-rule number is minted.
+
+**HELD / NOT minted (board-ruled).** `voice_assistant` (cohort-5, empty — no
+admissible identifier) is HELD. `wearable` (cohort-7, zero net-new + privacy
+one-way-door) is DEFERRED. Nest OUIs `64:16:66` / `18:b4:30` (cohort-5) are HELD
+(absent; board: do NOT promote as new). The 4 FP-magnet spy-cam SSID prefixes
+(`IPCAM-`/`SKYEYE`/`HCAM`/`BVCAM`) are HELD pending precision-narrowing. The 16
+net-new MA-L SoC OUIs (cohort-1) are NOT ingested (no insert-ready provenance in the
+staged artifacts; §8.4 / §11 #13 export-banned regardless); the 6 already-held
+MA-M/MA-S registrations route to `conflicts reason='potential_dedup_step_5'`.
+
+**SAR-13 sqlite_master-first.** The migration `_new` DDL was GENERATED
+column-for-column from the LIVE post-0032 `sqlite_master` (single-token enum
+injection, occurrence-count asserted == 1), NOT hand-transcribed. Table-rebuild
+pattern mirrors 0032. Row counts, `integrity_check`, and `foreign_key_check`
+preserved (verified on a throwaway copy + reconstruction diff vs the canonical
+backup).
+
+**⚠ CTO ship-gate flag (downstream-consumer, surfaced at MAC-419 — does NOT block
+ingestion).** `identifier_type='ssid_pattern'` and `'ble_local_name'` are §4.4
+EXPORT-DROPPED (`export_lynceus.py` — "no regex in Lynceus v0.2"). So cohort-1's 10
+spy-cam SSID families and cohort-6's 5 `ble_local_name` rows are **REGISTRY-INTERNAL
+only** and reach the Lynceus FEED = 0 — contrary to the disposition's "10 SSID
+families reach feed" headline. The rows are correctly categorized regardless; the
+true regen feed delta is **+112 standard / +111 high-confidence**, all from the
+`ble_uuid` + `oui` cohorts (c4/c5/c6/c3). Pushing the regenerated feed is a one-way
+door reserved to the CEO at gate #3.

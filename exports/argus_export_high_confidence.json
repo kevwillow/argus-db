@@ -1,23 +1,23 @@
 {
   "_meta": {
-    "argus_version": "32",
-    "exported_at": "2026-06-14T23:39:22Z",
-    "record_count": 353,
+    "argus_version": "33",
+    "exported_at": "2026-06-15T00:41:38Z",
+    "record_count": 464,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "d8a566e2-dcab-547d-bc28-2a52bd087842",
-    "source_record_count": 43128,
+    "argus_run_id": "46493163-54e0-52c2-821b-d281fa1d4752",
+    "source_record_count": 43255,
     "dropped_in_export": {
-      "unknown_category": 33350,
+      "unknown_category": 33349,
       "generic_reserved_uuid": 1,
-      "ssid_pattern": 24,
+      "ssid_pattern": 34,
       "device_fingerprint": 6,
-      "ble_local_name": 21,
+      "ble_local_name": 26,
       "ble_characteristic": 20,
       "product_family_codename": 156,
-      "oversized_mac_range": 47,
+      "oversized_mac_range": 48,
       "icao_24bit_address": 2,
       "rf_channel": 24,
       "burst_cadence_ms": 0,
@@ -61,7 +61,7 @@
       "imei_tac": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 53,
+      "below_confidence_threshold": 54,
       "excluded_source_type": 337,
       "geographic_scope_mismatch": 170
     }
@@ -80,6 +80,24 @@
       "argus_record_id": "0071d25f2613f37b"
     },
     {
+      "pattern": "6aa5711b-0376-44f1-bca1-8647b48bdb55",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "011ab12224ec52c5"
+    },
+    {
+      "pattern": "4d050082-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "022d43afaa700cf6"
+    },
+    {
+      "pattern": "e295c552-69d0-11e4-b116-123b93f75cba",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "02ab3e52a5669fd4"
+    },
+    {
       "pattern": "24:48:45",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -92,16 +110,40 @@
       "argus_record_id": "0523969063b0126e"
     },
     {
+      "pattern": "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "05d1fc3ff6918f63"
+    },
+    {
       "pattern": "1596F31",
       "pattern_type": "drone_id_prefix",
       "description": "Dronetag drone",
       "argus_record_id": "05daa54a13cc6f18"
     },
     {
+      "pattern": "00002760-08c2-11e1-9073-0e8ac72e0011",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "06c32e0b9a1a133f"
+    },
+    {
+      "pattern": "57b43003-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "07a6d6d62ac0e85a"
+    },
+    {
       "pattern": "ac:b9:2f",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "07bf3de4ee758b1a"
+    },
+    {
+      "pattern": "57b44001-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "07ec211ecd60bbbb"
     },
     {
       "pattern": "1787F01BM",
@@ -114,6 +156,12 @@
       "pattern_type": "oui",
       "description": "Hanwha Vision cctv_camera",
       "argus_record_id": "08403228f71e8350"
+    },
+    {
+      "pattern": "57b40003-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "08a0ee0d55681ed2"
     },
     {
       "pattern": "50:13:9d",
@@ -188,6 +236,12 @@
       "argus_record_id": "0e6ef5183f5a20a6"
     },
     {
+      "pattern": "d4305c76-7a89-4990-9395-9e054e1b4cd3",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "0f1f0b7f8129d454"
+    },
+    {
       "pattern": "00:23:bd",
       "pattern_type": "oui",
       "description": "Digital Ally body_cam",
@@ -212,10 +266,28 @@
       "argus_record_id": "108e8f0bd4b6da48"
     },
     {
+      "pattern": "4d050017-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "1091f633eae9cc43"
+    },
+    {
+      "pattern": "4d050012-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "10e7c6ad59699a2f"
+    },
+    {
       "pattern": "80:f5:ae",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "117365aa7e94e77a"
+    },
+    {
+      "pattern": "57b44022-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "11a6752afe300151"
     },
     {
       "pattern": "14:a7:8b",
@@ -224,10 +296,22 @@
       "argus_record_id": "11b1343ce8e78b0b"
     },
     {
+      "pattern": "4d050083-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "11ce6354d9c8e91c"
+    },
+    {
       "pattern": "e4:24:6c",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
       "argus_record_id": "131398074b017f80"
+    },
+    {
+      "pattern": "0734594a-a8e7-4b1a-a6b1-cd5243059a57",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "133da69abdcd586a"
     },
     {
       "pattern": "18:7f:88",
@@ -284,6 +368,12 @@
       "argus_record_id": "16f810b92a2695b1"
     },
     {
+      "pattern": "57b4000d-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "170c104b104a7a5e"
+    },
+    {
       "pattern": "e0:ba:ad",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -294,6 +384,18 @@
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
       "argus_record_id": "18004a32f2123e7a"
+    },
+    {
+      "pattern": "d8ecdb03-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "182cf024683cb3d1"
+    },
+    {
+      "pattern": "1030e062-0ebe-11e5-a5c2-0619f8945a4f",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "18a3d4c702d70f72"
     },
     {
       "pattern": "04:ee:cd",
@@ -314,6 +416,12 @@
       "argus_record_id": "1b00ec21a996b4bd"
     },
     {
+      "pattern": "e06d5efb-4f4a-45c0-9eb1-371ae5a14ad4",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "1b853add70a35edc"
+    },
+    {
       "pattern": "9c:14:63",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -326,6 +434,18 @@
       "argus_record_id": "1c452b196c10dab1"
     },
     {
+      "pattern": "57b40216-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "1c5098aa8de0a336"
+    },
+    {
+      "pattern": "4d050070-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "1cc3fb6677cf56cc"
+    },
+    {
       "pattern": "00:1b:d8",
       "pattern_type": "oui",
       "description": "Teledyne FLIR cctv_camera",
@@ -336,6 +456,18 @@
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
       "argus_record_id": "1d6c8f38cbb67cc0"
+    },
+    {
+      "pattern": "c977f87a-1d61-4f52-a7f1-ee6a270cb6e9",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "1d86607496d08eda"
+    },
+    {
+      "pattern": "02c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "1d9a2dc1707f4ac2"
     },
     {
       "pattern": "1581F5BK",
@@ -366,6 +498,12 @@
       "pattern_type": "oui",
       "description": "Axon body_cam",
       "argus_record_id": "219fd3f03346950a"
+    },
+    {
+      "pattern": "d8ecdb05-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "21adad4960d8ffbe"
     },
     {
       "pattern": "50:e4:67",
@@ -422,6 +560,12 @@
       "argus_record_id": "2863cf8c1d407326"
     },
     {
+      "pattern": "01ff5550-ba5e-f4ee-5ca1-eb1e5e4b1ce0",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "28aafff555249dea"
+    },
+    {
       "pattern": "c4:79:05",
       "pattern_type": "oui",
       "description": "Uniview cctv_camera",
@@ -438,6 +582,18 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "2a90e0263a10e616"
+    },
+    {
+      "pattern": "d7895ab1-acc7-4de3-b991-9e825c24c809",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "2b2726f5602c9060"
+    },
+    {
+      "pattern": "d8ecdb0a-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "2c7ceeae9d214fbd"
     },
     {
       "pattern": "88:26:3f",
@@ -470,10 +626,22 @@
       "argus_record_id": "2e31366af1bfff20"
     },
     {
+      "pattern": "b73c1927-6e64-46a3-8ce7-650ebf9afd03",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "2f5df201ca290d42"
+    },
+    {
       "pattern": "3c:da:6d",
       "pattern_type": "oui",
       "description": "Tiandy cctv_camera",
       "argus_record_id": "2f84ee7aa5852583"
+    },
+    {
+      "pattern": "567d7f2d-270a-438a-a785-f0af12ad8312",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "2fa620588bc0a0d3"
     },
     {
       "pattern": "48:1c:b9",
@@ -482,10 +650,22 @@
       "argus_record_id": "2fde1a991a0cd103"
     },
     {
+      "pattern": "52e4c6be-0f96-425c-8900-ddcef680f636",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "306a6d6a7c0b665e"
+    },
+    {
       "pattern": "1801BDV",
       "pattern_type": "drone_id_prefix",
       "description": "Drone Volt drone",
       "argus_record_id": "3132922d9f70ec89"
+    },
+    {
+      "pattern": "4d050090-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "325ce8061e93db34"
     },
     {
       "pattern": "c8:a7:02",
@@ -516,6 +696,18 @@
       "pattern_type": "drone_id_prefix",
       "description": "PARROT drone",
       "argus_record_id": "34077b9bc065ef49"
+    },
+    {
+      "pattern": "57b40215-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "345707d2e292a3d4"
+    },
+    {
+      "pattern": "01ff5551-ba5e-f4ee-5ca1-eb1e5e4b1ce0",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "3510e8ac7840f96b"
     },
     {
       "pattern": "58:8e:81",
@@ -572,6 +764,12 @@
       "argus_record_id": "38e6567e2e06fac2"
     },
     {
+      "pattern": "57b43004-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "3a8daf8aa2049f02"
+    },
+    {
       "pattern": "8c:e7:48",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -588,6 +786,18 @@
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
       "argus_record_id": "3d5398450c6c5c36"
+    },
+    {
+      "pattern": "52e4c6be-0f96-425c-8910-ddcef680f636",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "3d75cc858c12665d"
+    },
+    {
+      "pattern": "c08a25d7-35e6-592c-b7ad-43acc8d1d1c8",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "3dd5b805799405c1"
     },
     {
       "pattern": "20c944c1-add2-42d7-a638-967ee9a26ff6",
@@ -608,6 +818,12 @@
       "argus_record_id": "41505c73088aecd5"
     },
     {
+      "pattern": "d8ecdb09-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "41ec3af7d483921e"
+    },
+    {
       "pattern": "58:b8:58",
       "pattern_type": "oui",
       "description": "DJI drone",
@@ -618,6 +834,12 @@
       "pattern_type": "oui",
       "description": "Verkada cctv_camera",
       "argus_record_id": "448e6c9ff9823098"
+    },
+    {
+      "pattern": "57b40213-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "44bba26ba180fec2"
     },
     {
       "pattern": "00:02:d1",
@@ -656,6 +878,12 @@
       "argus_record_id": "4a13334e9a6c575c"
     },
     {
+      "pattern": "4d050071-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "4a4b78fe661b2f8b"
+    },
+    {
       "pattern": "3c:1b:f8",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -672,6 +900,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
       "argus_record_id": "4b9424d14d84cd92"
+    },
+    {
+      "pattern": "1fa97d5b-bb68-499e-ac1d-de8771c9348d",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "4c3df3f743f4fec7"
     },
     {
       "pattern": "80:48:9f",
@@ -692,10 +926,22 @@
       "argus_record_id": "4d76ed5a76dd6c44"
     },
     {
+      "pattern": "e0:7c:62",
+      "pattern_type": "oui",
+      "description": "Whistle Labs, Inc. gps_tracker",
+      "argus_record_id": "4db172b7effcb84f"
+    },
+    {
       "pattern": "18136H8E",
       "pattern_type": "drone_id_prefix",
       "description": "Harris Aerial drone",
       "argus_record_id": "4dbadab7ea45ed30"
+    },
+    {
+      "pattern": "4d050013-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "4e3c1e5cf3f70c57"
     },
     {
       "pattern": "1581F574",
@@ -722,10 +968,22 @@
       "argus_record_id": "50abf6b9067ac504"
     },
     {
+      "pattern": "57b40212-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "50b4cd37aef6f35d"
+    },
+    {
       "pattern": "1867F18001000",
       "pattern_type": "drone_id_prefix",
       "description": "Hoverfly Technologies drone",
       "argus_record_id": "51e6bce55d8bbfa8"
+    },
+    {
+      "pattern": "e295c550-69d0-11e4-b116-123b93f75cba",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "525d4edecc9683d5"
     },
     {
       "pattern": "d8:f3:bc",
@@ -758,10 +1016,28 @@
       "argus_record_id": "54439bd204a957fd"
     },
     {
+      "pattern": "7617daa5-71fd-5a85-8f94-e28d735ce9f4",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "5475c3e42095b303"
+    },
+    {
+      "pattern": "4a000000-0000-1000-8000-00805f4a494f",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "54aef020827bc913"
+    },
+    {
       "pattern": "a0:ff:0c",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "54ef3b548cdef9b2"
+    },
+    {
+      "pattern": "f03d385e-a731-5605-b15d-037f6da6097f",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "551e899ec86dbbab"
     },
     {
       "pattern": "48:2c:ea",
@@ -770,16 +1046,46 @@
       "argus_record_id": "55e911d833059e9e"
     },
     {
+      "pattern": "57b40001-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "55fdb269f8dd66a5"
+    },
+    {
       "pattern": "1581F4QZ",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "57650624cd4c1bb3"
     },
     {
+      "pattern": "04c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "5775dd3ce14f6a41"
+    },
+    {
       "pattern": "0c:bf:15",
       "pattern_type": "oui",
       "description": "Genetec cctv_camera",
       "argus_record_id": "58156e31b1fdfc1f"
+    },
+    {
+      "pattern": "01c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "584f0fd8be27a991"
+    },
+    {
+      "pattern": "57b40210-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "58d10e675e4ef6af"
+    },
+    {
+      "pattern": "00002760-08c2-11e1-9073-0e8ac72e1011",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "58f9d5639bbc1931"
     },
     {
       "pattern": "ec:c8:9c",
@@ -842,6 +1148,12 @@
       "argus_record_id": "5c9301df572ebbaa"
     },
     {
+      "pattern": "4d050091-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "5db6ddfcd40732a0"
+    },
+    {
       "pattern": "1748CJD2",
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
@@ -852,6 +1164,18 @@
       "pattern_type": "ble_uuid",
       "description": "Flock Safety gunshot_detect",
       "argus_record_id": "5ef22302a7634fb4"
+    },
+    {
+      "pattern": "d7895ab1-acc7-4de3-b991-9e825c24c80b",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "60103cab97bcbdb3"
+    },
+    {
+      "pattern": "4d050014-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "6020b4081eeb6260"
     },
     {
       "pattern": "cc:93:4a",
@@ -896,6 +1220,12 @@
       "argus_record_id": "628c69bdf83c3a18"
     },
     {
+      "pattern": "4d050084-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "62e5f3c925f51ba5"
+    },
+    {
       "pattern": "f8:4d:fc",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -914,6 +1244,12 @@
       "argus_record_id": "649658bd754e0081"
     },
     {
+      "pattern": "d8ecdb0b-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "658b05cb0a52baa2"
+    },
+    {
       "pattern": "1588E040452",
       "pattern_type": "drone_id_prefix",
       "description": "PARROT drone",
@@ -924,6 +1260,12 @@
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
       "argus_record_id": "65e76c30754b8890"
+    },
+    {
+      "pattern": "57b40217-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "669a3cd5f2d52a60"
     },
     {
       "pattern": "04:0d:84",
@@ -962,6 +1304,12 @@
       "argus_record_id": "69deceaa2e9a639b"
     },
     {
+      "pattern": "57b4000c-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "6a7e39666f5c72be"
+    },
+    {
       "pattern": "00:13:56",
       "pattern_type": "oui",
       "description": "Teledyne FLIR cctv_camera",
@@ -996,6 +1344,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "6f15b9ef337dec4f"
+    },
+    {
+      "pattern": "d7895ab1-acc7-4de3-b991-9e825c24c802",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "6f1cc9e59eaf0794"
     },
     {
       "pattern": "17287200",
@@ -1100,6 +1454,12 @@
       "argus_record_id": "777ba58a5fbbcdc9"
     },
     {
+      "pattern": "e295c554-69d0-11e4-b116-123b93f75cba",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "78cc7f74faf007a1"
+    },
+    {
       "pattern": "6c:1c:71",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -1110,6 +1470,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
       "argus_record_id": "796411da44a1d51e"
+    },
+    {
+      "pattern": "0000d0ff-3c17-d293-8e48-14fe2e4da212",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "7979a17c05ee816e"
     },
     {
       "pattern": "e0:2e:fe",
@@ -1160,6 +1526,18 @@
       "argus_record_id": "7dea9c3aa868a56f"
     },
     {
+      "pattern": "4d050092-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "7f3feaf5d51970ea"
+    },
+    {
+      "pattern": "4d050080-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "7fd800b90feada3e"
+    },
+    {
       "pattern": "5c:f5:1a",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -1208,6 +1586,12 @@
       "argus_record_id": "830490616132ed00"
     },
     {
+      "pattern": "57b40211-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "835c71a00bd64324"
+    },
+    {
       "pattern": "00:1f:92",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
@@ -1232,6 +1616,12 @@
       "argus_record_id": "85e72731590fd4b4"
     },
     {
+      "pattern": "14839ac4-7d7e-415c-9a42-167340cf2339",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "8610b1ae08bae080"
+    },
+    {
       "pattern": "bc:ad:28",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -1244,6 +1634,12 @@
       "argus_record_id": "879372e972382bf1"
     },
     {
+      "pattern": "4d050010-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "87d016418fd34006"
+    },
+    {
       "pattern": "fc:db:21",
       "pattern_type": "oui",
       "description": "Samsara automotive_telematics",
@@ -1254,6 +1650,12 @@
       "pattern_type": "oui",
       "description": "Arlo Technologies cctv_camera",
       "argus_record_id": "888062d8d226fa7e"
+    },
+    {
+      "pattern": "ba04c4b2-892b-43be-b69c-5d13f2195392",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "890cacfb22dc9588"
     },
     {
       "pattern": "1581F5FH",
@@ -1292,10 +1694,22 @@
       "argus_record_id": "8b4c4b0cdefe9b3a"
     },
     {
+      "pattern": "09c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "8b941a5da99a29c6"
+    },
+    {
       "pattern": "00:65:1e",
       "pattern_type": "oui",
       "description": "Amcrest cctv_camera",
       "argus_record_id": "8b9e5c15186c8ca9"
+    },
+    {
+      "pattern": "d8ecdb01-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "8cbaacf55d2e6182"
     },
     {
       "pattern": "3c:a0:70",
@@ -1352,6 +1766,36 @@
       "argus_record_id": "9140fb0380c358e5"
     },
     {
+      "pattern": "01ff5552-ba5e-f4ee-5ca1-eb1e5e4b1ce0",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "938435a1ba54ed45"
+    },
+    {
+      "pattern": "57b40007-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "939a373a27f968a2"
+    },
+    {
+      "pattern": "4d050081-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "93ad0286550a9f30"
+    },
+    {
+      "pattern": "4d050018-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "93ef8b7371cd88a7"
+    },
+    {
+      "pattern": "279f9dab-79be-4663-af1d-24407347af13",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "93fd4dc9bec052b3"
+    },
+    {
       "pattern": "17906080",
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
@@ -1400,16 +1844,34 @@
       "argus_record_id": "993ee07ebcd64fc4"
     },
     {
+      "pattern": "4d050011-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "9965085ce7d534aa"
+    },
+    {
       "pattern": "34:d2:62",
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "99696ff1930ae2c6"
     },
     {
+      "pattern": "d8ecdb08-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "9985ea6ef2d96371"
+    },
+    {
       "pattern": "1787F06BM",
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
       "argus_record_id": "9a9fe61cadafd8f9"
+    },
+    {
+      "pattern": "4d0500a1-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "9c02c9b710483bd0"
     },
     {
       "pattern": "4d455452-4f50-4f4c-4953-444556494345",
@@ -1422,6 +1884,12 @@
       "pattern_type": "oui",
       "description": "Uniview cctv_camera",
       "argus_record_id": "9e1c7b10a0c866fd"
+    },
+    {
+      "pattern": "a86abc2d-d44c-442e-99f7-80059a873e36",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "9ec4838b1639dc69"
     },
     {
       "pattern": "58:00:e3:c8:69:66",
@@ -1484,6 +1952,12 @@
       "argus_record_id": "a9885a22bc965ed3"
     },
     {
+      "pattern": "e295c551-69d0-11e4-b116-123b93f75cba",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "aa436eb7886cb37f"
+    },
+    {
       "pattern": "f8:ce:07",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -1526,6 +2000,12 @@
       "argus_record_id": "afcb7d370b76f04e"
     },
     {
+      "pattern": "4d0500a2-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "b0b0ceea3b3dcac1"
+    },
+    {
       "pattern": "cc:47:bd",
       "pattern_type": "oui",
       "description": "Rhombus Systems cctv_camera",
@@ -1544,6 +2024,12 @@
       "argus_record_id": "b320bc75c9e70537"
     },
     {
+      "pattern": "d8ecdb02-ddb6-4ffd-8f65-753cb9dc2e8a",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "b40a637901dfcca7"
+    },
+    {
       "pattern": "1787F07BM",
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
@@ -1560,6 +2046,18 @@
       "pattern_type": "oui",
       "description": "Parrot drone",
       "argus_record_id": "b5dd85cdbeb03302"
+    },
+    {
+      "pattern": "00002760-08c2-11e1-9073-0e8ac72e0012",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "b7b751cd2e7dfe79"
+    },
+    {
+      "pattern": "24:fd:5b",
+      "pattern_type": "oui",
+      "description": "SmartThings, Inc. smart_home_hub",
+      "argus_record_id": "b9fcedd5f9baffbc"
     },
     {
       "pattern": "7c:78:b2",
@@ -1616,6 +2114,18 @@
       "argus_record_id": "c07d2959627c49fd"
     },
     {
+      "pattern": "00c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "c089ca70e2b50114"
+    },
+    {
+      "pattern": "d7895ab1-acc7-4de3-b991-9e825c24c801",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "c0eaa280593be88a"
+    },
+    {
       "pattern": "1668BS20",
       "pattern_type": "drone_id_prefix",
       "description": "Skydio drone",
@@ -1626,6 +2136,12 @@
       "pattern_type": "oui",
       "description": "Arlo Technologies cctv_camera",
       "argus_record_id": "c2b251e931f56414"
+    },
+    {
+      "pattern": "57b43002-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "c326feb03e9736dc"
     },
     {
       "pattern": "4c:1f:86",
@@ -1670,10 +2186,34 @@
       "argus_record_id": "c8aaa346315214f9"
     },
     {
+      "pattern": "ce85ad03-0f20-4aed-abe5-b7407dd7cacc",
+      "pattern_type": "ble_uuid",
+      "description": "Schlage smart_lock",
+      "argus_record_id": "c8b14546fe444edb"
+    },
+    {
       "pattern": "84:70:03",
       "pattern_type": "oui",
       "description": "Axon body_cam",
       "argus_record_id": "c98dbb6938962160"
+    },
+    {
+      "pattern": "9a04f079-9840-4286-ab92-e65be0885f95",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "c9cf655a75f58969"
+    },
+    {
+      "pattern": "4d050019-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "ca99edb55204c6b0"
+    },
+    {
+      "pattern": "57b43001-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "cae7c2204e6d215c"
     },
     {
       "pattern": "1581F08Q3",
@@ -1748,10 +2288,28 @@
       "argus_record_id": "d0bd67e3f86468fc"
     },
     {
+      "pattern": "57b40214-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "d110bbbdcfeef0f2"
+    },
+    {
+      "pattern": "d96b40b7-092b-5cd1-a59f-9af80c337eba",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "d1bc8cf55cc2b226"
+    },
+    {
       "pattern": "dc:07:f8",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "d230d45c3b42f794"
+    },
+    {
+      "pattern": "e295c553-69d0-11e4-b116-123b93f75cba",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "d2543b8be83990a5"
     },
     {
       "pattern": "2c:a5:9c",
@@ -1784,6 +2342,12 @@
       "argus_record_id": "d4743d62379c60fe"
     },
     {
+      "pattern": "1bd19c14-b78a-4e0f-aeb5-8e0352bac382",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "d4bfec7e7497afc6"
+    },
+    {
       "pattern": "a4:14:37",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -1800,6 +2364,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "EVO Lite drone",
       "argus_record_id": "d5e89b1358e8855d"
+    },
+    {
+      "pattern": "11c8245c-829e-91b9-e34d-c7acb15a89d7",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "d67b8436434b7d4e"
     },
     {
       "pattern": "24:28:fd",
@@ -1838,6 +2408,12 @@
       "argus_record_id": "dae69ba9eada2005"
     },
     {
+      "pattern": "57b40002-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "db06ae6037710c4a"
+    },
+    {
       "pattern": "00:16:00",
       "pattern_type": "oui",
       "description": "Cellebrite hacking_tool",
@@ -1862,10 +2438,28 @@
       "argus_record_id": "dd9b9f36bd8d3ca3"
     },
     {
+      "pattern": "4d0500a0-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "de4f699fc192c072"
+    },
+    {
       "pattern": "1787F04BM",
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
       "argus_record_id": "e052f7cbb3dd1e9c"
+    },
+    {
+      "pattern": "57b44023-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "e0725653f7b9ba7c"
+    },
+    {
+      "pattern": "d7895ab1-acc7-4de3-b991-9e825c24c804",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "e08ddd1a5c8c58d8"
     },
     {
       "pattern": "70:1a:d5",
@@ -1904,6 +2498,12 @@
       "argus_record_id": "e2fed72e20892eca"
     },
     {
+      "pattern": "2c8f61da-1064-43e5-ab7e-520ea9f4dd4c",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "e3b38756af4761ba"
+    },
+    {
       "pattern": "00003400-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
       "description": "Flock Safety gunshot_detect",
@@ -1940,6 +2540,12 @@
       "argus_record_id": "e4fb964f328c8b50"
     },
     {
+      "pattern": "57b40013-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "e511fc5f05c2afe3"
+    },
+    {
       "pattern": "ac:9f:c3",
       "pattern_type": "oui",
       "description": "Ring cctv_camera",
@@ -1956,6 +2562,12 @@
       "pattern_type": "oui",
       "description": "Hanwha Vision cctv_camera",
       "argus_record_id": "e5a983a933038c01"
+    },
+    {
+      "pattern": "8b00ace7-eb0b-49b0-bbe9-9aee0a26e1a3",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "e67399815a36232b"
     },
     {
       "pattern": "0c:fa:22",
@@ -2036,6 +2648,12 @@
       "argus_record_id": "edbac6b416864b33"
     },
     {
+      "pattern": "0000db01-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Jiobit (Life360, Inc.) gps_tracker",
+      "argus_record_id": "edd0165db61ffb18"
+    },
+    {
       "pattern": "00:04:7d",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
@@ -2064,6 +2682,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "f032fd6afafb222b"
+    },
+    {
+      "pattern": "57b40006-2528-d6bc-b043-b49af0ec06c1",
+      "pattern_type": "ble_uuid",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "f06bf0e48de96e8d"
     },
     {
       "pattern": "1596A34",
@@ -2120,6 +2744,12 @@
       "argus_record_id": "f7818dc81f66d28a"
     },
     {
+      "pattern": "10:a4:50",
+      "pattern_type": "oui",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "f784922093102189"
+    },
+    {
       "pattern": "ac:cb:51",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -2130,6 +2760,12 @@
       "pattern_type": "oui",
       "description": "Harris persistent_surveillance",
       "argus_record_id": "f7e1c05b9ea4dbd3"
+    },
+    {
+      "pattern": "00002760-08c2-11e1-9073-0e8ac72e0013",
+      "pattern_type": "ble_uuid",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "f8222a7740792ca2"
     },
     {
       "pattern": "44:47:cc",
@@ -2166,6 +2802,36 @@
       "pattern_type": "oui",
       "description": "Teledyne FLIR cctv_camera",
       "argus_record_id": "fc8c7a30ce583c15"
+    },
+    {
+      "pattern": "4d050015-766c-42c4-8944-42bc98fc2d09",
+      "pattern_type": "ble_uuid",
+      "description": "Kwikset smart_lock",
+      "argus_record_id": "fd6fb74b78d73d22"
+    },
+    {
+      "pattern": "6e04eae1-ed32-4fc6-8977-a882b581f021",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "fe396b3daf3d9647"
+    },
+    {
+      "pattern": "a142addb-f878-4d30-ae05-09518c49578a",
+      "pattern_type": "ble_uuid",
+      "description": "Ultraloq smart_lock",
+      "argus_record_id": "fe6c61cdab9fdfbf"
+    },
+    {
+      "pattern": "b0:44:9c",
+      "pattern_type": "oui",
+      "description": "Assa Abloy AB - Yale smart_lock",
+      "argus_record_id": "feb024c0497a0fd8"
+    },
+    {
+      "pattern": "52e4c6be-0f96-425c-8920-ddcef680f636",
+      "pattern_type": "ble_uuid",
+      "description": "August smart_lock",
+      "argus_record_id": "ff4de5f7751da408"
     },
     {
       "pattern": "f0:82:c0",
