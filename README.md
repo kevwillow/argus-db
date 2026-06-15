@@ -24,12 +24,12 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.9:
+At v1.6.10:
 
-- **43,123 active canonical identifiers** — the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.9) is the BLE-tracker fast-follow: it mints the `bluetooth_tracker` category and makes 46 captured tracker rows export-visible, with no net-new identifiers; see the release notes below for the breakdown.
+- **43,255 active canonical identifiers** — the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.10) is the Wave-2 multi-cohort release: it mints the `smart_lock` and `smart_home_hub` categories and admits 132 net-new identifiers across six cohorts plus an Axon body-cam increment; see the release notes below for the breakdown.
 - **156 manufacturers** — surveillance vendors classified by what they make
 - **95 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
-- **18 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, etc.)
+- **20 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
 - **58 identifier types** — the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
 - **214 behavioral signatures** — cellular-control-plane patterns associated with IMSI-catcher detection
 
@@ -43,9 +43,9 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 351 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
-| `exports/argus_export.json` | 900 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 43,123 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export_high_confidence.json` | 464 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export.json` | 1,014 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export.csv` | 43,255 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
@@ -77,7 +77,7 @@ Argus covers surveillance equipment used by US law enforcement and adjacent oper
 
 **What's NOT covered:**
 
-- Consumer electronics (router OUIs, phone IMEIs, smart home devices) — these aren't surveillance equipment.
+- Generic consumer electronics (router OUIs, phone IMEIs, undifferentiated smart-home noise) are not surveillance equipment and stay out of scope. The exception is the narrow set of consumer devices whose wireless signature is a documented surveillance or covert-tracking vector: BLE smart locks (`smart_lock`), smart-home hubs (`smart_home_hub`), pet and kid cellular trackers, and Bluetooth trackers are admitted for that reason, not as general IoT coverage.
 - Military signals intelligence beyond what's discoverable via public regulatory and procurement records.
 - Real-time deployment status. Argus tells you what an identifier *is*; not whether it's currently deployed near you. That's the downstream scanner's job.
 - Vendors whose surveillance offering isn't public-record attestable. If we can't trace it back to a citable source, it doesn't ship.
@@ -86,7 +86,11 @@ Coverage is intentionally narrow per category. Argus has 156 vendors, but most c
 
 ## Most recent release
 
-**v1.6.9** is the most recent release — the dedicated BLE-tracker fast-follow (MAC-387) promised in the v1.6.8 notes. It mints a durable `bluetooth_tracker` device category (the first schema migration since 0031, schema_version 31 → 32) and makes the board's #1 cohort export-visible: 46 captured tracker rows (AirTag, Tile, Samsung SmartTag, Chipolo, AirGuard) move out of the export-suppressed `unknown` bin, and the ratified MAC-359 `ble_service_uuid → ble_uuid` export map is absorbed so BLE service UUIDs reach the Lynceus feeds for the first time. **No new identifiers are sourced** — every value already landed in v1.6.8 and traces to OpenHaystack, peer-reviewed Find-My teardowns, and Bluetooth-SIG `0x004C`; this cycle is categorization and export-visibility only. The active identifier count, manufacturers, and sources are unchanged (43,123 active, 156, 95). For a scanner operator, the standard export grows 737 → 900 and the high-confidence export 348 → 351, as the BLE service-UUID map surfaces 163 previously-dropped rows (`ble_uuid` feed entries 8 → 171). One false-positive — the Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor magnet — was caught in validation and held at `unknown`, absent from both feeds. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` (CP45) for the full record.
+**v1.6.10** is the most recent release: the Wave-2 multi-cohort cycle (MAC-392), bundled under one tag with the board-ratified Axon body-cam GATT increment (MAC-352). It admits **132 net-new identifiers** across six device cohorts and mints two durable categories, `smart_lock` and `smart_home_hub` (migration 0033, CP46, schema_version 32 → 33). Active identifiers move 43,123 → 43,255; the standard export grows 900 → 1,014 and the high-confidence export 351 → 464. The new feed entries are smart locks (Kwikset, August, Ultraloq, Schlage, Yale; 56 rows), pet and kid cellular trackers (Fi, Whistle, Jiobit; 54 rows), a Samsung SmartThings hub, a Pebblebee Bluetooth tracker, and the two Axon body-cam service UUIDs. **Honest scope note:** the 10 cohort-1 spy-camera `ssid_pattern` families and the 5 cohort-6 `ble_local_name` rows are captured in the registry and the full CSV, but they do **not** reach the Lynceus JSON feeds under v0.2 (the writer drops regex and local-name patterns per `export_lynceus.py` §4.4), so a scanner does not alert on those spy-cam SSIDs today. Closing that gap is the deferred follow-up MAC-420. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` (CP46) for the full record.
+
+### Prior release — v1.6.9
+
+**v1.6.9** was the dedicated BLE-tracker fast-follow (MAC-387): it minted the `bluetooth_tracker` device category (schema_version 31 → 32) and made 46 captured tracker rows (AirTag, Tile, Samsung SmartTag, Chipolo, AirGuard) export-visible by absorbing the MAC-359 `ble_service_uuid → ble_uuid` map, with no net-new identifiers (active unchanged at 43,123). The standard export grew 737 → 900 and the high-confidence export 348 → 351. The Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor false-positive magnet, was caught in validation and held at `unknown`, absent from both feeds. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
 ### Prior release — v1.6.8
 

@@ -14,33 +14,42 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
-## v1.6.10 — 2026-06-14 (PROPOSED — staged, pending board push-gate)
+## v1.6.10 — 2026-06-14 (PROPOSED, staged, pending board push-gate)
 
-A **data-shape micro-increment** on top of v1.6.9, landing the board-ratified Axon body-cam GATT admission deferred from [MAC-351](/MAC/issues/MAC-351) → [MAC-352](/MAC/issues/MAC-352) (board approval `879bbc33`). It admits **5 net-new identifiers** from a single vendor app (`com.axon.one` v2.2.1, apkcombo, sha256 `8c50b579…`): 2 `ble_service_uuid` (METROPOLISDEVICE, AXJANUSBWCDEVICE) and 3 `ble_characteristic` (`9ec5d2b8-…-b5e1/e2/e3`), all confidence 70, manufacturer Axon (id 15), `device_category=body_cam`. Basis is a client-side GATT def-use trace (CTO-re-verified against the baksmali tree): the 2 services bind via `BluetoothGattService.getUuid()`-vs-field-`k`, the 3 characteristics via `BluetoothGattCharacteristic.getUuid()`-vs-fields-`l/m/n`, all through the same `Lv8/d;`/`Lv8/c;` profile (`com.axon.aec.core`). `RESOLVABLECAMFV1` (`5245534f-…`) stays **DROPPED** (advertised/scan-filter service-data only, no GATT-service binding — deferred to the [MAC-416](/MAC/issues/MAC-416) advertised-service-data admission taxonomy). **No schema migration** (schema_version stays **32**), **no new Correction Pass** (the cross-vendor exclusion gate already landed as CP44 in v1.6.8; all 5 values pass it as single-vendor `com.axon.one`), **no new manufacturer or source** (Axon and the apkcombo source already exist). Active identifier count moves **43,123 → 43,128**; the standard Lynceus feed grows **900 → 902** and the high-confidence feed **351 → 353** as the 2 Axon service UUIDs surface via the settled `ble_service_uuid → ble_uuid` map. The 3 characteristics are stored but Lynceus-dropped (the scanner discovers by service UUID, not characteristic). Staged STAGE-ONLY; the push/tag and final version number are assigned at the board push-gate.
+A **multi-cohort data release** on top of v1.6.9: Wave 2 ([MAC-392](/MAC/issues/MAC-392) / [MAC-419](/MAC/issues/MAC-419), canonical write `3d5785b`), bundled with the board-ratified Axon body-cam GATT micro-increment ([MAC-352](/MAC/issues/MAC-352), board approval `879bbc33`, commit `8ea3352`). The two ship under one tag because MAC-352 is woven into the same canonical write and regen and cannot be cleanly separated. The cycle admits **132 net-new identifiers** across six device cohorts plus the body-cam increment, mints two durable device categories (`smart_lock`, `smart_home_hub`), and is the project's second schema migration in two cycles. schema_version moves **32 → 33** (migration `0033`, CP46). Active identifier count moves **43,123 → 43,255** (+132); total **43,678 → 43,810** (+132, all admissions active, zero supersessions). The standard Lynceus feed grows **900 → 1,014** (+114) and the high-confidence feed **351 → 464** (+113); the behavioral-signatures feed is unchanged at 132. Every admitted value traces to a quotable public source (IEEE OUI registry, Bluetooth-SIG assigned numbers, vendor APK static analysis, bounded WiGLE confirmation passes); each cohort was CTO-re-verified against the live database, and the feed deltas below were computed from the actual regen, not estimated.
+
+**Honest feed-reach note (binding).** Not every captured row reaches the runtime feed. The 10 cohort-1 spy-cam `ssid_pattern` families and the 5 cohort-6 `ble_local_name` rows are **§4.4 EXPORT-DROPPED** in the Lynceus writer (`export_lynceus.py`: `ssid_pattern -> None`, "no regex in Lynceus v0.2"; `ble_local_name -> None`, "no GAP local-name match"). They are captured in the canonical registry and the full CSV, but their **Lynceus feed reach is 0** under v0.2. A scanner does **not** alert on these spy-cam SSIDs or tracker local-names today. Closing that gap (regex and local-name support in the Lynceus writer) is the deferred follow-up [MAC-420](/MAC/issues/MAC-420). Of the 132 net-new rows, 114 reach the standard JSON feed; the remaining 18 are registry-internal (10 `ssid_pattern` + 5 `ble_local_name` + 3 `ble_characteristic`).
 
 ### What's new
 
-- **Axon body-worn camera BLE signatures reach the feed (+2).** The METROPOLIS and AXJANUS service UUIDs — bound as genuine client-side GATT services in the Axon Evidence Capture app, not scan-filter decoys — register as `ble_uuid` feed entries (`description: "Axon body_cam"`). A scanner now alerts on a nearby Axon body cam by its BLE service UUID.
-- **Characteristic triplet captured (+3, not feed-visible).** The 3 GATT characteristics bound under those services land as `ble_characteristic` rows (Lynceus-dropped per CP13 §4.4). They correct a prior shallow pass that wrongly dropped them as "non-BLE".
+- **`smart_lock` is now a durable export category (cohort 4, +56 feed).** Consumer and commercial BLE smart locks contribute 56 feed rows: 54 GATT `ble_service_uuid` (August 17, Kwikset 23, Ultraloq 13, Schlage 1) plus 2 `oui` (Kwikset, Assa Abloy / Yale). One prior U-tec `mac_range` row (id 7200, confidence 85) is recategorized into `smart_lock`; it was already feed-visible, so it relabels rather than adds. A scanner now alerts on a nearby smart lock by its BLE service UUID or OUI.
+- **`smart_home_hub` is now a durable export category (cohort 5, +1 feed).** The Samsung SmartThings hub `oui` lands as the first `smart_home_hub` feed row.
+- **Pet and kid cellular trackers reach the feed (cohort 6, `gps_tracker`, +54 feed).** 53 GATT `ble_service_uuid` (Fi / Barking Labs 23, Whistle / Mars Petcare 20, Jiobit / Life360 10) plus 1 Whistle `oui` register as feed entries. A further 5 `ble_local_name` rows are captured but §4.4-dropped (see the feed-reach note), so the cohort stages 59 and reaches 54.
+- **Bluetooth tracker (+1 feed, standard only).** The Pebblebee service UUID `0000fa25` lands as a `bluetooth_tracker` `ble_uuid` feed row. It is single-source and below the high-confidence source bar, so it appears in the standard feed only; this is the lone entry by which the standard delta (+114) exceeds the high-confidence delta (+113).
+- **Axon body-worn camera BLE signatures (MAC-352 bundle, +2 feed).** The METROPOLIS and AXJANUS GATT service UUIDs from the Axon Evidence Capture app (`com.axon.one` v2.2.1, sha256 `8c50b579…`, confidence 70, `body_cam`) register as `ble_uuid` feed entries; their 3 bound `ble_characteristic` rows are captured but Lynceus-dropped (the scanner discovers by service UUID, not characteristic). `RESOLVABLECAMFV1` stays DROPPED pending the [MAC-416](/MAC/issues/MAC-416) advertised-service-data taxonomy.
+- **Spy cameras captured, not yet feed-visible (cohort 1, `cctv_camera`).** 10 `ssid_pattern` families from the spy-cam APK and WiGLE pass land in the registry and CSV. Under Lynceus v0.2 they are §4.4-dropped and reach the feed by 0 (see the feed-reach note and [MAC-420](/MAC/issues/MAC-420)). Cohorts 2 (GPS) and 7 (wearables) contributed zero net-new admissible rows this wave.
 
 ### Schema
 
-- None. schema_version stays **32**.
+- **Migration `0033` (CP46).** Extends the `device_category` CHECK enum **+2 values (`smart_lock`, `smart_home_hub`)** on both host tables (`identifiers` + `behavioral_signatures`), preserving the CP32/CP33 dual-table parity invariant (verified: both enums carry 20 values, identical sets). schema_version **32 → 33**.
 
 ### Data
 
-- **`identifiers` active:** 43,123 → **43,128** (+5; 2 `ble_service_uuid` + 3 `ble_characteristic`, all net-new).
-- **`identifiers` total:** 43,678 → **43,683**.
-- **device categories / manufacturers / sources:** unchanged (Axon id 15 + apkcombo source pre-exist).
-- **Lynceus standard feed:** 900 → **902** (+2). **high-confidence feed:** 351 → **353** (+2). **behavioral-signatures feed:** unchanged.
+- **`identifiers` active:** 43,123 → **43,255** (+132 net-new admissions, zero supersessions).
+- **`identifiers` total:** 43,678 → **43,810** (+132).
+- **Wave-2 staged rows (ids 44502–44628):** 127 = cohort-4 56 + cohort-5 1 + cohort-6 59 + cohort-1 10 + cohort-3 1; plus the MAC-352 body-cam 5 = 132 net-new.
+- **device-category enum:** 18 → **20** (+`smart_lock`, +`smart_home_hub`); 19 of 20 categories carry active rows.
+- **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change).
+- **Lynceus standard feed:** 900 → **1,014** (+114 = cohort-4 56 + cohort-6 54 + cohort-3 1 + cohort-5 1 + MAC-352 2). **high-confidence feed:** 351 → **464** (+113, same set minus the single-source Pebblebee row). **behavioral-signatures feed:** **132** (no change). **CSV:** 43,255 rows, matching the active count.
+- **Feed-membership note (load-bearing).** 114 of 132 net-new rows reach the JSON feeds. The 18 that do not are the 10 `ssid_pattern` + 5 `ble_local_name` (§4.4-dropped) + 3 `ble_characteristic` (scanner matches by service UUID). All 132 appear in `argus_export.csv`.
 
 ### Bible amendments
 
-- None this increment. The cross-vendor-constant exclusion gate is the already-landed **CP44** (v1.6.8); all 5 values pass it. The positive GATT-binding admission bar is deferred to [MAC-416](/MAC/issues/MAC-416) as one consolidated BLE-UUID admission taxonomy (with the advertised-service-data question). The write is governed meanwhile by CP44 + cite-paste + Validator.
+- **CP46** mints `device_category='smart_lock'` and `device_category='smart_home_hub'` (taxonomy +2, dual-table), and narrows the §11 #13 `unknown`-category export ban to exclude these two promoting categories. CP46 is the next-free slot above CP45 (v1.6.9). The CP44 cross-vendor-constant exclusion gate (v1.6.8) continues to govern the BLE admissions; all admitted values pass it.
 
 ### Halts encountered
 
-- None. The export reconciled cleanly after the SAR-18 sibling coverage-matrix regen (the new `ble_characteristic` drops were registered in the MAC-45 drop_assignments map); 0-regression verified — all 43,678 pre-existing rows byte-identical, export delta exactly +2/−0; §11 #3 PII guards passed at all emit sites.
+- None. The regen reconciled cleanly: all 43,678 pre-existing rows byte-identical, the standard-feed delta is exactly +114/−0 and the high-confidence delta +113/−0, and §11 #3 PII guards passed at all emit sites. The spy-cam `ssid_pattern` feed-reach gap is a known v0.2 limitation tracked in [MAC-420](/MAC/issues/MAC-420), not a halt.
 
 ---
 
