@@ -1,10 +1,10 @@
 # Changelog
 
-All notable changes to Argus are documented in this file. The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project does not yet adopt semantic-versioning for the dataset shape itself — see "Schema versioning" below for the migration-ledger discipline.
+All notable changes to Argus are documented in this file. The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project does not yet adopt semantic-versioning for the dataset shape itself, see "Schema versioning" below for the migration-ledger discipline.
 
 ## TL;DR
 
-**Argus tracks surveillance vendor identifiers** — MAC ranges, FCC grantee codes, hostnames, certificate SANs, BLE company IDs, IMEI Type Allocation Codes, and dozens of other identifier classes — used by US law enforcement and adjacent surveillance deployments.
+**Argus tracks surveillance vendor identifiers**, MAC ranges, FCC grantee codes, hostnames, certificate SANs, BLE company IDs, IMEI Type Allocation Codes, and dozens of other identifier classes, used by US law enforcement and adjacent surveillance deployments.
 
 **Each version (v1.X.Y) bundles** a cycle of source admissions, manufacturer admissions, schema migrations, and bible-amendment ratifications. Headline metrics per version: schema_version, source count, manufacturer count, active identifier count, Lynceus high-confidence export count.
 
@@ -14,7 +14,7 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
-## v1.6.10 — 2026-06-14
+## v1.6.10 - 2026-06-14
 
 A **multi-cohort data release** on top of v1.6.9: Wave 2 ([MAC-392](/MAC/issues/MAC-392) / [MAC-419](/MAC/issues/MAC-419), canonical write `3d5785b`), bundled with the board-ratified Axon body-cam GATT micro-increment ([MAC-352](/MAC/issues/MAC-352), board approval `879bbc33`, commit `8ea3352`). The two ship under one tag because MAC-352 is woven into the same canonical write and regen and cannot be cleanly separated. The cycle admits **132 net-new identifiers** across six device cohorts plus the body-cam increment, mints two durable device categories (`smart_lock`, `smart_home_hub`), and is the project's second schema migration in two cycles. schema_version moves **32 → 33** (migration `0033`, CP46). Active identifier count moves **43,123 → 43,255** (+132); total **43,678 → 43,810** (+132, all admissions active, zero supersessions). The standard Lynceus feed grows **900 → 1,014** (+114) and the high-confidence feed **351 → 464** (+113); the behavioral-signatures feed is unchanged at 132. Every admitted value traces to a quotable public source (IEEE OUI registry, Bluetooth-SIG assigned numbers, vendor APK static analysis, bounded WiGLE confirmation passes); each cohort was CTO-re-verified against the live database, and the feed deltas below were computed from the actual regen, not estimated.
 
@@ -37,7 +37,7 @@ A **multi-cohort data release** on top of v1.6.9: Wave 2 ([MAC-392](/MAC/issues/
 
 - **`identifiers` active:** 43,123 → **43,255** (+132 net-new admissions, zero supersessions).
 - **`identifiers` total:** 43,678 → **43,810** (+132).
-- **Wave-2 staged rows (ids 44502–44628):** 127 = cohort-4 56 + cohort-5 1 + cohort-6 59 + cohort-1 10 + cohort-3 1; plus the MAC-352 body-cam 5 = 132 net-new.
+- **Wave-2 staged rows (ids 44502-44628):** 127 = cohort-4 56 + cohort-5 1 + cohort-6 59 + cohort-1 10 + cohort-3 1; plus the MAC-352 body-cam 5 = 132 net-new.
 - **device-category enum:** 18 → **20** (+`smart_lock`, +`smart_home_hub`); 19 of 20 categories carry active rows.
 - **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change).
 - **Lynceus standard feed:** 900 → **1,014** (+114 = cohort-4 56 + cohort-6 54 + cohort-3 1 + cohort-5 1 + MAC-352 2). **high-confidence feed:** 351 → **464** (+113, same set minus the single-source Pebblebee row). **behavioral-signatures feed:** **132** (no change). **CSV:** 43,255 rows, matching the active count.
@@ -45,23 +45,23 @@ A **multi-cohort data release** on top of v1.6.9: Wave 2 ([MAC-392](/MAC/issues/
 
 ---
 
-## v1.6.9 — 2026-06-14
+## v1.6.9 - 2026-06-14
 
-A **data-shape release** on top of v1.6.8 — the dedicated BLE-tracker fast-follow promised in the v1.6.8 notes (MAC-387). It does three coupled things: mints a durable `bluetooth_tracker` device category (the project's first schema migration since 0031), recategorizes the 46 captured tracker rows out of the export-suppressed `unknown` bin, and absorbs the ratified MAC-359 `ble_service_uuid → ble_uuid` export MAP so BLE service UUIDs reach the Lynceus feeds for the first time. **No new identifiers are sourced** — every value already landed in v1.6.8 and traces to its cohort-1 artifact (OpenHaystack, peer-reviewed Find-My teardowns, Bluetooth-SIG `0x004C`); this cycle is categorization + export-visibility only. schema_version moves **31 → 32**; manufacturers, sources, and the active identifier count are unchanged (43,123 active). The standard Lynceus feed grows **737 → 900** and the high-confidence feed **348 → 351**, as the BLE service-UUID map surfaces 163 previously-dropped rows (feed `ble_uuid` entries 8 → 171). One false-positive was caught and held during validation — the Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor magnet — recategorized back to `unknown` so it reaches neither feed.
+A **data-shape release** on top of v1.6.8, the dedicated BLE-tracker fast-follow promised in the v1.6.8 notes (MAC-387). It does three coupled things: mints a durable `bluetooth_tracker` device category (the project's first schema migration since 0031), recategorizes the 46 captured tracker rows out of the export-suppressed `unknown` bin, and absorbs the ratified MAC-359 `ble_service_uuid → ble_uuid` export MAP so BLE service UUIDs reach the Lynceus feeds for the first time. **No new identifiers are sourced**, every value already landed in v1.6.8 and traces to its cohort-1 artifact (OpenHaystack, peer-reviewed Find-My teardowns, Bluetooth-SIG `0x004C`); this cycle is categorization + export-visibility only. schema_version moves **31 → 32**; manufacturers, sources, and the active identifier count are unchanged (43,123 active). The standard Lynceus feed grows **737 → 900** and the high-confidence feed **348 → 351**, as the BLE service-UUID map surfaces 163 previously-dropped rows (feed `ble_uuid` entries 8 → 171). One false-positive was caught and held during validation, the Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor magnet, recategorized back to `unknown` so it reaches neither feed.
 
 ### What's new
 
-- **`bluetooth_tracker` is now a durable export category.** The board's #1 cohort — AirTag, Tile, Samsung SmartTag, Chipolo, and the AirGuard Find-My accessory UUIDs — is now export-visible. 46 rows move `unknown → bluetooth_tracker`: the 41 cohort-1 net-new from v1.6.8 (ids 44416–44456) plus 6 prior tagfinder service-UUID rows that belong (Samsung `0xfd5a`, Tile `0xfdcd`, Apple Find My `7dfc9002`/`7dfc9003`/`74278bda`/`0xfd44`), minus the `0xFD6F` false-positive. A scanner now alerts on a nearby AirTag or SmartTag by its BLE service UUID.
+- **`bluetooth_tracker` is now a durable export category.** The board's #1 cohort, AirTag, Tile, Samsung SmartTag, Chipolo, and the AirGuard Find-My accessory UUIDs, is now export-visible. 46 rows move `unknown → bluetooth_tracker`: the 41 cohort-1 net-new from v1.6.8 (ids 44416-44456) plus 6 prior tagfinder service-UUID rows that belong (Samsung `0xfd5a`, Tile `0xfdcd`, Apple Find My `7dfc9002`/`7dfc9003`/`74278bda`/`0xfd44`), minus the `0xFD6F` false-positive. A scanner now alerts on a nearby AirTag or SmartTag by its BLE service UUID.
 - **BLE service UUIDs reach the feed (MAC-359 map absorbed).** The ratified §4.4 `ble_service_uuid → ble_uuid` alias-collapse (CP21), parked since its draft, ships here because it is load-bearing for tracker visibility. Feed `ble_uuid` entries move 8 → 171. The symmetric `ble_company_id → ble_manufacturer_id` map (MAC-360) stays HELD on an unresolved id4884 collision and does **not** ride this release.
-- **False-positive hygiene.** Validation flagged `0xFD6F` (id 44433) — the Apple/Google Exposure-Notification service UUID, a cross-vendor magnet that would fire on unrelated contact-tracing hardware — and held it at `unknown` (MAC-390), so it is absent from both feeds. The `0x0075`/`0x02d0` company-ID-as-service-UUID corruptions and the `0xfe9f` Google-assigned UUID were excluded from the tracker set up front.
+- **False-positive hygiene.** Validation flagged `0xFD6F` (id 44433), the Apple/Google Exposure-Notification service UUID, a cross-vendor magnet that would fire on unrelated contact-tracing hardware, and held it at `unknown` (MAC-390), so it is absent from both feeds. The `0x0075`/`0x02d0` company-ID-as-service-UUID corruptions and the `0xfe9f` Google-assigned UUID were excluded from the tracker set up front.
 
 ### Schema
 
-- **Migration `0032` (CP45) — first since 0031.** Extends the `device_category` CHECK enum **+1 value `bluetooth_tracker`** on both host tables (`identifiers` + `behavioral_signatures`), preserving the CP32/CP33 dual-table parity invariant. schema_version **31 → 32**.
+- **Migration `0032` (CP45), first since 0031.** Extends the `device_category` CHECK enum **+1 value `bluetooth_tracker`** on both host tables (`identifiers` + `behavioral_signatures`), preserving the CP32/CP33 dual-table parity invariant. schema_version **31 → 32**.
 
 ### Data
 
-- **`identifiers` active:** 43,123 → **43,123** (no change — 46 rows recategorized `unknown → bluetooth_tracker`; no admissions or withdrawals).
+- **`identifiers` active:** 43,123 → **43,123** (no change, 46 rows recategorized `unknown → bluetooth_tracker`; no admissions or withdrawals).
 - **`identifiers` total:** **43,678** (no change).
 - **device categories:** 17 → **18** (+`bluetooth_tracker`).
 - **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change).
@@ -69,7 +69,7 @@ A **data-shape release** on top of v1.6.8 — the dedicated BLE-tracker fast-fol
 
 ### Bible amendments
 
-- **CP45** — mints `device_category='bluetooth_tracker'` (taxonomy +1, dual-table); narrows the §11 #13 `unknown`-category export ban to exclude this promoting category; absorbs the MAC-359 `ble_service_uuid → ble_uuid` export MAP. CP45 is the next-free slot above landed CP44 (the MAC-351 cross-vendor draft was folded into CP44, freeing the CP45 number); the CP46/CP47 references remain the MAC-359/MAC-360 draft reservations — MAC-359 is absorbed here, MAC-360 stays parked.
+- **CP45**, mints `device_category='bluetooth_tracker'` (taxonomy +1, dual-table); narrows the §11 #13 `unknown`-category export ban to exclude this promoting category; absorbs the MAC-359 `ble_service_uuid → ble_uuid` export MAP. CP45 is the next-free slot above landed CP44 (the MAC-351 cross-vendor draft was folded into CP44, freeing the CP45 number); the CP46/CP47 references remain the MAC-359/MAC-360 draft reservations, MAC-359 is absorbed here, MAC-360 stays parked.
 
 ### Halts encountered
 
@@ -77,7 +77,7 @@ A **data-shape release** on top of v1.6.8 — the dedicated BLE-tracker fast-fol
 
 ---
 
-## v1.6.8 — 2026-06-14
+## v1.6.8 - 2026-06-14
 
 A **data release** on top of v1.6.7, and the widest-net sourcing cycle the project has run (MAC-362 / MAC-363). It admits **81 net-new identifiers** across five device cohorts plus a deferred-revival cleanup, and it withdraws 25 bad OUIs that had been shipping in the standard feed. Active identifier count moves **43,213 → 43,123**, because the cleanup outweighs the admissions. **No schema migration** (schema_version stays **31**), **+1 manufacturer** (155 → 156, Qualcomm), **+9 sources** (86 → 95). The Lynceus high-confidence feed grows **322 → 348**, the standard feed **736 → 737**, and the behavioral-signatures feed **125 → 132**. Every identifier traces to a quotable public source (IEEE OUI registry, Bluetooth SIG assigned numbers, FCC filings, APK static analysis, academic Find-My teardowns); none came from model memory. The board approved the push (approval `1598798c`) after an independent re-verification against the live database, a backup-first apply per cohort, and an operator-gated fast-forward.
 
@@ -88,7 +88,7 @@ A **data release** on top of v1.6.7, and the widest-net sourcing cycle the proje
 - **ALPR and cop-car (+14).** Flock, Motorola/Vigilant, Genetec, and adjacent license-plate-reader vendors contribute 6 `ssid_pattern`, 5 `fcc_grantee_code`, and 3 `equipment_class_code` rows from APK package-ids and FCC filings, extending the v1.6.7 Flock/cop-car teardown method. All are Argus-internal types outside the Lynceus `{mac, oui, ssid, ble_uuid}` schema, so they sit in the CSV, not the JSON feeds.
 - **Drones, body cams, and DeFlock (no net-new identifiers).** The drone cohort (DJI/Parrot/Skydio/Autel/Anduril) added 3 sources, 5 behavioral signatures, and a 13-row FCC-band reclassification, with no new identifier values. The body-cam and acoustic cohort (Axon/Motorola/ShotSpotter/Getac) confirmed zero net-new admissible surface, since all four vendors already carry coverage from prior waves. The DeFlock coordinate tier (sid 6, ODbL-1.0) was probed read-only and held: it is structurally coordinate-only, carries no Kismet-visible identifier, and stays in `deployment_observations` rather than crossing the ODbL share-alike door.
 - **Deferred-revival cleanup.** Correctness fixes from the FoggedLens, OpenIPC, and MAC-337 revival pass: a source license correction (sid-86 to MIT), a FoggedLens source row, a Coban grantee re-attribution, and a 39-row Qualcomm `chipset_codename` re-attribution that registers Qualcomm as a manufacturer (id 326). All are export-DROPPED registry hygiene.
-- **Standard-feed hygiene (−25 OUIs).** The cleanup withdrew 23 known-fake, locally-administered, and multicast OUIs that had been live in the standard feed (MAC-385) and corrected 2 cohort-2 mis-attributions (MAC-375). Withdrawing bad data is why the standard feed moves only +1 net against +26 admissions.
+- **Standard-feed hygiene (-25 OUIs).** The cleanup withdrew 23 known-fake, locally-administered, and multicast OUIs that had been live in the standard feed (MAC-385) and corrected 2 cohort-2 mis-attributions (MAC-375). Withdrawing bad data is why the standard feed moves only +1 net against +26 admissions.
 
 ### Schema
 
@@ -96,12 +96,12 @@ A **data release** on top of v1.6.7, and the widest-net sourcing cycle the proje
 
 ### Data
 
-- **`identifiers` active:** 43,213 → **43,123** (−90: +81 net-new admissions, outweighed by ~173 supersessions from the MAC-385 known-fake collapse-and-withdraw and the MAC-375 correction).
+- **`identifiers` active:** 43,213 → **43,123** (-90: +81 net-new admissions, outweighed by ~173 supersessions from the MAC-385 known-fake collapse-and-withdraw and the MAC-375 correction).
 - **`identifiers` total:** 43,595 → **43,678** (+83).
 - **`manufacturers`:** 155 → **156** (+1, Qualcomm).
 - **`sources`:** 86 → **95** (+9: academic Find-My and OpenHaystack for trackers, drone vendor and FAA-RID, consumer mirrors, FoggedLens).
 - **`behavioral_signatures` export records:** 125 → **132** (+7, drone footprints).
-- **Lynceus high-confidence export records:** 322 → **348** (+26 consumer-camera OUIs at confidence 85). **Standard export records:** 736 → **737** (+26 consumer, −23 MAC-385, −2 MAC-375). **CSV:** 43,123 rows, matching the active count.
+- **Lynceus high-confidence export records:** 322 → **348** (+26 consumer-camera OUIs at confidence 85). **Standard export records:** 736 → **737** (+26 consumer, -23 MAC-385, -2 MAC-375). **CSV:** 43,123 rows, matching the active count.
 - **Export-membership note (load-bearing).** Only the 26 consumer-camera OUIs reach the US-filtered JSON feeds. The 41 BLE-tracker rows stay export-suppressed pending MAC-387; the ALPR `ssid_pattern` / `fcc_grantee_code` / `equipment_class_code`, the drone `fcc_grantee_code`, and the revival `chipset_codename` rows are Argus-internal types outside the Lynceus schema. All admitted rows appear in `argus_export.csv`.
 
 ### Bible amendments
@@ -112,9 +112,9 @@ A **data release** on top of v1.6.7, and the widest-net sourcing cycle the proje
 
 - **None.** Each cohort applied backup-first with an independent re-verification, and the validator battery (including lookup-tuple uniqueness) passed on every promotion batch. The 311 MB pre-apply database snapshots were caught outside `.gitignore` at the ship-gate and excluded before any commit.
 
-## v1.6.7 — 2026-06-12
+## v1.6.7 - 2026-06-12
 
-A **data release** layered on top of v1.6.6. It admits **+290** identifiers across two cohorts: the R2 SoC chipset set held back from v1.6.6, and the Flock / cop-car Android-app static-analysis cluster. Active identifier count **42,923 → 43,213**. **No schema migration** (schema_version stays **31**), **+14 manufacturers** (141 → 155), **+10 sources** (76 → 86). The Lynceus JSON feeds hold flat (high-confidence **322**, standard **736**) because every new row is an Argus-internal type — `chipset_codename`, `vendor_controlled_hostname`, `network_endpoint` — outside the Lynceus `{mac, oui, ssid, ble_uuid}` watchlist schema; all 290 land in the full CSV (43,213 rows). Both cohorts were operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
+A **data release** layered on top of v1.6.6. It admits **+290** identifiers across two cohorts: the R2 SoC chipset set held back from v1.6.6, and the Flock / cop-car Android-app static-analysis cluster. Active identifier count **42,923 → 43,213**. **No schema migration** (schema_version stays **31**), **+14 manufacturers** (141 → 155), **+10 sources** (76 → 86). The Lynceus JSON feeds hold flat (high-confidence **322**, standard **736**) because every new row is an Argus-internal type, `chipset_codename`, `vendor_controlled_hostname`, `network_endpoint`, outside the Lynceus `{mac, oui, ssid, ble_uuid}` watchlist schema; all 290 land in the full CSV (43,213 rows). Both cohorts were operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
 
 ### What's new
 
@@ -145,14 +145,14 @@ A **data release** layered on top of v1.6.6. It admits **+290** identifiers acro
 
 - **None blocking.** The apkcombo `com.evidence.flex` 410 (a delisted Axon Fleet variant) was logged as an honest-absence. The GATT-context trace, the backup-first apply, and the export regeneration came back clean.
 
-## v1.6.6 — 2026-06-11
+## v1.6.6 - 2026-06-11
 
-A **data release** layered on top of v1.6.5. It covers two waves admitted in the same cycle: the Wave WideNet acquisition pass and the R2 new-vendor cohort that v1.6.5 deferred. Active identifier count **41,716 → 42,923** (+1,207). **No schema migration** (schema_version stays **31**), **+15 manufacturers** (126 → 141 — the first net-new manufacturers in several releases), **+2 sources** (74 → 76). Both waves were operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
+A **data release** layered on top of v1.6.5. It covers two waves admitted in the same cycle: the Wave WideNet acquisition pass and the R2 new-vendor cohort that v1.6.5 deferred. Active identifier count **41,716 → 42,923** (+1,207). **No schema migration** (schema_version stays **31**), **+15 manufacturers** (126 → 141, the first net-new manufacturers in several releases), **+2 sources** (74 → 76). Both waves were operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
 
 ### What's new
 
 - **Wave WideNet acquisition (+185).** A registry-and-acquisition pass over certificate-transparency logs, FCC filings, and vendor mobile surfaces (MAC-329): 45 `fcc_grantee_code` + 24 `product_family_codename` + 11 `ble_uuid` + 103 `vendor_controlled_hostname` (Cellebrite, Oxygen Forensics, Eagle Eye, recovered with a per-row CT-log provenance triple) + 2 endpoint rows (WatchGuard, Reveal). Two sources register: `certspotter` (`primary_registry`, RFC 6962 CT logs) and `fcc.report` (`regulatory`). The 185 rows admit at **confidence=NULL** pending a later corroboration pass; the export pipeline gained a None-guard at the confidence gate so the NULL-confidence rows carry through cleanly (`38467df`, MAC-336). 27 rows were rejected to `conflicts` rather than promoted: 25 false-positive FCC grantee codes and 2 Motorola consumer OUIs.
-- **R2 new-vendor cohort, Gate-1A + Gate-1B (+1,022).** The new-vendor data deferred from v1.6.5 (MAC-339 / MAC-341). **15 surveillance brands register** as manufacturers — ACTi, Amcrest, Brivo, Digital Watchdog, GeoVision, HID Global, Lorex, March Networks, Mobotix, Openpath, Reolink, Speco, Swann, Teledyne FLIR, i-PRO — unlocking **51 registry rows** (20 `oui` + 3 `mac_range` + 28 `fcc_grantee_code`). **Reolink firmware** lands at full volume: 860 `firmware_sha256_hash` + 111 `firmware_branded_string`, each with a SHA-256 and provenance from the `reolink-fw-archive` `pak_info.json`. Board approval `06436619`. The SoC component-vendor batch (90 `chipset_codename`) stayed held this release pending the board's component-vendor category ruling; it ships in v1.6.7.
+- **R2 new-vendor cohort, Gate-1A + Gate-1B (+1,022).** The new-vendor data deferred from v1.6.5 (MAC-339 / MAC-341). **15 surveillance brands register** as manufacturers, ACTi, Amcrest, Brivo, Digital Watchdog, GeoVision, HID Global, Lorex, March Networks, Mobotix, Openpath, Reolink, Speco, Swann, Teledyne FLIR, i-PRO, unlocking **51 registry rows** (20 `oui` + 3 `mac_range` + 28 `fcc_grantee_code`). **Reolink firmware** lands at full volume: 860 `firmware_sha256_hash` + 111 `firmware_branded_string`, each with a SHA-256 and provenance from the `reolink-fw-archive` `pak_info.json`. Board approval `06436619`. The SoC component-vendor batch (90 `chipset_codename`) stayed held this release pending the board's component-vendor category ruling; it ships in v1.6.7.
 
 ### Schema
 
@@ -175,17 +175,17 @@ A **data release** layered on top of v1.6.5. It covers two waves admitted in the
 
 ### Halts encountered
 
-- **One, resolved.** The export `None < int` confidence-gate crash surfaced when the 185 NULL-confidence WideNet rows first reached `export_lynceus.py` — the prior active set carried no NULL-confidence rows. A None-guard at the §7.5 classify gate plus two regression tests fixed it (MAC-336, `38467df`) before the release shipped. The backup-first apply and export regeneration otherwise came back clean.
+- **One, resolved.** The export `None < int` confidence-gate crash surfaced when the 185 NULL-confidence WideNet rows first reached `export_lynceus.py`, the prior active set carried no NULL-confidence rows. A None-guard at the §7.5 classify gate plus two regression tests fixed it (MAC-336, `38467df`) before the release shipped. The backup-first apply and export regeneration otherwise came back clean.
 
-## v1.6.5 — 2026-06-06
+## v1.6.5 - 2026-06-06
 
-A **data release** layered on top of v1.6.4. It promoted **+208** validated, registry-sourced identifiers gathered from public registry pulls plus a firmware unpack of Dahua and Axis devices. Active identifier count **41,508 → 41,716**. **No schema migration** (schema_version stays **31**), **0 new `identifier_type` slots**, **0 new sources** (74), **0 new manufacturers** (126 — all 33 attributed vendors were already registered). The release was operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
+A **data release** layered on top of v1.6.4. It promoted **+208** validated, registry-sourced identifiers gathered from public registry pulls plus a firmware unpack of Dahua and Axis devices. Active identifier count **41,508 → 41,716**. **No schema migration** (schema_version stays **31**), **0 new `identifier_type` slots**, **0 new sources** (74), **0 new manufacturers** (126, all 33 attributed vendors were already registered). The release was operator-approved after an independent re-validation against the live database, a backup-first apply, and an operator-gated push.
 
 ### What's new
 
-- **Registry promotion (+208).** Net-new public-registry identifiers, each carrying `source_url` + extraction method + `last_verified`, deduped against the live database (0 collisions), confidence bands §8.2-conformant (`primary_registry` 80–85, `regulatory` 88–90, `manufacturer_doc` 85). By type: `oui` **+133** (444→577), `mac_range` **+19** (17,806→17,825), `fcc_grantee_code` **+44** (95→139), `vendor_controlled_hostname` **+5** (12,055→12,060), `firmware_sha256_hash` **+3** (17→20), `product_family_codename` **+2** (265→267), `firmware_branded_string` **+2** (30→32). Top vendors: Hikvision, Dahua, Hanwha, Trimble, Bosch Security, Uniview, Axon, Samsara, Verkada, Avigilon.
+- **Registry promotion (+208).** Net-new public-registry identifiers, each carrying `source_url` + extraction method + `last_verified`, deduped against the live database (0 collisions), confidence bands §8.2-conformant (`primary_registry` 80-85, `regulatory` 88-90, `manufacturer_doc` 85). By type: `oui` **+133** (444→577), `mac_range` **+19** (17,806→17,825), `fcc_grantee_code` **+44** (95→139), `vendor_controlled_hostname` **+5** (12,055→12,060), `firmware_sha256_hash` **+3** (17→20), `product_family_codename` **+2** (265→267), `firmware_branded_string` **+2** (30→32). Top vendors: Hikvision, Dahua, Hanwha, Trimble, Bosch Security, Uniview, Axon, Samsara, Verkada, Avigilon.
 - **Firmware binwalk (5 of the 12 firmware-attached rows).** A public Dahua IPC-HX5X3X "Rhea" build + Dahua Eos4 + Axis 206W firmware were `binwalk`/`unsquashfs`'d read-only; the **3 `firmware_sha256_hash` rows retain SHA-256 provenance and the binaries are not committed** (gitignored working data). Hardcoded `easy4ip.com` / `cpplusddns.com` / `axiscam.net` hostnames + `Rhea`/`Eos4` codenames extracted. No DRM circumvention (the obfuscated 2025 build was **not** bypassed).
-- **Governance dispositions (operator-ratified):** **Cisco Meraki ×57 OUIs excluded** — vendor-wide registrant spans MV cameras + MR/MS/MX networking; cannot isolate the surveillance line (existing §8.4 multi-purpose-vendor discipline). New-vendor **+1,112** (15 surveillance brands + 13 SoC component vendors + 860 Reolink firmware hashes) **deferred to v1.6.6** pending manufacturer registration + a component-vendor attribution policy + a Reolink-volume decision. Deferrals confirmed: `cid` (0 surveillance registrants), `matter_vendor_id` (full 432-vendor DCL pull → ~2 adjacent, already covered), Nordic GATT vocab, USB/PCI capture VIDs (skip-and-surface).
+- **Governance dispositions (operator-ratified):** **Cisco Meraki ×57 OUIs excluded**, vendor-wide registrant spans MV cameras + MR/MS/MX networking; cannot isolate the surveillance line (existing §8.4 multi-purpose-vendor discipline). New-vendor **+1,112** (15 surveillance brands + 13 SoC component vendors + 860 Reolink firmware hashes) **deferred to v1.6.6** pending manufacturer registration + a component-vendor attribution policy + a Reolink-volume decision. Deferrals confirmed: `cid` (0 surveillance registrants), `matter_vendor_id` (full 432-vendor DCL pull → ~2 adjacent, already covered), Nordic GATT vocab, USB/PCI capture VIDs (skip-and-surface).
 
 ### Schema
 
@@ -203,13 +203,13 @@ A **data release** layered on top of v1.6.4. It promoted **+208** validated, reg
 
 ### Bible amendments
 
-- **None this cycle.** No new rule was introduced — the Meraki exclusion applies the existing §8.4 multi-purpose-vendor discipline, and the deferrals are scheduling, not doctrine. **Possible future clarification flagged (not yet written):** a §4.4 note that `mac_range` promotions do not add to the Lynceus watchlist (they are expanded or dropped), so registry-OUI cycles should project Lynceus changes from concrete-category `oui` rows only.
+- **None this cycle.** No new rule was introduced, the Meraki exclusion applies the existing §8.4 multi-purpose-vendor discipline, and the deferrals are scheduling, not doctrine. **Possible future clarification flagged (not yet written):** a §4.4 note that `mac_range` promotions do not add to the Lynceus watchlist (they are expanded or dropped), so registry-OUI cycles should project Lynceus changes from concrete-category `oui` rows only.
 
 ### Halts encountered
 
 - **None.** The independent re-validation, backup-first apply, and the coverage-matrix and export regeneration all came back clean (0 halts).
 
-## v1.6.4 — 2026-06-05
+## v1.6.4 - 2026-06-05
 
 A **notes / data update** layered on top of v1.6.3: a single correction that restores a higher confidence level and `severity='high'` to one validated group of 19 identifiers, reversing a down-weighting from the previous release. **No records were added or removed, and there was no schema migration this cycle**; the only change is a confidence and severity adjustment plus an added `notes` marker on those 19 rows, landed at commit `3b6eb32`. Active identifier count stays at **41,508**; schema_version stays **31**.
 
@@ -229,38 +229,38 @@ A **notes / data update** layered on top of v1.6.3: a single correction that res
 - **`severity='high'` cohort:** 255 (v1.6.3 ship) → **274** (post-CP43; +19 Cohort A rows re-promoted).
 - **`sources`:** 74 (unchanged). **`manufacturers`:** 126 (unchanged). **`behavioral_signatures`:** 201 (unchanged).
 - **Lynceus high-confidence export records:** 159 (v1.6.3 ship) → **178** (post-CP43; +19, exactly ids 22810-22828; CP7 `geographic_scope='US'` filter unchanged).
-- **Lynceus standard export records:** 592 (unchanged — the 19 rows already cleared the conf≥30 floor at conf=60, so standard-export membership is unaffected).
+- **Lynceus standard export records:** 592 (unchanged, the 19 rows already cleared the conf≥30 floor at conf=60, so standard-export membership is unaffected).
 - **Behavioral signatures export records:** 125 (unchanged).
 
 ### Bible amendments
 
-- **CP43** (`docs/engineering/BIBLE_AMENDMENTS.md:5589`) — Selective revert of CP40 for negative-evidence-validated /24 OUI cohorts (Cohort A re-promotion; Cohort B retained under CP40).
+- **CP43** (`docs/engineering/BIBLE_AMENDMENTS.md:5589`), Selective revert of CP40 for negative-evidence-validated /24 OUI cohorts (Cohort A re-promotion; Cohort B retained under CP40).
 
 ### Halts encountered
 
 - None. The 19-row change landed at commit `3b6eb32` and passed an independent read-only verification battery (8/8) against that commit before the documentation and export work began.
 
-## v1.6.3 — 2026-06-03
+## v1.6.3 - 2026-06-03
 
-A **notes, severity, and code-correctness update** layered on top of the v1.6.2 data. **No records were added or removed from `identifiers` this cycle** — every change is a column addition, a notes update, or a consumer-export fix. It also includes the v1.6.2.1 content (the new severity column and the Flock-hunt floor carve-out), which had been held back and never separately tagged. Active identifier count stays at **41,508**; schema_version advances **30 → 31** (the column added in v1.6.2.1 is the schema this release ships).
+A **notes, severity, and code-correctness update** layered on top of the v1.6.2 data. **No records were added or removed from `identifiers` this cycle**, every change is a column addition, a notes update, or a consumer-export fix. It also includes the v1.6.2.1 content (the new severity column and the Flock-hunt floor carve-out), which had been held back and never separately tagged. Active identifier count stays at **41,508**; schema_version advances **30 → 31** (the column added in v1.6.2.1 is the schema this release ships).
 
 ### What's new
 
 - **Chip-vendor OUI correction.** A field-finder run on 2026-06-02 found that 37 rows in the lifted Flock-hunt group were Wi-Fi chip-vendor OUIs wrongly marked as Flock-attested. This change moves those rows out of `severity='high'`, with a `notes.cp40_marker` value recording the correction. The `severity='high'` group moves from 292 active rows down to 255.
 - **Documented the operator-override rule and closed two vendor paper-trails.** A new rule in the project spec governs how an operator may make a single manual database correction to fix drift: it must be individually authorized, limited to one statement, captured before and after, backed up with a checksum, cross-referenced in the handoff, and read-only afterward. Separately, the `manufacturers.notes.arm_flip_history` records for Avigilon (id=6) and Pelco (id=254) were filled in to document ownership changes that were left unrecorded when those vendors were first added.
 - **Export-correctness fixes.** Two fixes to the Lynceus export code (`db/validation/export_lynceus.py`): the first restores the correct handling that drops `imei_tac` rows from the consumer mapping (a mis-annotation had changed it); the second restores the identity-keyed `DROPPED_REASONS` convention after a regression had overwritten it with positional keys.
-- **Included the v1.6.2.1 content.** The new `identifiers.severity` column (`high`/`medium`/`low`/`NULL`) and the §7.5 floor carve-out for named Flock-hunting project sources (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar — 10 named sources) first landed at commit `233a634` on 2026-06-03 and were held back; v1.6.3 is their first public ship. See the v1.6.2.1 section below for the full detail.
+- **Included the v1.6.2.1 content.** The new `identifiers.severity` column (`high`/`medium`/`low`/`NULL`) and the §7.5 floor carve-out for named Flock-hunting project sources (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar, 10 named sources) first landed at commit `233a634` on 2026-06-03 and were held back; v1.6.3 is their first public ship. See the v1.6.2.1 section below for the full detail.
 
 ### Schema
 
-- **mig-0031** (`identifiers.severity` column add) is the v1.6.3 ship anchor — already documented at v1.6.2.1, but re-mentioned here because v1.6.2.1 was never separately tagged; the v1.6.3 stack is its first public ship cycle.
+- **mig-0031** (`identifiers.severity` column add) is the v1.6.3 ship anchor, already documented at v1.6.2.1, but re-mentioned here because v1.6.2.1 was never separately tagged; the v1.6.3 stack is its first public ship cycle.
 - **No additional migrations this cycle.** CP40 / CP41 / CP42 §1 / CP42 §2 are all data / notes / code mutations, not schema mutations. The migration ledger stays at **0001 through 0031**.
 
 ### Data
 
 - **`identifiers` active:** 41,508 (unchanged from v1.6.2; no INSERT/DELETE this cycle).
 - **`identifiers` total:** 41,890 (unchanged).
-- **`severity='high'` cohort:** 0 (pre-v1.6.2.1, column didn't exist) → 292 (CP39 narrow-scope landing at v1.6.2.1) → **255** (post-CP40 Lynceus chip-vendor OUI remediation; −37 net).
+- **`severity='high'` cohort:** 0 (pre-v1.6.2.1, column didn't exist) → 292 (CP39 narrow-scope landing at v1.6.2.1) → **255** (post-CP40 Lynceus chip-vendor OUI remediation; -37 net).
 - **`manufacturers.notes.arm_flip_history` backfill:** 2 rows (id=6 Avigilon + id=254 Pelco) per CP41.
 - **`sources`:** 74 (unchanged). **`manufacturers`:** 126 (unchanged). **`behavioral_signatures`:** 201 (unchanged).
 - **Lynceus high-confidence export records:** 146 (v1.6.2 baseline) → 178 (v1.6.2.1 CP39 narrow-fork lift) → **159** (v1.6.3 ship, post-CP40 chip-vendor remediation).
@@ -269,10 +269,10 @@ A **notes, severity, and code-correctness update** layered on top of the v1.6.2 
 
 ### Bible amendments
 
-- **CP40** (`docs/engineering/BIBLE_AMENDMENTS.md:5400`) — Identifier-specificity gate on §7.5 floor carve-outs (chip-vendor OUI remediation).
-- **CP41** (`docs/engineering/BIBLE_AMENDMENTS.md:5472`) — §11 #18 ratification → ratified as §11 #20 + Avigilon/Pelco arm-flip paper-trail closure.
-- **CP42 §1** (`docs/engineering/BIBLE_AMENDMENTS.md:5546`) — `imei_tac` Lynceus §4.4 consumer-side disposition restoration.
-- **CP42 §2** (`docs/engineering/BIBLE_AMENDMENTS.md:5569`) — CP35 §215 supersedure: `DROPPED_REASONS` identity-keyed convention restored.
+- **CP40** (`docs/engineering/BIBLE_AMENDMENTS.md:5400`), Identifier-specificity gate on §7.5 floor carve-outs (chip-vendor OUI remediation).
+- **CP41** (`docs/engineering/BIBLE_AMENDMENTS.md:5472`), §11 #18 ratification → ratified as §11 #20 + Avigilon/Pelco arm-flip paper-trail closure.
+- **CP42 §1** (`docs/engineering/BIBLE_AMENDMENTS.md:5546`), `imei_tac` Lynceus §4.4 consumer-side disposition restoration.
+- **CP42 §2** (`docs/engineering/BIBLE_AMENDMENTS.md:5569`), CP35 §215 supersedure: `DROPPED_REASONS` identity-keyed convention restored.
 
 ### Halts encountered
 
@@ -280,15 +280,15 @@ A **notes, severity, and code-correctness update** layered on top of the v1.6.2 
 - **Wording correction in an amendment.** A clause in the same amendment was reworded when applied so its text matched the actual scope of the change.
 - **Amendment-numbering collision.** Two separate changes were drafted against the same amendment number; the conflict was resolved by giving them distinct numbers.
 
-## v1.6.2.1 — 2026-05-30
+## v1.6.2.1 - 2026-05-30
 
 A **schema-bump patch** that adds a new optional `severity` column to the `identifiers` table and labels Flock Safety + Flock-context data as `severity='high'`, plus lifts a cohort of crowdsourced Flock-hunting data into the high-confidence export.
 
 ### What's new
 
-- **New column: `identifiers.severity`** — optional enum (`high` / `medium` / `low` / `NULL`). Default `NULL`. Captures surveillance-impact class as an axis orthogonal to `confidence` (which captures identifier-veracity). Narrow scope this cycle: only Flock-attested rows are labeled `high`; everything else stays `NULL` pending future cycles.
+- **New column: `identifiers.severity`**, optional enum (`high` / `medium` / `low` / `NULL`). Default `NULL`. Captures surveillance-impact class as an axis orthogonal to `confidence` (which captures identifier-veracity). Narrow scope this cycle: only Flock-attested rows are labeled `high`; everything else stays `NULL` pending future cycles.
 
-- **Flock-hunt project carve-out — 124 identifiers promoted into the high-confidence export.** Rows whose source is one of the named Flock-hunting GitHub projects (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar — 10 named sources) are now admitted at confidence ≥85 with `severity='high'`, even though `source_type` remains `crowdsourced`/`inferred`/`academic`. The rationale: those upstream projects have been released and have active users, which is sufficient external verification for our purposes. This is the first carve-out to the strict `≥70 + excludes crowdsourced/inferred` floor on `argus_export_high_confidence.json`; it is named and bounded (does not open the floor for arbitrary crowdsourced lifts elsewhere).
+- **Flock-hunt project carve-out, 124 identifiers promoted into the high-confidence export.** Rows whose source is one of the named Flock-hunting GitHub projects (DeFlock, the `flock-you` family, GainSec's Flock research repos, and similar, 10 named sources) are now admitted at confidence ≥85 with `severity='high'`, even though `source_type` remains `crowdsourced`/`inferred`/`academic`. The rationale: those upstream projects have been released and have active users, which is sufficient external verification for our purposes. This is the first carve-out to the strict `≥70 + excludes crowdsourced/inferred` floor on `argus_export_high_confidence.json`; it is named and bounded (does not open the floor for arbitrary crowdsourced lifts elsewhere).
 
 - **All Flock Safety records now labeled `severity='high'`.** 231 Flock Safety identifiers + 61 partner/LE-context identifiers from Flock-hunting sources (SoundThinking, Hikvision-via-FlockYou, Axon-via-Flock-context, etc.) carry the new `severity='high'` field. Total `severity='high'` rows: **292**.
 
@@ -296,7 +296,7 @@ A **schema-bump patch** that adds a new optional `severity` column to the `ident
 
 ### What stayed the same (intentional)
 
-- **Earlier re-labeling takes precedence on third-party detection patterns.** 19 `ssid_pattern` rows that an earlier release (v1.6.0) re-labeled as `inferred/50` because they're third-party detection guesses about *other* vendors (Sierra Wireless, Cradlepoint, DJI, Parrot, Skydio, Autel, Grayshift, Magnet Forensics, MSAB, Oxygen Forensics) **keep their `inferred/50` classification AND keep `severity=NULL`** — even though they live in a Flock-hunting repository. This release's carve-out is for Flock-Safety-attributable data, not for arbitrary content hosted in those repositories.
+- **Earlier re-labeling takes precedence on third-party detection patterns.** 19 `ssid_pattern` rows that an earlier release (v1.6.0) re-labeled as `inferred/50` because they're third-party detection guesses about *other* vendors (Sierra Wireless, Cradlepoint, DJI, Parrot, Skydio, Autel, Grayshift, Magnet Forensics, MSAB, Oxygen Forensics) **keep their `inferred/50` classification AND keep `severity=NULL`**, even though they live in a Flock-hunting repository. This release's carve-out is for Flock-Safety-attributable data, not for arbitrary content hosted in those repositories.
 - **False-positive caught.** One IEEE OUI row attributed to `Flock Audio Inc.` (a pro audio company, unrelated to Flock Safety surveillance) was excluded from the carve-out and the severity tag.
 
 ### By the numbers, compared with v1.6.2
@@ -304,14 +304,14 @@ A **schema-bump patch** that adds a new optional `severity` column to the `ident
 | | v1.6.2 | v1.6.2.1 |
 |---|---|---|
 | Schema version | 30 | **31** (+1 column: `severity`) |
-| Active identifiers | 41,508 | 41,508 (unchanged — labeling/lift only, no insert/delete) |
+| Active identifiers | 41,508 | 41,508 (unchanged, labeling/lift only, no insert/delete) |
 | Sources | 74 | 74 (unchanged) |
 | Manufacturers | 126 | 126 (unchanged) |
 | `manufacturer = 'Flock Safety'` (canonical) | 125 | **231** (+67 lowercase-normalize + 39 NULL-mfr attribution) |
 | `manufacturer = 'flock_safety'` (lowercase) | 67 | 0 |
 | `severity = 'high'` | 0 (column didn't exist) | **292** |
-| Lynceus high-confidence export records | 146 | **178** (+32 from CP39 — the Flock-hunt rows whose identifier_type maps to a Lynceus pattern survive the §4.4 mapping; the rest of the 124 lifts are DROPPED at §4.4 for type-mapping reasons unchanged by CP39) |
-| Lynceus standard export records | 592 | 592 (unchanged — the +124 lifted rows were either already in standard export or DROPPED at §4.4) |
+| Lynceus high-confidence export records | 146 | **178** (+32 from CP39, the Flock-hunt rows whose identifier_type maps to a Lynceus pattern survive the §4.4 mapping; the rest of the 124 lifts are DROPPED at §4.4 for type-mapping reasons unchanged by CP39) |
+| Lynceus standard export records | 592 | 592 (unchanged, the +124 lifted rows were either already in standard export or DROPPED at §4.4) |
 | Lynceus CSV export records | 41,508 | 41,508 (gains `severity` column) |
 
 ### Technical notes
@@ -321,11 +321,11 @@ A **schema-bump patch** that adds a new optional `severity` column to the `ident
 - Audit record: the change is logged in the `extraction_runs` table.
 - Pre-action backup: `db/argus.db.pre_mig0031_20260530T151838Z.bak` (project's internal archive).
 
-## v1.6.2 — 2026-05-29
+## v1.6.2 - 2026-05-29
 
-This release adds **116 net-new identifiers** to the v1.6.0 corpus — deepening identifier coverage for existing surveillance-camera vendors (Hikvision, Uniview, Reolink, Bosch Security Systems, Verkada, Hanwha Vision, Dahua, Axis Communications, Avigilon, Eagle Eye Networks, Milestone, Rhombus, FLIR, WatchGuard Video) and the surveillance-camera SoC supply chain (HiSilicon, Texas Instruments, Ambarella, Novatek) across firmware build strings, chipset codenames, vendor-controlled hostnames, FCC equipment-class codes, network-discovery patterns, and other identifier types. The release also removes 36 documentation-pattern placeholder rows from the earlier CCTV integration.
+This release adds **116 net-new identifiers** to the v1.6.0 corpus, deepening identifier coverage for existing surveillance-camera vendors (Hikvision, Uniview, Reolink, Bosch Security Systems, Verkada, Hanwha Vision, Dahua, Axis Communications, Avigilon, Eagle Eye Networks, Milestone, Rhombus, FLIR, WatchGuard Video) and the surveillance-camera SoC supply chain (HiSilicon, Texas Instruments, Ambarella, Novatek) across firmware build strings, chipset codenames, vendor-controlled hostnames, FCC equipment-class codes, network-discovery patterns, and other identifier types. The release also removes 36 documentation-pattern placeholder rows from the earlier CCTV integration.
 
-**No schema migration, no new sources, no new manufacturers** — the new identifiers landed under existing source coverage (vendor portals + cert-transparency queries + FCC equipment-grantee filings + NVD CVE entries + companion-app APK extracts + IEEE OUI + web.archive.org), so schema stays at 30 and source / manufacturer counts stay at 74 / 126.
+**No schema migration, no new sources, no new manufacturers**, the new identifiers landed under existing source coverage (vendor portals + cert-transparency queries + FCC equipment-grantee filings + NVD CVE entries + companion-app APK extracts + IEEE OUI + web.archive.org), so schema stays at 30 and source / manufacturer counts stay at 74 / 126.
 
 ### What changed
 
@@ -338,15 +338,15 @@ By the numbers, compared with the previous release:
 | | v1.6.1 | v1.6.2 |
 |---|---|---|
 | Schema version | 30 | 30 (unchanged) |
-| Active identifiers | 41,428 | **41,508** (+80 net: +116 promotion, −36 strip) |
+| Active identifiers | 41,428 | **41,508** (+80 net: +116 promotion, -36 strip) |
 | Total identifiers | 41,774 | 41,890 (+116; strip demotes are self-loops, not deletes) |
 | Demoted (`superseded_by IS NOT NULL`) | 346 | 382 (+36) |
 | Sources | 74 | 74 (unchanged) |
 | Manufacturers | 126 | 126 (unchanged) |
 | Behavioral signatures | 201 | 201 (unchanged) |
 | Lynceus high-confidence export records | 146 | 146 (the 36 strip rows were already below the ≥70 cut) |
-| Lynceus standard export records | 610 | 592 (−18 from the OUI strip; the 18 protocol-pattern strips were already excluded by the §4.4 NDPP drop bucket) |
-| Lynceus CSV export records | 41,544 | 41,508 (−36, 1:1 with the strip demotes) |
+| Lynceus standard export records | 610 | 592 (-18 from the OUI strip; the 18 protocol-pattern strips were already excluded by the §4.4 NDPP drop bucket) |
+| Lynceus CSV export records | 41,544 | 41,508 (-36, 1:1 with the strip demotes) |
 
 ### Technical notes
 
@@ -356,9 +356,9 @@ By the numbers, compared with the previous release:
 - A backup of the pre-removal database snapshot is recorded in the `extraction_runs` table (`notes.backup_sha256`); the backup file itself is held in the project's internal archive, not in the public source tree.
 - The 116 corrected-promote candidates this cycle were initially surfaced by a trial run of the Hermes / minimax m2.7 extraction tooling; the final records landed through the canonical extraction → validate → promotion pipeline.
 
-## v1.6.1 — 2026-05-25
+## v1.6.1 - 2026-05-25
 
-A **docs-only** patch over the v1.6.0 data ship. **No database change, no migrations, no promotions, no export-semantic change** — the schema version stays at 30 and the active identifier set stays at 41,428. This release makes the change log easier to read and tidies the repository.
+A **docs-only** patch over the v1.6.0 data ship. **No database change, no migrations, no promotions, no export-semantic change**, the schema version stays at 30 and the active identifier set stays at 41,428. This release makes the change log easier to read and tidies the repository.
 
 ### What changed
 
@@ -366,19 +366,19 @@ A **docs-only** patch over the v1.6.0 data ship. **No database change, no migrat
 - **Documentation refresh:** the data dictionary's live row-count snapshot was brought up to date with the v1.6.0 database (schema 30; 41,428 active identifiers; 126 manufacturers; 74 sources).
 - **Repository hygiene:** internal planning and backup artifacts were removed from the canonical source tree (they remain preserved in the project's internal archive).
 
-## v1.6.0 — 2026-05-25
+## v1.6.0 - 2026-05-25
 
-This release substantially expands Argus's coverage of surveillance and security-vendor equipment — **+3,627 device identifiers** and **+34 manufacturers** — and adds several new vendor categories.
+This release substantially expands Argus's coverage of surveillance and security-vendor equipment, **+3,627 device identifiers** and **+34 manufacturers**, and adds several new vendor categories.
 
 ### What's new
 
 New vendor categories now covered:
 
-- **Facial recognition** — NEC NeoFace, Idemia, Cognitec, AnyVision/Oosto, Paravision, Rank One, DataWorks Plus, FaceFirst.
-- **Mobile spyware** — NSO Group, Cytrox, Gamma Group (FinFisher), Hacking Team (Memento Labs), Candiru, QuaDream. Drawn from public Citizen Lab and Amnesty International forensic reports.
-- **Lawful-intercept / network-surveillance platforms** — Pen-Link, SS8, Cognyte, Utimaco, Polaris Wireless, Trovicor.
-- **Mobile forensic-extraction tools** — MSAB, Magnet Forensics / Grayshift, Oxygen Forensics, Detego, Compelson.
-- **Counter-drone systems** — Aaronia, Hidden Level, Epirus, CACI SkyTracker, plus the Anduril product family.
+- **Facial recognition**, NEC NeoFace, Idemia, Cognitec, AnyVision/Oosto, Paravision, Rank One, DataWorks Plus, FaceFirst.
+- **Mobile spyware**, NSO Group, Cytrox, Gamma Group (FinFisher), Hacking Team (Memento Labs), Candiru, QuaDream. Drawn from public Citizen Lab and Amnesty International forensic reports.
+- **Lawful-intercept / network-surveillance platforms**, Pen-Link, SS8, Cognyte, Utimaco, Polaris Wireless, Trovicor.
+- **Mobile forensic-extraction tools**, MSAB, Magnet Forensics / Grayshift, Oxygen Forensics, Detego, Compelson.
+- **Counter-drone systems**, Aaronia, Hidden Level, Epirus, CACI SkyTracker, plus the Anduril product family.
 
 By the numbers, compared with the previous release:
 
@@ -393,7 +393,7 @@ The new source is CISA's Known Exploited Vulnerabilities (KEV) catalog. The new 
 
 ### Data-quality notes
 
-- **Confidence re-labeling:** 19 Wi-Fi network-name (SSID) patterns — covering Sierra Wireless, Cradlepoint, and several drone makers — were re-labeled from "high confidence" down to "inferred." They originally came only from a community-built detection app, not from the vendors themselves, so the lower confidence is more honest. The data is kept; only its confidence and source label changed.
+- **Confidence re-labeling:** 19 Wi-Fi network-name (SSID) patterns, covering Sierra Wireless, Cradlepoint, and several drone makers, were re-labeled from "high confidence" down to "inferred." They originally came only from a community-built detection app, not from the vendors themselves, so the lower confidence is more honest. The data is kept; only its confidence and source label changed.
 
 ### Known follow-ups (planned for a later release)
 
@@ -405,7 +405,7 @@ The new source is CISA's Known Exploited Vulnerabilities (KEV) catalog. The new 
 - Schema version 29 → 30. One migration adds the `network_surveillance` device category to both the identifiers and behavioral-signatures tables.
 - Full amendment records live in the engineering bible (`docs/engineering/BIBLE_AMENDMENTS.md`).
 
-## [v1.5.4] — 2026-05-24
+## [v1.5.4], 2026-05-24
 
 A **docs-only** patch that refreshes the canonical documentation surface to the v1.5.3 state. **No DB mutation, no migrations, no promotions, no export-semantic change.** `schema_version` stays at 29; the active identifier set stays at 37,801. This release exists because the v1.5.3 data ship intentionally shipped its data ahead of the doc refresh (separate ship cycles); v1.5.4 brings the prose into line with the database.
 
@@ -417,13 +417,13 @@ A **docs-only** patch that refreshes the canonical documentation surface to the 
 
 ### Docs deltas
 
-- **`README.md`** — v1.5.2→v1.5.3 lead + "Most recent release" v1.5.3 narrative; active count 35,958→37,801; export records (standard 536→579); CSV "Records" corrected to the logical record count (37,801; the prior figure was a physical line count inflated by embedded newlines); amendment count 34→36.
-- **`docs/internal/PROJECT_STATE.md`** — current-state header refreshed to v1.5.3-staged + new "v1.5.3 headline counts" table; the prior cycle table preserved as history.
-- **`docs/internal/PLANNED_AND_FUTURE_UPDATES.md`** — carry-forward section appended (MAC-252 dedup hardening; MAC-261 NULL-manufacturer + Harris normalization; MAC-262 ledger-token alignment; J-1 heuristic-hardening; Cradlepoint/Cellebrite alias-expansion gate; 54-row Wayback queue) **plus an explicit "cohorts NOT extracted this wave" record** — facial-recognition-beyond-Clearview and mobile-spyware cohorts carry to v1.6.0 (0 vendors extracted; `manufacturers` unchanged at 92).
-- **`docs/engineering/DATA_DICTIONARY.md`** — schema 27→29 refresh (17 stale-claim locations); migration ledger extended through 0029; true enum counts (identifier_type 58, device_category 16, source_type 13, pair_kind 5).
-- **`CREDITS.md`** — 11 surgical drift-fixes (sid 4/34/48/51 v1.5.3 yields; source_type framing for sids 1/2/3; sid 7 Socrata 2021-03-22 freeze note; DeFlock OSM attribution; sid 15 MIT; v1.4.0 source-id tags). All per-release admission ledgers + the 92-vendor lexicon preserved.
-- **`docs/engineering/PROJECT_BIBLE.md` + `BIBLE_AMENDMENTS.md`** — verified already-current through CP36 / CP36-extension (commit anchors `7e6160e`/`a89aaff`, `7666748`, `dda50b1` confirmed); no edit required.
-- **`docs/engineering/METHODOLOGY.md`** — §7.5 PII discipline verified accurate; v1.0.0-frozen methodology snapshot intentionally not re-versioned (one optional `judicial_filing` band-reconciliation note left to the bible per its own defer-to-bible rule).
+- **`README.md`**, v1.5.2→v1.5.3 lead + "Most recent release" v1.5.3 narrative; active count 35,958→37,801; export records (standard 536→579); CSV "Records" corrected to the logical record count (37,801; the prior figure was a physical line count inflated by embedded newlines); amendment count 34→36.
+- **`docs/internal/PROJECT_STATE.md`**, current-state header refreshed to v1.5.3-staged + new "v1.5.3 headline counts" table; the prior cycle table preserved as history.
+- **`docs/internal/PLANNED_AND_FUTURE_UPDATES.md`**, carry-forward section appended (MAC-252 dedup hardening; MAC-261 NULL-manufacturer + Harris normalization; MAC-262 ledger-token alignment; J-1 heuristic-hardening; Cradlepoint/Cellebrite alias-expansion gate; 54-row Wayback queue) **plus an explicit "cohorts NOT extracted this wave" record**, facial-recognition-beyond-Clearview and mobile-spyware cohorts carry to v1.6.0 (0 vendors extracted; `manufacturers` unchanged at 92).
+- **`docs/engineering/DATA_DICTIONARY.md`**, schema 27→29 refresh (17 stale-claim locations); migration ledger extended through 0029; true enum counts (identifier_type 58, device_category 16, source_type 13, pair_kind 5).
+- **`CREDITS.md`**, 11 surgical drift-fixes (sid 4/34/48/51 v1.5.3 yields; source_type framing for sids 1/2/3; sid 7 Socrata 2021-03-22 freeze note; DeFlock OSM attribution; sid 15 MIT; v1.4.0 source-id tags). All per-release admission ledgers + the 92-vendor lexicon preserved.
+- **`docs/engineering/PROJECT_BIBLE.md` + `BIBLE_AMENDMENTS.md`**, verified already-current through CP36 / CP36-extension (commit anchors `7e6160e`/`a89aaff`, `7666748`, `dda50b1` confirmed); no edit required.
+- **`docs/engineering/METHODOLOGY.md`**, §7.5 PII discipline verified accurate; v1.0.0-frozen methodology snapshot intentionally not re-versioned (one optional `judicial_filing` band-reconciliation note left to the bible per its own defer-to-bible rule).
 
 ### Honest-absence dispositions (Phase K)
 
@@ -436,20 +436,20 @@ The v1.5.3 external-review evidence pull surfaced 7 honest-absence findings; all
 
 ### Schema
 
-- **No change.** `schema_version` = 29 (unchanged). No migrations. (Documentation note: the live `schema_version` row 29 is stamped `0029_cp35_…` while the on-disk migration file is `0029_cp36_…` — a benign apply-time pre-re-anchor token mismatch; the structural schema is correct. Documented verbatim in DATA_DICTIONARY §4.13; an optional one-row ledger re-stamp is deferred to the v1.5.x data-hygiene queue.)
+- **No change.** `schema_version` = 29 (unchanged). No migrations. (Documentation note: the live `schema_version` row 29 is stamped `0029_cp35_…` while the on-disk migration file is `0029_cp36_…`, a benign apply-time pre-re-anchor token mismatch; the structural schema is correct. Documented verbatim in DATA_DICTIONARY §4.13; an optional one-row ledger re-stamp is deferred to the v1.5.x data-hygiene queue.)
 
 ### Export verification
 
-- Exports regenerated against the unchanged live DB and confirmed byte-identical to the v1.5.3 exports modulo the `_meta.exported_at` timestamp — confirming the docs refresh did not leak into export semantics.
+- Exports regenerated against the unchanged live DB and confirmed byte-identical to the v1.5.3 exports modulo the `_meta.exported_at` timestamp, confirming the docs refresh did not leak into export semantics.
 
-## [v1.5.3] — 2026-05-24
+## [v1.5.3], 2026-05-24
 
-This release ships a **five-phase corpus expansion** (MAC-245; vendor / drone-RID / IMSI / GainSec / judicial-filing) — together with three checkpoint ratifications: CP35, CP36, and the CP36-extension. It is a confidence-invariant release: every count delta is a new-row promotion or a source-label parity fix; no existing identifier's confidence was lifted without a second independent source (§11 #8).
+This release ships a **five-phase corpus expansion** (MAC-245; vendor / drone-RID / IMSI / GainSec / judicial-filing), together with three checkpoint ratifications: CP35, CP36, and the CP36-extension. It is a confidence-invariant release: every count delta is a new-row promotion or a source-label parity fix; no existing identifier's confidence was lifted without a second independent source (§11 #8).
 
 ### Highlights
 
 - **Corpus expansion:** +1,843 net-new active identifiers (MAC-250), lifting the active set 35,958 → 37,801
-- **`judicial_filing` source_type** admitted to the enum (migration 0029) and 116 court-filing rows relabeled from the `foia` band-bucket proxy — a label-parity fix that left the confidence column untouched (§11 #8 invariant)
+- **`judicial_filing` source_type** admitted to the enum (migration 0029) and 116 court-filing rows relabeled from the `foia` band-bucket proxy, a label-parity fix that left the confidence column untouched (§11 #8 invariant)
 - **`network_discovery_protocol_pattern` (NDPP)** Lynceus consumer-mapping ratified as DROP (§4.4); the 18 NDPP rows remain canonical in the DB, gated consumer-side until Lynceus v0.3 ships discovery-protocol-signature scanning
 - **Coverage-matrix halt closed:** the `unknown_source_type` validator halt that fired against the 116 J-5 rows on every pass is now resolved (CP36-extension)
 
@@ -471,14 +471,14 @@ This release ships a **five-phase corpus expansion** (MAC-245; vendor / drone-RI
 
 - Standard export (`argus_export.json`, confidence ≥30): 536 → 579 records (+43)
 - High-confidence export (`argus_export_high_confidence.json`, confidence ≥70): 119 (unchanged count; cohort drift internal)
-- The 116 `judicial_filing` rows do **not** surface on either Talos export — all carry DROPPED-class identifier types (`product_family_codename` 109 + `firmware_branded_string` 7) per §4.4. This is correct filtering, not a regression.
+- The 116 `judicial_filing` rows do **not** surface on either Talos export, all carry DROPPED-class identifier types (`product_family_codename` 109 + `firmware_branded_string` 7) per §4.4. This is correct filtering, not a regression.
 - `dropped_in_export.procurement_only` = 0 (§11 #14 parity)
 
 ### Bible amendments
 
 - **CP35 (MAC-255):** §4.4 Lynceus consumer-mapping for `network_discovery_protocol_pattern` ratified as option (b) DROP, rationale `NDPP_pending_lynceus_v0_3_scanner_support`. 18 NDPP rows preserved in the canonical DB; consumer-side gating deferred to Lynceus v0.3 scanner support.
 - **CP36 (MAC-251):** `identifiers.source_type` enum parity (migration 0029) + 116 J-5 relabel (`foia` → `judicial_filing`) under the §11 #8 confidence-invariant (confidence column untouched).
-- **CP36-extension (MAC-256):** `SOURCE_TYPE_CEILINGS["judicial_filing"] = 85` added to `coverage_matrix.py` — closes the validator-side annotation-halt gap left when CP36 relabeled the source_type without updating the §8.2-sanity ceiling map in the same coordinated commit. Ceiling 85 inherits the `foia` band-ceiling proxy that landed the rows (§11 #8 invariant).
+- **CP36-extension (MAC-256):** `SOURCE_TYPE_CEILINGS["judicial_filing"] = 85` added to `coverage_matrix.py`, closes the validator-side annotation-halt gap left when CP36 relabeled the source_type without updating the §8.2-sanity ceiling map in the same coordinated commit. Ceiling 85 inherits the `foia` band-ceiling proxy that landed the rows (§11 #8 invariant).
 
 ### Sibling-discipline
 
@@ -488,7 +488,7 @@ This cycle applied the downstream-consumer-audit discipline: each bible amendmen
 
 - **`unknown_source_type` (coverage_matrix.py `_compute_halts`):** fired against the 116 J-5 `judicial_filing` rows after CP36's migration 0029 relabel, because the `SOURCE_TYPE_CEILINGS` §8.2-sanity map had not been updated in the same coordinated commit. Resolved by CP36-extension (MAC-256): the `coverage_report.md` halt-line transitioned `Halts at HB35: 1` → `0`.
 
-## [v1.5.2] — 2026-05-23
+## [v1.5.2], 2026-05-23
 
 This release closes a parallel work cycle covering CCTV camera vendors (Track A) and IMEI TAC research (Track B), and folds in the v1.5.1 documentation restructure.
 
@@ -515,7 +515,7 @@ This release closes a parallel work cycle covering CCTV camera vendors (Track A)
 
 Hikvision 46 · Tiandy 53 · Axis 21 · Verkada 10 · Avigilon 9 · Dahua 7
 
-### IMEI TAC research — notable negative result
+### IMEI TAC research, notable negative result
 
 A 25-vendor sweep across cellular gateways, fleet telematics, mobile ID apps, trail cameras, ankle monitors, consumer GPS trackers, and drone pilot apps yielded zero unique IMEI TACs.
 
@@ -532,7 +532,7 @@ Future TAC work will pivot to four better-suited sources:
 
 README, CHANGELOG, and project state docs refreshed and verified against the live database.
 
-## [v1.5.0] — 2026-05-22
+## [v1.5.0], 2026-05-22
 
 This release significantly expands the manufacturer lexicon through parallel sessions covering military/federal and commercial/consumer device makers.
 
@@ -574,7 +574,7 @@ Seven existing camera vendors moved to the new `cctv_camera` primary category: H
 
 README, CHANGELOG, data dictionary, credits, methodology, and project state docs all refreshed.
 
-## [v1.4.1] — 2026-05-21
+## [v1.4.1], 2026-05-21
 
 This release adds automotive telematics as a tracked device category and introduces schema support for multi-arm manufacturer relationships (parent/subsidiary structure).
 
@@ -601,16 +601,16 @@ This release adds automotive telematics as a tracked device category and introdu
 
 ### Documentation
 
-- New: `docs/internal/lynceus_handoff_v1_4_1.md` — integration handoff for downstream consumers
+- New: `docs/internal/lynceus_handoff_v1_4_1.md`, integration handoff for downstream consumers
 - README, CHANGELOG, data dictionary, credits, and methodology refreshed for v1.4.1
 
-## [v1.4.0] — 2026-05-20
+## [v1.4.0], 2026-05-20
 
 ### What's new in v1.4.0
 
 Argus v1.4.0 lands the **vendor cloud-infrastructure hostname corpus** from a four-pass autonomous extraction effort. 12,590 cumulative unique hostnames flowed from 8 extraction source-classes through Phase 2 FP-scrub (97.21% survivor rate, flagged for manual top-50 GitHub-sourced calibration as carry-forward) into 12,239 net-new identifiers (11,674 `vendor_controlled_hostname` + 565 `vendor_controlled_hostname_deprecated`) across all 51 canonical vendors. Net active identifier count grows 22,553 → **34,792** (+54.3%); raw_observations 133,830 → 146,188 (+12,358 with full provenance lineage); sources 53 → 66 (+13: crt.sh CT logs + Wayback CDX + GitHub vendor first-party + 5 RIR RDAP endpoints + npm/PyPI/RubyGems + bucket payload class + a cloud-infrastructure extraction methodology umbrella).
 
-The headline marquee finding is **`hppki.honeywell.com` promoted at confidence=99** (firmware-cert ceiling) via 4-source independent corroboration: 2 Honeywell OTA signing certificates recovered from CT40 Android firmware META-INF/com/android/otacert (issuer `C=US, O=Honeywell International Inc., OU=ACS, CN=Honeywell CodeSign RSA CA`; sha256 `60a8cf8feeb33926366776b395d6c8d9334bd8b42038b85563622ce0a1d0745b`) + crt.sh CT log attestation + binary Class A extraction + bucket payload Class A_bucket_payload_firmware. This is the strongest possible attribution chain in the Argus framework — firmware-embedded cert + vendor-signed code-signing CA + multi-source-class corroboration.
+The headline marquee finding is **`hppki.honeywell.com` promoted at confidence=99** (firmware-cert ceiling) via 4-source independent corroboration: 2 Honeywell OTA signing certificates recovered from CT40 Android firmware META-INF/com/android/otacert (issuer `C=US, O=Honeywell International Inc., OU=ACS, CN=Honeywell CodeSign RSA CA`; sha256 `60a8cf8feeb33926366776b395d6c8d9334bd8b42038b85563622ce0a1d0745b`) + crt.sh CT log attestation + binary Class A extraction + bucket payload Class A_bucket_payload_firmware. This is the strongest possible attribution chain in the Argus framework, firmware-embedded cert + vendor-signed code-signing CA + multi-source-class corroboration.
 
 Migration 0024 extends the `identifier_type` CHECK enum 51 → 54 with three CP29 value classes (`vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`). Two candidate CP29 value classes deferred per conservative ≥1-evidence gate: `vendor_asn_prefix` (class G halted url_pattern_issue; 0 findings) and `vendor_controlled_ip` (cert IP-SAN sub-passes 0/0/0 across the three follow-on passes). Both reserved for CP30 / migration 0025 when empirical observation surfaces.
 
@@ -618,9 +618,9 @@ Migration 0024 extends the `identifier_type` CHECK enum 51 → 54 with three CP2
 
 | sid | name | source_type | source_class |
 |---|---|---|---|
-| 54 | Certificate Transparency Logs — crt.sh aggregator | primary_registry | B (CT log aggregator) |
-| 55 | Internet Archive Wayback Machine — CDX | crowdsourced | K (public archive temporal) |
-| 56 | GitHub — vendor first-party content | manufacturer_app | I (vendor source/README) |
+| 54 | Certificate Transparency Logs, crt.sh aggregator | primary_registry | B (CT log aggregator) |
+| 55 | Internet Archive Wayback Machine, CDX | crowdsourced | K (public archive temporal) |
+| 56 | GitHub, vendor first-party content | manufacturer_app | I (vendor source/README) |
 | 57-61 | ARIN/RIPE/APNIC/LACNIC/AFRINIC RDAP | primary_registry | G (RIR; infrastructure-only admission for the next cycle) |
 | 62-64 | npm Registry / PyPI / RubyGems | manufacturer_app | J (public package registry) |
 | 65 | Vendor Public Cloud-Storage Bucket Payload (S3-class) | manufacturer_app | A_bucket_payload (SAR-13.5 attribution-gate-binding) |
@@ -644,7 +644,7 @@ per confidence band:
   conf=99 (firmware-cert ceiling):          1   (hppki.honeywell.com)
   conf=97 (cross-source + §8.3 lift):     108   (lifted candidates per CP24 independence)
   conf=87 (deprecated default high):      565   (NXDOMAIN-verified)
-  conf=85 (default high single-source): 11,565   (most common — single CT-log attestation)
+  conf=85 (default high single-source): 11,565   (most common, single CT-log attestation)
 §8.3 lifts applied:                       108   (per wave_i_lift_candidates_synthesis.json)
 raw_observations FK-chained:           12,358
 ```
@@ -658,17 +658,17 @@ raw_observations FK-chained:           12,358
 - **Cisco Meraki** (mfg_id=207): appended `Meraki LLC` (2 live-cert observations)
 - **Getac** (mfg_id=18): appended `Getac Technology Corporation` (1 live-cert observation)
 - **Jacobs** (mfg_id=13): appended `Jacobs Solutions Inc.` (1 live-cert observation)
-- **Honeywell** (mfg_id=211): appended `Honeywell International Inc.` (firmware OTA cert — added in post-ship corrective pass; the main Phase 6 enrichment script omitted Honeywell from its vendor-key-to-canonical mapping)
+- **Honeywell** (mfg_id=211): appended `Honeywell International Inc.` (firmware OTA cert, added in post-ship corrective pass; the main Phase 6 enrichment script omitted Honeywell from its vendor-key-to-canonical mapping)
 
 **Honeywell International Inc.** observed in firmware-embedded code-signing cert. Honeywell IS already in the canonical 51-vendor lexicon (mfg_id=211, canonical_name "Honeywell" with aliases "Honeywell Pro-Watch, Honeywell International, Honeywell Building Technologies"); the firmware-derived legal-entity string `Honeywell International Inc.` has been appended as a 4th alias to that row. (Post-ship corrective: the original Phase 6 enrichment script omitted `honeywell` from its vendor-key-to-canonical mapping and so missed this alias-merge during the main pass.)
 
 ### Bible amendments
 
-- **CP29** — vendor hostname corpus value_classes (3 codified, 2 deferred)
-- **SAR-13** — runguide-schema-fabrication discipline (PRAGMA-verify all column names + types prior to any SQL drafting against canonical schema)
-- **SAR-13.5** — bucket attribution discipline (content-based attribution gate before any public-bucket-derived promotion; three-state classification: confirmed / rejected_slug_collision / ambiguous_operator_review_required)
-- **SAR-15** *(post-ship codification, board comment 2026-05-20)* — per-vendor probe-scope discipline (per-vendor extraction passes must respect the rationale of the vendor's canonical admission; surfaced by 252 Johnson Matthey corporate-IT hostnames that surfaced from a vendor admitted for industrial-MAC-cohort completeness, not surveillance-axis hostname extraction; 252 rows flagged via `notes.scope_review_required=true` for next-cycle / v1.4.1 operator review per SAR-15)
-- **SAR-15.5** *(post-ship codification, board comment 2026-05-20)* — Validator-role independent close-out audit discipline for large-ship cycles (≥10 phases / ≥10k promotions / ≥3 new sources / ≥1 new migration); surfaced by the Honeywell-in-lexicon miss the main self-executed pass missed
+- **CP29**, vendor hostname corpus value_classes (3 codified, 2 deferred)
+- **SAR-13**, runguide-schema-fabrication discipline (PRAGMA-verify all column names + types prior to any SQL drafting against canonical schema)
+- **SAR-13.5**, bucket attribution discipline (content-based attribution gate before any public-bucket-derived promotion; three-state classification: confirmed / rejected_slug_collision / ambiguous_operator_review_required)
+- **SAR-15** *(post-ship codification, board comment 2026-05-20)*, per-vendor probe-scope discipline (per-vendor extraction passes must respect the rationale of the vendor's canonical admission; surfaced by 252 Johnson Matthey corporate-IT hostnames that surfaced from a vendor admitted for industrial-MAC-cohort completeness, not surveillance-axis hostname extraction; 252 rows flagged via `notes.scope_review_required=true` for next-cycle / v1.4.1 operator review per SAR-15)
+- **SAR-15.5** *(post-ship codification, board comment 2026-05-20)*, Validator-role independent close-out audit discipline for large-ship cycles (≥10 phases / ≥10k promotions / ≥3 new sources / ≥1 new migration); surfaced by the Honeywell-in-lexicon miss the main self-executed pass missed
 
 ### Lynceus export disposition
 
@@ -686,17 +686,17 @@ raw_observations FK-chained:           12,358
 
 ### Schema migrations
 
-- **0024**: identifier_type CHECK enum 51 → 54 (CP29 cluster) — table-rebuild pattern per 0009/0011/0013/0014/0018/0019/0023 precedent; 22,633 rows preserved via INSERT SELECT *; 6 indexes recreated; FK integrity preserved.
+- **0024**: identifier_type CHECK enum 51 → 54 (CP29 cluster), table-rebuild pattern per 0009/0011/0013/0014/0018/0019/0023 precedent; 22,633 rows preserved via INSERT SELECT *; 6 indexes recreated; FK integrity preserved.
 
-## [v1.3.0] — 2026-05-18
+## [v1.3.0], 2026-05-18
 
 ### What's new in v1.3.0
 
-Argus v1.3.0 lands the **desktop-application static-analysis integration** — the first release in which the vendor-companion-app extraction methodology generalizes from the Android mobile axis to Windows / macOS / Linux desktop application binaries. Three vendor desktop applications + one FP-control binary (519 MB acquired total) ran through a thin `wave_h_wrapper.py` adapter over the unmodified mobile-axis regex-extraction core (per the CP27 §3.0 P4 disposition — v4 untouched), with extraction outputs surfaced as a partial-cohort pass covering Cohort D (drone tooling: DJI Assistant 2 Mavic + DJI Assistant 2 FPV; Skydio P11 CLEAN NEGATIVE = documented_absence) + Cohort F (sanctioned-vendor v1: Hikvision iVMS-4200) + an H2-disambig FP-control (FileZilla 3.70.5).
+Argus v1.3.0 lands the **desktop-application static-analysis integration**, the first release in which the vendor-companion-app extraction methodology generalizes from the Android mobile axis to Windows / macOS / Linux desktop application binaries. Three vendor desktop applications + one FP-control binary (519 MB acquired total) ran through a thin `wave_h_wrapper.py` adapter over the unmodified mobile-axis regex-extraction core (per the CP27 §3.0 P4 disposition, v4 untouched), with extraction outputs surfaced as a partial-cohort pass covering Cohort D (drone tooling: DJI Assistant 2 Mavic + DJI Assistant 2 FPV; Skydio P11 CLEAN NEGATIVE = documented_absence) + Cohort F (sanctioned-vendor v1: Hikvision iVMS-4200) + an H2-disambig FP-control (FileZilla 3.70.5).
 
-The headline empirical finding is **the desktop identifier-class surface differs from the mobile one** even within installer-cohort vendors that DO have desktop binaries. After the CP26 §8 semantic-validation audit pass, **net genuine `ble_service_uuid` candidates = 0** across all three real-vendor binaries. The 4 unique surviving UUID-shaped values all re-class as different identifier classes: 2× MSI ProductCodes (Hikvision iVMS-4200 main package + Multilingual Wizard sub-package), 1× COM CLSID (DJI Assistant 2 DJIBrowser LocalServer32), 1× cloud-document UUID (DJI Mavic + FPV cross-product attested in `https://duss.djicorp.com/functional-document/<UUID>`). These are vendor-controlled identifiers with empirical density worth promoting — they would be lost if the wrapper continued to filter them as "not genuine BLE UUIDs". CP28 codifies the three identifier-classes as first-class `identifier_type` enum values + migration 0023 extends the CHECK enum 48 → 51 to receive them.
+The headline empirical finding is **the desktop identifier-class surface differs from the mobile one** even within installer-cohort vendors that DO have desktop binaries. After the CP26 §8 semantic-validation audit pass, **net genuine `ble_service_uuid` candidates = 0** across all three real-vendor binaries. The 4 unique surviving UUID-shaped values all re-class as different identifier classes: 2× MSI ProductCodes (Hikvision iVMS-4200 main package + Multilingual Wizard sub-package), 1× COM CLSID (DJI Assistant 2 DJIBrowser LocalServer32), 1× cloud-document UUID (DJI Mavic + FPV cross-product attested in `https://duss.djicorp.com/functional-document/<UUID>`). These are vendor-controlled identifiers with empirical density worth promoting, they would be lost if the wrapper continued to filter them as "not genuine BLE UUIDs". CP28 codifies the three identifier-classes as first-class `identifier_type` enum values + migration 0023 extends the CHECK enum 48 → 51 to receive them.
 
-The headline outcomes for downstream consumers: **22,553 active identifiers** (up from 22,549, +4 from this release's promotion), **53 sources** (up from 52; +1 `manufacturer_app` Vendor Desktop Application Static Analysis admission), **51 manufacturers** (up from 49; +2 stub admissions per MAC-178 P5 precedent — Eagle Eye Networks + Rhombus Systems via Cohort A absence-investigation), and a schema bumped from version 22 to **version 23** via one forward-only migration (the new `identifier_type` CHECK enum extension for the CP28 desktop non-BLE cluster).
+The headline outcomes for downstream consumers: **22,553 active identifiers** (up from 22,549, +4 from this release's promotion), **53 sources** (up from 52; +1 `manufacturer_app` Vendor Desktop Application Static Analysis admission), **51 manufacturers** (up from 49; +2 stub admissions per MAC-178 P5 precedent, Eagle Eye Networks + Rhombus Systems via Cohort A absence-investigation), and a schema bumped from version 22 to **version 23** via one forward-only migration (the new `identifier_type` CHECK enum extension for the CP28 desktop non-BLE cluster).
 
 ### Vendor Desktop Application Static Analysis methodology
 
@@ -704,7 +704,7 @@ This release extends the Android APK static-analysis methodology to publicly dow
 
 | # | SAR-12 FP class | Scope |
 |---|---|---|
-| 1 | `WINDOWS_SUPPORTEDOS_MANIFEST_GUIDS` | Microsoft application-manifest compatibility GUIDs (Vista / 7 / 8 / 8.1 / 10) — every Windows installer embeds. |
+| 1 | `WINDOWS_SUPPORTEDOS_MANIFEST_GUIDS` | Microsoft application-manifest compatibility GUIDs (Vista / 7 / 8 / 8.1 / 10), every Windows installer embeds. |
 | 2 | `WINDOWS_COM_INTERFACE_GUIDS` | Microsoft Windows SDK COM IIDs (`IID_IShellLinkA` + bulk-seeded from `combase.h`, `shobjidl.h`, `objidl.h`, `oaidl.h`, `unknwn.h`). |
 | 3 | `WINDOWS_DEVCLASS_SETUP_GUIDS` | SetupAPI device-class GUIDs (USB / Media / Modem / Net / HID / 1394 / Image / MTP / etc.). |
 | 4 | `LIBUSB_ASCII_IDENTIFIERS` | UUID-shaped ASCII strings inside libusb-win32-WDF library binary. |
@@ -718,48 +718,48 @@ The wrapper canonical path is `android_test/tools/extraction/wave_h_wrapper.py` 
 
 The original CP17 cohort thesis (mobile origin) predicted that the operator-vs-installer cohort split would generalize from mobile to desktop. The desktop sessions 1 + 2 empirically refine this finding in two distinct dimensions:
 
-**Dimension 1 — cohort presence.** The operator-cohort desktop class has structurally dissolved into web/mobile across modern VMS + drone-tooling vendors. Session 1 confirmed this for VMS (5 of 6 Cohort A targets were web-only or UWP-MSIX, not Electron desktop — Cohort A descoped). Session 2 §3 confirms this for drone tooling (Skydio Pilot does not exist as a desktop application — Skydio's distribution is mobile + hardware-controller + cloud; documented_absence emitted). The installer-cohort desktop class persists (DJI Assistant 2 ships a desktop installer; Hikvision iVMS-4200 ships a desktop installer) but the operator-cohort class is empirically absent at the desktop axis in 2026.
+**Dimension 1, cohort presence.** The operator-cohort desktop class has structurally dissolved into web/mobile across modern VMS + drone-tooling vendors. Session 1 confirmed this for VMS (5 of 6 Cohort A targets were web-only or UWP-MSIX, not Electron desktop, Cohort A descoped). Session 2 §3 confirms this for drone tooling (Skydio Pilot does not exist as a desktop application, Skydio's distribution is mobile + hardware-controller + cloud; documented_absence emitted). The installer-cohort desktop class persists (DJI Assistant 2 ships a desktop installer; Hikvision iVMS-4200 ships a desktop installer) but the operator-cohort class is empirically absent at the desktop axis in 2026.
 
-**Dimension 2 — identifier-class surface.** This is the NEW desktop finding the runguide did not predict. Even within installer-cohort desktop binaries that DO exist, the identifier-class surface differs from what mobile-axis extraction surfaced:
+**Dimension 2, identifier-class surface.** This is the NEW desktop finding the runguide did not predict. Even within installer-cohort desktop binaries that DO exist, the identifier-class surface differs from what mobile-axis extraction surfaced:
 
 - **Mobile binaries yield genuine BLE service UUIDs** because the mobile companion is the BLE peripheral pairing endpoint. The phone IS the BLE central; the vendor app contains BLE service/characteristic UUIDs in code.
-- **Desktop binaries yield MSI ProductCodes + COM CLSIDs + cloud-document UUIDs + vendor-cloud-endpoint hostnames** — not BLE protocol identifiers. The desktop client is for camera/drone management; the BLE pairing surface is in the camera/drone firmware (Cohort E) or in the mobile app, not in the desktop client.
+- **Desktop binaries yield MSI ProductCodes + COM CLSIDs + cloud-document UUIDs + vendor-cloud-endpoint hostnames**, not BLE protocol identifiers. The desktop client is for camera/drone management; the BLE pairing surface is in the camera/drone firmware (Cohort E) or in the mobile app, not in the desktop client.
 
 **Policy implication for Lynceus + Talos:** Desktop findings should be consumed as a different identifier-class surface than mobile findings. A "BLE UUID + SSID" yield expectation that worked for mobile does NOT apply to desktop. The desktop value-add is in the **vendor cloud-endpoint discovery** layer (e.g., the `duss.djicorp.com` hostname surfaced from DJI Assistant 2 binaries), the **installer-time configuration surface** (MSI ProductCode + COM CLSID = vendor-controlled OS-integration identifiers), and **the absence-as-finding** (CP17 operator-cohort dissolution itself is a vendor-architectural-shift observation worth codifying). Future desktop-axis runguides should re-scope to vendor cloud-endpoint discovery + installer-config surface as headline metrics, not BLE UUIDs.
 
-### Net new identifiers — the four CP28(c) desktop promotions
+### Net new identifiers, the four CP28(c) desktop promotions
 
 The 4 vendor-attested non-BLE UUIDs that CP26 §8 audit re-classed promote at the §8.2 sub-band ladder per CP28(c):
 
-- **DJI `f4d4dbf5-ba4b-40db-9a44-f8395f3728cf`** (`vendor_document_uuid_cloud_reference`) — cloud-document UUID embedded in DJI's `https://duss.djicorp.com/functional-document/f4d4dbf5-...` URL. Cross-product attested across DJI Assistant 2 Mavic 2.0.14 + DJI Assistant 2 FPV 2.1.2 (CP24 within-vendor-cross-product). Confidence 90 per the 80-95 sub-band ladder. §4.4 posture: **MAP** — the cloud-hostname half lifts into Lynceus's relevance window as a passively-scannable vendor cloud endpoint signature.
+- **DJI `f4d4dbf5-ba4b-40db-9a44-f8395f3728cf`** (`vendor_document_uuid_cloud_reference`), cloud-document UUID embedded in DJI's `https://duss.djicorp.com/functional-document/f4d4dbf5-...` URL. Cross-product attested across DJI Assistant 2 Mavic 2.0.14 + DJI Assistant 2 FPV 2.1.2 (CP24 within-vendor-cross-product). Confidence 90 per the 80-95 sub-band ladder. §4.4 posture: **MAP**, the cloud-hostname half lifts into Lynceus's relevance window as a passively-scannable vendor cloud endpoint signature.
 
-- **DJI `054aae20-4bea-4347-8a35-64a533254a9d`** (`windows_com_clsid_vendor_registered`) — Windows COM Class ID for the DJIBrowser LocalServer32, surfaced from `Software\Classes\CLSID\{054AAE20-...}\LocalServer32` registry context in DJI Assistant 2 Mavic 2.0.14. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED** — install/registry context only; low passive-scan utility.
+- **DJI `054aae20-4bea-4347-8a35-64a533254a9d`** (`windows_com_clsid_vendor_registered`), Windows COM Class ID for the DJIBrowser LocalServer32, surfaced from `Software\Classes\CLSID\{054AAE20-...}\LocalServer32` registry context in DJI Assistant 2 Mavic 2.0.14. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED**, install/registry context only; low passive-scan utility.
 
-- **Hikvision `9a25302d-30c0-39d9-bd6f-21e6ec160475`** (`windows_installer_productcode_vendor_registered`) — MSI ProductCode for iVMS-4200 v3.13.0.5_Multilingual main package, surfaced from `SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9A25302D-...}` registry context. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED**.
+- **Hikvision `9a25302d-30c0-39d9-bd6f-21e6ec160475`** (`windows_installer_productcode_vendor_registered`), MSI ProductCode for iVMS-4200 v3.13.0.5_Multilingual main package, surfaced from `SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{9A25302D-...}` registry context. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED**.
 
-- **Hikvision `ce2f96d0-63d2-4b9c-a8d6-0d1a60840bd8`** (`windows_installer_productcode_vendor_registered`) — MSI ProductCode for iVMS-4200 Multilingual Wizard sub-package, surfaced from `\{CE2F96D0-...}` registry context. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED**.
+- **Hikvision `ce2f96d0-63d2-4b9c-a8d6-0d1a60840bd8`** (`windows_installer_productcode_vendor_registered`), MSI ProductCode for iVMS-4200 Multilingual Wizard sub-package, surfaced from `\{CE2F96D0-...}` registry context. Confidence 85 per the 75-90 sub-band ladder. §4.4 posture: **DROPPED**.
 
-All 4 promoted identifiers carry single-source-at-promotion provenance (no §8.3 lift triggers fire — Cohort D's only independent vendor 2 was Skydio, which is P11 CLEAN NEGATIVE / documented_absence; no cross-vendor independent-source overlap to test). Per §11 #8, confidence stays at the §8.2 sub-band's empirical anchor; no drift.
+All 4 promoted identifiers carry single-source-at-promotion provenance (no §8.3 lift triggers fire, Cohort D's only independent vendor 2 was Skydio, which is P11 CLEAN NEGATIVE / documented_absence; no cross-vendor independent-source overlap to test). Per §11 #8, confidence stays at the §8.2 sub-band's empirical anchor; no drift.
 
-### Documented absences — Cohort A + Skydio Cohort D
+### Documented absences, Cohort A + Skydio Cohort D
 
-Session 1's Cohort A descope yielded **6 documented_absence rows** (Verkada Command, Genetec Citilog, Avigilon ACC Client, Axis Camera Station, Milestone XProtect, Honeywell Pro-Watch) anchored on the empirical observation that these vendors' "operator" client class has structurally dissolved into web/mobile distribution in 2026. Session 2 §3 added **1 Cohort D documented_absence row** (Skydio Pilot — P11 CLEAN NEGATIVE; Skydio's distribution is mobile + hardware-controller + cloud only; no desktop application). All 7 documented_absence rows are staged at `extraction_outputs/wave_h_pre_v1/per_vendor/_cohort_a_documented_absence.json` and `.../skydio_pilot_documented_absence.json`; they land in the appropriate canonical-state surface per current schema convention (the `documented_absence` first-class-table promotion remains held below the §3 #6 ≥30 cumulative-wave threshold per the CP27 surfacing).
+Session 1's Cohort A descope yielded **6 documented_absence rows** (Verkada Command, Genetec Citilog, Avigilon ACC Client, Axis Camera Station, Milestone XProtect, Honeywell Pro-Watch) anchored on the empirical observation that these vendors' "operator" client class has structurally dissolved into web/mobile distribution in 2026. Session 2 §3 added **1 Cohort D documented_absence row** (Skydio Pilot, P11 CLEAN NEGATIVE; Skydio's distribution is mobile + hardware-controller + cloud only; no desktop application). All 7 documented_absence rows are staged at `extraction_outputs/wave_h_pre_v1/per_vendor/_cohort_a_documented_absence.json` and `.../skydio_pilot_documented_absence.json`; they land in the appropriate canonical-state surface per current schema convention (the `documented_absence` first-class-table promotion remains held below the §3 #6 ≥30 cumulative-wave threshold per the CP27 surfacing).
 
 ### New data source
 
 One source joined Argus in this release, bringing the source count from 52 to 53:
 
-- **Vendor Desktop Application Static Analysis** (sid=53, `source_type='manufacturer_app'`, tier 1) — the methodology covers publicly-downloadable vendor desktop applications across Windows / macOS / Linux. Admitted under the existing mobile-axis `manufacturer_app` enum per CP15 source-type ceiling (the proposed `vendor_application_static_analysis` enum value is CP28(a) DEFERRED per CEO disposition — the operational band-distinction is encoded via the §8.2 sub-band ladder + `notes.session_admission='wave_h_pre_v1'`). License posture: `per_vendor` + `upstream_license_posture='no_license_declared_facts_only'` defaults per CP21. Session 1 + 2 EULA disposition counts: category_a 0, category_b 0, category_c 3, category_d 0 (Hikvision iVMS-4200 download-agreement modal + DJI EULA + FileZilla GPLv2 all §3.6 (c) include).
+- **Vendor Desktop Application Static Analysis** (sid=53, `source_type='manufacturer_app'`, tier 1), the methodology covers publicly-downloadable vendor desktop applications across Windows / macOS / Linux. Admitted under the existing mobile-axis `manufacturer_app` enum per CP15 source-type ceiling (the proposed `vendor_application_static_analysis` enum value is CP28(a) DEFERRED per CEO disposition, the operational band-distinction is encoded via the §8.2 sub-band ladder + `notes.session_admission='wave_h_pre_v1'`). License posture: `per_vendor` + `upstream_license_posture='no_license_declared_facts_only'` defaults per CP21. Session 1 + 2 EULA disposition counts: category_a 0, category_b 0, category_c 3, category_d 0 (Hikvision iVMS-4200 download-agreement modal + DJI EULA + FileZilla GPLv2 all §3.6 (c) include).
 
-### Bible amendment — Correction Pass 28 (CP28(c) identifier_type cluster + CP28(a)/(b) deferrals + SAR-12 7-FP-class codification + wrapper §-fragment)
+### Bible amendment, Correction Pass 28 (CP28(c) identifier_type cluster + CP28(a)/(b) deferrals + SAR-12 7-FP-class codification + wrapper §-fragment)
 
 This release's three CP28 candidate flags ratified as **`Correction Pass 28`**:
 
-- **CP28(c)** — three new `identifier_type` CHECK enum values: `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`. §8.2 sub-band ladder 75-90 / 75-90 / 80-95; §4.4 posture DROPPED / DROPPED / MAP respectively. Schema landed via migration 0023.
-- **CP28(a)** `vendor_application_static_analysis` source_type enum — **DEFERRED** per CEO disposition; band-distinction encoded via §8.2 sub-band ladder + `notes.session_admission`. Re-fire candidate post-desktop-continuation + next-cycle close.
-- **CP28(b)** `sanctioned_vendor_public_distribution_facts_only` license-posture sentinel — **DEFERRED** per CEO disposition; empirical anchor weakened post-CP26 §8 audit. Re-fire candidate post-Cohort-F completion as CP-of-its-own (currently Dahua + Uniview acquisition blocked at Cloudflare).
-- **Wrapper §-fragment** — ±90-char per-match windowed clipping discipline at the candidate-walk layer codified for next-runguide-template fold-in. Whole-line-with-overflow_dropped behavior deprecated for candidate-walk extraction.
-- **SAR-12 7-FP-class roster codification** — the wrapper's final 7-class roster (listed above in the methodology section) is canonized for cross-wave consumption (source-of-truth remains the wrapper).
+- **CP28(c)**, three new `identifier_type` CHECK enum values: `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`. §8.2 sub-band ladder 75-90 / 75-90 / 80-95; §4.4 posture DROPPED / DROPPED / MAP respectively. Schema landed via migration 0023.
+- **CP28(a)** `vendor_application_static_analysis` source_type enum, **DEFERRED** per CEO disposition; band-distinction encoded via §8.2 sub-band ladder + `notes.session_admission`. Re-fire candidate post-desktop-continuation + next-cycle close.
+- **CP28(b)** `sanctioned_vendor_public_distribution_facts_only` license-posture sentinel, **DEFERRED** per CEO disposition; empirical anchor weakened post-CP26 §8 audit. Re-fire candidate post-Cohort-F completion as CP-of-its-own (currently Dahua + Uniview acquisition blocked at Cloudflare).
+- **Wrapper §-fragment**, ±90-char per-match windowed clipping discipline at the candidate-walk layer codified for next-runguide-template fold-in. Whole-line-with-overflow_dropped behavior deprecated for candidate-walk extraction.
+- **SAR-12 7-FP-class roster codification**, the wrapper's final 7-class roster (listed above in the methodology section) is canonized for cross-wave consumption (source-of-truth remains the wrapper).
 
 CP28 lands as the bible-amendment sibling of migration 0023 in the MAC-181 v1.3.0 release sweep cycle. CP-anchor: migration commit `2795ebba7866ad164121668321e213308aa87936` + [MAC-181](/MAC/issues/MAC-181) child issue ID. Bible HEAD bumps from the CP27 commit to the CP28 commit landed alongside this entry. Ratification surface: [MAC-177 disposition `comment-0d15de7b`](/MAC/issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §7 "approve full path".
 
@@ -767,22 +767,22 @@ CP28 lands as the bible-amendment sibling of migration 0023 in the MAC-181 v1.3.
 
 One new migration landed this release (schema version 22 → 23):
 
-- **0023 — `identifier_type` CHECK enum extension CP28.** Pure additive enum extension (48 → 51 values) using the SQLite table-rebuild pattern from 0009 / 0011 / 0013 / 0014 / 0018 / 0019. Cumulative-CHECK discipline carries forward all 48 prior values verbatim + adds the 3 net-new CP28(c) values. PRAGMA integrity_check + quick_check both ok at apply time; 22,549 active rows preserved via INSERT SELECT *.
+- **0023, `identifier_type` CHECK enum extension CP28.** Pure additive enum extension (48 → 51 values) using the SQLite table-rebuild pattern from 0009 / 0011 / 0013 / 0014 / 0018 / 0019. Cumulative-CHECK discipline carries forward all 48 prior values verbatim + adds the 3 net-new CP28(c) values. PRAGMA integrity_check + quick_check both ok at apply time; 22,549 active rows preserved via INSERT SELECT *.
 
 ### Tracked follow-ons (post-v1.3.0)
 
-- **Cohort F post-CP28 re-fire** (Dahua + Uniview; option 2 per [MAC-177 disposition](/MAC/issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §5) — queued as a separate child issue.
-- **Next-cycle scope discussion** — hostname corpus → web SPA → iOS ranking ratified; separate child issue after v1.3.0 ships.
+- **Cohort F post-CP28 re-fire** (Dahua + Uniview; option 2 per [MAC-177 disposition](/MAC/issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §5), queued as a separate child issue.
+- **Next-cycle scope discussion**, hostname corpus → web SPA → iOS ranking ratified; separate child issue after v1.3.0 ships.
 - **CP28(b) sentinel re-anchor** at Cohort F completion as CP-of-its-own.
 - **CP28(a) re-fire** if Lynceus operationally requests filterable `vendor_application_static_analysis` source_type class post-next-cycle.
 
-## [v1.2.0] — 2026-05-18
+## [v1.2.0], 2026-05-18
 
 ### What's new in v1.2.0
 
-Argus v1.2.0 lands the cycle-7 autonomous-overnight-wave integration. The wave brought **two new authoritative data sources** for the US FCC equipment-authorization ecosystem (fccid.io as a community aggregator + the official FCC EAS Filings UI as a distinct primary-registry source), **671 FCC ID discovery rows** staged under a new dual-citation-pair convention (the citation half awaits a separate async re-citation pass when FCC.gov egress is restored), and **16 net-new identifiers** from a static-analysis pass against four LE-adjacency vendor companion apps (Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6). We also admitted **fourteen new manufacturer rows** — four for vendors whose identifiers we positively extracted (Hikvision, Dahua, Autel Robotics, Cisco Meraki) and ten stub rows for vendors whose identity we confirmed via absence-investigation (Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome).
+Argus v1.2.0 lands the cycle-7 autonomous-overnight-wave integration. The wave brought **two new authoritative data sources** for the US FCC equipment-authorization ecosystem (fccid.io as a community aggregator + the official FCC EAS Filings UI as a distinct primary-registry source), **671 FCC ID discovery rows** staged under a new dual-citation-pair convention (the citation half awaits a separate async re-citation pass when FCC.gov egress is restored), and **16 net-new identifiers** from a static-analysis pass against four LE-adjacency vendor companion apps (Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6). We also admitted **fourteen new manufacturer rows**, four for vendors whose identifiers we positively extracted (Hikvision, Dahua, Autel Robotics, Cisco Meraki) and ten stub rows for vendors whose identity we confirmed via absence-investigation (Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome).
 
-Alongside the data lands, the wave produced a **bible amendment codifying empirical-premise verification as a runguide precondition** — five separate web-scrape runguides (MAC-102 ISED, MAC-103 BT SIG, MAC-105 USPTO Patents, MAC-107 GitHub Code Search, MAC-110 Ofcom) plus one internal extraction pass (MAC-101 PC1.7's `application_id`-vs-`grant_id` discovery) all surfaced load-bearing-premise failures during the same 8-hour autonomous window. The amendment introduces a new `§2.4 Empirical-Premise Verification Precondition` requiring runguides to ship a `§3.0` verification-probe section that completes CLEAN before any `§3.1` bulk dispatch fires. **The amendment landed in a follow-on commit as `Correction Pass 27`** after CEO + operator ratification on the [MAC-178](/MAC/issues/MAC-178) issue thread.
+Alongside the data lands, the wave produced a **bible amendment codifying empirical-premise verification as a runguide precondition**, five separate web-scrape runguides (MAC-102 ISED, MAC-103 BT SIG, MAC-105 USPTO Patents, MAC-107 GitHub Code Search, MAC-110 Ofcom) plus one internal extraction pass (MAC-101 PC1.7's `application_id`-vs-`grant_id` discovery) all surfaced load-bearing-premise failures during the same 8-hour autonomous window. The amendment introduces a new `§2.4 Empirical-Premise Verification Precondition` requiring runguides to ship a `§3.0` verification-probe section that completes CLEAN before any `§3.1` bulk dispatch fires. **The amendment landed in a follow-on commit as `Correction Pass 27`** after CEO + operator ratification on the [MAC-178](/MAC/issues/MAC-178) issue thread.
 
 The headline outcomes for downstream consumers: **22,549 active identifiers** (up from 22,533, +16 from the MAC-104 companion-app promotion), **52 sources** (up from 50; +1 crowdsourced fccid.io + 1 regulatory FCC EAS Filings), **49 manufacturers** in the canonical vendor lexicon (up from 35), **133,825 raw_observations** rows (up from 133,134), and a schema bumped from version 21 to **version 22** via one forward-only migration (the new `fcc_citation_deferred_queue` staging table for the dual-citation pair pattern).
 
@@ -790,29 +790,29 @@ The headline outcomes for downstream consumers: **22,549 active identifiers** (u
 
 Two sources joined Argus in this release, bringing the source count from 50 to 52:
 
-- **fccid.io** (sid=51, `crowdsourced` tier 2) — a third-party aggregator of US FCC Equipment Authorization System filings. fccid.io mirrors the FCC's public filings catalog with a more navigable surface than the official `apps.fcc.gov` UI, but the upstream license is `NO_LICENSE_DECLARED` — Argus extracts facts under the Feist v. Rural Telephone facts-not-copyrightable doctrine, not via license inheritance. Compilation arrangement is not republished. This source feeds the new dual-citation-pair pattern (see below).
+- **fccid.io** (sid=51, `crowdsourced` tier 2), a third-party aggregator of US FCC Equipment Authorization System filings. fccid.io mirrors the FCC's public filings catalog with a more navigable surface than the official `apps.fcc.gov` UI, but the upstream license is `NO_LICENSE_DECLARED`, Argus extracts facts under the Feist v. Rural Telephone facts-not-copyrightable doctrine, not via license inheritance. Compilation arrangement is not republished. This source feeds the new dual-citation-pair pattern (see below).
 
-- **FCC Equipment Authorization System — Filings** (sid=52, `regulatory` tier 1) — the official FCC EAS Filings UI at `apps.fcc.gov/oetcf/eas/reports/GenericSearch.cfm`. Distinct from the existing FCC EAS grantee-registration data file (source 7); the Filings UI gives per-FCC-ID filing surfaces (test reports, internal photos, RF exposure data) that the grantee CSV doesn't expose. **The source was admitted under a degraded-mode posture**: at extraction time FCC.gov egress was unreachable from the runtime host (Akamai-edge HTTP/2 INTERNAL_ERROR across `apps.fcc.gov`), so the 671 fccid.io discovery rows were staged with their FCC citation half deferred to an asynchronous re-citation pass. The source exists; the citation rows accumulate when egress is restored.
+- **FCC Equipment Authorization System, Filings** (sid=52, `regulatory` tier 1), the official FCC EAS Filings UI at `apps.fcc.gov/oetcf/eas/reports/GenericSearch.cfm`. Distinct from the existing FCC EAS grantee-registration data file (source 7); the Filings UI gives per-FCC-ID filing surfaces (test reports, internal photos, RF exposure data) that the grantee CSV doesn't expose. **The source was admitted under a degraded-mode posture**: at extraction time FCC.gov egress was unreachable from the runtime host (Akamai-edge HTTP/2 INTERNAL_ERROR across `apps.fcc.gov`), so the 671 fccid.io discovery rows were staged with their FCC citation half deferred to an asynchronous re-citation pass. The source exists; the citation rows accumulate when egress is restored.
 
 ### Dual-citation deferred queue (new staging convention)
 
-The cycle-7 wave introduces a **dual-citation pair pattern** for sources where the discovery surface (an aggregator) is distinct from the primary surface (the regulator). Each FCC ID observed at fccid.io carries a `notes.dual_citation_pair_id` field pointing to a row in the new `fcc_citation_deferred_queue` table. The queue row holds the discovery anchor (`fccid_io_source_url` + SHA-256 of the served HTML) and an opportunistic enrichment field (`fcc_grant_ids[]` — 564 of 671 queue rows carry these, extracted from the fccid.io page's grant-bold-content block; this lets a future async re-citation pass shortcut FCC.gov navigation from 5-step lookup to 1-step). When FCC.gov egress is restored, the validator's async re-citation pass drains the queue and emits paired regulatory-band citation rows. Until then, the discovery rows stay at the `crowdsourced` 50-75 confidence band; no confidence drift on the discovery anchor alone.
+The cycle-7 wave introduces a **dual-citation pair pattern** for sources where the discovery surface (an aggregator) is distinct from the primary surface (the regulator). Each FCC ID observed at fccid.io carries a `notes.dual_citation_pair_id` field pointing to a row in the new `fcc_citation_deferred_queue` table. The queue row holds the discovery anchor (`fccid_io_source_url` + SHA-256 of the served HTML) and an opportunistic enrichment field (`fcc_grant_ids[]`, 564 of 671 queue rows carry these, extracted from the fccid.io page's grant-bold-content block; this lets a future async re-citation pass shortcut FCC.gov navigation from 5-step lookup to 1-step). When FCC.gov egress is restored, the validator's async re-citation pass drains the queue and emits paired regulatory-band citation rows. Until then, the discovery rows stay at the `crowdsourced` 50-75 confidence band; no confidence drift on the discovery anchor alone.
 
 ### MAC-104 companion-app net-new identifiers
 
-The wave ran a static-analysis extraction pass against four LE-adjacency vendor companion apps (downloaded from apk-pure; decompiled with jadx + apktool; structured field extractions only — no decompiled source ever enters the DB per §11 #15). Net-new identifier yield:
+The wave ran a static-analysis extraction pass against four LE-adjacency vendor companion apps (downloaded from apk-pure; decompiled with jadx + apktool; structured field extractions only, no decompiled source ever enters the DB per §11 #15). Net-new identifier yield:
 
-- **Hikvision Hik-Connect** (`com.hikvision.hikconnect`) — 1 BLE service UUID + 2 BLE characteristics, all anchored in the app's `HcpBluetoothServer` class. The Hik-Connect app is operator-cohort (cloud VMS / video doorbell), but the BLE pairing code path is installer-quality — vendor-named classes, paired `BluetoothGattService.equals(...)` / `getCharacteristic(...)` confirmations across multiple files.
-- **Dahua DMSS** (`com.mm.android.DMSS`) — 1 BLE service UUID + 1 BLE characteristic, paired in obfuscated class `sources/en/f.java`. Dahua DMSS substituted for the legacy `com.mm.android.direct.gdmsphone` (gDMSS Plus) which is documented-absent on both apk-pure and apk-mirror.
-- **Motorola WAVE PTT** (`com.motorolasolutions.wave`) — 2 BLE service UUIDs (one custom 128-bit, one 16-bit SIG-template) + 2 BLE characteristics, all anchored in `BluetoothLowEnergyPttValues` for the Milicom PTT Button accessory.
-- **Parrot FreeFlight 6** (`com.parrot.freeflight6`) — 1 BT SIG company-ID (67 / 0x0043 = Parrot SA) + 4 ASD-STAN drone-RID enums (`FR_30_OCTETS`, `ANSI_CTA_2063`, `FRENCH`, `EN4709_002`) + 1 ARSDK DRI feature class ID (41984 / 0xA400) + 1 ARSDK DRI command UID set. All anchored in `com/parrot/drone/sdkcore/arsdk/ArsdkFeatureDri.java` — clear-text Java, 262 lines; Parrot is the canonical drone vendor for which the entire ARSDK protocol + Drone-RID code path surfaces under Java decompilation.
+- **Hikvision Hik-Connect** (`com.hikvision.hikconnect`), 1 BLE service UUID + 2 BLE characteristics, all anchored in the app's `HcpBluetoothServer` class. The Hik-Connect app is operator-cohort (cloud VMS / video doorbell), but the BLE pairing code path is installer-quality, vendor-named classes, paired `BluetoothGattService.equals(...)` / `getCharacteristic(...)` confirmations across multiple files.
+- **Dahua DMSS** (`com.mm.android.DMSS`), 1 BLE service UUID + 1 BLE characteristic, paired in obfuscated class `sources/en/f.java`. Dahua DMSS substituted for the legacy `com.mm.android.direct.gdmsphone` (gDMSS Plus) which is documented-absent on both apk-pure and apk-mirror.
+- **Motorola WAVE PTT** (`com.motorolasolutions.wave`), 2 BLE service UUIDs (one custom 128-bit, one 16-bit SIG-template) + 2 BLE characteristics, all anchored in `BluetoothLowEnergyPttValues` for the Milicom PTT Button accessory.
+- **Parrot FreeFlight 6** (`com.parrot.freeflight6`), 1 BT SIG company-ID (67 / 0x0043 = Parrot SA) + 4 ASD-STAN drone-RID enums (`FR_30_OCTETS`, `ANSI_CTA_2063`, `FRENCH`, `EN4709_002`) + 1 ARSDK DRI feature class ID (41984 / 0xA400) + 1 ARSDK DRI command UID set. All anchored in `com/parrot/drone/sdkcore/arsdk/ArsdkFeatureDri.java`, clear-text Java, 262 lines; Parrot is the canonical drone vendor for which the entire ARSDK protocol + Drone-RID code path surfaces under Java decompilation.
 
 All 16 promoted identifiers carry `confidence ∈ {75, 85, 87}` per CP17 manufacturer_app sub-banding (installer-cohort 80-95 → 87; CP14 drone-RID class hits → 85; 16-bit SIG-template lower anchor → 75). All single-source at promotion (`notes.single_source_at_promotion=true`); no §5.6 cross-source uplift applied (verified: no pre-existing rows match any candidate identifier).
 
 **Four additional candidates held for SAR-12 schema-extension review:**
-- 2 default credentials (`lc2014` LeChange SDK default password, `terminal` DMSS OAuth client_secret) — no `default_credential` enum slot at v22 schema
-- 1 vendor namespace UUID (Parrot Skyward UTM `0045b822-...`) — handoff explicitly flags as NOT-a-BLE-service-UUID; no clean enum fit
-- 1 DJI RTK serial-number template (`1APDF7Q0010001` from DJI Pilot NRTK setup default) — handoff explicitly not-promoted-flagged; no `serial_number_template` enum slot
+- 2 default credentials (`lc2014` LeChange SDK default password, `terminal` DMSS OAuth client_secret), no `default_credential` enum slot at v22 schema
+- 1 vendor namespace UUID (Parrot Skyward UTM `0045b822-...`), handoff explicitly flags as NOT-a-BLE-service-UUID; no clean enum fit
+- 1 DJI RTK serial-number template (`1APDF7Q0010001` from DJI Pilot NRTK setup default), handoff explicitly not-promoted-flagged; no `serial_number_template` enum slot
 
 Each held row stages in `raw_observations` with `notes.hold_reason` + `notes.validator_review_recommendation`.
 
@@ -820,29 +820,29 @@ Each held row stages in `raw_observations` with `notes.hold_reason` + `notes.val
 
 Fourteen new manufacturer rows joined the canonical lexicon (from 35 to 49):
 
-- **Hikvision** (id=209) and **Dahua** (id=208) — both admitted with NDAA Section 889 note (state/local LE deployments persist outside the federal-procurement bar; runguide §0 scope).
-- **Autel Robotics** (id=206, primary_category=drone) and **Cisco Meraki** (id=207) — positive-extraction admissions from MAC-104b/d.
-- **Stub admissions** (10 vendors, primary_category set where the vendor's product line is unambiguous): Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome. Each carries `notes.admission_basis='documented_absence_only'` — the manufacturer identity was verified via absence-investigation (apk-pure 404 + apk-mirror "no results" + cohort-prediction reasoning) but no positive identifier extraction this wave.
+- **Hikvision** (id=209) and **Dahua** (id=208), both admitted with NDAA Section 889 note (state/local LE deployments persist outside the federal-procurement bar; runguide §0 scope).
+- **Autel Robotics** (id=206, primary_category=drone) and **Cisco Meraki** (id=207), positive-extraction admissions from MAC-104b/d.
+- **Stub admissions** (10 vendors, primary_category set where the vendor's product line is unambiguous): Verkada, Honeywell, Lenel, BluePoint Alert, PIPS Technology, Wolfcom, Utility Inc, Coban Technologies, Digital Ally, Aerodome. Each carries `notes.admission_basis='documented_absence_only'`, the manufacturer identity was verified via absence-investigation (apk-pure 404 + apk-mirror "no results" + cohort-prediction reasoning) but no positive identifier extraction this wave.
 
-**34 product-family taxonomy entries** added to seven manufacturers' `notes.product_family_taxonomy[]` arrays (additive; cross-APK observations of the same string are corroborating mentions and get separate entries — e.g. DJI "Mavic" appears once for DJI Fly + once for DJI Pilot = 2 entries, 1 distinct value). Distinct values: DJI (10), Hikvision (5), Motorola Solutions (4), Dahua (4), Parrot (3), Autel Robotics (2), Cisco Meraki (1).
+**34 product-family taxonomy entries** added to seven manufacturers' `notes.product_family_taxonomy[]` arrays (additive; cross-APK observations of the same string are corroborating mentions and get separate entries, e.g. DJI "Mavic" appears once for DJI Fly + once for DJI Pilot = 2 entries, 1 distinct value). Distinct values: DJI (10), Hikvision (5), Motorola Solutions (4), Dahua (4), Parrot (3), Autel Robotics (2), Cisco Meraki (1).
 
-**22 `documented_absence` JSON entries** applied to `manufacturers.notes.documented_absence[]` across 21 distinct vendor rows (DJI gets two entries: legacy `com.dji.go` + standalone `com.dji.mavicmini` folded into DJI Fly). Each entry carries `investigation_date_utc`, `investigation_dispatch_ref`, `channels_probed`, `outcome=categorical_absent`, `rationale` (one of `LE_only_distribution` / `federal_enterprise_managed` / `vendor_direct_NDA` / `controlled_distribution`), and the staging vendor_canonical for alias-trace continuity. Distribution: LE-only-distribution 9, federal-enterprise-managed 9, vendor-direct-NDA 3, controlled-distribution 1 (DroneShield RfPatrol — C-UAS / ITAR-adjacent; flagged for operator legal review before alt-channel pursuit).
+**22 `documented_absence` JSON entries** applied to `manufacturers.notes.documented_absence[]` across 21 distinct vendor rows (DJI gets two entries: legacy `com.dji.go` + standalone `com.dji.mavicmini` folded into DJI Fly). Each entry carries `investigation_date_utc`, `investigation_dispatch_ref`, `channels_probed`, `outcome=categorical_absent`, `rationale` (one of `LE_only_distribution` / `federal_enterprise_managed` / `vendor_direct_NDA` / `controlled_distribution`), and the staging vendor_canonical for alias-trace continuity. Distribution: LE-only-distribution 9, federal-enterprise-managed 9, vendor-direct-NDA 3, controlled-distribution 1 (DroneShield RfPatrol, C-UAS / ITAR-adjacent; flagged for operator legal review before alt-channel pursuit).
 
 ### SAR-11 FP-class registry additions
 
 Nineteen new SAR-11 FP-class proposals were baked into the canonical `proposed_fp_classes.json` registry per CEO §3 #5 ratification: **14 clean bulk-adds** (Docker/Jenkins build-host UUIDs, APK test fixtures, Motorola WAVE license GUID, Microsoft AppCenter / PDFBox / RN-Keychain library labels, NASA WorldWind constants, Autel password regex templates, Apache HttpClient context keys, RxJava build-host UUIDs, AndroidAnnotations cacerts default, XML layout TextView labels, Adobe XMP image metadata UUIDs) + **5 selective adds with `operator_review_note: "Hikvision/Dahua/drone-cohort overlap; flagged at MAC-104 cycle-7"`** (Alibaba Taobao security cipher key, Microsoft XML namespace UUID, Hikvision HTML doc-routing GUID, AMap location-SDK placeholder MACs, DJI api_debug.txt key). Each edge entry carries explicit `overlap_risk` prose so v3 extractor calibration applies exact-value-match-only, not generalization.
 
-### Bible amendment — Correction Pass 27 (`§2.4` Empirical-Premise Verification Precondition)
+### Bible amendment, Correction Pass 27 (`§2.4` Empirical-Premise Verification Precondition)
 
-The wave's six concrete failure-mode anchors (5 external runguides + 1 internal extraction pass) ratified as **`Correction Pass 27` — `§2.4 Empirical-Premise Verification Precondition`**: a new bible subsection requiring every runguide to ship a `§3.0` verification-probe section that completes CLEAN POSITIVE or CLEAN NEGATIVE before any `§3.1` bulk dispatch fires. INCONCLUSIVE outcomes halt the runguide; CEO disposition is required for any re-fire. The amendment also defines retroactive binding rules for runguides drafted-but-not-dispatched and runguides being re-dispatched.
+The wave's six concrete failure-mode anchors (5 external runguides + 1 internal extraction pass) ratified as **`Correction Pass 27`, `§2.4 Empirical-Premise Verification Precondition`**: a new bible subsection requiring every runguide to ship a `§3.0` verification-probe section that completes CLEAN POSITIVE or CLEAN NEGATIVE before any `§3.1` bulk dispatch fires. INCONCLUSIVE outcomes halt the runguide; CEO disposition is required for any re-fire. The amendment also defines retroactive binding rules for runguides drafted-but-not-dispatched and runguides being re-dispatched.
 
-CP27 landed as a single follow-on commit covering the `BIBLE_AMENDMENTS.md` CP27 entry, the `§2.4` insert into `PROJECT_BIBLE.md` (placed after `§2.3 A Note on Ambition`; before `§3 Architecture`), and this CHANGELOG flip. Schema version unchanged (CP27 is `§`-text only — no migration, no notes_json convention, no code-path sibling). Downstream-consumer audit: 10 runguides identified for retroactive `§3.0` adoption (8 "Must" cases enforced naturally at each runguide's next dispatch-firing gate per `§2.4`'s halt-before-fire contract; 2 "Should" cases fire lazily next time the completed runguides are touched). No separate tracking issue created — the discipline is structurally self-enforcing. Ratification surface: [MAC-178 disposition](/MAC/issues/MAC-178#comment-3029e567-c4e7-4dac-aff8-cd03b8c9a48a) (response to Validator draft [60301e62](/MAC/issues/MAC-178#comment-60301e62-da2e-4007-b975-b40caaf2c923)).
+CP27 landed as a single follow-on commit covering the `BIBLE_AMENDMENTS.md` CP27 entry, the `§2.4` insert into `PROJECT_BIBLE.md` (placed after `§2.3 A Note on Ambition`; before `§3 Architecture`), and this CHANGELOG flip. Schema version unchanged (CP27 is `§`-text only, no migration, no notes_json convention, no code-path sibling). Downstream-consumer audit: 10 runguides identified for retroactive `§3.0` adoption (8 "Must" cases enforced naturally at each runguide's next dispatch-firing gate per `§2.4`'s halt-before-fire contract; 2 "Should" cases fire lazily next time the completed runguides are touched). No separate tracking issue created, the discipline is structurally self-enforcing. Ratification surface: [MAC-178 disposition](/MAC/issues/MAC-178#comment-3029e567-c4e7-4dac-aff8-cd03b8c9a48a) (response to Validator draft [60301e62](/MAC/issues/MAC-178#comment-60301e62-da2e-4007-b975-b40caaf2c923)).
 
 ### Schema changes
 
 One new migration landed this release (schema version 21 → 22):
 
-- **0022 — `fcc_citation_deferred_queue` staging table.** New table holds the discovery-row half of the dual-citation pair pattern (one row per FCC ID; `fcc_id` UNIQUE; `promoted_at NULL` = pending drain by the validator's async re-citation pass; index on `(promoted_at)` partial WHERE NULL for drain queries; index on `fcc_grant_ids_csv` for grant-ID-shortcut lookup). 671 rows seeded from the MAC-101 partial-deliverable wave.
+- **0022, `fcc_citation_deferred_queue` staging table.** New table holds the discovery-row half of the dual-citation pair pattern (one row per FCC ID; `fcc_id` UNIQUE; `promoted_at NULL` = pending drain by the validator's async re-citation pass; index on `(promoted_at)` partial WHERE NULL for drain queries; index on `fcc_grant_ids_csv` for grant-ID-shortcut lookup). 671 rows seeded from the MAC-101 partial-deliverable wave.
 
 ### Conventions
 
@@ -859,26 +859,26 @@ All four canonical exports were regenerated against the post-cycle-7 active set:
 | `argus_export_high_confidence.json` (Lynceus, ≥70 + non-{crowdsourced, inferred}) | 113 | 113 | +0 |
 | `argus_export_behavioral_signatures.json` (Rayhunter; unchanged this wave) | 55 | 55 | unchanged |
 
-**Note on the JSON-export +0 delta:** the 16 MAC-104-promoted identifier_types (`ble_service_uuid`, `ble_characteristic`, `ble_company_id`, `asdstan_enum_value`, `device_class_id`, `rf_protocol_constant`) are all `§4.4 DROPPED-class` per CP16 / CP19 (mig-0018 cluster) / MAC-117 (mig-0019 round-2). Per the bible, DROPPED-class identifier_types are carried in the canonical DB (and the CSV rich-import feed) but NOT in the Lynceus pattern-table JSON exports — by design. The brief author's forecast of +20 standard-export rows + +6 to +14 high-confidence rows didn't account for this disposition. Whether to MAP some/all of these types into Lynceus is a separate `§4.4` amendment surface for a future CP cycle.
+**Note on the JSON-export +0 delta:** the 16 MAC-104-promoted identifier_types (`ble_service_uuid`, `ble_characteristic`, `ble_company_id`, `asdstan_enum_value`, `device_class_id`, `rf_protocol_constant`) are all `§4.4 DROPPED-class` per CP16 / CP19 (mig-0018 cluster) / MAC-117 (mig-0019 round-2). Per the bible, DROPPED-class identifier_types are carried in the canonical DB (and the CSV rich-import feed) but NOT in the Lynceus pattern-table JSON exports, by design. The brief author's forecast of +20 standard-export rows + +6 to +14 high-confidence rows didn't account for this disposition. Whether to MAP some/all of these types into Lynceus is a separate `§4.4` amendment surface for a future CP cycle.
 
 Also new: `exports/_export_manifest.json` ships the per-file size + SHA-256 + entry-count manifest with a delta-vs-forecast block, generation timestamp, and the §4.4 reasoning surfaced for downstream consumers.
 
 ### Post-CP27 runguide migrations (Patch Cycle 2)
 
-Following the CP27 ratification, four web-scrape runguides identified at the CP27 §2.4 audit were migrated through Patch Cycle 2 (PC2.A through PC2.D) as in-repo summary commits accompanying out-of-tree runguide-file edits. All four are docs/runguide-internal only — no sources, identifiers, manufacturers, raw_observations, schema, or license posture changed. Each landed a `§3.0` empirical-premise verification block (CP27 §2.4 compliance) alongside the upstream-surface migration:
+Following the CP27 ratification, four web-scrape runguides identified at the CP27 §2.4 audit were migrated through Patch Cycle 2 (PC2.A through PC2.D) as in-repo summary commits accompanying out-of-tree runguide-file edits. All four are docs/runguide-internal only, no sources, identifiers, manufacturers, raw_observations, schema, or license posture changed. Each landed a `§3.0` empirical-premise verification block (CP27 §2.4 compliance) alongside the upstream-surface migration:
 
-- **PC2.A — MAC-105 USPTO Patent Public Search migration** (`348f514`) — legacy `patft.uspto.gov` decommissioned; runguide migrated to `ppubs.uspto.gov/pubwebapp/` + the authenticated `data.uspto.gov/api/manage` ODP endpoint (`USPTO_ODP_API_KEY` env-var convention). 4-probe `§3.0` verification block (Google Patents + PPubs JS-shell + USPTO ODP authenticated + Espacenet rate-block detection).
-- **PC2.B — MAC-107 GitHub Code Search auth-required correction** (`fa967b1`) — runguide corrected to reflect mandatory authentication for all `/search/*` queries since GitHub's 2022 GA change; rate limit clarified as 30 req/min on `/search/*`; 4-row SQL column-drift fix (`identifier_value → identifier`, `manufacturer_canonical_name → manufacturer`); 4-probe `§3.0` verification block with PAT scope sanity + account-identity capture for §11 #3 audit-log provenance.
-- **PC2.C — MAC-102 ISED REL Spring Web Flow migration** (`164ceb2`) — legacy `apc-cap.ic.gc.ca` Oracle PL/SQL endpoint decommissioned; runguide migrated to `sms-sgs.ic.gc.ca/equipmentSearch/searchRadioEquipments` Spring Web Flow surface; per-row + bulk-data URL templates deferred to v2 runguide (continuation-token discovery + POST-flow advance not yet captured); 4-probe `§3.0` verification block. OGL-Canada-2.0 license posture unchanged.
-- **PC2.D — MAC-103 BT SIG Qualified Designs narrow-to-shallow** (`d66f986`) — runguide narrowed from full companion-app linkage to shallow-surface QDID capture (`QDID + product_name + owner_company + reference_QDID`); cross-source linkage to `ble_manufacturer_id` preserved; Cloudflare WAF UA-shape rejection documented (browser-shape UA required; `argus-research/*` UA rejected); public POST search at `qualificationapi.bluetooth.com/api/Platform/Listings/Search`; SIG member gate noted for deeper surfaces.
+- **PC2.A, MAC-105 USPTO Patent Public Search migration** (`348f514`), legacy `patft.uspto.gov` decommissioned; runguide migrated to `ppubs.uspto.gov/pubwebapp/` + the authenticated `data.uspto.gov/api/manage` ODP endpoint (`USPTO_ODP_API_KEY` env-var convention). 4-probe `§3.0` verification block (Google Patents + PPubs JS-shell + USPTO ODP authenticated + Espacenet rate-block detection).
+- **PC2.B, MAC-107 GitHub Code Search auth-required correction** (`fa967b1`), runguide corrected to reflect mandatory authentication for all `/search/*` queries since GitHub's 2022 GA change; rate limit clarified as 30 req/min on `/search/*`; 4-row SQL column-drift fix (`identifier_value → identifier`, `manufacturer_canonical_name → manufacturer`); 4-probe `§3.0` verification block with PAT scope sanity + account-identity capture for §11 #3 audit-log provenance.
+- **PC2.C, MAC-102 ISED REL Spring Web Flow migration** (`164ceb2`), legacy `apc-cap.ic.gc.ca` Oracle PL/SQL endpoint decommissioned; runguide migrated to `sms-sgs.ic.gc.ca/equipmentSearch/searchRadioEquipments` Spring Web Flow surface; per-row + bulk-data URL templates deferred to v2 runguide (continuation-token discovery + POST-flow advance not yet captured); 4-probe `§3.0` verification block. OGL-Canada-2.0 license posture unchanged.
+- **PC2.D, MAC-103 BT SIG Qualified Designs narrow-to-shallow** (`d66f986`), runguide narrowed from full companion-app linkage to shallow-surface QDID capture (`QDID + product_name + owner_company + reference_QDID`); cross-source linkage to `ble_manufacturer_id` preserved; Cloudflare WAF UA-shape rejection documented (browser-shape UA required; `argus-research/*` UA rejected); public POST search at `qualificationapi.bluetooth.com/api/Platform/Listings/Search`; SIG member gate noted for deeper surfaces.
 
 The four-instance pattern (PC2.A through PC2.D, covering decommission / host-migration / auth-gating / Cloudflare-WAF failure modes) is documented at `extraction_outputs/_patch_cycle_2/pc2_d_summary.md` as empirical evidence supporting CP27 §2.4's halt-before-fire contract.
 
-## [v1.1.0] — 2026-05-17
+## [v1.1.0], 2026-05-17
 
 ### What's new in v1.1.0
 
-Argus v1.1.0 broadens the project beyond pure equipment-identifier registries and into the corporate, judicial, and procurement records that anchor surveillance vendors to real-world entities. We added **seven new authoritative data sources** (taking the project from 43 sources to 50), **expanded our federal procurement coverage** by 2,560 net-new contract records, and **closed our first held entity** — Johnson Matthey PLC — by cross-checking it against the UK's official corporate registry.
+Argus v1.1.0 broadens the project beyond pure equipment-identifier registries and into the corporate, judicial, and procurement records that anchor surveillance vendors to real-world entities. We added **seven new authoritative data sources** (taking the project from 43 sources to 50), **expanded our federal procurement coverage** by 2,560 net-new contract records, and **closed our first held entity**, Johnson Matthey PLC, by cross-checking it against the UK's official corporate registry.
 
 Along the way we found and fixed seven small inconsistencies between our documentation and the actual database schema. These are codified in the amendment ledger so the next round of contributors doesn't trip over the same edges. We also introduced two new operating conventions: an explicit `access_mode` tag for sources we can't auto-scrape in one session (CAPTCHA-walled state corporate registries, paid-tier government databases), and a `cycle_completion_state` tag for sources that take multiple days to fully ingest. Both are described in plain language below.
 
@@ -888,19 +888,19 @@ The headline outcomes for downstream consumers: **22,533 active identifiers** (u
 
 Seven sources joined Argus in this release, bringing the source count from 43 to 50:
 
-- **UK Companies House** (sid=44) — the United Kingdom's official corporate registry, released under the Open Government Licence v3.0. We use it to confirm the corporate identity of UK-incorporated surveillance vendors against a primary government record. **This source enabled our first Class B hold closure: Johnson Matthey PLC (UK company #00033774), a London-headquartered chemistry and precious-metals firm**, was confirmed via Companies House cross-check and admitted to the canonical 35-entry manufacturer lexicon. Access is fully automated via the Companies House API.
+- **UK Companies House** (sid=44), the United Kingdom's official corporate registry, released under the Open Government Licence v3.0. We use it to confirm the corporate identity of UK-incorporated surveillance vendors against a primary government record. **This source enabled our first Class B hold closure: Johnson Matthey PLC (UK company #00033774), a London-headquartered chemistry and precious-metals firm**, was confirmed via Companies House cross-check and admitted to the canonical 35-entry manufacturer lexicon. Access is fully automated via the Companies House API.
 
-- **Delaware Division of Corporations** (sid=45) — Delaware is the registration state of record for a disproportionate share of US technology companies, so the Delaware corporate registry is a high-leverage source for vendor verification. The state's NameSearch web form is CAPTCHA-gated, so this source is recorded under the new `operator_manual_only` access convention: lookups happen via human-operated browser sessions rather than scripts.
+- **Delaware Division of Corporations** (sid=45), Delaware is the registration state of record for a disproportionate share of US technology companies, so the Delaware corporate registry is a high-leverage source for vendor verification. The state's NameSearch web form is CAPTCHA-gated, so this source is recorded under the new `operator_manual_only` access convention: lookups happen via human-operated browser sessions rather than scripts.
 
-- **California Secretary of State — Bizfile** (sid=46) — California's corporate registry, the second-most-relevant US state for surveillance vendor lookups after Delaware. The Bizfile portal is gated by an Incapsula bot-challenge wall, so this is also an `operator_manual_only` source.
+- **California Secretary of State, Bizfile** (sid=46), California's corporate registry, the second-most-relevant US state for surveillance vendor lookups after Delaware. The Bizfile portal is gated by an Incapsula bot-challenge wall, so this is also an `operator_manual_only` source.
 
-- **Texas Secretary of State SOSDirect** (sid=47) — the Texas corporate registry. Useful for Texas-headquartered surveillance vendors. Access requires paid-tier authentication, so this is again `operator_manual_only`.
+- **Texas Secretary of State SOSDirect** (sid=47), the Texas corporate registry. Useful for Texas-headquartered surveillance vendors. Access requires paid-tier authentication, so this is again `operator_manual_only`.
 
-- **CourtListener / RECAP (Free Law Project)** (sid=48) — a free, comprehensive judicial filings database covering US federal and state courts. CourtListener surfaces lawsuits, contract disputes, and federal court records that name surveillance vendors as parties. Metadata is dedicated to the public domain under CC0; full-text search requires an authenticated Bearer token.
+- **CourtListener / RECAP (Free Law Project)** (sid=48), a free, comprehensive judicial filings database covering US federal and state courts. CourtListener surfaces lawsuits, contract disputes, and federal court records that name surveillance vendors as parties. Metadata is dedicated to the public domain under CC0; full-text search requires an authenticated Bearer token.
 
-- **SEC EDGAR** (sid=49) — the US Securities and Exchange Commission's corporate-disclosure filings database. Public companies routinely name their major customers in 10-K annual reports and Item 1A risk-factor narratives; for surveillance vendors that file with the SEC, this lets us corroborate vendor-customer relationships against a primary public-domain regulatory source. EDGAR is automated via HTML parsing.
+- **SEC EDGAR** (sid=49), the US Securities and Exchange Commission's corporate-disclosure filings database. Public companies routinely name their major customers in 10-K annual reports and Item 1A risk-factor narratives; for surveillance vendors that file with the SEC, this lets us corroborate vendor-customer relationships against a primary public-domain regulatory source. EDGAR is automated via HTML parsing.
 
-- **SAM.gov Entity Registration** (sid=50) — the US federal procurement contractor-registration database. SAM.gov is the authoritative source for "is this vendor an active US federal contractor and what are their registered NAICS codes?" — exactly the question that determines whether procurement evidence is admissible. Access is automated via the SAM.gov API. This source is recorded under the new `partial_pre_day1` cycle-completion convention because we hit the SAM.gov non-Federal-individual-account daily rate ceiling (~10 requests/day) before the first full sweep finished. Remaining queries continue across subsequent days; the source row was admitted at first-batch completion.
+- **SAM.gov Entity Registration** (sid=50), the US federal procurement contractor-registration database. SAM.gov is the authoritative source for "is this vendor an active US federal contractor and what are their registered NAICS codes?", exactly the question that determines whether procurement evidence is admissible. Access is automated via the SAM.gov API. This source is recorded under the new `partial_pre_day1` cycle-completion convention because we hit the SAM.gov non-Federal-individual-account daily rate ceiling (~10 requests/day) before the first full sweep finished. Remaining queries continue across subsequent days; the source row was admitted at first-batch completion.
 
 ### Expanded federal procurement coverage
 
@@ -908,29 +908,29 @@ Federal procurement records grew by **2,560 net-new entries** (from 43,483 to 46
 
 Alongside the new rows, we landed **9,623 cross-source corroborations** from the SAM.gov ingestion cycle. **A corroboration here means: a fact we already had (a vendor's federal contract record) is now independently confirmed against a second, structurally different source (SAM.gov's contractor registration database).** When two independent sources agree on a fact, our confidence in that fact increases, and the corroboration is recorded in a per-row audit trail so downstream consumers can see the evidence chain.
 
-Note for downstream consumers: alongside the +2,560 net-new procurement records, we **rolled 180 procurement_record confidence values back from 90 to 85**. These rows had been corroborated by a second pass against USAspending itself — but that's the same source observed twice, not two independent sources, so the confidence boost wasn't earned. The full audit trail is preserved per row in `notes.confidence_history[]`. This is exactly the kind of self-correction the audit trail is designed to surface.
+Note for downstream consumers: alongside the +2,560 net-new procurement records, we **rolled 180 procurement_record confidence values back from 90 to 85**. These rows had been corroborated by a second pass against USAspending itself, but that's the same source observed twice, not two independent sources, so the confidence boost wasn't earned. The full audit trail is preserved per row in `notes.confidence_history[]`. This is exactly the kind of self-correction the audit trail is designed to surface.
 
 ### Schema changes
 
 Two new migrations landed this release (schema version 19 → 21):
 
-- **Migration 0020 (`source_type_enum_extension`)** — extends the `sources.source_type` enum with three new values (`judicial_filing`, `disclosure_filing`, `procurement_disclosure`) to properly classify the new judicial, SEC, and SAM.gov sources. Previously these would have fallen back silently to the generic `regulatory` bucket; now each source class has its own named tier.
+- **Migration 0020 (`source_type_enum_extension`)**, extends the `sources.source_type` enum with three new values (`judicial_filing`, `disclosure_filing`, `procurement_disclosure`) to properly classify the new judicial, SEC, and SAM.gov sources. Previously these would have fallen back silently to the generic `regulatory` bucket; now each source class has its own named tier.
 
-- **Migration 0021 (`procurement_vendor_canonical_normalized`)** — adds a new `procurement_records.vendor_canonical_normalized` column. This is a deterministic, query-friendly normalization of each procurement record's vendor name: lowercased, punctuation stripped, corporate suffixes (`INC`, `CORP`, `LLC`, `LTD`, `PLC`) removed. For example, `'AXON ENTERPRISE, INC.'`, `'Axon Enterprise, Inc.'`, and `'AXON ENT INC'` now all collapse to `axon enterprise`, making cross-validation joins against the manufacturer lexicon dramatically more reliable. The column was backfilled across all 46,043 procurement records.
+- **Migration 0021 (`procurement_vendor_canonical_normalized`)**, adds a new `procurement_records.vendor_canonical_normalized` column. This is a deterministic, query-friendly normalization of each procurement record's vendor name: lowercased, punctuation stripped, corporate suffixes (`INC`, `CORP`, `LLC`, `LTD`, `PLC`) removed. For example, `'AXON ENTERPRISE, INC.'`, `'Axon Enterprise, Inc.'`, and `'AXON ENT INC'` now all collapse to `axon enterprise`, making cross-validation joins against the manufacturer lexicon dramatically more reliable. The column was backfilled across all 46,043 procurement records.
 
-**What this means for downstream consumers:** check `MAX(version) FROM schema_version` at runtime; it should now read 21. If you query the `sources` table by `source_type`, you may now see three additional enum values. If you join against `procurement_records.vendor_canonical_name`, prefer the new `vendor_canonical_normalized` column instead — same data, dramatically better join semantics across 46k rows.
+**What this means for downstream consumers:** check `MAX(version) FROM schema_version` at runtime; it should now read 21. If you query the `sources` table by `source_type`, you may now see three additional enum values. If you join against `procurement_records.vendor_canonical_name`, prefer the new `vendor_canonical_normalized` column instead, same data, dramatically better join semantics across 46k rows.
 
 ### New discipline conventions
 
 Two new operating conventions were introduced. Both live in the `sources.notes` JSON field today and are described below in user terms; they may be promoted to first-class schema columns in a future release once the vocabulary stabilizes.
 
-- **`access_mode`** — describes how Argus fetches a given source. Values: `automated_api` (queried via documented API), `automated_html_parse` (scraped from HTML without an anti-bot wall), `automated_with_auth` (automated but requires a token), `mixed_automated_manual` (some candidates automated, some manual), and `operator_manual_only` (all access is via a human-operated browser session, because the source is CAPTCHA-walled, bot-challenged, or otherwise structurally hostile to automation). **Important: the access mode is a mechanism descriptor, not a quality signal.** Operator-manual sources carry identical confidence bands and provenance discipline to automated sources. The four state-registry sources added this release (DE / CA / TX) and three secondary state holds are flagged `operator_manual_only`.
+- **`access_mode`**, describes how Argus fetches a given source. Values: `automated_api` (queried via documented API), `automated_html_parse` (scraped from HTML without an anti-bot wall), `automated_with_auth` (automated but requires a token), `mixed_automated_manual` (some candidates automated, some manual), and `operator_manual_only` (all access is via a human-operated browser session, because the source is CAPTCHA-walled, bot-challenged, or otherwise structurally hostile to automation). **Important: the access mode is a mechanism descriptor, not a quality signal.** Operator-manual sources carry identical confidence bands and provenance discipline to automated sources. The four state-registry sources added this release (DE / CA / TX) and three secondary state holds are flagged `operator_manual_only`.
 
-- **`cycle_completion_state`** — describes whether a source's data has been fully ingested or whether ingestion is paced across multiple days. Values: absent (source is complete; default reading), `partial_pre_day1` (admission landed before the first sweep finished), `partial_pacing_in_flight` (multi-day pacing run still active), `partial_pacing_exhausted` (multi-day pacing terminated short of completion). When this field is set, the source row also carries `next_cycle_dispatch_scheduled_for_utc`, `next_cycle_dispatch_runguide_path`, and `partial_yield_metrics_at_admission` so downstream consumers can see exactly where the partial state sits and when the next cycle is scheduled. **SAM.gov (sid=50) is the first consumer**, recorded as `partial_pre_day1`.
+- **`cycle_completion_state`**, describes whether a source's data has been fully ingested or whether ingestion is paced across multiple days. Values: absent (source is complete; default reading), `partial_pre_day1` (admission landed before the first sweep finished), `partial_pacing_in_flight` (multi-day pacing run still active), `partial_pacing_exhausted` (multi-day pacing terminated short of completion). When this field is set, the source row also carries `next_cycle_dispatch_scheduled_for_utc`, `next_cycle_dispatch_runguide_path`, and `partial_yield_metrics_at_admission` so downstream consumers can see exactly where the partial state sits and when the next cycle is scheduled. **SAM.gov (sid=50) is the first consumer**, recorded as `partial_pre_day1`.
 
 ### Known limitations + what's coming
 
-Argus's coverage is still **intentionally narrow at this baseline** — broader categories of surveillance equipment remain out of scope. The roadmap below frames what's queued.
+Argus's coverage is still **intentionally narrow at this baseline**, broader categories of surveillance equipment remain out of scope. The roadmap below frames what's queued.
 
 **Currently held items:**
 
@@ -956,32 +956,32 @@ This section preserves the discipline-architecture audit trail for the v1.1.0 re
 
 **Bible amendment ledger (this release):**
 
-- **CP23** @ bible HEAD ratification — coordinated amendment: wide-net cycle-{1,3,4} schema-contract patches + migrations 0020 + 0021 + downstream-consumer audit. Folds seven schema-contract drift findings (PROJECT_BIBLE.md §4.2 / §4.3 / §8.2 / §8.3 §-text additions; `manufacturers.aliases` comma-string clarification; source_excerpt per-table CHECK constraint cap table; `notes.access_mode` notes_json convention; license-into-notes folding contract; cross-validation column-name normalizations) and the two migrations into a single bible commit per the §11 #11 amendment-log discipline. Source patches: `new data 5.16/schema_contract_patch_cycle3.md`, `new data 5.16/schema_contract_patch_cycle4.md`, `new data 5.16/schema_contract_patch_notes_license.md`.
-- **CP24** @ bible HEAD — §11 #8 within-source-re-extraction sub-rule + CP19 spirit-extension to `procurement_records` row-level audit-trail (`notes.confidence_history[]` convention) + "§5.2 +5 boost" citation hygiene correction. Within-source re-extraction (same upstream registry queried at two times by the same or different extraction sessions) is **not** a "second independent source" for §8.3 lift purposes. Provenance enrichment via `notes.corroborations[]` + `notes.corroboration_sessions[]` stays; confidence does not lift. The 180-row MAC-172 P4 USAspending deep-extension lift rollback (85 → 90 → 85) is the first consumer with full per-row audit-trail.
-- **CP25** @ bible HEAD `2803ae1` — `cross_source_corroboration_reversals[]` audit-trail convention + CP24 §12 `n` recount supersession (SEC EDGAR × USAspending drops 2 → 0 after §11 #1 semantic review of MAC-171 P3 RG5 findings) + within-source-FP discipline-evolution carry-forward. First consumer is the MAC-171 id=86738 reversal UPDATE.
-- **CP26** @ bible HEAD `64f381c` — SAM.gov cycle-5 day-0 partial fold (seven runguide-correction findings: probe-template UEI freshness, empirical rate ceiling, no-proactive-rate-limit-headers extraction discipline, operator-manual-queue file-format clarification, NAICS code revision drift, single-token alias fanout brittleness, snapshot-freshness pre-flight) + `cycle_completion_state` notes_json convention codification + within-source-FP discipline n=4 codification (text-pattern match + semantic-relationship validation as a default §4 match-scoring step). Source patch: `extraction_outputs/sam_gov_admission/STOP_THE_LINE_rate_ceiling.md`.
+- **CP23** @ bible HEAD ratification, coordinated amendment: wide-net cycle-{1,3,4} schema-contract patches + migrations 0020 + 0021 + downstream-consumer audit. Folds seven schema-contract drift findings (PROJECT_BIBLE.md §4.2 / §4.3 / §8.2 / §8.3 §-text additions; `manufacturers.aliases` comma-string clarification; source_excerpt per-table CHECK constraint cap table; `notes.access_mode` notes_json convention; license-into-notes folding contract; cross-validation column-name normalizations) and the two migrations into a single bible commit per the §11 #11 amendment-log discipline. Source patches: `new data 5.16/schema_contract_patch_cycle3.md`, `new data 5.16/schema_contract_patch_cycle4.md`, `new data 5.16/schema_contract_patch_notes_license.md`.
+- **CP24** @ bible HEAD, §11 #8 within-source-re-extraction sub-rule + CP19 spirit-extension to `procurement_records` row-level audit-trail (`notes.confidence_history[]` convention) + "§5.2 +5 boost" citation hygiene correction. Within-source re-extraction (same upstream registry queried at two times by the same or different extraction sessions) is **not** a "second independent source" for §8.3 lift purposes. Provenance enrichment via `notes.corroborations[]` + `notes.corroboration_sessions[]` stays; confidence does not lift. The 180-row MAC-172 P4 USAspending deep-extension lift rollback (85 → 90 → 85) is the first consumer with full per-row audit-trail.
+- **CP25** @ bible HEAD `2803ae1`, `cross_source_corroboration_reversals[]` audit-trail convention + CP24 §12 `n` recount supersession (SEC EDGAR × USAspending drops 2 → 0 after §11 #1 semantic review of MAC-171 P3 RG5 findings) + within-source-FP discipline-evolution carry-forward. First consumer is the MAC-171 id=86738 reversal UPDATE.
+- **CP26** @ bible HEAD `64f381c`, SAM.gov cycle-5 day-0 partial fold (seven runguide-correction findings: probe-template UEI freshness, empirical rate ceiling, no-proactive-rate-limit-headers extraction discipline, operator-manual-queue file-format clarification, NAICS code revision drift, single-token alias fanout brittleness, snapshot-freshness pre-flight) + `cycle_completion_state` notes_json convention codification + within-source-FP discipline n=4 codification (text-pattern match + semantic-relationship validation as a default §4 match-scoring step). Source patch: `extraction_outputs/sam_gov_admission/STOP_THE_LINE_rate_ceiling.md`.
 
 **Migration ledger entries (cumulative 1 → 21):**
 
-- **0020 `source_type_enum_extension`** (applied 2026-05-17 05:07:17) — `sources.source_type` CHECK enum 10 → 13 values: net-new `judicial_filing`, `disclosure_filing`, `procurement_disclosure`. Per CP23 / cycle-3 §1 finding #2. Table-rebuild per the 0009 / 0015 / 0018 / 0019 precedent. The 3 new bands are sources-tier taxonomy only; identifier-row promotion-pipeline confidence bands (§8.2) are unchanged.
-- **0021 `procurement_vendor_canonical_normalized`** (applied 2026-05-17 05:07:32) — `procurement_records.vendor_canonical_normalized TEXT NOT NULL DEFAULT ''` column + supporting B-tree index. Per CP23 / cycle-3 §1 finding #4 + CEO Path B ruling. Backfill populated all 46,043 rows; collapse ratio 0.9862 (1,157 distinct raw vendor_canonical_name values collapse to 1,141 distinct normalized values). Normalization algorithm canonical reference: `db/normalize_vendor.py::normalize_vendor_name` (pure function).
+- **0020 `source_type_enum_extension`** (applied 2026-05-17 05:07:17), `sources.source_type` CHECK enum 10 → 13 values: net-new `judicial_filing`, `disclosure_filing`, `procurement_disclosure`. Per CP23 / cycle-3 §1 finding #2. Table-rebuild per the 0009 / 0015 / 0018 / 0019 precedent. The 3 new bands are sources-tier taxonomy only; identifier-row promotion-pipeline confidence bands (§8.2) are unchanged.
+- **0021 `procurement_vendor_canonical_normalized`** (applied 2026-05-17 05:07:32), `procurement_records.vendor_canonical_normalized TEXT NOT NULL DEFAULT ''` column + supporting B-tree index. Per CP23 / cycle-3 §1 finding #4 + CEO Path B ruling. Backfill populated all 46,043 rows; collapse ratio 0.9862 (1,157 distinct raw vendor_canonical_name values collapse to 1,141 distinct normalized values). Normalization algorithm canonical reference: `db/normalize_vendor.py::normalize_vendor_name` (pure function).
 
 **MAC issue dispatch references:**
 
-- **MAC-101** — baseline aggregate state (v1.0.0 reference).
-- **MAC-168** — paperclip integration of CP23 (wide-net cycle-{1,3,4} schema-contract patches).
-- **MAC-169 through MAC-174** — admission cycle dispatches (UK Companies House P2; SEC EDGAR P3; USAspending deep-extension P4; state SoS P5; CourtListener V4 P6).
-- **MAC-172** — USAspending deep-extension P4 ingest (+2,560 net-new procurement_records; partial-ratify rollback of the 180-row lift; CP24 codification).
-- **MAC-175** — SAM.gov cycle-5 admission close (sid=50 INSERT + 9,623-row cross-source corroboration UPDATE batch: Vigilant 56 + Motorola 9,545 + Genetec 22; CP26 codification).
+- **MAC-101**, baseline aggregate state (v1.0.0 reference).
+- **MAC-168**, paperclip integration of CP23 (wide-net cycle-{1,3,4} schema-contract patches).
+- **MAC-169 through MAC-174**, admission cycle dispatches (UK Companies House P2; SEC EDGAR P3; USAspending deep-extension P4; state SoS P5; CourtListener V4 P6).
+- **MAC-172**, USAspending deep-extension P4 ingest (+2,560 net-new procurement_records; partial-ratify rollback of the 180-row lift; CP24 codification).
+- **MAC-175**, SAM.gov cycle-5 admission close (sid=50 INSERT + 9,623-row cross-source corroboration UPDATE batch: Vigilant 56 + Motorola 9,545 + Genetec 22; CP26 codification).
 
 **Source-tier license-posture vocabulary additions (CP23):**
 
-- `OGL-3.0` — UK Companies House (sid=44).
-- `PUBLIC_DOMAIN` — SEC EDGAR (sid=49), SAM.gov (sid=50).
-- `US_STATE_PUBLIC_RECORDS` — Delaware / California / Texas SoS (sid=45 / 46 / 47).
-- `CC0` — CourtListener / Free Law Project (sid=48).
+- `OGL-3.0`, UK Companies House (sid=44).
+- `PUBLIC_DOMAIN`, SEC EDGAR (sid=49), SAM.gov (sid=50).
+- `US_STATE_PUBLIC_RECORDS`, Delaware / California / Texas SoS (sid=45 / 46 / 47).
+- `CC0`, CourtListener / Free Law Project (sid=48).
 
-All four compose with the pre-existing CP21 `notes.upstream_license_posture` canonical sentinel-key for per-row license-aware downstream consumer filtering. License lives inside `notes_json.license` (the contract refers to this as `notes_json`; the underlying column is `sources.notes` TEXT containing JSON), NOT as a top-level column — codified per the cycle-1 patch finding #1.
+All four compose with the pre-existing CP21 `notes.upstream_license_posture` canonical sentinel-key for per-row license-aware downstream consumer filtering. License lives inside `notes_json.license` (the contract refers to this as `notes_json`; the underlying column is `sources.notes` TEXT containing JSON), NOT as a top-level column, codified per the cycle-1 patch finding #1.
 
 **Live-state verification (paste-not-cite per S.7):**
 
@@ -1007,29 +1007,29 @@ PRAGMA integrity_check      = ok
 
 **Open §12 questions surfaced this release (queued for future CP candidacy):**
 
-- `access_mode` first-class column migration — gated on value-set stabilization (~1-2 more cycles of new-source evidence).
-- Partial-cycle source-admission discipline first-class-column promotion (`cycle_completion_state`) — gated on at least 2 distinct sources using non-absent values.
-- Empirical-ceiling-probe runguide template — CP26 §3 candidate.
-- `procurement_reclassifications` audit table promotion — gated on forensic-query pattern emergence at scale (current row-local `notes.confidence_history[]` convention is canonical).
+- `access_mode` first-class column migration, gated on value-set stabilization (~1-2 more cycles of new-source evidence).
+- Partial-cycle source-admission discipline first-class-column promotion (`cycle_completion_state`), gated on at least 2 distinct sources using non-absent values.
+- Empirical-ceiling-probe runguide template, CP26 §3 candidate.
+- `procurement_reclassifications` audit table promotion, gated on forensic-query pattern emergence at scale (current row-local `notes.confidence_history[]` convention is canonical).
 
 ---
-## [v1.0.0] — TBD release date
+## [v1.0.0], TBD release date
 
 ### What's included
 
 Argus v1.0.0 ships the canonical surveillance-equipment-identifier database as a queryable SQLite artifact (`db/argus.db`, schema_version=19) plus four derived dataset exports under three licenses:
 
-- **Pipeline** (AGPL-3.0-or-later) — the migration + source-loader + extraction + validator + export code that reproduces the database from upstream sources.
-- **Database / dataset** (ODbL-1.0; Atlas-derived rows quarantined under CC-BY-NC-SA-4.0 per upstream NC clause; per-row LICENSE column at `deployment_observations.LICENSE` enables downstream license-aware filtering) — the canonical SQLite DB + the JSON/CSV exports at `exports/`.
-- **Documentation** (CC-BY-SA-4.0) — README, METHODOLOGY, DATA_DICTIONARY, CREDITS, SECURITY, THREAT_MODEL, LEGAL_POSTURE, CONTRIBUTING, CODE_OF_CONDUCT, this CHANGELOG.
+- **Pipeline** (AGPL-3.0-or-later), the migration + source-loader + extraction + validator + export code that reproduces the database from upstream sources.
+- **Database / dataset** (ODbL-1.0; Atlas-derived rows quarantined under CC-BY-NC-SA-4.0 per upstream NC clause; per-row LICENSE column at `deployment_observations.LICENSE` enables downstream license-aware filtering), the canonical SQLite DB + the JSON/CSV exports at `exports/`.
+- **Documentation** (CC-BY-SA-4.0), README, METHODOLOGY, DATA_DICTIONARY, CREDITS, SECURITY, THREAT_MODEL, LEGAL_POSTURE, CONTRIBUTING, CODE_OF_CONDUCT, this CHANGELOG.
 
 #### Database content
 
 - **14 user tables** at schema_version=19 (full schema reference in [DATA_DICTIONARY.md](DATA_DICTIONARY.md)):
-  - **Canonical-state**: `identifiers` (Layer 1 — the main table; 22,532 active rows + 80 superseded)
+  - **Canonical-state**: `identifiers` (Layer 1, the main table; 22,532 active rows + 80 superseded)
   - **Provenance + source**: `raw_observations` (133,134 rows), `sources` (43 sources), `manufacturers` (34-entry surveillance-tech vendor lexicon)
   - **Layer 2 + supporting**: `deployment_observations` (116,668 rows with per-row LICENSE column per migration 0016), `procurement_records` (43,483 rows), `fcc_grantees` (50,153 rows), `council_minutes_matters` (3 rows), `wigle_anchor_priority` (80,697 rows), `behavioral_signatures` (131 rows)
-  - **Audit-trail**: `source_reclassifications` (809 rows — row-level reclassification audit table)
+  - **Audit-trail**: `source_reclassifications` (809 rows, row-level reclassification audit table)
   - **Operational**: `conflicts` (20 rows), `extraction_runs` (106 rows), `schema_version` (migration ledger 1 → 19)
 - **Active identifier rows by class** (22,532 total active):
   - **IEEE-anchored mac_range / OUI** rows at `primary_registry` band: ~17,800 rows across IEEE OUI MA-L / MA-M / MA-S + IEEE IAB registries
@@ -1044,18 +1044,18 @@ Argus v1.0.0 ships the canonical surveillance-equipment-identifier database as a
 
 #### Source families integrated
 
-- **IEEE OUI registries** (MA-L 24-bit + MA-M 28-bit + MA-S 36-bit) at `primary_registry` band — vendor-to-OUI mappings; factual public registry data.
-- **IEEE IAB registry** (36-bit legacy) at `primary_registry` band — predecessor allocations.
-- **FCC EAS Equipment Authorization Grantee Registrations** at `primary_registry` band — 50,153-grantee corporate registrant lookup table; allowlist for `fcc_id_anchored` disambiguation and the vendor-disambiguation predicate.
-- **FAA ANSI/CTA-2063-A Remote ID prefix registry** at `primary_registry` band — drone-class identifier-to-vendor attribution.
-- **Bluetooth SIG company-identifier registry** at `primary_registry` band — BLE `ble_manufacturer_id` clusters.
-- **EFF Atlas of Surveillance** (CC-BY-NC-SA-4.0 quarantine; NC clause carries forward) — 15,071 deployment-location observations.
-- **DeFlock** (ODbL-1.0; license-compatible with compilation license) — 101,597 ALPR camera deployment-location observations.
-- **USAspending.gov + Granicus Legistar** — federal/state/municipal procurement records (43,483 + 3 rows respectively).
-- **Wireshark `manuf` file** — community-maintained OUI cross-reference for vendor-name curation.
-- **NDSS 2025 Marlin IMSI-catcher research** at `academic` band — 53 behavioral-signature rows for cellular-detection signatures.
-- **Vendor companion applications** (Hak5 docs / Flock Safety FS Installer / Getac BWC Viewer) at `manufacturer_app` band — BLE service UUIDs + default credentials + product-family taxonomy extracted via static analysis under the 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption.
-- **22 canonical community-research GitHub repositories** at `crowdsourced` or `manufacturer_doc` band — drone Remote ID + BLE tracker catalogs + IMSI-catcher detection + ALPR-camera + flock-detection cohorts.
+- **IEEE OUI registries** (MA-L 24-bit + MA-M 28-bit + MA-S 36-bit) at `primary_registry` band, vendor-to-OUI mappings; factual public registry data.
+- **IEEE IAB registry** (36-bit legacy) at `primary_registry` band, predecessor allocations.
+- **FCC EAS Equipment Authorization Grantee Registrations** at `primary_registry` band, 50,153-grantee corporate registrant lookup table; allowlist for `fcc_id_anchored` disambiguation and the vendor-disambiguation predicate.
+- **FAA ANSI/CTA-2063-A Remote ID prefix registry** at `primary_registry` band, drone-class identifier-to-vendor attribution.
+- **Bluetooth SIG company-identifier registry** at `primary_registry` band, BLE `ble_manufacturer_id` clusters.
+- **EFF Atlas of Surveillance** (CC-BY-NC-SA-4.0 quarantine; NC clause carries forward), 15,071 deployment-location observations.
+- **DeFlock** (ODbL-1.0; license-compatible with compilation license), 101,597 ALPR camera deployment-location observations.
+- **USAspending.gov + Granicus Legistar**, federal/state/municipal procurement records (43,483 + 3 rows respectively).
+- **Wireshark `manuf` file**, community-maintained OUI cross-reference for vendor-name curation.
+- **NDSS 2025 Marlin IMSI-catcher research** at `academic` band, 53 behavioral-signature rows for cellular-detection signatures.
+- **Vendor companion applications** (Hak5 docs / Flock Safety FS Installer / Getac BWC Viewer) at `manufacturer_app` band, BLE service UUIDs + default credentials + product-family taxonomy extracted via static analysis under the 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption.
+- **22 canonical community-research GitHub repositories** at `crowdsourced` or `manufacturer_doc` band, drone Remote ID + BLE tracker catalogs + IMSI-catcher detection + ALPR-camera + flock-detection cohorts.
 - **5 secondary-batch repositories** at `crowdsourced` or `academic` band with explicit license-posture annotations (AGPL-3.0 inherited / AGPL-3.0 declared / NO_LICENSE_DECLARED under the Feist facts-only doctrine / CC-BY-NC-ND-4.0 with research-use clause).
 
 Full per-source attribution + upstream-license chain in [CREDITS.md](CREDITS.md).
@@ -1064,21 +1064,21 @@ Full per-source attribution + upstream-license chain in [CREDITS.md](CREDITS.md)
 
 [METHODOLOGY.md](METHODOLOGY.md) documents the methodology behind v1.0.0:
 
-- **§3 Sources and source-type hierarchy** — 10-value `source_type` enum (`primary_registry` / `inferred` / `manufacturer_app` / `crowdsourced` / `official` / `manufacturer_doc` / `regulatory` / `procurement` / `academic` / `foia`) with confidence bands per source-class. The `primary_registry` band covers IEEE OUI / FCC EAS / FAA RID / Bluetooth SIG registry-class allocators with a 70-85 single-source ceiling.
-- **§4 Identifier types** — 48-value `identifier_type` enum across three structural categories: wire-observable (route to Lynceus-bound JSON exports), parametric / sub-protocol / forensic (DROPPED-class — analytical only, CSV export only), and alias-collapse (route to existing pattern_type).
-- **§5 Confidence model** — calibrated integer 0-99 (humility-margin invariant; schema-CHECK permits 0-100 with operational cap at 99) with source-type bands, `+5` corroboration boost, lowest-contributing-ceiling rule, `primary_registry` sub-banding, and `manufacturer_app` per-class sub-banding. Discrete confidence shapes diverge for `procurement_records` (continuous 0-100, no humility margin) and `council_minutes_matters` (discrete 70/75/80 per item-grading); see DATA_DICTIONARY §6.2.
-- **§6 Dedup + reclassification logic** — collapses N citations of the same identifier to a single canonical row with corroboration chain preservation; superseded-row preservation discipline (`identifiers.superseded_by` pointer chain). Row-level reclassifications (band/confidence/source_url changes) land an entry in `source_reclassifications` with `sweep_event_id` grouping + pre/post snapshot + rationale anchor.
-- **§7 Provenance discipline** — `raw_observations` as source-of-truth; `source_url` must be working at ingest + verbatim-preserved post-fetch (pinned-SHA + line-anchored URL template, e.g., `/blob/<sha>/<path>#<anchor>`); no-fabrication hard rule; third-party-citation-lineage boundary; no-PII discipline; amendment-log discipline.
-- **Feist facts-only promotion** — public-but-unlicensed sources (NO_LICENSE_DECLARED) qualify for facts-only extraction under *Feist v. Rural Telephone Service* (499 U.S. 340 (1991)). Argus extracts factual claims (identifier values, manufacturer attributions); Argus does NOT republish the source's compilation arrangement. Per-row canonical sentinel: `notes.upstream_license_posture='NO_LICENSE_DECLARED'`.
+- **§3 Sources and source-type hierarchy**, 10-value `source_type` enum (`primary_registry` / `inferred` / `manufacturer_app` / `crowdsourced` / `official` / `manufacturer_doc` / `regulatory` / `procurement` / `academic` / `foia`) with confidence bands per source-class. The `primary_registry` band covers IEEE OUI / FCC EAS / FAA RID / Bluetooth SIG registry-class allocators with a 70-85 single-source ceiling.
+- **§4 Identifier types**, 48-value `identifier_type` enum across three structural categories: wire-observable (route to Lynceus-bound JSON exports), parametric / sub-protocol / forensic (DROPPED-class, analytical only, CSV export only), and alias-collapse (route to existing pattern_type).
+- **§5 Confidence model**, calibrated integer 0-99 (humility-margin invariant; schema-CHECK permits 0-100 with operational cap at 99) with source-type bands, `+5` corroboration boost, lowest-contributing-ceiling rule, `primary_registry` sub-banding, and `manufacturer_app` per-class sub-banding. Discrete confidence shapes diverge for `procurement_records` (continuous 0-100, no humility margin) and `council_minutes_matters` (discrete 70/75/80 per item-grading); see DATA_DICTIONARY §6.2.
+- **§6 Dedup + reclassification logic**, collapses N citations of the same identifier to a single canonical row with corroboration chain preservation; superseded-row preservation discipline (`identifiers.superseded_by` pointer chain). Row-level reclassifications (band/confidence/source_url changes) land an entry in `source_reclassifications` with `sweep_event_id` grouping + pre/post snapshot + rationale anchor.
+- **§7 Provenance discipline**, `raw_observations` as source-of-truth; `source_url` must be working at ingest + verbatim-preserved post-fetch (pinned-SHA + line-anchored URL template, e.g., `/blob/<sha>/<path>#<anchor>`); no-fabrication hard rule; third-party-citation-lineage boundary; no-PII discipline; amendment-log discipline.
+- **Feist facts-only promotion**, public-but-unlicensed sources (NO_LICENSE_DECLARED) qualify for facts-only extraction under *Feist v. Rural Telephone Service* (499 U.S. 340 (1991)). Argus extracts factual claims (identifier values, manufacturer attributions); Argus does NOT republish the source's compilation arrangement. Per-row canonical sentinel: `notes.upstream_license_posture='NO_LICENSE_DECLARED'`.
 
 ### License posture
 
-- **Code:** AGPL-3.0-or-later ([LICENSE](LICENSE)) — network-use copyleft preserves source-availability for derivative scanners; AGPL-3.0 inheritance-compatible with community-contributed sources at `sources.id` 38/40/43.
+- **Code:** AGPL-3.0-or-later ([LICENSE](LICENSE)), network-use copyleft preserves source-availability for derivative scanners; AGPL-3.0 inheritance-compatible with community-contributed sources at `sources.id` 38/40/43.
 - **Dataset:** ODbL-1.0 ([LICENSE-DATA](LICENSE-DATA)) with three-layer per-row license-posture composition:
   - **Layer 1** `sources.notes.license_posture` (per-source declaration; 6 distinct posture classes documented in LICENSE-DATA §2.1)
   - **Layer 2** `deployment_observations.LICENSE` (per-row NOT NULL column, migration 0016; Atlas rows quarantined under CC-BY-NC-SA-4.0 NC clause; DeFlock rows under ODbL-1.0)
   - **Layer 3** `identifiers.notes.upstream_license_posture` (per-promoted-identifier canonical sentinel key)
-- **Documentation:** CC-BY-SA-4.0 ([LICENSE-DOCS](LICENSE-DOCS)) — ShareAlike preserves the discipline-architecture open-availability for derivative documentation.
+- **Documentation:** CC-BY-SA-4.0 ([LICENSE-DOCS](LICENSE-DOCS)), ShareAlike preserves the discipline-architecture open-availability for derivative documentation.
 - **DMCA / takedown posture:** project-side doctrinal grounding is Feist factual-data + 17 USC §1201(j) security-research exemption + 37 CFR §201.40(b) + nominative fair use. Vendor attribution disputes route through a GitHub issue.
 
 ### Schema versioning
@@ -1087,8 +1087,8 @@ The migration ledger (`schema_version` table) tracks every applied migration. v1
 
 **Migration ledger summary (1 → 19):**
 
-- **0001** initial schema — `identifiers` + `raw_observations` + `sources` + `manufacturers` + `extraction_runs` + `conflicts` + `schema_version` + 5 enum CHECK constraints
-- **0002-0005** supporting tables — `procurement_records`, `fcc_grantees`, `council_minutes_matters`, `wigle_anchor_priority`, `deployment_observations`
+- **0001** initial schema, `identifiers` + `raw_observations` + `sources` + `manufacturers` + `extraction_runs` + `conflicts` + `schema_version` + 5 enum CHECK constraints
+- **0002-0005** supporting tables, `procurement_records`, `fcc_grantees`, `council_minutes_matters`, `wigle_anchor_priority`, `deployment_observations`
 - **0006** PDF/SDK/FCC-report corpus support
 - **0007** vendor companion app static analysis support
 - **0008-0010** identifier-type extensions (`product_family_codename`, `ble_local_name`, `ble_characteristic`) + `behavioral_signatures` table + `ble_manufacturer_id` enum extension
@@ -1105,72 +1105,72 @@ The full amendment log lives in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md). Belo
 
 **Schema / data-shape amendments:**
 
-- **`identifier_type` enum extension cluster** — added `product_family_codename`, `ble_local_name`, `ble_characteristic`.
-- **LA-bit pairing** — added `paired_identifier_id` + `pair_kind` columns; Drone-RID identifier_type cluster; ALPR/camera `alpr_model` taxonomy.
-- **`source_type='primary_registry'` band** — added for registry-class allocators (IEEE OUI / FCC EAS / FAA RID / Bluetooth SIG) with 70–85 single-source ceiling.
-- **`source_type='manufacturer_app'` sub-banding** — vendor companion-app per-class confidence bands + cohort distinction (operator-facing vs installer/pairing-flow apps).
-- **`behavioral_signatures` sibling export** — added `argus_export_behavioral_signatures.json` (Rayhunter-consumable).
-- **`source_reclassifications` audit table** — added row-level reclassification ledger (`sweep_event_id` grouping + pre/post snapshot + rationale).
-- **Lynceus mapping table updates** — populated the Lynceus identifier-type mapping entries for added `identifier_type` values.
-- **`identifier_type` enum extensions** — added 14 net-new types from community-research dir Phase 1 + 7 net-new types from round-2 vocabulary review (cumulative CHECK enum 41 → 48).
-- **`deployment_observations.LICENSE` per-row column** — added (NOT NULL; Atlas CC-BY-NC-SA-4.0 + DeFlock ODbL-1.0 quarantine).
-- **`notes.upstream_license_posture` canonical sentinel-key** — established for facts-only promoted rows (`'NO_LICENSE_DECLARED'`).
+- **`identifier_type` enum extension cluster**, added `product_family_codename`, `ble_local_name`, `ble_characteristic`.
+- **LA-bit pairing**, added `paired_identifier_id` + `pair_kind` columns; Drone-RID identifier_type cluster; ALPR/camera `alpr_model` taxonomy.
+- **`source_type='primary_registry'` band**, added for registry-class allocators (IEEE OUI / FCC EAS / FAA RID / Bluetooth SIG) with 70-85 single-source ceiling.
+- **`source_type='manufacturer_app'` sub-banding**, vendor companion-app per-class confidence bands + cohort distinction (operator-facing vs installer/pairing-flow apps).
+- **`behavioral_signatures` sibling export**, added `argus_export_behavioral_signatures.json` (Rayhunter-consumable).
+- **`source_reclassifications` audit table**, added row-level reclassification ledger (`sweep_event_id` grouping + pre/post snapshot + rationale).
+- **Lynceus mapping table updates**, populated the Lynceus identifier-type mapping entries for added `identifier_type` values.
+- **`identifier_type` enum extensions**, added 14 net-new types from community-research dir Phase 1 + 7 net-new types from round-2 vocabulary review (cumulative CHECK enum 41 → 48).
+- **`deployment_observations.LICENSE` per-row column**, added (NOT NULL; Atlas CC-BY-NC-SA-4.0 + DeFlock ODbL-1.0 quarantine).
+- **`notes.upstream_license_posture` canonical sentinel-key**, established for facts-only promoted rows (`'NO_LICENSE_DECLARED'`).
 
 **Integration / consumer-facing amendments:**
 
-- **`argus_record_id` stable-identifier algorithm** — `sha256('<identifier_type>|<normalized_identifier>')[:16]`. Stable across re-runs, source-attribution changes, and confidence drift.
-- **`geographic_scope` filter** — applied at export time.
-- **Severity ownership** — moved operator-side via `severity_overrides.yaml`. Argus ships factual data; downstream consumers own alerting policy.
-- **Multi-purpose-vendor carveout** — `device_category='unknown'` excluded from high-confidence Lynceus export.
-- **Provenance discipline** — source-url-direct hard rule + per-shape mapper URL template (pinned-SHA + line-anchored).
-- **Feist facts-only doctrine** — codified for public-but-unlicensed sources.
+- **`argus_record_id` stable-identifier algorithm**, `sha256('<identifier_type>|<normalized_identifier>')[:16]`. Stable across re-runs, source-attribution changes, and confidence drift.
+- **`geographic_scope` filter**, applied at export time.
+- **Severity ownership**, moved operator-side via `severity_overrides.yaml`. Argus ships factual data; downstream consumers own alerting policy.
+- **Multi-purpose-vendor carveout**, `device_category='unknown'` excluded from high-confidence Lynceus export.
+- **Provenance discipline**, source-url-direct hard rule + per-shape mapper URL template (pinned-SHA + line-anchored).
+- **Feist facts-only doctrine**, codified for public-but-unlicensed sources.
 
 **Discipline-evolution amendments:**
 
-- **"Argus identifies; Lynceus correlates"** — architectural boundary: Argus ships factual attribution data; downstream scanners own correlation and alerting.
-- **Confidence-band ceiling rule** — corroborated confidence is bounded by the lowest contributing source-type band ceiling.
-- **Vendor-disambiguation predicate** — Motorola Mobility / Solutions canonical split; WatchGuard Video / Technologies split.
-- **LAA-bit confidence penalty** — locally-administered MAC addresses receive reduced confidence.
-- **CVE false-positive allowlist + framework-UUID SDO-attestation discipline** — extraction-time false-positive classification.
-- **Amendment-log discipline** — coordinated commits pair canonical-bible edits with this CHANGELOG and the per-row audit trail.
-- **No-PII default-to-HOLD** — individual-attributed names without corporate-entity confirmation stay held.
+- **"Argus identifies; Lynceus correlates"**, architectural boundary: Argus ships factual attribution data; downstream scanners own correlation and alerting.
+- **Confidence-band ceiling rule**, corroborated confidence is bounded by the lowest contributing source-type band ceiling.
+- **Vendor-disambiguation predicate**, Motorola Mobility / Solutions canonical split; WatchGuard Video / Technologies split.
+- **LAA-bit confidence penalty**, locally-administered MAC addresses receive reduced confidence.
+- **CVE false-positive allowlist + framework-UUID SDO-attestation discipline**, extraction-time false-positive classification.
+- **Amendment-log discipline**, coordinated commits pair canonical-bible edits with this CHANGELOG and the per-row audit trail.
+- **No-PII default-to-HOLD**, individual-attributed names without corporate-entity confirmation stay held.
 
 ### Pre-v1.0.0 history (major milestones)
 
 The dataset was built over roughly two weeks of intensive multi-agent orchestration. Major milestones, in chronological order:
 
-- **2026-05-04** — Argus working name confirmed; Tier-1 source acquisition complete (Atlas of Surveillance + DeFlock + IEEE OUI + Wireshark `manuf`).
-- **2026-05-05 to 05-07** — PDF/HTML extraction waves; the architectural boundary between Argus and Lynceus codified (Argus ships factual attribution; Lynceus owns correlation); coordinated Lynceus integration commits (geographic_scope filter; severity operator-side; `argus_record_id`; multi-purpose-vendor carveout).
-- **2026-05-08** — Vendor companion app static analysis admitted as a source class (under the 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption).
-- **2026-05-11** — Community-research GitHub corpus acquired (24 repos); identifier-type extensions for LA-bit pairing, Drone Remote ID, and ALPR/camera taxonomy landed; promotion-cycle-1 closed.
-- **2026-05-12** — Promotion-cycle-2 closed (~423 promotions); `primary_registry` source-type band introduced for registry-class allocators; 481 FAA RID drone_id_prefix promotions; Lynceus mapping populated for new identifier_types.
-- **2026-05-13** — `manufacturer_app` sub-banding for vendor companion apps; behavioral_signatures sibling export (`argus_export_behavioral_signatures.json`); first behavioral_signatures population (0 → 55 from Marlin NDSS 2025); sources reclassification sweep (808 reclassifications); `source_reclassifications` audit table introduced.
-- **2026-05-14** — Final release-readiness pass: IEEE PII triage and promotion (3,446 Class A); community-research deferred-dir Phase 2 close (145 promotions + 38 behavioral-signature backfills); Feist facts-only doctrine codified for public-but-unlicensed sources; final pre-release cleanup; v1.0.0 ship-readiness verified.
+- **2026-05-04**, Argus working name confirmed; Tier-1 source acquisition complete (Atlas of Surveillance + DeFlock + IEEE OUI + Wireshark `manuf`).
+- **2026-05-05 to 05-07**, PDF/HTML extraction waves; the architectural boundary between Argus and Lynceus codified (Argus ships factual attribution; Lynceus owns correlation); coordinated Lynceus integration commits (geographic_scope filter; severity operator-side; `argus_record_id`; multi-purpose-vendor carveout).
+- **2026-05-08**, Vendor companion app static analysis admitted as a source class (under the 17 USC §1201(j) + 37 CFR §201.40(b) security-research exemption).
+- **2026-05-11**, Community-research GitHub corpus acquired (24 repos); identifier-type extensions for LA-bit pairing, Drone Remote ID, and ALPR/camera taxonomy landed; promotion-cycle-1 closed.
+- **2026-05-12**, Promotion-cycle-2 closed (~423 promotions); `primary_registry` source-type band introduced for registry-class allocators; 481 FAA RID drone_id_prefix promotions; Lynceus mapping populated for new identifier_types.
+- **2026-05-13**, `manufacturer_app` sub-banding for vendor companion apps; behavioral_signatures sibling export (`argus_export_behavioral_signatures.json`); first behavioral_signatures population (0 → 55 from Marlin NDSS 2025); sources reclassification sweep (808 reclassifications); `source_reclassifications` audit table introduced.
+- **2026-05-14**, Final release-readiness pass: IEEE PII triage and promotion (3,446 Class A); community-research deferred-dir Phase 2 close (145 promotions + 38 behavioral-signature backfills); Feist facts-only doctrine codified for public-but-unlicensed sources; final pre-release cleanup; v1.0.0 ship-readiness verified.
 
 ### Known limitations + post-v1.0.0 roadmap
 
-Argus's v1.0.0 coverage is **intentionally narrow at this baseline** — do not assume comprehensive coverage of any specific surveillance equipment category. Expansion comes via the community contribution flow (standard GitHub PR + issue process) plus the following queued post-v1.0.0 work:
+Argus's v1.0.0 coverage is **intentionally narrow at this baseline**, do not assume comprehensive coverage of any specific surveillance equipment category. Expansion comes via the community contribution flow (standard GitHub PR + issue process) plus the following queued post-v1.0.0 work:
 
 **Documented held items with rationale** (framed as "known held items; contribution welcome" not "incomplete data"):
 
 - **31 behavioral_signatures** held pending second-source corroboration (substantive research-and-scrape work). Currently HELD with explicit rationale at `behavioral_signatures.notes`.
-- **62 Class B sustained holds** (IEEE-derived individual-attributed-pii_sustain rows with `notes.registry_xcheck_attempted=true`) — sustained per the PII default-to-HOLD rule; predominantly Lumiplan Duhamel ×9 (French digital-signage corporate; no FCC registration), individual-shaped names, and ~50 unique singletons with no surveillance-tech-vendor or FCC-grantee evidence.
-- **133 IEEE Private permanent holds** (`pii_review_disposition='ieee_private_registrant_permanent_hold'`) — IEEE OUI registrations declared as private at the registry source; ownership cannot be confirmed.
+- **62 Class B sustained holds** (IEEE-derived individual-attributed-pii_sustain rows with `notes.registry_xcheck_attempted=true`), sustained per the PII default-to-HOLD rule; predominantly Lumiplan Duhamel ×9 (French digital-signage corporate; no FCC registration), individual-shaped names, and ~50 unique singletons with no surveillance-tech-vendor or FCC-grantee evidence.
+- **133 IEEE Private permanent holds** (`pii_review_disposition='ieee_private_registrant_permanent_hold'`), IEEE OUI registrations declared as private at the registry source; ownership cannot be confirmed.
 - **142 round-2 held rows** (107 vocabulary-extension candidates + 19 behavioral-signature deferred + 15 CVE false-positive entries filed to the conflicts table + 1 attribution-pending Motorola/Vigilant).
-- **Known sources-row metadata discrepancy** — sources 1/2/3/7 carry historic `source_type='regulatory'` metadata pre-dating the source-type taxonomy refinement; identifier-row data is correctly labeled `primary_registry`. Cleanup queued post-ship. Downstream consumers filtering on `sources.source_type='primary_registry'` should also include `sources.id IN (1,2,3,7)` until the cleanup lands.
+- **Known sources-row metadata discrepancy**, sources 1/2/3/7 carry historic `source_type='regulatory'` metadata pre-dating the source-type taxonomy refinement; identifier-row data is correctly labeled `primary_registry`. Cleanup queued post-ship. Downstream consumers filtering on `sources.source_type='primary_registry'` should also include `sources.id IN (1,2,3,7)` until the cleanup lands.
 
 **Future-enrichment hooks (operationally inert at v1.0.0):**
 
-- **WiGLE integration** — the `wigle_anchor_priority` table ships at v1.0.0 populated with 80,697 pre-computed priority rankings but operationally inert (WiGLE API gated on user's own quota grant per WiGLE Terms of Service). Post-grant, the WiGLE integration activates without re-derivation.
+- **WiGLE integration**, the `wigle_anchor_priority` table ships at v1.0.0 populated with 80,697 pre-computed priority rankings but operationally inert (WiGLE API gated on user's own quota grant per WiGLE Terms of Service). Post-grant, the WiGLE integration activates without re-derivation.
 
 **Substantive expansion areas (planned post-v1.0.0):**
 
-- **Future community-source-acquisition waves** — additional crowdsourced + community-OSINT + court/FOIA + news/forum source families pending admission-review under the project's source-admission workflow.
-- **iOS vendor companion app coverage** — vendor companion app static analysis extended to iOS APK/IPA binaries (v1.0.0 was Android-first; iOS adds vendors with iOS-exclusive companion apps).
-- **Skydio Enterprise alt-channel scope** — `com.skydio.enterprise` Android package is law-enforcement-only distribution; alt-channel sourcing approach is a future scope proposal.
-- **107 round-2 vocabulary held candidates** — the operator may extend the `identifier_type` enum or accept the candidates as out-of-scope at a future amendment boundary.
-- **Lynceus MAP extensions for net-new identifier_types** — `ble_service_uuid` and `ble_company_id` are already aliased to existing pattern_types; other net-new types are currently DROPPED-class. Lynceus integrators may surface specific MAP needs in v1.x patch releases.
-- **License-posture composition extensions** — additional downstream-consumer guidance may emerge if new license-posture classes surface.
+- **Future community-source-acquisition waves**, additional crowdsourced + community-OSINT + court/FOIA + news/forum source families pending admission-review under the project's source-admission workflow.
+- **iOS vendor companion app coverage**, vendor companion app static analysis extended to iOS APK/IPA binaries (v1.0.0 was Android-first; iOS adds vendors with iOS-exclusive companion apps).
+- **Skydio Enterprise alt-channel scope**, `com.skydio.enterprise` Android package is law-enforcement-only distribution; alt-channel sourcing approach is a future scope proposal.
+- **107 round-2 vocabulary held candidates**, the operator may extend the `identifier_type` enum or accept the candidates as out-of-scope at a future amendment boundary.
+- **Lynceus MAP extensions for net-new identifier_types**, `ble_service_uuid` and `ble_company_id` are already aliased to existing pattern_types; other net-new types are currently DROPPED-class. Lynceus integrators may surface specific MAP needs in v1.x patch releases.
+- **License-posture composition extensions**, additional downstream-consumer guidance may emerge if new license-posture classes surface.
 
 ### Build process
 
@@ -1184,16 +1184,16 @@ Argus v1.0.0 is the product of public-record research and aggregation across 43 
 
 Particular thanks to the upstream data sources whose licenses make this work possible:
 
-- **EFF + UNLV Reynolds School of Journalism Atlas of Surveillance** (CC-BY-NC-SA-4.0) — the largest single deployment-observation corpus integrated (15,071 rows).
-- **DeFlock** (ODbL-1.0) — ALPR-camera deployment observations integrated under license-compatible terms (101,597 rows).
-- **IEEE Standards Association OUI registries** — public factual data anchoring the entire OUI→manufacturer attribution chain (~70,000 rows across MA-L/MA-M/MA-S/IAB).
-- **FCC Equipment Authorization System** — public regulatory data anchoring the `fcc_id_anchored` disambig allowlist (50,153 grantees).
-- **FAA Remote ID public registry** — public registry data anchoring the drone-class `drone_id_prefix` identifier-type cluster (427 active rows).
-- **Bluetooth SIG company-identifier registry** — `ble_manufacturer_id` allocations (3,971 active rows).
-- **NDSS 2025 Marlin: Detecting IMSI-Catchers by Characterizing Identity Exposing Messages in Cellular Traffic** — academic foundation for the `behavioral_signatures` table (53 raw observations contributing 55+38=93 corroborated signatures).
-- **22 canonical community-OSINT contributors** + **5 secondary-batch contributors** — public open-source-intelligence research repositories listed at [CREDITS.md §5](CREDITS.md).
-- **GainSec / anti-crime-ecosystem-research + flock-safety-falcon-sparrow-alpr-edl-firehose** — firmware-binary-anchored extracts (CC-BY-NC-ND-4.0 with research-use clause + NO_LICENSE_DECLARED under the Feist facts-only regime).
-- **Wireshark community** — `manuf` file cross-reference for vendor-name curation.
+- **EFF + UNLV Reynolds School of Journalism Atlas of Surveillance** (CC-BY-NC-SA-4.0), the largest single deployment-observation corpus integrated (15,071 rows).
+- **DeFlock** (ODbL-1.0), ALPR-camera deployment observations integrated under license-compatible terms (101,597 rows).
+- **IEEE Standards Association OUI registries**, public factual data anchoring the entire OUI→manufacturer attribution chain (~70,000 rows across MA-L/MA-M/MA-S/IAB).
+- **FCC Equipment Authorization System**, public regulatory data anchoring the `fcc_id_anchored` disambig allowlist (50,153 grantees).
+- **FAA Remote ID public registry**, public registry data anchoring the drone-class `drone_id_prefix` identifier-type cluster (427 active rows).
+- **Bluetooth SIG company-identifier registry**, `ble_manufacturer_id` allocations (3,971 active rows).
+- **NDSS 2025 Marlin: Detecting IMSI-Catchers by Characterizing Identity Exposing Messages in Cellular Traffic**, academic foundation for the `behavioral_signatures` table (53 raw observations contributing 55+38=93 corroborated signatures).
+- **22 canonical community-OSINT contributors** + **5 secondary-batch contributors**, public open-source-intelligence research repositories listed at [CREDITS.md §5](CREDITS.md).
+- **GainSec / anti-crime-ecosystem-research + flock-safety-falcon-sparrow-alpr-edl-firehose**, firmware-binary-anchored extracts (CC-BY-NC-ND-4.0 with research-use clause + NO_LICENSE_DECLARED under the Feist facts-only regime).
+- **Wireshark community**, `manuf` file cross-reference for vendor-name curation.
 
 ### Integrating with v1.0.0
 
@@ -1216,8 +1216,8 @@ This is the first tagged release; there is no prior version to migrate from. Dow
 
 The project will tag releases when substantive new data, new source families, or schema-impacting changes land. Notable post-v1.0.0 work queued (per "Known limitations + post-v1.0.0 roadmap" above):
 
-- **v1.0.x patch releases** — refresh post-integration of any new public-record source family that completes the source-admission workflow during the post-v1.0.0 cycle; refresh post-resolution of held items (behavioral_signatures second-source corroboration; Class B re-triage if new registries become available).
-- **v1.1.0** — projected to ship iOS vendor companion app coverage + future community-source-acquisition waves + Skydio Enterprise alt-channel resolution.
+- **v1.0.x patch releases**, refresh post-integration of any new public-record source family that completes the source-admission workflow during the post-v1.0.0 cycle; refresh post-resolution of held items (behavioral_signatures second-source corroboration; Class B re-triage if new registries become available).
+- **v1.1.0**, projected to ship iOS vendor companion app coverage + future community-source-acquisition waves + Skydio Enterprise alt-channel resolution.
 
 Release cadence: tagged releases when substantive change accumulates; no fixed schedule. Higher-major-version releases (v2.x+) are not projected at the v1.0.0 baseline; they would be documented at the time the change set triggering them is approved.
 

@@ -20,18 +20,18 @@ Argus is a database rather than a real-time monitor. It lists the wireless and r
 
 Tools to surveil people are abundant; tools to detect surveillance are not. The asymmetry favors the surveillor. Argus narrows the gap by making vendor identifiers queryable in a single place with full provenance for every row.
 
-**Argus is for *detection* of public-record-derived surveillance equipment identifiers — NOT for evasion of legitimate law-enforcement interaction.** Argus operates as a passive identification database: identifiers and metadata only, no active interference, no jamming, no attack tooling, no deanonymization of individual officers or agencies. The scope is *equipment categories*, not people.
+**Argus is for *detection* of public-record-derived surveillance equipment identifiers, NOT for evasion of legitimate law-enforcement interaction.** Argus operates as a passive identification database: identifiers and metadata only, no active interference, no jamming, no attack tooling, no deanonymization of individual officers or agencies. The scope is *equipment categories*, not people.
 
 ## What's in the dataset
 
 At v1.6.10:
 
-- **43,255 active canonical identifiers** — the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.10) is the Wave-2 multi-cohort release: it mints the `smart_lock` and `smart_home_hub` categories and admits 132 net-new identifiers across six cohorts plus an Axon body-cam increment; see the release notes below for the breakdown.
-- **156 manufacturers** — surveillance vendors classified by what they make
-- **95 upstream sources** — every identifier traces back to at least one of these public sources, with a direct URL citation
-- **20 device categories** — what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
-- **58 identifier types** — the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
-- **214 behavioral signatures** — cellular-control-plane patterns associated with IMSI-catcher detection
+- **43,255 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.10) is the Wave-2 multi-cohort release: it mints the `smart_lock` and `smart_home_hub` categories and admits 132 net-new identifiers across six cohorts plus an Axon body-cam increment; see the release notes below for the breakdown.
+- **156 manufacturers**, surveillance vendors classified by what they make
+- **95 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
+- **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
+- **58 identifier types**, the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
+- **214 behavioral signatures**, cellular-control-plane patterns associated with IMSI-catcher detection
 
 An *identifier* is a piece of data that pinpoints a vendor's hardware on a wire or radio band: an OUI (the first 24 bits of a MAC address, which maps to a manufacturer), a BLE service UUID broadcast by a device, an FCC grantee code on a regulatory filing, or a hostname embedded in a vendor's companion app. When a downstream scanner observes one of these in the wild, it can use Argus to identify what vendor and what device category produced it.
 
@@ -58,22 +58,22 @@ For walkthroughs (querying the CSV, building a watchlist, integrating with a sca
 
 Argus covers surveillance equipment used by US law enforcement and adjacent operators, organized across these device categories:
 
-- **ALPR (automated license plate readers)** — Flock Safety, Genetec, Rekor, Vigilant Solutions
-- **IMSI catchers** — Harris, Digital Receiver Technology, Engility, KeyW, Jacobs, Septier, Rohde & Schwarz
-- **Body cameras** — Axon, Getac, Reveal, WatchGuard Video
-- **Police radios** — Kenwood, Motorola Solutions (multi-purpose subset)
-- **Drones** — DJI, Parrot, BRINC, Skydio
-- **Counter-drone systems** — Anduril, Dedrone, DroneShield, Fortem, Citadel Defense, Black Sage, D-Fend, AeroDefense, Echodyne, Liteye, Robin Radar, MyDefence, Sensofusion
-- **CCTV / IP cameras** — Hikvision, Dahua, Axis, Avigilon, Verkada, Eagle Eye Networks, Rhombus, Hanwha, Milestone, Pelco, Uniview, Tiandy, Vivotek (NDAA §889 attribution preserved on Hikvision/Dahua/Uniview/Tiandy)
-- **Persistent surveillance** — Elbit Systems of America, General Atomics, TCOM, Persistent Surveillance Systems (aerostats, towers, strategic-altitude platforms)
-- **Through-wall radar** — Camero, NIITEK, TiaLinx (UWB; FCC §15.519 LE-only carveout)
-- **Fleet telematics** — Geotab, Verizon Connect, Samsara, Motive, Lytx, Omnitracs
-- **Electronic monitoring (ankle monitors)** — BI Incorporated, Attenti, STOP, Sentinel Offender Services, Track Group
-- **Gunshot detection** — SoundThinking (ShotSpotter)
-- **Forensic extraction tools** — Cellebrite, Magnet Forensics, Berla, Hak5
-- **Face recognition** — Clearview AI, BriefCam
+- **ALPR (automated license plate readers)**, Flock Safety, Genetec, Rekor, Vigilant Solutions
+- **IMSI catchers**, Harris, Digital Receiver Technology, Engility, KeyW, Jacobs, Septier, Rohde & Schwarz
+- **Body cameras**, Axon, Getac, Reveal, WatchGuard Video
+- **Police radios**, Kenwood, Motorola Solutions (multi-purpose subset)
+- **Drones**, DJI, Parrot, BRINC, Skydio
+- **Counter-drone systems**, Anduril, Dedrone, DroneShield, Fortem, Citadel Defense, Black Sage, D-Fend, AeroDefense, Echodyne, Liteye, Robin Radar, MyDefence, Sensofusion
+- **CCTV / IP cameras**, Hikvision, Dahua, Axis, Avigilon, Verkada, Eagle Eye Networks, Rhombus, Hanwha, Milestone, Pelco, Uniview, Tiandy, Vivotek (NDAA §889 attribution preserved on Hikvision/Dahua/Uniview/Tiandy)
+- **Persistent surveillance**, Elbit Systems of America, General Atomics, TCOM, Persistent Surveillance Systems (aerostats, towers, strategic-altitude platforms)
+- **Through-wall radar**, Camero, NIITEK, TiaLinx (UWB; FCC §15.519 LE-only carveout)
+- **Fleet telematics**, Geotab, Verizon Connect, Samsara, Motive, Lytx, Omnitracs
+- **Electronic monitoring (ankle monitors)**, BI Incorporated, Attenti, STOP, Sentinel Offender Services, Track Group
+- **Gunshot detection**, SoundThinking (ShotSpotter)
+- **Forensic extraction tools**, Cellebrite, Magnet Forensics, Berla, Hak5
+- **Face recognition**, Clearview AI, BriefCam
 - **Concealed surveillance cameras**
-- **Multi-purpose vendors** — when a vendor's equipment can't cleanly map to a single device category (e.g., Cradlepoint, Sierra Wireless, L3Harris, Northrop Grumman, Lockheed Martin, Trimble, Bosch Security Systems), they're flagged `device_category='unknown'` and excluded from the high-confidence Lynceus export to avoid false-positive risk.
+- **Multi-purpose vendors**, when a vendor's equipment can't cleanly map to a single device category (e.g., Cradlepoint, Sierra Wireless, L3Harris, Northrop Grumman, Lockheed Martin, Trimble, Bosch Security Systems), they're flagged `device_category='unknown'` and excluded from the high-confidence Lynceus export to avoid false-positive risk.
 
 **What's NOT covered:**
 
@@ -88,19 +88,19 @@ Coverage is intentionally narrow per category. Argus has 156 vendors, but most c
 
 **v1.6.10** is the most recent release: the Wave-2 multi-cohort cycle (MAC-392), bundled under one tag with the board-ratified Axon body-cam GATT increment (MAC-352). It admits **132 net-new identifiers** across six device cohorts and mints two durable categories, `smart_lock` and `smart_home_hub` (migration 0033, CP46, schema_version 32 → 33). Active identifiers move 43,123 → 43,255; the standard export grows 900 → 1,014 and the high-confidence export 351 → 464. The new feed entries are smart locks (Kwikset, August, Ultraloq, Schlage, Yale; 56 rows), pet and kid cellular trackers (Fi, Whistle, Jiobit; 54 rows), a Samsung SmartThings hub, a Pebblebee Bluetooth tracker, and the two Axon body-cam service UUIDs. **Honest scope note:** the 10 cohort-1 spy-camera `ssid_pattern` families and the 5 cohort-6 `ble_local_name` rows are captured in the registry and the full CSV, but they do **not** reach the Lynceus JSON feeds under v0.2 (the writer drops regex and local-name patterns per `export_lynceus.py` §4.4), so a scanner does not alert on those spy-cam SSIDs today. Closing that gap is the deferred follow-up MAC-420. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` (CP46) for the full record.
 
-### Prior release — v1.6.9
+### Prior release, v1.6.9
 
 **v1.6.9** was the dedicated BLE-tracker fast-follow (MAC-387): it minted the `bluetooth_tracker` device category (schema_version 31 → 32) and made 46 captured tracker rows (AirTag, Tile, Samsung SmartTag, Chipolo, AirGuard) export-visible by absorbing the MAC-359 `ble_service_uuid → ble_uuid` map, with no net-new identifiers (active unchanged at 43,123). The standard export grew 737 → 900 and the high-confidence export 348 → 351. The Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor false-positive magnet, was caught in validation and held at `unknown`, absent from both feeds. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
-### Prior release — v1.6.8
+### Prior release, v1.6.8
 
 **v1.6.8** was the widest-net sourcing cycle the project has run: **81 net-new identifiers** across five device cohorts (Bluetooth trackers and stalkerware, ALPR and cop-car, drones, body cams and acoustic, consumer surveillance) plus a deferred-revival cleanup, with 25 bad OUIs withdrawn from the standard feed (active 43,213 → 43,123). The 26 consumer-camera OUIs (Ring, Wyze, Arlo, Blink) grew the high-confidence export 322 → 348; the Bluetooth-tracker rows landed captured-but-suppressed, with their feed-visibility deferred to the v1.6.9 fast-follow above. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
-### Prior release — v1.6.7
+### Prior release, v1.6.7
 
 **v1.6.7** layered +290 identifiers on v1.6.6 across two cohorts: the R2 SoC chipset set and the Flock/cop-car Android-app static-analysis cluster (active 42,923 → 43,213). The JSON feeds held flat because every new row was an Argus-internal type outside the Lynceus watchlist schema. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
-### Prior release — v1.6.6
+### Prior release, v1.6.6
 
 **v1.6.6** registered 15 new surveillance brands and brought in the deferred R2 new-vendor cohort (+1,022) plus Reolink firmware at full volume. See [`CHANGELOG.md`](CHANGELOG.md) for the breakdown.
 
@@ -119,41 +119,41 @@ The repo ships with `db/argus.db` and the export files already populated, so rea
 
 External contribution is welcome:
 
-- **New identifiers / new sources** — submit a GitHub PR with per-row source citations. Every observation needs a concrete file path (e.g., `https://github.com/Owner/Repo/blob/<sha>/<path>#L<line>`), not just a bare repo URL.
-- **No PII** — Argus identifies *equipment*, not people. Officer names, badge numbers, home addresses don't ship.
-- **Provenance-first** — promotion to the canonical state requires a `raw_observations` ancestor + cited source band. The discipline framework is documented in [`docs/engineering/PROJECT_BIBLE.md`](docs/engineering/PROJECT_BIBLE.md) and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md).
-- **Vendor attribution disputes** — open a GitHub issue. Argus's doctrinal grounding is Feist factual-data + 17 USC §1201(j) security-research exemption + 37 CFR §201.40(b) + nominative fair use.
+- **New identifiers / new sources**, submit a GitHub PR with per-row source citations. Every observation needs a concrete file path (e.g., `https://github.com/Owner/Repo/blob/<sha>/<path>#L<line>`), not just a bare repo URL.
+- **No PII**, Argus identifies *equipment*, not people. Officer names, badge numbers, home addresses don't ship.
+- **Provenance-first**, promotion to the canonical state requires a `raw_observations` ancestor + cited source band. The discipline framework is documented in [`docs/engineering/PROJECT_BIBLE.md`](docs/engineering/PROJECT_BIBLE.md) and [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md).
+- **Vendor attribution disputes**, open a GitHub issue. Argus's doctrinal grounding is Feist factual-data + 17 USC §1201(j) security-research exemption + 37 CFR §201.40(b) + nominative fair use.
 
-For schema-impacting changes (new tables, new `identifier_type` enum values, new `source_type` bands), coordinate with the amendment process documented in [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) — schema changes pair with formal amendment entries.
+For schema-impacting changes (new tables, new `identifier_type` enum values, new `source_type` bands), coordinate with the amendment process documented in [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md), schema changes pair with formal amendment entries.
 
 ## Documentation map
 
-- [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md) — version-by-version history (v1.0.0 through v1.6.10).
-- [`CREDITS.md`](CREDITS.md) — per-source attribution and per-vendor lexicon.
-- [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) — developer setup (clone, verify, migrations, tests).
-- [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) — how Argus integrates sources, confidence model, dedup logic.
-- [`docs/engineering/DATA_DICTIONARY.md`](docs/engineering/DATA_DICTIONARY.md) — schema reference for every table, column, enum value.
-- [`docs/engineering/PROJECT_BIBLE.md`](docs/engineering/PROJECT_BIBLE.md) — formal canonical specification.
-- [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md) — append-only log of changes to the project's rules.
+- [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), start here. Plain-language overview, walkthroughs, coverage caveats.
+- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.10).
+- [`CREDITS.md`](CREDITS.md), per-source attribution and per-vendor lexicon.
+- [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md), developer setup (clone, verify, migrations, tests).
+- [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md), how Argus integrates sources, confidence model, dedup logic.
+- [`docs/engineering/DATA_DICTIONARY.md`](docs/engineering/DATA_DICTIONARY.md), schema reference for every table, column, enum value.
+- [`docs/engineering/PROJECT_BIBLE.md`](docs/engineering/PROJECT_BIBLE.md), formal canonical specification.
+- [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md), append-only log of changes to the project's rules.
 
 ## Downstream consumers
 
 Argus is designed as a producer of detection data for downstream RF-scanner consumers:
 
-- **[Lynceus](https://github.com/kevwillow/lynceus-warden)** (Raspberry-Pi-class RF security monitor) — consumes the JSON exports; matches on `{pattern, pattern_type}` against live RF observations.
-- **[Rayhunter](https://github.com/EFForg/rayhunter)** (cellular IMSI-catcher detector on supported modems) — consumes the behavioral signatures export.
-- **Operator-side combined deployment** — an operator may run Lynceus + Rayhunter together; the two exports are non-overlapping (wire-observable patterns vs cellular-control-plane behavior).
+- **[Lynceus](https://github.com/kevwillow/lynceus-warden)** (Raspberry-Pi-class RF security monitor), consumes the JSON exports; matches on `{pattern, pattern_type}` against live RF observations.
+- **[Rayhunter](https://github.com/EFForg/rayhunter)** (cellular IMSI-catcher detector on supported modems), consumes the behavioral signatures export.
+- **Operator-side combined deployment**, an operator may run Lynceus + Rayhunter together; the two exports are non-overlapping (wire-observable patterns vs cellular-control-plane behavior).
 
-**Operator-stack self-exclusion**: Argus operator-side hardware MUST NOT appear in the high-confidence export — that covers Lynceus host hardware (Raspberry Pi OUIs) and Rayhunter-supported modems (Orbic RC400L, FY UZ801, PinePhone Quectel, Wingtech CT2MHS01, T-Mobile TMOHS1, TP-Link M7350/M7310). This is mandatory regardless of source confidence.
+**Operator-stack self-exclusion**: Argus operator-side hardware MUST NOT appear in the high-confidence export. That covers Lynceus host hardware (Raspberry Pi OUIs) and Rayhunter-supported modems (Orbic RC400L, FY UZ801, PinePhone Quectel, Wingtech CT2MHS01, T-Mobile TMOHS1, TP-Link M7350/M7310). This is mandatory regardless of source confidence.
 
 ## License
 
 Argus ships under three licenses by artifact class:
 
-- **Code:** [AGPL-3.0-or-later](LICENSE) — network-use copyleft for derivative scanners.
+- **Code:** [AGPL-3.0-or-later](LICENSE), network-use copyleft for derivative scanners.
 - **Dataset:** [ODbL-1.0](LICENSE-DATA) with three-layer per-row license-posture composition.
-- **Documentation:** [CC-BY-SA-4.0](LICENSE-DOCS) — ShareAlike for derivative documentation.
+- **Documentation:** [CC-BY-SA-4.0](LICENSE-DOCS), ShareAlike for derivative documentation.
 
 **For users producing derived datasets:** honor the upstream license carry-forward chain. Commercial deployments MUST exclude `deployment_observations.LICENSE='CC-BY-NC-SA-4.0'` rows (the EFF Atlas of Surveillance non-commercial clause); standard ODbL ShareAlike applies otherwise. See [`CREDITS.md`](CREDITS.md) §9 for the re-derivation discipline.
 
@@ -182,7 +182,7 @@ I plan and orchestrate this project myself, using Claude chat as a strategic-pla
 
 The AI agents are highly capable executors with substantial scoping autonomy inside the constraints I set. They surface findings, propose decompositions, escalate when something needs ratification, and run extensive verification work I couldn't do at scale manually. But they don't decide canonical contract. I do.
 
-This was not vibe-coded. Argus has 38 documented amendments to its canonical contract and 18 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough — provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
+This was not vibe-coded. Argus has 38 documented amendments to its canonical contract and 18 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough. Provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
 
 ### Notable technical work
 
@@ -190,13 +190,13 @@ Two areas surfaced data that wasn't otherwise aggregated anywhere queryable:
 
 **Vendor app decompilation.** I downloaded Android APKs of setup and admin apps published by surveillance-equipment vendors (Flock Safety, Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot) and analyzed the binaries for embedded identifier patterns: BLE service UUIDs, MAC address prefixes, vendor-specific protocol fields, and default device names. Vendor setup apps need to recognize and connect to their own equipment, so they ship with the identifiers needed to do that. Decompiling public app-store binaries surfaced this information directly. This is legal reverse-engineering of publicly-distributed software under 17 USC §1201(j) + 37 CFR §201.40(b), but it required doing the work rather than waiting for vendors to publish identifier schemas (they don't).
 
-**GitHub researcher-repo aggregation.** Surveillance equipment has been studied by independent researchers for years — drone RID protocol work (alphafox02/DragonSync), cellular intercept detection (EFForg/rayhunter), BLE stalking-tracker research (seemoo-lab/AirGuard), FAA Remote ID database mirrors (jlrjr's wrapper), and more. The data exists across these projects but had never been pulled into a single queryable database with provenance discipline. Argus aggregates it: every identifier traces back to the specific researcher repo, the specific commit, the specific file path, with proper attribution under the original licenses. This is meta-research synthesis rather than primary discovery, but it makes a large amount of distributed researcher work actually usable.
+**GitHub researcher-repo aggregation.** Surveillance equipment has been studied by independent researchers for years: drone RID protocol work (alphafox02/DragonSync), cellular intercept detection (EFForg/rayhunter), BLE stalking-tracker research (seemoo-lab/AirGuard), FAA Remote ID database mirrors (jlrjr's wrapper), and more. The data exists across these projects but had never been pulled into a single queryable database with provenance discipline. Argus aggregates it: every identifier traces back to the specific researcher repo, the specific commit, the specific file path, with proper attribution under the original licenses. This is meta-research synthesis rather than primary discovery, but it makes a large amount of distributed researcher work actually usable.
 
 ### The discipline framework
 
 The most substantial thing I built is the framework that makes the database verifiable, more than the database itself.
 
-Every active identifier carries source attribution, confidence scoring, source-type classification, and a chain of corroboration. The framework includes hard rules that prevent fabrication (every identifier must trace to a concrete public source), PII discipline (individual-attributed registrations stay held, not promoted), and downstream-consumer protection (downstream scanners receive only high-confidence canonical data). The framework evolved with the work — each substantive amendment is documented with case studies showing what went wrong (or could have gone wrong) and why the rule exists.
+Every active identifier carries source attribution, confidence scoring, source-type classification, and a chain of corroboration. The framework includes hard rules that prevent fabrication (every identifier must trace to a concrete public source), PII discipline (individual-attributed registrations stay held, not promoted), and downstream-consumer protection (downstream scanners receive only high-confidence canonical data). The framework evolved with the work, each substantive amendment is documented with case studies showing what went wrong (or could have gone wrong) and why the rule exists.
 
 Building this with AI tools is what made it possible at the scale and velocity it happened. Building it deliberately, with operator-final-say discipline and a binding correctness framework, is what makes the output trustworthy.
 
@@ -206,14 +206,14 @@ Building this with AI tools is what made it possible at the scale and velocity i
 
 This project was built as a hobby by one person, a couple of computers, and a couple of LLMs. It burned through a fair bit of token cost and a lot of personal time, but it was worth it. If Argus saves you some time, or you just think it's cool, consider tossing a few sats my way. No pressure, but coffee and compute aren't free.
 
-- **Star this repo** — it's free and it helps others find the project
-- **Submit an issue or PR** — bug reports and feature ideas welcome
-- **Crypto donations** — if you're feeling generous:
-  - **BTC** — `bc1qmtzjlc2cw2y45nea2jqf4deh946j8mq502zvsw`
-  - **BTC (Unstoppable Domain)** — `gurutech.blockchain`
-  - **LTC** — `ltc1qf32n038a90ulajlq6zz67r3n2myewpjlj2ej6w`
-  - **ETH** — `0x9bf3311c4721fe37f58913dc57c2bf1722dc8a0f`
-  - **BCH** — `bitcoincash:qr2l294kuve9cw48u7xek9nklhed066ycvjtj4ymq9`
-  - **SOL** — `CuraE8usMpSrAhpY2QiWaQGoBjyJzkSaUNP6kRgAzscU`
+- **Star this repo**, it's free and it helps others find the project
+- **Submit an issue or PR**, bug reports and feature ideas welcome
+- **Crypto donations**, if you're feeling generous:
+  - **BTC**, `bc1qmtzjlc2cw2y45nea2jqf4deh946j8mq502zvsw`
+  - **BTC (Unstoppable Domain)**, `gurutech.blockchain`
+  - **LTC**, `ltc1qf32n038a90ulajlq6zz67r3n2myewpjlj2ej6w`
+  - **ETH**, `0x9bf3311c4721fe37f58913dc57c2bf1722dc8a0f`
+  - **BCH**, `bitcoincash:qr2l294kuve9cw48u7xek9nklhed066ycvjtj4ymq9`
+  - **SOL**, `CuraE8usMpSrAhpY2QiWaQGoBjyJzkSaUNP6kRgAzscU`
 
-- **Contact** — kev@gurutechnology.services
+- **Contact**, kev@gurutechnology.services
