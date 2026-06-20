@@ -14,6 +14,48 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.11 - 2026-06-20
+
+A **multi-lane sourcing release** on top of v1.6.10: Wave 3 ([MAC-490](/MAC/issues/MAC-490), canonical write `84f0803`, DB post-sha `97765f5e`). It admits **19 net-new identifiers** (ids 44629-44647) across six harvest lanes, applies the CP47 `ble_company_id → ble_manufacturer_id` export MAP, and proposes the CP50 `ble_local_name` literal/template split. There is **no schema migration** this cycle: schema_version stays **33** (last migration `0033`, CP46). Active identifier count moves **43,255 → 43,274** (+19); total **43,810 → 43,829** (+19, all admissions active, zero supersessions). The standard Lynceus feed grows **1,014 → 1,042** (+28) and the high-confidence feed **464 → 469** (+5); the behavioral-signatures feed is unchanged at **132**. Every admitted value traces to a quotable public source (IEEE OUI registry, ASTM F3411 Remote ID, vendor APK and researcher-repo static analysis, Bluetooth-SIG assigned numbers); each lane was CTO-re-verified against the live database, and the feed deltas below were computed from the actual regen, not estimated.
+
+**Honest feed-reach note (binding).** Two scope facts carry into this release. First, `ble_local_name` literals now reach the runtime feed under the CP50 split: 12 literal local-names are feed-visible, while 14 template local-names (wildcards and per-device suffixes that would over-match) stay held. Second, the cohort-1 spy-camera `ssid_pattern` families remain §4.4 EXPORT-DROPPED because Lynceus v0.2 has no regex matcher, so a scanner still does not alert on those SSIDs today; closing that gap is the deferred follow-up [MAC-420](/MAC/issues/MAC-420). Of the 19 net-new rows, 14 reach the standard JSON feed; the 5 that do not are `unknown`-category OUIs held out by the §11 #13 export ban.
+
+### What's new
+
+- **Drone Remote ID reaches the feed (lane B1, +4).** The ASTM F3411 Remote ID service-data UUID `0xFFFA` (`ble_service_uuid`) and the `org.opendroneid.remoteid` Wi-Fi Aware service name (`wifi_aware_service_name`) are vendor-agnostic Remote ID surfaces, joined by the Teal Drones (`b0:30:c8`) and uAvionix (`54:6f:71`) OUIs. A scanner now alerts on a broadcasting drone by its Remote ID service identifier regardless of airframe vendor.
+- **Body-cam and gunshot-detection identifiers (lane B3, +3).** Two Utility, Inc. body-cam OUIs (`00:09:bc`, `00:16:ed`) plus the Flock Safety `00003000` GATT service UUID (`gunshot_detect`).
+- **Camera and smart-lock OUIs (lanes B2 and B4, +6).** One Bosch Sicherheitssysteme camera OUI (`30:f0:28`, `cctv_camera`) and five `smart_lock` OUIs: August (`78:9c:85`), ASSA ABLOY (`00:17:7a`), iRevo (`98:1b:b5`), Unilock (`14:a1:bf`), and Côte Picarde (`dc:c0:eb`).
+- **Google Find My Device anti-stalking UUID (lane B6, +1).** The Google FMDN sound service UUID `15190001-12f4-c226-88ed-2ac5579f2a85` (`ble_service_uuid`, `bluetooth_tracker`) is a first-party 128-bit identifier with low false-positive risk, admitted as a countersurveillance signal.
+- **Smart-home OUIs captured, not feed-visible (lane B5, +5).** Five `unknown`-category OUIs (Nest x2, Lumi x2, SimpliSafe) land in the registry and CSV but are held out of both JSON feeds by the §11 #13 `unknown`-category export ban; they are security-system parents that do not cleanly attribute to a single surveillance category.
+- **B7 `mesh_radio` mint DECLINED (board ethics ruling).** The proposed mesh-radio category (Meshtastic and activist-mesh hardware) was declined at the board ethics gate and feed-suppressed; nothing from that lane is ingested.
+
+### Schema
+
+- **No migration this cycle.** schema_version stays **33** (last migration `0033`, CP46). The two export-layer changes (CP47, CP50) operate in the Lynceus writer, not the canonical schema.
+
+### Data
+
+- **`identifiers` active:** 43,255 → **43,274** (+19 net-new admissions, zero supersessions).
+- **`identifiers` total:** 43,810 → **43,829** (+19).
+- **Wave-3 net-new rows (ids 44629-44647):** 19 = B1 4 + B2 1 + B3 3 + B4 5 + B5 5 + B6 1.
+- **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change). **device-category enum:** **20** (no change; all six lanes reuse existing categories).
+- **Lynceus standard feed:** 1,014 → **1,042** (+28). 14 of the +28 are this wave's net-new feed-reaching rows; the remaining 14 are previously-captured rows surfaced into the feed by the CP47 `ble_company_id → ble_manufacturer_id` export MAP and the CP50 `ble_local_name` literal split. **high-confidence feed:** 464 → **469** (+5). **behavioral-signatures feed:** **132** (no change). **CSV:** 43,274 rows, matching the active count.
+
+### Export-layer changes
+
+- **CP47 (`ble_company_id → ble_manufacturer_id` §4.4 export MAP).** The symmetric companion to the CP21 `ble_service_uuid → ble_uuid` map, parked since MAC-360 on an id4884 collision, applies here. The value `id23052` is normalized `'67' → '0x0043'` (decimal to canonical hex) so the Bluetooth-SIG company identifier renders consistently. CP47 is applied to canonical in the Wave-3 ingest; its formal Bible amendment rides the board push gate with the rest of this stack.
+- **CP50 (`ble_local_name` literal/template split, proposed).** The Lynceus writer now separates literal BLE local-names (exact GAP advertisement strings, feed-eligible) from template local-names (wildcards and per-device suffixes that would over-match, held). 12 literals reach the feed, 14 templates stay dropped. CP50 is proposed; its Bible amendment is reserved for the board push gate.
+
+### Bible amendments
+
+- **None landed in this commit.** CP47 (applied to canonical in the Wave-3 ingest, STAGE-ONLY) and CP50 (proposed) both carry their formal `BIBLE_AMENDMENTS.md` ratification to the board push gate, consistent with the staging discipline. No ratification is recorded ahead of board sign-off.
+
+### Halts encountered
+
+- None.
+
+---
+
 ## v1.6.10 - 2026-06-14
 
 A **multi-cohort data release** on top of v1.6.9: Wave 2 ([MAC-392](/MAC/issues/MAC-392) / [MAC-419](/MAC/issues/MAC-419), canonical write `3d5785b`), bundled with the board-ratified Axon body-cam GATT micro-increment ([MAC-352](/MAC/issues/MAC-352), board approval `879bbc33`, commit `8ea3352`). The two ship under one tag because MAC-352 is woven into the same canonical write and regen and cannot be cleanly separated. The cycle admits **132 net-new identifiers** across six device cohorts plus the body-cam increment, mints two durable device categories (`smart_lock`, `smart_home_hub`), and is the project's second schema migration in two cycles. schema_version moves **32 → 33** (migration `0033`, CP46). Active identifier count moves **43,123 → 43,255** (+132); total **43,678 → 43,810** (+132, all admissions active, zero supersessions). The standard Lynceus feed grows **900 → 1,014** (+114) and the high-confidence feed **351 → 464** (+113); the behavioral-signatures feed is unchanged at 132. Every admitted value traces to a quotable public source (IEEE OUI registry, Bluetooth-SIG assigned numbers, vendor APK static analysis, bounded WiGLE confirmation passes); each cohort was CTO-re-verified against the live database, and the feed deltas below were computed from the actual regen, not estimated.

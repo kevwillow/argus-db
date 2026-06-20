@@ -24,9 +24,9 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.10:
+At v1.6.11:
 
-- **43,255 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.10) is the Wave-2 multi-cohort release: it mints the `smart_lock` and `smart_home_hub` categories and admits 132 net-new identifiers across six cohorts plus an Axon body-cam increment; see the release notes below for the breakdown.
+- **43,274 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.11) is the Wave-3 multi-lane sourcing release: it admits 19 net-new identifiers across six harvest lanes (drones, cameras, body cams, smart locks, smart-home OUIs, and a Google Find My Device tracker UUID), applies the CP47 BLE manufacturer-ID export map, and proposes the CP50 BLE local-name literal split, with no schema migration; see the release notes below for the breakdown.
 - **156 manufacturers**, surveillance vendors classified by what they make
 - **95 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
 - **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
@@ -43,9 +43,9 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 464 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
-| `exports/argus_export.json` | 1,014 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 43,255 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export_high_confidence.json` | 469 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export.json` | 1,042 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export.csv` | 43,274 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
@@ -86,7 +86,11 @@ Coverage is intentionally narrow per category. Argus has 156 vendors, but most c
 
 ## Most recent release
 
-**v1.6.10** is the most recent release: the Wave-2 multi-cohort cycle (MAC-392), bundled under one tag with the board-ratified Axon body-cam GATT increment (MAC-352). It admits **132 net-new identifiers** across six device cohorts and mints two durable categories, `smart_lock` and `smart_home_hub` (migration 0033, CP46, schema_version 32 → 33). Active identifiers move 43,123 → 43,255; the standard export grows 900 → 1,014 and the high-confidence export 351 → 464. The new feed entries are smart locks (Kwikset, August, Ultraloq, Schlage, Yale; 56 rows), pet and kid cellular trackers (Fi, Whistle, Jiobit; 54 rows), a Samsung SmartThings hub, a Pebblebee Bluetooth tracker, and the two Axon body-cam service UUIDs. **Honest scope note:** the 10 cohort-1 spy-camera `ssid_pattern` families and the 5 cohort-6 `ble_local_name` rows are captured in the registry and the full CSV, but they do **not** reach the Lynceus JSON feeds under v0.2 (the writer drops regex and local-name patterns per `export_lynceus.py` §4.4), so a scanner does not alert on those spy-cam SSIDs today. Closing that gap is the deferred follow-up MAC-420. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` (CP46) for the full record.
+**v1.6.11** is the most recent release: the Wave-3 multi-lane sourcing cycle (MAC-490). It admits **19 net-new identifiers** (ids 44629-44647) across six harvest lanes and ships two export-layer changes, with no schema migration (schema_version stays 33). Active identifiers move 43,255 → 43,274; the standard export grows 1,014 → 1,042 and the high-confidence export 464 → 469. The new rows are drone Remote ID surfaces (the ASTM F3411 `0xFFFA` service UUID and the `org.opendroneid.remoteid` Wi-Fi Aware service, plus Teal and uAvionix OUIs), a Bosch camera OUI, two Utility body-cam OUIs with the Flock Safety gunshot-detection service UUID, five smart-lock OUIs (August, ASSA ABLOY, iRevo, Unilock, Côte Picarde), five `unknown`-category smart-home OUIs (Nest, Lumi, SimpliSafe), and the Google Find My Device anti-stalking sound UUID. **Honest scope note:** the CP50 `ble_local_name` literal split makes 12 literal local-names feed-visible while holding 14 templates, and the five `unknown` smart-home OUIs are captured but held out of the JSON feeds by the §11 #13 export ban. The 10 cohort-1 spy-camera `ssid_pattern` families stay registry-internal because Lynceus v0.2 has no regex matcher; closing that gap is the deferred follow-up MAC-420. The proposed B7 `mesh_radio` category was declined at the board ethics gate and nothing from that lane shipped. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+
+### Prior release, v1.6.10
+
+**v1.6.10** was the Wave-2 multi-cohort cycle (MAC-392), bundled under one tag with the board-ratified Axon body-cam GATT increment (MAC-352). It admits **132 net-new identifiers** across six device cohorts and mints two durable categories, `smart_lock` and `smart_home_hub` (migration 0033, CP46, schema_version 32 → 33). Active identifiers move 43,123 → 43,255; the standard export grows 900 → 1,014 and the high-confidence export 351 → 464. The new feed entries are smart locks (Kwikset, August, Ultraloq, Schlage, Yale; 56 rows), pet and kid cellular trackers (Fi, Whistle, Jiobit; 54 rows), a Samsung SmartThings hub, a Pebblebee Bluetooth tracker, and the two Axon body-cam service UUIDs. **Honest scope note:** the 10 cohort-1 spy-camera `ssid_pattern` families and the 5 cohort-6 `ble_local_name` rows are captured in the registry and the full CSV, but they do **not** reach the Lynceus JSON feeds under v0.2 (the writer drops regex and local-name patterns per `export_lynceus.py` §4.4), so a scanner does not alert on those spy-cam SSIDs today. Closing that gap is the deferred follow-up MAC-420. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` (CP46) for the full record.
 
 ### Prior release, v1.6.9
 
@@ -129,7 +133,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.10).
+- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.11).
 - [`CREDITS.md`](CREDITS.md), per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md), developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md), how Argus integrates sources, confidence model, dedup logic.
