@@ -152,9 +152,11 @@ DROPPED_REASONS: dict[str, str] = {
     # IDENTIFIER_TYPE_TO_PATTERN_TYPE carries the MAP entry; neither module keeps
     # a ble_service_uuid drop bin. Bins here auto-derive from
     # DROPPED_REASONS.values(), so removal is sufficient.
-    # `ble_company_id` STAYS DROPPED — MAC-360 (→ ble_manufacturer_id) is HELD
-    # (id4884); keep this key until that ratification lands.
-    "ble_company_id": "ble_company_id",
+    # `ble_company_id` removed at MAC-360 / CP47 (absorbed CP21 §4.4 MAP →
+    # ble_manufacturer_id), symmetric to MAC-359's ble_service_uuid. SAR-18 parity:
+    # export_lynceus.py IDENTIFIER_TYPE_TO_PATTERN_TYPE carries the MAP entry;
+    # neither module keeps a ble_company_id drop bin. Bins here auto-derive from
+    # DROPPED_REASONS.values(), so removal is sufficient.
     "frequency_band": "frequency_band",
     "ble_protocol_byte": "ble_protocol_byte",
     "operator_profile": "operator_profile",
@@ -577,6 +579,16 @@ def matches_pi_self_exclude(identifier: str, identifier_type: str) -> bool:
     return False
 
 
+# CP50 (§4.4, MAC-420) — ble_local_name literal-vs-template predicate. MUST be
+# byte-identical to export_lynceus.py::_ble_local_name_is_template (the
+# `db/validation/export_lynceus.py::_reconcile` cross-check halts on divergence).
+_BLE_LOCAL_NAME_TEMPLATE_CHARS = "[]()?*+|<>%"
+
+
+def _ble_local_name_is_template(value: str) -> bool:
+    return any(ch in value for ch in _BLE_LOCAL_NAME_TEMPLATE_CHARS)
+
+
 def _assign_drop_bin(
     row: ActiveRow,
     confidence_floor: int,
@@ -613,12 +625,16 @@ def _assign_drop_bin(
         return "device_fingerprint"
     if row.identifier_type == "ssid_pattern":
         return "ssid_pattern"
-    # CP13 (§4.4) — Wave G analytical-only types. Each drops to its own bin
-    # so the tally cleanly shows what's carried in the canonical DB but
-    # withheld from Lynceus (no GAP local-name matching, no characteristic
-    # discovery, no codename ingestion in v0.3).
-    if row.identifier_type == "ble_local_name":
+    # CP13 / CP50 (§4.4, MAC-420) — ble_local_name: LITERAL advertised names
+    # survive (MAP → feed, exact GAP local-name match); TEMPLATED / regex forms
+    # drop to the ble_local_name bin (Lynceus v0.3 has no template matcher).
+    # Mirror of export_lynceus.py::_classify_row — the `_reconcile` map-vs-writer
+    # cross-check in export_lynceus.py halts on any divergence.
+    if row.identifier_type == "ble_local_name" and _ble_local_name_is_template(
+        row.identifier
+    ):
         return "ble_local_name"
+    # ble_characteristic + product_family_codename stay full-DROPPED (CP13).
     if row.identifier_type == "ble_characteristic":
         return "ble_characteristic"
     if row.identifier_type == "product_family_codename":

@@ -123,6 +123,22 @@ IDENTIFIER_TYPE_TO_PATTERN_TYPE: dict[str, str | None] = {
     # tracks; Argus exports unconditionally regardless of Lynceus scanner
     # support state).
     "ble_manufacturer_id": "ble_manufacturer_id",  # MAP — new pattern_type; BLE adv manuf_data[0:2] match
+    # CP50 (§4.4, MAC-420) — ble_local_name LITERAL advertised-name exact match.
+    # Conditional MAP: only literal values reach this entry; templated/regex forms
+    # are DROPPED earlier in _classify_row via _ble_local_name_is_template. Argus
+    # exports unconditionally regardless of Lynceus scanner local-name support
+    # state (architectural-separation policy). Proposed slot CP50 — CP48=§11#22
+    # reserved, CP49 contested by MAC-478/489 drafts; board finalizes CP numbering
+    # at the push gate (see operator_review/MAC-490).
+    "ble_local_name": "ble_local_name",  # MAP — CP50 literal advertised-name exact match
+    # CP21 (§4.4) — symmetric to the MAC-359 ble_service_uuid alias-collapse:
+    # `ble_company_id` IS the SIG company-id variant of `ble_manufacturer_id`
+    # (PROJECT_BIBLE.md:279, board e246a32a, MAC-101 §2.5). Un-held at MAC-360 /
+    # CP47. MUST ride the ingest gate COUPLED with the id23052 '67'->'0x0043'
+    # normalize (scripts/mac360_cp47_ble_company_id_normalize_apply.py) — a regen
+    # before that mutation lands would ship the malformed decimal '67'. id4884
+    # (ble_manufacturer_id 0x0043, unknown) is unknown-banned → no feed dup.
+    "ble_company_id": "ble_manufacturer_id",  # MAP — CP21 §4.4 alias-collapse (MAC-360 / CP47)
     "drone_id_prefix": "drone_id_prefix",  # MAP — new pattern_type; Remote ID prefix string match (WiFi NAN/Beacon/BLE Legacy 4.x); BLE5 LE Coded PHY is a current-hardware boundary
     "wifi_aware_service_name": "wifi_aware_service_name",  # MAP — new pattern_type; WiFi NAN service-name UTF-8 match; capability-gated by Lynceus-side NAN support (consumer-carries-state)
     # CP28 (§4.4) — Wave H desktop-axis vendor-registered non-BLE cluster MAP case (1 entry).
@@ -163,9 +179,10 @@ DROPPED_REASONS: dict[str, str] = {
     # `ble_service_uuid` MOVED to IDENTIFIER_TYPE_TO_PATTERN_TYPE (MAP → ble_uuid)
     # at MAC-359 — CP21 §4.4 alias-collapse, code-vs-Bible gap closed (absorbed
     # at MAC-388). No drop bin retained for it (see bins dict below).
-    # `ble_company_id` STAYS DROPPED — MAC-360 (→ ble_manufacturer_id) is HELD
-    # (id4884); do NOT move it without that ratification.
-    "ble_company_id": "ble_company_id",  # Company-id variant of ble_manufacturer_id; MAC-360 HELD/DROPPED
+    # `ble_company_id` MOVED to IDENTIFIER_TYPE_TO_PATTERN_TYPE (MAP → ble_manufacturer_id)
+    # at MAC-360 / CP47 — CP21 §4.4 alias-collapse, symmetric to MAC-359's
+    # ble_service_uuid. No drop bin retained (see bins dict below). Rides the
+    # ingest gate coupled with the id23052 normalize.
     "frequency_band": "frequency_band",  # Parametric (GSM900/DCS1800/etc.) — not wire-pattern
     "ble_protocol_byte": "ble_protocol_byte",  # Sub-field byte — too coarse for Lynceus match
     "operator_profile": "operator_profile",  # G-17 corporate operator entity — analytical-only
@@ -566,6 +583,20 @@ def _format_description(row: ActiveRow) -> str:
     return DESCRIPTION_VENDOR_UNATTRIBUTED
 
 
+# CP50 (§4.4, MAC-420) — ble_local_name literal-vs-template predicate. A literal
+# advertised name (e.g. "Flock", "FS Ext Battery", "whistle3") is an exact GAP
+# complete-local-name string Lynceus can match byte-for-byte. A template carries
+# regex/family metacharacters (e.g. "flock[_-]?", "(cellebrite|ufed)[_-]?",
+# "flipper <name>") and stays DROPPED until Lynceus gains a template matcher.
+# MUST be byte-identical to coverage_matrix.py::_ble_local_name_is_template
+# (the _reconcile cross-check halts on any divergence).
+_BLE_LOCAL_NAME_TEMPLATE_CHARS = "[]()?*+|<>%"
+
+
+def _ble_local_name_is_template(value: str) -> bool:
+    return any(ch in value for ch in _BLE_LOCAL_NAME_TEMPLATE_CHARS)
+
+
 def _classify_row(
     row: ActiveRow,
     *,
@@ -621,10 +652,17 @@ def _classify_row(
     # §4.4 — ssid_pattern dropped (no regex in Lynceus v0.2).
     if row.identifier_type == "ssid_pattern":
         return "ssid_pattern", []
-    # §4.4 CP13 — Wave G analytical-only types. All three are DROPPED-class:
-    # carried in the canonical DB but never reach the Lynceus pattern table.
-    if row.identifier_type == "ble_local_name":
+    # §4.4 CP13 / CP50 (MAC-420) — ble_local_name: LITERAL advertised names reach
+    # the feed (exact GAP complete-local-name match; MAP entry below). TEMPLATED /
+    # regex forms (vendor pattern families carrying metacharacters) stay DROPPED —
+    # Lynceus v0.3 has no template/regex local-name matcher. See
+    # `_ble_local_name_is_template`. Mirror in coverage_matrix.py::_assign_drop_bin
+    # (the `_reconcile` map-vs-writer cross-check halts on any divergence).
+    if row.identifier_type == "ble_local_name" and _ble_local_name_is_template(
+        row.identifier
+    ):
         return "ble_local_name", []
+    # ble_characteristic + product_family_codename stay full-DROPPED (CP13).
     if row.identifier_type == "ble_characteristic":
         return "ble_characteristic", []
     if row.identifier_type == "product_family_codename":
@@ -965,7 +1003,8 @@ def _build_export(
         "ble_protocol_byte_table": 0,
         # "ble_service_uuid" removed at MAC-359 (absorbed MAC-388) — now
         # MAP→ble_uuid (CP21), no drop bin.
-        "ble_company_id": 0,  # MAC-360 HELD — stays DROPPED
+        # "ble_company_id" removed at MAC-360 / CP47 — now MAP→ble_manufacturer_id
+        # (CP21), no drop bin.
         "frequency_band": 0,
         "ble_protocol_byte": 0,
         "operator_profile": 0,
@@ -1129,7 +1168,7 @@ def _build_coverage_report_md(
             # Migration 0018 / SAR-13 §S.3 — MAC-109 vocab-extension cluster.
             ("ble_protocol_byte_table (§4.4 mig0018)", bins["ble_protocol_byte_table"]),
             # ble_service_uuid removed at MAC-359 (absorbed MAC-388) — now MAP→ble_uuid (CP21); no drop bin.
-            ("ble_company_id (§4.4 mig0018)", bins["ble_company_id"]),
+            # ble_company_id removed at MAC-360 / CP47 — now MAP→ble_manufacturer_id (CP21); no drop bin.
             ("frequency_band (§4.4 mig0018)", bins["frequency_band"]),
             ("ble_protocol_byte (§4.4 mig0018)", bins["ble_protocol_byte"]),
             ("operator_profile (§4.4 mig0018)", bins["operator_profile"]),

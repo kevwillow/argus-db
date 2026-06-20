@@ -1,20 +1,20 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-06-15T00:41:38Z",
-    "record_count": 1014,
+    "exported_at": "2026-06-20T16:52:52Z",
+    "record_count": 1042,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "46493163-54e0-52c2-821b-d281fa1d4752",
-    "source_record_count": 43255,
+    "argus_run_id": "6f634d61-b3ae-5d68-a27e-1a8f0317dd4a",
+    "source_record_count": 43274,
     "dropped_in_export": {
-      "unknown_category": 33349,
+      "unknown_category": 33354,
       "generic_reserved_uuid": 1,
       "ssid_pattern": 34,
       "device_fingerprint": 6,
-      "ble_local_name": 26,
+      "ble_local_name": 14,
       "ble_characteristic": 20,
       "product_family_codename": 156,
       "oversized_mac_range": 48,
@@ -31,7 +31,6 @@
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_company_id": 2,
       "frequency_band": 32,
       "ble_protocol_byte": 0,
       "operator_profile": 3,
@@ -144,6 +143,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Flightwave drone",
       "argus_record_id": "03cce0106e92d5ae"
+    },
+    {
+      "pattern": "dc:c0:eb",
+      "pattern_type": "oui",
+      "description": "ASSA ABLOY COTE PICARDE smart_lock",
+      "argus_record_id": "04a50d98b0e9b92f"
     },
     {
       "pattern": "0000fe25-0000-1000-8000-00805f9b34fb",
@@ -306,6 +311,18 @@
       "pattern_type": "oui",
       "description": "Digital Watchdog cctv_camera",
       "argus_record_id": "0bdc0ea088dc73ef"
+    },
+    {
+      "pattern": "fi-backhaul-db",
+      "pattern_type": "ble_local_name",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "0bf6231ee84aad5d"
+    },
+    {
+      "pattern": "0x0e29",
+      "pattern_type": "ble_manufacturer_id",
+      "description": "Flipper Devices Inc. hacking_tool",
+      "argus_record_id": "0c274938e9d51cc7"
     },
     {
       "pattern": "1581F5FK",
@@ -588,6 +605,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "EXO drone",
       "argus_record_id": "153bc3784f59963c"
+    },
+    {
+      "pattern": "Flock",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "15827fdee3aa0dfc"
     },
     {
       "pattern": "1581F37Q",
@@ -1094,6 +1117,12 @@
       "argus_record_id": "294df3732b98a779"
     },
     {
+      "pattern": "00003000-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "2961d80a36122760"
+    },
+    {
       "pattern": "1871CAUR00000",
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
@@ -1158,6 +1187,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "2cbd44bc32337605"
+    },
+    {
+      "pattern": "Penguin-",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "2cc8711e72e0cdad"
     },
     {
       "pattern": "88:26:3f",
@@ -1928,6 +1963,12 @@
       "argus_record_id": "4be8bef7e0dc0ff7"
     },
     {
+      "pattern": "Penguin",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "4c190755453769a3"
+    },
+    {
       "pattern": "1889ESPP",
       "pattern_type": "drone_id_prefix",
       "description": "WISPR drone",
@@ -2094,6 +2135,18 @@
       "pattern_type": "ble_uuid",
       "description": "Flock Safety gunshot_detect",
       "argus_record_id": "52f6bf7990060f7a"
+    },
+    {
+      "pattern": "0x0043",
+      "pattern_type": "ble_manufacturer_id",
+      "description": "Parrot drone",
+      "argus_record_id": "5331a8fd49e57a66"
+    },
+    {
+      "pattern": "fi-db",
+      "pattern_type": "ble_local_name",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "535dabadb25f644f"
     },
     {
       "pattern": "1968FS20S200",
@@ -2486,6 +2539,12 @@
       "argus_record_id": "63b7b4d41665277e"
     },
     {
+      "pattern": "54:6f:71",
+      "pattern_type": "oui",
+      "description": "uAvionix Corporation drone",
+      "argus_record_id": "64751e18118b543c"
+    },
+    {
       "pattern": "28:a3:31",
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
@@ -2604,6 +2663,12 @@
       "pattern_type": "ssid",
       "description": "Flock Safety alpr",
       "argus_record_id": "69248a5dad0c2eab"
+    },
+    {
+      "pattern": "whistle3_charge",
+      "pattern_type": "ble_local_name",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "69affcd7af262476"
     },
     {
       "pattern": "80:30:49",
@@ -2784,6 +2849,18 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "71ecc067771452a6"
+    },
+    {
+      "pattern": "14:a1:bf",
+      "pattern_type": "oui",
+      "description": "ASSA ABLOY Korea Co., Ltd Unilock smart_lock",
+      "argus_record_id": "724610859904c3f1"
+    },
+    {
+      "pattern": "00:16:ed",
+      "pattern_type": "oui",
+      "description": "Utility, Inc body_cam",
+      "argus_record_id": "726959d5bf7261bd"
     },
     {
       "pattern": "1865C0000030000",
@@ -3110,6 +3187,12 @@
       "argus_record_id": "808bdadf13233a81"
     },
     {
+      "pattern": "15190001-12f4-c226-88ed-2ac5579f2a85",
+      "pattern_type": "ble_uuid",
+      "description": "Google bluetooth_tracker",
+      "argus_record_id": "80992820e763e4ad"
+    },
+    {
       "pattern": "0000fa25-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
       "description": "Pebblebee bluetooth_tracker",
@@ -3234,6 +3317,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Microdrones drone",
       "argus_record_id": "84d8e579e9475fe9"
+    },
+    {
+      "pattern": "0000fffa-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Open Drone ID (ASTM F3411) drone",
+      "argus_record_id": "8592669e3afae692"
     },
     {
       "pattern": "e4:30:22",
@@ -3404,6 +3493,12 @@
       "argus_record_id": "8bcfd6e5c128eab0"
     },
     {
+      "pattern": "00:09:bc",
+      "pattern_type": "oui",
+      "description": "Utility, Inc body_cam",
+      "argus_record_id": "8c5e7e6c49e85ebd"
+    },
+    {
       "pattern": "d8ecdb01-ddb6-4ffd-8f65-753cb9dc2e8a",
       "pattern_type": "ble_uuid",
       "description": "Jiobit (Life360, Inc.) gps_tracker",
@@ -3414,6 +3509,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Freefly Systems drone",
       "argus_record_id": "8cce5a2a31af924a"
+    },
+    {
+      "pattern": "TBD-Gray",
+      "pattern_type": "ble_local_name",
+      "description": "Motorola Solutions gps_tracker",
+      "argus_record_id": "8d248575207873de"
     },
     {
       "pattern": "2055BG11P",
@@ -3456,6 +3557,12 @@
       "pattern_type": "ble_uuid",
       "description": "Axis Communications cctv_camera",
       "argus_record_id": "8e10bb5ccd66f042"
+    },
+    {
+      "pattern": "98:1b:b5",
+      "pattern_type": "oui",
+      "description": "ASSA ABLOY Korea Co., Ltd iRevo smart_lock",
+      "argus_record_id": "8e255f19a681858b"
     },
     {
       "pattern": "1785C000000001000",
@@ -3530,6 +3637,12 @@
       "argus_record_id": "90345b00852466cf"
     },
     {
+      "pattern": "whistle3",
+      "pattern_type": "ble_local_name",
+      "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
+      "argus_record_id": "9059626c6ac3bbac"
+    },
+    {
       "pattern": "1581F3YT",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -3576,6 +3689,12 @@
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "915f443b472700e1"
+    },
+    {
+      "pattern": "30:f0:28",
+      "pattern_type": "oui",
+      "description": "Bosch Sicherheitssysteme GmbH cctv_camera",
+      "argus_record_id": "9279ffdc911ea3a5"
     },
     {
       "pattern": "1840A00000100",
@@ -3962,6 +4081,18 @@
       "argus_record_id": "a22b218f37826650"
     },
     {
+      "pattern": "FS Ext Battery",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "a2d37fb799db170f"
+    },
+    {
+      "pattern": "FS Ext Battery",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "a2d37fb799db170f"
+    },
+    {
       "pattern": "1620A110240",
       "pattern_type": "drone_id_prefix",
       "description": "Aero Systems West drone",
@@ -4250,6 +4381,12 @@
       "argus_record_id": "ae00e7e7711ee581"
     },
     {
+      "pattern": "78:9c:85",
+      "pattern_type": "oui",
+      "description": "August Home, Inc. smart_lock",
+      "argus_record_id": "ae14e2b65ec8363f"
+    },
+    {
       "pattern": "1865C0000000000",
       "pattern_type": "drone_id_prefix",
       "description": "Holy Stone drone",
@@ -4266,6 +4403,18 @@
       "pattern_type": "ble_uuid",
       "description": "Tile, Inc. bluetooth_tracker",
       "argus_record_id": "ae897d4835d67592"
+    },
+    {
+      "pattern": "org.opendroneid.remoteid",
+      "pattern_type": "wifi_aware_service_name",
+      "description": "Open Drone ID (ASTM F3411) drone",
+      "argus_record_id": "aec2bca766980634"
+    },
+    {
+      "pattern": "Flock-",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "aeec61e0728084ca"
     },
     {
       "pattern": "19375114",
@@ -5516,6 +5665,12 @@
       "argus_record_id": "e3b38756af4761ba"
     },
     {
+      "pattern": "00:17:7a",
+      "pattern_type": "oui",
+      "description": "ASSA ABLOY AB smart_lock",
+      "argus_record_id": "e3d62ee03c8e69a7"
+    },
+    {
       "pattern": "1893FB100000000000",
       "pattern_type": "drone_id_prefix",
       "description": "Pierce Aerospace drone",
@@ -5556,6 +5711,12 @@
       "pattern_type": "oui",
       "description": "Ring cctv_camera",
       "argus_record_id": "e4b48861ae8e4073"
+    },
+    {
+      "pattern": "fi-walk-",
+      "pattern_type": "ble_local_name",
+      "description": "Fi (Barking Labs Corp) gps_tracker",
+      "argus_record_id": "e4bcc093b92c20f2"
     },
     {
       "pattern": "9c:2f:9d",
@@ -5802,6 +5963,12 @@
       "pattern_type": "ssid",
       "description": "Flock Safety alpr",
       "argus_record_id": "ef29f65fa5ed8a78"
+    },
+    {
+      "pattern": "b0:30:c8",
+      "pattern_type": "oui",
+      "description": "Teal Drones, Inc. drone",
+      "argus_record_id": "ef6ee9794bdbcbd9"
     },
     {
       "pattern": "7dfc9003-0000-1000-8000-00805f9b34fb",

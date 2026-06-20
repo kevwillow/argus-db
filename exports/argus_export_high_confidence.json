@@ -1,20 +1,20 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-06-15T00:41:38Z",
-    "record_count": 464,
+    "exported_at": "2026-06-20T16:52:52Z",
+    "record_count": 469,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "46493163-54e0-52c2-821b-d281fa1d4752",
-    "source_record_count": 43255,
+    "argus_run_id": "6f634d61-b3ae-5d68-a27e-1a8f0317dd4a",
+    "source_record_count": 43274,
     "dropped_in_export": {
-      "unknown_category": 33349,
+      "unknown_category": 33354,
       "generic_reserved_uuid": 1,
       "ssid_pattern": 34,
       "device_fingerprint": 6,
-      "ble_local_name": 26,
+      "ble_local_name": 14,
       "ble_characteristic": 20,
       "product_family_codename": 156,
       "oversized_mac_range": 48,
@@ -31,7 +31,6 @@
       "wifi_nan_param_signature": 0,
       "alpr_model": 11,
       "ble_protocol_byte_table": 0,
-      "ble_company_id": 2,
       "frequency_band": 32,
       "ble_protocol_byte": 0,
       "operator_profile": 3,
@@ -61,9 +60,9 @@
       "imei_tac": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 54,
-      "excluded_source_type": 337,
-      "geographic_scope_mismatch": 170
+      "below_confidence_threshold": 59,
+      "excluded_source_type": 338,
+      "geographic_scope_mismatch": 187
     }
   },
   "entries": [
@@ -356,6 +355,12 @@
       "argus_record_id": "1522700c4fd5aa29"
     },
     {
+      "pattern": "Flock",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "15827fdee3aa0dfc"
+    },
+    {
       "pattern": "3c:e3:6b",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -570,6 +575,12 @@
       "pattern_type": "oui",
       "description": "Uniview cctv_camera",
       "argus_record_id": "294df3732b98a779"
+    },
+    {
+      "pattern": "00003000-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Flock Safety gunshot_detect",
+      "argus_record_id": "2961d80a36122760"
     },
     {
       "pattern": "1581F446",
@@ -902,6 +913,12 @@
       "argus_record_id": "4b9424d14d84cd92"
     },
     {
+      "pattern": "Penguin",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "4c190755453769a3"
+    },
+    {
       "pattern": "1fa97d5b-bb68-499e-ac1d-de8771c9348d",
       "pattern_type": "ble_uuid",
       "description": "Ultraloq smart_lock",
@@ -996,6 +1013,12 @@
       "pattern_type": "ble_uuid",
       "description": "Flock Safety gunshot_detect",
       "argus_record_id": "52f6bf7990060f7a"
+    },
+    {
+      "pattern": "0x0043",
+      "pattern_type": "ble_manufacturer_id",
+      "description": "Parrot drone",
+      "argus_record_id": "5331a8fd49e57a66"
     },
     {
       "pattern": "74:ab:93",
@@ -1932,6 +1955,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Applied Aeronautics drone",
       "argus_record_id": "a22b218f37826650"
+    },
+    {
+      "pattern": "FS Ext Battery",
+      "pattern_type": "ble_local_name",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "a2d37fb799db170f"
     },
     {
       "pattern": "94:34:69",

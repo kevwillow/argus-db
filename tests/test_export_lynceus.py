@@ -176,8 +176,11 @@ def test_type_mapping_drops_match_44_verbatim() -> None:
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["mac_range"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["bssid"] == "mac"
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_service"] == "ble_uuid"
-    # CP13 (§4.4) — all three Wave G analytical-only types are DROPPED.
-    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_local_name"] is None
+    # CP13 (§4.4) — ble_characteristic / product_family_codename stay DROPPED.
+    # CP50 (§4.4, MAC-420) — ble_local_name is now a CONDITIONAL MAP: literal
+    # advertised names reach the feed (pattern_type "ble_local_name"); templated/
+    # regex forms drop in _classify_row via _ble_local_name_is_template.
+    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_local_name"] == "ble_local_name"
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ble_characteristic"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["product_family_codename"] is None
     # CP16 (§4.4) — 3 new MAP entries flow through the dict (new pattern_types).
@@ -331,24 +334,38 @@ def test_classify_device_fingerprint_drops_section_44() -> None:
     assert bin_label == "device_fingerprint"
 
 
-def test_classify_ble_local_name_drops_section_44_cp13() -> None:
-    """CP13: ble_local_name is DROPPED-class (no GAP local-name match in Lynceus v0.3)."""
+def test_classify_ble_local_name_template_drops_literal_survives_cp50() -> None:
+    """CP50 (§4.4, MAC-420): a TEMPLATE ble_local_name (regex/family
+    metacharacters) DROPS; a LITERAL advertised name SURVIVES to the
+    `ble_local_name` pattern_type (exact GAP local-name match)."""
+    # template -> DROP
     bin_label, entries = _classify_row(
-        _row(identifier="FlockLPR-A2", identifier_type="ble_local_name",
+        _row(identifier="flocklpr[_-]?", identifier_type="ble_local_name",
              device_category="alpr", manufacturer="Flock Safety", confidence=82),
         confidence_threshold=30,
         apply_pi_self_exclude=False,
     )
     assert bin_label == "ble_local_name"
     assert entries == []
-
-
-def test_classify_ble_local_name_drops_in_high_conf_too() -> None:
-    """CP13 type-drop fires above the confidence-floor gate per priority order:
-    a high-conf ble_local_name still drops to its type bin, never to
-    `below_confidence_threshold` and never as a survivor."""
+    # literal -> SURVIVE
     bin_label, entries = _classify_row(
         _row(identifier="FlockLPR-A2", identifier_type="ble_local_name",
+             device_category="alpr", manufacturer="Flock Safety", confidence=82),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label is None
+    assert len(entries) == 1
+    assert entries[0].pattern_type == "ble_local_name"
+    assert entries[0].pattern == "FlockLPR-A2"
+
+
+def test_classify_ble_local_name_template_drops_in_high_conf_too() -> None:
+    """CP50: a TEMPLATE ble_local_name drops to its type bin above the
+    confidence-floor gate per priority order — never to
+    `below_confidence_threshold` and never as a survivor."""
+    bin_label, entries = _classify_row(
+        _row(identifier="flocklpr[_-]?", identifier_type="ble_local_name",
              device_category="alpr", manufacturer="Flock Safety", confidence=85),
         confidence_threshold=70,
         apply_pi_self_exclude=True,
@@ -594,7 +611,8 @@ def test_build_export_meta_carries_cp13_drop_bins() -> None:
     Wave G analytical-only types so MAC-45 reconciliation lines up
     bin-for-bin against the writer's tally."""
     rows = [
-        _row(id=70, identifier="FlockLPR-A2", identifier_type="ble_local_name",
+        # CP50: a TEMPLATE ble_local_name still drops to the ble_local_name bin.
+        _row(id=70, identifier="flocklpr[_-]?", identifier_type="ble_local_name",
              device_category="alpr", manufacturer="Flock Safety", confidence=82,
              geographic_scope="US"),
         _row(id=71, identifier="0000aaaa-0000-1000-8000-00805f9b34fb",
@@ -640,8 +658,8 @@ def test_build_export_cp13_rows_never_appear_in_entries() -> None:
         _row(id=80, identifier="0000fd6f-0000-1000-8000-00805f9b34fb",
              identifier_type="ble_service", device_category="alpr",
              manufacturer="Flock Safety", confidence=87, geographic_scope="US"),
-        # All three CP13 DROPPED-class types.
-        _row(id=81, identifier="FlockLPR-A2", identifier_type="ble_local_name",
+        # All three DROPPED-class types (CP50: ble_local_name TEMPLATE form drops).
+        _row(id=81, identifier="flocklpr[_-]?", identifier_type="ble_local_name",
              device_category="alpr", manufacturer="Flock Safety", confidence=82,
              geographic_scope="US"),
         _row(id=82, identifier="0000aaaa-0000-1000-8000-00805f9b34fb",
