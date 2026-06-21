@@ -1,17 +1,17 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-06-20T16:52:52Z",
-    "record_count": 469,
+    "exported_at": "2026-06-21T22:18:50Z",
+    "record_count": 468,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "6f634d61-b3ae-5d68-a27e-1a8f0317dd4a",
-    "source_record_count": 43274,
+    "argus_run_id": "6ae27206-025f-56de-8aa2-746b0e10e24d",
+    "source_record_count": 43166,
     "dropped_in_export": {
       "unknown_category": 33354,
-      "generic_reserved_uuid": 1,
+      "generic_reserved_uuid": 0,
       "ssid_pattern": 34,
       "device_fingerprint": 6,
       "ble_local_name": 14,
@@ -62,7 +62,7 @@
       "self_exclude_oui": 0,
       "below_confidence_threshold": 59,
       "excluded_source_type": 338,
-      "geographic_scope_mismatch": 187
+      "geographic_scope_mismatch": 81
     }
   },
   "entries": [
@@ -2063,12 +2063,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
       "argus_record_id": "b4e7964b29533d0f"
-    },
-    {
-      "pattern": "d54ace3f-8e27-4718-aa17-019f0e318e14",
-      "pattern_type": "ble_uuid",
-      "description": "Dahua cctv_camera",
-      "argus_record_id": "b4ede32c5ad9f722"
     },
     {
       "pattern": "00:12:1c",
