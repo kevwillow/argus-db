@@ -1,23 +1,23 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-06-21T22:18:50Z",
-    "record_count": 935,
+    "exported_at": "2026-06-22T23:39:22Z",
+    "record_count": 945,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "6ae27206-025f-56de-8aa2-746b0e10e24d",
-    "source_record_count": 43166,
+    "argus_run_id": "5a8d6721-e766-562b-970d-1dfebc24bdfb",
+    "source_record_count": 43177,
     "dropped_in_export": {
-      "unknown_category": 33354,
+      "unknown_category": 33353,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 34,
       "device_fingerprint": 6,
       "ble_local_name": 14,
       "ble_characteristic": 20,
       "product_family_codename": 156,
-      "oversized_mac_range": 48,
+      "oversized_mac_range": 49,
       "icao_24bit_address": 2,
       "rf_channel": 24,
       "burst_cadence_ms": 0,
@@ -54,7 +54,7 @@
       "vendor_controlled_hostname": 3298,
       "vendor_cloud_endpoint_url": 2,
       "vendor_controlled_hostname_deprecated": 4,
-      "fcc_grantee_code": 137,
+      "fcc_grantee_code": 138,
       "equipment_class_code": 7,
       "network_discovery_protocol_pattern": 11,
       "imei_tac": 0,
@@ -251,6 +251,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
       "argus_record_id": "0a9662b53ccfb421"
+    },
+    {
+      "pattern": "64:fc:8c",
+      "pattern_type": "oui",
+      "description": "Zonar Systems automotive_telematics",
+      "argus_record_id": "0ab48fa1ae8486c5"
     },
     {
       "pattern": "1581F6GK",
@@ -1621,6 +1627,12 @@
       "argus_record_id": "45d7cbd90069d70f"
     },
     {
+      "pattern": "20:c3:a4",
+      "pattern_type": "oui",
+      "description": "RetailNext cctv_camera",
+      "argus_record_id": "45e05e32515efc23"
+    },
+    {
       "pattern": "34:09:62",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -1871,6 +1883,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Hoverfly Technologies drone",
       "argus_record_id": "51e6bce55d8bbfa8"
+    },
+    {
+      "pattern": "00:17:3d",
+      "pattern_type": "oui",
+      "description": "Neology alpr",
+      "argus_record_id": "51f9971aa8978bf4"
     },
     {
       "pattern": "28:57:BE",
@@ -2485,6 +2503,12 @@
       "argus_record_id": "6dcc7e8573a2ae85"
     },
     {
+      "pattern": "94:8f:ee",
+      "pattern_type": "oui",
+      "description": "Verizon Telematics automotive_telematics",
+      "argus_record_id": "6dd3a9bd7404f92d"
+    },
+    {
       "pattern": "1787F03BM23070003218",
       "pattern_type": "drone_id_prefix",
       "description": "Commaris drone",
@@ -2993,6 +3017,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "830490616132ed00"
+    },
+    {
+      "pattern": "50:df:95",
+      "pattern_type": "oui",
+      "description": "Lytx automotive_telematics",
+      "argus_record_id": "833a30cab2df9604"
     },
     {
       "pattern": "57b40211-2528-d6bc-b043-b49af0ec06c1",
@@ -3685,6 +3715,12 @@
       "argus_record_id": "a090d3ed5ada4e98"
     },
     {
+      "pattern": "00:0a:99",
+      "pattern_type": "oui",
+      "description": "CalAmp Wireless Networks Inc automotive_telematics",
+      "argus_record_id": "a0f6035aedfc007e"
+    },
+    {
       "pattern": "1892CF5SA000000",
       "pattern_type": "drone_id_prefix",
       "description": "SJRC drone",
@@ -3701,6 +3737,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
       "argus_record_id": "a16a52cf6fce4677"
+    },
+    {
+      "pattern": "58:a7:48",
+      "pattern_type": "oui",
+      "description": "Lytx automotive_telematics",
+      "argus_record_id": "a201c5b9fb55eaab"
     },
     {
       "pattern": "AA2",
@@ -3743,6 +3785,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "a3eb7b932fd226c8"
+    },
+    {
+      "pattern": "7c:a2:36",
+      "pattern_type": "oui",
+      "description": "Verizon Connect automotive_telematics",
+      "argus_record_id": "a485de2293db49f7"
     },
     {
       "pattern": "1894AL5DCX999",
@@ -4981,6 +5029,12 @@
       "argus_record_id": "df09cc11239b4134"
     },
     {
+      "pattern": "70:e4:6e",
+      "pattern_type": "oui",
+      "description": "Lytx automotive_telematics",
+      "argus_record_id": "df28159c9f7011e0"
+    },
+    {
       "pattern": "1581F895",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -5585,6 +5639,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Zing Drone Solutions drone",
       "argus_record_id": "fbaa75fa1b0c02cc"
+    },
+    {
+      "pattern": "2c:42:05",
+      "pattern_type": "oui",
+      "description": "Lytx automotive_telematics",
+      "argus_record_id": "fbe1a2acc53e0d51"
     },
     {
       "pattern": "1969BFS000000054",
