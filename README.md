@@ -24,9 +24,9 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.11:
+At v1.6.12:
 
-- **43,274 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.11) is the Wave-3 multi-lane sourcing release: it admits 19 net-new identifiers across six harvest lanes (drones, cameras, body cams, smart locks, smart-home OUIs, and a Google Find My Device tracker UUID), applies the CP47 BLE manufacturer-ID export map, and proposes the CP50 BLE local-name literal split, with no schema migration; see the release notes below for the breakdown.
+- **43,177 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.12) bundles the MAC-477 correction — withdrawing 108 contaminated `ble_service_uuid` false positives by supersession — with the Wave-4 ingest of 11 net-new identifiers (eight fleet-telematics OUIs, the Neology ALPR OUI and FCC grantee code, and a RetailNext people-counting OUI) plus the ELSAG ALPR recategorization, with no schema migration; net active −97 (the drop is the contamination cleanup, not a regression). See the release notes below for the breakdown.
 - **156 manufacturers**, surveillance vendors classified by what they make
 - **95 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
 - **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
@@ -43,9 +43,9 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 469 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
-| `exports/argus_export.json` | 1,042 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 43,274 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export_high_confidence.json` | 478 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export.json` | 945 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export.csv` | 43,177 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
@@ -86,7 +86,11 @@ Coverage is intentionally narrow per category. Argus has 156 vendors, but most c
 
 ## Most recent release
 
-**v1.6.11** is the most recent release: the Wave-3 multi-lane sourcing cycle (MAC-490). It admits **19 net-new identifiers** (ids 44629-44647) across six harvest lanes and ships two export-layer changes, with no schema migration (schema_version stays 33). Active identifiers move 43,255 → 43,274; the standard export grows 1,014 → 1,042 and the high-confidence export 464 → 469. The new rows are drone Remote ID surfaces (the ASTM F3411 `0xFFFA` service UUID and the `org.opendroneid.remoteid` Wi-Fi Aware service, plus Teal and uAvionix OUIs), a Bosch camera OUI, two Utility body-cam OUIs with the Flock Safety gunshot-detection service UUID, five smart-lock OUIs (August, ASSA ABLOY, iRevo, Unilock, Côte Picarde), five `unknown`-category smart-home OUIs (Nest, Lumi, SimpliSafe), and the Google Find My Device anti-stalking sound UUID. **Honest scope note:** the CP50 `ble_local_name` literal split makes 12 literal local-names feed-visible while holding 14 templates, and the five `unknown` smart-home OUIs are captured but held out of the JSON feeds by the §11 #13 export ban. The 10 cohort-1 spy-camera `ssid_pattern` families stay registry-internal because Lynceus v0.2 has no regex matcher; closing that gap is the deferred follow-up MAC-420. The proposed B7 `mesh_radio` category was declined at the board ethics gate and nothing from that lane shipped. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+**v1.6.12** is the most recent release: a quality-correction + sourcing cycle that bundles two staged commits under one tag. The MAC-477 correction (`8cfed9f`) **withdraws 108 string-pool `ble_service_uuid` false positives** by supersession (migrations 0034/0035/0036) — GATT characteristic-UUID mis-types that were never advertised service UUIDs — and the Wave-4 ingest (MAC-493, `7d3652d`) **admits 11 net-new identifiers** (ids 44648-44658): eight fleet-telematics OUIs (CalAmp, Zonar, Lytx ×4, Verizon Connect, Verizon Telematics), the Neology ALPR OUI `00:17:3d` plus its FCC grantee code `2AKNF`, and the RetailNext people-counting OUI `20:c3:a4`, with the ELSAG ALPR MAC range recategorized `unknown → alpr`. There is no schema migration (schema_version stays 33). Active identifiers move 43,274 → **43,177** (−97 net): the drop is the contamination cleanup, not a regression — the dataset got more accurate. The standard export moves 1,042 → 945 and the high-confidence export 469 → 478 (the 108 withdrawals cut 107 standard / 1 high-confidence feed entries; the 10 feed-reaching Wave-4 rows add +10 to each). **Honest scope note:** the Neology FCC grantee code `2AKNF` is captured but registry-internal (`fcc_grantee_code` is outside the Lynceus v0.2 watchlist), and CalAmp / Zonar / RetailNext are attributed via free-text manufacturer rather than curated `manufacturers` rows (count stays 156). The CP47 / CP50 export-layer Bible amendments proposed in v1.6.11 remain pending on MAC-492. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+
+### Prior release, v1.6.11
+
+**v1.6.11** was the Wave-3 multi-lane sourcing cycle (MAC-490): it admitted **19 net-new identifiers** (ids 44629-44647) across six harvest lanes and shipped two export-layer changes, with no schema migration (schema_version 33). Active identifiers moved 43,255 → 43,274; the standard export grew 1,014 → 1,042 and the high-confidence export 464 → 469. The new rows were drone Remote ID surfaces (the ASTM F3411 `0xFFFA` service UUID and the `org.opendroneid.remoteid` Wi-Fi Aware service, plus Teal and uAvionix OUIs), a Bosch camera OUI, two Utility body-cam OUIs with the Flock Safety gunshot-detection service UUID, five smart-lock OUIs (August, ASSA ABLOY, iRevo, Unilock, Côte Picarde), five `unknown`-category smart-home OUIs (Nest, Lumi, SimpliSafe), and the Google Find My Device anti-stalking sound UUID. The CP50 `ble_local_name` literal split made 12 literal local-names feed-visible while holding 14 templates; the proposed B7 `mesh_radio` category was declined at the board ethics gate. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
 
 ### Prior release, v1.6.10
 
@@ -133,7 +137,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.11).
+- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.12).
 - [`CREDITS.md`](CREDITS.md), per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md), developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md), how Argus integrates sources, confidence model, dedup logic.

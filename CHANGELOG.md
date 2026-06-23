@@ -14,6 +14,43 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.12 - 2026-06-22
+
+A **quality-correction + sourcing release** on top of v1.6.11, bundling two staged commits under one tag because the second sits on top of the first: the MAC-477 `ble_service_uuid` contamination cleanup (canonical write `8cfed9f`) and the Wave-4 consolidated ingest ([MAC-493](/MAC/issues/MAC-493), canonical write `7d3652d`, DB post-sha `fea9decafc54e5e9`). [MAC-477](/MAC/issues/MAC-477) **withdraws 108 string-pool `ble_service_uuid` false-positive rows** by supersession (migrations `0034`/`0035`/`0036`, from MAC-478/486/489) — GATT characteristic-UUID mis-types and string-pool artifacts that were never advertised service UUIDs and should not have reached the registry. Wave-4 ([MAC-493](/MAC/issues/MAC-493)) then **admits 11 net-new identifiers** (ids 44648-44658) across fleet telematics, ALPR, and retail people-counting, and recategorizes the ELSAG ALPR MAC range out of `unknown`. There is **no schema migration** this cycle: schema_version stays **33** (last schema-changing migration `0033`, CP46); the three MAC-477 migrations `0034`/`0035`/`0036` are data-only supersession passes (no DDL, no schema_version bump) and Wave-4 reuses existing categories. The net of the two movements is honest and intentional: active identifier count moves **43,274 → 43,177** (−97 net = 108 contamination withdrawals + 11 net-new admissions); the drop is the cleanup, not a regression — the dataset got *more* accurate. Total identifiers move **43,829 → 43,840** (+11; the 108 withdrawals are supersessions, which retain the rows as history, so total reflects only the admissions). The standard Lynceus feed moves **1,042 → 945** (−97) and the high-confidence feed **469 → 478** (+9); the behavioral-signatures feed is unchanged at **132**. Every admitted value traces to a quotable public source (IEEE OUI registry, FCC grantee registry); each lane was CTO-re-verified against the live database (DB sha `fea9decafc54e5e9`), and the feed deltas below were computed from the actual regen, not estimated.
+
+**Honest feed-reach note (binding).** The standard feed's −97 is the sum of two separate movements, and they should be read apart. The MAC-477 withdrawal removes **107** entries from the standard feed (spanning **53** distinct `ble_service_uuid` values — contaminated UUIDs that appeared under multiple rows) and only **1** high-confidence entry: of the 108 withdrawn rows, only `d54ace3f-8e27-4718-aa17-019f0e318e14` cleared the ≥70 high-confidence floor, so the high-confidence feed fell by just 1 while the standard feed fell by 107. The Wave-4 ingest then adds back **+10** to both feeds: 10 of the 11 net-new rows reach the standard feed and all 10 are confidence ≥70, so they lift the standard and high-confidence feeds equally. The single Wave-4 row that does not reach the feed is the Neology FCC grantee code `2AKNF` (`fcc_grantee_code`), which is registry-internal — `fcc_grantee_code` is outside the Lynceus v0.2 watchlist schema. Net: standard 1,042 − 107 + 10 = **945**; high-confidence 469 − 1 + 10 = **478**; behavioral unchanged at **132**.
+
+### What's new
+
+- **Fleet-telematics OUIs reach the feed (+8).** Eight `automotive_telematics` OUIs (confidence 80) register as standard- and high-confidence-feed entries: CalAmp (`00:0a:99`), Zonar (`64:fc:8c`), four Lytx ranges (`2c:42:05`, `58:a7:48`, `70:e4:6e`, `50:df:95`), Verizon Connect (`7c:a2:36`), and Verizon Telematics (`94:8f:ee`). They reuse the existing `automotive_telematics` category (Samsara / Geotab precedent), so no mint is needed.
+- **Neology ALPR identifiers (+2 captured, +1 feed).** The Neology OUI `00:17:3d` (`oui`, `alpr`, confidence 85) reaches both feeds; the Neology FCC grantee code `2AKNF` (`fcc_grantee_code`, `alpr`, confidence 85) is captured but registry-internal (no `fcc_grantee_code` reach in Lynceus v0.2). Neology is the parent of the curated PIPS ALPR line (manufacturer id 214).
+- **RetailNext retail people-counting OUI (+1 feed).** The RetailNext OUI `20:c3:a4` (`cctv_camera`, confidence 80) registers as a feed entry.
+- **ELSAG ALPR recategorized (`unknown → alpr`).** The ELSAG (Leonardo) MAC range `70:b3:d5:1c:5/36` (id 21364, `mac_range`, confidence 85) moves out of the export-suppressed `unknown` bin into `alpr`; its `notes` were JSON-merged by property (CP39-safe), not text-suffixed. The row was already in the registry, so this relabels rather than adds.
+- **108 contaminated `ble_service_uuid` rows withdrawn (MAC-477).** A re-audit of the cctv-installer / Dahua / Wave-3 GATT lanes found 108 rows that were string-pool false positives or GATT characteristic-UUID mis-types, not advertised service UUIDs. They are withdrawn by supersession (migrations `0034`/`0035`/`0036`), removing 107 standard-feed and 1 high-confidence entry. The rows remain in the registry as superseded history; this is a contamination cleanup, not a data loss.
+
+### Schema
+
+- **No migration this cycle.** schema_version stays **33** (last schema-changing migration `0033`, CP46). The three MAC-477 migrations (`0034`/`0035`/`0036`) are data-only supersession passes that withdraw rows without altering the schema, and the Wave-4 ingest reuses existing categories — neither extends the `device_category` enum, which stays at **20** values.
+
+### Data
+
+- **`identifiers` active:** 43,274 → **43,177** (−97 net = 108 MAC-477 supersession withdrawals + 11 Wave-4 net-new admissions).
+- **`identifiers` total:** 43,829 → **43,840** (+11; the 108 MAC-477 withdrawals are supersessions, which retain rows as history, so total reflects only the admissions).
+- **Wave-4 net-new rows (ids 44648-44658):** 11 = 8 `automotive_telematics` + 2 `alpr` (1 `oui` + 1 `fcc_grantee_code`) + 1 `cctv_camera`. Plus the ELSAG id 21364 `unknown → alpr` recategorization (relabel, not net-new).
+- **`manufacturers`:** **156** (no change — see attribution note). **`sources`:** **95** (no change). **device-category enum:** **20** (no change; all lanes reuse existing categories).
+- **Manufacturer attribution note (load-bearing).** CalAmp, Zonar, and RetailNext are attributed via free-text `identifiers.manufacturer` rather than curated `manufacturers` rows, consistent with existing telematics vendors (Sierra Wireless, Motive, Omnitracs). Lytx (id 248), Verizon Connect (id 245), and Neology / PIPS (id 214) are already curated. The `manufacturers` count therefore stays 156; curating CalAmp / Zonar / RetailNext is logged as an optional fast-follow.
+- **Lynceus standard feed:** 1,042 → **945** (−97 = −107 MAC-477 + 10 Wave-4). **high-confidence feed:** 469 → **478** (+9 = −1 MAC-477 + 10 Wave-4). **behavioral-signatures feed:** **132** (no change). **CSV:** 43,177 rows, matching the active count.
+
+### Bible amendments
+
+- **None landed in this commit.** The CP47 (`ble_company_id → ble_manufacturer_id` export MAP) and CP50 (`ble_local_name` literal/template split) ratifications proposed in v1.6.11 remain pending on [MAC-492](/MAC/issues/MAC-492); they carry their formal `BIBLE_AMENDMENTS.md` entries to the board push gate, consistent with the staging discipline. No new amendment is recorded here.
+
+### Halts encountered
+
+- None.
+
+---
+
 ## v1.6.11 - 2026-06-20
 
 A **multi-lane sourcing release** on top of v1.6.10: Wave 3 ([MAC-490](/MAC/issues/MAC-490), canonical write `84f0803`, DB post-sha `97765f5e`). It admits **19 net-new identifiers** (ids 44629-44647) across six harvest lanes, applies the CP47 `ble_company_id → ble_manufacturer_id` export MAP, and proposes the CP50 `ble_local_name` literal/template split. There is **no schema migration** this cycle: schema_version stays **33** (last migration `0033`, CP46). Active identifier count moves **43,255 → 43,274** (+19); total **43,810 → 43,829** (+19, all admissions active, zero supersessions). The standard Lynceus feed grows **1,014 → 1,042** (+28) and the high-confidence feed **464 → 469** (+5); the behavioral-signatures feed is unchanged at **132**. Every admitted value traces to a quotable public source (IEEE OUI registry, ASTM F3411 Remote ID, vendor APK and researcher-repo static analysis, Bluetooth-SIG assigned numbers); each lane was CTO-re-verified against the live database, and the feed deltas below were computed from the actual regen, not estimated.
