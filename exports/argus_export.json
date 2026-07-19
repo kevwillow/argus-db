@@ -1,16 +1,16 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-06-22T23:39:22Z",
+    "exported_at": "2026-07-19T04:25:56Z",
     "record_count": 945,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "5a8d6721-e766-562b-970d-1dfebc24bdfb",
-    "source_record_count": 43177,
+    "argus_run_id": "10b46f03-3d3a-5646-9279-48cbb8d469aa",
+    "source_record_count": 43134,
     "dropped_in_export": {
-      "unknown_category": 33353,
+      "unknown_category": 33338,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 34,
       "device_fingerprint": 6,
@@ -38,7 +38,7 @@
       "ble_adv_interval": 0,
       "ble_payload_offset": 0,
       "firmware_sha256_hash": 880,
-      "network_endpoint": 3564,
+      "network_endpoint": 3542,
       "firmware_image_variant": 3,
       "qualcomm_chip_format_id": 1,
       "firmware_branded_string": 141,
@@ -51,7 +51,7 @@
       "firmware_build_uuid": 1,
       "windows_installer_productcode_vendor_registered": 2,
       "windows_com_clsid_vendor_registered": 1,
-      "vendor_controlled_hostname": 3298,
+      "vendor_controlled_hostname": 3292,
       "vendor_cloud_endpoint_url": 2,
       "vendor_controlled_hostname_deprecated": 4,
       "fcc_grantee_code": 138,
