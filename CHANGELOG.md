@@ -14,6 +14,33 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.13 - 2026-07-19
+
+A **data-quality cleanup release** on top of v1.6.12, requested by the board ([MAC-511](/MAC/issues/MAC-511)) and staged as canonical write `a99f858` (DB post-sha `b406dff1...daa265`). It **withdraws 43 junk identifier rows by supersession** (migration `0037`, CP32 section 9 self-loop: `superseded_by = id`, `confidence = 0`, MAC-477 precedent, nothing deleted). The rows were APK string-pool concatenation glue, scrape-glue concatenations, RFC-2606 reserved-placeholder domains, and one Java class token mis-typed as a hostname, none of them real vendor identifiers. There is **no schema migration** this cycle: schema_version stays **33** (last schema-changing migration `0033`, CP46); `0037` is a data-only supersession pass with no DDL and no schema_version bump. Active identifier count moves **43,177 → 43,134** (-43); total identifiers stay **43,840**, since the 43 withdrawals are supersessions that retain the rows as history. All three Lynceus feeds are **unchanged** (standard **945**, high-confidence **478**, behavioral **132**): every withdrawn row was already section-4.4 export-dropped, because the `network_endpoint` and `vendor_controlled_hostname` types do not reach the Lynceus v0.2 feeds, so removing them moves the active and CSV counts but not the feed counts. The CTO re-verified the active, total, and cohort counts against the live database (DB sha `b406dff1...daa265`) and read the three feed counts below from the actual regen rather than estimating them.
+
+### Schema
+
+- **No migration this cycle.** schema_version stays **33** (last schema-changing migration `0033`, CP46). `0037` is a data-only supersession pass that withdraws rows without altering the schema; it does not extend the `device_category` enum, which stays at **20** values.
+
+### Data
+
+- **`identifiers` active:** 43,177 → **43,134** (-43 supersession withdrawals, zero admissions).
+- **`identifiers` total:** **43,840** (no change; the 43 withdrawals are CP32 section 9 self-loop supersessions, which retain rows as history).
+- **Withdrawn cohort (43 rows, migration `0037`):** 22 `network_endpoint` (APK string-pool concatenation glue) plus 21 `vendor_controlled_hostname`, of which 10 are scrape-glue concatenations, 10 are RFC-2606 reserved-placeholder (`example.com`) domains, and 1 is a Java class token mis-typed as a hostname.
+- **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change). **device-category enum:** **20** (no change).
+- **Lynceus standard feed:** **945** (no change). **high-confidence feed:** **478** (no change). **behavioral-signatures feed:** **132** (no change). All three hold flat because `network_endpoint` and `vendor_controlled_hostname` are section-4.4 export-dropped types that never reach the Lynceus v0.2 feeds, so withdrawing these 43 rows moves the active and CSV counts and leaves every feed entry untouched. **CSV:** 43,134 rows, matching the active count.
+- **DB post-sha:** `b406dff1209f1068945a668aeb23aacfead47cc9e516b315eddf8dedefdaa265` (canonical write `a99f858`).
+
+### Bible amendments
+
+- **None.** The withdrawal reuses the CP32 section 9 self-loop supersession mechanism (`superseded_by = id`, `confidence = 0`), which is existing discipline rather than a new amendment. No `BIBLE_AMENDMENTS.md` entry is recorded here.
+
+### Halts encountered
+
+- None.
+
+---
+
 ## v1.6.12 - 2026-06-22
 
 A **quality-correction + sourcing release** on top of v1.6.11, bundling two staged commits under one tag because the second sits on top of the first: the MAC-477 `ble_service_uuid` contamination cleanup (canonical write `8cfed9f`) and the Wave-4 consolidated ingest ([MAC-493](/MAC/issues/MAC-493), canonical write `7d3652d`, DB post-sha `fea9decafc54e5e9`). [MAC-477](/MAC/issues/MAC-477) **withdraws 108 string-pool `ble_service_uuid` false-positive rows** by supersession (migrations `0034`/`0035`/`0036`, from MAC-478/486/489) — GATT characteristic-UUID mis-types and string-pool artifacts that were never advertised service UUIDs and should not have reached the registry. Wave-4 ([MAC-493](/MAC/issues/MAC-493)) then **admits 11 net-new identifiers** (ids 44648-44658) across fleet telematics, ALPR, and retail people-counting, and recategorizes the ELSAG ALPR MAC range out of `unknown`. There is **no schema migration** this cycle: schema_version stays **33** (last schema-changing migration `0033`, CP46); the three MAC-477 migrations `0034`/`0035`/`0036` are data-only supersession passes (no DDL, no schema_version bump) and Wave-4 reuses existing categories. The net of the two movements is honest and intentional: active identifier count moves **43,274 → 43,177** (−97 net = 108 contamination withdrawals + 11 net-new admissions); the drop is the cleanup, not a regression — the dataset got *more* accurate. Total identifiers move **43,829 → 43,840** (+11; the 108 withdrawals are supersessions, which retain the rows as history, so total reflects only the admissions). The standard Lynceus feed moves **1,042 → 945** (−97) and the high-confidence feed **469 → 478** (+9); the behavioral-signatures feed is unchanged at **132**. Every admitted value traces to a quotable public source (IEEE OUI registry, FCC grantee registry); each lane was CTO-re-verified against the live database (DB sha `fea9decafc54e5e9`), and the feed deltas below were computed from the actual regen, not estimated.

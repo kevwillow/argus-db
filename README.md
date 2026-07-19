@@ -24,9 +24,9 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.12:
+At v1.6.13:
 
-- **43,177 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.12) bundles the MAC-477 correction — withdrawing 108 contaminated `ble_service_uuid` false positives by supersession — with the Wave-4 ingest of 11 net-new identifiers (eight fleet-telematics OUIs, the Neology ALPR OUI and FCC grantee code, and a RetailNext people-counting OUI) plus the ELSAG ALPR recategorization, with no schema migration; net active −97 (the drop is the contamination cleanup, not a regression). See the release notes below for the breakdown.
+- **43,134 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.13) is the Wave-5 data-quality cleanup (MAC-511): it withdraws 43 junk identifier rows by supersession (22 `network_endpoint` and 21 `vendor_controlled_hostname` rows that were APK string-pool glue, scrape-glue concatenations, RFC-2606 placeholder domains, or a mis-typed class token), with no schema migration; net active -43. All three JSON feeds stay flat because those rows were already section-4.4 export-dropped and never reached a feed. See the release notes below for the breakdown.
 - **156 manufacturers**, surveillance vendors classified by what they make
 - **95 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
 - **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
@@ -45,7 +45,7 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 |---|---:|---|
 | `exports/argus_export_high_confidence.json` | 478 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
 | `exports/argus_export.json` | 945 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 43,177 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export.csv` | 43,134 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
@@ -86,7 +86,11 @@ Coverage is intentionally narrow per category. Argus has 156 vendors, but most c
 
 ## Most recent release
 
-**v1.6.12** is the most recent release: a quality-correction + sourcing cycle that bundles two staged commits under one tag. The MAC-477 correction (`8cfed9f`) **withdraws 108 string-pool `ble_service_uuid` false positives** by supersession (migrations 0034/0035/0036) — GATT characteristic-UUID mis-types that were never advertised service UUIDs — and the Wave-4 ingest (MAC-493, `7d3652d`) **admits 11 net-new identifiers** (ids 44648-44658): eight fleet-telematics OUIs (CalAmp, Zonar, Lytx ×4, Verizon Connect, Verizon Telematics), the Neology ALPR OUI `00:17:3d` plus its FCC grantee code `2AKNF`, and the RetailNext people-counting OUI `20:c3:a4`, with the ELSAG ALPR MAC range recategorized `unknown → alpr`. There is no schema migration (schema_version stays 33). Active identifiers move 43,274 → **43,177** (−97 net): the drop is the contamination cleanup, not a regression — the dataset got more accurate. The standard export moves 1,042 → 945 and the high-confidence export 469 → 478 (the 108 withdrawals cut 107 standard / 1 high-confidence feed entries; the 10 feed-reaching Wave-4 rows add +10 to each). **Honest scope note:** the Neology FCC grantee code `2AKNF` is captured but registry-internal (`fcc_grantee_code` is outside the Lynceus v0.2 watchlist), and CalAmp / Zonar / RetailNext are attributed via free-text manufacturer rather than curated `manufacturers` rows (count stays 156). The CP47 / CP50 export-layer Bible amendments proposed in v1.6.11 remain pending on MAC-492. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+**v1.6.13** is the most recent release: the Wave-5 data-quality cleanup (MAC-511), staged as canonical write `a99f858`. It **withdraws 43 junk identifier rows by supersession** (migration 0037): 22 `network_endpoint` rows that were APK string-pool concatenation glue, and 21 `vendor_controlled_hostname` rows made up of 10 scrape-glue concatenations, 10 RFC-2606 reserved-placeholder (`example.com`) domains, and 1 Java class token mis-typed as a hostname. None were real vendor identifiers. There is no schema migration (schema_version stays 33), and nothing is deleted: the withdrawn rows stay in the registry as superseded history under the CP32 section 9 self-loop mechanism. Active identifiers move 43,177 → **43,134** (-43); total identifiers stay 43,840. All three Lynceus feeds hold flat (standard 945, high-confidence 478, behavioral 132) because `network_endpoint` and `vendor_controlled_hostname` are section-4.4 export-dropped types that never reach the v0.2 feeds, so the cleanup moves the active and CSV counts without touching a single feed entry. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+
+### Prior release, v1.6.12
+
+**v1.6.12** was a quality-correction and sourcing cycle that bundled two staged commits under one tag: the MAC-477 correction (`8cfed9f`) and the Wave-4 ingest (MAC-493, `7d3652d`). The MAC-477 correction **withdrew 108 string-pool `ble_service_uuid` false positives** by supersession (migrations 0034/0035/0036), GATT characteristic-UUID mis-types that were never advertised service UUIDs, and Wave-4 **admitted 11 net-new identifiers** (ids 44648-44658): eight fleet-telematics OUIs (CalAmp, Zonar, Lytx ×4, Verizon Connect, Verizon Telematics), the Neology ALPR OUI `00:17:3d` plus its FCC grantee code `2AKNF`, and the RetailNext people-counting OUI `20:c3:a4`, with the ELSAG ALPR MAC range recategorized `unknown → alpr`. There was no schema migration (schema_version stayed 33). Active identifiers moved 43,274 → 43,177 (-97 net): the drop was the contamination cleanup, not a regression. The standard export moved 1,042 → 945 and the high-confidence export 469 → 478. The CP47 / CP50 export-layer Bible amendments proposed in v1.6.11 remain pending on MAC-492. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
 
 ### Prior release, v1.6.11
 
@@ -137,7 +141,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.12).
+- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.13).
 - [`CREDITS.md`](CREDITS.md), per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md), developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md), how Argus integrates sources, confidence model, dedup logic.
