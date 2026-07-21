@@ -94,7 +94,17 @@ IDENTIFIER_TYPE_TO_PATTERN_TYPE: dict[str, str | None] = {
     "mac": "mac",
     "bssid": "mac",
     "ssid_exact": "ssid",
-    "ssid_pattern": None,  # DROPPED per §4.4 (no regex in Lynceus v0.2)
+    # CP51 (§4.4, MAC-517) — ssid_pattern MAP → Lynceus 0.9.2 `ssid_pattern`
+    # matcher (case-insensitive substring containment: `? LIKE '%'||needle||'%'
+    # COLLATE NOCASE`, db.py:1126). Superseded the stale "no regex in v0.2" DROP:
+    # the board (MAC-516) pinned Lynceus 0.9.2 as substring-not-regex, so every
+    # active ssid_pattern value is converted to a Lynceus-safe leading-literal
+    # substring via `_ssid_pattern_to_substring` and emitted here. FP-hold rows
+    # (generic/short stems) return None from that helper and drop to the
+    # `ssid_pattern_fp_hold` bin instead. Mirror in
+    # coverage_matrix.py::_assign_drop_bin (the `_reconcile` cross-check halts on
+    # any divergence).
+    "ssid_pattern": "ssid_pattern",  # MAP — CP51 Lynceus-0.9.2 substring (MAC-517)
     "ble_uuid": "ble_uuid",
     "ble_service": "ble_uuid",
     # CP21 (§4.4) — alias-collapse to existing `ble_uuid` per the CP13
@@ -597,6 +607,81 @@ def _ble_local_name_is_template(value: str) -> bool:
     return any(ch in value for ch in _BLE_LOCAL_NAME_TEMPLATE_CHARS)
 
 
+# CP51 (§4.4, MAC-517) — ssid_pattern → Lynceus 0.9.2 substring conversion.
+# Lynceus 0.9.2 matches `ssid_pattern` as a case-insensitive SUBSTRING
+# (`? LIKE '%'||needle||'%' COLLATE NOCASE`, db.py:1126) — NOT regex/PCRE/POSIX/
+# glob (board-confirmed at MAC-516). This helper reduces each stored
+# `ssid_pattern` value to the Lynceus-safe substring(s) to emit:
+#   1. strip a leading `(?i)` inline flag and a leading `^` anchor;
+#   2. if the value is a leading alternation `(a|b|...)`, SPLIT into one
+#      substring per branch (e.g. `(msab|xry)…` → ["msab", "xry"]);
+#   3. otherwise take the longest LEADING literal run up to the first regex/SQL
+#      metachar as the stem (trailing `$`/`.*`/`%` fall away naturally);
+#   4. FP gate: a stem shorter than `_SSID_STEM_MIN_LEN`, OR a generic
+#      device-class term in `_SSID_PATTERN_FP_HOLD_STEMS`, returns None → the
+#      whole row is FP-held (drop-bin `ssid_pattern_fp_hold`) for a
+#      tighter-stem / confidence follow-up.
+# Board disposition (MAC-517 plan) ships the distinctive 3-char brand tokens
+# `dji` / `xry` but holds the generic acronym `lpr` (License Plate Reader), so
+# the plan's prose "stem len<4 → hold" is superseded by a min-len-3 floor plus
+# an explicit generic-term hold-set (apply-time correction; per-row disposition
+# is authoritative). MUST be byte-identical to
+# coverage_matrix.py::_ssid_pattern_to_substring — the `_reconcile` map-vs-writer
+# cross-check halts on any divergence.
+_SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")
+_SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({"lpr"})
+_SSID_STEM_MIN_LEN = 3
+
+
+def _ssid_pattern_to_substring(value: str) -> list[str] | None:
+    """Convert an ``ssid_pattern`` value to Lynceus-0.9.2 substring(s).
+
+    Returns the list of case-insensitive substrings to emit (usually one; more
+    than one only for a leading-alternation SPLIT), or ``None`` when the row is
+    FP-held and must drop to the ``ssid_pattern_fp_hold`` bin. See the module
+    comment above for the deterministic rule.
+    """
+
+    s = value.strip()
+    if s.startswith("(?i)"):
+        s = s[4:]
+    if s.startswith("^"):
+        s = s[1:]
+    branches: list[str] | None = None
+    if s.startswith("("):
+        depth = 0
+        close = None
+        for i, ch in enumerate(s):
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    close = i
+                    break
+        if close is not None:
+            inner = s[1:close]
+            # Only a simple capturing alternation `(a|b|...)` splits; a
+            # non-capturing / flag group `(?...)` or a group with no `|` falls
+            # through to leading-literal stemming on the whole string.
+            if inner and not inner.startswith("?") and "|" in inner:
+                branches = inner.split("|")
+    if branches is None:
+        branches = [s]
+    out: list[str] = []
+    for branch in branches:
+        stem_chars: list[str] = []
+        for ch in branch:
+            if ch in _SSID_STEM_METACHARS:
+                break
+            stem_chars.append(ch)
+        stem = "".join(stem_chars).strip()
+        if len(stem) < _SSID_STEM_MIN_LEN or stem.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+            return None
+        out.append(stem)
+    return out or None
+
+
 def _classify_row(
     row: ActiveRow,
     *,
@@ -639,6 +724,9 @@ def _classify_row(
     static reconciliation against MAC-45.
     """
 
+    # CP51 (§4.4, MAC-517) — holder for the converted ssid_pattern substring(s),
+    # set by the ssid_pattern gate below and consumed at the survivor branch.
+    ssid_substrings: list[str] | None = None
     # §11 #14 — procurement-only ban (defense-in-depth: should not appear
     # in `identifiers` per §4.1 + §4.5, but check anyway).
     if row.source_type == "procurement":
@@ -649,9 +737,17 @@ def _classify_row(
     # §4.4 — device_fingerprint dropped.
     if row.identifier_type == "device_fingerprint":
         return "device_fingerprint", []
-    # §4.4 — ssid_pattern dropped (no regex in Lynceus v0.2).
+    # §4.4 CP51 (MAC-517) — ssid_pattern MAP → Lynceus 0.9.2 substring. Convert
+    # to the leading-literal substring(s); a None result is an FP-hold and drops
+    # to `ssid_pattern_fp_hold`. Survivors flow through the confidence / source /
+    # geo gates below (a low-confidence or excluded-source ssid_pattern row still
+    # attributes to the more specific gate, as for every other type). Mirror in
+    # coverage_matrix.py::_assign_drop_bin (the `_reconcile` cross-check halts on
+    # any divergence).
     if row.identifier_type == "ssid_pattern":
-        return "ssid_pattern", []
+        ssid_substrings = _ssid_pattern_to_substring(row.identifier)
+        if ssid_substrings is None:
+            return "ssid_pattern_fp_hold", []
     # §4.4 CP13 / CP50 (MAC-420) — ble_local_name: LITERAL advertised names reach
     # the feed (exact GAP complete-local-name match; MAP entry below). TEMPLATED /
     # regex forms (vendor pattern families carrying metacharacters) stay DROPPED —
@@ -740,6 +836,24 @@ def _classify_row(
             f"row id={row.id} description '{description}' exceeds "
             f"{DESCRIPTION_MAX_CHARS}-char §7.5 ceiling"
         )
+    # CP51 (§4.4, MAC-517) — a surviving ssid_pattern row emits one entry per
+    # converted substring (usually one; two for the single leading-alternation
+    # SPLIT). `pattern` is the substring actually shipped, and `argus_record_id`
+    # hashes `("ssid_pattern"|substring)` so each emitted pattern is a distinct,
+    # re-run-stable record (a SPLIT must not collide two records on the source
+    # regex). Cross-row NOCASE dedup of these substrings happens once, in
+    # `_build_export`, since it needs whole-file state the per-row classifier
+    # lacks.
+    if ssid_substrings is not None:
+        return None, [
+            TalosEntry(
+                pattern=substring,
+                pattern_type=pattern_type,
+                description=description,
+                argus_record_id=_sar10_hash("ssid_pattern", substring),
+            )
+            for substring in ssid_substrings
+        ]
     return None, [
         TalosEntry(
             pattern=row.identifier,
@@ -839,18 +953,31 @@ def _build_meta(
     exported_at: str,
     source_record_count: int,
     bins: dict[str, int],
+    record_count: int,
+    ssid_pattern_emission: dict[str, int],
 ) -> dict[str, Any]:
-    """Build the §7.5 ``_meta`` block (CP7 augments with scope filter)."""
+    """Build the §7.5 ``_meta`` block (CP7 augments with scope filter).
+
+    ``record_count`` is the true feed record count (``len(entries)``). For every
+    identifier_type except ``ssid_pattern`` this equals the row-based survivor
+    count ``source_record_count − sum(bins)``; CP51 (§4.4, MAC-517) ssid_pattern
+    substring conversion can fan out (leading-alternation SPLIT) or collapse
+    (NOCASE dedup), so the two diverge by exactly
+    ``split_expansions − nocase_deduped`` — recorded in ``ssid_pattern_emission``
+    for the coverage-report cross-check.
+    """
 
     return {
         "argus_version": str(schema_version),
         "exported_at": exported_at,
-        "record_count": source_record_count - sum(bins.values()),
+        "record_count": record_count,
         "confidence_threshold": confidence_threshold,
         "geographic_scope_filter": list(geographic_scope_filter),
         "argus_run_id": argus_run_id,
         "source_record_count": source_record_count,
         "dropped_in_export": bins,
+        # CP51 (§4.4, MAC-517) — ssid_pattern substring-emission accounting.
+        "ssid_pattern_emission": ssid_pattern_emission,
     }
 
 
@@ -974,6 +1101,10 @@ def _build_export(
         # value-suppression bin.
         "generic_reserved_uuid": 0,
         "ssid_pattern": 0,
+        # CP51 (§4.4, MAC-517) — ssid_pattern rows whose converted substring is
+        # FP-held (generic/short stem). Distinct from `ssid_pattern`, which now
+        # only fires if a legacy hard-drop path is ever reintroduced (0 today).
+        "ssid_pattern_fp_hold": 0,
         "device_fingerprint": 0,
         # CP13 (§4.4) — Wave G analytical-only types (DROPPED-class).
         "ble_local_name": 0,
@@ -1084,6 +1215,7 @@ def _build_export(
     # CP7 geographic_scope filter (runtime parameter, post-reconciliation).
     is_high_confidence = confidence_threshold >= 70
     entries: list[TalosEntry] = []
+    surviving_ssid_row_ids: set[int] = set()
     for row, entry in survivor_rows:
         if _passes_geographic_scope(
             row,
@@ -1091,9 +1223,45 @@ def _build_export(
             is_high_confidence=is_high_confidence,
         ):
             entries.append(entry)
+            if entry.pattern_type == "ssid_pattern":
+                surviving_ssid_row_ids.add(row.id)
         else:
             bin_assignments[row.id] = "geographic_scope_mismatch"
             bins["geographic_scope_mismatch"] += 1
+    # CP51 (§4.4, MAC-517) — cross-row NOCASE dedup of ssid_pattern substrings.
+    # Lynceus matches ssid_pattern case-insensitively, so `flock` / `Flock` /
+    # `FLOCK` (three distinct canonical rows) collapse to one feed record. Done
+    # here (whole-file state) rather than in the per-row classifier. Kept
+    # deterministic by preserving survivor order (rows are id-ordered) and
+    # keeping the first occurrence of each lowercased substring.
+    ssid_entries_pre_dedup = sum(
+        1 for e in entries if e.pattern_type == "ssid_pattern"
+    )
+    deduped: list[TalosEntry] = []
+    seen_ssid: set[str] = set()
+    nocase_deduped = 0
+    for entry in entries:
+        if entry.pattern_type == "ssid_pattern":
+            key = entry.pattern.lower()
+            if key in seen_ssid:
+                nocase_deduped += 1
+                continue
+            seen_ssid.add(key)
+        deduped.append(entry)
+    entries = deduped
+    # SPLIT expansion count: emitted ssid substrings (pre-dedup) beyond one per
+    # surviving ssid row — i.e. the leading-alternation fan-out (only `(msab|xry)`
+    # today). record_count is the true feed record count (entry-based); it differs
+    # from the row-based survivor count `len(rows) − sum(bins)` by exactly
+    # `split_expansions − nocase_deduped`, surfaced in `_meta.ssid_pattern_emission`
+    # for the coverage-report cross-check.
+    split_expansions = ssid_entries_pre_dedup - len(surviving_ssid_row_ids)
+    ssid_pattern_emission = {
+        "surviving_ssid_rows": len(surviving_ssid_row_ids),
+        "substring_records": ssid_entries_pre_dedup - nocase_deduped,
+        "split_expansions": split_expansions,
+        "nocase_deduped": nocase_deduped,
+    }
     meta = _build_meta(
         schema_version=schema_version,
         confidence_threshold=confidence_threshold,
@@ -1102,6 +1270,8 @@ def _build_export(
         exported_at=exported_at,
         source_record_count=len(rows),
         bins=bins,
+        record_count=len(entries),
+        ssid_pattern_emission=ssid_pattern_emission,
     )
     payload = {
         "_meta": meta,
@@ -1148,6 +1318,7 @@ def _build_coverage_report_md(
             ("procurement_only (§11 #14)", bins["procurement_only"]),
             ("device_fingerprint (§4.4)", bins["device_fingerprint"]),
             ("ssid_pattern (§4.4)", bins["ssid_pattern"]),
+            ("ssid_pattern_fp_hold (§4.4 CP51 MAC-517)", bins["ssid_pattern_fp_hold"]),
             ("ble_local_name (§4.4 CP13)", bins["ble_local_name"]),
             ("ble_characteristic (§4.4 CP13)", bins["ble_characteristic"]),
             ("product_family_codename (§4.4 CP13)", bins["product_family_codename"]),
@@ -1188,6 +1359,25 @@ def _build_coverage_report_md(
             ("chipset_codename (§4.4 mig0019)", bins["chipset_codename"]),
             ("firmware_build_string (§4.4 mig0019)", bins["firmware_build_string"]),
             ("firmware_build_uuid (§4.4 mig0019)", bins["firmware_build_uuid"]),
+            # MAC-181 / migration 0023 — CP28(c) Wave H desktop-axis cluster.
+            (
+                "windows_installer_productcode_vendor_registered (§4.4 CP28c)",
+                bins["windows_installer_productcode_vendor_registered"],
+            ),
+            (
+                "windows_com_clsid_vendor_registered (§4.4 CP28c)",
+                bins["windows_com_clsid_vendor_registered"],
+            ),
+            # CP29 (migration 0024) — Wave I vendor cloud-infrastructure cluster.
+            ("vendor_controlled_hostname (§4.4 CP29)", bins["vendor_controlled_hostname"]),
+            ("vendor_cloud_endpoint_url (§4.4 CP29)", bins["vendor_cloud_endpoint_url"]),
+            (
+                "vendor_controlled_hostname_deprecated (§4.4 CP29)",
+                bins["vendor_controlled_hostname_deprecated"],
+            ),
+            # CP31 (migration 0025) — FCC EAS identifier-type cluster.
+            ("fcc_grantee_code (§4.4 CP31)", bins["fcc_grantee_code"]),
+            ("equipment_class_code (§4.4 CP31)", bins["equipment_class_code"]),
             # CP35 (mig-0028 / MAC-255) — NDPP ratified DROP. Identity-keyed
             # per CP42 §2 (MAC-300) supersedure of CP35 §215.
             (
@@ -1211,14 +1401,33 @@ def _build_coverage_report_md(
         for name, n in bin_rows:
             lines.append(f"| {name} | {n} |")
             total += n
-        survivors = source_count - total
-        check = "✅" if survivors == len(standard_payload["entries"] if label == "argus_export.json" else high_payload["entries"]) else "❌"
+        payload = standard_payload if label == "argus_export.json" else high_payload
+        emitted = len(payload["entries"])
+        survivor_rows = source_count - total
+        # CP51 (§4.4, MAC-517) — feed record count is entry-based; it diverges
+        # from the row-based survivor count by the ssid_pattern SPLIT / NOCASE
+        # fan-out, so reconciliation is `source − dropped + split − dedup = entries`.
+        emission = payload["_meta"]["ssid_pattern_emission"]
+        split_expansions = emission["split_expansions"]
+        nocase_deduped = emission["nocase_deduped"]
+        reconciled = survivor_rows + split_expansions - nocase_deduped
+        check = (
+            "✅"
+            if reconciled == emitted == payload["_meta"]["record_count"]
+            else "❌"
+        )
         lines.append(f"| **sum(dropped_in_export)** | **{total}** |")
+        lines.append(f"| **survivor rows** (source − dropped) | **{survivor_rows}** |")
         lines.append(
-            f"| **survivors → entries.length** | **{survivors}** |"
+            f"| ssid_pattern SPLIT expansions (+) | +{split_expansions} |"
         )
         lines.append(
-            f"| **reconciliation** | **{source_count} − {total} = {survivors}** {check} |"
+            f"| ssid_pattern NOCASE dedup (−) | −{nocase_deduped} |"
+        )
+        lines.append(f"| **entries.length** (feed records) | **{emitted}** |")
+        lines.append(
+            f"| **reconciliation** | **{source_count} − {total} + "
+            f"{split_expansions} − {nocase_deduped} = {reconciled}** {check} |"
         )
         return "\n".join(lines)
 
@@ -1406,8 +1615,10 @@ def _build_coverage_report_md(
     )
     md_parts.append(
         f"- Step-6 `argus_export.json._meta.dropped_in_export` = "
-        f"{json.dumps(standard_bins, sort_keys=True)} → survivors "
-        f"{standard_meta['record_count']} (reconciles {source_count})."
+        f"{json.dumps(standard_bins, sort_keys=True)} → survivor rows "
+        f"{source_count - sum(standard_bins.values())} (reconciles {source_count}); "
+        f"feed records {standard_meta['record_count']} after CP51 ssid_pattern "
+        f"emission {json.dumps(standard_meta['ssid_pattern_emission'], sort_keys=True)}."
     )
     md_parts.append(
         f"- MAC-45 `drop_tally_high_confidence.bins` = "
@@ -1416,8 +1627,10 @@ def _build_coverage_report_md(
     )
     md_parts.append(
         f"- Step-6 `argus_export_high_confidence.json._meta.dropped_in_export` = "
-        f"{json.dumps(high_bins, sort_keys=True)} → survivors "
-        f"{high_meta['record_count']} (reconciles {source_count})."
+        f"{json.dumps(high_bins, sort_keys=True)} → survivor rows "
+        f"{source_count - sum(high_bins.values())} (reconciles {source_count}); "
+        f"feed records {high_meta['record_count']} after CP51 ssid_pattern "
+        f"emission {json.dumps(high_meta['ssid_pattern_emission'], sort_keys=True)}."
     )
     md_parts.append(
         "- Conclusion: per-bin equality + per-row `drop_assignments` equality verified "

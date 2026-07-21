@@ -176,7 +176,7 @@ The tri-state was implicit pre-MAC-217 and is now codified at CP32 §9. Consumer
 - MAC addresses: lowercase, colon-separated (`aa:bb:cc:dd:ee:ff`)
 - OUIs: lowercase, colon-separated 3 octets (`aa:bb:cc`)
 - BLE UUIDs: lowercase, hyphenated 8-4-4-4-12 format
-- SSIDs: stored exactly as broadcast; pattern fields use POSIX regex
+- SSIDs: stored exactly as broadcast. `ssid_exact` matches by exact equality; `ssid_pattern` matches by **case-insensitive SUBSTRING containment** at the Lynceus consumer (`? LIKE '%' || needle || '%' COLLATE NOCASE`, Lynceus 0.9.2 `db.py:1126`) — **not** regex / PCRE / POSIX / glob (the earlier "POSIX regex" claim was wrong; corrected CP51 / MAC-517 after the board pinned Lynceus 0.9.2 at MAC-516). `%` and `_` in a pattern are NOT escaped and act as SQL wildcards (accepted edge case). Argus stores `ssid_pattern` values verbatim (including legacy `(?i)^…`, char-classes, `%`) and converts each to a Lynceus-safe leading-literal substring at export (`export_lynceus.py::_ssid_pattern_to_substring`); generic/short stems are FP-held. `ble_local_name` matches by **exact equality, case-SENSITIVE** in Lynceus 0.9.2 (literals only; substring/template matching deferred to Lynceus v1.4.3+).
 - Manufacturer names: matched against a canonical list maintained in `manufacturers` table; new vendors added explicitly. **Aliases live as a comma-separated TEXT string on `manufacturers.aliases`** (CP23 — wide-net cycle-3 §1 finding #1 + cycle-4 §1 finding #1 formalization); there is NO `manufacturers_aliases` separate table. Append semantics: `aliases = CASE WHEN aliases IS NULL OR aliases = '' THEN ? ELSE aliases || ',' || ? END`. Lookup semantics: `WHERE aliases LIKE '%term%' OR LOWER(canonical_name) = LOWER(?)`.
 
 **source_excerpt per-table CHECK constraint cap table (Correction Pass 23 — DB-verified actuals; supersedes any contradicting prior runguide language).** Per cycle-3 §1 finding #3 contradicted by live schema; CP23 codifies the authoritative table:
@@ -252,7 +252,7 @@ The downstream consumer (Lynceus, the Raspberry Pi RF security monitor) has a fi
 | `mac` | `mac` | direct pass |
 | `bssid` | `mac` | a BSSID *is* a MAC for Lynceus's purposes |
 | `ssid_exact` | `ssid` | direct pass |
-| `ssid_pattern` | (DROPPED) | Lynceus has no regex support in v0.2; record in coverage report |
+| `ssid_pattern` | `ssid_pattern` | **MAP** (CP51 / MAC-517) — Lynceus 0.9.2 `ssid_pattern` = case-insensitive substring (`LIKE '%'||needle||'%' COLLATE NOCASE`, `db.py:1126`), NOT regex. `export_lynceus.py::_ssid_pattern_to_substring` converts each value to its leading-literal substring(s) — strips `(?i)`/`^`, SPLITs a leading `(a|b)` alternation, takes the literal run up to the first metachar. FP-held (drop-bin `ssid_pattern_fp_hold`) when the stem is <3 chars or a generic device-class term (e.g. `lpr`). Superseded the stale "no regex in v0.2" DROP. |
 | `ble_uuid` | `ble_uuid` | direct pass |
 | `ble_service` | `ble_uuid` | collapsed; BLE service UUIDs *are* UUIDs for Lynceus |
 | `mac_range` | (expand or DROP) | expand into individual MACs at export ONLY if range ≤256 entries; otherwise drop and note in coverage report |

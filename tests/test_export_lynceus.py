@@ -42,6 +42,7 @@ from db.validation.export_lynceus import (
     _normalize_datetime,
     _open_readonly,
     _passes_geographic_scope,
+    _ssid_pattern_to_substring,
     run,
 )
 
@@ -169,9 +170,12 @@ def test_type_mapping_covers_every_identifier_type() -> None:
 
 
 def test_type_mapping_drops_match_44_verbatim() -> None:
+    # CP51 (§4.4, MAC-517) — ssid_pattern is now a MAP → Lynceus 0.9.2
+    # `ssid_pattern` (case-insensitive substring). Convertible rows survive;
+    # FP-held rows drop via _classify_row to `ssid_pattern_fp_hold`.
+    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ssid_pattern"] == "ssid_pattern"
     # Legacy DROPPED entries (still live in IDENTIFIER_TYPE_TO_PATTERN_TYPE per
     # CP16 board direction at MAC-75 5b9212ce: legacy branches preserved).
-    assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["ssid_pattern"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["device_fingerprint"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["mac_range"] is None
     assert IDENTIFIER_TYPE_TO_PATTERN_TYPE["bssid"] == "mac"
@@ -316,13 +320,52 @@ def test_classify_pi_self_exclude_only_for_high_conf_file() -> None:
     assert bin_label == "self_exclude_oui"
 
 
-def test_classify_ssid_pattern_drops_section_44() -> None:
-    bin_label, _ = _classify_row(
+def test_classify_ssid_pattern_maps_to_substring_cp51() -> None:
+    # CP51 (§4.4, MAC-517) — a convertible ssid_pattern row SURVIVES and emits
+    # its leading-literal substring as pattern_type "ssid_pattern".
+    bin_label, entries = _classify_row(
         _row(identifier="^Flock-.*$", identifier_type="ssid_pattern", device_category="alpr"),
         confidence_threshold=30,
         apply_pi_self_exclude=False,
     )
-    assert bin_label == "ssid_pattern"
+    assert bin_label is None
+    assert len(entries) == 1
+    assert entries[0].pattern == "Flock-"
+    assert entries[0].pattern_type == "ssid_pattern"
+
+
+def test_classify_ssid_pattern_fp_hold_cp51() -> None:
+    # CP51 — a generic/short stem (`lpr`) is FP-held to a dedicated drop-bin.
+    bin_label, entries = _classify_row(
+        _row(identifier="(?i)^lpr[_-]?cam.*", identifier_type="ssid_pattern", device_category="alpr"),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label == "ssid_pattern_fp_hold"
+    assert entries == []
+
+
+def test_classify_ssid_pattern_alternation_split_cp51() -> None:
+    # CP51 — a leading `(a|b)` alternation SPLITs into one entry per branch.
+    bin_label, entries = _classify_row(
+        _row(identifier="(?i)^(msab|xry)[_-]?.*", identifier_type="ssid_pattern", device_category="hacking_tool"),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label is None
+    assert sorted(e.pattern for e in entries) == ["msab", "xry"]
+    # distinct, re-run-stable record ids per emitted substring (no collision)
+    assert len({e.argus_record_id for e in entries}) == 2
+
+
+def test_ssid_pattern_to_substring_unit_cp51() -> None:
+    # CP51 — deterministic conversion rule spot-checks.
+    assert _ssid_pattern_to_substring("V380%") == ["V380"]
+    assert _ssid_pattern_to_substring("(?i)^elsag.*") == ["elsag"]
+    assert _ssid_pattern_to_substring("dji[-_].+") == ["dji"]  # 3-char brand ships
+    assert _ssid_pattern_to_substring("(?i)^lpr[_-]?cam.*") is None  # generic acronym holds
+    assert _ssid_pattern_to_substring("xy") is None  # <3 chars holds
+    assert _ssid_pattern_to_substring("(?:foo|bar).*") is None  # non-capturing group holds
 
 
 def test_classify_device_fingerprint_drops_section_44() -> None:

@@ -375,6 +375,10 @@ class DropBinTally:
     below_confidence_threshold: int
     oversized_mac_range: int
     ssid_pattern: int
+    # CP51 (§4.4, MAC-517) — ssid_pattern rows whose converted substring is
+    # FP-held (generic/short stem). Mirrors export_lynceus.py's bin of the same
+    # name so the per-row drop_assignments map reconciles with the writer.
+    ssid_pattern_fp_hold: int
     device_fingerprint: int
     # CP13 (§4.4) — Wave G analytical-only types.
     ble_local_name: int
@@ -589,6 +593,62 @@ def _ble_local_name_is_template(value: str) -> bool:
     return any(ch in value for ch in _BLE_LOCAL_NAME_TEMPLATE_CHARS)
 
 
+# CP51 (§4.4, MAC-517) — ssid_pattern → Lynceus 0.9.2 substring conversion.
+# MUST be byte-identical to
+# db/validation/export_lynceus.py::_ssid_pattern_to_substring (the
+# export_lynceus.py `_reconcile` map-vs-writer cross-check halts on any
+# divergence). coverage_matrix.py only needs the is-None (FP-hold) decision to
+# assign the `ssid_pattern_fp_hold` drop bin; the exporter additionally emits
+# the returned substrings. See the exporter's module comment for the rule.
+_SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")
+_SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({"lpr"})
+_SSID_STEM_MIN_LEN = 3
+
+
+def _ssid_pattern_to_substring(value: str) -> list[str] | None:
+    """Convert an ``ssid_pattern`` value to Lynceus-0.9.2 substring(s).
+
+    Returns the list of case-insensitive substrings to emit, or ``None`` when
+    the row is FP-held and must drop to the ``ssid_pattern_fp_hold`` bin.
+    """
+
+    s = value.strip()
+    if s.startswith("(?i)"):
+        s = s[4:]
+    if s.startswith("^"):
+        s = s[1:]
+    branches: list[str] | None = None
+    if s.startswith("("):
+        depth = 0
+        close = None
+        for i, ch in enumerate(s):
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    close = i
+                    break
+        if close is not None:
+            inner = s[1:close]
+            if inner and not inner.startswith("?") and "|" in inner:
+                branches = inner.split("|")
+    if branches is None:
+        branches = [s]
+    out: list[str] = []
+    for branch in branches:
+        stem_chars: list[str] = []
+        for ch in branch:
+            if ch in _SSID_STEM_METACHARS:
+                break
+            stem_chars.append(ch)
+        stem = "".join(stem_chars).strip()
+        if len(stem) < _SSID_STEM_MIN_LEN or stem.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+            return None
+        out.append(stem)
+    return out or None
+
+
 def _assign_drop_bin(
     row: ActiveRow,
     confidence_floor: int,
@@ -623,8 +683,14 @@ def _assign_drop_bin(
         return "unknown_category"
     if row.identifier_type == "device_fingerprint":
         return "device_fingerprint"
+    # §4.4 CP51 (MAC-517) — ssid_pattern MAP → Lynceus 0.9.2 substring. FP-held
+    # rows (None conversion) drop to `ssid_pattern_fp_hold`; convertible rows
+    # survive this gate and flow to the confidence / source gates below (mirror
+    # of export_lynceus.py::_classify_row — its `_reconcile` cross-check halts on
+    # any divergence).
     if row.identifier_type == "ssid_pattern":
-        return "ssid_pattern"
+        if _ssid_pattern_to_substring(row.identifier) is None:
+            return "ssid_pattern_fp_hold"
     # CP13 / CP50 (§4.4, MAC-420) — ble_local_name: LITERAL advertised names
     # survive (MAP → feed, exact GAP local-name match); TEMPLATED / regex forms
     # drop to the ble_local_name bin (Lynceus v0.3 has no template matcher).
@@ -698,6 +764,8 @@ def _compute_drop_tally(
         "below_confidence_threshold": 0,
         "oversized_mac_range": 0,
         "ssid_pattern": 0,
+        # CP51 (§4.4, MAC-517) — ssid_pattern FP-hold bin.
+        "ssid_pattern_fp_hold": 0,
         "device_fingerprint": 0,
         # CP13 (§4.4) — Wave G analytical-only types.
         "ble_local_name": 0,
@@ -738,6 +806,7 @@ def _compute_drop_tally(
         below_confidence_threshold=bins["below_confidence_threshold"],
         oversized_mac_range=bins["oversized_mac_range"],
         ssid_pattern=bins["ssid_pattern"],
+        ssid_pattern_fp_hold=bins["ssid_pattern_fp_hold"],
         device_fingerprint=bins["device_fingerprint"],
         ble_local_name=bins["ble_local_name"],
         ble_characteristic=bins["ble_characteristic"],
@@ -766,6 +835,7 @@ def _check_halts(
         + standard.below_confidence_threshold
         + standard.oversized_mac_range
         + standard.ssid_pattern
+        + standard.ssid_pattern_fp_hold  # CP51 (§4.4, MAC-517)
         + standard.device_fingerprint
         + standard.ble_local_name
         + standard.ble_characteristic
@@ -792,6 +862,7 @@ def _check_halts(
         + high_conf.below_confidence_threshold
         + high_conf.oversized_mac_range
         + high_conf.ssid_pattern
+        + high_conf.ssid_pattern_fp_hold  # CP51 (§4.4, MAC-517)
         + high_conf.device_fingerprint
         + high_conf.ble_local_name
         + high_conf.ble_characteristic
@@ -948,6 +1019,8 @@ def _drop_tally_to_dict(t: DropBinTally) -> dict:
         "below_confidence_threshold": t.below_confidence_threshold,
         "oversized_mac_range": t.oversized_mac_range,
         "ssid_pattern": t.ssid_pattern,
+        # CP51 (§4.4, MAC-517) — ssid_pattern FP-hold bin.
+        "ssid_pattern_fp_hold": t.ssid_pattern_fp_hold,
         "device_fingerprint": t.device_fingerprint,
         # CP13 (§4.4) — Wave G analytical-only types.
         "ble_local_name": t.ble_local_name,
@@ -1199,6 +1272,7 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
             ("`procurement_only` (§11 #14)", tally.procurement_only),
             ("`device_fingerprint` (§4.4)", tally.device_fingerprint),
             ("`ssid_pattern` (§4.4)", tally.ssid_pattern),
+            ("`ssid_pattern_fp_hold` (§4.4 CP51 MAC-517)", tally.ssid_pattern_fp_hold),
             ("`ble_local_name` (§4.4 CP13)", tally.ble_local_name),
             ("`ble_characteristic` (§4.4 CP13)", tally.ble_characteristic),
             ("`product_family_codename` (§4.4 CP13)", tally.product_family_codename),

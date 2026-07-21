@@ -5910,3 +5910,60 @@ families reach feed" headline. The rows are correctly categorized regardless; th
 true regen feed delta is **+112 standard / +111 high-confidence**, all from the
 `ble_uuid` + `oui` cohorts (c4/c5/c6/c3). Pushing the regenerated feed is a one-way
 door reserved to the CEO at gate #3.
+
+### CP51 (PROVISIONAL — board finalizes CP numbering at push gate) — `ssid_pattern` §4.4 MAP → Lynceus 0.9.2 case-insensitive substring; §179 POSIX-regex claim corrected (MAC-517, 2026-07-21)
+
+**Provisional slot.** Numbered CP51 pending board finalization against the in-flight
+CP48–CP50 renumber (CP49 MAC-478/489-contested, CP50 MAC-420 `ble_local_name`
+literal — both still code-only / un-ratified in this file). Code comments in
+`export_lynceus.py` / `coverage_matrix.py` carry the `CP51` label provisionally.
+
+**What changed.** The board (MAC-516) pinned the live Lynceus matcher at **0.9.2**:
+`ssid_pattern` is matched as a **case-insensitive SUBSTRING** (`? LIKE '%' || needle
+|| '%' COLLATE NOCASE`, `db.py:1126`), NOT regex/PCRE/POSIX/glob. This supersedes
+the stale "no regex in Lynceus v0.2" hard-DROP that had kept all 40 active
+`ssid_pattern` rows registry-internal (Lynceus FEED = 0). Two prior claims are
+corrected as factually wrong: (a) §179 "pattern fields use POSIX regex"; (b) the §4.4
+table `ssid_pattern` "(DROPPED) … no regex support in v0.2" row.
+
+**§4.4 disposition.** `ssid_pattern` MAPs to pattern_type `ssid_pattern`.
+`export_lynceus.py::_ssid_pattern_to_substring` (byte-mirrored in
+`coverage_matrix.py`) converts each stored value to its Lynceus-safe leading-literal
+substring(s): strip a leading `(?i)` inline flag and `^` anchor; SPLIT a leading
+`(a|b|…)` alternation into one substring per branch; take the longest leading literal
+run up to the first regex/SQL metachar (trailing `$`/`.*`/`%` fall away). FP gate:
+stem <3 chars OR a generic device-class term (`lpr`) → `None` → drop-bin
+`ssid_pattern_fp_hold` (new). The plan's prose "stem len<4 → hold" is superseded by
+the board's per-row disposition (ships the distinctive 3-char brand tokens `dji` /
+`xry`, holds the generic acronym `lpr`): implemented as a min-len-3 floor plus an
+explicit generic-term hold-set (apply-time correction).
+
+**Emission accounting.** A surviving `ssid_pattern` row emits one feed record per
+converted substring; `argus_record_id = sha256("ssid_pattern"|substring)[:16]` so
+each shipped pattern is a distinct, re-run-stable record (a SPLIT must not collide).
+Cross-row NOCASE dedup collapses case variants (`flock`/`Flock`/`FLOCK` → one).
+Feed record count is therefore entry-based and diverges from the row-based survivor
+count by exactly `split_expansions − nocase_deduped`, surfaced in
+`_meta.ssid_pattern_emission` and cross-checked in the coverage report.
+
+**`ble_local_name`.** Lynceus 0.9.2 matches `ble_local_name` by exact equality,
+case-SENSITIVE (literals only; substring/template deferred to Lynceus v1.4.3+). No
+change to the current disposition here — literal admission is governed by the pending
+CP50; templated forms stay DROPPED.
+
+**Regen delta (STAGE-ONLY, export + docs; no DB write, DB sha unchanged; active
+43,142).** `argus_export.json` **948→980 (+32) ssid_pattern records** measured
+against the live-DB-43,142 baseline
+(33 surviving rows: split `(msab|xry)`→2, NOCASE-dedup `flock`/`Flock`/`FLOCK`→1;
+`lpr` FP-held; the 6 `unknown`-category router rows stay `unknown_category`-banned).
+`argus_export_high_confidence.json` **+3 ssid_pattern records** (`flock`, `FS Ext
+Battery`, `Penguin` — the CP39 flock-hunt-carveout rows with conf≥70 and geo=US;
+the 5 geo-NULL alpr-vendor rows are CP7-geo-filtered out of the high-conf feed). Also
+fixes a **pre-existing** coverage-report reconciliation display bug (7 §4.4-cluster
+drop bins were missing from the `§9` tally table, rendering a spurious `❌`).
+
+**Verification.** Conversion unit-tested against all 40 live rows = 0 mismatches vs
+the board per-row disposition; two-module functional parity = 0 mismatches over 50
+inputs; `_reconcile` STOP-THE-LINE halts = 0; all four coverage-report reconciliations
+`✅`; SQLite `LIKE`-NOCASE match validation passes (positive SSIDs match, negatives
+don't).
