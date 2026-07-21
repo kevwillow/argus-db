@@ -1,8 +1,8 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-07-19T04:25:56Z",
-    "record_count": 478,
+    "exported_at": "2026-07-21T06:24:12Z",
+    "record_count": 481,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
@@ -12,7 +12,8 @@
     "dropped_in_export": {
       "unknown_category": 33338,
       "generic_reserved_uuid": 0,
-      "ssid_pattern": 34,
+      "ssid_pattern": 0,
+      "ssid_pattern_fp_hold": 1,
       "device_fingerprint": 6,
       "ble_local_name": 14,
       "ble_characteristic": 20,
@@ -60,9 +61,15 @@
       "imei_tac": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 59,
-      "excluded_source_type": 338,
-      "geographic_scope_mismatch": 81
+      "below_confidence_threshold": 72,
+      "excluded_source_type": 348,
+      "geographic_scope_mismatch": 86
+    },
+    "ssid_pattern_emission": {
+      "surviving_ssid_rows": 5,
+      "substring_records": 3,
+      "split_expansions": 0,
+      "nocase_deduped": 2
     }
   },
   "entries": [
@@ -413,6 +420,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "18fb1c9808c2351c"
+    },
+    {
+      "pattern": "Penguin",
+      "pattern_type": "ssid_pattern",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "1930d9ed28f84a8d"
     },
     {
       "pattern": "00:18:85",
@@ -773,6 +786,12 @@
       "pattern_type": "oui",
       "description": "Reolink cctv_camera",
       "argus_record_id": "38c4f74ddde48c4b"
+    },
+    {
+      "pattern": "flock",
+      "pattern_type": "ssid_pattern",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "38e079023241122f"
     },
     {
       "pattern": "1587A051000152S",
@@ -2159,6 +2178,12 @@
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
       "argus_record_id": "be4c4ac30f67c8e5"
+    },
+    {
+      "pattern": "FS Ext Battery",
+      "pattern_type": "ssid_pattern",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "bec1ec02517ac66f"
     },
     {
       "pattern": "b8:e2:8c",

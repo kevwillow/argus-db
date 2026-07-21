@@ -1,8 +1,8 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-07-19T04:25:56Z",
-    "record_count": 945,
+    "exported_at": "2026-07-21T06:24:12Z",
+    "record_count": 977,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
@@ -12,7 +12,8 @@
     "dropped_in_export": {
       "unknown_category": 33338,
       "generic_reserved_uuid": 0,
-      "ssid_pattern": 34,
+      "ssid_pattern": 0,
+      "ssid_pattern_fp_hold": 1,
       "device_fingerprint": 6,
       "ble_local_name": 14,
       "ble_characteristic": 20,
@@ -63,6 +64,12 @@
       "below_confidence_threshold": 11,
       "excluded_source_type": 0,
       "geographic_scope_mismatch": 0
+    },
+    "ssid_pattern_emission": {
+      "surviving_ssid_rows": 33,
+      "substring_records": 32,
+      "split_expansions": 1,
+      "nocase_deduped": 2
     }
   },
   "entries": [
@@ -223,6 +230,12 @@
       "argus_record_id": "08a0ee0d55681ed2"
     },
     {
+      "pattern": "anafi",
+      "pattern_type": "ssid_pattern",
+      "description": "Parrot drone",
+      "argus_record_id": "08a3ad4a6660edb2"
+    },
+    {
       "pattern": "1871C000000005",
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
@@ -233,6 +246,12 @@
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
       "argus_record_id": "08ba884cc4bbaa57"
+    },
+    {
+      "pattern": "HDMiniCam",
+      "pattern_type": "ssid_pattern",
+      "description": "HDMiniCam / g_zhang cctv_camera",
+      "argus_record_id": "09384a03f2e76d10"
     },
     {
       "pattern": "7dfc9000-7d1c-4951-86aa-8d9728f8d66c",
@@ -349,6 +368,12 @@
       "argus_record_id": "0de438475138ac61"
     },
     {
+      "pattern": "mavic",
+      "pattern_type": "ssid_pattern",
+      "description": "DJI drone",
+      "argus_record_id": "0e2a3f8b5e7dc5a5"
+    },
+    {
       "pattern": "00:26:7e",
       "pattern_type": "oui",
       "description": "Parrot drone",
@@ -427,6 +452,12 @@
       "argus_record_id": "0ffbaf67fb800117"
     },
     {
+      "pattern": "dji",
+      "pattern_type": "ssid_pattern",
+      "description": "DJI drone",
+      "argus_record_id": "10107cfeff6fe6fb"
+    },
+    {
       "pattern": "1926FP82306LRS1N10",
       "pattern_type": "drone_id_prefix",
       "description": "Skyfront drone",
@@ -503,6 +534,12 @@
       "pattern_type": "ble_uuid",
       "description": "Kwikset smart_lock",
       "argus_record_id": "11ce6354d9c8e91c"
+    },
+    {
+      "pattern": "skydio",
+      "pattern_type": "ssid_pattern",
+      "description": "Skydio drone",
+      "argus_record_id": "12d479e6945b142f"
     },
     {
       "pattern": "e4:24:6c",
@@ -691,10 +728,22 @@
       "argus_record_id": "18fb1c9808c2351c"
     },
     {
+      "pattern": "Penguin",
+      "pattern_type": "ssid_pattern",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "1930d9ed28f84a8d"
+    },
+    {
       "pattern": "1581F6N8",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "194d9f49a643d762"
+    },
+    {
+      "pattern": "CamHipro",
+      "pattern_type": "ssid_pattern",
+      "description": "CamHi / HiChip cctv_camera",
+      "argus_record_id": "19a3fa627165f769"
     },
     {
       "pattern": "0000fd84-0000-1000-8000-00805f9b34fb",
@@ -749,6 +798,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Vision Aerial drone",
       "argus_record_id": "1b2a23d073bdba71"
+    },
+    {
+      "pattern": "oxygen",
+      "pattern_type": "ssid_pattern",
+      "description": "Oxygen Forensics hacking_tool",
+      "argus_record_id": "1b41592236fa8081"
     },
     {
       "pattern": "184384610",
@@ -961,6 +1016,12 @@
       "argus_record_id": "244ce9a1646a5443"
     },
     {
+      "pattern": "autel",
+      "pattern_type": "ssid_pattern",
+      "description": "Autel Robotics drone",
+      "argus_record_id": "245d687507b53c58"
+    },
+    {
       "pattern": "80:be:af",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -1033,10 +1094,22 @@
       "argus_record_id": "28d2d7e0233dcbac"
     },
     {
+      "pattern": "BLACKLENS",
+      "pattern_type": "ssid_pattern",
+      "description": "BlackLens (ESNAPP) cctv_camera",
+      "argus_record_id": "28f109a4c015a1cb"
+    },
+    {
       "pattern": "20686S3",
       "pattern_type": "drone_id_prefix",
       "description": "Black Swift Technologies drone",
       "argus_record_id": "290ed04a9e0b9063"
+    },
+    {
+      "pattern": "EUROSPY",
+      "pattern_type": "ssid_pattern",
+      "description": "EuroSpy (ESNAPP) cctv_camera",
+      "argus_record_id": "293760bd8c2327c6"
     },
     {
       "pattern": "c4:79:05",
@@ -1423,6 +1496,12 @@
       "argus_record_id": "38c4f74ddde48c4b"
     },
     {
+      "pattern": "flock",
+      "pattern_type": "ssid_pattern",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "38e079023241122f"
+    },
+    {
       "pattern": "1587A051000152S",
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
@@ -1439,6 +1518,12 @@
       "pattern_type": "oui",
       "description": "Axis Communications cctv_camera",
       "argus_record_id": "39b60b488cecc04c"
+    },
+    {
+      "pattern": "elsag",
+      "pattern_type": "ssid_pattern",
+      "description": "Leonardo DRS alpr",
+      "argus_record_id": "3a1d98d44f0f4ae0"
     },
     {
       "pattern": "57b43004-2528-d6bc-b043-b49af0ec06c1",
@@ -1691,6 +1776,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
       "argus_record_id": "49381ce4939ff07a"
+    },
+    {
+      "pattern": "SPYSITE",
+      "pattern_type": "ssid_pattern",
+      "description": "SpySite (ESNAPP) cctv_camera",
+      "argus_record_id": "496deb5f7fff0240"
     },
     {
       "pattern": "1748CLT",
@@ -2023,6 +2114,12 @@
       "argus_record_id": "55fdb269f8dd66a5"
     },
     {
+      "pattern": "inspire",
+      "pattern_type": "ssid_pattern",
+      "description": "DJI drone",
+      "argus_record_id": "563ef7e2f1f7b447"
+    },
+    {
       "pattern": "1581F4QZ",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -2053,6 +2150,12 @@
       "argus_record_id": "584f0fd8be27a991"
     },
     {
+      "pattern": "parrot",
+      "pattern_type": "ssid_pattern",
+      "description": "Parrot drone",
+      "argus_record_id": "584f61df5b743227"
+    },
+    {
       "pattern": "2108F",
       "pattern_type": "drone_id_prefix",
       "description": "Vesper UAS drone",
@@ -2069,6 +2172,12 @@
       "pattern_type": "ble_uuid",
       "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
       "argus_record_id": "58f9d5639bbc1931"
+    },
+    {
+      "pattern": "genetec",
+      "pattern_type": "ssid_pattern",
+      "description": "Genetec alpr",
+      "argus_record_id": "5940f14449f5d60b"
     },
     {
       "pattern": "ec:c8:9c",
@@ -2105,6 +2214,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
       "argus_record_id": "5a621270db409a30"
+    },
+    {
+      "pattern": "graykey",
+      "pattern_type": "ssid_pattern",
+      "description": "Grayshift hacking_tool",
+      "argus_record_id": "5a62392d75d4bc74"
     },
     {
       "pattern": "1581F8ZX",
@@ -2677,6 +2792,12 @@
       "argus_record_id": "7460226eabe11116"
     },
     {
+      "pattern": "alpr",
+      "pattern_type": "ssid_pattern",
+      "description": "Unattributed identifier",
+      "argus_record_id": "74ac37b224c5f9f1"
+    },
+    {
       "pattern": "c4:aa:c4",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -2747,6 +2868,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "A2Z drone",
       "argus_record_id": "781238de5a12ca12"
+    },
+    {
+      "pattern": "msab",
+      "pattern_type": "ssid_pattern",
+      "description": "MSAB hacking_tool",
+      "argus_record_id": "787d1c71f10fb651"
     },
     {
       "pattern": "2046DSKRXB003",
@@ -3283,6 +3410,12 @@
       "argus_record_id": "8e2b2f6aaadd1c9a"
     },
     {
+      "pattern": "grayshift",
+      "pattern_type": "ssid_pattern",
+      "description": "Grayshift hacking_tool",
+      "argus_record_id": "8e31ef3d49fc96d5"
+    },
+    {
       "pattern": "fc:5f:49",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -3595,6 +3728,12 @@
       "argus_record_id": "9985ea6ef2d96371"
     },
     {
+      "pattern": "MVSPT",
+      "pattern_type": "ssid_pattern",
+      "description": "V380 / Macrovideo cctv_camera",
+      "argus_record_id": "998747c228efb594"
+    },
+    {
       "pattern": "0000fed0-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
       "description": "Apple, Inc. bluetooth_tracker",
@@ -3617,6 +3756,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Amazon Prime Air drone",
       "argus_record_id": "9b4dd7e3dfb02e49"
+    },
+    {
+      "pattern": "iCSee",
+      "pattern_type": "ssid_pattern",
+      "description": "iCSee / Xiongmai cctv_camera",
+      "argus_record_id": "9b7614537d43d9df"
     },
     {
       "pattern": "4d0500a1-766c-42c4-8944-42bc98fc2d09",
@@ -3809,6 +3954,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "DMR Technologies drone",
       "argus_record_id": "a70c8d52b8607622"
+    },
+    {
+      "pattern": "autovu",
+      "pattern_type": "ssid_pattern",
+      "description": "Genetec alpr",
+      "argus_record_id": "a78b9a389e32ba34"
     },
     {
       "pattern": "1872CV11AR",
@@ -4219,6 +4370,12 @@
       "argus_record_id": "be4c4ac30f67c8e5"
     },
     {
+      "pattern": "FS Ext Battery",
+      "pattern_type": "ssid_pattern",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "bec1ec02517ac66f"
+    },
+    {
       "pattern": "b8:e2:8c",
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
@@ -4283,6 +4440,12 @@
       "pattern_type": "ble_uuid",
       "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
       "argus_record_id": "c0eaa280593be88a"
+    },
+    {
+      "pattern": "phantom",
+      "pattern_type": "ssid_pattern",
+      "description": "DJI drone",
+      "argus_record_id": "c0f38c7d2875bc89"
     },
     {
       "pattern": "17906110",
@@ -4429,6 +4592,12 @@
       "argus_record_id": "c82ae36849a49fef"
     },
     {
+      "pattern": "iMiniCam",
+      "pattern_type": "ssid_pattern",
+      "description": "HDMiniCam / g_zhang cctv_camera",
+      "argus_record_id": "c849052c84081ede"
+    },
+    {
       "pattern": "181792",
       "pattern_type": "drone_id_prefix",
       "description": "Freefly Systems drone",
@@ -4573,6 +4742,12 @@
       "argus_record_id": "cedf9891ae71781d"
     },
     {
+      "pattern": "MATECAM",
+      "pattern_type": "ssid_pattern",
+      "description": "MateCam (ESNAPP) cctv_camera",
+      "argus_record_id": "cf0af3a1c7d6da57"
+    },
+    {
       "pattern": "1971F3A85113",
       "pattern_type": "drone_id_prefix",
       "description": "FIMI X8 SE 2022 Drone drone",
@@ -4715,6 +4890,12 @@
       "pattern_type": "ble_uuid",
       "description": "Flock Safety gunshot_detect",
       "argus_record_id": "d3548b94fac0f910"
+    },
+    {
+      "pattern": "xry",
+      "pattern_type": "ssid_pattern",
+      "description": "MSAB hacking_tool",
+      "argus_record_id": "d379e0349467a3c4"
     },
     {
       "pattern": "16988ER0",
@@ -4879,6 +5060,12 @@
       "argus_record_id": "d8262380d0f525b4"
     },
     {
+      "pattern": "V380",
+      "pattern_type": "ssid_pattern",
+      "description": "V380 / Macrovideo cctv_camera",
+      "argus_record_id": "d8476eac2f40ce78"
+    },
+    {
       "pattern": "d0:3f:27",
       "pattern_type": "oui",
       "description": "Wyze Labs cctv_camera",
@@ -4919,6 +5106,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "SmartDrone drone",
       "argus_record_id": "dae69ba9eada2005"
+    },
+    {
+      "pattern": "vigilant",
+      "pattern_type": "ssid_pattern",
+      "description": "Motorola Solutions alpr",
+      "argus_record_id": "dae7a4cf4387a6ef"
     },
     {
       "pattern": "57b40002-2528-d6bc-b043-b49af0ec06c1",
@@ -5579,6 +5772,12 @@
       "pattern_type": "oui",
       "description": "Harris persistent_surveillance",
       "argus_record_id": "f7e1c05b9ea4dbd3"
+    },
+    {
+      "pattern": "magnet",
+      "pattern_type": "ssid_pattern",
+      "description": "Magnet Forensics hacking_tool",
+      "argus_record_id": "f806767791eb9244"
     },
     {
       "pattern": "00002760-08c2-11e1-9073-0e8ac72e0013",
