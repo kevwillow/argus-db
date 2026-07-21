@@ -24,9 +24,9 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.13:
+At v1.6.14:
 
-- **43,134 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.13) is the Wave-5 data-quality cleanup (MAC-511): it withdraws 43 junk identifier rows by supersession (22 `network_endpoint` and 21 `vendor_controlled_hostname` rows that were APK string-pool glue, scrape-glue concatenations, RFC-2606 placeholder domains, or a mis-typed class token), with no schema migration; net active -43. All three JSON feeds stay flat because those rows were already section-4.4 export-dropped and never reached a feed. See the release notes below for the breakdown.
+- **43,134 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.14) is the CP51 `ssid_pattern` export-layer flip (MAC-517): it re-pins the Lynceus `ssid_pattern` disposition to 0.9.2 case-insensitive substring matching, shipping 32 previously-dropped `ssid_pattern` rows to the standard feed (+3 to the high-confidence feed) with no data change — zero admissions, zero withdrawals, active stays 43,134. See the release notes below for the breakdown.
 - **156 manufacturers**, surveillance vendors classified by what they make
 - **95 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
 - **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
@@ -43,8 +43,8 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 478 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
-| `exports/argus_export.json` | 945 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export_high_confidence.json` | 481 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export.json` | 977 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
 | `exports/argus_export.csv` | 43,134 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
@@ -86,7 +86,11 @@ Coverage is intentionally narrow per category. Argus has 156 vendors, but most c
 
 ## Most recent release
 
-**v1.6.13** is the most recent release: the Wave-5 data-quality cleanup (MAC-511), staged as canonical write `a99f858`. It **withdraws 43 junk identifier rows by supersession** (migration 0037): 22 `network_endpoint` rows that were APK string-pool concatenation glue, and 21 `vendor_controlled_hostname` rows made up of 10 scrape-glue concatenations, 10 RFC-2606 reserved-placeholder (`example.com`) domains, and 1 Java class token mis-typed as a hostname. None were real vendor identifiers. There is no schema migration (schema_version stays 33), and nothing is deleted: the withdrawn rows stay in the registry as superseded history under the CP32 section 9 self-loop mechanism. Active identifiers move 43,177 → **43,134** (-43); total identifiers stay 43,840. All three Lynceus feeds hold flat (standard 945, high-confidence 478, behavioral 132) because `network_endpoint` and `vendor_controlled_hostname` are section-4.4 export-dropped types that never reach the v0.2 feeds, so the cleanup moves the active and CSV counts without touching a single feed entry. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+**v1.6.14** is the most recent release: the CP51 `ssid_pattern` export-layer capability flip (MAC-517), isolated out of the in-flight Wave-6 gate so it ships alone rather than riding a data cycle. It is **export-only** — zero admissions, zero withdrawals, no schema migration (schema_version stays 33), and no canonical write, so the database is byte-identical to v1.6.13 (DB post-sha `b406dff1...daa265`) and the standard feed's `argus_run_id` `10b46f03-3d3a-5646-9279-48cbb8d469aa` still matches the shipped v1.6.13 active set. CP51 re-pins the Lynceus `ssid_pattern` disposition from the stale "v0.2, no regex → DROP" assumption to **Lynceus 0.9.2 case-insensitive substring matching** (`? LIKE '%' || needle || '%' COLLATE NOCASE`, `db.py:1126`), after the board pinned the live matcher at 0.9.2 on MAC-516. Previously section-4.4 export-dropped `ssid_pattern` rows now ship as leading-literal substring stems: the standard Lynceus feed moves **945 → 977** (+32, 100% `ssid_pattern`) and the high-confidence feed **478 → 481** (+3); the behavioral feed holds at 132. Short or generic stems (`lpr`, `ibr`, `rv50`, `mp70`) are FP-held and confirmed absent from the feed. **Consumer note:** these substring rows require **Lynceus 0.9.2 or newer** to match; `ble_local_name` templates stay deferred to Lynceus v1.4.3+. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+
+### Prior release, v1.6.13
+
+**v1.6.13** was the Wave-5 data-quality cleanup (MAC-511), staged as canonical write `937fefe`. It **withdraws 43 junk identifier rows by supersession** (migration 0037): 22 `network_endpoint` rows that were APK string-pool concatenation glue, and 21 `vendor_controlled_hostname` rows made up of 10 scrape-glue concatenations, 10 RFC-2606 reserved-placeholder (`example.com`) domains, and 1 Java class token mis-typed as a hostname. None were real vendor identifiers. There is no schema migration (schema_version stays 33), and nothing is deleted: the withdrawn rows stay in the registry as superseded history under the CP32 section 9 self-loop mechanism. Active identifiers move 43,177 → **43,134** (-43); total identifiers stay 43,840. All three Lynceus feeds hold flat (standard 945, high-confidence 478, behavioral 132) because `network_endpoint` and `vendor_controlled_hostname` are section-4.4 export-dropped types that never reach the v0.2 feeds, so the cleanup moves the active and CSV counts without touching a single feed entry. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
 
 ### Prior release, v1.6.12
 
@@ -141,7 +145,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.13).
+- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.14).
 - [`CREDITS.md`](CREDITS.md), per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md), developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md), how Argus integrates sources, confidence model, dedup logic.

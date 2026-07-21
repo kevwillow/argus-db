@@ -14,9 +14,39 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.6.14 - 2026-07-21
+
+An **export-layer capability-flip release** on top of v1.6.13, isolated out of the in-flight Wave-6 gate ([MAC-517](/MAC/issues/MAC-517)) so the CP51 `ssid_pattern` change ships alone rather than riding a data cycle. It is **export-only: zero admissions, zero withdrawals, zero canonical database writes.** The database is byte-identical to v1.6.13 (DB post-sha `b406dff1...daa265`, unchanged because nothing was written), and the active-set fingerprint is unchanged — the standard feed's `argus_run_id` is `10b46f03-3d3a-5646-9279-48cbb8d469aa`, which matches the shipped v1.6.13 active set. What changes is the Lynceus export layer: **CP51 (provisional) re-pins the `ssid_pattern` disposition from the stale "Lynceus v0.2, no regex → DROP" assumption to Lynceus 0.9.2, which matches `ssid_pattern` as a case-insensitive substring** (`? LIKE '%' || needle || '%' COLLATE NOCASE`, Lynceus consumer `db.py:1126`), not a regex, after the board pinned the live matcher at 0.9.2 on [MAC-516](/MAC/issues/MAC-516). Previously section-4.4 export-dropped `ssid_pattern` rows now ship as leading-literal substring stems. The standard Lynceus feed moves **945 → 977** (**+32**, 100% `ssid_pattern`, nothing removed) and the high-confidence feed **478 → 481** (**+3**, 100% `ssid_pattern`); the behavioral-signatures feed is unchanged at **132**. There is **no schema migration** (schema_version stays **33**, last schema-changing migration `0033`, CP46) and no data change: active identifiers stay **43,134**, total identifiers stay **43,840**, manufacturers **156**, sources **95**, and the device-category enum **20** — all unchanged from v1.6.13. The CTO re-verified the two feed deltas and the `argus_run_id` directly against the committed export JSONs (isolated regen `db4933f` vs v1.6.13 baseline `02212cf`) and confirmed the four short-stem false-positive holds are absent from the feed rather than estimating them.
+
+**Consumer note (binding).** The new `ssid_pattern` feed rows are substring stems that require **Lynceus 0.9.2 or newer** to consume. A Lynceus consumer older than 0.9.2 does not implement the `ssid_pattern` substring matcher and will not act on these +32 standard / +3 high-confidence entries. `ble_local_name` templates stay deferred — Lynceus 0.9.2 matches `ble_local_name` only by exact, case-sensitive equality, and substring/template matching is not available until Lynceus v1.4.3+, so `ble_local_name` is out of scope for this release.
+
+### Schema
+
+- **No migration this cycle.** schema_version stays **33** (last schema-changing migration `0033`, CP46). CP51 is an export-layer type-mapping change in `export_lynceus.py` / `coverage_matrix.py`; it touches no DDL, adds no `identifier_type` or `device_category` enum value (the enum stays at **20**), and writes nothing to the database.
+
+### Data
+
+- **`identifiers` active:** **43,134** (no change — zero admissions, zero withdrawals; this is an export-only release).
+- **`identifiers` total:** **43,840** (no change).
+- **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change). **device-category enum:** **20** (no change).
+- **Lynceus standard feed:** 945 → **977** (**+32**, 100% `ssid_pattern`, zero removed). **high-confidence feed:** 478 → **481** (**+3**, 100% `ssid_pattern`). **behavioral-signatures feed:** **132** (no change). **CSV:** 43,134 rows (unchanged; byte-identical to the v1.6.13 CSV modulo the per-run `exported_at` timestamp).
+- **What the +32 / +3 are:** previously section-4.4 export-dropped `ssid_pattern` rows that Lynceus 0.9.2 can now match as case-insensitive substrings. Each surviving row emits one feed record per converted leading-literal substring; the standard-feed `argus_run_id` `10b46f03-3d3a-5646-9279-48cbb8d469aa` matches the shipped v1.6.13 active-set fingerprint, confirming the active set was not touched.
+- **False-positive holds:** short or generic stems are FP-held (drop-bin `ssid_pattern_fp_hold`) so they never reach the feed. `lpr`, `ibr`, `rv50`, and `mp70` were confirmed absent from the standard feed.
+- **DB post-sha:** `b406dff1209f1068945a668aeb23aacfead47cc9e516b315eddf8dedefdaa265` (unchanged from v1.6.13; the database is byte-identical because this release performs no canonical write).
+
+### Bible amendments
+
+- **CP51 (provisional) — `ssid_pattern` §4.4 MAP → Lynceus 0.9.2 case-insensitive substring; §179 POSIX-regex claim corrected ([MAC-517](/MAC/issues/MAC-517)).** The `export_lynceus.py` §4.4 type-mapping table and PROJECT_BIBLE §179 are re-pinned from the stale "Lynceus v0.2, no SSID regex" assumption to Lynceus 0.9.2 substring matching, after the board pinned the live Lynceus matcher at 0.9.2 on [MAC-516](/MAC/issues/MAC-516). Two prior statements are corrected as factually wrong: §179's "pattern fields use POSIX regex" and the §4.4 table's `ssid_pattern` "(DROPPED) … no regex support in v0.2" row. The amendment is carried in `docs/engineering/BIBLE_AMENDMENTS.md`; it is numbered **CP51 provisionally**, and the board finalizes the CP number against the in-flight CP48–CP50 renumber at the push gate.
+
+### Halts encountered
+
+- None.
+
+---
+
 ## v1.6.13 - 2026-07-19
 
-A **data-quality cleanup release** on top of v1.6.12, requested by the board ([MAC-511](/MAC/issues/MAC-511)) and staged as canonical write `a99f858` (DB post-sha `b406dff1...daa265`). It **withdraws 43 junk identifier rows by supersession** (migration `0037`, CP32 section 9 self-loop: `superseded_by = id`, `confidence = 0`, MAC-477 precedent, nothing deleted). The rows were APK string-pool concatenation glue, scrape-glue concatenations, RFC-2606 reserved-placeholder domains, and one Java class token mis-typed as a hostname, none of them real vendor identifiers. There is **no schema migration** this cycle: schema_version stays **33** (last schema-changing migration `0033`, CP46); `0037` is a data-only supersession pass with no DDL and no schema_version bump. Active identifier count moves **43,177 → 43,134** (-43); total identifiers stay **43,840**, since the 43 withdrawals are supersessions that retain the rows as history. All three Lynceus feeds are **unchanged** (standard **945**, high-confidence **478**, behavioral **132**): every withdrawn row was already section-4.4 export-dropped, because the `network_endpoint` and `vendor_controlled_hostname` types do not reach the Lynceus v0.2 feeds, so removing them moves the active and CSV counts but not the feed counts. The CTO re-verified the active, total, and cohort counts against the live database (DB sha `b406dff1...daa265`) and read the three feed counts below from the actual regen rather than estimating them.
+A **data-quality cleanup release** on top of v1.6.12, requested by the board ([MAC-511](/MAC/issues/MAC-511)) and staged as canonical write `937fefe` (DB post-sha `b406dff1...daa265`). It **withdraws 43 junk identifier rows by supersession** (migration `0037`, CP32 section 9 self-loop: `superseded_by = id`, `confidence = 0`, MAC-477 precedent, nothing deleted). The rows were APK string-pool concatenation glue, scrape-glue concatenations, RFC-2606 reserved-placeholder domains, and one Java class token mis-typed as a hostname, none of them real vendor identifiers. There is **no schema migration** this cycle: schema_version stays **33** (last schema-changing migration `0033`, CP46); `0037` is a data-only supersession pass with no DDL and no schema_version bump. Active identifier count moves **43,177 → 43,134** (-43); total identifiers stay **43,840**, since the 43 withdrawals are supersessions that retain the rows as history. All three Lynceus feeds are **unchanged** (standard **945**, high-confidence **478**, behavioral **132**): every withdrawn row was already section-4.4 export-dropped, because the `network_endpoint` and `vendor_controlled_hostname` types do not reach the Lynceus v0.2 feeds, so removing them moves the active and CSV counts but not the feed counts. The CTO re-verified the active, total, and cohort counts against the live database (DB sha `b406dff1...daa265`) and read the three feed counts below from the actual regen rather than estimating them.
 
 ### Schema
 
@@ -29,7 +59,7 @@ A **data-quality cleanup release** on top of v1.6.12, requested by the board ([M
 - **Withdrawn cohort (43 rows, migration `0037`):** 22 `network_endpoint` (APK string-pool concatenation glue) plus 21 `vendor_controlled_hostname`, of which 10 are scrape-glue concatenations, 10 are RFC-2606 reserved-placeholder (`example.com`) domains, and 1 is a Java class token mis-typed as a hostname.
 - **`manufacturers`:** **156** (no change). **`sources`:** **95** (no change). **device-category enum:** **20** (no change).
 - **Lynceus standard feed:** **945** (no change). **high-confidence feed:** **478** (no change). **behavioral-signatures feed:** **132** (no change). All three hold flat because `network_endpoint` and `vendor_controlled_hostname` are section-4.4 export-dropped types that never reach the Lynceus v0.2 feeds, so withdrawing these 43 rows moves the active and CSV counts and leaves every feed entry untouched. **CSV:** 43,134 rows, matching the active count.
-- **DB post-sha:** `b406dff1209f1068945a668aeb23aacfead47cc9e516b315eddf8dedefdaa265` (canonical write `a99f858`).
+- **DB post-sha:** `b406dff1209f1068945a668aeb23aacfead47cc9e516b315eddf8dedefdaa265` (canonical write `937fefe`).
 
 ### Bible amendments
 
