@@ -5962,6 +5962,27 @@ the 5 geo-NULL alpr-vendor rows are CP7-geo-filtered out of the high-conf feed).
 fixes a **pre-existing** coverage-report reconciliation display bug (7 §4.4-cluster
 drop bins were missing from the `§9` tally table, rendering a spurious `❌`).
 
+**Apply-time correction (MAC-521, 2026-07-21):** The Regen-delta prediction above
+measured against a **live-DB-43,142** baseline and reported `argus_export.json`
+**948→980** / `argus_export_high_confidence.json` **+3** — those are the
+**pre-isolation, Wave-6-inclusive** figures. The board subsequently chose to
+ISOLATE the CP51 flip out of the in-flight Wave-6 gate
+([MAC-517](/MAC/issues/MAC-517)), so v1.6.14 actually ships the flip regenerated
+on the **v1.6.13 / active-43,134** baseline, with Wave-6 ids 44659-44666 **NOT**
+present. The shipped isolated deltas are standard **945 → 977 (+32)**,
+high-confidence **478 → 481 (+3)**, active **43,134**. The **+32 / +3 deltas are
+invariant** vs the prediction (same conversion, same 33 surviving rows); only the
+absolute baselines differ — `948→980` was measured on live-DB-43,142, `945→977`
+on the isolated 43,134. Cite-paste proof against the committed export JSONs:
+standard `exports/argus_export.json` `_meta.record_count` = **977** and
+`_meta.source_record_count` = **43134**; high-confidence
+`exports/argus_export_high_confidence.json` = **481** entries; both carry the
+shipped standard `argus_run_id` `10b46f03-3d3a-5646-9279-48cbb8d469aa`, which
+matches the shipped v1.6.13 active-set fingerprint and confirms **no canonical
+write** (DB post-sha `b406dff1...daa265`, byte-identical to v1.6.13). The original
+`948→980` / `43,142` prediction prose above is preserved verbatim and NOT edited
+in place, per [[feedback_apply_time_correction_when_prediction_diverges_from_reality]].
+
 **Verification.** Conversion unit-tested against all 40 live rows = 0 mismatches vs
 the board per-row disposition; two-module functional parity = 0 mismatches over 50
 inputs; `_reconcile` STOP-THE-LINE halts = 0; all four coverage-report reconciliations
