@@ -1,14 +1,14 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-07-21T06:24:12Z",
-    "record_count": 481,
+    "exported_at": "2026-07-22T14:08:11Z",
+    "record_count": 479,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "10b46f03-3d3a-5646-9279-48cbb8d469aa",
-    "source_record_count": 43134,
+    "argus_run_id": "221274e8-22cd-5dfe-850d-9da623532822",
+    "source_record_count": 43125,
     "dropped_in_export": {
       "unknown_category": 33338,
       "generic_reserved_uuid": 0,
@@ -61,15 +61,15 @@
       "imei_tac": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 72,
+      "below_confidence_threshold": 69,
       "excluded_source_type": 348,
-      "geographic_scope_mismatch": 86
+      "geographic_scope_mismatch": 84
     },
     "ssid_pattern_emission": {
-      "surviving_ssid_rows": 5,
-      "substring_records": 3,
+      "surviving_ssid_rows": 1,
+      "substring_records": 1,
       "split_expansions": 0,
-      "nocase_deduped": 2
+      "nocase_deduped": 0
     }
   },
   "entries": [
@@ -420,12 +420,6 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "18fb1c9808c2351c"
-    },
-    {
-      "pattern": "Penguin",
-      "pattern_type": "ssid_pattern",
-      "description": "Flock Safety alpr",
-      "argus_record_id": "1930d9ed28f84a8d"
     },
     {
       "pattern": "00:18:85",
@@ -786,12 +780,6 @@
       "pattern_type": "oui",
       "description": "Reolink cctv_camera",
       "argus_record_id": "38c4f74ddde48c4b"
-    },
-    {
-      "pattern": "flock",
-      "pattern_type": "ssid_pattern",
-      "description": "Flock Safety alpr",
-      "argus_record_id": "38e079023241122f"
     },
     {
       "pattern": "1587A051000152S",

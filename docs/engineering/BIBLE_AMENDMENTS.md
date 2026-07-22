@@ -5988,3 +5988,74 @@ the board per-row disposition; two-module functional parity = 0 mismatches over 
 inputs; `_reconcile` STOP-THE-LINE halts = 0; all four coverage-report reconciliations
 `✅`; SQLite `LIKE`-NOCASE match validation passes (positive SSIDs match, negatives
 don't).
+
+### CP52 (PROVISIONAL — board finalizes CP numbering at push gate) — `ssid_pattern` FP-magnet refine/demote (MAC-527, 2026-07-22)
+
+**Provisional slot.** Numbered CP52 pending board finalization against the in-flight
+CP48–CP51 numbering (CP51 itself is provisional). This change is **data-only** (a
+migration + BIBLE prose); no `CP52` label is carried in code, so a board renumber
+touches only this file.
+
+**Why.** CP51 unlocked all active `ssid_pattern` rows into the Lynceus 0.9.2
+case-insensitive **bare-substring** matcher. The MAC-522 WiGLE re-mine
+(`operator_review/MAC-522/cto_wigle_ratification.md`) fired the SAME contains-query
+against WiGLE and proved **14 of the 32 shipped substrings are SEVERE false-positive
+magnets** — a downstream consumer scanner mislabels ordinary home/business WiFi as
+surveillance (`flock`→"Schneeflocke", `Penguin`→112k home nets, `dji`→"Fidji",
+`oxygen`→"Oxygen.Net", `iCSee`→"LogisticsEE", …). CEO one-way-door product call
+(MAC-527): refine/demote the 14 SEVERE by rule; leave the 12 LOW-FP alone; tighten
+the 6 MODERATE only where cheap and lossless.
+
+**Disposition** (`db/migrations/0038_mac527_ssid_pattern_fp_magnet_refine_demote.sql`;
+full table in the ratification doc). Two pure-DB mechanisms, NO code change — the
+byte-mirrored `_ssid_pattern_to_substring` helper re-derives every substring from
+the new stored values, so `_reconcile` stays green:
+- **WITHDRAW (9 rows → CP32 §9 self-loop `superseded_by=id`, `confidence=0`):**
+  `flock`/`Flock`/`FLOCK` (559/560/561), `Penguin` (563), `vigilant` (44465),
+  `alpr` (44469), `magnet` (39610), `oxygen` (41839), `dji` (35597). Rule-1
+  categorically-wrong (`oxygen`/`magnet` = forensic software, no field AP; `alpr` =
+  internal category-acronym) and rule-2/3 bare-stem drops with no salvageable form
+  whose vendor keeps rich coverage.
+- **REFINE (8 rows → in-place `identifier` UPDATE to a delimiter-anchored
+  `(?i)^(X_|X-).*` form):** `phantom`, `inspire`, `parrot`, `anafi`, `mavic`
+  (35598-35602), `(msab|xry)` (39613 → 4 branches), `iCSee` (44620), `V380` (44618).
+  The delimiter boundary kills the confirmed mid-word FPs (`inspirefreewifi`,
+  `parrothead`, `bananafish`, `williamsabc`, `LogisticsEE`) while keeping real
+  device SSIDs (`MAVIC_AIR-…`, `Mavic-…`, `V380_…`, `iCSee_…`).
+
+**Marquee-coverage guard (rule 3).** Every dropped/refined vendor retains ≥1 working
+identifier (verified from the live-DB inventory): Flock (38 oui + 5 `ssid_exact
+Flock-*` + BLE + `FS Ext Battery` kept), DJI (15 oui + 51 drone_id_prefix + refined
+mavic/phantom), Parrot (5 oui + BLE), Motorola (10 oui + BLE), Magnet/Oxygen/MSAB
+(kept via network_discovery_protocol_pattern + product_family_codename); `iCSee` /
+`V380` are sole/near-sole identifiers → REFINED, never dropped. Never dropped a
+marquee vendor's last identifier.
+
+**Near-term recall tradeoff & relax-back.** The delimiter-anchored forms require a
+`_`/`-` boundary, so a no-delimiter device SSID (`Phantom4-…`) is missed near-term
+(accepted per the CEO plan). The structural fix is Lynceus matcher hardening
+(min-len≥5 + word/`_`/`-` boundary anchoring), board-owned via MAC-517/MAC-356;
+once it lands, the original stems (preserved verbatim in migration 0038) can be
+relaxed back for full recall. This CP does NOT block on it.
+
+**Regen delta (STAGE-ONLY; ISOLATED at the v1.6.14 / active-43,134 baseline —
+Wave-6 ids 44659-44666 excluded, mirroring the CP51 isolation; MAC-527's rows are
+all id ≤ 44627 so the −9 delta is Wave-6-invariant).** `argus_export.json`
+**977 → 979** (ssid `substring_records` 32→34: +9 refine-splits −7 withdrawn
+substrings; `surviving_ssid_rows` 33→24; `split_expansions` 1→10; `nocase_deduped`
+2→0). `argus_export_high_confidence.json` **481 → 479** (ssid substring_records
+3→1 — `flock`+`Penguin` withdrawn; only `FS Ext Battery` survives high-conf). CSV
+active **43,134 → 43,125 (−9)**. Unlike CP51's export-only flip this is a real
+canonical write, so `argus_run_id` CHANGES (standard
+`10b46f03…` → `221274e8-22cd-5dfe-850d-9da623532822`, deterministic over the new
+active set). `argus_export_behavioral_signatures.json` is byte-identical modulo
+`exported_at` (record_count 132, run_id `260b5777…` unchanged — ssid-only change)
+→ NOT re-staged. schema_version stays **33** (data-only).
+
+**Verification.** Applied on a throwaway copy of the live DB: 43,142→43,133 (−9);
+exactly 17 rows differ (no collateral); fan-out = 0; two-module `_ssid_pattern
+_to_substring` parity = 0 mismatches on all 8 refined values; coverage_matrix
+`_reconcile` Halts = 0; FP-kill simulation = 0/18 confirmed mine FPs still match,
+all real device SSIDs still match; `json_valid(notes)` over the 17-row scope
+unchanged (notes NOT modified — 10 rows carry pre-existing CP39 text-suffix
+corruption; the migration file + this CP are the audit trail).
