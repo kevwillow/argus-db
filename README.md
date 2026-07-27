@@ -24,9 +24,9 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.14:
+At v1.6.15:
 
-- **43,134 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.14) is the CP51 `ssid_pattern` export-layer flip (MAC-517): it re-pins the Lynceus `ssid_pattern` disposition to 0.9.2 case-insensitive substring matching, shipping 32 previously-dropped `ssid_pattern` rows to the standard feed (+3 to the high-confidence feed) with no data change — zero admissions, zero withdrawals, active stays 43,134. See the release notes below for the breakdown.
+- **43,125 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.15) is the CP52 `ssid_pattern` false-positive remediation (MAC-527): under Lynceus 0.9.2's case-insensitive substring matcher, 14 of the 32 `ssid_pattern` substrings shipped in v1.6.14 were false-positive magnets that mislabel ordinary WiFi as surveillance, so it withdraws 9 and refines 8 to delimiter-anchored device forms — active moves 43,134 → 43,125 (-9), standard feed 977 → 979, high-confidence 481 → 479, with every dropped/refined vendor keeping at least one working identifier. See the release notes below for the breakdown.
 - **156 manufacturers**, surveillance vendors classified by what they make
 - **95 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
 - **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
@@ -43,9 +43,9 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 481 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
-| `exports/argus_export.json` | 977 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 43,134 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export_high_confidence.json` | 479 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export.json` | 979 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export.csv` | 43,125 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
@@ -86,7 +86,11 @@ Coverage is intentionally narrow per category. Argus has 156 vendors, but most c
 
 ## Most recent release
 
-**v1.6.14** is the most recent release: the CP51 `ssid_pattern` export-layer capability flip (MAC-517), isolated out of the in-flight Wave-6 gate so it ships alone rather than riding a data cycle. It is **export-only** — zero admissions, zero withdrawals, no schema migration (schema_version stays 33), and no canonical write, so the database is byte-identical to v1.6.13 (DB post-sha `b406dff1...daa265`) and the standard feed's `argus_run_id` `10b46f03-3d3a-5646-9279-48cbb8d469aa` still matches the shipped v1.6.13 active set. CP51 re-pins the Lynceus `ssid_pattern` disposition from the stale "v0.2, no regex → DROP" assumption to **Lynceus 0.9.2 case-insensitive substring matching** (`? LIKE '%' || needle || '%' COLLATE NOCASE`, `db.py:1126`), after the board pinned the live matcher at 0.9.2 on MAC-516. Previously section-4.4 export-dropped `ssid_pattern` rows now ship as leading-literal substring stems: the standard Lynceus feed moves **945 → 977** (+32, 100% `ssid_pattern`) and the high-confidence feed **478 → 481** (+3); the behavioral feed holds at 132. Short or generic stems (`lpr`, `ibr`, `rv50`, `mp70`) are FP-held and confirmed absent from the feed. **Consumer note:** these substring rows require **Lynceus 0.9.2 or newer** to match; `ble_local_name` templates stay deferred to Lynceus v1.4.3+. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+**v1.6.15** is the most recent release: the CP52 `ssid_pattern` false-positive remediation (MAC-527), isolated out of the in-flight Wave-6 gate (board call) so the fix ships alone and now rather than waiting on the Wave-6 data cycle, which regens into v1.6.16 next. Unlike the export-only v1.6.14 it is a **canonical data change** (migration `0038`, data-only, schema_version stays 33): it **withdraws 9 `ssid_pattern` rows by supersession and refines 8 in place** to remediate the 14 SEVERE false-positive magnets the MAC-522 WiGLE re-mine proved — under Lynceus 0.9.2's case-insensitive bare-substring matcher, 14 of the 32 substrings shipped in v1.6.14 mislabel ordinary home/business WiFi as surveillance (`flock` → "Schneeflocke", `dji` → "Fidji", `oxygen` → "Oxygen.Net", `iCSee` → "LogisticsEE"). Active identifiers move 43,134 → **43,125** (-9, all supersessions; total stays 43,840); the standard Lynceus feed moves **977 → 979** and the high-confidence feed **481 → 479** (`flock` + `Penguin` withdrawn); the behavioral feed holds at 132. The standard feed's `argus_run_id` moves to `221274e8-…` over the new active set. Every dropped or refined vendor keeps at least one working identifier (Flock, DJI, Parrot, Motorola stay detectable; `iCSee` / `V380` are refined, not dropped), and the CTO confirmed the 18 documented mine false-positives no longer match while real device SSIDs still do (FP-kill 0/18). Regenerated ISOLATED at the v1.6.14 / 43,134 baseline (Wave-6 excluded). **Consumer note:** the refined substring stems require **Lynceus 0.9.2 or newer**; they are delimiter-anchored, a near-term recall trade-off pending board matcher hardening (MAC-517 / MAC-356). See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+
+### Prior release, v1.6.14
+
+**v1.6.14** was the CP51 `ssid_pattern` export-layer capability flip (MAC-517), isolated out of the in-flight Wave-6 gate so it ships alone rather than riding a data cycle. It is **export-only** — zero admissions, zero withdrawals, no schema migration (schema_version stays 33), and no canonical write, so the database is byte-identical to v1.6.13 (DB post-sha `b406dff1...daa265`) and the standard feed's `argus_run_id` `10b46f03-3d3a-5646-9279-48cbb8d469aa` still matches the shipped v1.6.13 active set. CP51 re-pins the Lynceus `ssid_pattern` disposition from the stale "v0.2, no regex → DROP" assumption to **Lynceus 0.9.2 case-insensitive substring matching** (`? LIKE '%' || needle || '%' COLLATE NOCASE`, `db.py:1126`), after the board pinned the live matcher at 0.9.2 on MAC-516. Previously section-4.4 export-dropped `ssid_pattern` rows now ship as leading-literal substring stems: the standard Lynceus feed moves **945 → 977** (+32, 100% `ssid_pattern`) and the high-confidence feed **478 → 481** (+3); the behavioral feed holds at 132. Short or generic stems (`lpr`, `ibr`, `rv50`, `mp70`) are FP-held and confirmed absent from the feed. **Consumer note:** these substring rows require **Lynceus 0.9.2 or newer** to match; `ble_local_name` templates stay deferred to Lynceus v1.4.3+. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
 
 ### Prior release, v1.6.13
 
@@ -145,7 +149,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.14).
+- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.15).
 - [`CREDITS.md`](CREDITS.md), per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md), developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md), how Argus integrates sources, confidence model, dedup logic.
