@@ -32,7 +32,11 @@ from db.validation.coverage_matrix import (
     IDENTIFIER_TYPES,
     PI_SELF_EXCLUDE_OUIS,
     SOURCE_TYPE_CEILINGS,
+    _alias_tokens_for_vendor,
     _assign_drop_bin,
+    _CORP_SUFFIX_STOPLIST,
+    _is_bogus_token,
+    _split_alias_blob,
     ActiveRow,
     mac_range_size,
     matches_pi_self_exclude,
@@ -608,3 +612,259 @@ def test_markdown_emission_is_well_formed(conn: sqlite3.Connection) -> None:
     # Every device_category row appears in the matrix.
     for dc in DEVICE_CATEGORIES:
         assert f"`{dc}`" in md
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# MAC-535 §6.2 alias-tokenization defense (Finding 1)
+#
+# The naive comma-split of manufacturers.aliases yielded corporate-suffix
+# tokens ("Ltd.", "Inc.", "LLC", "THE", "Co.") that inflated per-vendor
+# §6.2 corroboration counts for 17 active vendors. The 3-layer defense:
+# (1) quote-aware split (structural), (2) corporate-suffix stop-list
+# (defense-in-depth), (3) min-length floor (length-4 minimum).
+# These tests pin all three layers + the per-vendor end-to-end on the
+# affected 17 vendors.
+# ────────────────────────────────────────────────────────────────────────────
+
+
+def test_corp_suffix_stoplist_constant_matches_cto_catalogue() -> None:
+    """The stop-list constant is exactly the catalogue cited in
+    operator_review/MAC-533/cto_ratification.md §Finding 2. Sibling test
+    in this file (test_alias_tokens_drop_only_stoplist_catalog) asserts
+    no off-catalogue entries. If a future addition is needed, update the
+    catalogue + the MAC-535 analysis doc + this constant together."""
+    assert _CORP_SUFFIX_STOPLIST == frozenset({
+        "ltd", "ltd.", "inc", "inc.", "llc", "co.", "co", "the",
+    })
+
+
+def test_is_bogus_token_corp_suffix_case_insensitive() -> None:
+    """Layer 2: case-insensitive corporate-suffix match. Verifies each
+    catalogued suffix in upper/lower/title case."""
+    for sfx in ("Ltd", "LTD", "ltd.", "Inc", "INC", "inc.", "INC.",
+                "LLC", "llc", "Co.", "CO.", "co", "Co", "THE", "the"):
+        assert _is_bogus_token(sfx), f"{sfx!r} should be classified bogus"
+    for keep in ("LTD Inc", "Honeywell", "Hikvision",
+                 "Hangzhou Hikvision Digital Technology Co.",
+                 "Numerex Corp.", "WatchGuard"):
+        assert not _is_bogus_token(keep), f"{keep!r} should be kept"
+
+
+def test_is_bogus_token_min_length_floor() -> None:
+    """Layer 3: tokens shorter than the floor are dropped. Catalogued
+    stop-list members ≤3 chars (none today; 'THE' is 3, caught by layer
+    2 too) but the length floor catches future additions cleanly."""
+    assert _is_bogus_token("ab")     # 2 chars
+    assert _is_bogus_token("L3")     # 2 chars (WatchGuard alias — too short)
+    assert _is_bogus_token("a")      # 1 char
+    assert _is_bogus_token("")       # empty
+    assert not _is_bogus_token("Flock")        # 5 chars, not stop-listed
+    assert not _is_bogus_token("Hikvision")    # 9 chars
+
+
+def test_split_alias_blob_bare_value_with_embedded_comma() -> None:
+    """Layer 1, no-quote case: an unquoted value with an embedded comma
+    splits into 2 tokens (current data shape). The bogus filter in
+    `_alias_tokens_for_vendor` catches the bogus one; layer 1 is a
+    no-op on unquoted data."""
+    # Verbatim Hikvision shape from db/argus.db:
+    blob = "Hangzhou Hikvision Digital Technology Co., Ltd."
+    toks = _split_alias_blob(blob)
+    # Naive split on a quoted-vs-bare value: this blob has NO quotes so
+    # we DO split on the embedded comma. The bogus filter then drops " Ltd.".
+    assert "Hangzhou Hikvision Digital Technology Co." in toks
+    # " Ltd." is the raw shape (with leading space — the literal substring
+    # between the comma and "Ltd."); `_alias_tokens_for_vendor` then strips
+    # whitespace + drops via stop-list before exposing the token list.
+    assert any("Ltd." in t for t in toks)
+
+
+def test_split_alias_blob_quoted_value_with_embedded_comma() -> None:
+    """Layer 1, quote case: a properly quoted value with an embedded
+    comma is ONE token. Future-proofs the parser against properly-
+    constructed alias rows without relying on layer 2 to clean up."""
+    blob = ('Hangzhou Hikvision Digital Technology, "Hangzhou Hikvision '
+            'Digital Technology Co., Ltd.",EZVIZ,HiLook')
+    toks = _split_alias_blob(blob)
+    # The quoted phrase survives intact as a single token.
+    assert "Hangzhou Hikvision Digital Technology Co., Ltd." in toks
+    # The bare comma-separated phrase also survives.
+    assert "Hangzhou Hikvision Digital Technology" in toks
+    # Plus the unqualified tokens.
+    assert "EZVIZ" in toks
+    assert "HiLook" in toks
+
+
+def test_split_alias_blob_handles_trailing_and_double_commas() -> None:
+    """Layer 1, edge cases: trailing comma, doubled comma, leading comma,
+    whitespace-only token. None of these appear on canonical data but
+    the parser must not crash."""
+    toks = _split_alias_blob("a,,b, ,c,")
+    # 'a', 'b', 'c' survive; empty / whitespace tokens are dropped.
+    assert toks == ["a", "b", "c"]
+
+
+def test_alias_tokens_for_vendor_returns_canonical_when_no_row() -> None:
+    """If a manufacturer row is absent, fall back to [canonical] verbatim —
+    the legacy behavior is preserved (a downstream code path that names a
+    non-canonical manufacturer still gets a deterministic LIKE token)."""
+    c = sqlite3.connect(":memory:")
+    c.row_factory = sqlite3.Row
+    c.executescript("""
+        CREATE TABLE manufacturers (
+          id INTEGER PRIMARY KEY,
+          canonical_name TEXT NOT NULL UNIQUE,
+          aliases TEXT,
+          primary_category TEXT,
+          source_url TEXT,
+          notes TEXT,
+          added_at DATETIME
+        );
+    """)
+    c.commit()
+    assert _alias_tokens_for_vendor(c, "Unknown Vendor") == ["Unknown Vendor"]
+    c.close()
+
+
+def test_alias_tokens_for_vendor_preserves_canonical_name() -> None:
+    """The canonical_name is always present in the token list (it's
+    added before the bogus-filter pass); it must never be filtered out
+    even if it would otherwise be a stop-list match."""
+    c = sqlite3.connect(":memory:")
+    c.row_factory = sqlite3.Row
+    c.executescript("""
+        CREATE TABLE manufacturers (
+          id INTEGER PRIMARY KEY,
+          canonical_name TEXT NOT NULL UNIQUE,
+          aliases TEXT,
+          primary_category TEXT,
+          source_url TEXT,
+          notes TEXT,
+          added_at DATETIME
+        );
+    """)
+    c.execute(
+        "INSERT INTO manufacturers (canonical_name, aliases, source_url) "
+        "VALUES (?, ?, ?)",
+        ("Test Vendor", "Flock, Ltd., Inc.", "http://x"),
+    )
+    c.commit()
+    toks = _alias_tokens_for_vendor(c, "Test Vendor")
+    assert toks[0] == "Test Vendor"
+    # Bogus tokens dropped; genuine kept.
+    assert "Flock" in toks
+    assert "Ltd." not in toks
+    assert "Inc." not in toks
+    c.close()
+
+
+def test_alias_tokens_drop_only_stoplist_catalog_hikvision(conn: sqlite3.Connection) -> None:
+    """End-to-end on Hikvision (id=209) — the canonical §6.2 regression
+    case cited in MAC-533 §cto_ratification Finding 2.
+
+    Pre-fix tokenization included `Ltd.` (matched 8,660 bogus FCC rows).
+    Post-fix drops `Ltd.`; the `Hangzhou Hikvision Digital Technology`
+    token remains and matches the 1 genuine FCC grantee (see
+    operator_review/MAC-535/tokenization_analysis.md).
+    """
+    conn.execute(
+        "INSERT INTO manufacturers (canonical_name, aliases, source_url) VALUES (?, ?, ?)",
+        (
+            "Hikvision",
+            "Hangzhou Hikvision Digital Technology, HikCentral, HikConnect,"
+            "Hangzhou Hikvision Digital Technology Co., Ltd.,"
+            "EZVIZ,HiLook,Hikmicro,HiWatch,Annke,LaView",
+            "http://ipvm/reports/hikvision-oem-directory",
+        ),
+    )
+    conn.commit()
+    toks = _alias_tokens_for_vendor(conn, "Hikvision")
+    # Bogus tokens dropped.
+    assert "Ltd." not in toks
+    assert "Inc." not in toks
+    assert "LLC" not in toks
+    assert "THE" not in toks
+    # Genuine aliases preserved.
+    assert "Hikvision" in toks
+    assert "Hangzhou Hikvision Digital Technology" in toks
+    assert "HikCentral" in toks
+    assert "HikConnect" in toks
+    assert "EZVIZ" in toks
+    assert "HiLook" in toks
+    assert "Hikmicro" in toks
+    assert "HiWatch" in toks
+    assert "Annke" in toks
+    assert "LaView" in toks
+
+
+def test_alias_tokens_drop_only_stoplist_catalog_motorola(conn: sqlite3.Connection) -> None:
+    """End-to-end on Motorola Solutions — the second-largest bogus-token
+    offender cited in MAC-533 §cto_ratification Finding 2 (Inc. bogus,
+    5,163 FCC matches)."""
+    conn.execute(
+        "INSERT INTO manufacturers (canonical_name, aliases, source_url) VALUES (?, ?, ?)",
+        (
+            "Motorola Solutions",
+            "Motorola Vigilant, Motorola APX, Motorola V300, Motorola V500,"
+            "Motorola Solutions Canada Inc.,Motorola Solutions Germany GmbH,"
+            "MOTOROLA SOLUTIONS CONNECTIVITY, INC.,"
+            "Flock Safety, Motorola Solutions,Motorola Solutions L6Q,"
+            "Axon, Motorola Solutions",
+            "http://bible",
+        ),
+    )
+    conn.commit()
+    toks = _alias_tokens_for_vendor(conn, "Motorola Solutions")
+    # Bogus suffix stripped (token-level, not substring):
+    assert not any(t.strip().lower() == "inc." for t in toks)
+    assert not any(t.strip().lower() == "inc" for t in toks)
+    # Genuine aliases preserved (including "Inc." inside longer tokens —
+    # substring matches aren't filtered, only whole-token matches).
+    assert "Motorola Solutions Canada Inc." in toks
+    assert "Motorola Solutions Germany GmbH" in toks
+    assert "Motorola APX" in toks
+    assert "Motorola V300" in toks
+    assert "Motorola V500" in toks
+
+
+def test_alias_tokens_keep_genuine_substring_matches(conn: sqlite3.Connection) -> None:
+    """Defense against over-filtering: tokens that CONTAIN a stop-listed
+    substring but are NOT stop-listed tokens themselves are preserved.
+    E.g., 'LLC d.b.a. WatchGuard Video' is NOT a stop-listed token (the
+    stop-list is exact-match, not substring), so it must survive even
+    though it contains the substring 'LLC'.
+
+    NOTE on WatchGuard data shape: the on-disk value
+    `Enforcement Video, LLC (d.b.a. WatchGuard Video)` was stored without
+    quote-wrapping, so it splits into 2 tokens at the inner comma. The
+    resulting "LLC (d.b.a. WatchGuard Video)" survives (length-30+
+    token, not on stop-list) and is highly specific (only matches rows
+    with that exact phrase in the corpus). This is benign — extreme
+    precision rather than extreme breadth."""
+    conn.execute(
+        "INSERT INTO manufacturers (canonical_name, aliases, source_url) VALUES (?, ?, ?)",
+        (
+            "WatchGuard",
+            "WatchGuard Video, WatchGuard Video (legacy),"
+            "Enforcement Video, LLC (d.b.a. WatchGuard Video),"
+            "WatchGuard Technologies, Inc.,L3, WatchGuard,"
+            "Motorola WatchGuard",
+            "http://bible",
+        ),
+    )
+    conn.commit()
+    toks = _alias_tokens_for_vendor(conn, "WatchGuard")
+    # Bare "LLC" and "Inc." tokens are dropped (whole-token match).
+    assert not any(t.strip() == "LLC" for t in toks)
+    assert not any(t.strip() == "Inc." for t in toks)
+    # The longer phrase containing "LLC" survives (not a stop-list match).
+    assert "LLC (d.b.a. WatchGuard Video)" in toks
+    # "L3" is dropped by min-length floor (2 chars < 4).
+    assert "L3" not in toks
+    # WatchGuard Technologies is preserved (whole-token match).
+    assert "WatchGuard Technologies" in toks
+    assert "Motorola WatchGuard" in toks
+    # Genuine aliases preserved.
+    assert "WatchGuard Video" in toks
+    assert "WatchGuard Video (legacy)" in toks
+    assert "Enforcement Video" in toks

@@ -293,6 +293,29 @@ HIGH_CORROBORATION_PROCUREMENT_FLOOR = 10
 # §4.4 mac_range expansion ceiling.
 MAC_RANGE_EXPANSION_CEILING = 256
 
+# MAC-535 §6.2 alias-tokenization defense (Finding 1). The naive comma-split of
+# manufacturers.aliases yields corporate-suffix tokens ("Ltd.", "Inc.", "LLC",
+# "THE", "Co.") that match a huge share of the FCC corpus (17.3% / 10.3% / 4.8%
+# / 1.1% / 4.8% respectively against the 50,153-row fcc_grantees corpus),
+# inflating per-vendor corroboration counts for 17 active vendors. The fix is a
+# 3-layer defense:
+#   1. Quote-aware splitting — current data does not consistently wrap comma-
+#      containing values, but the discipline is structural (RFC-4180-lite):
+#      a token begins after `, ` and ends at the next `, ` OR a `"`-wrapped
+#      phrase. If future aliases ARE quoted, the parser handles them correctly.
+#   2. Corporate-suffix stop-list — drop known-bogus tokens regardless of how
+#      they were produced (defense-in-depth for unquoted-comma values that
+#      slip through layer 1). Case-insensitive; matches the cto_ratification.md
+#      Finding 2 catalogue verbatim.
+#   3. Min-length floor — drop tokens of length ≤3 ("a", "ab", "THE" already
+#      caught by stop-list; protects against future short-token false positives).
+# See operator_review/MAC-535/tokenization_analysis.md for the full design +
+# before/after corroboration table.
+_CORP_SUFFIX_STOPLIST: frozenset[str] = frozenset({
+    "ltd", "ltd.", "inc", "inc.", "llc", "co.", "co", "the",
+})
+_ALIAS_TOKEN_MIN_LEN = 4
+
 # §7.5 Talos export confidence thresholds.
 EXPORT_STANDARD_FLOOR = 30
 EXPORT_HIGH_CONFIDENCE_FLOOR = 70
@@ -488,6 +511,61 @@ def _compute_cells(rows: list[ActiveRow]) -> list[CellStats]:
     return cells
 
 
+def _split_alias_blob(blob: str) -> list[str]:
+    """MAC-535 §6.2 tokenization layer-1: quote-aware split.
+
+    The aliases blob is comma-separated. Two value shapes coexist in the live
+    data:
+
+    * Bare values: ``Hangzhou Hikvision Digital Technology Co., Ltd.``
+      (no surrounding quotes; the embedded comma is unintentional artifact
+      of manual alias construction — splits into 2 bogus tokens).
+    * Quoted values (RFC-4180-lite): ``"Hangzhou Hikvision Digital Technology
+      Co., Ltd."`` — the parser treats the quoted phrase as ONE token.
+
+    This helper handles both shapes. It does NOT fix the bug (stop-list +
+    min-length in layer 2/3 do) — it just preserves the structural meaning
+    when a future alias IS properly quoted. Today every stored alias is
+    unquoted so layer 1 is a no-op; layer 2 (stop-list) carries the fix.
+    """
+    out: list[str] = []
+    i = 0
+    n = len(blob)
+    while i < n:
+        # Skip whitespace + commas between tokens.
+        while i < n and blob[i] in (",", " "):
+            i += 1
+        if i >= n:
+            break
+        if blob[i] == '"':
+            # Quoted phrase — read until matching close-quote (no escape support).
+            j = blob.find('"', i + 1)
+            if j == -1:
+                # Unterminated quote — fall back to bare-token read of the
+                # remainder (defensive; doesn't happen on canonical data).
+                out.append(blob[i + 1:].strip())
+                break
+            out.append(blob[i + 1:j].strip())
+            i = j + 1
+        else:
+            # Bare token — read until next comma at top level.
+            j = blob.find(",", i)
+            if j == -1:
+                out.append(blob[i:].strip())
+                break
+            out.append(blob[i:j].strip())
+            i = j + 1
+    return [t for t in out if t]
+
+
+def _is_bogus_token(tok: str) -> bool:
+    """MAC-535 §6.2 tokenization layer-2/3: stop-list + min-length."""
+    s = tok.strip()
+    if len(s) < _ALIAS_TOKEN_MIN_LEN:
+        return True
+    return s.lower() in _CORP_SUFFIX_STOPLIST
+
+
 def _alias_tokens_for_vendor(
     conn: sqlite3.Connection, canonical: str
 ) -> list[str]:
@@ -497,9 +575,12 @@ def _alias_tokens_for_vendor(
     ).fetchone()
     if row is None:
         return [canonical]
-    toks = [row["canonical_name"]]
+    toks: list[str] = [row["canonical_name"]]
     if row["aliases"]:
-        toks += [a.strip() for a in row["aliases"].split(",") if a.strip()]
+        toks += [
+            t for t in _split_alias_blob(row["aliases"])
+            if t and not _is_bogus_token(t)
+        ]
     return toks
 
 

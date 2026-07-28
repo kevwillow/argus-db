@@ -1,12 +1,37 @@
 -- ============================================================================
 -- Script:    0041_mac533_ipvm_public_directory_attribution_ingest.sql
--- Status:    STAGED. Apply to canonical db/argus.db in this heartbeat after the
---            throwaway-prove. Slot 0041 is free — verified by direct working-
---            tree read (highest live = 0039, MAC-528; git status --porcelain
---            db/migrations/ empty pre-author). Slot 0040 is RESERVED for
---            MAC-531 and is NOT touched here. schema_version stays at 33
---            (data-only attribution ingest; no DDL — no new CHECK enum value,
---            no column add, no rebuild).
+-- Status:    APPLIED 2026-07-28 (MAC-533 Phase 2 of v1.7.0 consolidated release).
+--            Do NOT re-apply — see WARNING below.
+--
+-- WARNING: NOT RE-APPLY-SAFE (MAC-535, ratified by DBArchitect 2026-07-28).
+-- The six `UPDATE manufacturers SET aliases = ...` statements on id=209
+-- (Hikvision) lack a UNIQUE backstop, so a second apply would re-append
+-- the 6 new tokens (EZVIZ, HiLook, Hikmicro, HiWatch, Annke, LaView)
+-- producing `{'EZVIZ': 2, 'HiLook': 2, ...}` duplicates. Root cause:
+-- the sqlite3 CLI does not -bail by default, so a failing `CHECK(ok=1)`
+-- on the _mig0041_pre TEMP table aborts only the offending statement,
+-- not the script. The 84 INSERTs and the sources INSERT are UNIQUE-
+-- backstopped (canonical_name UNIQUE / sources.url NOT-NULL+UNIQUE), so
+-- they survive; the UPDATE alone is unsafe on re-apply.
+--
+-- Mitigation if a re-apply ever becomes operationally necessary:
+-- (a) read this file's pre-condition guard at line ~103 and confirm the
+--     CHECK(ok=1) conditions fire (in particular condition (d): the 6
+--     tokens must already NOT appear in Hikvision's aliases), OR
+-- (b) wrap each `UPDATE ... SET aliases = CASE WHEN aliases NOT LIKE
+--     '%<token>%' THEN ... END` so the append is idempotent on re-apply.
+-- The current file is preserved verbatim to maintain the provenance link
+-- between the migration file and what actually ran at apply time; do not
+-- edit the body in place. If a corrective migration is needed, land it
+-- as a new slot (mig-0043+) per §11 #21 (canonical-slot discipline) and
+-- §11 #11 (amendment-log discipline).
+--
+-- Slot 0041 is free — verified by direct working-
+-- tree read (highest live = 0039, MAC-528; git status --porcelain
+-- db/migrations/ empty pre-author). Slot 0040 is RESERVED for
+-- MAC-531 and is NOT touched here. schema_version stays at 33
+-- (data-only attribution ingest; no DDL — no new CHECK enum value,
+-- no column add, no rebuild).
 --
 -- Issue:     MAC-533 (Phase 2 of MAC-530 v1.7.0 consolidated release) — IPVM
 --            public-directory attribution ingest.
