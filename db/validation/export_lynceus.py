@@ -122,7 +122,17 @@ IDENTIFIER_TYPE_TO_PATTERN_TYPE: dict[str, str | None] = {
     "device_fingerprint": None,  # DROPPED per §4.4
     # CP13 (§4.4) — Wave G analytical-only types. All three are DROPPED-class:
     # carried in the canonical DB but never reach the Lynceus pattern table.
-    "ble_local_name": None,  # DROPPED — no GAP local-name match in Lynceus v0.3
+    #
+    # Apply-time correction (MAC-543, 2026-07-28): the CP13 blanket DROP for
+    # `ble_local_name` was SUPERSEDED by CP50 (§4.4, MAC-420) — it is now a
+    # conditional MAP and its sole entry lives below with the CP50 rationale.
+    # A stale duplicate `"ble_local_name": None` key survived here inside the
+    # same dict literal; Python last-key-wins already resolved the mapping to
+    # the CP50 MAP, so removing it is a no-op on all three consumer artifacts
+    # (proof: operator_review/MAC-543/noop_proof.md). It is removed because a
+    # keep-first dedup codemod, an alphabetical re-sort, or a bad merge would
+    # have silently flipped the CP50 MAP back to DROPPED with no error and no
+    # test failure. See the DUPLICATE-KEY GUARD below.
     "ble_characteristic": None,  # DROPPED — Lynceus discovers by service UUID, not characteristic
     "product_family_codename": None,  # DROPPED — vendor-internal taxonomy / cohort strings
     # CP16 (§4.4) — CP14 identifier_type cluster MAP cases (3 new pattern_types).
@@ -283,6 +293,92 @@ DROPPED_REASONS_RATIONALE: dict[str, str] = {
         "precedent)"
     ),
 }
+
+
+# ---------------------------------------------------------------------------
+# DUPLICATE-KEY GUARD (MAC-543) — §11 halt-the-line discipline applied to the
+# §4.4 mapping tables themselves.
+#
+# `IDENTIFIER_TYPE_TO_PATTERN_TYPE` is the single source of truth for what
+# reaches the Lynceus feed. A duplicate key inside the dict literal is
+# resolved silently by Python (last wins) — no error, no test failure, no
+# dangerous-looking diff — so which of the two entries wins depends on source
+# ORDER, and any keep-first dedup codemod / alphabetical re-sort / bad merge
+# can invert a MAP into a DROP. MAC-543 found exactly that: a stale CP13
+# `"ble_local_name": None` shadowed by the CP50 MAP entry.
+#
+# Two checks, catching two different failure modes:
+#   (1) `_assert_no_duplicate_dict_keys` re-parses THIS module's own source and
+#       halts if ANY dict literal in the file (module-level or nested) declares
+#       more constant key entries than it resolves to. Catches a duplicate being
+#       (re-)introduced anywhere, not just in the §4.4 tables.
+#   (2) the explicit CP50 value assertions below. Catches the case a dedup
+#       CANNOT catch — a reviewer deleting the surviving entry and keeping the
+#       shadowed one, which leaves zero duplicates but flips the mapping.
+#
+# Both raise (never `assert`) so `python -O` cannot strip them.
+# ---------------------------------------------------------------------------
+def _assert_no_duplicate_dict_keys() -> None:
+    """Halt if any dict literal in this file declares a duplicate constant key.
+
+    Covers every dict literal in the module, nested ones included. Only constant
+    keys are compared — computed keys cannot be resolved statically and are
+    skipped rather than guessed at.
+
+    Silent no-op when the source is unreadable (frozen/zipped import); the
+    explicit CP50 assertions below are the unconditional backstop.
+    """
+    import ast
+
+    try:
+        source = Path(__file__).read_text(encoding="utf-8")
+        tree = ast.parse(source)
+    except (OSError, SyntaxError, NameError):  # pragma: no cover — frozen import
+        return
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Dict):
+            continue
+        literal_keys = [
+            key.value for key in node.keys if isinstance(key, ast.Constant)
+        ]
+        if len(literal_keys) != len(set(literal_keys)):
+            duplicates = sorted(
+                {key for key in literal_keys if literal_keys.count(key) > 1}
+            )
+            raise RuntimeError(
+                "HALT (§11, MAC-543): duplicate key(s) in the dict literal at "
+                f"{Path(__file__).name}:{node.lineno} — {duplicates}. Python "
+                "resolves these silently by source order; a §4.4 mapping entry "
+                "may be shadowed. Delete the stale entry, do NOT rely on "
+                "last-key-wins."
+            )
+
+
+_assert_no_duplicate_dict_keys()
+
+# CP50 (§4.4, MAC-420) — `ble_local_name` MUST stay a MAP. Value-level check:
+# survives a dedup that keeps the wrong entry, which check (1) cannot see.
+if IDENTIFIER_TYPE_TO_PATTERN_TYPE.get("ble_local_name") != "ble_local_name":
+    raise RuntimeError(
+        "HALT (§4.4 CP50, MAC-420/MAC-543): IDENTIFIER_TYPE_TO_PATTERN_TYPE"
+        "['ble_local_name'] must MAP to 'ble_local_name' (literal advertised-"
+        "name exact match). Got "
+        f"{IDENTIFIER_TYPE_TO_PATTERN_TYPE.get('ble_local_name')!r}. Templated "
+        "values are DROPPED earlier in _classify_row via "
+        "_ble_local_name_is_template — the type-level entry is NOT the drop."
+    )
+
+# CP13 siblings that CP50 did NOT lift — pin them so the correction above is
+# not over-applied to the other two Wave G analytical-only types.
+for _cp13_dropped in ("ble_characteristic", "product_family_codename"):
+    if IDENTIFIER_TYPE_TO_PATTERN_TYPE.get(_cp13_dropped, "sentinel") is not None:
+        raise RuntimeError(
+            f"HALT (§4.4 CP13, MAC-543): {_cp13_dropped!r} must stay "
+            "DROPPED-class (None) in IDENTIFIER_TYPE_TO_PATTERN_TYPE."
+        )
+del _cp13_dropped
+
 
 # §4.5 severity mapping — SUPERSEDED at CP8 (2026-05-07).
 # Severity is now owned operator-side via Lynceus's ``severity_overrides.yaml``;
