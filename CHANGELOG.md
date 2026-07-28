@@ -14,34 +14,64 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
-## v1.6.15 - 2026-07-27
+## v1.7.0 - 2026-07-28
 
-A **false-positive remediation release** on top of v1.6.14, isolated out of the in-flight Wave-6 gate (board call, [MAC-527](/MAC/issues/MAC-527)) so the `ssid_pattern` FP-magnet correction ships **alone and now** — the magnets are live in v1.6.14 and misfiring in the field — rather than waiting on the Wave-6 data cycle, which regens into v1.6.16 next. Unlike the export-only v1.6.14, this is a **canonical data change**: migration `0038` (data-only, no schema change) **withdraws 9 `ssid_pattern` rows by supersession and refines 8 in place** to remediate the 14 SEVERE false-positive magnets the [MAC-522](/MAC/issues/MAC-522) WiGLE re-mine proved. Under Lynceus 0.9.2's case-insensitive bare-substring matcher, 14 of the 32 `ssid_pattern` substrings shipped in v1.6.14 mislabel ordinary home/business WiFi as surveillance (`flock` → "Schneeflocke", `Penguin` → 112k home nets, `dji` → "Fidji", `oxygen` → "Oxygen.Net", `iCSee` → "LogisticsEE"). The CEO made a one-way-door product call: withdraw the categorically-wrong and no-salvageable-form stems, refine the rest to delimiter-anchored device forms. Active identifiers move **43,134 → 43,125** (−9, all supersessions; total identifiers stay **43,840**). The standard Lynceus feed moves **977 → 979** (net +2: +9 refine-splits, −7 withdrawn substrings) and the high-confidence feed **481 → 479** (−2: `flock` and `Penguin` withdrawn, `FS Ext Battery` retained); the behavioral-signatures feed is unchanged at **132**. The standard feed's `argus_run_id` moves to `221274e8-22cd-5dfe-850d-9da623532822` (a real active-set change, unlike v1.6.14's export-only flip). Regenerated **ISOLATED** at the v1.6.14 / 43,134 baseline (Wave-6 ids 44659-44666 excluded); the CTO proved every delta on a throwaway copy and confirmed the 18 documented mine false-positives no longer match while real device SSIDs still do (FP-kill **0/18**).
+Six lanes of finished work, shipped together. The board asked for one substantial release instead of a run of small ones, so everything that queued behind separate gates since v1.6.14 lands here: a false-positive fix to the SSID patterns, eight new identifiers, a junk-row cleanup, three new sources, and a large vendor-attribution import.
 
-**Marquee coverage (binding).** Every withdrawn or refined vendor retains at least one working identifier — Flock (38 OUI + `ssid_exact Flock-*` + BLE + `FS Ext Battery`), DJI (15 OUI + 51 drone-ID prefixes + the refined `mavic`/`phantom` stems), Parrot (5 OUI + BLE), Motorola/Vigilant (10 OUI + BLE); Magnet, Oxygen, and MSAB stay in canonical via their protocol / product-family identifiers. `iCSee` and `V380` are sole identifiers, so they are refined, not dropped. Flock and DJI stay detectable.
+**About the version gap.** A v1.6.15 was assembled and staged in late July, then pulled before publication when the board decided against shipping the false-positive fix on its own. No `v1.6.15` tag exists and nothing was released under that name. Its content ships here, so the public history runs v1.6.14 to v1.7.0.
 
-**Consumer note (binding).** The refined rows are `ssid_pattern` substring stems and still require **Lynceus 0.9.2 or newer** to consume. The refined stems are delimiter-anchored (`x_` / `x-`), so a no-delimiter device SSID may be missed near-term; this is the accepted recall trade-off until the board lands Lynceus matcher hardening (min-length ≥5 plus word / `_` / `-` boundary anchoring, [MAC-517](/MAC/issues/MAC-517) / [MAC-356](/MAC/issues/MAC-356)), after which the original stems (preserved verbatim in migration `0038`) can be relaxed back for full recall.
+### If you consume the feeds, read this part
+
+**The SSID patterns stop matching your neighbours.** A WiGLE re-mine ([MAC-522](/MAC/issues/MAC-522)) tested the 32 SSID substrings v1.6.14 shipped against real-world network data and found 14 of them hitting ordinary home and business WiFi. `flock` matched "Schneeflocke". `Penguin` matched 112,000 networks. `dji` matched "Fidji". `oxygen` matched "Oxygen.Net". Lynceus 0.9.2 compares these as bare substrings, ignoring case and word boundaries, so a scanner running v1.6.14 could label a neighbour's router a license plate reader. Migration `0038` withdraws 9 of those rows and rewrites 8 into delimiter-anchored forms, `mavic_` and `mavic-` in place of bare `mavic`. Measured against the shipped v1.6.14 feed, that removes 7 substrings (`flock`, `Penguin`, `dji`, `magnet`, `oxygen`, `vigilant`, `alpr`) and replaces 9 more with 18 anchored pairs.
+
+Every vendor touched by that pass keeps a working identifier. In the standard feed Flock retains 38 OUIs, the `ssid_exact` entries `Flock` and `Flock-230503`, 6 BLE local names, 8 BLE UUIDs, 4 MACs and the `FS Ext Battery` pattern. DJI retains 15 OUIs, 51 drone-ID prefixes and the anchored `mavic` / `phantom` stems. Magnet, Oxygen and MSAB stay in the database through their product identifiers. `iCSee` and `V380` are the only identifiers their vendors have, so we tightened those rather than dropping them.
+
+The cost: an anchored stem misses a device whose SSID carries no delimiter. We accept that until Lynceus gets minimum-length and word-boundary matching ([MAC-517](/MAC/issues/MAC-517), [MAC-356](/MAC/issues/MAC-356)), at which point the original stems, preserved verbatim inside migration `0038`, can be relaxed back.
+
+**A dead pattern is gone.** The `ssid_exact` entry `Flock-*` never matched anything: the `*` is a literal character, not a wildcard, so Lynceus was looking for a network named `Flock-*`. Migration `0039` withdraws it (id 22910). The staged v1.6.15 notes cited `ssid_exact Flock-*` as live Flock coverage; the working SSID identifiers are `Flock` and `Flock-230503`, and the 38-OUI count in that line was and remains correct.
+
+**Eight new identifiers**, ids 44659-44666 ([MAC-518](/MAC/issues/MAC-518), [MAC-519](/MAC/issues/MAC-519)). The DriveCam OUI `00:16:b2` and two Tianjin Hualai camera OUIs, `18:50:73` and `e4:aa:ec`, plus five FCC grantee codes covering Chipolo, Pebblebee, PB Inc, Netradyne and Nauto. The three OUIs reach the feeds; grantee codes do not, by design.
+
+**Feed totals.** Standard 977 to **981**, high-confidence **481** on both sides, behavioral **132** unchanged. The high-confidence total holding still conceals real movement: three Flock entries left (`Flock-*`, `flock`, `Penguin`) and the three new OUIs arrived.
+
+### Everything else
+
+**Sixteen junk rows withdrawn** (migration `0040`, [MAC-531](/MAC/issues/MAC-531)). Thirteen hostnames that were never vendor infrastructure (`java.sun.com`, `jabber.org`, `www.bouncycastle.org`, `android.asset`, and scrape fragments such as `ap.meraki.com.wshttp`), two bad endpoints (`localhost:54664`, `peticaonline.comv`), and a `ble_company_id` written `0x4C` where the surviving row already carries the four-digit `0x004C`. One further row was corrected in place, FCC grantee code `2a2v6` to `2A2V6`. None of the 16 appeared in any shipped feed, confirmed by comparing the feeds entry by entry rather than reasoning about it.
+
+**Three new sources**, 95 to 98. MuckRock's cell-site-simulator FOIA census and the ACLU's stingray disclosure compilation ([MAC-524](/MAC/issues/MAC-524), [MAC-526](/MAC/issues/MAC-526)) brought **7 procurement records** naming Harris and Digital Receiver Technology hardware at seven agencies, among them Rochester PD, Virginia State Police and Oakland PD. IPVM's public camera and VMS directory ([MAC-533](/MAC/issues/MAC-533)) is the third.
+
+**Vendor attribution, 156 manufacturers to 240** (migration `0041`). The 84 additions are OEM arms of Hikvision (52) and Dahua (32), the rebadging brands those two sell through. Six aliases were attached to Hikvision (EZVIZ, HiLook, Hikmicro, HiWatch, Annke, LaView), and Amcrest and Lorex were linked to Dahua as their parent. The arms are marked hidden by default, so they change how a camera traces back to its real maker without padding vendor lists. No identifiers changed: this is attribution, not new coverage. Forty-four former Dahua OEM brands and 242 unverified vendor leads were held back rather than ingested.
 
 ### Schema
 
-- **No migration this cycle.** schema_version stays **33** (last schema-changing migration `0033`, CP46). Migration `0038` is a data-only refine/withdraw pass — no DDL, no `identifier_type` or `device_category` enum change (the enum stays at **20**), and it touches only `identifiers` rows.
+- **No schema change.** `schema_version` stays **33** (last schema-changing migration `0033`, CP46). All four migrations this cycle, `0038` / `0039` / `0040` / `0041`, are data-only: no DDL, no new `identifier_type` or `device_category` values (the category enum stays at **20**).
 
 ### Data
 
-- **`identifiers` active:** 43,134 → **43,125** (−9: `flock` / `Flock` / `FLOCK`, `Penguin`, `vigilant`, `alpr`, `magnet`, `oxygen`, `dji` withdrawn via the CP32 section 9 self-loop `superseded_by = id`, `confidence = 0`; nothing deleted).
-- **`identifiers` total:** **43,840** (no change — the 9 withdrawals are supersessions that retain the rows as history, and the 8 refinements are in-place value edits).
-- **Refined (8 rows, migration `0038`):** `phantom`, `inspire`, `parrot`, `anafi`, `mavic`, `(msab|xry)`, `iCSee`, `V380` tightened to delimiter-anchored `(?i)^(X_|X-).*` forms (the export emits `x_` / `x-` substrings). **No code change** — the byte-mirrored `_ssid_pattern_to_substring` helper re-derives every substring from the new stored values, so the `_reconcile` cross-check stays green.
-- **`manufacturers`:** **156** (no change). **`sources`:** **95** as shipped (the live registry carries an unshipped, export-suppressed +2 to 97 from the [MAC-524](/MAC/issues/MAC-524) FOIA-source add, excluded from this isolated release). **device-category enum:** **20** (no change). MAC-527 modifies only identifier rows.
-- **Lynceus standard feed:** 977 → **979** (net +2: `ssid_pattern` substring records 32 → 34 — +9 refine-splits, −7 withdrawn substrings). **high-confidence feed:** 481 → **479** (−2: `flock` + `Penguin` withdrawn; `FS Ext Battery` retained). **behavioral-signatures feed:** **132** (no change — MAC-527 is `ssid_pattern`-only). **CSV:** **43,125** rows (matching the active count).
-- **Isolation & fingerprint:** regenerated ISOLATED at the v1.6.14 / 43,134 baseline with Wave-6 ids 44659-44666 excluded (mirrors the CP51 isolation), so v1.6.15 is a clean FP-fix-only delta. The standard-feed `argus_run_id` is `221274e8-22cd-5dfe-850d-9da623532822` over the new 43,125 active set; the behavioral feed's `argus_run_id` `260b5777-…` is unchanged (byte-identical modulo `exported_at`). The canonical `db/argus.db` carries migration `0038` (live active 43,133, including the unshipped Wave-6 rows); the shipped exports are the isolated 43,125 set.
+- **`identifiers` active:** 43,134 → **43,116** (net −18: +8 admitted, −9 false-positive stems, −1 dead `Flock-*`, −16 junk rows). Nothing is deleted; withdrawn rows stay as superseded history under the CP32 §9 self-loop.
+- **`identifiers` total:** 43,840 → **43,848** (+8, the Wave-6 admissions).
+- **`manufacturers`:** 156 → **240** (+84 OEM arms). **`sources`:** 95 → **98**. **`procurement_records`:** **50,499**. **behavioral signatures:** **214** (no change). **device-category enum:** **20** (no change).
+- **Lynceus standard feed:** 977 → **981** (+21 entries / −17 entries). **high-confidence feed:** **481** → **481** (+3 / −3). **behavioral-signatures feed:** **132** (entry set byte-identical). **CSV:** **43,116** rows, matching the active count.
+- **Fingerprint.** The standard and high-confidence feeds carry `argus_run_id` `06182438-91da-5a0d-91fa-6515dc86d921`; the behavioral feed carries `260b5777-99c8-5f75-8023-f4012242e7f4`. Canonical `db/argus.db` sha256 `b05c097b666ed0ae9c4034d5b77c0d532a397365a32cc20438b3d706c67cbbc0`. One consolidated regeneration ran against canonical after both database-write phases landed, and re-running it in an isolated directory reproduced all three consumer artifacts byte for byte.
+
+### Known limitation
+
+`exports/coverage_report.md` §6.2, the vendor-corroboration table, was generated before a tokenizer fix that landed in the same stack ([MAC-535](/MAC/issues/MAC-535)). Splitting vendor aliases on commas produced junk tokens out of corporate suffixes (`Ltd.`, `Inc.`, `LLC`), which inflated corroboration counts for 17 vendors; Hikvision reads 8,662 there where 2 is genuine. Re-running the fixed matcher at this commit changes 20 of 18,713 rows and moves the HIGH tier from 52 vendors to 37. Nothing else moves: the active count, the halt count and both feed drop tallies come out identical, and no `identifiers.confidence` value depends on this table. Those §6.2 tiers are reporting-only, and they are the same numbers every prior release shipped. They get corrected at the next regeneration.
 
 ### Bible amendments
 
-- **CP52 (provisional) — `ssid_pattern` FP-magnet refine/demote ([MAC-527](/MAC/issues/MAC-527)).** Withdraws 9 FP-magnet substrings and refines 8 to delimiter-anchored device forms, per the CEO one-way-door call on the [MAC-522](/MAC/issues/MAC-522) WiGLE proof. Rule split: rule-1 DROP for categorically-wrong identifiers (`oxygen` / `magnet` forensic software with no field AP; `alpr` internal category-acronym); rule-2/3 refine, or bare-drop-with-rich-coverage, for the device families — with a non-negotiable marquee-coverage guard. The amendment is carried in `docs/engineering/BIBLE_AMENDMENTS.md`; numbered **CP52 provisionally**, the board finalizes the CP number against the in-flight CP48–CP51 renumber at the push gate.
+- **CP52 (provisional), `ssid_pattern` false-positive refine and demote ([MAC-527](/MAC/issues/MAC-527)).** Drops categorically wrong stems (`oxygen` and `magnet` are forensic software with no field access point, `alpr` is an internal category acronym), refines device families to delimiter-anchored forms, and binds a marquee-coverage guard: no vendor loses its last working identifier. Carried in `docs/engineering/BIBLE_AMENDMENTS.md`. The board finalizes the CP number against the in-flight CP48-CP51 renumber.
+- **§11 #21 reserved ([MAC-535](/MAC/issues/MAC-535)).** Any `UPDATE` in a migration that lacks a `UNIQUE` or `CHECK` backstop must be written so a second apply is harmless. Migration `0041` appends aliases without such a guard; canonical is clean and the file now carries a warning header.
 
 ### Halts encountered
 
-- None. coverage_matrix `_reconcile` STOP-THE-LINE halts = 0; two-module `_ssid_pattern_to_substring` parity = 0 mismatches; withdrawal fan-out = 0 (no row references the 17 targets via `superseded_by` / `paired_identifier_id`).
+- None. `coverage_matrix` `_reconcile` halts: **0**. The CSV reconciles to canonical active, 43,116 = 43,116. The export path took no database write, proved by identical sha256 before and after the regeneration.
+
+---
+
+## v1.6.15 (withdrawn before release)
+
+Assembled 2026-07-27 as an isolated false-positive fix, then pulled at the board's direction in favour of one bundled release. No tag was cut and nothing was published under this version. Its content, the CP52 `ssid_pattern` remediation and migration `0038`, ships in v1.7.0 above.
 
 ---
 

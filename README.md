@@ -24,11 +24,11 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 
 ## What's in the dataset
 
-At v1.6.15:
+At v1.7.0:
 
-- **43,125 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.6.15) is the CP52 `ssid_pattern` false-positive remediation (MAC-527): under Lynceus 0.9.2's case-insensitive substring matcher, 14 of the 32 `ssid_pattern` substrings shipped in v1.6.14 were false-positive magnets that mislabel ordinary WiFi as surveillance, so it withdraws 9 and refines 8 to delimiter-anchored device forms — active moves 43,134 → 43,125 (-9), standard feed 977 → 979, high-confidence 481 → 479, with every dropped/refined vendor keeping at least one working identifier. See the release notes below for the breakdown.
-- **156 manufacturers**, surveillance vendors classified by what they make
-- **95 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
+- **43,116 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.7.0) bundles six lanes of work: it fixes the SSID patterns that were matching ordinary home WiFi, admits 8 new identifiers, clears 16 junk rows, adds 3 sources, and maps 84 OEM camera brands back to Hikvision and Dahua. Active moves 43,134 → 43,116, the standard feed 977 → 981, high-confidence holds at 481. See the release notes below for the breakdown.
+- **240 manufacturers**, surveillance vendors classified by what they make. 92 of those are OEM arms, the rebadging brands a parent vendor sells through, and they stay hidden from vendor lists by default.
+- **98 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
 - **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
 - **58 identifier types**, the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
 - **214 behavioral signatures**, cellular-control-plane patterns associated with IMSI-catcher detection
@@ -43,9 +43,9 @@ Argus ships four export files for downstream consumption. Pick the one that matc
 
 | Export | Records | Best for |
 |---|---:|---|
-| `exports/argus_export_high_confidence.json` | 479 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
-| `exports/argus_export.json` | 979 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 43,125 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
+| `exports/argus_export_high_confidence.json` | 481 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
+| `exports/argus_export.json` | 981 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
+| `exports/argus_export.csv` | 43,116 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
 | `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
@@ -82,11 +82,19 @@ Argus covers surveillance equipment used by US law enforcement and adjacent oper
 - Real-time deployment status. Argus tells you what an identifier *is*; not whether it's currently deployed near you. That's the downstream scanner's job.
 - Vendors whose surveillance offering isn't public-record attestable. If we can't trace it back to a citable source, it doesn't ship.
 
-Coverage is intentionally narrow per category. Argus has 156 vendors, but most categories list 3-13 vendors, not hundreds. Expansion comes from community contributions and future research.
+Coverage is intentionally narrow per category. Argus lists 240 vendors, 92 of them OEM arms that exist to attribute a rebadged device back to its real maker, and most categories carry 3-13 vendors rather than hundreds. Expansion comes from community contributions and future research.
 
 ## Most recent release
 
-**v1.6.15** is the most recent release: the CP52 `ssid_pattern` false-positive remediation (MAC-527), isolated out of the in-flight Wave-6 gate (board call) so the fix ships alone and now rather than waiting on the Wave-6 data cycle, which regens into v1.6.16 next. Unlike the export-only v1.6.14 it is a **canonical data change** (migration `0038`, data-only, schema_version stays 33): it **withdraws 9 `ssid_pattern` rows by supersession and refines 8 in place** to remediate the 14 SEVERE false-positive magnets the MAC-522 WiGLE re-mine proved — under Lynceus 0.9.2's case-insensitive bare-substring matcher, 14 of the 32 substrings shipped in v1.6.14 mislabel ordinary home/business WiFi as surveillance (`flock` → "Schneeflocke", `dji` → "Fidji", `oxygen` → "Oxygen.Net", `iCSee` → "LogisticsEE"). Active identifiers move 43,134 → **43,125** (-9, all supersessions; total stays 43,840); the standard Lynceus feed moves **977 → 979** and the high-confidence feed **481 → 479** (`flock` + `Penguin` withdrawn); the behavioral feed holds at 132. The standard feed's `argus_run_id` moves to `221274e8-…` over the new active set. Every dropped or refined vendor keeps at least one working identifier (Flock, DJI, Parrot, Motorola stay detectable; `iCSee` / `V380` are refined, not dropped), and the CTO confirmed the 18 documented mine false-positives no longer match while real device SSIDs still do (FP-kill 0/18). Regenerated ISOLATED at the v1.6.14 / 43,134 baseline (Wave-6 excluded). **Consumer note:** the refined substring stems require **Lynceus 0.9.2 or newer**; they are delimiter-anchored, a near-term recall trade-off pending board matcher hardening (MAC-517 / MAC-356). See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
+**v1.7.0** is the most recent release, and it bundles six lanes of work the board asked to ship together rather than as a run of small releases.
+
+The part that matters if you run a scanner: **the SSID patterns stop matching your neighbours.** A WiGLE re-mine (MAC-522) tested the 32 SSID substrings v1.6.14 shipped and found 14 of them hitting ordinary home and business WiFi. `flock` matched "Schneeflocke", `Penguin` matched 112,000 networks, `dji` matched "Fidji". Lynceus 0.9.2 compares these as bare substrings with no case or word-boundary check, so a v1.6.14 scanner could label a neighbour's router a license plate reader. Migration `0038` withdraws 9 of those rows and rewrites 8 into delimiter-anchored forms (`mavic_` and `mavic-` in place of bare `mavic`). Migration `0039` withdraws a second dead entry, the `ssid_exact` pattern `Flock-*`, where the `*` was a literal character rather than a wildcard and so never matched anything. Flock's working SSID identifiers are `Flock` and `Flock-230503`, alongside its 38 OUIs.
+
+The rest: **8 new identifiers** (ids 44659-44666, MAC-518 / MAC-519) covering a DriveCam OUI, two Tianjin Hualai camera OUIs and five FCC grantee codes for Chipolo, Pebblebee, PB Inc, Netradyne and Nauto; **16 junk rows** cleared (migration `0040`, MAC-531), mostly hostnames that were never vendor infrastructure; **three new sources** (95 → 98) from MuckRock's FOIA census, the ACLU stingray compilation and IPVM's camera directory, bringing 7 procurement records naming Harris and DRT hardware at seven agencies; and **84 OEM camera brands** mapped back to Hikvision and Dahua (migration `0041`, manufacturers 156 → 240), which changes attribution without adding coverage.
+
+Active identifiers move 43,134 → **43,116**; the standard Lynceus feed **977 → 981**; high-confidence holds at **481**, though three Flock entries left and three OUIs arrived; the behavioral feed holds at **132**. There is no schema migration (schema_version stays 33). **Consumer note:** the anchored SSID stems require **Lynceus 0.9.2 or newer**, and an anchored stem will miss a device whose SSID uses no delimiter, a recall trade-off we accept until Lynceus gets minimum-length and word-boundary matching (MAC-517 / MAC-356).
+
+A v1.6.15 was assembled in late July and then pulled before publication when the board chose one bundled release instead. No tag was cut; its content ships here. See [`CHANGELOG.md`](CHANGELOG.md) for the full record, including a known limitation in the `coverage_report.md` §6.2 corroboration tiers.
 
 ### Prior release, v1.6.14
 
@@ -149,7 +157,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.6.15).
+- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.7.0).
 - [`CREDITS.md`](CREDITS.md), per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md), developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md), how Argus integrates sources, confidence model, dedup logic.
