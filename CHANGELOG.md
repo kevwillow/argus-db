@@ -50,11 +50,32 @@ The cost: an anchored stem misses a device whose SSID carries no delimiter. We a
 
 - **`identifiers` active:** 43,134 → **43,116** (net −18: +8 admitted, −9 false-positive stems, −1 dead `Flock-*`, −16 junk rows). Nothing is deleted; withdrawn rows stay as superseded history under the CP32 §9 self-loop.
 - **`identifiers` total:** 43,840 → **43,848** (+8, the Wave-6 admissions).
-- **`manufacturers`:** 156 → **240** (+84 OEM arms). **`sources`:** 95 → **98**. **`procurement_records`:** **50,499**. **behavioral signatures:** **214** (no change). **device-category enum:** **20** (no change).
+- **`manufacturers`:** 156 → **240** (+84 OEM arms). **`sources`:** 95 → **98**. **behavioral signatures:** **214** (no change). **device-category enum:** **20** (no change). **`procurement_records` is deliberately not quoted as a coverage figure** — see "Known limitation" below.
 - **Lynceus standard feed:** 977 → **981** (+21 entries / −17 entries). **high-confidence feed:** **481** → **481** (+3 / −3). **behavioral-signatures feed:** **132** (entry set byte-identical). **CSV:** **43,116** rows, matching the active count.
 - **Fingerprint.** The standard and high-confidence feeds carry `argus_run_id` `06182438-91da-5a0d-91fa-6515dc86d921`; the behavioral feed carries `260b5777-99c8-5f75-8023-f4012242e7f4`. Canonical `db/argus.db` sha256 `b05c097b666ed0ae9c4034d5b77c0d532a397365a32cc20438b3d706c67cbbc0`. One consolidated regeneration ran against canonical after both database-write phases landed, and re-running it in an isolated directory reproduced all three consumer artifacts byte for byte.
 
 ### Known limitation
+
+`procurement_records` holds 50,499 rows, and that number is not a surveillance-coverage figure. The
+table was populated by delegating vendor matching to USAspending's server-side `keywords` filter,
+which is bare containment over recipient name and award description with no word or entity boundary.
+Re-matching every row on entity boundaries ([MAC-542](/MAC/issues/MAC-542)) finds **9,065 rows, 17.95%,
+that match no vendor in the registry at any boundary** — `NATIONAL OIL DJIBOUTI SAS` on "DJI",
+`FAXON ENGINEERING` on "AXON", `HAMILTON PACIFIC CHAMBERLAIN` on "BERLA", and 2,034 rows of Defense
+Logistics Agency alprazolam repackaging caught on "ALPR". A further 8,658 rows are held up only by a
+short single-token vendor name and are under adjudication. The boundary-valid total is 41,434 and the
+corrected figure will be lower still, so no coverage claim is made from this table until MAC-542 lands.
+
+**No shipped identifier is affected.** `procurement_records` is read by nothing under `db/export/`;
+procurement-sourced rows are Talos-export-banned outright under bible §11 #14, with a standing
+`new_procurement_only_export_leak` sentinel enforcing it; and only 7 of the 50,499 rows carry a
+`linked_identifier_id` at all — **none of them among the 9,065**. No Lynceus feed entry, no CSV row and
+no `identifiers.confidence` value moves.
+
+It has exactly one consumer: the `exports/coverage_report.md` §6.2 vendor-corroboration table, whose
+`procurement_records` counts gate the HIGH tier at a floor of 10. So §6.2 carries **two** independent
+defects this cycle — the alias-tokenizer bug below, and the containment contamination above. Both are
+reporting-only, and both are corrected at the next regeneration.
 
 `exports/coverage_report.md` §6.2, the vendor-corroboration table, was generated before a tokenizer fix that landed in the same stack ([MAC-535](/MAC/issues/MAC-535)). Splitting vendor aliases on commas produced junk tokens out of corporate suffixes (`Ltd.`, `Inc.`, `LLC`), which inflated corroboration counts for 17 vendors; Hikvision reads 8,662 there where 2 is genuine. Re-running the fixed matcher at this commit changes 20 of 18,713 rows and moves the HIGH tier from 52 vendors to 37. Nothing else moves: the active count, the halt count and both feed drop tallies come out identical, and no `identifiers.confidence` value depends on this table. Those §6.2 tiers are reporting-only, and they are the same numbers every prior release shipped. They get corrected at the next regeneration.
 
