@@ -1,16 +1,16 @@
 {
   "_meta": {
     "argus_version": "33",
-    "exported_at": "2026-07-22T14:08:11Z",
-    "record_count": 479,
+    "exported_at": "2026-07-28T16:34:51Z",
+    "record_count": 481,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "221274e8-22cd-5dfe-850d-9da623532822",
-    "source_record_count": 43125,
+    "argus_run_id": "06182438-91da-5a0d-91fa-6515dc86d921",
+    "source_record_count": 43116,
     "dropped_in_export": {
-      "unknown_category": 33338,
+      "unknown_category": 33326,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 0,
       "ssid_pattern_fp_hold": 1,
@@ -39,7 +39,7 @@
       "ble_adv_interval": 0,
       "ble_payload_offset": 0,
       "firmware_sha256_hash": 880,
-      "network_endpoint": 3542,
+      "network_endpoint": 3540,
       "firmware_image_variant": 3,
       "qualcomm_chip_format_id": 1,
       "firmware_branded_string": 141,
@@ -52,10 +52,10 @@
       "firmware_build_uuid": 1,
       "windows_installer_productcode_vendor_registered": 2,
       "windows_com_clsid_vendor_registered": 1,
-      "vendor_controlled_hostname": 3292,
+      "vendor_controlled_hostname": 3290,
       "vendor_cloud_endpoint_url": 2,
       "vendor_controlled_hostname_deprecated": 4,
-      "fcc_grantee_code": 138,
+      "fcc_grantee_code": 143,
       "equipment_class_code": 7,
       "network_discovery_protocol_pattern": 11,
       "imei_tac": 0,
@@ -1484,12 +1484,6 @@
       "argus_record_id": "759d22ae8c310a68"
     },
     {
-      "pattern": "Flock-*",
-      "pattern_type": "ssid",
-      "description": "Flock Safety alpr",
-      "argus_record_id": "765db90376bacdbb"
-    },
-    {
       "pattern": "e4:7a:2c",
       "pattern_type": "oui",
       "description": "DJI drone",
@@ -1674,6 +1668,12 @@
       "pattern_type": "oui",
       "description": "Hanwha Vision cctv_camera",
       "argus_record_id": "85e72731590fd4b4"
+    },
+    {
+      "pattern": "00:16:b2",
+      "pattern_type": "oui",
+      "description": "DriveCam Inc automotive_telematics",
+      "argus_record_id": "85f7ed9d8a20948e"
     },
     {
       "pattern": "14839ac4-7d7e-415c-9a42-167340cf2339",
@@ -2130,6 +2130,12 @@
       "pattern_type": "ble_uuid",
       "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
       "argus_record_id": "b7b751cd2e7dfe79"
+    },
+    {
+      "pattern": "18:50:73",
+      "pattern_type": "oui",
+      "description": "Tianjin Hualai Technology Co., Ltd. cctv_camera",
+      "argus_record_id": "b9d48e142aa83700"
     },
     {
       "pattern": "24:fd:5b",
@@ -2748,6 +2754,12 @@
       "pattern_type": "oui",
       "description": "Motorola Solutions police_radio",
       "argus_record_id": "ee6ba1f85f7588af"
+    },
+    {
+      "pattern": "e4:aa:ec",
+      "pattern_type": "oui",
+      "description": "Tianjin Hualai Technology Co., Ltd. cctv_camera",
+      "argus_record_id": "ee94faf6969b28ad"
     },
     {
       "pattern": "Flock-230503",
