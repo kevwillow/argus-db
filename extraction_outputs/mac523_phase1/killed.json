@@ -1,0 +1,131 @@
+{
+ "bit_test": [
+  "0182AB",
+  "45B20C",
+  "498899",
+  "5274D2",
+  "6DB300",
+  "754874",
+  "7FF298",
+  "A6E66D",
+  "A93AF4",
+  "FFFFFF"
+ ],
+ "not_in_ieee": [
+  "0182AB",
+  "244F59",
+  "45B20C",
+  "498899",
+  "5274D2",
+  "6DB300",
+  "754874",
+  "7FF298",
+  "904EEA",
+  "A6E66D",
+  "A93AF4",
+  "D0DCBD",
+  "F49DA1",
+  "FFFFFF"
+ ],
+ "sdk_hub_udns": [
+  {
+   "udn": "4b710320-451a-11e2-bcfd-0800200c9a66",
+   "manufacturers": [
+    "H.264 Network Camera",
+    "JSS",
+    "LOREX",
+    "PCI",
+    "Solid"
+   ]
+  }
+ ],
+ "sdk_hub_node_parts": [
+  "080020"
+ ],
+ "already_held": [
+  {
+   "oui": "D42DC5",
+   "identifier": "d4:2d:c5",
+   "manufacturer": "i-PRO (Panasonic)",
+   "device_category": "cctv_camera"
+  }
+ ],
+ "summary": {
+  "total_oui_candidates": 40,
+  "killed_bit_test": 10,
+  "killed_not_in_ieee": 14,
+  "killed_sdk_hub": 1,
+  "killed_already_held": 1,
+  "net_new_survivors": 13,
+  "entity_boundary_killed": 11,
+  "final_total_distinct_ouis": 40
+ },
+ "entity_boundary_or_non_surveillance": [
+  {
+   "oui": "000000",
+   "ieee_assignee": "XEROX CORPORATION",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "XEROX CORPORATION (IEEE registry) \u2014 but American Dynamics Inc. VideoEdge NVR observed in same OUI match. OUI not registered to AD; likely placeholder MAC in NVR config (00:00:00:XX:XX:XX pattern) \u2014 not real NIC assignment. Entity-boundary kill."
+  },
+  {
+   "oui": "000100",
+   "ieee_assignee": "EQUIP'TRANS",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "EQUIP'TRANS \u2014 evidence contains `docker0\\ngateway\\nether\\n00:01:00:01:00:01` (Linux bridge / veth interface); software-defined interface MAC, not device identity. Entity-boundary kill."
+  },
+  {
+   "oui": "001788",
+   "ieee_assignee": "Philips Lighting BV",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Philips Lighting BV (Signify) \u2014 model 'Philips hue bridge 2015' / 'Philips hue Personal Wireless Lighting' observed; consumer smart-home lighting, NOT surveillance. Non-surveillance class."
+  },
+  {
+   "oui": "001C7F",
+   "ieee_assignee": "Check Point Software Technologies",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Check Point Software Technologies \u2014 evidence contains `managedBySmp`, `cssSuffix`, `login_bg3.png`, `macAddr` from a Check Point firewall admin web UI; NIC of management interface, not surveillance device. Entity-boundary kill."
+  },
+  {
+   "oui": "2C00AB",
+   "ieee_assignee": "Commscope",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Commscope (ARRIS) \u2014 model 'ARRIS NVG443B' / 'Frontier-NVG443B' observed; ARRIS NVG443B is a Frontier Communications fiber-optic home gateway (ONT). Non-surveillance class."
+  },
+  {
+   "oui": "70CA97",
+   "ieee_assignee": "Ruckus Wireless",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Ruckus Wireless \u2014 model 'Ruckus Wireless ZoneDirector' / 'ZD1200' observed; ZoneDirector is a wireless LAN controller, NOT surveillance. Non-surveillance class."
+  },
+  {
+   "oui": "9C65EE",
+   "ieee_assignee": "Zhone Technologies, Inc.",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Zhone Technologies \u2014 model 'DASAN-GPON-ONU-RG-H660GM' observed; GPON-ONU is a fiber-optic network terminal, NOT surveillance. Non-surveillance class."
+  },
+  {
+   "oui": "B479C8",
+   "ieee_assignee": "Ruckus Wireless",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Ruckus Wireless \u2014 model 'Ruckus Wireless ZoneDirector' / 'ZD1200' observed; same as 70CA97. Non-surveillance class."
+  },
+  {
+   "oui": "C089AB",
+   "ieee_assignee": "Commscope",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Commscope (ARRIS) \u2014 model 'ARRIS NVG443B' / 'Frontier-NVG443B' observed; same as 2C00AB. Non-surveillance class."
+  },
+  {
+   "oui": "ECB5FA",
+   "ieee_assignee": "Philips Lighting BV",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Philips Lighting BV (Signify) \u2014 same as 001788. Non-surveillance class."
+  },
+  {
+   "oui": "F03575",
+   "ieee_assignee": "Hui Zhou Gaoshengda Technology Co.,LTD",
+   "kill_reason": "entity_boundary_or_non_surveillance",
+   "review_note": "Hui Zhou Gaoshengda Technology \u2014 evidence contains `LOCATION: http://192.168.1.4:8060/` (Roku ECP port) and `WAKEUP: MAC=f0:35:75:35:68:c3;Timeout=10`; Roku streaming device, NOT surveillance. Non-surveillance class."
+  }
+ ]
+}

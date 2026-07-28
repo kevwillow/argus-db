@@ -1,0 +1,342 @@
+[
+ {
+  "oui": "000E53",
+  "ieee_assignee": "AV TECH CORPORATION",
+  "channel": [
+   "banner-literal"
+  ],
+  "evidence_bytes": "bf6ec9bfd5fbcd192b0a275c6\"}, \"product\": \"AVTECH Corporation. Surveillance IP CAMERA (Fixed) AVM561E-000E532D9E95\", \"hash\": -1077328976, \"os\": null, \"timestamp\": \"2026-07-25T23:49:13.388861\", \"isp\": \"Data Communication Business Group\", \"transport\": \"udp\", \"upnp\": {\"model_url\": \"http://www.avtech.com.tw/\", \"manufacturer_url\": \"http://www.avtech.com.t",
+  "manufacturer": [
+   "AVTECH Corporation."
+  ],
+  "model_name": [
+   "Surveillance"
+  ],
+  "model_description": [
+   "IP CAMERA (H.264)"
+  ],
+  "shodan_query": "A1_port1900_ipcam.json",
+  "observed_count": 10,
+  "device_category": "cctv_camera",
+  "category_reason": "AV TECH CORPORATION \u2014 Product.Type=DVR observed in evidence (cmd.php page); single-product surveillance vendor per \u00a72.1"
+ },
+ {
+  "oui": "00115F",
+  "ieee_assignee": "ITX Security Co., Ltd.",
+  "channel": [
+   "uuidv1-node"
+  ],
+  "evidence_bytes": "vent/BasicServiceId\"}], \"model_description\": \"Network Camera\", \"udn\": \"uuid:70c6ab20-38f4-11e2-81c1-00115F82DF35\", \"model_name\": \"Network Camera\", \"manufacturer\": \"ITX Security\"}, \"asn\": \"AS1237\", \"hostnames\": [], \"location\": {\"city\": \"Busan\", \"region_code\": \"26\", \"area_code\": null, \"longitude\": 129.03004, \"latitude\": 35.10168, \"country_code\": \"KR\"",
+  "manufacturer": [
+   "ITX Security"
+  ],
+  "model_name": [
+   "Network Camera"
+  ],
+  "model_description": [
+   "Network Camera"
+  ],
+  "shodan_query": "A5_port1900_networkcam.json",
+  "observed_count": 2,
+  "device_category": "cctv_camera",
+  "category_reason": "ITX Security Co., Ltd. \u2014 Network Camera model observed; Phase 0 confirmed"
+ },
+ {
+  "oui": "001B9D",
+  "ieee_assignee": "Novus Security Sp. z o.o.",
+  "channel": [
+   "banner-literal"
+  ],
+  "evidence_bytes": "t\\\"\", \"udn\": \"uuid:{59765E24-0C12-4d20-BsdsEE-71578AE02CB9}_00:1b:9d:07:7a:ae\", \"model_name\": \"DVR (192.168.10.10)\"}, \"asn\": \"AS6866\", \"h",
+  "manufacturer": [],
+  "model_name": [
+   "DVR (192.168.10.10)"
+  ],
+  "model_description": [
+   "\"DVR/Tilt\""
+  ],
+  "shodan_query": "A2_port1900_dvr.json",
+  "observed_count": 1,
+  "device_category": "cctv_camera",
+  "category_reason": "Novus Security Sp. z o.o. \u2014 model_name 'DVR (192.168.10.10)' observed; Novus is surveillance vendor"
+ },
+ {
+  "oui": "001C27",
+  "ieee_assignee": "Sunell Electronics Co.",
+  "channel": [
+   "banner-literal"
+  ],
+  "evidence_bytes": "mas-upnp-org:device:EmbeddedNetDevice:1\", \"serial_number\": \"00:1C:27:18:76:78\", \"services\": [{\"service_type\": \"urn:schemas-upnp-org:servi",
+  "manufacturer": [
+   "Eagle Eye Networks"
+  ],
+  "model_name": [
+   "EN-CDUM-008-2"
+  ],
+  "model_description": [
+   "EN-CDUM-008-2"
+  ],
+  "shodan_query": "D1_port1900_country_us.json",
+  "observed_count": 1,
+  "device_category": "cctv_camera",
+  "category_reason": "Sunell Electronics \u2014 model EN-CDUM-008-2 (Eagle Eye Networks bridge) observed; Sunell is CCTV manufacturer"
+ },
+ {
+  "oui": "00224E",
+  "ieee_assignee": "SEEnergy Corp.",
+  "channel": [
+   "banner-literal"
+  ],
+  "evidence_bytes": "\": \"urn:schemas-upnp-org:device:Basic:1\", \"serial_number\": \"00:22:4E:F1:03:1E\", \"model_description\": \"Network Video Recorder\", \"udn\": \"uu",
+  "manufacturer": [
+   "SystemK"
+  ],
+  "model_name": [
+   "NVR-204 Mk2"
+  ],
+  "model_description": [
+   "Network Video Recorder"
+  ],
+  "shodan_query": "A3_port1900_nvr.json",
+  "observed_count": 1,
+  "device_category": "cctv_camera",
+  "category_reason": "SEEnergy Corp. \u2014 model_description 'Network Video Recorder' observed"
+ },
+ {
+  "oui": "002401",
+  "ieee_assignee": "D-Link Corporation",
+  "channel": [
+   "banner-literal"
+  ],
+  "evidence_bytes": "dernartcam1\\n  Version: 1.06\\n  Build: 5731\\n  MAC Address: 00:24:01:12:E1:F5\\n  IP Address: 192.168.0.160\\n\\nOK language\\nOK profile1for",
+  "manufacturer": [],
+  "model_name": [],
+  "model_description": [],
+  "shodan_query": "F1_upnp_module.json",
+  "observed_count": 8,
+  "device_category": "unknown",
+  "category_reason": "D-Link Corporation \u2014 no model bound; general-vendor block per \u00a711 #10"
+ },
+ {
+  "oui": "0080F0",
+  "ieee_assignee": "Panasonic Communications Co., Ltd.",
+  "channel": [
+   "uuidv1-node"
+  ],
+  "evidence_bytes": "mService1\"}], \"model_description\": \"Panasonic Network Camera\", \"udn\": \"uuid:4d454930-0000-1000-8000-0080f0ae59d2\", \"model_name\": \"Network Camera\", \"manufacturer\": \"Panasonic\"}, \"asn\": \"AS24309\", \"hostnames\": [\"106.51.20.213.actcorp.in\"], \"location\": {\"city\": \"Chennai\", \"region_code\": \"TN\", \"area_code\": null, \"longitude\": 80.27847, \"latitude\": 13.08",
+  "manufacturer": [
+   "Panasonic"
+  ],
+  "model_name": [
+   "Network Camera"
+  ],
+  "model_description": [
+   "Panasonic Network Camera"
+  ],
+  "shodan_query": "A5_port1900_networkcam.json",
+  "observed_count": 29,
+  "device_category": "unknown",
+  "category_reason": "Panasonic Communications Co., Ltd. \u2014 Network Camera model observed; multi-purpose vendor per \u00a711 #10 (Phase 0 confirmed)"
+ },
+ {
+  "oui": "00A784",
+  "ieee_assignee": "ITX security",
+  "channel": [
+   "uuidv1-node"
+  ],
+  "evidence_bytes": "vent/BasicServiceId\"}], \"model_description\": \"Network Camera\", \"udn\": \"uuid:70c6ab20-38f4-11e2-81c1-00A784117DA1\", \"model_name\": \"Network Camera\", \"manufacturer\": \"ITX Security\"}, \"asn\": \"AS2518\", \"hostnames\": [\"FL1-125-199-22-74.osk.mesh.ad.jp\"], \"location\": {\"city\": \"Osaka\", \"region_code\": \"27\", \"area_code\": null, \"longitude\": 135.50107, \"latitud",
+  "manufacturer": [
+   "ITX Security"
+  ],
+  "model_name": [
+   "Network Camera"
+  ],
+  "model_description": [
+   "Network Camera"
+  ],
+  "shodan_query": "A5_port1900_networkcam.json",
+  "observed_count": 2,
+  "device_category": "cctv_camera",
+  "category_reason": "ITX security \u2014 Network Camera model observed; single-product surveillance vendor (Phase 0 confirmed)"
+ },
+ {
+  "oui": "080023",
+  "ieee_assignee": "Panasonic Communications Co., Ltd.",
+  "channel": [
+   "uuidv1-node"
+  ],
+  "evidence_bytes": "mService1\"}], \"model_description\": \"Panasonic Network Camera\", \"udn\": \"uuid:4d454930-0000-1000-8000-08002390b8b5\", \"model_name\": \"Network Camera\", \"manufacturer\": \"Panasonic\"}, \"asn\": \"AS7524\", \"hostnames\": [\"31.221.8.202.bb.banban.jp\"], \"location\": {\"city\": \"Kakogawach\\u014d-honmachi\", \"region_code\": \"28\", \"area_code\": null, \"longitude\": 134.82905",
+  "manufacturer": [
+   "Panasonic"
+  ],
+  "model_name": [
+   "Network Camera"
+  ],
+  "model_description": [
+   "Panasonic Network Camera"
+  ],
+  "shodan_query": "A5_port1900_networkcam.json",
+  "observed_count": 7,
+  "device_category": "unknown",
+  "category_reason": "Panasonic Communications Co., Ltd. \u2014 Network Camera / i-PRO Network Camera observed; multi-purpose vendor per \u00a711 #10 (Phase 0 confirmed)"
+ },
+ {
+  "oui": "64255E",
+  "ieee_assignee": "Observint Technologies, Inc.",
+  "channel": [
+   "banner-literal"
+  ],
+  "evidence_bytes": "mas-upnp-org:device:EmbeddedNetDevice:1\", \"serial_number\": \"64:25:5E:05:0F:D1\", \"services\": [{\"service_type\": \"urn:schemas-upnp-org:servi",
+  "manufacturer": [
+   "Alibi"
+  ],
+  "model_name": [
+   "AC-VS-NC114FA"
+  ],
+  "model_description": [
+   "AC-VS-NC114FA"
+  ],
+  "shodan_query": "D1_port1900_country_us.json",
+  "observed_count": 1,
+  "device_category": "cctv_camera",
+  "category_reason": "Observint (Alibi brand) \u2014 model AC-VS-NC114FA observed; Alibi is Observint's surveillance brand"
+ },
+ {
+  "oui": "B0C554",
+  "ieee_assignee": "D-Link International",
+  "channel": [
+   "banner-literal"
+  ],
+  "evidence_bytes": " \"http://www.dlink.com\", \"manufacturer_url\": \"http://www.dlink.com\", \"friendly_name\": \"DCS-4633EV - B0C55431F09F\", \"model_number\": \"DCS-4633EV_A\", \"presentation_url\": \"http://192.168.0.101:80/\", \"device_type\": \"urn:schemas-upnp-org:device:Basic:1\", \"serial_number\": \"B0C55431F09F\", \"services\": [{\"service_type\": \"(null)\", \"service_id\": \"(null)\", \"con",
+  "manufacturer": [
+   "D-Link Corporation"
+  ],
+  "model_name": [
+   "DCS-4633EV"
+  ],
+  "model_description": [
+   "3M Outdoor Day & Night Dome Network Camera"
+  ],
+  "shodan_query": "E3_port1900_dome.json",
+  "observed_count": 2,
+  "device_category": "unknown",
+  "category_reason": "D-Link International \u2014 Outdoor Day & Night Dome Network Camera / Outdoor Bullet Network Camera observed; general-vendor block per dispatch rule (Phase 0 confirmed)"
+ },
+ {
+  "oui": "BCC342",
+  "ieee_assignee": "Panasonic Communications Co., Ltd.",
+  "channel": [
+   "uuidv1-node"
+  ],
+  "evidence_bytes": "mService1\"}], \"model_description\": \"Panasonic Network Camera\", \"udn\": \"uuid:4d454930-0000-1000-8000-bcc34209b4fc\", \"model_name\": \"Network Camera\", \"manufacturer\": \"Panasonic\"}, \"asn\": \"AS2519\", \"hostnames\": [\"202.231.70.120.ap.gmobb-fix.jp\"], \"location\": {\"city\": \"Tokyo\", \"region_code\": \"13\", \"area_code\": null, \"longitude\": 139.69171, \"latitude\": 3",
+  "manufacturer": [
+   "Panasonic"
+  ],
+  "model_name": [
+   "Network Camera"
+  ],
+  "model_description": [
+   "Panasonic Network Camera"
+  ],
+  "shodan_query": "A5_port1900_networkcam.json",
+  "observed_count": 3,
+  "device_category": "unknown",
+  "category_reason": "Panasonic Communications Co., Ltd. \u2014 Network Camera / i-PRO Network Camera observed; multi-purpose vendor per \u00a711 #10 (Phase 0 confirmed)"
+ },
+ {
+  "oui": "E061B2",
+  "ieee_assignee": "HANGZHOU ZENOINTEL TECHNOLOGY CO., LTD",
+  "channel": [
+   "banner-literal"
+  ],
+  "evidence_bytes": "t\\\"\", \"udn\": \"uuid:{59765E24-0C12-4d20-BsdsEE-71578AE02CB9}_e0:61:b2:07:2e:be\", \"model_name\": \"DVR (192.168.1.88)\"}, \"asn\": \"AS7552\", \"ho",
+  "manufacturer": [],
+  "model_name": [
+   "DVR (125.227.247.90)",
+   "DVR (180.92.230.226)",
+   "DVR (186.96.209.155)",
+   "DVR (192.168.0.101)",
+   "DVR (192.168.0.150)",
+   "DVR (192.168.0.180)",
+   "DVR (192.168.0.200)",
+   "DVR (192.168.0.3)",
+   "DVR (192.168.0.88)",
+   "DVR (192.168.0.90)",
+   "DVR (192.168.1.10)",
+   "DVR (192.168.1.100)",
+   "DVR (192.168.1.101)",
+   "DVR (192.168.1.102)",
+   "DVR (192.168.1.105)",
+   "DVR (192.168.1.108)",
+   "DVR (192.168.1.11)",
+   "DVR (192.168.1.111)",
+   "DVR (192.168.1.112)",
+   "DVR (192.168.1.113)",
+   "DVR (192.168.1.138)",
+   "DVR (192.168.1.140)",
+   "DVR (192.168.1.15)",
+   "DVR (192.168.1.155)",
+   "DVR (192.168.1.16)",
+   "DVR (192.168.1.166)",
+   "DVR (192.168.1.170)",
+   "DVR (192.168.1.188)",
+   "DVR (192.168.1.2)",
+   "DVR (192.168.1.200)",
+   "DVR (192.168.1.220)",
+   "DVR (192.168.1.222)",
+   "DVR (192.168.1.234)",
+   "DVR (192.168.1.245)",
+   "DVR (192.168.1.250)",
+   "DVR (192.168.1.252)",
+   "DVR (192.168.1.253)",
+   "DVR (192.168.1.30)",
+   "DVR (192.168.1.33)",
+   "DVR (192.168.1.35)",
+   "DVR (192.168.1.50)",
+   "DVR (192.168.1.64)",
+   "DVR (192.168.1.65)",
+   "DVR (192.168.1.77)",
+   "DVR (192.168.1.88)",
+   "DVR (192.168.1.90)",
+   "DVR (192.168.1.98)",
+   "DVR (192.168.1.99)",
+   "DVR (192.168.10.200)",
+   "DVR (192.168.10.3)",
+   "DVR (192.168.100.12)",
+   "DVR (192.168.100.48)",
+   "DVR (192.168.100.88)",
+   "DVR (192.168.100.90)",
+   "DVR (192.168.155.180)",
+   "DVR (192.168.2.10)",
+   "DVR (192.168.2.130)",
+   "DVR (192.168.2.41)",
+   "DVR (192.168.2.88)",
+   "DVR (192.168.2.90)",
+   "DVR (192.168.200.13)",
+   "DVR (192.168.73.172)",
+   "DVR (192.168.8.110)",
+   "DVR (59.3.177.226)",
+   "DVR (62.183.229.85)",
+   "DVR (78.88.175.106)",
+   "DVR (91.196.93.153)",
+   "DVR (93.63.216.227)",
+   "DVR (95.169.75.132)",
+   "NVR (192.168.1.10)",
+   "NVR (192.168.1.100)",
+   "NVR (192.168.1.101)",
+   "NVR (192.168.1.102)",
+   "NVR (192.168.1.104)",
+   "NVR (192.168.1.110)",
+   "NVR (192.168.1.150)",
+   "NVR (192.168.1.44)",
+   "NVR (192.168.1.88)"
+  ],
+  "model_description": [
+   "\"DVR/Tilt\""
+  ],
+  "shodan_query": "A2_port1900_dvr.json",
+  "observed_count": 109,
+  "device_category": "cctv_camera",
+  "category_reason": "HANGZHOU ZENOINTEL TECHNOLOGY \u2014 model 'DVR/Tilt' observed across 109 unique hosts; high-density deployment indicator"
+ }
+]
