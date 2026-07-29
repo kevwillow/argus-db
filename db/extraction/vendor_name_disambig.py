@@ -496,12 +496,17 @@ MATCH_KIND_CANDIDATE_IS_PREFIX: Final[str] = "candidate_is_prefix"
 def _split_aliases(aliases_field: str | None) -> list[str]:
     """Parse a manufacturers.aliases field into a list of alias strings.
 
-    Storage convention (verified at MAC-102): comma-separated. Empty / None
-    yields an empty list. Whitespace around each alias is stripped.
+    Storage convention (verified at MAC-102, refined at MAC-569): comma-
+    separated, with RFC-4180-lite quoting for values that themselves
+    contain a comma. Empty / None yields an empty list. Whitespace around
+    each alias is stripped. This is a thin re-export of the canonical
+    ``db.alias_parser.split_aliases`` — every consumer of manufacturers.
+    aliases in the project routes through that single parser so the
+    RFC-4180-lite contract has exactly one implementation.
     """
-    if not aliases_field:
-        return []
-    return [a.strip() for a in aliases_field.split(",") if a.strip()]
+    from db.alias_parser import split_aliases as _split_aliases_canonical
+
+    return _split_aliases_canonical(aliases_field)
 
 
 def registry_xcheck_manufacturers(

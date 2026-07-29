@@ -523,47 +523,26 @@ def _split_alias_blob(blob: str) -> list[str]:
     * Quoted values (RFC-4180-lite): ``"Hangzhou Hikvision Digital Technology
       Co., Ltd."`` — the parser treats the quoted phrase as ONE token.
 
-    This helper handles both shapes. It does NOT fix the bug (stop-list +
-    min-length in layer 2/3 do) — it just preserves the structural meaning
-    when a future alias IS properly quoted. Today every stored alias is
-    unquoted so layer 1 is a no-op; layer 2 (stop-list) carries the fix.
+    This helper is a thin re-export of the canonical ``db.alias_parser.
+    split_aliases`` so the RFC-4180-lite contract has exactly one
+    implementation. Layer-2/3 (stop-list + min-length) defense is applied
+    by ``_alias_tokens_for_vendor`` via ``_is_bogus_token`` below.
     """
-    out: list[str] = []
-    i = 0
-    n = len(blob)
-    while i < n:
-        # Skip whitespace + commas between tokens.
-        while i < n and blob[i] in (",", " "):
-            i += 1
-        if i >= n:
-            break
-        if blob[i] == '"':
-            # Quoted phrase — read until matching close-quote (no escape support).
-            j = blob.find('"', i + 1)
-            if j == -1:
-                # Unterminated quote — fall back to bare-token read of the
-                # remainder (defensive; doesn't happen on canonical data).
-                out.append(blob[i + 1:].strip())
-                break
-            out.append(blob[i + 1:j].strip())
-            i = j + 1
-        else:
-            # Bare token — read until next comma at top level.
-            j = blob.find(",", i)
-            if j == -1:
-                out.append(blob[i:].strip())
-                break
-            out.append(blob[i:j].strip())
-            i = j + 1
-    return [t for t in out if t]
+    from db.alias_parser import split_aliases as _split_aliases_canonical
+
+    return _split_aliases_canonical(blob)
 
 
 def _is_bogus_token(tok: str) -> bool:
-    """MAC-535 §6.2 tokenization layer-2/3: stop-list + min-length."""
-    s = tok.strip()
-    if len(s) < _ALIAS_TOKEN_MIN_LEN:
-        return True
-    return s.lower() in _CORP_SUFFIX_STOPLIST
+    """MAC-535 §6.2 tokenization layer-2/3: stop-list + min-length.
+
+    Re-exported from the canonical ``db.alias_parser`` module so the
+    bogus-token catalogue (verbatim from cto_ratification.md §Finding 2)
+    has exactly one source of truth.
+    """
+    from db.alias_parser import is_bogus_token as _is_bogus_token_canonical
+
+    return _is_bogus_token_canonical(tok)
 
 
 def _alias_tokens_for_vendor(
@@ -577,10 +556,9 @@ def _alias_tokens_for_vendor(
         return [canonical]
     toks: list[str] = [row["canonical_name"]]
     if row["aliases"]:
-        toks += [
-            t for t in _split_alias_blob(row["aliases"])
-            if t and not _is_bogus_token(t)
-        ]
+        from db.alias_parser import filter_bogus_tokens as _filter_bogus_canonical
+
+        toks += _filter_bogus_canonical(_split_alias_blob(row["aliases"]))
     return toks
 
 

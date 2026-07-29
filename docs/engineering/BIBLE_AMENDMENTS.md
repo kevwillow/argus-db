@@ -6094,3 +6094,63 @@ Before/after corroboration table for all 17 affected vendors is in `operator_rev
 - `docs/engineering/BIBLE_AMENDMENTS.md` — this entry.
 
 **Bible commit (deferred).** The coordinated commit applying the §11 #21 amendment to `PROJECT_BIBLE.md` §11 + this BIBLE_AMENDMENTS.md entry + the `coverage_matrix.py` fix + the `tests/test_coverage_matrix.py` additions + the mig-0041 WARNING header lands at the next CP cycle that bundles a §11 touch (likely CP54 or wherever the next §-text sweep is). The amendment-log entry is binding; the §-text insertion is mechanical.
+
+### MAC-569 — `manufacturers.aliases` RFC-4180-lite wire-format normalization (data-side complement to MAC-535 §6.2 alias-tokenization defense)
+
+**Source.** [MAC-569](/MAC/issues/MAC-569) — defect: `manufacturers.aliases` is comma-delimited over comma-bearing values, producing phantom corporate-suffix alias tokens (`Ltd.`, `Inc.`, `LLC`, `THE`, `Co.`) on every naive-split consumer of the column. MAC-535's Finding 1 patch added a 3-layer defense in `coverage_matrix._alias_tokens_for_vendor` (quote-aware split + corp-suffix stop-list + min-length floor) that stopped the §6.2 corroboration inflation for 17 vendors, but left the underlying data defect in place. The other 4 consumers of the column (`extraction.vendor_name_disambig._split_aliases`, `validation.sar8_bulk_stage.<lexicon-build>`, `validation.phase3_inference_candidates.<lexicon-build>`, and the §6.2 path itself pre-MAC-535) still saw the phantom tokens. MAC-569 ships the data-side complement: the wire format is now RFC-4180-lite (comma-bearing alias values wrapped in `"..."`) and there is exactly one parser implementation (`db/alias_parser.split_aliases`) that every consumer re-exports.
+
+**Rule (new binding discipline — `aliases` column wire format).** Effective immediately, the canonical wire format for `manufacturers.aliases` is **RFC-4180-lite**:
+
+```
+manufacturers.aliases  ::=  alias ("," alias)*
+alias                  ::=  DQUOTE *<no-DQUOTE> DQUOTE     ; quoted variant
+                       |   *<no-comma>                    ; bare variant (no "," allowed)
+```
+
+Whitespace surrounding each alias is stripped on read. Empty / NULL yields `[]`. A quoted alias value may legitimately contain a comma, so it is the escape mechanism for the otherwise-flat comma-separated representation. Lookup discipline (verbatim from PROJECT_BIBLE.md §4.4) `WHERE aliases LIKE '%term%' OR LOWER(canonical_name) = LOWER(?)` continues to work because the unquoted alias text is a substring of the quoted form (`"Foo, Inc."` contains `Foo, Inc.`).
+
+**Migration-slot allocation.**
+- `0041` = MAC-533 (IPVM public-directory attribution ingest)
+- `0042` = MAC-542 (procurement boundary quarantine)
+- `0043` = MAC-569 (RFC-4180-lite aliases normalize) — **THIS MIGRATION**
+- `0044` = MAC-523 (Shodan Phase 1 cctv_camera ingest)
+- schema_version: `33 → 34` (data-only; no DDL).
+
+**Source ID file.** None. Migration is a uniform per-row recombine + quote-wrap; the input is the live `manufacturers.aliases` blob (verbatim, 86 rows non-empty at apply time).
+
+**Fix shape (deployed at MAC-569).**
+
+1. **Canonical parser module** — `db/alias_parser.py`. Public surface: `split_aliases(aliases_field)`, `is_bogus_token(tok)`, `filter_bogus_tokens(tokens)`, `recombine_and_quote_normalize(blob)`. The MAC-535 §6.2 bogus-token predicate is re-exported as `is_bogus_token`; the catalogue is verbatim from `operator_review/MAC-533/cto_ratification.md §Finding 2` and pinned by `test_corp_suffix_stoplist_matches_cto_catalogue` (a future catalogue addition MUST come with a sibling amendment-log entry that updates constant + catalogue + analysis doc together).
+
+2. **Five consumers rewired** to a single parser:
+   - `db/validation/coverage_matrix.py::_split_alias_blob` / `_is_bogus_token` → thin re-export of `db.alias_parser.split_aliases` / `is_bogus_token` (was previously private; now shares the canonical implementation).
+   - `db/extraction/vendor_name_disambig.py::_split_aliases` → thin re-export of `db.alias_parser.split_aliases`.
+   - `db/validation/sar8_bulk_stage.py` lexicon builder → uses `db.alias_parser.split_aliases`.
+   - `db/validation/phase3_inference_candidates.py` lexicon builder → uses `db.alias_parser.split_aliases`.
+
+3. **Data migration** — `db/migrations/0043_mac569_alias_rfc4180_quote_normalize.sql` + apply script `scripts/mac569_alias_quote_normalize_apply.py`. The transform is a pure function over rows: (1) RECOMBINE — naive-split tokens; if a token is a corp-suffix fragment (Ltd./Inc./LLC/...) AND its predecessor ends in a corp-suffix word boundary, merge them with `", "` join (recovers the original comma-bearing alias value); (2) QUOTE-WRAP — for every resulting string that contains a comma, wrap it in double quotes (canonical RFC-4180-lite form). Apply results: 86 rows modified, 17 phantom tokens recovered, token count 551 (naive) → 534 (smart), `delta = 17`.
+
+4. **Tests** — `tests/test_alias_parser.py` (50 tests, all pass). Coverage: bare form (5 parametrized cases), quote-aware form (5 tests covering mixed quoted/bare), MAC-535 §6.2 bogus-token catalogue (verbatim freeze invariant), MAC-569 transform (5 parametrized cases + idempotency-on-canonical-input + cross-vendor phrase preservation + bounded phantom count), and the two pattern-catalogue freeze invariants.
+
+5. **Operator-review artifact** — `operator_review/MAC-569/fix_proof.md` (this entry's binding companion), `operator_review/MAC-569/aliases_normalize_diff.tsv` (86-row before/after diff).
+
+**Findings.**
+
+- **Finding 1 — defect scope.** Pre-apply, 86 / 104 rows with non-empty aliases (82.7 %) carry comma-bearing values verbatim. Naive-split produced 17 phantom tokens (verbatim per the MAC-535 catalogue: 5× DJI, 7× Honeywell, 3× Autel Robotics, 1× Dahua, 1× Hikvision, 1× each of 11 other vendors). After MAC-569 normalize, every comma-bearing value is quote-wrapped and the phantom count drops to **0** (verified by post-apply idempotency check).
+- **Finding 2 — single-parser discipline.** The 5 consumers previously each had their own `aliases.split(",")` call. Refactoring them all to the canonical `db.alias_parser.split_aliases` makes the wire-format contract have exactly one implementation. Future alias-encoding changes (e.g., a future migration that introduces nested escaping) edit one file, not five.
+- **Finding 3 — verify-token-count delta.** Post-apply `sum(len(split_aliases(...)))` is strictly less than pre-apply `sum(len(naive_split(...)))` (or equal for rows that were already canonical-form). The script enforces this as a post-condition; a regression here would indicate the recombine pass lost or invented tokens.
+
+**No identifiers write. No schema mutation. No export regen. No push, no tag.** The migration is data-only, scoped to `manufacturers.aliases`, and does not change any identifier row, confidence value, or §6.2 corroboration count (the MAC-535 patch already produced the corrected counts; MAC-569's data normalization does not change them because the post-filter token set is unchanged).
+
+**Authority.** DBArchitect (this commit author, agent `6c93a466-d498-49e0-b7af-3fc0d08eb2b0`) under CTO dispatch MAC-569. The RFC-4180-lite wire format is the binding output; the §-text insertion into `PROJECT_BIBLE.md` §4.4 is deferred to the next coordinated CP cycle that touches §4 (per §11 #11 amendment-log discipline; this entry IS the closure).
+
+**Companion artifacts.**
+- `operator_review/MAC-569/fix_proof.md` — test results, spot-checks, scope discipline, per-row before/after diff summary.
+- `operator_review/MAC-569/aliases_normalize_diff.tsv` — 86-row TSV: id, canonical_name, phantoms_recovered, old_aliases, new_aliases.
+- `db/alias_parser.py` — canonical quote-aware parser + MAC-535 §6.2 predicate + MAC-569 transform.
+- `db/migrations/0043_mac569_alias_rfc4180_quote_normalize.sql` — schema_version bump with pre-condition guards.
+- `scripts/mac569_alias_quote_normalize_apply.py` — apply script (backup-first, idempotency verification, post-apply token-count check).
+- `tests/test_alias_parser.py` — 50 new tests.
+- `db/extraction/vendor_name_disambig.py`, `db/validation/sar8_bulk_stage.py`, `db/validation/phase3_inference_candidates.py`, `db/validation/coverage_matrix.py` — thin re-exports of `db.alias_parser.split_aliases` / `is_bogus_token` / `filter_bogus_tokens`.
+- `db/argus.db.pre_mac569_20260729T030931Z` — pre-apply backup (sha256 `2fad9f2eb2bb602ebe6b6bf4111304add313f2295a7a35bdb953c71bd3b396d7`).
+- `docs/engineering/BIBLE_AMENDMENTS.md` — this entry.

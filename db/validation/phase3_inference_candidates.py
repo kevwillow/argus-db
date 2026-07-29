@@ -148,11 +148,11 @@ def build_canonical_lookup(
     to find the first canonical match (or flag-for-review).
     """
     lexicon: list[dict[str, Any]] = []
+    from db.alias_parser import split_aliases as _split_aliases_canonical
+
     for row in manufacturers:
         cn = row["canonical_name"]
-        alias_strings = [cn] + [
-            a.strip() for a in (row["aliases"] or "").split(",") if a.strip()
-        ]
+        alias_strings = [cn] + _split_aliases_canonical(row["aliases"])
         lexicon.append(
             {
                 "canonical_name": cn,

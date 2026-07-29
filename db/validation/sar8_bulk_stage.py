@@ -137,11 +137,11 @@ def _build_lexicon(conn: sqlite3.Connection) -> list[dict[str, Any]]:
         "WHERE query_default = 'visible'"
     ).fetchall()
     out: list[dict[str, Any]] = []
+    from db.alias_parser import split_aliases as _split_aliases_canonical
+
     for r in rows:
         cn = r["canonical_name"]
-        alias_strings = [cn] + [
-            a.strip() for a in (r["aliases"] or "").split(",") if a.strip()
-        ]
+        alias_strings = [cn] + _split_aliases_canonical(r["aliases"])
         out.append(
             {
                 "canonical_name": cn,
