@@ -2,9 +2,10 @@
 """Gate a worker brief against the mechanically-checkable rules in
 operator_review/BRIEF_STANDARDS.md (R1-R3, R6, R7).
 
-Standing rules ratified by CEO on MAC-558 comment 6b298929. R6 is STAGED on MAC-573 and R7 on
-MAC-551; both await CEO ratification. R4/R5 are judgement calls and are not checked here -- see
-the authoring checklist in BRIEF_STANDARDS.md.
+Standing rules ratified by CEO on MAC-558 comment 6b298929. R6 and R7 are also STANDING: the CEO
+ratified R6 on MAC-573 and R7 on MAC-551, both 2026-07-29. Every rule this gate enforces is now
+ratified. R4/R5 are judgement calls and are not checked here -- see the authoring checklist in
+BRIEF_STANDARDS.md.
 
 Usage:  python3 scripts/check_brief_standards.py <brief.md> [<brief.md> ...]
 Exit 0 = all briefs pass. Exit 1 = at least one FAIL.
@@ -200,7 +201,8 @@ def check(path):
             fails.append(
                 "R7 extraction format dispatched on filename/suffix/URL path (`%s`) with no "
                 "`content_type` route; the failure is silent -- the parser raises, `except` "
-                "returns \"\", and a 527KB HTML page scores 0 chars (MAC-547 scan_all.py:163)"
+                "returns \"\", and a 527KB HTML page scores 0 chars "
+                "(138669b:extraction_outputs/MAC-547/scripts/scan_all.py:163)"
                 % " ".join(m.group(0).split())[:60]
             )
 
