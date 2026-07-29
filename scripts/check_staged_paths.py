@@ -31,7 +31,16 @@ Take the baseline BEFORE your first write. A path you are creating in this lane 
 `absent` at baseline; a path already `dirty` or `untracked` at baseline belongs to someone
 else, and R10 sends you to `git apply --cached` rather than `git add`.
 
-Exit 0 = PASS. Exit 1 = at least one FAIL. Exit 2 = usage error.
+Exit 0 = PASS or WARN. Exit 1 = at least one FAIL. Exit 2 = usage error.
+Exit 3 = SKIPPED: a check could not be evaluated, so this commit is uncertified.
+
+MAC-599. Exit 3 rather than the 2 the issue proposed, because 2 was already spent three
+ways -- a duplicate declared path, a missing `--label`, and a bad mode all exit 2, the
+last two from argparse, which hard-codes it and cannot be retargeted. Reusing 2 would
+have made "the sweep class was never evaluated" indistinguishable from "you typed the
+command wrong": the same conflation this issue exists to remove, one exit code along.
+Un-evaluated is kept distinct from 1 as well; a lane that skipped the baseline has an
+uncertified commit, not a proven sweep, and the two want different remedies.
 """
 import argparse
 import json
@@ -41,6 +50,18 @@ import sys
 
 BASELINE_DIR = "argus_stage_baseline"
 DIFF_PREVIEW_CHARS = 4000
+
+EXIT_OK = 0
+EXIT_FAIL = 1
+EXIT_USAGE = 2  # also argparse's own hard-coded exit for a malformed argv
+EXIT_UNEVALUATED = 3
+
+# Structural guard, not decoration: the whole point of a separate un-evaluated code is
+# that a caller can tell the four outcomes apart. Two of these constants collapsing to
+# the same integer would silently restore the defect MAC-599 removed, and every fixture
+# in tests/test_staged_paths.py would still pass, because each asserts its own code in
+# isolation. Compare the constants to each other, where the collision actually lives.
+assert len({EXIT_OK, EXIT_FAIL, EXIT_USAGE, EXIT_UNEVALUATED}) == 4, "exit codes collide"
 
 
 def git(*args, check=True):
@@ -131,7 +152,7 @@ def cmd_baseline(root, label, declared):
 
 
 def cmd_check(root, label, declared):
-    fails, warns, notes = [], [], []
+    fails, warns, unevaluated = [], [], []
     declared_set = set(declared)
 
     # --- C1: staged path set == declared path set.
@@ -154,7 +175,7 @@ def cmd_check(root, label, declared):
     # this: the sweep happens INSIDE a path the lane legitimately declared.
     bpath = baseline_path(root, label)
     if not os.path.exists(bpath):
-        notes.append(
+        unevaluated.append(
             "C2 SKIPPED -- no baseline at %s. The cf9031a sweep class was NOT evaluated. "
             "Run `check_staged_paths.py baseline --label %s <paths>` before your first write."
             % (bpath, label)
@@ -200,15 +221,26 @@ def cmd_check(root, label, declared):
             % (len(drifted), ", ".join(drifted), drifted[0])
         )
 
-    status = "FAIL" if fails else ("WARN" if warns else "PASS")
+    # Precedence: FAIL > SKIPPED > WARN > PASS. `unevaluated` outranks `warns` because a
+    # WARN exits 0 -- letting a warning own the headline would put the un-evaluated sweep
+    # class back behind a green exit code, which is the defect, relocated.
+    if fails:
+        status, code = "FAIL", EXIT_FAIL
+    elif unevaluated:
+        status, code = "SKIPPED", EXIT_UNEVALUATED
+    elif warns:
+        status, code = "WARN", EXIT_OK
+    else:
+        status, code = "PASS", EXIT_OK
+
     print("%s  %s  (%d declared, %d staged)" % (status, label, len(declared_set), len(staged)))
-    for note in notes:
-        print("    note  %s" % note)
+    for note in unevaluated:
+        print("    SKIP  %s" % note)
     for f in fails:
         print("    FAIL  %s" % f)
     for w in warns:
         print("    warn  %s" % w)
-    return 1 if fails else 0
+    return code
 
 
 def main(argv):
@@ -222,7 +254,7 @@ def main(argv):
     declared = [rel(p, root) for p in args.paths]
     if len(set(declared)) != len(declared):
         print("usage error: duplicate declared path", file=sys.stderr)
-        return 2
+        return EXIT_USAGE
 
     if args.mode == "baseline":
         return cmd_baseline(root, args.label, declared)

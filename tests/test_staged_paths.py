@@ -27,6 +27,13 @@ import pytest
 
 GATE = Path(__file__).resolve().parents[1] / "scripts" / "check_staged_paths.py"
 
+# Deliberately a literal, not an import from the gate. Importing the gate's own
+# constant would make every assertion below agree with whatever the gate happens
+# to return -- including 2, which is already usage error. A post-condition that
+# mirrors its transform is vacuous, and this is the exit code a pre-commit hook
+# reads, so it is pinned as a wire contract.
+EXIT_UNEVALUATED = 3
+
 # Verbatim from `git show cf9031a -- scripts/run_liveness_probe.py`, the hunk the
 # MAC-579 lane had uncommitted in the shared worktree when MAC-573 ran `git add`.
 MAC579_UNCOMMITTED_FIX = "    marker = last_out or started\n"
@@ -224,14 +231,86 @@ def test_c2_reports_skipped_rather_than_passing_with_no_baseline(repo):
 
     This is the vacuity control: without it, the whole sweep class silently
     evaporates for any lane that forgets the baseline step.
+
+    MAC-599: the first version of this fixture asserted ``code == 0`` under this
+    exact name, so it certified the defect it is named for. The note in the body
+    is prose; the exit code is the machine-readable verdict, and it is the one a
+    hook or a habituated operator reads. Both are asserted here.
     """
     (repo / "standards.md").write_text("# standards\n\nR10\n", encoding="utf-8")
     run_git(repo, "add", "standards.md")
 
     code, out = run_gate(repo, "check", "--label", "never-baselined", "standards.md")
-    assert code == 0, out
+    assert code == EXIT_UNEVALUATED, out
+    assert out.startswith("SKIPPED  never-baselined  (1 declared, 1 staged)"), out
+    assert not out.startswith("PASS"), out
     assert "C2 SKIPPED" in out, out
     assert "was NOT evaluated" in out, out
+
+
+def test_unevaluated_exit_code_is_distinct_from_usage_error(repo):
+    """``2`` was already spent, so unevaluated cannot be spelled ``2``.
+
+    ``main`` returns 2 for a duplicate declared path and argparse exits 2 of its
+    own accord on a malformed argv. Reusing 2 would make "the sweep class was not
+    evaluated" indistinguishable from "you typed the command wrong" — which is
+    the same conflation, one exit code further along. This asserts the three
+    non-PASS outcomes are mutually distinct rather than merely non-zero.
+    """
+    (repo / "standards.md").write_text("# standards\n\nR10\n", encoding="utf-8")
+    run_git(repo, "add", "standards.md")
+
+    unevaluated, _ = run_gate(repo, "check", "--label", "never-baselined", "standards.md")
+    usage, _ = run_gate(repo, "check", "--label", "L", "standards.md", "./standards.md")
+    argparse_err, _ = run_gate(repo, "check", "standards.md")
+
+    run_gate(repo, "baseline", "--label", "F", "standards.md")
+    (repo / "probe.py").write_text("undeclared\n", encoding="utf-8")
+    run_git(repo, "add", "probe.py")
+    real_fail, _ = run_gate(repo, "check", "--label", "F", "standards.md")
+
+    assert (unevaluated, usage, argparse_err, real_fail) == (EXIT_UNEVALUATED, 2, 2, 1)
+    assert len({unevaluated, usage, real_fail, 0}) == 4
+
+
+def test_a_real_failure_outranks_an_unevaluated_c2(repo):
+    """FAIL must not be downgraded to SKIPPED by the absence of a baseline.
+
+    A lane that skipped the baseline AND staged an undeclared path has a proven
+    defect, not merely an unevaluated one. Exit 1 has to survive.
+    """
+    (repo / "standards.md").write_text("# standards\n\nR10\n", encoding="utf-8")
+    (repo / "probe.py").write_text("def classify():\n    return 9\n", encoding="utf-8")
+    run_git(repo, "add", "standards.md", "probe.py")
+
+    code, out = run_gate(repo, "check", "--label", "never-baselined", "standards.md")
+    assert code == 1, out
+    assert out.startswith("FAIL"), out
+    assert "C2 SKIPPED" in out, out
+
+
+def test_unevaluated_outranks_a_c3_warning(repo):
+    """WARN exits 0, so a WARN headline would re-hide the unevaluated sweep."""
+    (repo / "standards.md").write_text("# standards\n\nR10\n", encoding="utf-8")
+    run_git(repo, "add", "standards.md")
+    (repo / "standards.md").write_text("# standards\n\nR10\npeer line\n", encoding="utf-8")
+
+    code, out = run_gate(repo, "check", "--label", "never-baselined", "standards.md")
+    assert code == EXIT_UNEVALUATED, out
+    assert out.startswith("SKIPPED"), out
+    assert "C3 1 declared path(s) have unstaged changes" in out, out
+
+
+def test_docstring_promise_names_the_exit_code_it_returns(repo):
+    """R9: the header that states the contract must be checkable against the code.
+
+    MAC-599 exists because ``check_staged_paths.py:15`` promised SKIPPED-never-PASS
+    while the verdict expression had no ``notes`` term. A prose promise nothing
+    reads is how that divergence survived review, so the promise is pinned here.
+    """
+    header = GATE.read_text(encoding="utf-8").split('"""')[1]
+    assert "With no baseline this reports SKIPPED, never PASS" in header, header
+    assert "Exit %d" % EXIT_UNEVALUATED in header, header
 
 
 # --------------------------------------------------------------------------
