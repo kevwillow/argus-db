@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Gate a worker brief against the mechanically-checkable rules in
-operator_review/BRIEF_STANDARDS.md (R1-R3, R6).
+operator_review/BRIEF_STANDARDS.md (R1-R3, R6, R7).
 
-Standing rules ratified by CEO on MAC-558 comment 6b298929. R6 is STAGED on MAC-573 and
-awaits CEO ratification. R4/R5 are judgement calls and are not checked here -- see the
-authoring checklist in BRIEF_STANDARDS.md.
+Standing rules ratified by CEO on MAC-558 comment 6b298929. R6 is STAGED on MAC-573 and R7 on
+MAC-551; both await CEO ratification. R4/R5 are judgement calls and are not checked here -- see
+the authoring checklist in BRIEF_STANDARDS.md.
 
 Usage:  python3 scripts/check_brief_standards.py <brief.md> [<brief.md> ...]
 Exit 0 = all briefs pass. Exit 1 = at least one FAIL.
@@ -60,6 +60,30 @@ CITATION_SPAN = re.compile(r"```.*?```|`[^`\n]*`|\"[^\"\n]*\"|“[^”\n]*”", 
 # quote the precedent that misused them. Briefs cite that document rather than restating it
 # (R0), so this heading never appears in a brief.
 R6_DEFINITION = re.compile(r"^#{1,4}\s*R6\s*[-—–]", re.M)
+
+# R7 (MAC-551): a zero needs a positive control, and format is decided by `content_type`.
+# Re-running the same instrument re-derives the same number from the same instrument; only a
+# known-positive fed through the REAL extraction path separates a channel zero from a
+# capability zero. Triggered by the same admission R1 keys off -- a brief that concedes it may
+# return nothing.
+R7_POSITIVE_CONTROL = re.compile(
+    r"positive[- ]control|known[- ]positive|synthetic\s+\w*\s*positive|"
+    r"canary\s+(input|document|row)",
+    re.I,
+)
+R7_ZERO_KIND = re.compile(r"channel\s+zero|capability\s+zero|channel[- ]vs[- ]capability", re.I)
+# Format dispatch. Naming the filename route to FORBID it is the rule working, so the presence
+# of `content_type` anywhere in the brief clears this check.
+R7_FILENAME_DISPATCH = re.compile(
+    r"\b(?:file\s?name|filename|suffix|extension|url\s+path)\b[^\n]{0,80}"
+    r"\b(?:pdf|html|parse|parser|extract|dispatch|decide|route)\b|"
+    r"\b(?:pdf|html|parse|parser|extract|dispatch|decide|route)\w*\b[^\n]{0,80}"
+    r"\b(?:file\s?name|filename|suffix|extension|url\s+path)\b",
+    re.I,
+)
+R7_CONTENT_TYPE = re.compile(r"content[-_ ]type", re.I)
+# The document that DEFINES R7 must state the banned filename route in order to forbid it.
+R7_DEFINITION = re.compile(r"^#{1,4}\s*R7\s*[-—–]", re.M)
 
 
 def paragraph_at(text, pos):
@@ -155,6 +179,30 @@ def check(path):
             "MAC-573)" % m.group(0).strip()
         )
         break
+
+    # --- R7 positive control on a zero, and content_type dispatch. Scoped to briefs that admit
+    # they may return nothing -- the same admission R1 keys off.
+    if not R7_DEFINITION.search(text) and any(re.search(p, text, re.I) for p in R1_TRIGGER):
+        if not R7_POSITIVE_CONTROL.search(text):
+            fails.append(
+                "R7 brief admits its deliverable may be zero but mandates no positive control; "
+                "re-running the same instrument re-derives the same number from the same "
+                "instrument. Require a synthetic known-positive through the real extraction "
+                "path (MAC-551 ctf_nonvacuity_probe.py, 6/6 fired)"
+            )
+        if not R7_ZERO_KIND.search(text):
+            warns.append(
+                "R7 zero is not qualified as a channel zero (source class carries nothing) vs a "
+                "capability zero (instrument could not see it)"
+            )
+        m = R7_FILENAME_DISPATCH.search(text)
+        if m and not R7_CONTENT_TYPE.search(text):
+            fails.append(
+                "R7 extraction format dispatched on filename/suffix/URL path (`%s`) with no "
+                "`content_type` route; the failure is silent -- the parser raises, `except` "
+                "returns \"\", and a 527KB HTML page scores 0 chars (MAC-547 scan_all.py:163)"
+                % " ".join(m.group(0).split())[:60]
+            )
 
     return fails, warns
 
