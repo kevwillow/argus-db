@@ -562,15 +562,33 @@ def _alias_tokens_for_vendor(
     return toks
 
 
-def _or_like_count(
-    conn: sqlite3.Connection, table: str, column: str, tokens: list[str]
-) -> int:
-    if not tokens:
-        return 0
-    where = " OR ".join([f"{column} LIKE ?"] * len(tokens))
-    args = [f"%{t}%" for t in tokens]
-    cur = conn.execute(f"SELECT COUNT(*) FROM {table} WHERE {where}", args)
-    return cur.fetchone()[0]
+#: The four Phase-3 corpora swept by §6.2, as ``(table, free-text column)``.
+_PHASE3_CORPORA: tuple[tuple[str, str], ...] = (
+    ("fcc_grantees", "grantee_name"),
+    ("procurement_records", "vendor_canonical_name"),
+    ("deployment_observations", "vendor_raw"),
+    ("council_minutes_matters", "vendor_canonical_name"),
+)
+
+
+def _or_boundary_count(corpus, tokens: list[str]) -> int:
+    """Rows where ANY token entity-boundary-matches the corpus column.
+
+    MAC-585. This replaced an ``OR``-chain of ``LIKE '%token%'`` — bare
+    containment, which counted ``DJI`` inside ``DJIBOUTI``, ``Arris`` inside
+    ``L3HARRIS``, ``Axon`` inside ``FAXON`` and ``yst`` inside ``Systems``.
+    Because §6.2 gates the HIGH corroboration tier on these counts, those false
+    positives were promoting vendors: 27 of the 36 pre-fix HIGH vendors held
+    the tier on containment artifacts alone. See
+    ``operator_review/MAC-585/RATIFICATION.md``.
+
+    The predicate lives in ``db/entity_boundary.py`` (one implementation,
+    transcribed from the MAC-542 reference ``operator_review/MAC-542/
+    rematch.py:26-40``). It is NOT merely a tightening: token normalization
+    crosses punctuation, so ``Controls Inc`` now also matches ``Controls,
+    Inc.``. Counts move in both directions.
+    """
+    return corpus.count(tokens)
 
 
 def _compute_vendor_corroboration(
@@ -582,19 +600,22 @@ def _compute_vendor_corroboration(
         if r.manufacturer:
             by_vendor.setdefault(r.manufacturer, []).append(r)
 
+    # Boundary matching cannot be pushed into SQLite, so each corpus is
+    # tokenized and indexed once per report rather than rescanned per vendor.
+    from db.entity_boundary import BoundaryCorpus
+
+    corpora = {
+        table: BoundaryCorpus(conn, table, column)
+        for table, column in _PHASE3_CORPORA
+    }
+
     out: list[VendorCorroboration] = []
     for canonical in sorted(by_vendor):
         toks = _alias_tokens_for_vendor(conn, canonical)
-        fcc = _or_like_count(conn, "fcc_grantees", "grantee_name", toks)
-        proc = _or_like_count(
-            conn, "procurement_records", "vendor_canonical_name", toks
-        )
-        depl = _or_like_count(
-            conn, "deployment_observations", "vendor_raw", toks
-        )
-        cmm = _or_like_count(
-            conn, "council_minutes_matters", "vendor_canonical_name", toks
-        )
+        fcc = _or_boundary_count(corpora["fcc_grantees"], toks)
+        proc = _or_boundary_count(corpora["procurement_records"], toks)
+        depl = _or_boundary_count(corpora["deployment_observations"], toks)
+        cmm = _or_boundary_count(corpora["council_minutes_matters"], toks)
         high = (
             fcc >= HIGH_CORROBORATION_GRANTEES_FLOOR
             and proc >= HIGH_CORROBORATION_PROCUREMENT_FLOOR
@@ -1256,8 +1277,11 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
     lines.append("")
     lines.append(
         "Per active vendor, count rows in the four Phase-3 corpora whose "
-        "free-text vendor field matches `LIKE '%<canonical>%'` OR any of the "
-        "`manufacturers.aliases` tokens (OR-semantics; no double-count)."
+        "free-text vendor field ENTITY-BOUNDARY-matches the canonical name OR "
+        "any of the `manufacturers.aliases` tokens (OR-semantics; no "
+        "double-count). Boundary match = uppercase, split on runs of "
+        "non-alphanumerics, then require the token sequence to appear as a "
+        "contiguous run of whole tokens (`db/entity_boundary.py`, per MAC-585)."
     )
     lines.append("")
     lines.append(
@@ -1289,13 +1313,18 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
     )
     lines.append("")
     lines.append(
-        "**Alias-noise caveat (CP5 board-class):** common-token aliases "
-        "(`Axis`, `Flock`, `Harris`, `Jacobs`, `Parrot`) inflate counts via "
-        "surname / county-name / figurative usage. The substring-LIKE sweep "
-        "is intentionally permissive per dispatch (\"NOT identifier-level "
-        "dedup — this is procurement-context only\"); a Step-7 export-time "
-        "tightening would need a bible-amendment-grade word-boundary disambig "
-        "predicate. Out of MAC-45 scope; flagged for CP5 surface."
+        "**Alias-noise caveat (CP5 board-class):** the permissive substring-"
+        "LIKE sweep this section shipped through v1.6.5 was replaced by the "
+        "entity-boundary predicate under MAC-585, because it gated the HIGH "
+        "tier: 27 of 36 pre-fix HIGH vendors held the tier on containment "
+        "artifacts alone (`Arris` inside `L3HARRIS`, `yst` inside `Systems`, "
+        "`Axon` inside `FAXON`). **Boundary is necessary but not sufficient.** "
+        "A short single-token vendor name (`Axis`, `Flock`, `Harris`, "
+        "`Jacobs`, `Parrot`) boundary-matches surnames, county names and "
+        "ordinary usage exactly as often as it matches the vendor, so the "
+        "MAC-542 §5 T2 residual is UNRESOLVED here: some vendors still reach "
+        "HIGH on short-single-token support alone. Per-vendor T2 adjudication "
+        "remains a CP5 surface and is NOT performed by this report."
     )
     lines.append("")
     lines.append(
