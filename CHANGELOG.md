@@ -62,9 +62,13 @@ which is bare containment over recipient name and award description with no word
 Re-matching every row on entity boundaries ([MAC-542](/MAC/issues/MAC-542)) finds **9,065 rows, 17.95%,
 that match no vendor in the registry at any boundary** — `NATIONAL OIL DJIBOUTI SAS` on "DJI",
 `FAXON ENGINEERING` on "AXON", `HAMILTON PACIFIC CHAMBERLAIN` on "BERLA", and 2,034 rows of Defense
-Logistics Agency alprazolam repackaging caught on "ALPR". A further 8,658 rows are held up only by a
-short single-token vendor name and are under adjudication. The boundary-valid total is 41,434 and the
-corrected figure will be lower still, so no coverage claim is made from this table until MAC-542 lands.
+Logistics Agency alprazolam repackaging caught on "ALPR". The boundary-valid total is 41,434. A
+further tranche is held up only by a short single-token vendor name and is still under adjudication,
+but that tranche's size is **not final and is not quoted here**: the first pass enumerated 8,658 rows
+while omitting four keyword families (`Axis`, `DRT`, `Magnet`, `Flock`), so the partition is being
+re-derived under [MAC-574](/MAC/issues/MAC-574). The 9,065 and 41,434 figures above are unaffected by
+that gap — every omitted row is boundary-clean and none of them falls inside the 9,065. The corrected
+figure will be lower still, so no coverage claim is made from this table until MAC-542 lands.
 
 **No shipped identifier is affected.** `procurement_records` is read by nothing under `db/export/`;
 procurement-sourced rows are Talos-export-banned outright under bible §11 #14, with a standing
