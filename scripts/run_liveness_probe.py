@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Classify Paperclip heartbeat runs as live, stalled, or re-adopted orphans.
 
-Ratified on MAC-572. Replaces the ad-hoc "is that agent dead?" eyeball check that
-produced two contradictory answers in one hour.
+Shipped on MAC-572 at a534c66; adopted as BRIEF_STANDARDS.md R6 on MAC-573, where it is
+STAGED pending CEO ratification -- MAC-572 was closed by the CEO before the adopt decision
+was taken, so nothing was ratified there. Replaces the ad-hoc "is that agent dead?" eyeball
+check that produced two contradictory answers in one hour.
 
 NEVER USE `agents.lastHeartbeatAt`. It does not advance while a run is in flight, so a
 busy agent looks progressively deader the longer it works -- the signal inverts. This
@@ -23,6 +25,10 @@ and the file mtime described the previous incarnation.
 
 PID_MISMATCH is the local cross-check when /proc is readable: compare `processStartedAt`
 against the real start time of `processPid`. On a3312a6f these differed by ~4 hours.
+
+That 5/5 measurement is an operator-run attestation, not a suite. The suite is
+`tests/test_run_liveness_probe.py` (added on MAC-579), which pins the ORPHAN arithmetic
+and the MAC-576 just-started-run false positive as regressions.
 
 Usage:  python3 scripts/run_liveness_probe.py [--stall-minutes N] [--limit N]
 Env:    PAPERCLIP_API_URL, PAPERCLIP_API_KEY, PAPERCLIP_COMPANY_ID
@@ -103,13 +109,29 @@ def classify(run, now, stall_minutes):
             return "PID_MISMATCH", "pid %s really started %.0f min from processStartedAt" % (
                 run.get("processPid"), skew / 60.0)
 
-    if last_out:
-        quiet = (now - last_out).total_seconds() / 60.0
-        if quiet > stall_minutes:
-            return "STALL", "no output for %.1f min (threshold %d)" % (quiet, stall_minutes)
-        return "OK", "last output %.1f min ago, seq=%s" % (quiet, run.get("lastOutputSeq"))
+    # Silence is measured from the last output when there is one, and from
+    # `startedAt` otherwise, so the measured window always exists. A run just
+    # handed a process has not emitted anything YET, and "no output yet" is not
+    # "no output for 20 minutes". MAC-576 paid for this on the sibling probe:
+    # CEO run 0c94aa41 flipped to `running` at 03:39:44.892Z and stamped its
+    # first `lastOutputAt` at 03:39:47.250Z; the old unconditional
+    # `return "STALL"` below called that 2.4-second-old run a corpse. See
+    # `is_stalled` in issue_lock_probe.py -- the two must stay in agreement.
+    marker = last_out or started
+    if marker is None:
+        # A `running` record carrying neither timestamp is mid-dispatch. There
+        # is no window to measure, so there is no evidence of death.
+        return "OK", "running, mid-dispatch: neither startedAt nor lastOutputAt recorded yet"
 
-    return "STALL", "running with no output recorded at all"
+    quiet = (now - marker).total_seconds() / 60.0
+    if quiet > stall_minutes:
+        if last_out:
+            return "STALL", "no output for %.1f min (threshold %d)" % (quiet, stall_minutes)
+        return "STALL", "no output at all since start %.1f min ago (threshold %d)" % (
+            quiet, stall_minutes)
+    if last_out:
+        return "OK", "last output %.1f min ago, seq=%s" % (quiet, run.get("lastOutputSeq"))
+    return "OK", "started %.1f min ago, no output yet (threshold %d)" % (quiet, stall_minutes)
 
 
 def main():

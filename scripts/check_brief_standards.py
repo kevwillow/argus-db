@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Gate a worker brief against the mechanically-checkable rules in
-operator_review/BRIEF_STANDARDS.md (R1-R3).
+operator_review/BRIEF_STANDARDS.md (R1-R3, R6).
 
-Standing rules ratified by CEO on MAC-558 comment 6b298929. R4/R5 are judgement calls
-and are not checked here -- see the authoring checklist in BRIEF_STANDARDS.md.
+Standing rules ratified by CEO on MAC-558 comment 6b298929. R6 is STAGED on MAC-573 and
+awaits CEO ratification. R4/R5 are judgement calls and are not checked here -- see the
+authoring checklist in BRIEF_STANDARDS.md.
 
 Usage:  python3 scripts/check_brief_standards.py <brief.md> [<brief.md> ...]
 Exit 0 = all briefs pass. Exit 1 = at least one FAIL.
@@ -13,6 +14,9 @@ import sys
 from pathlib import Path
 
 STANDARDS = "operator_review/BRIEF_STANDARDS.md"
+# A brief one directory down cites `../BRIEF_STANDARDS.md`, which is a correct path citation.
+# R0 asks that the file be cited rather than restated, so match the basename with any prefix.
+STANDARDS_CITE = re.compile(r"(^|[`'\"(\s/])(?:[\w./-]*/)?BRIEF_STANDARDS\.md")
 
 # R1: a brief that can produce a negative finding must say what a negative finding costs.
 R1_EVIDENCE = [r"HTTP status", r"byte count", r"fetch command"]
@@ -30,6 +34,46 @@ FIXED_VALUE_MARKER = re.compile(
 )
 QUOTED_LITERAL = re.compile(r"[`\"][A-Za-z0-9_\-]+[`\"]")
 WINDOW = 200
+
+# R6 (MAC-573): liveness is `lastOutputAt < startedAt`. Two signals are banned as evidence of
+# it -- lastHeartbeatAt stamps at run dispatch so it inverts, and logRef mtime describes the
+# incarnation the re-adoption overwrote. Naming either is fine; INFERRING liveness from it is not.
+R6_BANNED = re.compile(
+    r"lastHeartbeatAt|logRef[^\n]{0,60}\bmtimes?\b|\bmtimes?\b[^\n]{0,60}logRef", re.I
+)
+R6_LIVENESS = re.compile(
+    r"\b(dark|dead|alive|liveness|stalled?|hung|hang|zombie|stuck|orphan|reaped|"
+    r"no output|not running|still running)\b",
+    re.I,
+)
+# A brief may cite the banned signal in order to strike or forbid it. That is the rule working.
+R6_EXEMPT = re.compile(
+    r"~~|never use|not a liveness|no liveness|must not|do not infer|banned|struck|"
+    r"is not a substitute|inverts",
+    re.I,
+)
+# Raw evidence and quoted prose are citations, not the brief's own inference. A brief that
+# documents the MAC-547 defect must quote `"and dark since"` to name it; MAC-547 itself asserted
+# it unquoted. Strip fenced blocks, inline code and quoted spans before testing for the claim.
+CITATION_SPAN = re.compile(r"```.*?```|`[^`\n]*`|\"[^\"\n]*\"|“[^”\n]*”", re.S)
+# The document that DEFINES R6 must name both banned fields in order to forbid them, and must
+# quote the precedent that misused them. Briefs cite that document rather than restating it
+# (R0), so this heading never appears in a brief.
+R6_DEFINITION = re.compile(r"^#{1,4}\s*R6\s*[-—–]", re.M)
+
+
+def paragraph_at(text, pos):
+    """The blank-line-delimited paragraph containing `pos`.
+
+    R6 asks whether the brief infers liveness FROM the banned field. That inference lives in
+    the same paragraph as the field; a fixed character window straddles paragraphs and fires
+    on unrelated prose (MAC-547, where `reaped` in the previous paragraph tripped a correction
+    that was itself compliant).
+    """
+    start = text.rfind("\n\n", 0, pos)
+    start = 0 if start < 0 else start + 2
+    end = text.find("\n\n", pos)
+    return text[start: end if end >= 0 else len(text)]
 
 
 def sections(text):
@@ -49,7 +93,7 @@ def check(path):
     fails, warns = [], []
 
     # --- R0: the brief must cite the standards file rather than restate it.
-    if STANDARDS not in text:
+    if not STANDARDS_CITE.search(text):
         fails.append(f"R0 brief does not cite {STANDARDS}; rules must be inherited, not restated")
 
     # --- R1 negative-finding clause
@@ -93,6 +137,24 @@ def check(path):
             "R3 fixed-key contract (%s) has no post-check assertion required of the worker"
             % ", ".join(sorted(fixed_keys))
         )
+
+    # --- R6 banned liveness signals. Flag only where the banned field sits next to a liveness
+    # claim and is not being struck -- naming the field to forbid it must stay legal.
+    for m in [] if R6_DEFINITION.search(text) else R6_BANNED.finditer(text):
+        # Scope to the containing paragraph, not a raw character window: a ±200-char window
+        # crosses paragraph boundaries and picks up liveness words from unrelated sentences.
+        near = paragraph_at(text, m.start())
+        if R6_EXEMPT.search(near):
+            continue
+        if not R6_LIVENESS.search(CITATION_SPAN.sub(" ", near)):
+            continue
+        fails.append(
+            "R6 liveness inferred from `%s`; that signal inverts (lastHeartbeatAt stamps at run "
+            "dispatch) or describes a superseded incarnation (logRef mtime). Use "
+            "`lastOutputAt < startedAt` -- scripts/run_liveness_probe.py (MAC-547 validator_gate, "
+            "MAC-573)" % m.group(0).strip()
+        )
+        break
 
     return fails, warns
 
