@@ -1,0 +1,105 @@
+{
+  "issue": "MAC-559",
+  "worker_run": "2026-07-28T23:42:35Z",
+  "retrievals": [
+    {
+      "url": "https://tkhsecurity.com/",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233744Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/about-us",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233842Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/security-management",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233817Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/system-vdg-sense-video-management",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233817Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/park-assist-solutions",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233817Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/system-iprotect-access-control",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233817Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/system-atlas-access",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233817Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/asset-and-site-management-solutions",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233817Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/system-apollo-asset-and-site-management",
+      "http_status": 200,
+      "ts_dir": "raw/tkh_search/20260728T233817Z/"
+    },
+    {
+      "url": "https://tkhsecurity.com/robots.txt",
+      "http_status": 200,
+      "bytes": 275,
+      "sha256": "1232c57eb93eea18246f693100e73275ddb5511bd2516511fd18b6b9174b9122",
+      "ts_dir": "raw/tkh_search/20260729T002908Z/",
+      "note": "robots parser allowed /us/ for ArgusPublicSourceAudit/1.0"
+    },
+    {
+      "url": "https://tkhsecurity.com/us/",
+      "http_status": 200,
+      "bytes": 151131,
+      "sha256": "c0319032523429632651479476093deb1aeebed0915b424573eca0d730f72863",
+      "ts_dir": "raw/tkh_search/20260729T002908Z/",
+      "note": "Body never names TKH Security Solutions USA and explicitly names TKH Security B.V.; not registrant-bound primary material"
+    },
+    {
+      "url": "https://www.siqura.com/products",
+      "http_status": 404,
+      "ts_dir": "raw/tkh_search/20260728T233744Z/",
+      "note": "Siqura legacy brand; product page folded into TKH Security"
+    },
+    {
+      "url": "https://www.tkh-security.com/",
+      "http_status": null,
+      "ts_dir": "raw/tkh_search/20260728T233744Z/",
+      "note": "DNS resolution failure"
+    },
+    {
+      "url": "https://tkhsolutionsusa.com/",
+      "http_status": null,
+      "ts_dir": "raw/tkh_search/20260728T233842Z/",
+      "note": "DNS resolution failure"
+    },
+    {
+      "url": "https://www.tkhsolutionsusa.com/",
+      "http_status": null,
+      "ts_dir": "raw/tkh_search/20260728T233842Z/",
+      "note": "DNS resolution failure"
+    },
+    {
+      "url": "https://tkhsecurity.us/",
+      "http_status": null,
+      "ts_dir": "raw/tkh_search/20260728T233842Z/",
+      "note": "DNS resolution failure"
+    },
+    {
+      "url": "https://www.tkhsecurity.us/",
+      "http_status": null,
+      "ts_dir": "raw/tkh_search/20260728T233842Z/",
+      "note": "DNS resolution failure"
+    }
+  ],
+  "bot_walls": [],
+  "five_xx": []
+}
