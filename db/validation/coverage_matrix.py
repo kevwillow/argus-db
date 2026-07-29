@@ -1393,24 +1393,44 @@ def report_to_markdown(report: CoverageMatrixReport) -> str:
         lines.append("")
     lines.append("")
 
-    lines.append("### mac_range secondary-constraint note (CP5 board-class)")
+    lines.append("### mac_range secondary-constraint note (CP5 board-class, refreshed MAC-596)")
     lines.append("")
-    mac_range_rows = [
-        c for c in report.cells if c.identifier_type == "mac_range" and c.n > 0
-    ]
-    total_mr = sum(c.n for c in mac_range_rows)
+    # MAC-596 handback: the previous prose claimed ALL active `mac_range`
+    # rows drop to `unknown_category`, but the bin tally above
+    # (`oversized_mac_range`) carries a non-zero count of mac_range rows
+    # that cleared §11 #13 and fell through to the §4.4 wall. Both
+    # subsets are sourced from the data so the prose cannot drift from
+    # the tally again:
+    #   - non_unknown_mr ← the `oversized_mac_range` bin (computed from
+    #     rows, not from the cells grid; same signal the tally reads)
+    #   - unknown_mr ← the (device_category='unknown', identifier_type=
+    #     'mac_range') cell (the only cell whose value is BIN-INDEPENDENT,
+    #     so its accuracy is not gated on the cells grid's
+    #     DEVICE_CATEGORIES list being current)
+    #   - total_mr ← the two summed
+    non_unknown_mr = report.drop_tally_standard.oversized_mac_range
+    unknown_cell = next(
+        (c for c in report.cells
+         if c.identifier_type == "mac_range" and c.device_category == "unknown"),
+        None,
+    )
+    unknown_mr = unknown_cell.n if unknown_cell is not None else 0
+    total_mr = non_unknown_mr + unknown_mr
     lines.append(
-        f"- All {total_mr} active `mac_range` rows are OUI-28 (28-bit, 1,048,576 "
-        f"entries) or OUI-36 (36-bit, 4096 entries) prefixes — both far "
-        f"exceed §4.4's 256-entry expansion ceiling. They drop to "
+        f"- All {total_mr} active `mac_range` rows are OUI-28 (28-bit, "
+        f"1,048,576 entries) or OUI-36 (36-bit, 4096 entries) prefixes — "
+        f"both far exceed §4.4's 256-entry expansion ceiling. The "
+        f"device_category='unknown' subset ({unknown_mr} rows) drops to "
         f"`unknown_category` in the tally above (priority order puts §11 #13 "
-        f"first), but they would ALSO drop to `oversized_mac_range` if their "
-        f"`device_category` were ever lifted off `unknown` without an "
-        f"export-time `mac_range`-expansion strategy. The two drop reasons "
-        f"are not exclusive; the priority order picks one for arithmetic. "
-        f"CP5 board-class surface: a per-OUI `unknown`-only-fallback or a "
-        f"§4.4 amendment to permit OUI-prefix routing without expansion "
-        f"would unblock these for Talos."
+        f"first); the non-unknown subset ({non_unknown_mr} rows, identical "
+        f"to the `oversized_mac_range` bin) clears §11 #13 and falls "
+        f"through to `oversized_mac_range` at export time. The two drop "
+        f"reasons are not exclusive in principle; the priority order picks "
+        f"one per row for arithmetic. CP5 board-class surface: a per-OUI "
+        f"`unknown`-only-fallback or a §4.4 amendment to permit OUI-prefix "
+        f"routing without expansion would unblock the "
+        f"device_category='unknown' half for Talos — the non-unknown half "
+        f"is wall-bound by §4.4's expansion ceiling regardless."
     )
     lines.append("")
 

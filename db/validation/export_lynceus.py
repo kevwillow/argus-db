@@ -489,6 +489,73 @@ class Halt(Exception):
     """Stop-the-line signal raised on any §11 trip or reconciliation mismatch."""
 
 
+# MAC-611 (remediation of MAC-570) — Bluetooth SIG registry boundary.
+#
+# `ble_company_id` is the SIG *Company Identifier* registry (16-bit assigned
+# numbers). Values at or above 0xFC00 are NOT company identifiers: that block is
+# the SIG *Member UUID* range (`assigned_numbers/uuids/member_uuids.yaml`), which
+# renders as the 16-bit alias of a 128-bit base UUID
+# (`0000FCxx-0000-1000-8000-00805F9B34FB`) and belongs to `ble_uuid` / the
+# MAC-477 GATT-binding rule.
+#
+# `IDENTIFIER_TYPE_TO_PATTERN_TYPE` maps every `ble_company_id` to the Lynceus
+# `ble_manufacturer_id` wire type (CP21 §4.4 alias-collapse, MAC-360 / CP47).
+# A member-UUID value riding that MAP would ship as a manufacturer ID no
+# consumer can match, and would invite vendor-evidence adjudication against the
+# wrong registry. Export must HALT on it rather than silently repair it: the
+# fix is a separately ratified canonical retype, not an exporter rewrite.
+BLE_SIG_MEMBER_UUID_FLOOR: int = 0xFC00
+
+
+def _ble_company_id_value(identifier: str) -> int | None:
+    """Parse a `ble_company_id` identifier to its integer SIG assigned number.
+
+    Returns None when the value does not parse — an unparsed value is itself a
+    type-integrity defect and is halted by the caller rather than waived.
+    """
+
+    raw = identifier.strip()
+    try:
+        if raw.lower().startswith("0x"):
+            return int(raw, 16)
+        return int(raw, 0)
+    except (TypeError, ValueError):
+        return None
+
+
+def _assert_ble_registry_type(row: ActiveRow) -> None:
+    """MAC-611 gate 1 — BLE registry-type integrity, PRE-classification.
+
+    Raised before ``_classify_row`` so a member-UUID-range value never reaches
+    the `ble_company_id -> ble_manufacturer_id` MAP at all.
+    """
+
+    if row.identifier_type != "ble_company_id":
+        return
+    value = _ble_company_id_value(row.identifier)
+    if value is None:
+        raise Halt(
+            "HALT ble_registry_type_mismatch (MAC-611): "
+            f"identifiers.id={row.id} identifier_type='ble_company_id' "
+            f"identifier={row.identifier!r} does not parse as a SIG assigned "
+            "number. An unparsed value cannot be proven to sit below the "
+            f"member-UUID floor 0x{BLE_SIG_MEMBER_UUID_FLOOR:04X}; it requires "
+            "a separately ratified canonical correction."
+        )
+    if value >= BLE_SIG_MEMBER_UUID_FLOOR:
+        raise Halt(
+            "HALT ble_registry_type_mismatch (MAC-611): "
+            f"identifiers.id={row.id} identifier_type='ble_company_id' "
+            f"identifier={row.identifier!r} (0x{value:04X}) sits at or above the "
+            f"Bluetooth SIG member-UUID floor 0x{BLE_SIG_MEMBER_UUID_FLOOR:04X}. "
+            "That block is the SIG member-UUID registry, not the company-identifier "
+            "registry, so this row must not ride the CP21 §4.4 "
+            "`ble_company_id -> ble_manufacturer_id` MAP. Route it through the "
+            "MAC-477 GATT/member-UUID binding rule and retype it canonically; "
+            "the exporter must not repair it."
+        )
+
+
 @dataclass(frozen=True)
 class ActiveRow:
     """A single ``identifiers`` row in the active set."""
@@ -861,12 +928,19 @@ def _classify_row(
         return "product_family_codename", []
     # §4.4 — mac_range expand or drop.
     if row.identifier_type == "mac_range":
-        # The expansion logic stays codified for the case of a non-`unknown`-
-        # category mac_range row reaching this gate. Currently no such row
-        # exists in the active identifiers set (all live mac_range rows have
-        # category='unknown' and hit the §11 #13 unknown_category gate above);
-        # the branch fires only on a future Phase-5 reopening or category-
-        # correction promotion that lifts a mac_range out of unknown.
+        # Live branch (MAC-596 handback). Every active mac_range row whose
+        # device_category is not 'unknown' — that is, every row that cleared
+        # the §11 #13 priority gate above — falls through to this return.
+        # Such rows are non-zero in the live identifiers set today; the
+        # `oversized_mac_range` bin in `_meta.dropped_in_export` reflects
+        # their actual count and reconciles against the count of `mac_range`
+        # rows whose `device_category != 'unknown'` in the canonical DB.
+        # The ≤256-entry expansion logic stays codified for a future row
+        # that fits the ceiling, but no active mac_range fits today: every
+        # one is an OUI-28 / OUI-36 sub-allocation vastly exceeding the
+        # ceiling, so the bare `oversized_mac_range` drop is the only path
+        # actually exercised. Reopening `mac_range` as a promote path is a
+        # CEO-class decision and is explicitly NOT being requested here.
         return "oversized_mac_range", []
     # §4.4 CP16 — CP14 identifier_type cluster DROPPED-with-reason filter.
     # 12 new analytical-only types from migrations 0011/0013/0014; carried
@@ -1038,6 +1112,108 @@ def _reconcile(
             f"{file_label}: active row id set {writer_ids} disagrees with "
             f"MAC-45 reconstruction {mac45_ids} — STOP-THE-LINE."
         )
+
+
+def _classify_emitted_key_collision(rows: list[ActiveRow]) -> str:
+    """Diagnostic label for a duplicate emitted-key group (MAC-570 taxonomy).
+
+    Classification is DIAGNOSTIC ONLY. It never participates in the rejection
+    predicate — see ``_assert_emitted_keys_unique``.
+    """
+
+    if len({r.device_category for r in rows}) > 1:
+        return "CATEGORY_CONTRADICTION"
+    manufacturers = {r.manufacturer for r in rows}
+    if None in manufacturers and len(manufacturers) > 1:
+        return "ATTRIBUTED_VS_NULL_VENDOR"
+    return "DEDUP_MISS"
+
+
+def _assert_emitted_keys_unique(
+    *,
+    file_label: str,
+    emitted: list[tuple[ActiveRow, TalosEntry]],
+) -> None:
+    """MAC-611 gate 2 — no duplicate emitted key at all (remediates MAC-570).
+
+    The predicate is literal and unconditional::
+
+        len(entries) == len({e.argus_record_id for e in entries})
+        len(entries) == len({(e.pattern_type, e.pattern) for e in entries})
+
+    BOTH halves are load-bearing:
+
+    * ``argus_record_id`` is the Lynceus *upsert* key (SAR-10 over
+      ``{identifier_type}|{normalized_identifier}``). Two entries sharing it
+      race on ingest and last-write-wins decides the shipped row.
+    * ``(pattern_type, pattern)`` is the Lynceus *wire-match* key. A §4.4 alias
+      (CP21 ``ble_company_id -> ble_manufacturer_id``, CP21 ``ble_service_uuid
+      -> ble_uuid``) collapses distinct Argus identifier_types onto one wire
+      key while SAR-10 *correctly* assigns them different ``argus_record_id``
+      values. An id-only guard is blind to that class — the live
+      ``ble_manufacturer_id|0x0019`` pair (ids 4925, 35776) is the armed
+      tripwire.
+
+    This gate **HALTS. It never collapses.** Collapsing duplicates to the last
+    entry is the defect, not the repair: it moves last-write-wins out of the
+    consumer and into the exporter, and ships the contradiction silently.
+    Emitting fewer entries than were built must raise.
+
+    Originating canonical row ids are carried for *diagnostics only*. They never
+    waive multiplicity — two duplicate entries produced by a single row halt
+    exactly as two entries from two rows do.
+
+    Scope note (CEO amendment, MAC-611): the predicate is scoped to EMITTED
+    entries, not to canonical ``(identifier_type, identifier)`` groups. A shared
+    canonical pair is only a contradiction when the identifier_type carries
+    device identity. Class-valued types — ``equipment_class_code`` today, where
+    one FCC equipment class legitimately spans many grantees — share by
+    construction, and a canonical-scope predicate would fire false halts on
+    correct data. Do not widen this predicate across identifier types without
+    first proving the type asserts identity.
+    """
+
+    by_record_id: dict[str, list[tuple[ActiveRow, TalosEntry]]] = {}
+    by_wire_key: dict[tuple[str, str], list[tuple[ActiveRow, TalosEntry]]] = {}
+    for row, entry in emitted:
+        by_record_id.setdefault(entry.argus_record_id, []).append((row, entry))
+        by_wire_key.setdefault((entry.pattern_type, entry.pattern), []).append(
+            (row, entry)
+        )
+
+    dup_ids = {k: v for k, v in by_record_id.items() if len(v) > 1}
+    dup_wire = {k: v for k, v in by_wire_key.items() if len(v) > 1}
+    if not dup_ids and not dup_wire:
+        return
+
+    # One line per colliding group, keyed on the wire key so a §4.4 alias
+    # collapse and an upsert-key collision report as one finding when they
+    # coincide. Groups are union-ordered and deterministic.
+    groups: dict[tuple[str, str], list[tuple[ActiveRow, TalosEntry]]] = dict(dup_wire)
+    for pairs in dup_ids.values():
+        key = (pairs[0][1].pattern_type, pairs[0][1].pattern)
+        groups.setdefault(key, by_wire_key[key])
+
+    redundant = sum(len(v) - 1 for v in groups.values())
+    lines: list[str] = []
+    classes: dict[str, int] = {}
+    for (pattern_type, pattern), pairs in sorted(groups.items()):
+        rows = [r for r, _ in pairs]
+        label = _classify_emitted_key_collision(rows)
+        classes[label] = classes.get(label, 0) + 1
+        record_ids = sorted({e.argus_record_id for _, e in pairs})
+        lines.append(
+            f"- {','.join(record_ids)}  {pattern_type}|{pattern}  "
+            f"ids={sorted(r.id for r in rows)}  {label}"
+        )
+    summary = "; ".join(f"{n} {label}" for label, n in sorted(classes.items()))
+    raise Halt(
+        f"HALT duplicate_emitted_key (MAC-611/{file_label}): {len(groups)} "
+        f"duplicate emitted-key groups; {redundant} redundant entries; "
+        f"{summary}. The gate HALTS and never collapses — resolve the "
+        "contradiction canonically (supersession / category correction), then "
+        "re-export.\n" + "\n".join(lines)
+    )
 
 
 def _build_meta(
@@ -1288,6 +1464,10 @@ def _build_export(
     bin_assignments: dict[int, str | None] = {}
     survivor_rows: list[tuple[ActiveRow, TalosEntry]] = []
     for row in rows:
+        # MAC-611 gate 1 — BLE registry-type integrity, strictly BEFORE
+        # `_classify_row` so a SIG member-UUID value never reaches the CP21 §4.4
+        # `ble_company_id -> ble_manufacturer_id` MAP.
+        _assert_ble_registry_type(row)
         drop_bin, row_entries = _classify_row(
             row,
             confidence_threshold=confidence_threshold,
@@ -1310,7 +1490,10 @@ def _build_export(
     )
     # CP7 geographic_scope filter (runtime parameter, post-reconciliation).
     is_high_confidence = confidence_threshold >= 70
-    entries: list[TalosEntry] = []
+    # MAC-611 — each surviving entry keeps its originating canonical row so the
+    # emitted-key gate can name the colliding ids. The row half is diagnostic
+    # context only; it never participates in the rejection predicate.
+    emitted: list[tuple[ActiveRow, TalosEntry]] = []
     surviving_ssid_row_ids: set[int] = set()
     for row, entry in survivor_rows:
         if _passes_geographic_scope(
@@ -1318,7 +1501,7 @@ def _build_export(
             geographic_scope_filter=geographic_scope_filter,
             is_high_confidence=is_high_confidence,
         ):
-            entries.append(entry)
+            emitted.append((row, entry))
             if entry.pattern_type == "ssid_pattern":
                 surviving_ssid_row_ids.add(row.id)
         else:
@@ -1331,20 +1514,27 @@ def _build_export(
     # deterministic by preserving survivor order (rows are id-ordered) and
     # keeping the first occurrence of each lowercased substring.
     ssid_entries_pre_dedup = sum(
-        1 for e in entries if e.pattern_type == "ssid_pattern"
+        1 for _, e in emitted if e.pattern_type == "ssid_pattern"
     )
-    deduped: list[TalosEntry] = []
+    deduped: list[tuple[ActiveRow, TalosEntry]] = []
     seen_ssid: set[str] = set()
     nocase_deduped = 0
-    for entry in entries:
+    for row, entry in emitted:
         if entry.pattern_type == "ssid_pattern":
             key = entry.pattern.lower()
             if key in seen_ssid:
                 nocase_deduped += 1
                 continue
             seen_ssid.add(key)
-        deduped.append(entry)
-    entries = deduped
+        deduped.append((row, entry))
+    emitted = deduped
+    # MAC-611 gate 2 — final emitted-key uniqueness. Placement is load-bearing:
+    # AFTER `_reconcile`, the CP7 geographic filter and the intentional CP51
+    # `ssid_pattern` NOCASE collapse (so the only surviving multiplicity is
+    # unintended), and BEFORE `_build_meta` and payload serialization (so no
+    # duplicate key can be counted into `_meta` or written to disk).
+    _assert_emitted_keys_unique(file_label=file_label, emitted=emitted)
+    entries: list[TalosEntry] = [entry for _, entry in emitted]
     # SPLIT expansion count: emitted ssid substrings (pre-dedup) beyond one per
     # surviving ssid row — i.e. the leading-alternation fan-out (only `(msab|xry)`
     # today). record_count is the true feed record count (entry-based); it differs
