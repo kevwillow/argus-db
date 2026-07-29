@@ -6136,9 +6136,9 @@ Whitespace surrounding each alias is stripped on read. Empty / NULL yields `[]`.
 
 **Findings.**
 
-- **Finding 1 — defect scope.** Pre-apply, 86 / 104 rows with non-empty aliases (82.7 %) carry comma-bearing values verbatim. Naive-split produced 17 phantom tokens (verbatim per the MAC-535 catalogue: 5× DJI, 7× Honeywell, 3× Autel Robotics, 1× Dahua, 1× Hikvision, 1× each of 11 other vendors). After MAC-569 normalize, every comma-bearing value is quote-wrapped and the phantom count drops to **0** (verified by post-apply idempotency check).
+- **Finding 1 — defect scope (MAC-580 corrected).** Pre-apply, 86 / 104 rows with non-empty aliases (82.7 %) carry comma-bearing values verbatim. Naive-split produced **21** phantom tokens under the strict verbatim `Ltd.`/`Inc.`/`LLC`/`Co.` predicate (CTO re-query against the pre-apply backup; supersedes the predicted 17 — see `operator_review/MAC-578/cto_ratification.md` §1.5 and `operator_review/MAC-569/fix_proof.md` apply-time correction). The MAC-569 transform's binding deliverable is the **17 phantoms recovered** (naive-to-smart token delta, 551 → 534), NOT a count of zero. After MAC-569 normalize, every `<…> Co., Ltd.`-shape value is quote-wrapped, but the dominant `<Name>, Inc.`-shape (predecessor does NOT end in a corp suffix) was **left bare**. The CTO re-derived **26 standalone corp-suffix tokens surviving** at HEAD across Motorola Solutions, Rekor, L3Harris (×6), Digital Receiver Technology, Axon (×2), WatchGuard, Sierra Wireless, Cellebrite, Dedrone, Honeywell (×2), Anduril Industries, Brivo (×2), Openpath, Teledyne FLIR (×3), and `L.P.`/`INC` variants (`operator_review/MAC-578/cto_ratification.md` §1.3). The "drops to 0" claim above is **staged-prose error** — it was asserted before the post-condition was independently audited. **MAC-580** (`db/migrations/0045_mac580_alias_suffix_completion.sql`, schema 34 → 35) closes this defect by relaxing the merge predicate to fire on any pure fragment; see MAC-580 amendment entry below.
 - **Finding 2 — single-parser discipline.** The 5 consumers previously each had their own `aliases.split(",")` call. Refactoring them all to the canonical `db.alias_parser.split_aliases` makes the wire-format contract have exactly one implementation. Future alias-encoding changes (e.g., a future migration that introduces nested escaping) edit one file, not five.
-- **Finding 3 — verify-token-count delta.** Post-apply `sum(len(split_aliases(...)))` is strictly less than pre-apply `sum(len(naive_split(...)))` (or equal for rows that were already canonical-form). The script enforces this as a post-condition; a regression here would indicate the recombine pass lost or invented tokens.
+- **Finding 3 — verify-token-count delta (post-MAC-580 corrected).** The original MAC-569 post-condition (3) (`if post_total > pre_total`) was **vacuous by construction** (CTO finding MAC-578 §1.4): the predicate `post_total > pre_total` cannot fire because the merge predicate never adds tokens. The check existed but never observed to fail, so it was not a check. After MAC-580, the mac569 apply script's post-condition (2) was replaced with the independent `db.alias_parser.standalone_corp_suffix_tokens(...)` predicate (a per-row scan of every smart-parsed token against `FRAGMENT_SUFFIX_PATTERN` — no predecessor-context logic, no shared predicate with the transform). This is the same predicate the MAC-580 apply script enforces on the post-state (`scripts/mac580_alias_suffix_completion_apply.py:88-94`). Empirical proof that the new check IS a check: pytest invocation `tests/test_alias_parser.py::test_standalone_suffix_check_is_independent_of_merge_context` invokes the predicate on the adversarial blob `"ACME CORPORATION, INC., GLOBEX HOLDINGS, LLC, INITECH GROUP, Ltd."` and asserts the predicate returns `["INC.", "LLC", "Ltd."]` (i.e., it FAILS to report zero survivors — observed firing). After `recombine_and_quote_normalize` on the same blob, the predicate returns `[]` (observed passing on canonical). Token-count delta post-MAC-580 is still computed and printed for forensic record but is no longer a fail-gate.
 
 **No identifiers write. No schema mutation. No export regen. No push, no tag.** The migration is data-only, scoped to `manufacturers.aliases`, and does not change any identifier row, confidence value, or §6.2 corroboration count (the MAC-535 patch already produced the corrected counts; MAC-569's data normalization does not change them because the post-filter token set is unchanged).
 
@@ -6153,4 +6153,83 @@ Whitespace surrounding each alias is stripped on read. Empty / NULL yields `[]`.
 - `tests/test_alias_parser.py` — 50 new tests.
 - `db/extraction/vendor_name_disambig.py`, `db/validation/sar8_bulk_stage.py`, `db/validation/phase3_inference_candidates.py`, `db/validation/coverage_matrix.py` — thin re-exports of `db.alias_parser.split_aliases` / `is_bogus_token` / `filter_bogus_tokens`.
 - `db/argus.db.pre_mac569_20260729T030931Z` — pre-apply backup (sha256 `2fad9f2eb2bb602ebe6b6bf4111304add313f2295a7a35bdb953c71bd3b396d7`).
+- `docs/engineering/BIBLE_AMENDMENTS.md` — this entry.
+
+---
+
+## MAC-580 — alias suffix completion (CTO-followup to MAC-569)
+
+**Date:** 2026-07-29
+**Commits:** `8e905cf` (initial), `da2b532` (review polish — phantom metrics, stricter idempotency, count correction).
+**Source:** [MAC-580](/MAC/issues/MAC-580) — MAC-569 follow-up. CTO ratification withheld under [MAC-578](/MAC/issues/MAC-578) §1.3 (the `<Name>, Inc.`-shape phantom tokens survived the predecessor-and-suffix merge predicate) and §1.4 (the post-condition (2) was vacuous by construction).
+**Status:** Ratification-pending. CTO has not signed MAC-580; this amendment-log entry IS the §11 #11 closure for the migration that landed. Vendor screens continue to match `canonical_name` only until CTO ratifies MAC-580.
+
+**Rule (binding refinement to MAC-569's wire format).** The MAC-569 merge predicate in `db.alias_parser.recombine_and_quote_normalize` is **relaxed**: any smart-parsed token matching `_FRAGMENT_SUFFIX_PATTERN` is merged back into its immediate predecessor with `", "` join, regardless of whether the predecessor ends in a corporate suffix. The previous MAC-569 predicate also required `_ends_with_corp_suffix(merged[-1])` — that captured the `<…> Co., Ltd.` shape but missed the dominant `<Name>, Inc.` shape. The relaxed predicate captures both.
+
+Cross-vendor compounds (e.g. `Flock Safety, Motorola Solutions`, `Autel, DJI`) are unchanged: the second token is not a pure corporate suffix, so neither the old nor the new predicate fires. The disambiguation rule (`test_recombine_and_quote_normalize_preserves_cross_vendor_pairs_at_scale`) is the regression catch.
+
+**Migration-slot allocation.**
+- `0043` = MAC-569 (RFC-4180-lite aliases normalize)
+- `0044` = MAC-523 (Shodan Phase 1 cctv_camera ingest)
+- `0045` = MAC-580 (alias suffix completion — **THIS MIGRATION**)
+- schema_version: `34 → 35` (data-only; no DDL).
+
+**Source ID file.** None. Migration is a uniform per-row recombine applied to the 15 rows whose `<Name>, Inc.`-shape tokens survived MAC-569; the input is the live `manufacturers.aliases` blob (verbatim, 240 rows total, 104 with non-empty `aliases`).
+
+**Fix shape (deployed at MAC-580).**
+
+1. **Transform relaxation** — `db/alias_parser.py::recombine_and_quote_normalize`. The merge predicate dropped the `_ends_with_corp_suffix(merged[-1])` clause:
+
+   ```python
+   # Before (MAC-569, defect 1 of MAC-578 §1.3):
+   if (merged
+       and _is_pure_fragment(tok)
+       and _ends_with_corp_suffix(merged[-1])):
+       merged[-1] = merged[-1] + ", " + tok.strip()
+       phantom_count += 1
+   # After (MAC-580):
+   if merged and _is_pure_fragment(tok):
+       merged[-1] = merged[-1] + ", " + tok.strip()
+       phantom_count += 1
+   ```
+
+2. **Independent post-condition function** — `db.alias_parser.standalone_corp_suffix_tokens(blob)` returns every smart-parsed token that matches `_FRAGMENT_SUFFIX_PATTERN`. This predicate does NOT consult the predecessor and shares no logic with the merge predicate; it is the post-condition that **MAC-569 §1.4 missed**. Used by both `scripts/mac580_alias_suffix_completion_apply.py:88-94` and (post-MAC-580) `scripts/mac569_alias_quote_normalize_apply.py` post-condition (2).
+
+3. **Data migration** — `db/migrations/0045_mac580_alias_suffix_completion.sql` + apply script `scripts/mac580_alias_suffix_completion_apply.py`. The migration applies the relaxed transform to every row, then enforces byte-exact equality (`recombine_and_quote_normalize(post) == post`), idempotency, no `canonical_name` drift, no `identifiers` row-count change, and **zero surviving standalone corp-suffix tokens** under `standalone_corp_suffix_tokens`. Schema bump: `34 → 35` (data-only; no DDL).
+
+   Apply results (`operator_review/MAC-580/fix_proof.md`):
+   - 240 rows scanned, **15 rows modified** (id 3, 5, 9, 10, 15, 17, 21, 28, 33, 211, 223, 238, 299, 306, 310).
+   - **26 phantom tokens recovered** (the 26 surviving standalone corp-suffix tokens across the 15 modified rows; matches the CTO re-query at `operator_review/MAC-578/cto_ratification.md` §1.3).
+   - Pre-total tokens (naive) = 551, post-total tokens (smart) = 508, `delta = 43`.
+   - Reconstruction mismatches = 0 / 240.
+   - Non-idempotent rows = 0.
+   - `canonical_name` drift = 0.
+   - `identifiers` count 43,856 pre == 43,856 post.
+   - Standalone corp-suffix tokens surviving = 0.
+   - schema_version: 34 → 35.
+
+4. **Tests** — `tests/test_alias_parser.py` (+3 tests, 50 → 53 tests total, all pass). New tests:
+   - `test_recombine_and_quote_normalize_merges_name_suffix_shape` — the `<Name>, Inc.` shape is now merged.
+   - `test_recombine_and_quote_normalize_preserves_cross_vendor_pairs_at_scale` — `Flock Safety, Motorola Solutions, Autel, DJI, …` remains unchanged.
+   - `test_standalone_suffix_check_is_independent_of_merge_context` — **observed firing** on the adversarial blob `"ACME CORPORATION, INC., GLOBEX HOLDINGS, LLC, INITECH GROUP, Ltd."` (returns `["INC.", "LLC", "Ltd."]`).
+
+5. **Operator-review artifact** — `operator_review/MAC-580/fix_proof.md` (this entry's binding companion), with id=3 (Motorola Solutions) and id=22 (DJI) spot checks.
+
+**Findings.**
+
+- **Finding 1 — defect scope closed.** Pre-MAC-580 (post-MAC-569) standalone corp-suffix tokens = 26 (per CTO re-query at `operator_review/MAC-578/cto_ratification.md` §1.3 and re-derived by `standalone_corp_suffix_tokens` against the pre-MAC-580 backup). Post-MAC-580 standalone corp-suffix tokens = 0 across all 240 manufacturer rows. The 15 modified rows (id 3, 5, 9, 10, 15, 17, 21, 28, 33, 211, 223, 238, 299, 306, 310) account for the surviving 26 — distribution per row: id=3 (1), id=5 (1), id=9 (7), id=10 (1), id=15 (2), id=17 (1), id=21 (1), id=28 (1), id=33 (1), id=211 (2), id=223 (1), id=238 (1), id=299 (2), id=306 (1), id=310 (3). Verified at apply-time: `[mac580] standalone corp suffixes: 0`.
+- **Finding 2 — disambiguation rule preserves cross-vendor compounds.** The relaxed predicate fires only when a smart-parsed token IS a pure fragment (`_FRAGMENT_SUFFIX_PATTERN`); the 5× DJI cross-vendor pairs (`Autel, DJI`, `Parrot, DJI`, etc.) have neither token as a pure fragment, so they remain separate. The id=22 spot-check in `operator_review/MAC-580/fix_proof.md` confirms byte-identical pre/post for that row.
+- **Finding 3 — independent post-condition.** Post-MAC-580, the mac569 apply script's post-condition (2) was replaced with the independent `standalone_corp_suffix_tokens` predicate (no predecessor logic, no shared predicate with the transform). The MAC-580 apply script enforces the same predicate. **Observed firing**: `tests/test_alias_parser.py::test_standalone_suffix_check_is_independent_of_merge_context` invokes the predicate on the adversarial blob and asserts it returns `["INC.", "LLC", "Ltd."]` — a check that has been observed to fail is a check. Cited failing run in `operator_review/MAC-580/fix_proof.md` §"Independent adversarial gate (observed firing)".
+
+**No identifiers write. No schema mutation beyond 34→35. No export regen. No push, no tag.** Migration is data-only, scoped to `manufacturers.aliases`. Identifiers rows untouched (verified by pre/post row-count equality). The Lynceus export pipeline is byte-identical modulo `exported_at`. Vendor screens continue to match `canonical_name` only until CTO ratifies MAC-580; the standing screen rule is not lifted by this amendment-log entry.
+
+**Authority.** DBArchitect (this commit author, agent `6c93a466-d498-49e0-b7af-3fc0d08eb2b0`) under CTO dispatch MAC-580. The relaxed merge predicate and the independent post-condition are the binding outputs; the §-text insertion into `PROJECT_BIBLE.md` §4.4 is deferred to the next coordinated CP cycle that touches §4 (per §11 #11 amendment-log discipline; this entry IS the closure for the migration that landed).
+
+**Companion artifacts.**
+- `operator_review/MAC-580/fix_proof.md` — apply results, spot checks, observed-firing evidence, scope discipline.
+- `db/alias_parser.py` — relaxed merge predicate + new `standalone_corp_suffix_tokens` post-condition helper.
+- `db/migrations/0045_mac580_alias_suffix_completion.sql` — schema_version bump with pre-condition guards.
+- `scripts/mac580_alias_suffix_completion_apply.py` — apply script (backup-first, byte-exact reconstruction, idempotency, no canonical_name drift, no identifier drift, zero survivors under independent check). **Note:** as part of the MAC-580 follow-up (this issue's resolution), the apply script was patched to add `connection.row_factory = sqlite3.Row` (the script previously used tuple indexing on row objects but then called `r["aliases"]`, which only works under Row factory) and to import `split_aliases` from `db.alias_parser` (the post-total computation at line 97 was previously `NameError`-bound). These patches were verified by re-running the apply against the pre-MAC-580 backup; the post-patch output (`phantoms_recovered = 26, pre_total = 551, post_total = 508, token_delta = 43`) replaces the `da2b532` polish-commit figures in the proof artifact.
+- `tests/test_alias_parser.py` — 53 tests total (+3 for MAC-580).
+- `db/argus.db.pre_mac580_20260729T034855Z` — pre-apply backup (sha256 `c509235127f2a5283f250a04796f7b6800d79adf66f5a4041176a0b60bb54bd1`).
 - `docs/engineering/BIBLE_AMENDMENTS.md` — this entry.

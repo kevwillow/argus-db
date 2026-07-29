@@ -32,7 +32,11 @@ def main() -> int:
         raise SystemExit(f"missing database: {db}")
 
     sys.path.insert(0, str(REPO))
-    from db.alias_parser import recombine_and_quote_normalize, standalone_corp_suffix_tokens
+    from db.alias_parser import (
+        recombine_and_quote_normalize,
+        split_aliases,
+        standalone_corp_suffix_tokens,
+    )
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     backup = db.with_name(f"{db.name}.pre_mac580_{timestamp}")
@@ -43,6 +47,7 @@ def main() -> int:
     )
 
     connection = sqlite3.connect(db)
+    connection.row_factory = sqlite3.Row
     try:
         schema = connection.execute("SELECT MAX(version) FROM schema_version").fetchone()[0]
         if schema != EXPECTED_SCHEMA_BASELINE:
