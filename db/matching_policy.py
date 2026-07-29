@@ -43,6 +43,44 @@ The flagged set is NOT re-derived here. It is the non-``KEEP`` cohort of
 carries the ``is_common_word`` column. ``tests/test_matching_policy.py`` pins
 this module's sets against that TSV so the two cannot drift.
 
+Corpus provenance — re-measured after MAC-580 (MAC-618)
+-------------------------------------------------------
+Every count quoted in this module is an **A2V** count: the alias is the
+needle, ``vendor_canonical_name`` / description is the haystack, which is what
+``db.entity_boundary.boundary_match(token, text)`` computes. Direction matters
+here, so it is stated rather than assumed.
+
+MAC-580 rewrote 15 ``manufacturers.aliases`` blobs into RFC-4180-lite quoted
+form, which *lengthens* an alias token (``REKOR RECOGNITION SYSTEMS`` +
+``INC.`` become the single ``REKOR RECOGNITION SYSTEMS, INC.``). A longer
+needle can only ever match fewer rows, so MAC-618 re-ran MAC-577's probe
+against the pre-apply backup and against live and diffed them::
+
+    PYTHONPATH=. python3 operator_review/MAC-618/rerun_blast_radius.py
+    PYTHONPATH=. python3 operator_review/MAC-618/alias_confirmed_15.py
+
+Measured result, not an inference: **every A2V count below is unchanged**.
+All 12 flagged canonicals hold on all six probe fields, and the A2V union
+holds for all 15 changed ids. The re-measured pre-corpus reproduces
+``operator_review/MAC-577/alias_only_blast_radius.json`` field-for-field, and
+a positive control (an alias mutated to an unmatchable string, 90 -> 0)
+confirms the harness can see a move when one exists.
+
+Two things the re-measurement corrected, both scoping errors rather than
+arithmetic:
+
+* The ``Harris`` entry below is ``manufacturers.id=8``, whose alias blob
+  MAC-580 did **not** touch. It is not L3Harris (``id=9``); ``L3Harris`` is a
+  separate canonical and is not in MAC-542's flagged cohort at all.
+* The lengthening mechanism is real, but it fires once and off this cohort:
+  Dedrone (``id=33``) alias ``Dedrone Holdings`` matched 5 rows and
+  ``Dedrone Holdings, Inc.`` matches 4 — ``procurement_records.id=51399``,
+  whose excerpt reads ``DEDRONE HOLDINGS, $480,000`` and so has no ``INC``
+  token to absorb. The sibling alias ``DEDRONE DEFENSE LLC`` still covers the
+  row, so the union is flat at 13. A union alone would have hidden this;
+  per-alias decomposition is what surfaces it
+  (``operator_review/MAC-618/alias_confirmed_15.json``).
+
 Three tiers, not a flag
 -----------------------
 Alias-only matching is only a refinement when the vendor's alias set can carry
