@@ -166,5 +166,51 @@ def test_running_but_silent_past_threshold_is_orphan_lock():
     assert got["MAC-998"][0] == "ORPHAN_LOCK"
 
 
+# ── T4: the just-started slot-holder (the probe's own first live FP) ─────────
+#
+# Verbatim API values from MAC-576. CEO run 0c94aa41 held the CEO's slot; queued
+# CEO run 318a23e9 held MAC-575's lock. 0c94aa41 started 03:39:44.892Z and stamped
+# its first lastOutputAt at 03:39:47.250Z. Probed inside that 2.4 s window the old
+# code called it a corpse and escalated MAC-575 to DEADLOCK; probed 90 s later,
+# same issue and same lock-holder, INFO. Load-bearing like T2: T2 covers a healthy
+# slot-holder that has already spoken, T4 covers one that has not spoken YET.
+CEO = "62a86779-651b-4c59-8773-cee9e0f53334"
+DBARCHITECT = "6c93a466-d498-49e0-b7af-3fc0d08eb2b0"
+RUN_CEO_QUEUED = _run("318a23e9-b4d1-4415-a45e-fd27ffe29b7e", CEO, "queued")
+ISSUE_MAC575 = _issue("MAC-575", DBARCHITECT, RUN_CEO_QUEUED["id"], "2026-07-29T03:38:35.209Z")
+
+
+def test_t4_just_started_slot_holder_is_not_a_corpse():
+    """Before the first output line lands: lastOutputAt is still None."""
+    just_started = _run("0c94aa41-6b87-4689-867f-e6dc5c18d0b1", CEO, "running",
+                        "2026-07-29T03:39:44.892Z", None, 0)
+    got = verdicts([ISSUE_MAC575], [RUN_CEO_QUEUED, just_started], "2026-07-29T03:39:46Z")
+    assert got["MAC-575"][0] == "INFO"
+    assert "LOCK_BY_QUEUED_RUN" in got["MAC-575"][1]
+
+
+def test_t4_same_pair_after_first_output_still_info():
+    """90 s later, unchanged by any intervention. The two must agree."""
+    speaking = _run("0c94aa41-6b87-4689-867f-e6dc5c18d0b1", CEO, "running",
+                    "2026-07-29T03:39:44.892Z", "2026-07-29T03:39:47.250Z", 1)
+    got = verdicts([ISSUE_MAC575], [RUN_CEO_QUEUED, speaking], "2026-07-29T03:41:14Z")
+    assert got["MAC-575"][0] == "INFO"
+
+
+def test_t4_silence_is_measured_from_startedAt_when_output_never_lands():
+    """The branch must not become unconditionally safe: a run that started long
+    ago and never emitted anything IS stalled, measured from startedAt."""
+    never_spoke = _run("0c94aa41-6b87-4689-867f-e6dc5c18d0b1", CEO, "running",
+                       "2026-07-29T03:39:44.892Z", None, 0)
+    got = verdicts([ISSUE_MAC575], [RUN_CEO_QUEUED, never_spoke], "2026-07-29T04:39:44Z")
+    assert got["MAC-575"][0] == "DEADLOCK"
+
+
+def test_t4_running_record_with_no_timestamps_is_mid_dispatch_not_dead():
+    mid_dispatch = _run("0c94aa41-6b87-4689-867f-e6dc5c18d0b1", CEO, "running", None, None, 0)
+    got = verdicts([ISSUE_MAC575], [RUN_CEO_QUEUED, mid_dispatch], "2026-07-29T04:39:44Z")
+    assert got["MAC-575"][0] == "INFO"
+
+
 def test_unlocked_issues_are_not_reported():
     assert verdicts([_issue("MAC-500", VALIDATOR, None, None)], [], "2026-07-29T03:31:22Z") == {}

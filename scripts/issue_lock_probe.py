@@ -99,13 +99,30 @@ def is_orphan(run):
 
 
 def is_stalled(run, now, stall_minutes):
-    """A running run that has emitted nothing for longer than the threshold."""
+    """A running run that has emitted nothing for longer than the threshold.
+
+    Silence is measured from the last output if there is one, and otherwise from
+    ``startedAt``. A run that has just been handed a process has not emitted
+    anything yet, and "no output yet" is not "no output for 20 minutes".
+
+    Paid for by the probe's own first live actionable verdict (MAC-576). CEO run
+    ``0c94aa41`` flipped to ``running`` at 03:39:44.892Z and did not stamp its
+    first ``lastOutputAt`` until 03:39:47.250Z. Inside that 2.4-second window the
+    old ``last_out is None -> True`` branch called it a corpse, which escalated
+    MAC-575's routine queued lock to DEADLOCK. Re-probed 90 s later with no
+    intervention: INFO. That is precisely the false positive the T2 test exists
+    to forbid, arriving through the one input T2 did not cover.
+
+    A ``running`` record carrying neither timestamp is a record mid-dispatch, not
+    evidence of a corpse; there is no window to measure, so it is not stalled.
+    The impossible-ordering case stays with ``is_orphan``.
+    """
     if run.get("status") != "running":
         return False
-    last_out = parse_ts(run.get("lastOutputAt"))
-    if last_out is None:
-        return True
-    return (now - last_out).total_seconds() / 60.0 > stall_minutes
+    marker = parse_ts(run.get("lastOutputAt")) or parse_ts(run.get("startedAt"))
+    if marker is None:
+        return False
+    return (now - marker).total_seconds() / 60.0 > stall_minutes
 
 
 def classify_lock(issue, runs_by_id, runs_by_agent, now, stall_minutes):
