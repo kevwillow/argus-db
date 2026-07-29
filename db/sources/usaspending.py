@@ -366,6 +366,21 @@ def _fetch_post(
 # vendor universe is unchanged. This override only affects the search
 # *keyword* phrasing within each vendor's query, not the vendor's
 # inclusion. The override choice is logged in extraction_runs.notes.
+#
+# MAC-577 — this table is the ASK side and it is NOT a control.
+# `extraction_runs.id=15` notes record `keyword_overrides_applied` with
+# `"Reveal": "Reveal Media"`, i.e. the override below WAS in force for the
+# sweep. Reveal still returned 66 rows, of which exactly 1 contains the
+# phrase "Reveal Media" (the other 65 are REVEAL GLOBAL CONSULTING, REVEAL
+# IMAGING TECHNOLOGIES, REVEAL BIOSCIENCES, REVEAL TECHNOLOGY). USAspending's
+# `keywords` filter does not honour a multi-word value as a phrase, so this
+# table constrains what we ask for and never what we accept.
+# The ACCEPT-side control is `db/matching_policy.py`; that is where a
+# common-word / short-single-token canonical is actually stopped from
+# attributing on its bare name. Keep the two in the same direction: a
+# canonical in `matching_policy.ALIAS_ONLY_CANONICALS` should also have an
+# entry here. `STOP` and `Rekor` are currently accept-side-only — deliberate,
+# so this freeze does not change what a live sweep queries.
 KEYWORD_OVERRIDES: dict[str, str] = {
     "Harris": "Harris Corporation",            # alias; pre-2019 IMSI legacy entity
     "Jacobs": "Jacobs Engineering",            # alias; pre-2019 acquirer of Engility
