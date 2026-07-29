@@ -62,13 +62,36 @@ canonicals split three ways:
                                a canonical DB write with its own ratified plan.
 
 Every entry carries its measured reason rather than being silently omitted.
+
+A fourth shape: basis-differentiated (MAC-588)
+----------------------------------------------
+``Axon`` is the one flagged canonical whose loss cohort is **basis-split**, so
+no uniform rule fits it. Measured on HEAD (50,499 ``procurement_records``,
+``operator_review/MAC-588/measure_rules.py``): 890 bare boundary-matches, 665
+alias-confirmed, 225 bare-only — and that 225 splits 123 vendor-basis / 102
+description-basis with opposite verdicts. All 102 were adjudicated
+exhaustively (``operator_review/MAC-588/adjudication.tsv``): 29 are real
+Axon Enterprise reseller awards, 73 are FPs.
+
+So the rule is per-basis, and on the description basis the bare canonical is
+additionally gated on a product qualifier. ``BasisRule`` below expresses that;
+``attributes()`` is the decision function callers should use, because it makes
+the qualifier impossible to skip.
 """
 
 from __future__ import annotations
 
-from typing import Iterable
+from dataclasses import dataclass
+from typing import Iterable, Literal, Optional
 
 from db.alias_parser import split_aliases
+# MAC-585 single-implementation boundary matcher. Imported rather than
+# re-transcribed: MAC-588's constraint is "do not invent a second normaliser",
+# and db/entity_boundary.py is the verbatim transcription of
+# operator_review/MAC-542/rematch.py:26-40 that exists for exactly this reason.
+from db.entity_boundary import boundary_match
+
+Basis = Literal["vendor", "description"]
 
 # MAC-542 §5 short-single-token rule, verbatim from
 # ``operator_review/MAC-542/t2_select.py:57`` — kept identical on purpose so
@@ -191,6 +214,80 @@ DEFERRED_CANONICALS: dict[str, str] = {
 }
 
 
+# ── basis-differentiated (MAC-588) ────────────────────────────────────────
+
+
+@dataclass(frozen=True)
+class BasisRule:
+    """Alias-only on the vendor basis; bare-plus-qualifier on the description.
+
+    ``description_qualifiers`` are boundary-matched against the SAME description
+    text the bare canonical matched. A bare hit with no qualifier does not
+    attribute. The set must be non-empty: an empty one silently degrades this
+    rule to "alias-only on vendor, bare on description", which is a different
+    (measurably worse) rule — see ``assert_basis_rules_are_sound``.
+    """
+
+    reason: str
+    description_qualifiers: tuple[str, ...]
+
+
+# Axon's qualifier set. Every entry is either LOAD-BEARING (its removal loses
+# an adjudicated true positive) or product-line hardening with zero measured
+# hits on this corpus. Leave-one-out and leave-one-family-out are in
+# operator_review/MAC-588/edges.json; the zero-hit entries are labelled there
+# as speculative, NOT as measured.
+#
+#   LOAD-BEARING  TASER(12) CAMERA(4) TASERS(1) TAZER(1) CAMERAS(1)
+#                 CARTRIDGE(1)
+#   redundant here, kept for the next sweep   X26 X26P CARTRIDGES HOLSTERS
+#                 FLEET "AXON BODY" "AXON FLEET"
+#   zero hits (speculative hardening)         TAZERS CEW BODYCAM BODYCAMS
+#                 "BODY WORN" HOLSTER EVIDENCE.COM "AXON DOCK" "AXON SIGNAL"
+#                 "AXON RESPOND"
+_AXON_QUALIFIERS = (
+    "TASER", "TASERS", "TAZER", "TAZERS", "CEW",
+    "CAMERA", "CAMERAS", "BODYCAM", "BODYCAMS", "BODY WORN",
+    "X26", "X26P",
+    "CARTRIDGE", "CARTRIDGES", "HOLSTER", "HOLSTERS",
+    "FLEET",
+    "EVIDENCE.COM",
+    "AXON BODY", "AXON FLEET", "AXON DOCK", "AXON SIGNAL", "AXON RESPOND",
+)
+
+# APPLIED basis-differentiated rules. Empty: MAC-588 measured Axon's rule and
+# found it clean, but Axon is in the MAC-542 short-single-token cohort
+# (``is_common_word=no``, ``recommended_action=REFINE``) and MAC-577's standing
+# gate holds that cohort for per-vendor sign-off before application. Promotion
+# is a one-line move of the entry below into this dict.
+BASIS_DIFFERENTIATED: dict[str, BasisRule] = {}
+
+# PROPOSED: measured, adjudicated exhaustively, NOT applied.
+PROPOSED_BASIS_DIFFERENTIATED: dict[str, BasisRule] = {
+    "Axon": BasisRule(
+        reason=(
+            "basis-split loss cohort, so no uniform rule fits. 890 bare "
+            "boundary-matches / 665 alias-confirmed / 225 bare-only = 123 "
+            "vendor-basis + 102 description-basis. The 123 vendor-basis rows "
+            "are 9 distinct vendors, none of them Axon Enterprise (THE AXON "
+            "GROUP LTD x50, AXON MEDICAL INC x43, AXON GARY L x14, AXON CABLE "
+            "INC x10, AXON CONNECTED LLC x2, AXON MEDCHEM B.V. x1, AXON "
+            "INSTRUMENTS INC x1, AXON SYSTEMS INC x1, AXON GOVERNMENT & "
+            "COMMERCIAL SERVICES CORP x1). All 102 description-basis rows were "
+            "adjudicated: 29 real Axon Enterprise reseller awards, 73 FPs. "
+            "This rule retains 29/29 TP and 0/73 FP on that cohort and drops "
+            "all 123 vendor-basis rows; corpus total 890 -> 694."
+        ),
+        description_qualifiers=_AXON_QUALIFIERS,
+    ),
+}
+
+
+def is_basis_differentiated(canonical: str) -> bool:
+    """True iff an APPLIED basis-differentiated rule governs ``canonical``."""
+    return canonical in BASIS_DIFFERENTIATED
+
+
 def is_alias_only(canonical: str) -> bool:
     """True iff ``canonical`` must never be matched as a bare keyword."""
     return canonical in ALIAS_ONLY_CANONICALS
@@ -217,15 +314,127 @@ def matcher_keywords_for(canonical: str, aliases_field: str | None) -> list[str]
     """
     if not is_alias_only(canonical):
         return [canonical]
-    qualified = [a for a in split_aliases(aliases_field) if is_qualified_alias(a)]
-    # dedupe, preserve first-seen order
+    return qualified_aliases_for(canonical, aliases_field)
+
+
+def qualified_aliases_for(canonical: str, aliases_field: str | None) -> list[str]:
+    """The vendor's qualified aliases, deduped, first-seen order."""
     seen: set[str] = set()
     out: list[str] = []
-    for k in qualified:
-        if k not in seen:
-            seen.add(k)
-            out.append(k)
+    for a in split_aliases(aliases_field):
+        if is_qualified_alias(a) and a not in seen:
+            seen.add(a)
+            out.append(a)
     return out
+
+
+def matcher_keywords_for_basis(
+    canonical: str, aliases_field: str | None, basis: Basis
+) -> list[str]:
+    """Keywords admissible on ``basis`` for ``canonical``.
+
+    For a basis-differentiated canonical the vendor basis is alias-only (the
+    bare canonical is dropped) while the description basis still offers the
+    bare canonical — but a bare description hit is NOT sufficient on its own.
+    ``attributes()`` applies the qualifier; call that, not this, unless you are
+    implementing the qualifier yourself.
+    """
+    if basis not in ("vendor", "description"):
+        raise ValueError(f"basis must be 'vendor' or 'description', got {basis!r}")
+    if not is_basis_differentiated(canonical):
+        return matcher_keywords_for(canonical, aliases_field)
+    aliases = qualified_aliases_for(canonical, aliases_field)
+    if basis == "vendor":
+        return aliases
+    return aliases + [canonical]
+
+
+def attributes(
+    canonical: str,
+    aliases_field: str | None,
+    vendor_text: str | None,
+    description_text: str | None,
+) -> Optional[Basis]:
+    """Does this row attribute to ``canonical``, and on which basis?
+
+    Returns ``"vendor"``, ``"description"`` or ``None``. Vendor basis wins
+    when both hold, matching ``operator_review/MAC-542/rematch.py``'s
+    precedence.
+
+    This is the function callers should use. ``matcher_keywords_for_basis``
+    alone cannot express the description-basis qualifier, so a caller that
+    builds keyword lists and matches them itself silently gets the un-narrowed
+    behaviour for a basis-differentiated canonical.
+    """
+    if not is_basis_differentiated(canonical):
+        kws = matcher_keywords_for(canonical, aliases_field)
+        if any(boundary_match(k, vendor_text) for k in kws):
+            return "vendor"
+        if any(boundary_match(k, description_text) for k in kws):
+            return "description"
+        return None
+
+    rule = BASIS_DIFFERENTIATED[canonical]
+    aliases = qualified_aliases_for(canonical, aliases_field)
+    if any(boundary_match(a, vendor_text) for a in aliases):
+        return "vendor"
+    if any(boundary_match(a, description_text) for a in aliases):
+        return "description"
+    # Bare canonical on the description basis only, and only with a qualifier.
+    if boundary_match(canonical, description_text) and any(
+        boundary_match(q, description_text) for q in rule.description_qualifiers
+    ):
+        return "description"
+    return None
+
+
+def assert_basis_rules_are_sound() -> None:
+    """Structural guards on the basis-differentiated tier.
+
+    Deliberately NOT folded into ``assert_no_overlap``: a basis-differentiated
+    canonical stays in ``DEFERRED_CANONICALS`` because alias-only really is
+    unsafe for it (for Axon it would delete 29 adjudicated real awards). The
+    two tiers describe different rules, so they overlap on purpose.
+    """
+    both = set(BASIS_DIFFERENTIATED) & set(PROPOSED_BASIS_DIFFERENTIATED)
+    if both:
+        raise AssertionError(
+            f"canonical in both applied and proposed basis tiers: {sorted(both)}")
+    clash = set(BASIS_DIFFERENTIATED) & set(ALIAS_ONLY_CANONICALS)
+    if clash:
+        raise AssertionError(
+            f"canonical is both ALIAS_ONLY and basis-differentiated — the two "
+            f"rules contradict on the description basis: {sorted(clash)}")
+    for tier in (BASIS_DIFFERENTIATED, PROPOSED_BASIS_DIFFERENTIATED):
+        for canonical, rule in tier.items():
+            if canonical not in flagged_canonicals():
+                raise AssertionError(
+                    f"{canonical} is not in the MAC-542 flagged cohort; a "
+                    f"basis rule for it would be a new screen, not a refinement")
+            if not rule.description_qualifiers:
+                raise AssertionError(
+                    f"{canonical} has an empty qualifier set — that silently "
+                    f"degrades the rule to bare-on-description")
+
+
+def assert_basis_rules_are_applicable(
+    rows: Iterable[tuple[str, str | None]]
+) -> None:
+    """No APPLIED basis rule may leave a vendor with an empty vendor-basis set.
+
+    Same failure mode as ``assert_policy_is_applicable``: the vendor basis is
+    alias-only, so a vendor with no qualified alias would be deleted from
+    vendor-basis attribution entirely.
+    """
+    empty = [
+        c for c, al in rows
+        if is_basis_differentiated(c)
+        and not matcher_keywords_for_basis(c, al, "vendor")
+    ]
+    if empty:
+        raise AssertionError(
+            "basis-differentiated canonicals with no qualified alias would "
+            f"attribute nothing on the vendor basis: {sorted(empty)}")
 
 
 def assert_policy_is_applicable(rows: Iterable[tuple[str, str | None]]) -> None:

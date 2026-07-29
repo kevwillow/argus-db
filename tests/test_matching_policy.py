@@ -16,20 +16,29 @@ import pytest
 
 from db.matching_policy import (
     ALIAS_ONLY_CANONICALS,
+    BASIS_DIFFERENTIATED,
     DEFERRED_CANONICALS,
     PROPOSED_ALIAS_ONLY,
+    PROPOSED_BASIS_DIFFERENTIATED,
     SHORT_MAX_LEN,
+    BasisRule,
+    assert_basis_rules_are_applicable,
+    assert_basis_rules_are_sound,
     assert_no_overlap,
     assert_policy_is_applicable,
+    attributes,
     is_alias_only,
+    is_basis_differentiated,
     is_qualified_alias,
     is_short_token,
     flagged_canonicals,
     matcher_keywords_for,
+    matcher_keywords_for_basis,
 )
 
 REPO = Path(__file__).resolve().parents[1]
 T2_TSV = REPO / "operator_review/MAC-542/T2_query_default_demotion_proposal.tsv"
+ADJ_TSV = REPO / "operator_review/MAC-588/adjudication.tsv"
 DB = REPO / "db/argus.db"
 
 
@@ -205,3 +214,212 @@ def test_applied_vendors_all_have_a_qualified_alias():
             (c,)).fetchone()
         assert r is not None, f"{c} not in manufacturers"
         assert matcher_keywords_for(c, r[0]), f"{c} would attribute nothing"
+
+
+# ── 6. basis-differentiated tier (MAC-588) ────────────────────────────────
+
+# Verbatim from HEAD: SELECT aliases FROM manufacturers WHERE canonical_name='Axon'
+# (note the quoting — a hand-built comma-join does NOT round-trip through
+# split_aliases, it shatters "Axon Enterprise, Inc" into two aliases).
+AXON_ALIASES = ('TASER International (legacy), "Axon Enterprise, Inc", '
+                '"AXON ENTERPRISE, INC.", Axon Enterprise, Axon Body-2, Axon Flex')
+
+
+def _adjudication():
+    """MAC-588's exhaustive verdict on the 102 description-basis rows."""
+    with ADJ_TSV.open() as f:
+        return {int(r["id"]): r["verdict"] for r in csv.DictReader(f, delimiter="\t")}
+
+
+def test_basis_rules_are_structurally_sound():
+    assert_basis_rules_are_sound()
+
+
+def test_axon_is_proposed_not_applied():
+    """MAC-577's standing gate: the short-single-token cohort needs per-vendor
+    sign-off. MAC-588 supplies the dossier; it does not grant the sign-off."""
+    assert set(BASIS_DIFFERENTIATED) == set()
+    assert set(PROPOSED_BASIS_DIFFERENTIATED) == {"Axon"}
+    assert not is_basis_differentiated("Axon")
+    # un-applied means un-applied: Axon still matches bare, on both bases.
+    assert matcher_keywords_for("Axon", AXON_ALIASES) == ["Axon"]
+    assert matcher_keywords_for_basis("Axon", AXON_ALIASES, "vendor") == ["Axon"]
+
+
+def test_axon_stays_in_deferred_because_alias_only_is_still_unsafe():
+    """The tiers overlap on purpose — they describe different rules."""
+    assert "Axon" in DEFERRED_CANONICALS
+    assert "Axon" not in ALIAS_ONLY_CANONICALS
+
+
+def test_basis_rule_reason_is_evidence():
+    for canonical, rule in {**BASIS_DIFFERENTIATED,
+                            **PROPOSED_BASIS_DIFFERENTIATED}.items():
+        assert isinstance(rule, BasisRule)
+        assert len(rule.reason) > 40, f"{canonical} reason is not evidence"
+        assert any(ch.isdigit() for ch in rule.reason), (
+            f"{canonical} reason cites no measured count")
+
+
+def test_empty_qualifier_set_is_rejected():
+    """A rule with no qualifiers silently degrades to bare-on-description."""
+    import db.matching_policy as mp
+    saved = dict(mp.PROPOSED_BASIS_DIFFERENTIATED)
+    mp.PROPOSED_BASIS_DIFFERENTIATED["Axon"] = BasisRule(
+        reason="x" * 50 + " 1 count", description_qualifiers=())
+    try:
+        with pytest.raises(AssertionError, match="empty qualifier set"):
+            assert_basis_rules_are_sound()
+    finally:
+        mp.PROPOSED_BASIS_DIFFERENTIATED.clear()
+        mp.PROPOSED_BASIS_DIFFERENTIATED.update(saved)
+
+
+def test_unflagged_canonical_cannot_get_a_basis_rule():
+    """A basis rule for a KEEP canonical would be a new screen."""
+    import db.matching_policy as mp
+    saved = dict(mp.PROPOSED_BASIS_DIFFERENTIATED)
+    mp.PROPOSED_BASIS_DIFFERENTIATED["Flock Safety"] = BasisRule(
+        reason="x" * 50 + " 1 count", description_qualifiers=("ALPR",))
+    try:
+        with pytest.raises(AssertionError, match="not in the MAC-542 flagged"):
+            assert_basis_rules_are_sound()
+    finally:
+        mp.PROPOSED_BASIS_DIFFERENTIATED.clear()
+        mp.PROPOSED_BASIS_DIFFERENTIATED.update(saved)
+
+
+def _with_axon_applied():
+    """Context: promote Axon, i.e. exactly the one-line move the CEO signs off."""
+    import contextlib
+    import db.matching_policy as mp
+
+    @contextlib.contextmanager
+    def ctx():
+        mp.BASIS_DIFFERENTIATED["Axon"] = mp.PROPOSED_BASIS_DIFFERENTIATED["Axon"]
+        try:
+            yield
+        finally:
+            mp.BASIS_DIFFERENTIATED.pop("Axon", None)
+
+    return ctx()
+
+
+def test_promoted_rule_separates_the_measured_examples():
+    """The mechanism, exercised on the rows MAC-588 adjudicated by hand."""
+    with _with_axon_applied():
+        assert is_basis_differentiated("Axon")
+        # vendor basis is alias-only: the bare canonical is gone.
+        assert matcher_keywords_for_basis("Axon", AXON_ALIASES, "vendor") == [
+            "TASER International (legacy)", "Axon Enterprise, Inc",
+            "AXON ENTERPRISE, INC.", "Axon Enterprise", "Axon Body-2",
+            "Axon Flex"]
+        assert "Axon" in matcher_keywords_for_basis(
+            "Axon", AXON_ALIASES, "description")
+
+        # vendor-basis FPs: dropped (id=43627-shaped rows keep matching via
+        # the alias, so the real vendor is never at risk).
+        assert attributes("Axon", AXON_ALIASES, "THE AXON GROUP, LTD", None) is None
+        assert attributes("Axon", AXON_ALIASES, "AXON MEDICAL INC", None) is None
+        assert attributes("Axon", AXON_ALIASES, "AXON, GARY L", None) is None
+        assert attributes(
+            "Axon", AXON_ALIASES, "AXON ENTERPRISE, INC.",
+            "AWARD OF IDVRS-BODY WORN CAMERAS") == "vendor"
+
+        # description-basis TPs: retained.
+        for excerpt in ("AXON X26P TASERS",
+                        "AXON SPECIAL SERVICE AGREEMENT FOR ALL BODY CAMERAS "
+                        "SOLUTIONS LOCATED AT PENTAGON FORCE PROTECTION AGENCY.",
+                        "POLICE&SECURITY IN-CAR CAMERA RECORDING SYSTEM (AXON)",
+                        "BLRI AXON FLEET 2 INSTALL - SOUTH",
+                        "G:ESTAR, 2019 AXON CARTRIDGE ORDER",
+                        "SUPPLIES, TAZER AXON 2 FOR NPS, MARTIN LUTHER KING JR."):
+            assert attributes("Axon", AXON_ALIASES, "AARDVARK", excerpt) == \
+                "description", excerpt
+
+        # description-basis FPs: dropped.
+        for excerpt in ("AXON THERAPY SYSTEM",
+                        "INFORMATICA AXON GOVERN LICENSE",
+                        "4514387007!AXON INSTRUMENT AND TI IMPLANT SET",
+                        "AXON TUBE ADAPTER",
+                        "AXON GENEPIX PERSONAL 4100A SCANNER",
+                        "AXON 920-1 TPC FEMTOSECOND LASER SYSTEM"):
+            assert attributes(
+                "Axon", AXON_ALIASES, "SOME RESELLER LLC", excerpt) is None, excerpt
+
+
+def test_promotion_would_not_lose_a_single_adjudicated_true_positive():
+    """The load-bearing claim, asserted against HEAD rather than narrated.
+
+    Pins MAC-588's measurement: over all 102 adjudicated description-basis
+    rows the promoted rule retains 29/29 TP and 0/73 FP. A qualifier deleted
+    from the set fails here, not in the registry.
+    """
+    if not DB.exists():
+        pytest.skip("db/argus.db not present")
+    verdicts = _adjudication()
+    assert len(verdicts) == 102
+    assert sum(v == "TP" for v in verdicts.values()) == 29
+    assert sum(v == "FP" for v in verdicts.values()) == 73
+
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
+    rows = con.execute(
+        "SELECT id, vendor_canonical_name, product_family, source_excerpt "
+        "FROM procurement_records WHERE id IN "
+        f"({','.join('?' * len(verdicts))})", tuple(verdicts)).fetchall()
+    assert len(rows) == 102
+
+    with _with_axon_applied():
+        kept_tp = kept_fp = 0
+        for r in rows:
+            desc = " ".join(filter(None, [r["product_family"],
+                                          r["source_excerpt"]]))
+            got = attributes("Axon", AXON_ALIASES,
+                             r["vendor_canonical_name"], desc)
+            if verdicts[r["id"]] == "TP":
+                assert got == "description", (
+                    f"id={r['id']} is an adjudicated TP and would be LOST: {desc!r}")
+                kept_tp += 1
+            else:
+                assert got is None, (
+                    f"id={r['id']} is an adjudicated FP and would be KEPT: {desc!r}")
+                kept_fp += 1
+    assert (kept_tp, kept_fp) == (29, 73)
+
+
+def test_basis_guard_fires_when_vendor_basis_would_be_emptied():
+    """Berla-shaped input for the basis tier: no qualified alias -> loud fail."""
+    with _with_axon_applied():
+        with pytest.raises(AssertionError, match="attribute nothing"):
+            assert_basis_rules_are_applicable([("Axon", None)])
+        # short bare co-mentions are not qualified aliases either
+        with pytest.raises(AssertionError, match="attribute nothing"):
+            assert_basis_rules_are_applicable([("Axon", "DJI, Brinc, Axon")])
+        assert_basis_rules_are_applicable([("Axon", AXON_ALIASES)])
+
+
+def test_basis_rule_is_inert_while_unapplied():
+    """With Axon un-applied, attributes() must reproduce today's bare match."""
+    assert attributes("Axon", AXON_ALIASES, "THE AXON GROUP, LTD", None) == "vendor"
+    assert attributes("Axon", AXON_ALIASES, "SOME RESELLER LLC",
+                      "AXON THERAPY SYSTEM") == "description"
+
+
+def test_basis_differentiation_is_a_narrowing_not_an_expansion():
+    """Every row the promoted rule attributes must already match today."""
+    if not DB.exists():
+        pytest.skip("db/argus.db not present")
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
+    rows = con.execute(
+        "SELECT vendor_canonical_name, product_family, source_excerpt "
+        "FROM procurement_records LIMIT 5000").fetchall()
+    for r in rows:
+        desc = " ".join(filter(None, [r["product_family"], r["source_excerpt"]]))
+        before = attributes("Axon", AXON_ALIASES, r["vendor_canonical_name"], desc)
+        with _with_axon_applied():
+            after = attributes("Axon", AXON_ALIASES,
+                               r["vendor_canonical_name"], desc)
+        assert not (after and not before), (
+            f"promoted rule ADDED a row: {r['vendor_canonical_name']!r} {desc!r}")
