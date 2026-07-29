@@ -22,6 +22,9 @@ from db.matching_policy import (
     PROPOSED_BASIS_DIFFERENTIATED,
     SHORT_MAX_LEN,
     BasisRule,
+    PREFIX_NEUTRAL_TOKENS,
+    extension_permits_attribution,
+    extension_verdict,
     assert_basis_rules_are_applicable,
     assert_basis_rules_are_sound,
     assert_no_overlap,
@@ -423,3 +426,130 @@ def test_basis_differentiation_is_a_narrowing_not_an_expansion():
                                r["vendor_canonical_name"], desc)
         assert not (after and not before), (
             f"promoted rule ADDED a row: {r['vendor_canonical_name']!r} {desc!r}")
+
+
+# ── MAC-598: proper-extension guard ───────────────────────────────────────
+
+def test_prefix_extension_is_blocked():
+    """The finding of record: DIGITAL AXIS COMMUNICATIONS is not Axis."""
+    assert extension_verdict("Axis Communications",
+                             "DIGITAL AXIS COMMUNICATIONS") == "block"
+    assert not extension_permits_attribution("Axis Communications",
+                                             "DIGITAL AXIS COMMUNICATIONS")
+    # The same shape on a long SINGLE-token keyword, which MAC-598's opening
+    # sweep did not cover. Both rows are real: t3_audit.log "PREFIX
+    # extensions (LONG SINGLE-token kw)".
+    assert extension_verdict("Kenwood", "BLUE-KENWOOD LLC") == "block"
+    assert extension_verdict("Kenwood", "022808 KENWOOD LLC") == "block"
+
+
+def test_exact_and_neutral_suffix_are_retained():
+    assert extension_verdict("Axis Communications",
+                             "AXIS COMMUNICATIONS") == "exact"
+    assert extension_verdict("Axis Communications",
+                             "AXIS COMMUNICATIONS INC") == "retain"
+    assert extension_verdict("Motorola Solutions",
+                             "MOTOROLA SOLUTIONS, INC.") == "retain"
+    assert extension_verdict("Magnet Forensics",
+                             "MAGNET FORENSICS USA INC") == "retain"
+    assert extension_verdict("Sierra Wireless",
+                             "SIERRA WIRELESS AMERICA, INC") == "retain"
+    assert extension_verdict("Lockheed Martin",
+                             "LOCKHEED MARTIN CORPORATION") == "retain"
+    for v in ("AXIS COMMUNICATIONS", "AXIS COMMUNICATIONS INC"):
+        assert extension_permits_attribution("Axis Communications", v)
+
+
+def test_descriptive_suffix_routes_to_adjudication_not_retention():
+    """The half of the issue's proposed rule that the evidence refutes.
+
+    Each of these is a SUFFIX extension AND a different entity, proven from
+    the source excerpt, not from the name. A rule that retained every suffix
+    extension would credit all of them to a surveillance vendor.
+    """
+    for keyword, vendor in [
+        ("Kenwood", "KENWOOD FIRE DEPARTMENT"),        # fire response, trust land
+        ("Kenwood", "KENWOOD HEALTH CARE CORP"),       # community nursing home
+        ("Kenwood", "KENWOOD KITCHENS INC"),           # kitchen renovation
+        ("Clearview", "CLEARVIEW-ROUTH LP"),           # nursing home services
+        ("Clearview", "CLEARVIEW SONOGRAPHICS LLC"),   # ultrasound coverage
+        ("Clearview", "CLEARVIEW CLEANING LLC"),       # janitorial services
+        ("Vigilant", "VIGILANT CYBER SYSTEMS, INC."),  # DHA SBIR medical R&D
+        ("Vigilant", "VIGILANT FIRE INC."),            # fire extinguisher disposal
+        ("Vigilant Solutions", "VIGILANT SOLUTIONS LLC INTEGRATION GROUP"),
+    ]:
+        assert extension_verdict(keyword, vendor) == "adjudicate", (keyword, vendor)
+        assert not extension_permits_attribution(keyword, vendor), (keyword, vendor)
+
+
+def test_prefix_neutral_allowlist_is_reachable():
+    """BRIEF_STANDARDS R7 positive control.
+
+    PREFIX_NEUTRAL_TOKENS is untriggered by the live corpus, so a caller
+    could not otherwise tell an empty-by-design allowlist from a dead branch.
+    This asserts the branch is reachable and that removing THE from the set
+    changes the verdict — i.e. the allowlist is load-bearing, not decorative.
+    """
+    assert PREFIX_NEUTRAL_TOKENS == {"THE"}
+    # Corpus-grounded, not synthetic: procurement_records carries
+    # 'THE KEYW CORPORATION' (ids 45097/45098/45134/45183, ...) and
+    # 'THE KEYW HOLDING CORPORATION'. KeyW is short so it routes to T2 by the
+    # MAC-542 §5 screen, but the TOKEN SHAPE the allowlist exists for is real.
+    assert extension_verdict("KeyW", "THE KEYW CORPORATION") == "retain"
+    assert extension_verdict("Axis Communications",
+                             "THE AXIS COMMUNICATIONS COMPANY") == "retain"
+    import db.matching_policy as mp
+    saved = mp.PREFIX_NEUTRAL_TOKENS
+    try:
+        mp.PREFIX_NEUTRAL_TOKENS = frozenset()
+        assert mp.extension_verdict("KeyW", "THE KEYW CORPORATION") == "block"
+        assert mp.extension_verdict("Axis Communications",
+                                    "THE AXIS COMMUNICATIONS COMPANY") == "block"
+    finally:
+        mp.PREFIX_NEUTRAL_TOKENS = saved
+
+
+def test_prefix_neutral_shape_occurs_in_the_live_corpus():
+    """The allowlist is not hypothetical — assert the shape exists in the DB."""
+    if not DB.exists():
+        pytest.skip("db/argus.db not present")
+    con = sqlite3.connect(DB)
+    n = con.execute(
+        "SELECT COUNT(*) FROM procurement_records "
+        "WHERE vendor_canonical_name LIKE 'THE %'").fetchone()[0]
+    assert n > 0, "no 'THE <name>' vendor rows: PREFIX_NEUTRAL_TOKENS is dead code"
+
+
+def test_non_match_and_substring_are_distinguished():
+    assert extension_verdict("Axis Communications", "MOTOROLA SOLUTIONS, INC.") is None
+    # Entity-boundary still holds: substring-inside-token is not a match.
+    assert extension_verdict("Axis", "PLAXIS BV") is None
+    assert extension_verdict("Axis", None) is None
+
+
+def test_guard_verdicts_over_the_live_corpus_are_stable():
+    """Pin the measured blast radius on the keywords that actually reach T3.
+
+    Scoped to LONG keywords on purpose. The guard fires on short keywords too
+    (BAKER JACOBS JV, DEREK J HARRIS, PRI/DJI A RECONSTRUCTION JV), but those
+    already route to T2 and were adjudicated there — the guard complements the
+    MAC-542 §5 short screen, it does not replace it. The never-adjudicated
+    class is exactly the long half, so that is what this pins.
+    """
+    if not DB.exists():
+        pytest.skip("db/argus.db not present")
+    con = sqlite3.connect(DB)
+    universe = sorted({r[0] for r in con.execute(
+        "SELECT canonical_name FROM manufacturers WHERE query_default='visible'")})
+    long_kw = [k for k in universe if not is_short_token(k)]
+    vendors = con.execute(
+        "SELECT vendor_canonical_name, COUNT(*) FROM procurement_records "
+        "GROUP BY vendor_canonical_name").fetchall()
+    blocked, blocked_rows = set(), 0
+    for vendor, n in vendors:
+        if any(extension_verdict(k, vendor) == "block" for k in long_kw):
+            blocked.add(vendor)
+            blocked_rows += n
+    assert blocked == {"DIGITAL AXIS COMMUNICATIONS", "BLUE-KENWOOD LLC",
+                       "022808 KENWOOD LLC"}, sorted(blocked)
+    assert blocked_rows == 6, blocked_rows

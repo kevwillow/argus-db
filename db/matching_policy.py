@@ -89,7 +89,7 @@ from db.alias_parser import split_aliases
 # re-transcribed: MAC-588's constraint is "do not invent a second normaliser",
 # and db/entity_boundary.py is the verbatim transcription of
 # operator_review/MAC-542/rematch.py:26-40 that exists for exactly this reason.
-from db.entity_boundary import boundary_match
+from db.entity_boundary import boundary_match, contiguous, tokenize
 
 Basis = Literal["vendor", "description"]
 
@@ -478,3 +478,122 @@ def flagged_canonicals() -> set[str]:
     """Every canonical the MAC-542 screen flagged, across all three tiers."""
     return (set(ALIAS_ONLY_CANONICALS) | set(PROPOSED_ALIAS_ONLY)
             | set(DEFERRED_CANONICALS))
+
+
+# ── Proper-extension guard (MAC-598) ──────────────────────────────────────
+#
+# Boundary-valid is not identity-valid. ``db/entity_boundary.py`` stops
+# substring-inside-token (``PLAXIS`` does not match ``AXIS``); it does nothing
+# against a token-level extension. ``Axis Communications`` tokenises to
+# ``[AXIS, COMMUNICATIONS]``, a contiguous sublist of
+# ``[DIGITAL, AXIS, COMMUNICATIONS]``, so the row boundary-matches — and
+# because that keyword is LONG, ``t2_select.py``'s ``all(k in SHORT)`` test
+# never routes it to T2. It lands in T3 "boundary-clean" unadjudicated.
+#
+# MAC-598 swept every LONG keyword in the ``rematch.py`` KEYWORDS union (118
+# of 155) against every distinct ``procurement_records.vendor_canonical_name``
+# for the PROPER-extension case (vendor strictly longer than keyword):
+# ``operator_review/MAC-598/t3_audit.py`` -> 86 pairs, 84 vendors, 29,874 rows.
+#
+# The issue proposed a two-way rule: prefix extension bad, suffix extension
+# fine. The prefix half survives; the suffix half does NOT, and it is
+# falsified on source-side evidence rather than on names:
+#
+#   KENWOOD FIRE DEPARTMENT (14 rows, canonical ``Kenwood``/police_radio)
+#     "REIMBURSEMENT FOR FIRE RESPONSE ON TRUST LAND"
+#   KENWOOD HEALTH CARE CORP (5)          "CNH FY 2008"
+#   CLEARVIEW-ROUTH LP (7, ``Clearview AI``/face_recog)
+#     "NURSING HOME SERVICES - 1ST QUARTER EXPRESS"
+#   CLEARVIEW SONOGRAPHICS LLC (2)        "CRSU - ONE MONTH ULTRASOUND COVERAGE."
+#   VIGILANT CYBER SYSTEMS, INC. (10, ``Vigilant Solutions``/alpr)
+#     "MEDICAL RESEARCH AND DEVELOPMENT CONTRACT DHA SBIR 2021.1"
+#   VIGILANT FIRE INC. (1)                "FIRE EXTINGUISHER DISPOSAL"
+#
+# Every one is a SUFFIX extension and a different entity. What actually
+# separates the legitimate cases is not the direction of the extension but
+# whether the appended tokens are *entity-neutral* — a legal form or a
+# jurisdiction. ``MOTOROLA SOLUTIONS, INC.`` appends only ``INC``;
+# ``KENWOOD FIRE DEPARTMENT`` appends a whole line of business.
+#
+# So the guard is three-way, and the residual is routed to adjudication rather
+# than silently retained. That is the whole point of the defect: T3 was
+# labelled adjudicated when it was not.
+
+ExtensionVerdict = Literal["exact", "retain", "adjudicate", "block"]
+
+# Tokens that carry no entity information. Legal forms and jurisdictions only.
+# Derived from the observed tail vocabulary of the MAC-598 sweep
+# (``operator_review/MAC-598/t3_audit.log``) plus the standard forms of the
+# same kind; anything descriptive (SYSTEMS, SOLUTIONS, DEFENSE, MARITIME,
+# TECHNOLOGIES, ...) is deliberately absent, because those are exactly the
+# tokens that distinguish ``VIGILANT SOLUTIONS`` from ``VIGILANT CYBER
+# SYSTEMS``.
+LEGAL_FORM_TOKENS = frozenset({
+    "INC", "INCORPORATED", "LLC", "LLP", "LP", "L", "P", "LTD", "LIMITED",
+    "CORP", "CORPORATION", "CO", "COMPANY", "PLC", "GMBH", "AG", "SA", "SAS",
+    "NV", "BV", "AB", "AS", "OY", "SPA", "SRL", "PTY", "PTE", "KK", "KG",
+})
+
+# Jurisdiction qualifiers. A national arm of a vendor is still that vendor.
+GEOGRAPHIC_TOKENS = frozenset({
+    "USA", "US", "AMERICA", "AMERICAS", "CANADA", "UK", "EUROPE", "EMEA",
+    "APAC", "ASIA", "INTERNATIONAL", "GLOBAL", "WORLDWIDE",
+})
+
+# Tokens that may be PREPENDED without changing the entity. Articles only.
+# Untriggered in the current corpus (the three observed prepends are DIGITAL,
+# BLUE and 022808) — ``tests/test_matching_policy.py`` carries the positive
+# control that proves this allowlist is reachable, per BRIEF_STANDARDS R7.
+PREFIX_NEUTRAL_TOKENS = frozenset({"THE"})
+
+_NEUTRAL_TAIL_TOKENS = LEGAL_FORM_TOKENS | GEOGRAPHIC_TOKENS
+
+
+def extension_verdict(keyword: str, vendor_text: str | None) -> Optional[ExtensionVerdict]:
+    """Classify how ``keyword`` sits inside ``vendor_text``.
+
+    ``None``   no entity-boundary match at all.
+    ``exact``  the vendor name is exactly the keyword's token sequence.
+    ``retain`` proper SUFFIX extension whose appended tail is entirely
+               entity-neutral (legal form / jurisdiction). Same entity.
+    ``adjudicate``
+               proper SUFFIX extension carrying descriptive tokens. May or may
+               not be the same entity; a human must say which. This is the
+               MAC-598 residue that T3 mislabelled as clean.
+    ``block``  proper PREFIX extension. A prepended descriptive token changes
+               the entity: ``DIGITAL AXIS COMMUNICATIONS`` is an AV integrator,
+               not ``Axis Communications``.
+
+    Callers must not treat ``adjudicate`` as ``retain``. Substituting one for
+    the other reintroduces precisely the defect this function exists to catch.
+    """
+    need = tokenize(keyword)
+    hay = tokenize(vendor_text)
+    if not need or not contiguous(need, hay):
+        return None
+    if len(hay) == len(need):
+        return "exact"
+
+    # Offsets at which the keyword occurs as a whole-token run.
+    offs = [i for i in range(len(hay) - len(need) + 1)
+            if hay[i:i + len(need)] == need]
+    # Prefer the earliest occurrence: it minimises the prepended tail, so a
+    # vendor name that repeats the keyword is judged on its leading form.
+    start = min(offs)
+    head, tail = hay[:start], hay[start + len(need):]
+
+    if head and any(t not in PREFIX_NEUTRAL_TOKENS for t in head):
+        return "block"
+    if tail and any(t not in _NEUTRAL_TAIL_TOKENS for t in tail):
+        return "adjudicate"
+    return "retain"
+
+
+def extension_permits_attribution(keyword: str, vendor_text: str | None) -> bool:
+    """Vendor-basis gate: may this boundary hit be credited without review?
+
+    ``True`` only for ``exact`` and ``retain``. ``adjudicate`` is False on
+    purpose — an unreviewed descriptive-suffix hit is not evidence, and
+    returning True for it is the T3 mislabelling in one line of code.
+    """
+    return extension_verdict(keyword, vendor_text) in ("exact", "retain")
