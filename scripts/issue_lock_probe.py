@@ -22,6 +22,15 @@ both conditions at once, and all three cleared on their own within 115 seconds
 once the queue could drain. A detector that fires on either condition alone is a
 false-positive machine. They are reported as INFO.
 
+That 115-second measurement was taken on a SHALLOW queue, and the INFO line used
+to assert "expect self-clear" unconditionally -- a prediction printed as a
+finding, with no arithmetic behind it. On MAC-573 the same INFO fired on MAC-537
+(the v1.7.0 critical path) while its lock was held by a CEO run sitting 11 deep
+in a queue serialized at 1, unstarted for 30 minutes, with arrivals at 1/2.0 min
+against a 9.6 min median service time. That queue diverges: the holder was ~115
+minutes away, not "draining normally". Self-clear is now MEASURED, never
+asserted -- see STARVED.
+
 WHAT IS ACTUALLY BROKEN
 -----------------------
   * DEADLOCK      -- the lock is held by a QUEUED run whose agent's run slot is
@@ -35,6 +44,11 @@ WHAT IS ACTUALLY BROKEN
   * ORPHAN_LOCK   -- the lock is held by a RUNNING run that ORPHAN-flags
                      (``lastOutputAt < startedAt``: the supervisor re-adopted a
                      pre-existing process onto a fresh run record).
+  * STARVED       -- the lock is held by a QUEUED run whose projected wait
+                     exceeds the threshold: nothing is dead, the queue is simply
+                     saturated. Distinct remedy -- there is no corpse to SIGTERM,
+                     so this needs a capacity or routing decision, not a kill.
+                     Never claimed without a measured service time.
 
 The MAC-572 incident in these terms: run ``a3312a6f`` (Validator) was ORPHAN and
 held Validator's only slot; queued run ``f748727e`` held MAC-565's lock behind
@@ -64,8 +78,18 @@ DEFAULT_STALL_MINUTES = 20
 OPEN_STATUSES = "todo,in_progress,in_review,blocked"
 TERMINAL = ("succeeded", "failed", "cancelled")
 
+# Projected wait beyond which "expect self-clear" stops being a claim this probe
+# can make. A heartbeat is minutes; an hour-plus wait on an assigned issue is a
+# capacity fact the caller needs, not routine FIFO churn.
+DEFAULT_STARVE_MINUTES = 45
+# How many of an agent's finished runs to measure service time over.
+SERVICE_SAMPLE = 12
+
 # Verdicts that mean a human/kill is required, in descending severity.
 ACTIONABLE = ("DEADLOCK", "STALE_LOCK", "ORPHAN_LOCK")
+# Saturation, not death. Exits non-zero like ACTIONABLE, but the remedy differs:
+# SIGTERM is the wrong advice when nothing is dead.
+CAPACITY = ("STARVED",)
 
 
 def api(path):
@@ -125,7 +149,41 @@ def is_stalled(run, now, stall_minutes):
     return (now - marker).total_seconds() / 60.0 > stall_minutes
 
 
-def classify_lock(issue, runs_by_id, runs_by_agent, now, stall_minutes):
+def service_minutes(agent_runs):
+    """Median wall-clock of this agent's most recent finished runs, or None.
+
+    None means unmeasured, and an unmeasured drain rate must never be reported as
+    a drain rate. The caller degrades to "position known, wait unmeasured" rather
+    than inventing a number -- an unevaluated prediction is the defect STARVED
+    exists to remove, so it must not reappear as a default.
+    """
+    done = [r for r in agent_runs if parse_ts(r.get("startedAt")) and parse_ts(r.get("finishedAt"))]
+    done.sort(key=lambda r: r.get("finishedAt") or "")
+    durations = sorted(
+        (parse_ts(r["finishedAt"]) - parse_ts(r["startedAt"])).total_seconds() / 60.0
+        for r in done[-SERVICE_SAMPLE:]
+    )
+    if not durations:
+        return None
+    return durations[len(durations) // 2]
+
+
+def queue_position(run, agent_runs):
+    """(queued runs created before this one, runs currently occupying a slot)."""
+    created = parse_ts(run.get("createdAt"))
+    ahead = 0
+    for other in agent_runs:
+        if other.get("id") == run.get("id") or other.get("status") != "queued":
+            continue
+        other_created = parse_ts(other.get("createdAt"))
+        if created and other_created and other_created < created:
+            ahead += 1
+    running = sum(1 for r in agent_runs if r.get("status") == "running")
+    return ahead, running
+
+
+def classify_lock(issue, runs_by_id, runs_by_agent, now, stall_minutes,
+                  starve_minutes=DEFAULT_STARVE_MINUTES):
     """Return (verdict, detail) for one locked issue."""
     run_id = issue.get("executionRunId")
     run = runs_by_id.get(run_id)
@@ -160,10 +218,27 @@ def classify_lock(issue, runs_by_id, runs_by_agent, now, stall_minutes):
     notes = ["LOCK_BY_QUEUED_RUN"]
     if run.get("agentId") and issue.get("assigneeAgentId") and run["agentId"] != issue["assigneeAgentId"]:
         notes.append("LOCK_AGENT_MISMATCH")
-    return "INFO", "%s -- queue is draining normally, expect self-clear" % "+".join(notes)
+    label = "+".join(notes)
+
+    # "Expect self-clear" is a prediction. Measure it or do not make it.
+    agent_runs = runs_by_agent.get(run.get("agentId"), [])
+    ahead, running = queue_position(run, agent_runs)
+    service = service_minutes(agent_runs)
+    if service is None:
+        return "INFO", "%s -- %d queued ahead, %d in flight; drain rate unmeasured " \
+            "(no finished run recorded for this agent)" % (label, ahead, running)
+
+    lanes = max(1, running)
+    wait = ((ahead + running) / float(lanes)) * service
+    shape = "%d queued ahead, %d in flight, %.1f min median service -> ~%.0f min projected wait" % (
+        ahead, running, service, wait)
+    if wait > starve_minutes:
+        return "STARVED", "%s -- %s (threshold %d min). Nothing is dead; the queue is saturated" % (
+            label, shape, starve_minutes)
+    return "INFO", "%s -- %s, under the %d min threshold" % (label, shape, starve_minutes)
 
 
-def probe(issues, runs, now, stall_minutes):
+def probe(issues, runs, now, stall_minutes, starve_minutes=DEFAULT_STARVE_MINUTES):
     runs_by_id = {r["id"]: r for r in runs}
     runs_by_agent = {}
     for r in runs:
@@ -172,7 +247,8 @@ def probe(issues, runs, now, stall_minutes):
     for issue in issues:
         if not issue.get("executionRunId"):
             continue
-        verdict, detail = classify_lock(issue, runs_by_id, runs_by_agent, now, stall_minutes)
+        verdict, detail = classify_lock(
+            issue, runs_by_id, runs_by_agent, now, stall_minutes, starve_minutes)
         results.append((issue, verdict, detail))
     return results
 
@@ -180,6 +256,8 @@ def probe(issues, runs, now, stall_minutes):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stall-minutes", type=int, default=DEFAULT_STALL_MINUTES)
+    ap.add_argument("--starve-minutes", type=int, default=DEFAULT_STARVE_MINUTES,
+                    help="projected queue wait above which a queued lock is STARVED")
     ap.add_argument("--replay", help="JSON snapshot {now, issues[], runs[], agents[]} instead of the API")
     args = ap.parse_args()
 
@@ -197,27 +275,40 @@ def main():
         now = datetime.now(timezone.utc)
 
     names = {a.get("id"): a.get("name") for a in agents}
-    results = probe(issues, runs, now, args.stall_minutes)
+    results = probe(issues, runs, now, args.stall_minutes, args.starve_minutes)
 
-    bad = []
+    bad, starved = [], []
     for issue, verdict, detail in sorted(results, key=lambda t: t[0].get("identifier") or ""):
-        marker = "! " if verdict in ACTIONABLE else "  "
+        marker = "! " if verdict in ACTIONABLE + CAPACITY else "  "
         print("%s%-11s %-9s %-14s %s" % (
             marker, verdict, issue.get("identifier"),
             names.get(issue.get("assigneeAgentId"), "(none)"), detail))
         if verdict in ACTIONABLE:
             bad.append((issue, verdict, detail))
+        elif verdict in CAPACITY:
+            starved.append((issue, verdict, detail))
 
-    if not bad:
+    if not bad and not starved:
         print("\nNo unreachable issues: every execution lock is live or draining.")
         return 0
 
-    print("\n%d issue(s) hold a lock nothing will release:" % len(bad))
-    for issue, verdict, _ in bad:
-        print("  %-11s %s (assignee %s)" % (
-            verdict, issue.get("identifier"), names.get(issue.get("assigneeAgentId"), "(none)")))
-    print("\nAgents are 403 on POST /api/heartbeat-runs/{id}/cancel, but the PROCESS is"
-          "\nreachable: confirm unique PID binding, then SIGTERM. See MAC-572.")
+    if bad:
+        print("\n%d issue(s) hold a lock nothing will release:" % len(bad))
+        for issue, verdict, _ in bad:
+            print("  %-11s %s (assignee %s)" % (
+                verdict, issue.get("identifier"), names.get(issue.get("assigneeAgentId"), "(none)")))
+        print("\nAgents are 403 on POST /api/heartbeat-runs/{id}/cancel, but the PROCESS is"
+              "\nreachable: confirm unique PID binding, then SIGTERM. See MAC-572.")
+
+    if starved:
+        print("\n%d issue(s) are locked behind a saturated queue:" % len(starved))
+        for issue, verdict, _ in starved:
+            print("  %-11s %s (assignee %s)" % (
+                verdict, issue.get("identifier"), names.get(issue.get("assigneeAgentId"), "(none)")))
+        print("\nDo NOT SIGTERM these -- nothing is dead, and killing a healthy run to"
+              "\njump a queue destroys work. The remedy is a capacity or routing decision:"
+              "\nraise the holder agent's concurrency, or re-stamp the lock onto the"
+              "\nassignee's own queue. See MAC-573.")
     return 1
 
 

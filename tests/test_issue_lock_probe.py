@@ -214,3 +214,121 @@ def test_t4_running_record_with_no_timestamps_is_mid_dispatch_not_dead():
 
 def test_unlocked_issues_are_not_reported():
     assert verdicts([_issue("MAC-500", VALIDATOR, None, None)], [], "2026-07-29T03:31:22Z") == {}
+
+
+# ── T4: saturation is not death ──────────────────────────────────────────────
+#
+# MAC-573, 2026-07-29T04:47Z. Verbatim values from the CEO queue while MAC-537
+# -- the v1.7.0 critical path, assigned to the CTO -- was 409-locked behind a
+# CEO run that had been queued 30 minutes without starting.
+#
+# The old INFO line asserted "queue is draining normally, expect self-clear"
+# with no arithmetic behind it. Here the queue diverges: arrivals at 1/2.0 min
+# against a 9.6 min median service, serialized at 1. The holder was ~115 min
+# away. T4 pins the measurement; T2 above pins the benign shallow case that
+# STARVED must never swallow.
+
+CEO = "62a86779-651b-4c59-8773-cee9e0f53334"
+CTO = "0715773f-a0ad-435c-9eea-bd6125685f7b"
+
+# The lock holder: CEO, queued, never started, position 12 of 22.
+RUN_MAC537_HOLDER = {
+    "id": "4bfd2d02-1ac2-4c5c-80c9-2d7082d4be95",
+    "agentId": CEO,
+    "status": "queued",
+    "createdAt": "2026-07-29T04:16:42.352Z",
+    "startedAt": None,
+    "lastOutputAt": None,
+    "lastOutputSeq": 0,
+}
+# The one live CEO run occupying the single slot.
+RUN_CEO_LIVE = {
+    "id": "8256c133-fe76-477e-a2c3-d1d73f634a9d",
+    "agentId": CEO,
+    "status": "running",
+    "createdAt": "2026-07-29T03:54:25.366Z",
+    "startedAt": "2026-07-29T04:44:30.000Z",
+    "lastOutputAt": "2026-07-29T04:46:30.000Z",
+    "lastOutputSeq": 47,
+}
+
+
+def _queued_ahead(n):
+    """n CEO runs created before the holder, all still queued."""
+    return [
+        {"id": "0000%04d-0000-0000-0000-00000000ceo0" % i, "agentId": CEO,
+         "status": "queued", "createdAt": "2026-07-29T04:%02d:00.000Z" % i,
+         "startedAt": None, "lastOutputAt": None, "lastOutputSeq": 0}
+        for i in range(1, n + 1)
+    ]
+
+
+def _finished(n, minutes):
+    """n finished CEO runs of `minutes` each, so service time is measurable."""
+    return [
+        {"id": "ffff%04d-0000-0000-0000-00000000ceo0" % i, "agentId": CEO,
+         "status": "succeeded", "createdAt": "2026-07-29T03:00:00.000Z",
+         "startedAt": "2026-07-29T03:%02d:00.000Z" % i,
+         "finishedAt": "2026-07-29T03:%02d:00.000Z" % (i + minutes),
+         "lastOutputAt": None, "lastOutputSeq": 0}
+        for i in range(1, n + 1)
+    ]
+
+
+def test_t4_deep_queue_on_assigned_issue_is_starved():
+    """MAC-537: 11 ahead, 1 in flight, 9.6 min service -> ~115 min. Not INFO."""
+    got = verdicts(
+        [_issue("MAC-537", CTO, RUN_MAC537_HOLDER["id"], "2026-07-29T04:16:42.352Z")],
+        [RUN_MAC537_HOLDER, RUN_CEO_LIVE] + _queued_ahead(11) + _finished(12, 10),
+        "2026-07-29T04:47:00Z",
+    )
+    verdict, detail = got["MAC-537"]
+    assert verdict == "STARVED"
+    assert "11 queued ahead" in detail
+    assert "projected wait" in detail
+    # The remedy must not be confused with the corpse verdicts.
+    assert verdict not in probe_mod.ACTIONABLE
+    assert verdict in probe_mod.CAPACITY
+
+
+def test_t4_shallow_queue_is_still_info():
+    """One run ahead at 10 min service is 20 min out -- genuinely self-clearing.
+    STARVED must not swallow the T2 case it was built alongside."""
+    got = verdicts(
+        [_issue("MAC-537", CTO, RUN_MAC537_HOLDER["id"], "2026-07-29T04:16:42.352Z")],
+        [RUN_MAC537_HOLDER, RUN_CEO_LIVE] + _queued_ahead(1) + _finished(12, 10),
+        "2026-07-29T04:47:00Z",
+    )
+    verdict, detail = got["MAC-537"]
+    assert verdict == "INFO"
+    assert "under the 45 min threshold" in detail
+
+
+def test_t4_unmeasured_service_never_invents_a_wait():
+    """No finished run for the holder's agent => no drain rate exists. The probe
+    must say so rather than default to a number, in either direction: inventing
+    'expect self-clear' is the original defect, and inventing STARVED would be
+    the same error wearing the opposite sign."""
+    got = verdicts(
+        [_issue("MAC-537", CTO, RUN_MAC537_HOLDER["id"], "2026-07-29T04:16:42.352Z")],
+        [RUN_MAC537_HOLDER, RUN_CEO_LIVE] + _queued_ahead(11),
+        "2026-07-29T04:47:00Z",
+    )
+    verdict, detail = got["MAC-537"]
+    assert verdict == "INFO"
+    assert "unmeasured" in detail
+    assert "projected wait" not in detail
+
+
+def test_t4_starved_does_not_mask_a_real_deadlock():
+    """A deep queue whose slot is held by a CORPSE is still DEADLOCK: the kill
+    is the remedy, and STARVED's 'do not SIGTERM' advice must not reach it."""
+    corpse = dict(RUN_CEO_LIVE, id="dead0000-0000-0000-0000-00000000ceo0",
+                  startedAt="2026-07-29T02:38:24.719Z",
+                  lastOutputAt="2026-07-29T01:34:00.950Z")
+    got = verdicts(
+        [_issue("MAC-537", CTO, RUN_MAC537_HOLDER["id"], "2026-07-29T04:16:42.352Z")],
+        [RUN_MAC537_HOLDER, corpse] + _queued_ahead(11) + _finished(12, 10),
+        "2026-07-29T04:47:00Z",
+    )
+    assert got["MAC-537"][0] == "DEADLOCK"
