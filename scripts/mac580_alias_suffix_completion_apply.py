@@ -78,7 +78,7 @@ def main() -> int:
             raise RuntimeError("modified-row set differs from transform prediction")
         if any(post_by_id[row_id][2] != expected[row_id] for row_id in expected):
             raise RuntimeError("post-state differs from byte-exact transform")
-        if any(row[2] and recombine_and_quote_normalize(row[2])[0] != row[2] for row in post_rows):
+        if any(row[2] and recombine_and_quote_normalize(row[2]) != (row[2], 0) for row in post_rows):
             raise RuntimeError("transform is not idempotent on post-state")
         if any(before[1] != post_by_id[before[0]][1] for before in pre_rows):
             raise RuntimeError("canonical_name drift detected")
@@ -93,24 +93,36 @@ def main() -> int:
         if survivors:
             raise RuntimeError(f"standalone corporate suffixes survived: {survivors!r}")
 
+        pre_total = sum(len(r["aliases"].split(",")) if r["aliases"] else 0 for r in pre_rows)
+        post_total = sum(len(split_aliases(r["aliases"])) for r in post_rows)
+        phantom_total = sum(
+            recombine_and_quote_normalize(before[2])[1] if before[2] else 0
+            for before in pre_rows
+            if before[2] != post_by_id[before[0]][2]
+        )
+
         connection.commit()
         connection.executescript(SQL_FILE.read_text(encoding="utf-8"))
         post_schema = connection.execute("SELECT MAX(version) FROM schema_version").fetchone()[0]
         if post_schema != EXPECTED_SCHEMA_POST:
             raise RuntimeError(f"schema post-version must be {EXPECTED_SCHEMA_POST}, got {post_schema}")
 
-        print(f"backup={backup}")
-        print(f"backup_sha256={backup_sha}")
-        print(f"rows_total={len(pre_rows)}")
-        print(f"rows_modified={len(changed_ids)}")
-        print(f"modified_ids={','.join(map(str, sorted(changed_ids)))}")
-        print("reconstruction_mismatches=0")
-        print("non_idempotent_rows=0")
-        print("canonical_name_drift=0")
-        print(f"identifiers_before={identifiers_before}")
-        print(f"identifiers_after={identifiers_after}")
-        print("standalone_corp_suffix_tokens=0")
-        print(f"schema_version={EXPECTED_SCHEMA_BASELINE}->{post_schema}")
+        print(f"[mac580] backup={backup}")
+        print(f"[mac580] backup_sha256={backup_sha}")
+        print(f"[mac580] rows total:               {len(pre_rows)}")
+        print(f"[mac580] rows modified:            {len(changed_ids)}")
+        print(f"[mac580] modified ids:             {','.join(map(str, sorted(changed_ids)))}")
+        print(f"[mac580] phantoms recovered:       {phantom_total}")
+        print(f"[mac580] pre total tokens (naive): {pre_total}")
+        print(f"[mac580] post total tokens (smart): {post_total}")
+        print(f"[mac580] token delta:               {pre_total - post_total}")
+        print("[mac580] reconstruction mismatches: 0")
+        print("[mac580] non-idempotent rows:        0")
+        print("[mac580] canonical_name drift:       0")
+        print(f"[mac580] identifiers before:         {identifiers_before}")
+        print(f"[mac580] identifiers after:          {identifiers_after}")
+        print("[mac580] standalone corp suffixes:   0")
+        print(f"[mac580] schema_version:             {EXPECTED_SCHEMA_BASELINE} -> {post_schema}")
     except Exception:
         connection.rollback()
         raise
