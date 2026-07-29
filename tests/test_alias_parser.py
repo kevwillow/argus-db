@@ -23,6 +23,7 @@ from db.alias_parser import (
     is_bogus_token,
     recombine_and_quote_normalize,
     split_aliases,
+    standalone_corp_suffix_tokens,
 )
 
 
@@ -206,11 +207,27 @@ def test_recombine_and_quote_normalize_preserves_cross_vendor_phrases() -> None:
     neither contains an embedded comma after the bare-token parse."""
     raw = "Autel, DJI, Aeryon Labs, DJI"
     blob, phantoms = recombine_and_quote_normalize(raw)
-    # No phantom recovery: 'Autel', 'DJI', 'Aeryon Labs', 'DJI' — none end
-    # with a corp suffix and none are pure fragments.
     assert phantoms == 0
-    # The output is whitespace-normalized (`, ` joiner) but tokens are unchanged.
     assert blob == "Autel, DJI, Aeryon Labs, DJI"
+
+
+def test_recombine_and_quote_normalize_merges_name_suffix_shape() -> None:
+    raw = "TASER International (legacy), Axon Enterprise, Inc, AXON ENTERPRISE, INC."
+    blob, phantoms = recombine_and_quote_normalize(raw)
+    assert blob == 'TASER International (legacy), "Axon Enterprise, Inc", "AXON ENTERPRISE, INC."'
+    assert phantoms == 2
+
+
+def test_recombine_and_quote_normalize_preserves_cross_vendor_pairs_at_scale() -> None:
+    raw = "Flock Safety, Motorola Solutions, Autel, DJI, Aeryon Labs, DJI, Parrot, DJI"
+    blob, phantoms = recombine_and_quote_normalize(raw)
+    assert blob == raw
+    assert phantoms == 0
+
+
+def test_standalone_suffix_check_is_independent_of_merge_context() -> None:
+    adversarial = "ACME CORPORATION, INC., GLOBEX HOLDINGS, LLC, INITECH GROUP, Ltd."
+    assert standalone_corp_suffix_tokens(adversarial) == ["INC.", "LLC", "Ltd."]
 
 
 def test_recombine_and_quote_normalize_phantom_count_is_bounded() -> None:

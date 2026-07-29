@@ -160,6 +160,11 @@ def _ends_with_corp_suffix(tok: str) -> bool:
     return bool(_TRAILING_CORP_SUFFIX.search(tok))
 
 
+def standalone_corp_suffix_tokens(blob: str | None) -> list[str]:
+    """Return every smart-parsed token that is a pure corporate suffix."""
+    return [token for token in split_aliases(blob) if _is_pure_fragment(token)]
+
+
 def recombine_and_quote_normalize(blob: str | None) -> tuple[str, int]:
     """Reconstruct the canonical RFC-4180-lite alias blob from raw input.
 
@@ -169,12 +174,11 @@ def recombine_and_quote_normalize(blob: str | None) -> tuple[str, int]:
     Algorithm:
       1. Parse with ``split_aliases`` (quote-aware; handles already-quoted
          input correctly so the migration is safe on partially-migrated DBs).
-      2. Walk the parsed tokens. If a token looks like a corporate-suffix
-         fragment AND its predecessor ends with a corporate-suffix word
-         boundary, merge the fragment back into the predecessor with
-         ``", "`` join. This is the "recombine" pass — it reverses the
-         MAC-535 phantom-token inflation by recovering the original
-         comma-bearing alias value.
+      2. Walk the parsed tokens. If a token is a pure corporate-suffix
+         fragment, merge it back into its immediate predecessor with
+         ``", "`` join. Corporate suffixes are never valid standalone aliases;
+         cross-vendor pairs remain separate because neither token is a pure
+         suffix.
       3. For every resulting string that contains a comma, wrap it in
          double quotes. This is the "quote normalize" pass — it brings
          the blob into the canonical RFC-4180-lite form so future
@@ -191,11 +195,7 @@ def recombine_and_quote_normalize(blob: str | None) -> tuple[str, int]:
     merged: list[str] = []
     phantom_count = 0
     for tok in tokens:
-        if (
-            merged
-            and _is_pure_fragment(tok)
-            and _ends_with_corp_suffix(merged[-1])
-        ):
+        if merged and _is_pure_fragment(tok):
             merged[-1] = merged[-1] + ", " + tok.strip()
             phantom_count += 1
         else:

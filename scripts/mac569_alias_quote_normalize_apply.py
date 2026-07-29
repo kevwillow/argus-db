@@ -190,16 +190,11 @@ def main() -> int:
         if non_idempotent > 0:
             fail(f"post-apply verification: {non_idempotent} rows are not idempotent on re-transform")
 
-        # (2) Zero bare-token phantom remains: every smart-parsed token that
-        #     ENDS with a corporate suffix must have been preceded by a token
-        #     ending with one too (i.e., the fragment was merged back).
+        # (2) Zero standalone corporate-suffix tokens under an independent check.
         bad_fragments = 0
         for r in post_rows:
-            smart_tokens = split_aliases(r["aliases"])
-            from db.alias_parser import _FRAGMENT_SUFFIX_PATTERN, _TRAILING_CORP_SUFFIX
-            for i, t in enumerate(smart_tokens):
-                if i > 0 and _FRAGMENT_SUFFIX_PATTERN.match(t.strip()) and _TRAILING_CORP_SUFFIX.search(smart_tokens[i - 1]):
-                    bad_fragments += 1
+            from db.alias_parser import standalone_corp_suffix_tokens
+            bad_fragments += len(standalone_corp_suffix_tokens(r["aliases"]))
         if bad_fragments > 0:
             fail(f"post-apply verification: {bad_fragments} bare corp-suffix fragments survived")
 
