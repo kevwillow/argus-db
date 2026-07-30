@@ -18,6 +18,7 @@ Every fixture runs in a throwaway repo under ``tmp_path``. The gate shells out t
 concurrent agent runs — a test that staged into it would corrupt a peer's commit
 while asserting that peers must not corrupt each other's commits.
 """
+import importlib.util
 import json
 import subprocess
 import sys
@@ -25,7 +26,18 @@ from pathlib import Path
 
 import pytest
 
-GATE = Path(__file__).resolve().parents[1] / "scripts" / "check_staged_paths.py"
+REPO = Path(__file__).resolve().parents[1]
+GATE = REPO / "scripts" / "check_staged_paths.py"
+
+
+def _load_gate_module():
+    spec = importlib.util.spec_from_file_location("check_staged_paths", GATE)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+gate_mod = _load_gate_module()
 
 # Deliberately a literal, not an import from the gate. Importing the gate's own
 # constant would make every assertion below agree with whatever the gate happens
@@ -361,3 +373,308 @@ def test_baseline_records_the_four_states(repo):
 def test_duplicate_declared_path_is_a_usage_error(repo):
     code, out = run_gate(repo, "check", "--label", "L", "standards.md", "./standards.md")
     assert code == 2, out
+
+
+# --------------------------------------------------------------------------
+# C4 / C5 — MAC-635. The size dimension, STAGED not standing.
+#
+# C1-C3 are structurally size-blind. `db/argus.db` at 329,711,616 bytes cleared all
+# three at `ceff54f`, `8e905cf` and `4b1e0d9` — a declared path, staged deliberately,
+# on a clean baseline. Every fixture below is paired: the tree the check must reject
+# beside the tree it must clear, because a size check that has never been shown
+# failing cannot support a green result (R7).
+# --------------------------------------------------------------------------
+
+CEILING = 100_000_000
+WARN = 50_000_000
+
+# The real byte count of `exports/argus_export.csv` at HEAD, verified with
+# `git cat-file -s 14e33cc3cf9a7a54c0075c7f00d277b4c53cda2a` -> 26401006. MAC-612 treats
+# `exports/` as a committed build artifact rather than a view, so a gate that blocks it is
+# wrong, and this is the non-regression anchor for that.
+ARGUS_EXPORT_CSV_BYTES = 26_401_006
+
+# `git cat-file -s 41abd2863ec3300cf48ed3376e85ad523e2f250c` at HEAD -> 329711616. The blob
+# `ceff54f` introduced, still an ancestor of HEAD.
+CEFF54F_DB_BLOB = "41abd2863ec3300cf48ed3376e85ad523e2f250c"
+CEFF54F_DB_BYTES = 329_711_616
+
+
+def sparse(root, relpath, size):
+    """Write a `size`-byte sparse file. git hashes the full length; the disk holds ~nothing.
+
+    A 100 MB fixture that cost 100 MB of disk would not get written, and the boundary cases
+    are exactly where a size check is worth testing.
+    """
+    dest = root / relpath
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with open(dest, "wb") as fh:
+        fh.truncate(size)
+    return dest
+
+
+def stage_only(repo, label, relpath, size):
+    """Baseline, THEN create and stage, so C1/C2/C3 are all silent and only C4/C5 can speak.
+
+    Order matters and is not incidental: R10 requires the baseline before the first write, and
+    a fixture that wrote first would trip C2 and pass for the wrong reason — green on the size
+    dimension it never reached. That is the vacuity this file exists to refuse.
+    """
+    run_gate(repo, "baseline", "--label", label, relpath)
+    sparse(repo, relpath, size)
+    run_git(repo, "add", "--force", relpath)
+
+
+def test_c4_fires_on_a_blob_over_the_ceiling(repo):
+    """100,000,001 bytes. One byte over, and the only thing wrong with the commit."""
+    stage_only(repo, "L", "big.bin", CEILING + 1)
+
+    code, out = run_gate(repo, "check", "--label", "L", "big.bin")
+    assert code == 1, out
+    assert out.startswith("FAIL"), out
+    assert "C4 big.bin is 100000001 bytes staged, over the 100000000-byte ceiling" in out, out
+    # Independence: `big.bin` matches no large-artifact pattern, so C5 must stay silent.
+    assert "C5" not in out, out
+    # And the other three checks had nothing to say — this commit is clean by R10-as-ratified.
+    assert "C1" not in out and "C2" not in out and "C3" not in out, out
+
+
+def test_c4_negative_control_at_exactly_the_ceiling_passes(repo):
+    """The comparison is `>`, not `>=`. A ceiling you cannot reach is a different ceiling."""
+    stage_only(repo, "L", "big.bin", CEILING)
+
+    code, out = run_gate(repo, "check", "--label", "L", "big.bin")
+    assert code == 0, out
+    assert out.startswith("WARN"), out  # over 50 MB, so it warns; it does not fail
+    assert "over the 100000000-byte ceiling" not in out, out
+
+
+def test_c4_49mb_passes_with_no_warning(repo):
+    stage_only(repo, "L", "mid.bin", 49_000_000)
+
+    code, out = run_gate(repo, "check", "--label", "L", "mid.bin")
+    assert code == 0, out
+    assert out.startswith("PASS"), out
+    assert "C4" not in out, out
+
+
+def test_c4_51mb_passes_with_a_warning(repo):
+    """GitHub's own warning threshold. A WARN exits 0 — approaching the wall is not hitting it."""
+    stage_only(repo, "L", "mid.bin", 51_000_000)
+
+    code, out = run_gate(repo, "check", "--label", "L", "mid.bin")
+    assert code == 0, out
+    assert out.startswith("WARN"), out
+    assert "C4 mid.bin is 51000000 bytes staged, over the 50000000-byte warning threshold" in out
+
+
+def test_c4_non_regression_the_committed_export_artifact_passes(repo):
+    """`exports/argus_export.csv` at its real 26,401,006 bytes must clear the gate silently.
+
+    MAC-612 treats `exports/` as a committed build artifact. A gate that blocks the
+    deliverable is not a gate, it is an outage.
+    """
+    stage_only(repo, "L", "exports/argus_export.csv", ARGUS_EXPORT_CSV_BYTES)
+
+    code, out = run_gate(repo, "check", "--label", "L", "exports/argus_export.csv")
+    assert code == 0, out
+    assert out.startswith("PASS"), out
+    assert "C4" not in out and "C5" not in out, out
+
+
+def test_c4_anti_vacuity_the_same_index_fails_when_only_the_ceiling_moves(repo):
+    """The control `cf9031a` teaches: show the check failing on its own counterexample.
+
+    `cf9031a` staged exactly the three paths it declared and passed a path-set check while
+    being defective — green because the check could not see the defect, not because there
+    was none. Same shape here: the fixture above is green, so flip ONE input, the ceiling,
+    one byte below the staged blob and nothing else. If it stays green the check is reading
+    a constant rather than the object.
+    """
+    stage_only(repo, "L", "exports/argus_export.csv", ARGUS_EXPORT_CSV_BYTES)
+
+    passing, _ = run_gate(repo, "check", "--label", "L", "exports/argus_export.csv")
+    code, out = run_gate(
+        repo,
+        "check",
+        "--label",
+        "L",
+        "--max-bytes",
+        str(ARGUS_EXPORT_CSV_BYTES - 1),
+        "--warn-bytes",
+        "1000",
+        "exports/argus_export.csv",
+    )
+
+    assert passing == 0
+    assert code == 1, out
+    assert (
+        "C4 exports/argus_export.csv is 26401006 bytes staged, over the 26401005-byte ceiling"
+        in out
+    ), out
+
+
+def test_c4_ignores_a_staged_deletion_of_an_oversize_blob(repo):
+    """Staging the REMOVAL of a 100 MB blob is the remedy. A gate that blocked its own fix
+    would leave MAC-610 permanently unfixable."""
+    sparse(repo, "big.bin", CEILING + 1)
+    run_git(repo, "add", "--force", "big.bin")
+    run_git(repo, "commit", "-q", "-m", "the defect")
+
+    run_gate(repo, "baseline", "--label", "L", "big.bin")
+    run_git(repo, "rm", "-q", "big.bin")
+
+    code, out = run_gate(repo, "check", "--label", "L", "big.bin")
+    assert code == 0, out
+    assert out.startswith("PASS"), out
+    assert "C4" not in out, out
+
+
+def test_c4_reports_unevaluated_rather_than_passing_on_an_unreadable_size(repo):
+    """A size the gate could not read is not a size under the ceiling.
+
+    Staged here as a blob-mode entry pointing at a TREE object: the object exists, so git
+    stages it happily, but `cat-file --batch-check` reports type `tree` and there is no blob
+    size to compare. That must surface as SKIPPED at exit 3, not fall through to PASS —
+    the same rule C2 already obeys, applied to the new dimension.
+    """
+    tree_sha = run_git(repo, "rev-parse", "HEAD^{tree}").strip()
+    run_gate(repo, "baseline", "--label", "L", "ghost.bin")
+    run_git(repo, "update-index", "--add", "--cacheinfo", "100644,%s,ghost.bin" % tree_sha)
+
+    code, out = run_gate(repo, "check", "--label", "L", "ghost.bin")
+    assert code == 3, out
+    assert out.startswith("SKIPPED"), out
+    assert not out.startswith("PASS"), out
+    assert "C4 SKIPPED -- no object size resolved for 1 staged path(s): ghost.bin" in out, out
+    assert "NOT evaluated" in out, out
+
+
+def test_c4_fail_outranks_an_unevaluated_c2(repo):
+    """A proven oversize blob is a defect, not merely an unevaluated one. Exit 1 survives."""
+    sparse(repo, "big.bin", CEILING + 1)
+    run_git(repo, "add", "--force", "big.bin")
+
+    code, out = run_gate(repo, "check", "--label", "never-baselined", "big.bin")
+    assert code == 1, out
+    assert out.startswith("FAIL"), out
+    assert "C2 SKIPPED" in out, out
+    assert "over the 100000000-byte ceiling" in out, out
+
+
+def test_c5_fires_on_db_argus_db_at_three_bytes(repo):
+    """Pattern and size are INDEPENDENT triggers, not one trigger with two spellings.
+
+    A tracked path escaping gitignore is the MAC-610 failure exactly, and it is that failure
+    at 3 bytes as much as at 329 MB — the file only grows afterwards.
+    """
+    run_gate(repo, "baseline", "--label", "L", "db/argus.db")
+    (repo / "db").mkdir()
+    (repo / "db" / "argus.db").write_bytes(b"SQL")
+    run_git(repo, "add", "--force", "db/argus.db")
+
+    code, out = run_gate(repo, "check", "--label", "L", "db/argus.db")
+    assert code == 1, out
+    assert "C5 1 staged path(s) match a .gitignore large-artifact pattern" in out, out
+    assert "db/argus.db [db/*.db]" in out, out
+    # The size trigger must be silent, or the two triggers are not shown to be independent.
+    assert "C4" not in out, out
+
+
+@pytest.mark.parametrize("pattern", gate_mod.LARGE_ARTIFACT_PATTERNS)
+def test_c5_fires_on_every_declared_large_artifact_pattern(repo, pattern):
+    """Derived from the gate's own tuple, not a retyped list.
+
+    Not vacuous: the assertion is that each declared pattern is actually WIRED to a FAIL,
+    which a list comparison against itself would not show. A pattern can sit in the tuple
+    and reach no branch.
+    """
+    path = pattern.replace("*", "x")
+    run_gate(repo, "baseline", "--label", "L", path)
+    (repo / "db").mkdir(exist_ok=True)
+    (repo / path).write_bytes(b"x")
+    run_git(repo, "add", "--force", path)
+
+    code, out = run_gate(repo, "check", "--label", "L", path)
+    assert code == 1, out
+    assert "%s [%s]" % (path, pattern) in out, out
+
+
+def test_c5_patterns_are_the_ones_gitignore_already_declares(repo):
+    """Anti-drift against an independent file, which is what makes this check non-circular.
+
+    `.gitignore` is where these patterns were declared and where they failed to bind, since
+    gitignore does not reach an already-tracked path. If someone widens that block and not
+    this tuple, the gate silently stops covering the new pattern.
+    """
+    gitignore = (REPO / ".gitignore").read_text(encoding="utf-8").splitlines()
+    missing = [p for p in gate_mod.LARGE_ARTIFACT_PATTERNS if p not in gitignore]
+    assert missing == [], "patterns absent from .gitignore: %s" % missing
+
+
+def test_c5_ignores_a_staged_deletion_of_a_barred_path(repo):
+    """Removing `db/argus.db` from the index is the MAC-610 remedy. It must not be blocked."""
+    (repo / "db").mkdir()
+    (repo / "db" / "argus.db").write_bytes(b"SQL")
+    run_git(repo, "add", "--force", "db/argus.db")
+    run_git(repo, "commit", "-q", "-m", "the defect")
+
+    run_gate(repo, "baseline", "--label", "L", "db/argus.db")
+    run_git(repo, "rm", "-q", "db/argus.db")
+
+    code, out = run_gate(repo, "check", "--label", "L", "db/argus.db")
+    assert code == 0, out
+    assert out.startswith("PASS"), out
+    assert "C5" not in out, out
+
+
+def test_warn_threshold_at_or_above_the_ceiling_is_a_usage_error(repo):
+    """The structural guard, shown failing.
+
+    With WARN >= FAIL every oversize blob is classified by the `elif` and downgraded to a
+    warning that exits 0. The gate would still print, still look configured, and pass the
+    exact input it exists to reject.
+    """
+    stage_only(repo, "L", "big.bin", CEILING + 1)
+
+    code, out = run_gate(
+        repo, "check", "--label", "L", "--max-bytes", "1000", "--warn-bytes", "1000", "big.bin"
+    )
+    assert code == 2, out
+    assert "must be below --max-bytes" in out, out
+    assert gate_mod.DEFAULT_WARN_BLOB_BYTES < gate_mod.DEFAULT_MAX_BLOB_BYTES
+
+
+@pytest.mark.skipif(
+    subprocess.run(
+        ("git", "-C", str(REPO), "cat-file", "-e", CEFF54F_DB_BLOB), capture_output=True
+    ).returncode
+    != 0,
+    reason="ceff54f's db/argus.db blob is not present in this clone",
+)
+def test_c4_positive_control_on_the_real_ceff54f_blob(repo):
+    """The commit that caused this issue, replayed. If the gate cannot fail on it, it is not a gate.
+
+    The blob is borrowed through `objects/info/alternates` rather than copied: 329,711,616
+    real bytes, the real path, the real object name from real history, and zero bytes of disk.
+    `git add db/argus.db` at that tree produces exactly this index entry, and the index is all
+    the gate reads.
+    """
+    (repo / ".git" / "objects" / "info").mkdir(parents=True, exist_ok=True)
+    (repo / ".git" / "objects" / "info" / "alternates").write_text(
+        str(REPO / ".git" / "objects") + "\n", encoding="utf-8"
+    )
+    assert (
+        run_git(repo, "cat-file", "-s", CEFF54F_DB_BLOB).strip() == str(CEFF54F_DB_BYTES)
+    ), "borrowed blob is not the 329,711,616-byte object ceff54f introduced"
+
+    run_gate(repo, "baseline", "--label", "MAC-523", "db/argus.db")
+    run_git(repo, "update-index", "--add", "--cacheinfo", "100644,%s,db/argus.db" % CEFF54F_DB_BLOB)
+
+    code, out = run_gate(repo, "check", "--label", "MAC-523", "db/argus.db")
+    assert code == 1, out
+    assert "C4 db/argus.db is 329711616 bytes staged, over the 100000000-byte ceiling" in out, out
+    assert "C5 1 staged path(s) match a .gitignore large-artifact pattern" in out, out
+    # C1 and C2 stay silent: `ceff54f` declared this path and had every right to stage it.
+    # That is the whole point — R10-as-ratified was green on the commit that broke the push.
+    assert "C1" not in out and "C2" not in out, out
