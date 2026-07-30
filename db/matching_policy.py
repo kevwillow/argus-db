@@ -88,10 +88,18 @@ the attribution on its own. Measured per vendor
 (``operator_review/MAC-577/alias_only_blast_radius.json``), the 12 flagged
 canonicals split three ways:
 
-``ALIAS_ONLY_CANONICALS`` (2)  applied. The two ``is_common_word=yes`` rows.
-``PROPOSED_ALIAS_ONLY``   (3)  measured safe, NOT applied — MAC-577 §3 holds
-                               the short-single-token cohort for per-vendor
-                               sign-off before it is applied.
+``ALIAS_ONLY_CANONICALS`` (5)  applied. The two ``is_common_word=yes`` rows,
+                               plus ``KeyW``/``Rekor``/``Harris``, ratified into
+                               the applied tier by the CEO on MAC-636 (decision
+                               comment ``8ce463c7-75d1-4de6-ab6a-0e23512273a1``
+                               on MAC-577, control staged at ``3f7a2bf``).
+``PROPOSED_ALIAS_ONLY``   (0)  empty. Held the three above until MAC-636.
+                               MAC-577 §3's gate is NOT withdrawn — it still
+                               holds the remaining short-single-token cohort,
+                               and the gate that enforces it now pins the three
+                               ratified names by name (see
+                               ``MAC636_RATIFIED_PROMOTIONS`` and
+                               ``tests/test_matching_policy.py``).
 ``DEFERRED_CANONICALS``   (7)  measured UNSAFE. Aliases absent, non-matching,
                                or themselves short bare tokens, so alias-only
                                would delete the vendor's footprint — the
@@ -169,16 +177,10 @@ ALIAS_ONLY_CANONICALS: dict[str, str] = {
         "CONSULTING x34, REVEAL IMAGING TECHNOLOGIES x20, REVEAL "
         "BIOSCIENCES x6, REVEAL TECHNOLOGY x5."
     ),
-}
-
-# PROPOSED: measured safe, but NOT applied. MAC-577 deliverable 3 requires the
-# short-single-token cohort to come back for per-vendor sign-off before it is
-# applied — "do not apply alias-only matching to them blindly". These three
-# clear the bar on evidence; promoting them is a CEO call, and the promotion
-# is a one-line move of the entry into ALIAS_ONLY_CANONICALS above.
-# Joint measured cost if all three are promoted: +7 rows lost, all FP
-# (see operator_review/MAC-577/policy_delta.json).
-PROPOSED_ALIAS_ONLY: dict[str, str] = {
+    # ── promoted from PROPOSED_ALIAS_ONLY by MAC-636 ──────────────────────
+    # CEO-ratified: MAC-577 decision comment
+    # 8ce463c7-75d1-4de6-ab6a-0e23512273a1, on the control staged at 3f7a2bf
+    # (operator_review/MAC-577/ceo_ratification_check.py).
     "KeyW": (
         "short single token. bare_only=0 — every row the bare canonical "
         "reaches is also reached by a qualified alias, so the substitution "
@@ -190,15 +192,74 @@ PROPOSED_ALIAS_ONLY: dict[str, str] = {
         "FP); 90 of 91 rows are alias-confirmed via REKOR RECOGNITION "
         "SYSTEMS, INC. / Rekor Systems / Rekor Scout."
     ),
+    # WITHDRAWN CLAIM (MAC-636). Through 3f7a2bf this entry ended with the
+    # sentence quoted below. It is quoted verbatim, and line-broken so that each
+    # phrase a reader would actually grep stays contiguous on one line, because
+    # a retraction that its own wrapping makes unsearchable is not a retraction
+    # (MAC-580: an in-place correction can orphan its own retraction):
+    #     "Note the L3Harris footprint is unaffected: 'L3HARRIS' is a single"
+    #     "token and never boundary-matched bare 'Harris' in the first place."
+    # That is true on the VENDOR basis and FALSE on the DESCRIPTION basis, and
+    # the matcher tests both (`contiguous(ct, vt[i]) or contiguous(ct, dt[i])`).
+    # Asserting it of "the footprint" generalised a one-basis measurement to a
+    # two-basis matcher. Measured correction below; per-row proof in
+    # operator_review/MAC-636/l3harris_reattribution.tsv.
     "Harris": (
         "short single token. 3,029 bare boundary-matches vs 2,066 "
         "alias-confirmed via 'Harris Corporation'; sole-loss is 6 rows, all "
         "FP (HARRIS FIRE PROTECTION CO INC, DEREK J HARRIS, N HARRIS "
-        "COMPUTER CORPORATION, MISCELLANEOUS FOREIGN AWARDEES). Note the "
-        "L3Harris footprint is unaffected: 'L3HARRIS' is a single token and "
-        "never boundary-matched bare 'Harris' in the first place."
+        "COMPUTER CORPORATION, MISCELLANEOUS FOREIGN AWARDEES). L3Harris "
+        "RE-ATTRIBUTES, it is not unaffected: 4 rows with vendor "
+        "'L3HARRIS TECHNOLOGIES, INC.' (procurement_records.id 59770, 59854, "
+        "60042, 60078) carry a bare HARRIS token in their excerpt, were "
+        "asserted to Harris (manufacturers.id=8), and do lose that "
+        "attribution. All 4 are retained by the bare 'L3Harris' keyword "
+        "(manufacturers.id=9, outside the MAC-542 flagged cohort, so still "
+        "bare) and re-attribute to the correct vendor — verified per row, "
+        "both bases and the full supporting-keyword set, in "
+        "operator_review/MAC-636/l3harris_reattribution.tsv."
     ),
 }
+
+# The three names MAC-636 moved, pinned against the issue that decided them.
+# The MAC-577 §3 gate is enforced against THIS tuple rather than against
+# "ALIAS_ONLY_CANONICALS is allowed to contain short tokens": the gate has to
+# distinguish "decided" from "any short token is fair game", and a count-only
+# assertion cannot. Adding a name here is the recorded decision; the gate in
+# tests/test_matching_policy.py fails on a short-token promotion that is not
+# listed here, and that failure is itself exercised by a simulation.
+MAC636_RATIFIED_PROMOTIONS: tuple[str, ...] = ("Harris", "KeyW", "Rekor")
+
+# COST OF THIS PROMOTION — two numbers, and they are not interchangeable.
+#
+#   corpus-union       +7 rows leave the corpus entirely. 71 rows lost in the
+#                      applied arm, 78 in the promoted arm
+#                      (operator_review/MAC-577/policy_delta.json and
+#                      policy_delta_promoted.json). A row counts here only if NO
+#                      keyword in the whole 155-keyword universe still reaches
+#                      it. 6 of the 7 are Harris, 1 is Rekor.
+#   attribution-level  964 attributions removed: Harris 3,029 -> 2,066 (963),
+#                      Rekor 91 -> 90 (1), KeyW 399 -> 399 (0). 957 of those 964
+#                      rows KEEP their place in the corpus under another
+#                      canonical; only the 7 above leave it.
+#
+# The +7 is the right number for corpus retention and the wrong number for a
+# matcher-policy decision, because a row can hold its place in the corpus while
+# silently losing its Harris attribution. Do not quote one as the other.
+#
+# Of the 964, the ingest had ever asserted 10 (Harris 9, Rekor 1, KeyW 0) —
+# operator_review/MAC-577/ceo_ratification_check.py. 4 of the Harris 9
+# re-attribute to L3Harris (above); the remaining 5 sit inside the 6 sole-loss
+# FP rows. The other 954 exist only because the harvest and the audit matcher
+# are two derivations of one keyword set, which is the defect MAC-577 found.
+
+# PROPOSED: empty. It held KeyW/Rekor/Harris until MAC-636 promoted them.
+# MAC-577 deliverable 3 — "do not apply alias-only matching to them blindly" —
+# is NOT withdrawn by that promotion: it still governs the remaining
+# short-single-token cohort, which is now exactly DEFERRED_CANONICALS. A future
+# candidate lands here first, with its measured reason, and moving it up is a
+# CEO call plus a line in MAC636_RATIFIED_PROMOTIONS' successor.
+PROPOSED_ALIAS_ONLY: dict[str, str] = {}
 
 # DEFERRED: flagged by the MAC-542 screen, but alias-only matching would
 # destroy real attribution. Not applied. Each needs alias coverage first,

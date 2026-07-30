@@ -18,6 +18,7 @@ from db.matching_policy import (
     ALIAS_ONLY_CANONICALS,
     BASIS_DIFFERENTIATED,
     DEFERRED_CANONICALS,
+    MAC636_RATIFIED_PROMOTIONS,
     PROPOSED_ALIAS_ONLY,
     PROPOSED_BASIS_DIFFERENTIATED,
     SHORT_MAX_LEN,
@@ -62,8 +63,11 @@ def test_policy_partitions_exactly_the_flagged_cohort():
 
 def test_tiers_are_pairwise_disjoint():
     assert_no_overlap()
-    assert len(ALIAS_ONLY_CANONICALS) == 2
-    assert len(PROPOSED_ALIAS_ONLY) == 3
+    # MAC-636 inverted these two pins rather than relaxing them: the promotion
+    # moved 3 entries, so the counts move 2->5 and 3->0. A count that stopped
+    # being asserted would let the next promotion in silently.
+    assert len(ALIAS_ONLY_CANONICALS) == 5
+    assert len(PROPOSED_ALIAS_ONLY) == 0
     assert len(DEFERRED_CANONICALS) == 7
 
 
@@ -145,16 +149,119 @@ def test_unapplied_canonicals_keep_their_bare_name():
 
 
 def test_short_single_token_cohort_is_gated_not_applied():
-    """MAC-577 deliverable 3: the 10 short-single-token canonicals must not be
-    applied without per-vendor sign-off. Only the 2 common words ship."""
+    """MAC-577 §3, repointed by MAC-636 — NOT deleted.
+
+    The original form asserted the cohort intersects the applied tier in
+    NOTHING. That is the correct gate right up until the first ratified
+    promotion, at which point it fails by design and the tempting repair is to
+    delete it. Deleting it would leave the remaining 7 deferred canonicals —
+    Skydio and Axon among them — promotable by anyone who edits one dict.
+
+    So the gate becomes an EQUALITY against a named set instead of an
+    emptiness check. "Decided" and "any short token is fair game" are different
+    states and only equality separates them: an 8th short-token canonical in
+    the applied tier fails here whether or not it was moved cleanly out of
+    DEFERRED_CANONICALS.
+
+    That this gate is not hollow is proved, not asserted — see
+    ``test_cohort_gate_fires_on_an_unratified_promotion`` below, which performs
+    the promotion and requires this function to raise.
+    """
     screen = _screen()
     short_cohort = {c for c, r in screen.items()
                     if r["recommended_action"] != "KEEP"
                     and r["is_common_word"] == "no"}
     assert len(short_cohort) == 10
-    assert not (short_cohort & set(ALIAS_ONLY_CANONICALS)), (
-        "a short-single-token canonical was applied without sign-off")
-    assert short_cohort == set(PROPOSED_ALIAS_ONLY) | set(DEFERRED_CANONICALS)
+
+    applied_short = short_cohort & set(ALIAS_ONLY_CANONICALS)
+    assert applied_short == set(MAC636_RATIFIED_PROMOTIONS), (
+        "the set of short-single-token canonicals in ALIAS_ONLY_CANONICALS is "
+        f"{sorted(applied_short)}, but the only ratified promotions are "
+        f"{sorted(MAC636_RATIFIED_PROMOTIONS)} (MAC-636, CEO comment "
+        "8ce463c7-75d1-4de6-ab6a-0e23512273a1). A short-single-token canonical "
+        "was applied without a recorded decision, or a ratified one was "
+        "reverted without updating MAC636_RATIFIED_PROMOTIONS.")
+
+    # The cohort is still fully accounted for: 3 ratified + 0 proposed + 7
+    # deferred. Nothing fell out of the taxonomy on the way through.
+    assert short_cohort == (set(MAC636_RATIFIED_PROMOTIONS)
+                            | set(PROPOSED_ALIAS_ONLY)
+                            | set(DEFERRED_CANONICALS))
+    # And every ratified name really is a short single token — the gate would be
+    # trivially satisfiable by listing a long canonical here.
+    assert all(is_short_token(c) for c in MAC636_RATIFIED_PROMOTIONS)
+
+
+@pytest.mark.parametrize("intruder", ["Skydio", "Axon"])
+@pytest.mark.parametrize("clean_move", [False, True])
+def test_cohort_gate_fires_on_an_unratified_promotion(intruder, clean_move):
+    """Simulate an 8th promotion and require the gate above to FAIL.
+
+    A gate that passes on an unauthorised promotion is worse than the broken
+    one it replaced, so the failure is exercised rather than reasoned about.
+
+    Both shapes of the mistake are covered, and ``clean_move=True`` is the one
+    that matters:
+
+    ``clean_move=False``  the entry is copied into ALIAS_ONLY_CANONICALS and
+                          left in DEFERRED_CANONICALS. ``assert_no_overlap``
+                          also catches this, so it does not on its own show the
+                          cohort gate is doing any work.
+    ``clean_move=True``   the entry is MOVED — added to the applied tier and
+                          deleted from DEFERRED_CANONICALS. This is what a real
+                          promotion edit looks like, the tiers stay disjoint,
+                          ``assert_no_overlap`` PASSES (asserted below), and the
+                          cohort gate is then the only thing standing between a
+                          deferred canonical and the applied tier.
+
+    Skydio and Axon are the two the issue names: Skydio has 0 qualified aliases
+    (580 sole-loss rows, alias-only is undefined for it) and Axon's loss cohort
+    is basis-split with 29 adjudicated true positives inside it.
+    """
+    import db.matching_policy as mp
+
+    assert intruder in DEFERRED_CANONICALS
+    assert intruder not in MAC636_RATIFIED_PROMOTIONS
+    assert is_short_token(intruder), "the intruder must be in the short cohort"
+
+    saved_deferred = dict(mp.DEFERRED_CANONICALS)
+    mp.ALIAS_ONLY_CANONICALS[intruder] = saved_deferred[intruder]
+    if clean_move:
+        del mp.DEFERRED_CANONICALS[intruder]
+    try:
+        if clean_move:
+            # The tiers are still disjoint, so the disjointness gate is happy.
+            # Whatever fails next is the cohort gate, not a bookkeeping check.
+            assert_no_overlap()
+        with pytest.raises(AssertionError) as exc:
+            test_short_single_token_cohort_is_gated_not_applied()
+        assert intruder in str(exc.value), (
+            "the gate failed, but not about the intruder — the failure must "
+            "name what was promoted or it is not diagnostic")
+    finally:
+        mp.ALIAS_ONLY_CANONICALS.pop(intruder, None)
+        mp.DEFERRED_CANONICALS.clear()
+        mp.DEFERRED_CANONICALS.update(saved_deferred)
+
+    # Teardown restored the tiers, so the real gate passes again. Without this
+    # the parametrised runs would mask each other's leakage.
+    assert_no_overlap()
+    test_short_single_token_cohort_is_gated_not_applied()
+
+
+def test_ratified_promotions_are_actually_applied():
+    """The pin is a claim about ALIAS_ONLY_CANONICALS, so check the direction
+    the gate above cannot: every ratified name must really be in the applied
+    tier. A name listed here but never moved would make the gate pass while
+    the promotion silently did not happen."""
+    assert len(MAC636_RATIFIED_PROMOTIONS) == 3
+    assert set(MAC636_RATIFIED_PROMOTIONS) == {"Harris", "KeyW", "Rekor"}
+    for c in MAC636_RATIFIED_PROMOTIONS:
+        assert c in ALIAS_ONLY_CANONICALS, f"{c} is ratified but not applied"
+        assert is_alias_only(c), f"{c} is in the dict but is_alias_only says no"
+        assert c not in PROPOSED_ALIAS_ONLY and c not in DEFERRED_CANONICALS
+    # Axon is explicitly NOT among them — MAC-588 owns it (out of MAC-636 scope).
+    assert "Axon" not in MAC636_RATIFIED_PROMOTIONS
 
 
 # ── 4. the guard that prevents a silent vendor drop ───────────────────────
