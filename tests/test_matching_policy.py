@@ -9,15 +9,18 @@ Two jobs:
 from __future__ import annotations
 
 import csv
+import json
 import sqlite3
 from pathlib import Path
 
 import pytest
 
+from db.entity_boundary import boundary_match
 from db.matching_policy import (
     ALIAS_ONLY_CANONICALS,
     BASIS_DIFFERENTIATED,
     DEFERRED_CANONICALS,
+    MAC595_RATIFIED_BASIS_PROMOTIONS,
     MAC636_RATIFIED_PROMOTIONS,
     PROPOSED_ALIAS_ONLY,
     PROPOSED_BASIS_DIFFERENTIATED,
@@ -38,6 +41,7 @@ from db.matching_policy import (
     flagged_canonicals,
     matcher_keywords_for,
     matcher_keywords_for_basis,
+    qualified_aliases_for,
 )
 
 REPO = Path(__file__).resolve().parents[1]
@@ -149,7 +153,7 @@ def test_unapplied_canonicals_keep_their_bare_name():
 
 
 def test_short_single_token_cohort_is_gated_not_applied():
-    """MAC-577 §3, repointed by MAC-636 — NOT deleted.
+    """MAC-577 §3, repointed by MAC-636 and WIDENED to the basis tier by MAC-622.
 
     The original form asserted the cohort intersects the applied tier in
     NOTHING. That is the correct gate right up until the first ratified
@@ -163,9 +167,19 @@ def test_short_single_token_cohort_is_gated_not_applied():
     the applied tier fails here whether or not it was moved cleanly out of
     DEFERRED_CANONICALS.
 
+    MAC-622 closes the other half of the hole. Through MAC-636 this gate read
+    ``ALIAS_ONLY_CANONICALS`` and nothing else, so MAC-577 §3 constrained the
+    alias-only tier alone — and ``BASIS_DIFFERENTIATED`` is a second applied
+    tier reachable by the same cohort. Under MAC-595's simulated promotion of
+    Axon this gate PASSED, which is the defect: the next short-single-token
+    canonical could enter the basis tier with no sign-off at all and the gate
+    would stay green. Both applied tiers are now gated, each against its own
+    named decision set.
+
     That this gate is not hollow is proved, not asserted — see
-    ``test_cohort_gate_fires_on_an_unratified_promotion`` below, which performs
-    the promotion and requires this function to raise.
+    ``test_cohort_gate_fires_on_an_unratified_promotion`` and
+    ``test_cohort_gate_fires_on_an_unratified_basis_promotion`` below, which
+    perform the promotion and require this function to raise.
     """
     screen = _screen()
     short_cohort = {c for c, r in screen.items()
@@ -182,14 +196,28 @@ def test_short_single_token_cohort_is_gated_not_applied():
         "was applied without a recorded decision, or a ratified one was "
         "reverted without updating MAC636_RATIFIED_PROMOTIONS.")
 
+    # Same rule, second applied tier. Axon is the only signed-off entry.
+    basis_short = short_cohort & set(BASIS_DIFFERENTIATED)
+    assert basis_short == set(MAC595_RATIFIED_BASIS_PROMOTIONS), (
+        "the set of short-single-token canonicals in BASIS_DIFFERENTIATED is "
+        f"{sorted(basis_short)}, but the only ratified basis promotions are "
+        f"{sorted(MAC595_RATIFIED_BASIS_PROMOTIONS)} (MAC-595, CEO comment "
+        "6564f836-66be-4f78-a643-474f11ee1a57). A short-single-token canonical "
+        "was given an APPLIED basis rule without a recorded decision, or a "
+        "ratified one was reverted without updating "
+        "MAC595_RATIFIED_BASIS_PROMOTIONS.")
+
     # The cohort is still fully accounted for: 3 ratified + 0 proposed + 7
-    # deferred. Nothing fell out of the taxonomy on the way through.
+    # deferred. Nothing fell out of the taxonomy on the way through. Axon is
+    # counted here under DEFERRED, where it still belongs — a basis rule is not
+    # an alias-only rule, and the tiers overlap on purpose.
     assert short_cohort == (set(MAC636_RATIFIED_PROMOTIONS)
                             | set(PROPOSED_ALIAS_ONLY)
                             | set(DEFERRED_CANONICALS))
     # And every ratified name really is a short single token — the gate would be
     # trivially satisfiable by listing a long canonical here.
     assert all(is_short_token(c) for c in MAC636_RATIFIED_PROMOTIONS)
+    assert all(is_short_token(c) for c in MAC595_RATIFIED_BASIS_PROMOTIONS)
 
 
 @pytest.mark.parametrize("intruder", ["Skydio", "Axon"])
@@ -260,8 +288,74 @@ def test_ratified_promotions_are_actually_applied():
         assert c in ALIAS_ONLY_CANONICALS, f"{c} is ratified but not applied"
         assert is_alias_only(c), f"{c} is in the dict but is_alias_only says no"
         assert c not in PROPOSED_ALIAS_ONLY and c not in DEFERRED_CANONICALS
-    # Axon is explicitly NOT among them — MAC-588 owns it (out of MAC-636 scope).
+    # Axon is explicitly NOT among them — it is an alias-only promotion set, and
+    # Axon's sign-off (MAC-595) applied a BASIS rule instead. Different tier,
+    # different decision set; alias-only is still measured unsafe for Axon.
     assert "Axon" not in MAC636_RATIFIED_PROMOTIONS
+    assert "Axon" not in ALIAS_ONLY_CANONICALS
+
+
+@pytest.mark.parametrize("intruder", ["Skydio", "Getac"])
+def test_cohort_gate_fires_on_an_unratified_basis_promotion(intruder):
+    """MAC-622: simulate an unsigned SECOND basis promotion, require a FAIL.
+
+    This is the criterion the MAC-595 sign-off called the real deliverable. The
+    hole it names is specific: a basis promotion legitimately leaves its entry
+    in ``DEFERRED_CANONICALS`` (Axon does), so none of the bookkeeping checks
+    move at all when a second one is added. This test proves that:
+
+    * ``assert_no_overlap`` PASSES — it only knows the three alias tiers.
+    * ``assert_basis_rules_are_sound`` PASSES — the intruder is in the flagged
+      cohort and its rule has a non-empty qualifier set, so it is structurally
+      valid. Structural validity is not authorisation.
+
+    ...and then requires the cohort gate to raise anyway, naming the intruder.
+    Without the basis-tier arm added by MAC-622 this test cannot pass, which is
+    what makes that arm load-bearing rather than decorative.
+    """
+    import db.matching_policy as mp
+
+    assert intruder in DEFERRED_CANONICALS
+    assert intruder not in MAC595_RATIFIED_BASIS_PROMOTIONS
+    assert is_short_token(intruder), "the intruder must be in the short cohort"
+
+    mp.BASIS_DIFFERENTIATED[intruder] = BasisRule(
+        reason=f"simulated unsigned promotion of {intruder} — 1 count",
+        description_qualifiers=("DRONE",))
+    try:
+        # Neither structural gate objects: the promotion is well-formed, it is
+        # merely unauthorised. So whatever fails next is the sign-off gate.
+        assert_no_overlap()
+        assert_basis_rules_are_sound()
+        with pytest.raises(AssertionError) as exc:
+            test_short_single_token_cohort_is_gated_not_applied()
+        assert intruder in str(exc.value), (
+            "the gate failed, but not about the intruder — the failure must "
+            "name what was promoted or it is not diagnostic")
+    finally:
+        mp.BASIS_DIFFERENTIATED.pop(intruder, None)
+
+    # Teardown restored the tier, so the real gate passes again with Axon alone.
+    assert set(BASIS_DIFFERENTIATED) == {"Axon"}
+    assert_basis_rules_are_sound()
+    test_short_single_token_cohort_is_gated_not_applied()
+
+
+def test_ratified_basis_promotion_is_actually_applied():
+    """The direction the gate above cannot check: every name recorded as a
+    ratified basis promotion must really be in the applied tier. A name listed
+    in MAC595_RATIFIED_BASIS_PROMOTIONS but never moved would make the gate
+    pass while the promotion silently did not happen."""
+    assert MAC595_RATIFIED_BASIS_PROMOTIONS == ("Axon",)
+    for c in MAC595_RATIFIED_BASIS_PROMOTIONS:
+        assert c in BASIS_DIFFERENTIATED, f"{c} is ratified but not applied"
+        assert is_basis_differentiated(c), (
+            f"{c} is in the dict but is_basis_differentiated says no")
+        assert c not in PROPOSED_BASIS_DIFFERENTIATED
+    # The proposed tier is empty and the applied tier is exactly the decided set:
+    # nothing is awaiting sign-off, and nothing was applied without one.
+    assert PROPOSED_BASIS_DIFFERENTIATED == {}
+    assert set(BASIS_DIFFERENTIATED) == set(MAC595_RATIFIED_BASIS_PROMOTIONS)
 
 
 # ── 4. the guard that prevents a silent vendor drop ───────────────────────
@@ -345,15 +439,26 @@ def test_basis_rules_are_structurally_sound():
     assert_basis_rules_are_sound()
 
 
-def test_axon_is_proposed_not_applied():
-    """MAC-577's standing gate: the short-single-token cohort needs per-vendor
-    sign-off. MAC-588 supplies the dossier; it does not grant the sign-off."""
-    assert set(BASIS_DIFFERENTIATED) == set()
-    assert set(PROPOSED_BASIS_DIFFERENTIATED) == {"Axon"}
-    assert not is_basis_differentiated("Axon")
-    # un-applied means un-applied: Axon still matches bare, on both bases.
+def test_axon_is_applied_not_proposed():
+    """INVERTED by MAC-622, not deleted (MAC-595 sign-off condition 2).
+
+    This pinned the un-applied state through MAC-588: MAC-577 §3 held the
+    short-single-token cohort for per-vendor sign-off, and MAC-588 supplied the
+    dossier without granting it. MAC-595 granted it. The pin now reads the other
+    way, and it is still a pin in both directions — a revert that empties
+    BASIS_DIFFERENTIATED fails here, and so does a re-proposal.
+    """
+    assert set(BASIS_DIFFERENTIATED) == {"Axon"}
+    assert set(PROPOSED_BASIS_DIFFERENTIATED) == set()
+    assert is_basis_differentiated("Axon")
+    # applied means applied: the bare canonical is gone from the vendor basis.
+    assert "Axon" not in matcher_keywords_for_basis(
+        "Axon", AXON_ALIASES, "vendor")
+    # ...but the ALIAS-only tier is untouched, so the plain keyword helper — which
+    # only knows that tier — still returns the bare name. That is not a leak: it
+    # is why callers must use attributes()/matcher_keywords_for_basis(), and the
+    # docstring on matcher_keywords_for_basis says so.
     assert matcher_keywords_for("Axon", AXON_ALIASES) == ["Axon"]
-    assert matcher_keywords_for_basis("Axon", AXON_ALIASES, "vendor") == ["Axon"]
 
 
 def test_axon_stays_in_deferred_because_alias_only_is_still_unsafe():
@@ -372,17 +477,26 @@ def test_basis_rule_reason_is_evidence():
 
 
 def test_empty_qualifier_set_is_rejected():
-    """A rule with no qualifiers silently degrades to bare-on-description."""
+    """A rule with no qualifiers silently degrades to bare-on-description.
+
+    Repointed at the APPLIED tier by MAC-622: with Axon applied, planting a
+    same-named entry in the proposed tier trips the both-tiers check first and
+    the assertion under test never runs. Mutating the tier Axon actually lives
+    in keeps this exercising the qualifier guard.
+    """
     import db.matching_policy as mp
-    saved = dict(mp.PROPOSED_BASIS_DIFFERENTIATED)
-    mp.PROPOSED_BASIS_DIFFERENTIATED["Axon"] = BasisRule(
+    saved = dict(mp.BASIS_DIFFERENTIATED)
+    mp.BASIS_DIFFERENTIATED["Axon"] = BasisRule(
         reason="x" * 50 + " 1 count", description_qualifiers=())
     try:
         with pytest.raises(AssertionError, match="empty qualifier set"):
             assert_basis_rules_are_sound()
     finally:
-        mp.PROPOSED_BASIS_DIFFERENTIATED.clear()
-        mp.PROPOSED_BASIS_DIFFERENTIATED.update(saved)
+        mp.BASIS_DIFFERENTIATED.clear()
+        mp.BASIS_DIFFERENTIATED.update(saved)
+    # The restore really restored: the live rule still has its qualifiers.
+    assert BASIS_DIFFERENTIATED["Axon"].description_qualifiers
+    assert_basis_rules_are_sound()
 
 
 def test_unflagged_canonical_cannot_get_a_basis_rule():
@@ -400,17 +514,59 @@ def test_unflagged_canonical_cannot_get_a_basis_rule():
 
 
 def _with_axon_applied():
-    """Context: promote Axon, i.e. exactly the one-line move the CEO signs off."""
+    """REPOINTED at the applied tier by MAC-622 (MAC-595 sign-off condition 1).
+
+    Through MAC-588 this context performed the promotion, reading the entry out
+    of ``PROPOSED_BASIS_DIFFERENTIATED``. That read is a ``KeyError`` now that
+    the entry has moved, and the tempting repair — swap in a no-op
+    ``nullcontext`` — is the trap the sign-off called out: every 29/29 and 0/73
+    assertion below would keep executing and keep passing, against whatever
+    state happened to be live, proving nothing about the rule.
+
+    So the context asserts the applied state rather than creating it. The proofs
+    that use it only run while the rule they prove is genuinely in force, and a
+    revert makes them fail here instead of quietly going vacuous.
+    """
     import contextlib
     import db.matching_policy as mp
 
     @contextlib.contextmanager
     def ctx():
-        mp.BASIS_DIFFERENTIATED["Axon"] = mp.PROPOSED_BASIS_DIFFERENTIATED["Axon"]
+        rule = mp.BASIS_DIFFERENTIATED.get("Axon")
+        assert rule is not None, (
+            "Axon is not in BASIS_DIFFERENTIATED, so the proof that follows "
+            "would measure the un-applied matcher while claiming to measure the "
+            "promoted rule. MAC-595 applied this rule; if it was reverted, "
+            "revert these proofs too rather than letting them pass vacuously.")
+        assert rule.description_qualifiers, (
+            "the applied rule has an empty qualifier set — it has degraded to "
+            "bare-on-description and the proof below would not detect it")
+        yield
+        assert mp.BASIS_DIFFERENTIATED.get("Axon") is rule, (
+            "the applied rule changed identity mid-proof")
+
+    return ctx()
+
+
+def _with_axon_unapplied():
+    """The pre-promotion baseline: temporarily un-apply the ratified rule.
+
+    Needed by the narrowing measurement, which has to compare the promoted arm
+    against the status quo it replaced. ``pop`` without a default is deliberate
+    — if Axon is not applied there is no baseline to establish and this raises
+    ``KeyError`` rather than yielding a context that measures the same arm twice.
+    """
+    import contextlib
+    import db.matching_policy as mp
+
+    @contextlib.contextmanager
+    def ctx():
+        rule = mp.BASIS_DIFFERENTIATED.pop("Axon")
         try:
+            assert not mp.is_basis_differentiated("Axon")
             yield
         finally:
-            mp.BASIS_DIFFERENTIATED.pop("Axon", None)
+            mp.BASIS_DIFFERENTIATED["Axon"] = rule
 
     return ctx()
 
@@ -509,30 +665,182 @@ def test_basis_guard_fires_when_vendor_basis_would_be_emptied():
         assert_basis_rules_are_applicable([("Axon", AXON_ALIASES)])
 
 
-def test_basis_rule_is_inert_while_unapplied():
-    """With Axon un-applied, attributes() must reproduce today's bare match."""
-    assert attributes("Axon", AXON_ALIASES, "THE AXON GROUP, LTD", None) == "vendor"
-    assert attributes("Axon", AXON_ALIASES, "SOME RESELLER LLC",
-                      "AXON THERAPY SYSTEM") == "description"
+def test_basis_rule_is_live_and_pins_what_the_promotion_removed():
+    """INVERTED by MAC-622, not deleted (MAC-595 sign-off condition 2).
+
+    This pinned inertness: while Axon was un-applied, ``attributes()`` had to
+    reproduce the plain bare match. Inverting it means pinning that those two
+    rows are now DROPPED — but an assertion that they are gone, on its own, is
+    weak evidence: it would also pass if ``attributes()`` had broken and started
+    returning ``None`` for everything.
+
+    So the pin runs in both directions off one pair of rows. The un-applied arm
+    reproduces the exact pre-promotion verdicts (the old assertions, kept
+    verbatim), the applied arm shows both gone, and the difference between the
+    two arms IS the promotion. That is also the smallest honest statement of
+    what MAC-595 authorised.
+    """
+    fp_vendor = ("THE AXON GROUP, LTD", None)
+    fp_desc = ("SOME RESELLER LLC", "AXON THERAPY SYSTEM")
+
+    with _with_axon_unapplied():
+        assert attributes("Axon", AXON_ALIASES, *fp_vendor) == "vendor"
+        assert attributes("Axon", AXON_ALIASES, *fp_desc) == "description"
+
+    with _with_axon_applied():
+        assert attributes("Axon", AXON_ALIASES, *fp_vendor) is None
+        assert attributes("Axon", AXON_ALIASES, *fp_desc) is None
+        # ...and the rule is a narrowing, not a break: a real TP on the same
+        # description basis still attributes. Without this the two Nones above
+        # would be satisfied by an attributes() that had stopped working.
+        assert attributes("Axon", AXON_ALIASES, "AARDVARK",
+                          "AXON X26P TASERS") == "description"
 
 
 def test_basis_differentiation_is_a_narrowing_not_an_expansion():
-    """Every row the promoted rule attributes must already match today."""
+    """Every row the applied rule attributes must already have matched before.
+
+    Widened by MAC-622 from ``LIMIT 5000`` to all 50,499 rows. The MAC-595
+    sign-off re-ran the full corpus and found the subset property holds exactly,
+    making the shipped claim stronger than the one filed; a sampled test cannot
+    carry that claim, so the sample is gone.
+
+    The measured arms are pinned as well as the property, because "no row was
+    added" is also true of a rule that dropped everything. R0 890 -> RB 694,
+    delta -196 = 123 vendor-basis FPs + 73 adjudicated description-basis FPs.
+    """
     if not DB.exists():
         pytest.skip("db/argus.db not present")
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
     rows = con.execute(
-        "SELECT vendor_canonical_name, product_family, source_excerpt "
-        "FROM procurement_records LIMIT 5000").fetchall()
+        "SELECT id, vendor_canonical_name, product_family, source_excerpt "
+        "FROM procurement_records").fetchall()
+    assert len(rows) == 50499, f"corpus moved: {len(rows)} rows"
+
+    texts = [(r["id"], r["vendor_canonical_name"],
+              " ".join(filter(None, [r["product_family"], r["source_excerpt"]])))
+             for r in rows]
+
+    # R0: the status quo the promotion replaced. Measured, not quoted.
+    with _with_axon_unapplied():
+        r0 = {i for i, v, d in texts
+              if attributes("Axon", AXON_ALIASES, v, d) is not None}
+    # RB: the applied basis-differentiated rule.
+    with _with_axon_applied():
+        rb = {i for i, v, d in texts
+              if attributes("Axon", AXON_ALIASES, v, d) is not None}
+
+    added = rb - r0
+    assert added == set(), (
+        f"applied rule ADDED {len(added)} rows that did not match before: "
+        f"{sorted(added)[:10]}")
+    assert len(r0) == 890, f"R0 moved: {len(r0)}"
+    assert len(rb) == 694, f"RB moved: {len(rb)}"
+    assert len(rb) - len(r0) == -196
+
+
+def test_description_basis_drop_cohort_is_recomputed_and_reconciles():
+    """MAC-622 discharges the MAC-595 sweep obligation AS CODE, not as prose.
+
+    The obligation exists because of what the sign-off found: the adjudication
+    covers 102 rows, but the live description-basis cohort is **112**. The
+    cohort had moved and nothing recomputed it. It was benign this time — and
+    "benign this time" is exactly the state that stops being true silently, so
+    the re-dump runs on every sweep of this suite rather than living in a
+    runbook step somebody has to remember.
+
+    What it recomputes, from the live DB and via the single-implementation
+    matcher (``db.entity_boundary``, imported by the policy — no second
+    normaliser is invented here):
+
+        bare_only        225 = 123 vendor + 102 description   <- adjudicated
+        alias_confirmed  665 = 655 vendor +  10 description   <- the gap
+                         890 total
+
+    and then requires the 10-row gap to be benign for the stated reason rather
+    than by assumption: every one alias-confirmed on a real Axon Enterprise
+    alias, and every one RETAINED under the applied rule. If a future harvest
+    moves a row from the gap into the un-adjudicated bare-only set, the identity
+    assertion against ``cohort.json`` fails and the adjudication gets re-run.
+    """
+    if not DB.exists():
+        pytest.skip("db/argus.db not present")
+    cohort = json.loads((REPO / "operator_review/MAC-588/cohort.json").read_text())
+
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
+
+    # Re-query the alias blob rather than trusting the module constant: the
+    # cohort is a function of live registry state, and MAC-580 rewrote these
+    # blobs once already.
+    live_aliases = con.execute(
+        "SELECT aliases FROM manufacturers WHERE canonical_name='Axon'"
+    ).fetchone()["aliases"]
+    assert live_aliases == AXON_ALIASES, (
+        "manufacturers.aliases for Axon has drifted from the constant this "
+        "suite pins; re-derive the cohort before trusting any count below")
+    qualified = qualified_aliases_for("Axon", live_aliases)
+    assert qualified == cohort["qualified_aliases"]
+
+    rows = con.execute(
+        "SELECT id, vendor_canonical_name, product_family, source_excerpt "
+        "FROM procurement_records").fetchall()
+    assert len(rows) == cohort["n_rows"] == 50499
+
+    bare_v, bare_d, alias_hit = set(), set(), set()
+    text = {}
     for r in rows:
+        i = r["id"]
+        vendor = r["vendor_canonical_name"]
         desc = " ".join(filter(None, [r["product_family"], r["source_excerpt"]]))
-        before = attributes("Axon", AXON_ALIASES, r["vendor_canonical_name"], desc)
-        with _with_axon_applied():
-            after = attributes("Axon", AXON_ALIASES,
-                               r["vendor_canonical_name"], desc)
-        assert not (after and not before), (
-            f"promoted rule ADDED a row: {r['vendor_canonical_name']!r} {desc!r}")
+        text[i] = (vendor, desc)
+        if boundary_match("Axon", vendor):
+            bare_v.add(i)
+        if boundary_match("Axon", desc):
+            bare_d.add(i)
+        if any(boundary_match(a, vendor) or boundary_match(a, desc)
+               for a in qualified):
+            alias_hit.add(i)
+
+    bare = bare_v | bare_d
+    bare_only = bare - alias_hit
+    alias_confirmed = bare & alias_hit
+
+    # The three totals of record.
+    assert len(bare) == cohort["bare"] == 890
+    assert len(bare_only) == cohort["bare_only"] == 225
+    assert len(alias_confirmed) == cohort["alias_confirmed"] == 665
+
+    # bare_only splits 123 vendor + 102 description...
+    assert len(bare_only & bare_v) == cohort["vendor_basis"] == 123
+    bare_only_desc = bare_only - bare_v
+    assert len(bare_only_desc) == cohort["description_basis"] == 102
+    # ...and the description half is IDENTICALLY the adjudicated set, not merely
+    # the same size. A same-size different-membership cohort is the failure this
+    # obligation exists to catch.
+    assert bare_only_desc == set(cohort["description_basis_ids"])
+    assert bare_only_desc == set(_adjudication())
+
+    # alias_confirmed splits 655 vendor + 10 description — the 10 are the gap
+    # between the live description-basis cohort (112) and the adjudicated 102.
+    assert len(alias_confirmed & bare_v) == 655
+    gap = alias_confirmed - bare_v
+    assert len(gap) == 10
+    assert len(bare_d - bare_v) == 112 == len(bare_only_desc) + len(gap)
+
+    # The gap is benign for a stated reason, so assert the reason.
+    gap_vendors = {text[i][0] for i in gap}
+    assert gap_vendors == {"AARDVARK", "CARAHSOFT TECHNOLOGY CORP"}, gap_vendors
+    with _with_axon_applied():
+        for i in gap:
+            vendor, desc = text[i]
+            hits = [a for a in qualified
+                    if boundary_match(a, vendor) or boundary_match(a, desc)]
+            assert hits, f"id={i} is in the alias-confirmed gap with no alias hit"
+            assert attributes("Axon", live_aliases, vendor, desc) is not None, (
+                f"id={i} is an un-adjudicated alias-confirmed row and the "
+                f"applied rule DROPS it — the gap is no longer benign")
 
 
 # ── MAC-598: proper-extension guard ───────────────────────────────────────

@@ -123,6 +123,23 @@ So the rule is per-basis, and on the description basis the bare canonical is
 additionally gated on a product qualifier. ``BasisRule`` below expresses that;
 ``attributes()`` is the decision function callers should use, because it makes
 the qualifier impossible to skip.
+
+APPLIED by MAC-622 under MAC-595 sign-off
+-----------------------------------------
+The rule is no longer proposed. The CEO signed off ``promote`` on MAC-595
+(decision comment ``6564f836-66be-4f78-a643-474f11ee1a57``), having re-derived
+every number above at HEAD rather than reading the dossier's, and MAC-622
+applied it. ``MAC595_RATIFIED_BASIS_PROMOTIONS`` records the decision so the
+sign-off gate can tell "decided" from "any short token is fair game" — the same
+shape MAC-636 used for the alias-only tier, and for the same reason.
+
+The sign-off was explicit that the move is not the deliverable: it also names
+the gate hole the move opens (MAC-577 §3 constrained the alias-only tier and
+nothing else, so a second short-single-token canonical could enter THIS tier
+unsigned while the gate stayed green) and the drop-cohort re-dump obligation.
+Both are discharged in ``tests/test_matching_policy.py``, as executing checks
+rather than as prose — the live description-basis cohort is 112, not the 102
+adjudicated, and nothing recomputed that until the sign-off did.
 """
 
 from __future__ import annotations
@@ -354,15 +371,14 @@ _AXON_QUALIFIERS = (
     "AXON BODY", "AXON FLEET", "AXON DOCK", "AXON SIGNAL", "AXON RESPOND",
 )
 
-# APPLIED basis-differentiated rules. Empty: MAC-588 measured Axon's rule and
-# found it clean, but Axon is in the MAC-542 short-single-token cohort
-# (``is_common_word=no``, ``recommended_action=REFINE``) and MAC-577's standing
-# gate holds that cohort for per-vendor sign-off before application. Promotion
-# is a one-line move of the entry below into this dict.
-BASIS_DIFFERENTIATED: dict[str, BasisRule] = {}
-
-# PROPOSED: measured, adjudicated exhaustively, NOT applied.
-PROPOSED_BASIS_DIFFERENTIATED: dict[str, BasisRule] = {
+# APPLIED basis-differentiated rules. MAC-588 measured Axon's rule and found it
+# clean; Axon is in the MAC-542 short-single-token cohort (``is_common_word=no``,
+# ``recommended_action=REFINE``), so MAC-577 §3 held it for per-vendor sign-off.
+# That sign-off was given on MAC-595 and MAC-622 applied it. Axon deliberately
+# STAYS in DEFERRED_CANONICALS: alias-only really is unsafe for it (it would
+# delete 29 adjudicated real awards), and the two tiers describe different rules
+# — see ``assert_basis_rules_are_sound``.
+BASIS_DIFFERENTIATED: dict[str, BasisRule] = {
     "Axon": BasisRule(
         reason=(
             "basis-split loss cohort, so no uniform rule fits. 890 bare "
@@ -380,6 +396,28 @@ PROPOSED_BASIS_DIFFERENTIATED: dict[str, BasisRule] = {
         description_qualifiers=_AXON_QUALIFIERS,
     ),
 }
+
+# The name MAC-622 moved, pinned against the issue that decided it. Same
+# construction as MAC636_RATIFIED_PROMOTIONS and for the same reason: the
+# MAC-577 §3 gate has to distinguish "decided" from "any short token is fair
+# game", and neither a count nor an emptiness check can. Adding a name here is
+# the recorded decision; the gate in tests/test_matching_policy.py fails on a
+# short-token basis promotion that is not listed here, and that failure is
+# itself exercised by a simulation.
+#
+# MAC-595 decision comment 6564f836-66be-4f78-a643-474f11ee1a57, verdict
+# ``promote``, re-derived at HEAD 11eaa5f rather than at the dossier's 9e4a511:
+# R0 890, RB 694 (delta -196), 29/29 TP retained, 0/73 FP retained, 0
+# newly-attributed rows over all 50,499 (not the shipped LIMIT 5000).
+MAC595_RATIFIED_BASIS_PROMOTIONS: tuple[str, ...] = ("Axon",)
+
+# PROPOSED: empty. It held Axon until MAC-622 applied the MAC-595 sign-off.
+# MAC-577 §3 is NOT withdrawn by that promotion — it still governs every other
+# short-single-token canonical, on THIS tier as well as the alias-only one. A
+# future candidate lands here first, with its measured reason and its
+# exhaustively adjudicated loss cohort, and moving it up is a CEO call plus a
+# line in MAC595_RATIFIED_BASIS_PROMOTIONS' successor.
+PROPOSED_BASIS_DIFFERENTIATED: dict[str, BasisRule] = {}
 
 
 def is_basis_differentiated(canonical: str) -> bool:
