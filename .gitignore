@@ -14,6 +14,15 @@ db/*.db-journal
 db/*.db-wal
 db/*.db-shm
 
+# Root-level sqlite strays. A DB-named file at the repo root is one `git add -A`
+# from becoming a real incident, and the push stack already carries three
+# oversized DB blobs (MAC-641 apply; CEO ratification 1f5d4ded). Root only —
+# does not shadow db/ or exports/, which have their own rules above and below.
+/*.db
+/*.db-journal
+/*.db-wal
+/*.db-shm
+
 # Exports are intentionally tracked when small; large ones via Phase 5 only.
 exports/*.db
 

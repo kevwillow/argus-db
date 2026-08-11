@@ -45,7 +45,19 @@
 BEGIN IMMEDIATE;
 
 -- ============================ PRECONDITIONS =============================
--- CHECK (ok = 1) aborts the whole transaction on any 0.
+-- CORRECTED (MAC-641 apply, CEO ratification 1f5d4ded): the previous text here
+-- read "CHECK (ok = 1) aborts the whole transaction on any 0." That is FALSE and
+-- BIBLE_AMENDMENTS.md:6072 (MAC-535, Finding 2) already says so: the sqlite3 CLI
+-- does not auto-rollback on a CHECK violation without -bail. The violation aborts
+-- the offending STATEMENT, not the script, and the runner walks on to the writes.
+--
+-- What actually gates every write below is the SECOND arm, not this CHECK: each
+-- write carries `AND (SELECT COUNT(*) FROM _mig0052_pre) = 8`. A failed guard
+-- leaves this temp table short of 8 rows, so every write matches zero rows and the
+-- migration degrades to a clean no-op. That arm is apply-method-independent -- it
+-- holds under the bare CLI *and* under conn.executescript(), whereas `.bail on` is
+-- a dot-command that breaks the python path. Do not copy this file's shape without
+-- copying the count=8 arm; the CHECK alone inherits the mig-0041 half-apply defect.
 CREATE TEMP TABLE _mig0052_pre (ok INTEGER CHECK (ok = 1));
 
 -- schema_version is exactly 35 (no DDL migration has landed since)
@@ -54,6 +66,21 @@ INSERT INTO _mig0052_pre(ok) SELECT CASE WHEN
 THEN 1 ELSE 0 END;
 
 -- this migration has not already been applied
+--
+-- VACUOUS BY CONSTRUCTION -- kept only to hold the slot, never to be relied on.
+-- This file is data-only and deliberately does NOT bump schema_version (see the
+-- header and the final post-condition, both of which assert it stays 35). Nothing
+-- in the fleet ever writes the name below, so this COUNT is 0 on a virgin DB and 0
+-- on an already-applied DB alike: the guard cannot fire. It is NOT what makes this
+-- migration re-apply-safe. Verified at apply time: mig-0048 and mig-0049 carry the
+-- same shape and the same vacuity -- schema_version tops out at 35 (= 0045), the
+-- last migration that self-recorded via `INSERT INTO schema_version (version, name)`.
+--
+-- Re-apply is actually caught by the five STATE preconditions below -- the 240-row
+-- count, the 20-name non-existence check, and the three alias-routing byte checks.
+-- Measured on a scratch copy: a second apply fails exactly those 5 of 8 and writes
+-- nothing. Consequence to carry forward (MAC-661): after this applies there is no
+-- DB-side record that 0052 ran; "applied" is provable only from the data state.
 INSERT INTO _mig0052_pre(ok) SELECT CASE WHEN
     (SELECT COUNT(*) FROM schema_version
       WHERE name = '0052_mac641_mac586_tranche1_manufacturer_admission') = 0
