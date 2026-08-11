@@ -44,8 +44,10 @@ Halts on missing backup.
 
 Authority chain
 ---------------
-* BIBLE_AMENDMENTS.md CP12 (commit ``90132fa``) — added ``manufacturer_app``
-  to §8.2 source_type sub-banding without sibling schema migration.
+* BIBLE_AMENDMENTS.md CP12 — added ``manufacturer_app`` to §8.2 source_type
+  sub-banding without sibling schema migration. (Sha cite dropped at MAC-711:
+  ``90132fa`` predates the pre-v1.0.0 history rewrite and no longer resolves;
+  the amendment number is the durable anchor.)
 * BIBLE_AMENDMENTS.md CP13 (this commit) — schema-sibling for CP12 +
   three Wave G structural-fidelity ``identifier_type`` values.
 * Board ratification: MAC-1 [`9d568fa7`] 2026-05-10 HB63 (Path X).
@@ -74,7 +76,13 @@ MIGRATION_PATH = (
 )
 
 VALIDATOR_AGENT_ID = "da137694-2efe-4589-8150-828dcab881fb"
-BIBLE_COMMIT_PRE = "90132fa"  # CP12 HEAD; CP13 lands paired with this migration
+# MAC-711: the `BIBLE_COMMIT_PRE = "90132fa"` constant and its `bible_commit_pre` payload
+# key were dropped here. That sha was minted before the pre-v1.0.0 history rewrite and no
+# longer resolves, so a re-run of this script would have written a fresh dead cite into
+# `extraction_runs.notes`. Its comment recorded "CP12 HEAD; CP13 lands paired with this
+# migration" — that relationship is carried durably and without git by the surviving
+# `amendments_landed` (CP13) / `amendments_referenced` (CP12) keys. See
+# BIBLE_AMENDMENTS.md *Citing a commit in this ledger*.
 BOARD_RATIFICATION_COMMENT_ID = "9d568fa7-edc0-4d68-a7dd-fb40d4cd919e"
 CEO_STEP0_COMMENT_ID = "34c908b8-0a66-4a6f-a3a5-4aa6d2bc5470"
 ISSUE_ID = "MAC-54"
@@ -258,7 +266,6 @@ def _insert_audit_row(
         "deliverable": "MAC-54 — CP12 schema-sibling migration 0009",
         "amendments_landed": ["CP13"],
         "amendments_referenced": ["CP12"],
-        "bible_commit_pre": BIBLE_COMMIT_PRE,
         "board_ratification_comment": BOARD_RATIFICATION_COMMENT_ID,
         "ceo_step0_ratification_comment": CEO_STEP0_COMMENT_ID,
         "migration": MIGRATION_NAME,

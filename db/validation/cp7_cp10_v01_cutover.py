@@ -72,7 +72,11 @@ MIGRATION_PATH = (
 )
 
 VALIDATOR_AGENT_ID = "da137694-2efe-4589-8150-828dcab881fb"
-BIBLE_COMMIT = "0aa89a0"
+# MAC-711: the `BIBLE_COMMIT = "0aa89a0"` constant and its `bible_commit` payload key
+# were dropped here. That sha was minted before the pre-v1.0.0 history rewrite and no
+# longer resolves, so a re-run of this script would have written a fresh dead cite into
+# `extraction_runs.notes`. The durable anchor is `amendments_applied` (CP7 + CP10), which
+# needs no git access at all — see BIBLE_AMENDMENTS.md *Citing a commit in this ledger*.
 BOARD_RATIFICATION_COMMENT_ID = "4f075253-2eae-4ea3-9db5-c67c6f02e012"
 ISSUE_ID = "MAC-48"
 
@@ -353,7 +357,6 @@ def _insert_audit_row(
         "issue": ISSUE_ID,
         "deliverable": "Sub-deliverable A — data-layer prep",
         "amendments_applied": ["CP7", "CP10"],
-        "bible_commit": BIBLE_COMMIT,
         "board_ratification_comment": BOARD_RATIFICATION_COMMENT_ID,
         "migration": "0008_cp7_cp10_v01_cutover",
         "no_op_re_run": no_op,

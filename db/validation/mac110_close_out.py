@@ -73,8 +73,24 @@ DB_PATH = "db/argus.db"
 NOW = datetime.now(timezone.utc).isoformat()
 DISPATCH_CITE = "MAC-110"
 RATIFIED_AT_MAC = "MAC-104"
-RATIFIED_AT_COMMIT = "8de7309"
-RECLASS_ANCHOR = f"{RATIFIED_AT_MAC} CEO ratification comment 3daf49f0 + bible commit {RATIFIED_AT_COMMIT} (CP20 + SAR-13)"
+# MAC-711: the `RATIFIED_AT_COMMIT = "8de7309"` constant was dropped here, along with the
+# `+ bible commit {RATIFIED_AT_COMMIT}` clause of RECLASS_ANCHOR below and all nine payload
+# keys that carried it (`ratified_at_commit` ×8, `bible_commit` ×1). That sha was minted
+# before the pre-v1.0.0 history rewrite and no longer resolves.
+#
+# The RECLASS_ANCHOR clause was the costliest of the ten: it rendered to the bare-prose
+# form `bible <the-word-commit> <the-sha>`, the one shape in this file that the MAC-704
+# gate selector actually matches — so a re-run would have written a cite that reads as
+# live to the gate and resolves to nothing. (Spelled around here on purpose: quoting
+# those bytes verbatim would re-mint the very cite this edit removes, and the gate reads
+# this file. The dropped value is on the constant line above, which the selector cannot
+# see.) The durable anchors all survive:
+# RATIFIED_AT_MAC (MAC-104), the CP20 + SAR-13 amendment numbers, DISPATCH_CITE (MAC-110),
+# and the board comment id. See BIBLE_AMENDMENTS.md *Citing a commit in this ledger*.
+#
+# `3daf49f0` is retained deliberately: it is a Paperclip board comment id, not a git object,
+# so the history rewrite never touched it and the sha-cite rule does not reach it.
+RECLASS_ANCHOR = f"{RATIFIED_AT_MAC} CEO ratification comment 3daf49f0 (CP20 + SAR-13)"
 SWEEP_EVENT_Q5 = "mac110_q5_eaaaea_uplift"
 SWEEP_EVENT_STAGE1 = "mac110_stage1_supersede"
 
@@ -223,7 +239,6 @@ def execute_stage1(cur) -> dict:
             "oui_registry_assignee": "Liteon Technology Corporation",
             "attribution_lens": "product-vendor",
             "ratified_at_mac": RATIFIED_AT_MAC,
-            "ratified_at_commit": RATIFIED_AT_COMMIT,
             "mac110_supersedes_identifier_id": original_mac107_id,
             "supersedes_reason": (
                 "prior-lens MAC-107 promotion at mfr='Liteon Technology Corporation' "
@@ -303,7 +318,6 @@ def execute_stage1(cur) -> dict:
                 "Flock Safety ALPR ecosystem per Wave-A id=1 precedent (CP4 §4.3 + §8.4)."
             ),
             "ratified_at_mac": RATIFIED_AT_MAC,
-            "ratified_at_commit": RATIFIED_AT_COMMIT,
             "mac110_supersedes_identifier_id": original_mac107_id,
             "supersedes_reason": (
                 "prior-lens MAC-107 promotion at mfr=NULL dc='unknown' (§8.4 OUI-level "
@@ -378,7 +392,6 @@ def execute_stage1(cur) -> dict:
             ],
             "last_verified_at_uplift": NOW,
             "ratified_at_mac": RATIFIED_AT_MAC,
-            "ratified_at_commit": RATIFIED_AT_COMMIT,
         }
         cur.execute(
             "UPDATE identifiers SET confidence=?, last_verified=?, notes=? WHERE id=1",
@@ -411,7 +424,6 @@ def execute_stage1(cur) -> dict:
                 json.dumps({
                     "stage": "mac110_stage1_q5_leg1",
                     "dispatch_anchor": DISPATCH_CITE,
-                    "bible_commit": RATIFIED_AT_COMMIT,
                 }, separators=(",", ":")),
             ),
         )
@@ -443,7 +455,6 @@ def execute_stage1(cur) -> dict:
             "corroboration_formula": "§8.3 min(99, max(65)+5) = 70",
             "cross_validation_pending_wigle_anchors": True,
             "ratified_at_mac": RATIFIED_AT_MAC,
-            "ratified_at_commit": RATIFIED_AT_COMMIT,
             "mac110_supersedes_identifier_id": 22770,
             "supersedes_reason": (
                 "prior-lens MAC-107 promotion at mfr=NULL dc='unknown' conf=65; "
@@ -506,7 +517,6 @@ def execute_stage1(cur) -> dict:
             },
             "memory_cite": "feedback_agent_asserted_history_needs_verification.md",
             "ratified_at_mac": RATIFIED_AT_MAC,
-            "ratified_at_commit": RATIFIED_AT_COMMIT,
             "stage": "mac110_stage1_q7",
             "next_action": "standing M&A verification pass — verify Motorola-Vigilant 2019 acquisition timing vs pre-2019 attribution discipline (§8.4 audit-fidelity).",
         }, separators=(",", ":"))
@@ -600,7 +610,6 @@ def stage2_bx_sig_backfill(cur) -> dict:
             "source_excerpt": exc,
             "source_url": url,
             "ratified_at_mac": RATIFIED_AT_MAC,
-            "ratified_at_commit": RATIFIED_AT_COMMIT,
             "sar13_routing": "§S.3 detector-internal class — routed to behavioral_signatures",
         }
         if ctype == "tunable_threshold":
@@ -615,7 +624,6 @@ def stage2_bx_sig_backfill(cur) -> dict:
             "candidate_type": ctype,
             "raw_observation_id": raw_id,
             "ratified_at_mac": RATIFIED_AT_MAC,
-            "ratified_at_commit": RATIFIED_AT_COMMIT,
             "sar13_routing_cite": "SAR-13 §S.3 detector-internal class",
         }
 
@@ -847,7 +855,6 @@ def stage2_mapper_corrected_and_vocab_cleared(cur) -> dict:
             "raw_observation_id": raw_id,
             "wave": "A_deferred_dir",
             "ratified_at_mac": RATIFIED_AT_MAC,
-            "ratified_at_commit": RATIFIED_AT_COMMIT,
             "facts_only_basis": "§11 #16 Feist facts-only promotion (NO_LICENSE_DECLARED / public-but-unlicensed)",
             "src_band_basis": "§8.2 crowdsourced 50–75 cap (≤70 dispatch ratification ceiling); Wave-A precedent floor 65",
             "id_type_normalize": (
