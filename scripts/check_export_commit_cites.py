@@ -9,11 +9,23 @@ different questions:
   check_doc_anchors.py    does a DOC print a number canonical disagrees with.
   this script             does a GENERATED EXPORT cite a commit git cannot resolve.
 
-The defect this exists for: `export_lynceus.py:1859` wrote "(commit `6853780`)" into
-`exports/coverage_report.md`, which is a shipped artifact whose whole job is to document
-provenance. `git cat-file -t 6853780` fails -- the object is not in this repo, most likely
-dropped by the MAC-610 history rewrite. A correctness release shipped a provenance claim
-that did not resolve, and nothing mechanical would have caught it.
+The defect this exists for: `export_lynceus.py:1859` wrote "(commit `6853780`)" -- a dead-cite exemplar --
+into `exports/coverage_report.md`, which is a shipped artifact whose whole job is to document
+provenance. (Quoted to document the defect, never asserted as a cite; the marker is what keeps
+`scripts/check_commit_cites.py` from reading this docstring as a fresh instance of it.) `git cat-file -t 6853780` fails -- the object is not in this repo. A
+correctness release shipped a provenance claim that did not resolve, and nothing
+mechanical would have caught it.
+
+Attribution corrected at MAC-704. This docstring first read "most likely dropped by the
+MAC-610 history rewrite"; that is not what happened, and the correction matters because it
+changes the remedy. `6853780` is absent from the `pre-filter-backup` tag (2026-05-14),
+which IS an ancestor of HEAD -- so the object was already gone three months before MAC-610,
+and MAC-610 cannot have dropped it. The same is true of every other dead cite in the tree:
+they are pre-v1.0.0 shas, and the early-May history they name was rewritten wholesale
+(`db/sources/deflock.py` was introduced by `22b6224` today, not by the `d81de3b` its own
+docstring cited). Blaming a recent rewrite invites "repoint them to the new shas"; the
+measured cause -- a rewrite nobody has a mapping for -- is why the content-hash remedy
+below is the right one and re-pinning is not.
 
 Why a content hash is the preferred remedy, not a fresher commit cite
 ---------------------------------------------------------------------
