@@ -25,16 +25,22 @@ Three kinds of text mention a slot and only one of them reserves it:
 Attributing an ECHO or a NEGATIVE is how a proof artifact poisons the next lane's scan, so both are
 classified out of the claim set (and counted in the report — suppression is never silent).
 
+MAC-684: the tool could express a claim but not a RELEASE, so a slot that a ruling freed kept
+reading `CONTESTED unresolved` forever. See the release-pragma block below `NEGATIVE_RE` for why
+the prose layer is structurally incapable of fixing that, and what the pragma does instead.
+
     python3 scripts/next_migration_slot.py                     # full-range claim report
     python3 scripts/next_migration_slot.py --claim MAC-608     # ... and reconcile one issue
     python3 scripts/next_migration_slot.py --claim MAC-700 --slot 0046   # assert a specific slot
     python3 scripts/next_migration_slot.py --selftest          # positive control, see below
 
-Exit codes:
+Exit codes (a bitmask):
     0  the proposed slot is free and the issue holds nothing else
     1  the named issue ALREADY HOLDS a slot -- use it or release it, do not take a new one
     2  the proposed slot is HELD BY SOMEONE ELSE
-    3  both of the above
+    4  a `slot-release:` pragma did NOT take effect (unmatched, refused or malformed). This bit is
+       OR'd in on a plain report run too, with no `--claim`: a release that failed silently leaves
+       a slot contested that somebody has already been told is free.
 """
 import argparse
 import pathlib
@@ -76,7 +82,12 @@ ECHO_RE = re.compile(
     r"FULL-RANGE claim scan|python3 scripts/next_migration_slot\.py|"
     r"scripts/next_migration_slot\.py --claim|mentions dropped|POSITIVE CONTROL|"
     r"no-collision:|-> do NOT take|-> CONFIRMED:|is NOT free:|"
-    r"gaps below the highest applied file", re.I)
+    r"gaps below the highest applied file|"
+    # MAC-684 release-report signatures. `slot release ledger` is deliberately three words: bare
+    # "release ledger" already appears twice in the corpus meaning CHANGELOG.md, and swallowing
+    # those lines would be a silent scope change. `[release]` prefixes every ledger row so a
+    # pasted ledger cannot mint a PATH-tier claim out of the slot number it is reporting on.
+    r"slot release ledger|slot releases\s*:|\[release\]|slot-release\s*:", re.I)
 # A file may declare itself non-authoritative. A post-hoc analysis that QUOTES a claim -- a
 # ratification, a defect write-up, this issue's own proof -- is not making one, and regexes cannot
 # tell the difference reliably: MAC-674's proof narrated a wrong verdict ("the tool reported
@@ -98,6 +109,47 @@ DECLARATIVE_RE = re.compile(
     r"\b(?:reserv\w*|claim(?:s|ed|ing)?|holds?|held|takes?|taken|owns?|allocat\w*|"
     r"assigned?|moves?\s+to|moved\s+to)\b", re.I)
 
+# --- the release pragma (MAC-684) ---------------------------------------------------------
+# There was a verb for claiming a slot and none for releasing one, so a slot a ruling freed read
+# `CONTESTED unresolved` forever. The prose layer cannot close this and no amount of wording will:
+# `scan_prose()` drops a NEGATIVE line BEFORE it creates evidence, so a negative sentence
+# suppresses its own line and nothing else, and `resolve()` aggregates every `Ev` without ever
+# seeing a retraction. A co-mention on a ratified line therefore outlives any correction that does
+# not edit that line -- and editing it is exactly what the amend ban forbids. Only code closes it.
+#
+#     <!-- slot-scan: ignore -->
+#     <!-- slot-release: 0053 MAC-663 operator_review/MAC-663/CEO_RATIFICATION.md:179 "deliberately skipped" -->
+#
+# A release retracts exactly ONE cited piece of evidence. It can never free a slot by assertion,
+# which is the failure that would be worse than the phantom it fixes:
+#
+#   * It names the slot, the issue whose mention it retracts, the exact `path:line`, AND a verbatim
+#     substring of that line. Writing one requires having READ the claim -- cite-paste, not cite.
+#     A stale line number fails CLOSED: the release goes UNMATCHED, the slot stays contested, and
+#     the ledger says which cite went stale.
+#   * It can never reach APPLIED or DRAFT evidence. A file on disk is released by deleting or
+#     renaming the file, never by prose. This is what stops a release from stealing a live claim:
+#     MAC-608 holds `0050` as a draft file, and no pragma anywhere can move it.
+#   * It retracts one `Ev`. A slot held by three mentions needs three cited releases, each one its
+#     own ledger row. There is no blanket "0053 is free".
+#   * It is honored only from the cited claim's OWN issue directory, so a release lands beside the
+#     claim it retracts and the next reader of that directory cannot miss it.
+#   * It is a HEADER pragma, matched only in FENCE_LINES, for the same reason `slot-scan: ignore`
+#     is: matched anywhere, a document that merely DESCRIBES a release would perform one.
+#   * The release document must ALSO carry `slot-scan: ignore`. A release document is not a claim
+#     document, and auto-fencing it would quietly make `slot-release:` a second way to silence a
+#     file's claims. One fencing verb, declared out loud.
+#
+# Every release appears in the ledger with its disposition -- HONORED, UNMATCHED, REFUSED,
+# MALFORMED -- and a fully released slot keeps its own report line and its own state. Silent
+# absence would read identical to "never mentioned", and no silent caps is the standing rule.
+#
+# A RELEASED slot does NOT re-enter the auto-handout path. It becomes an ordinary gap under the
+# rule this tool already prints: reclaiming a gap is a deliberate, named decision.
+RELEASE_ANY_RE = re.compile(r"slot-release\s*:", re.I)
+RELEASE_RE = re.compile(
+    r"slot-release\s*:\s*(\d{4})\s+(MAC[-_ ]?\d{3,4})\s+(\S+?)(?::(\d+))?\s+\"([^\"]+)\"", re.I)
+
 # Evidence strength. Only STRONG tiers name a holder; WEAK tiers only make a slot contested.
 APPLIED, DRAFT, FILENAME, DECLARATIVE, COMENTION, PATH, UNATTRIBUTED = (
     "APPLIED", "DRAFT", "FILENAME", "DECLARATIVE", "CO-MENTION", "PATH", "UNATTRIBUTED")
@@ -108,12 +160,88 @@ RANK = {APPLIED: 0, DRAFT: 1, FILENAME: 2, DECLARATIVE: 3, COMENTION: 4, PATH: 5
 class Ev:
     """One piece of evidence that a slot is spoken for."""
 
-    def __init__(self, slot, tier, issue, where, text):
+    def __init__(self, slot, tier, issue, where, text, full=None):
         self.slot, self.tier, self.issue, self.where, self.text = slot, tier, issue, where, text
+        # `text` is truncated for display; `full` is what a release anchor is matched against, so
+        # an anchor past column 100 still verifies.
+        self.full = text if full is None else full
+        self.released = None  # set to the Release that retracted this mention
 
     @property
     def strong(self):
         return self.tier in STRONG
+
+
+class Release:
+    """One `slot-release:` header pragma: a targeted retraction of ONE cited claim."""
+
+    def __init__(self, doc, line_no, raw, slot=None, issue=None, path=None, line=None, anchor=None):
+        self.doc, self.line_no, self.raw = doc, line_no, raw
+        self.slot, self.issue, self.path, self.line, self.anchor = slot, issue, path, line, anchor
+        self.where = (f"{path}:{line}" if line else path) if path else None
+        self.disposition, self.detail, self.retracted = "PENDING", "", []
+
+    @property
+    def took_effect(self):
+        return self.disposition == "HONORED"
+
+
+def parse_release(doc, line_no, raw):
+    """A header line mentioning the pragma always yields a Release, even when it does not parse.
+    A pragma that is silently ignored is the one failure mode a release must never have."""
+    m = RELEASE_RE.search(raw)
+    if not m:
+        r = Release(doc, line_no, raw)
+        r.disposition = "MALFORMED"
+        r.detail = ('expected `slot-release: NNNN MAC-NNN path:line "verbatim anchor"` -- got '
+                    f'{raw.strip()[:90]}')
+        return r
+    return Release(doc, line_no, raw, slot=int(m.group(1)), issue=norm(ISSUE_RE.search(
+        m.group(2)).group(1)), path=m.group(3), line=int(m.group(4)) if m.group(4) else None,
+        anchor=m.group(5))
+
+
+def apply_releases(releases, evidence, fenced):
+    """Match every release against the full evidence pool and mark what it retracts.
+
+    Fail-closed at each step: anything short of an exact match retracts nothing and is reported.
+    The order of the checks is the order of the guarantees -- a release is refused for WHERE it
+    was declared before it is ever allowed to look at what it targets, so a cross-lane pragma
+    cannot even probe another lane's evidence by watching the disposition change."""
+    for r in releases:
+        if r.disposition == "MALFORMED":
+            continue
+        if r.doc not in fenced:
+            r.disposition = "REFUSED"
+            r.detail = ("the release document must also carry `slot-scan: ignore` in its header; "
+                        "a release document is not a claim document")
+            continue
+        home = path_issue(r.path) or r.issue
+        if path_issue(r.doc) != home:
+            r.disposition = "REFUSED"
+            r.detail = (f"cross-lane: a mention living in {home}'s document is released from "
+                        f"{home}'s own directory, not from {r.doc}")
+            continue
+        exact = [e for e in evidence
+                 if e.slot == r.slot and e.issue == r.issue and e.where == r.where]
+        onfile = [e for e in exact if e.tier in (APPLIED, DRAFT)]
+        if onfile:
+            r.disposition = "REFUSED"
+            r.detail = (f"[{onfile[0].tier}] {onfile[0].where} is a file on disk -- release it by "
+                        "deleting or renaming the file; prose can never retract it")
+            continue
+        anchored = [e for e in exact if r.anchor in e.full]
+        if not anchored:
+            r.disposition = "UNMATCHED"
+            r.detail = (f"nothing at {r.where} claims {r.slot:04d} for {r.issue}"
+                        if not exact else
+                        f"the cite matches, but the anchor {r.anchor!r} is not a substring of "
+                        "that line -- the line moved or was rewritten")
+            continue
+        for e in anchored:
+            e.released = r
+        r.disposition = "HONORED"
+        r.detail = f"{len(anchored)} mention(s) of {r.slot:04d} retracted at {r.where}"
 
 
 def norm(num):
@@ -187,15 +315,21 @@ def prose_files():
 
 
 def scan_prose():
-    """Layer 3: reservation prose. Returns (evidence, echo_count, negative_count, fenced)."""
-    ev, echoes, negatives, fenced = [], 0, 0, []
+    """Layer 3: reservation prose. Returns (evidence, echoes, negatives, fenced, releases)."""
+    ev, echoes, negatives, fenced, releases = [], 0, 0, [], []
     for f in prose_files():
         try:
             text = f.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
         rel = f.relative_to(ROOT)
-        if FENCE_RE.search("\n".join(text.splitlines()[:FENCE_LINES])):
+        header = text.splitlines()[:FENCE_LINES]
+        # Header pragmas are read from every file, fenced or not: a release document is required
+        # to be fenced, so reading its pragma only after the fence check would never find one.
+        for n, raw in enumerate(header, 1):
+            if RELEASE_ANY_RE.search(raw):
+                releases.append(parse_release(str(rel), n, raw))
+        if FENCE_RE.search("\n".join(header)):
             fenced.append(str(rel))
             continue
         owner = path_issue(rel)
@@ -215,22 +349,27 @@ def scan_prose():
             issues = [norm(m.group(1)) for m in ISSUE_RE.finditer(line)]
             governed = verb_governs(line, loose)
             for slot, issue in bound.items():
-                ev.append(Ev(slot, FILENAME, issue, where, snippet))
+                ev.append(Ev(slot, FILENAME, issue, where, snippet, line))
             for slot in loose:
                 if len(issues) == 1 and slot in governed:
-                    ev.append(Ev(slot, DECLARATIVE, issues[0], where, snippet))
+                    ev.append(Ev(slot, DECLARATIVE, issues[0], where, snippet, line))
                 elif issues:
                     for issue in issues:
-                        ev.append(Ev(slot, COMENTION, issue, where, snippet))
+                        ev.append(Ev(slot, COMENTION, issue, where, snippet, line))
                 elif owner:
-                    ev.append(Ev(slot, PATH, owner, where, snippet))
+                    ev.append(Ev(slot, PATH, owner, where, snippet, line))
                 else:
-                    ev.append(Ev(slot, UNATTRIBUTED, None, where, snippet))
-    return ev, echoes, negatives, fenced
+                    ev.append(Ev(slot, UNATTRIBUTED, None, where, snippet, line))
+    return ev, echoes, negatives, fenced, releases
 
 
 def resolve(ev):
-    """Per slot: the strongest evidence wins the holder. Weak-only evidence -> contested, no holder."""
+    """Per slot: the strongest LIVE evidence wins the holder. Weak-only -> contested, no holder.
+
+    Retracted mentions are kept in `ev` and excluded from `live`, never dropped. A slot whose every
+    mention was retracted resolves to RELEASED and stays in the map -- deleting it would make the
+    slot read identical to one nobody ever mentioned, and would hand it straight back to the
+    auto-handout loop in `report()`, which skips any slot present here."""
     by_slot = {}
     for e in ev:
         by_slot.setdefault(e.slot, []).append(e)
@@ -241,19 +380,25 @@ def resolve(ev):
         items.sort(key=lambda e: (RANK[e.tier],
                                   0 if e.issue and e.issue in e.where else 1,
                                   e.where))
-        strong = [e for e in items if e.strong and e.issue]
+        live = [e for e in items if e.released is None]
+        strong = [e for e in live if e.strong and e.issue]
+        holders = []
         if strong:
             best = RANK[strong[0].tier]
             holders = sorted({e.issue for e in strong if RANK[e.tier] == best})
-            holder = holders[0] if len(holders) == 1 else None
-            disputed = len(holders) > 1
+        holder = holders[0] if len(holders) == 1 else None
+        if any(e.tier == APPLIED for e in live):
+            state = "APPLIED"
+        elif len(holders) > 1:
+            state = "DISPUTED"
+        elif holder:
+            state = "CLAIMED"
+        elif live:
+            state = "CONTESTED"
         else:
-            holder, disputed = None, False
-        applied = any(e.tier == APPLIED for e in items)
-        state = "APPLIED" if applied else ("DISPUTED" if disputed else
-                                           ("CLAIMED" if holder else "CONTESTED"))
-        out[slot] = {"state": state, "holder": holder, "ev": items,
-                     "holders": holders if strong else []}
+            state = "RELEASED"
+        out[slot] = {"state": state, "holder": holder, "ev": items, "live": live,
+                     "holders": holders}
     return out
 
 
@@ -266,13 +411,14 @@ def held_by(slots, issue):
     lane that actually landed the file is not the one credited."""
     strong, weak = [], []
     for slot, info in slots.items():
-        onfile = [e for e in info["ev"] if e.tier in (APPLIED, DRAFT)]
+        live = info["live"]  # a retracted mention is not a hold
+        onfile = [e for e in live if e.tier in (APPLIED, DRAFT)]
         if onfile:
             if any(e.issue == issue for e in onfile):
                 strong.append((slot, next(e for e in onfile if e.issue == issue)))
             continue  # the file names someone else -- prose cannot outvote it
-        s = [e for e in info["ev"] if e.strong and e.issue == issue]
-        w = [e for e in info["ev"] if not e.strong and e.issue == issue]
+        s = [e for e in live if e.strong and e.issue == issue]
+        w = [e for e in live if not e.strong and e.issue == issue]
         if s:
             strong.append((slot, s[0]))
         elif w:
@@ -280,16 +426,48 @@ def held_by(slots, issue):
     return sorted(strong), sorted(weak)
 
 
-def report(slots, echoes, negatives, out_of_range, ceiling, fenced, verbose=False):
+def holder_label(info):
+    if info["state"] == "RELEASED":
+        # Never "unresolved": a released slot is resolved, and resolved to nobody.
+        return "-- retracted, see the slot release ledger"
+    return info["holder"] or ("/".join(info["holders"]) if info["holders"] else "unresolved")
+
+
+def release_ledger(releases):
+    """Every pragma, honored or not, with the cite it targeted. A release that vanished from the
+    report would be indistinguishable from one that was never written."""
+    tally = {k: sum(1 for r in releases if r.disposition == k)
+             for k in ("HONORED", "UNMATCHED", "REFUSED", "MALFORMED")}
+    print(f"slot releases        : {tally['HONORED']} honored, {tally['UNMATCHED']} unmatched, "
+          f"{tally['REFUSED']} refused, {tally['MALFORMED']} malformed")
+    return tally
+
+
+def print_ledger(releases):
+    print("\nslot release ledger (a release retracts ONE cited mention; a file on disk is never "
+          "releasable):")
+    if not releases:
+        print("  [release] (none)")
+        return
+    for r in sorted(releases, key=lambda r: (r.doc, r.line_no)):
+        head = f"{r.slot:04d} {r.issue}" if r.slot else "(unparsed)"
+        print(f"  [release] {r.disposition:<9} {head}  targets {r.where or '-'}")
+        print(f"  [release]           declared at {r.doc}:{r.line_no}")
+        print(f"  [release]           {r.detail}")
+
+
+def report(slots, echoes, negatives, out_of_range, ceiling, fenced, releases, verbose=False):
     applied = sorted(s for s, i in slots.items() if i["state"] == "APPLIED")
     highest_file = max(applied)
     print(f"highest file on disk : {highest_file:04d}")
     print(f"naive next (WRONG)   : {highest_file + 1:04d}   <- what `ls db/migrations/` tells you")
     print(f"mentions dropped     : {echoes} echo, {negatives} negative, "
           f"{out_of_range} above the {ceiling:04d} ceiling (not reservations)")
+    tally = release_ledger(releases)
     if fenced:
         print(f"fenced files         : {len(fenced)} self-declared non-authoritative "
               f"(slot-scan: ignore) -- {', '.join(fenced)}")
+    print_ledger(releases)
     print()
 
     print(f"FULL-RANGE claim scan 0001..{ceiling:04d} "
@@ -297,11 +475,11 @@ def report(slots, echoes, negatives, out_of_range, ceiling, fenced, verbose=Fals
     for slot, info in sorted(slots.items()):
         if info["state"] == "APPLIED" and not verbose:
             continue
-        holder = info["holder"] or ("/".join(info["holders"]) if info["holders"] else "unresolved")
-        print(f"  {slot:04d}  {info['state']:<9} {holder}")
+        print(f"  {slot:04d}  {info['state']:<9} {holder_label(info)}")
         shown = info["ev"] if verbose else [e for e in info["ev"][:3]]
         for e in shown:
-            print(f"          [{e.tier}] {e.where}")
+            tag = f"  [release] RETRACTED by {e.released.doc}" if e.released else ""
+            print(f"          [{e.tier}] {e.where}{tag}")
             print(f"          {e.text}")
         if not verbose and len(info["ev"]) > len(shown):
             print(f"          ... {len(info['ev']) - len(shown)} more (--verbose)")
@@ -312,15 +490,38 @@ def report(slots, echoes, negatives, out_of_range, ceiling, fenced, verbose=Fals
         print("  (none)")
     for s in gaps:
         info = slots.get(s)
-        who = (info["holder"] or "unresolved") if info else "-"
+        who = holder_label(info) if info else "-"
         print(f"  {s:04d}  {info['state'] if info else 'NO EVIDENCE'}  {who}")
     print("  a gap is NOT auto-reused -- reclaiming one is a deliberate, named decision")
+    print("  a RELEASED slot is a gap like any other: freed, never auto-handed-out")
 
     free = highest_file + 1
     while free in slots:
         free += 1
     print(f"\nnext free slot       : {free:04d}")
-    return free
+    return free, tally
+
+
+class Scan:
+    """One full read of the repo. Named so the selftest can build a second one with releases
+    switched off and compare -- a release fixture that cannot be poisoned proves nothing."""
+
+    def __init__(self, lookahead=LOOKAHEAD, honor_releases=True):
+        files = scan_files()
+        ev, self.echoes, self.negatives, self.fenced, self.releases = scan_prose()
+        self.pool = files + ev
+        if honor_releases:
+            apply_releases(self.releases, self.pool, set(self.fenced))
+        self.ceiling = max(e.slot for e in files if e.tier == APPLIED) + lookahead
+        in_range = [e for e in self.pool if 1 <= e.slot <= self.ceiling]
+        self.out_of_range = len(self.pool) - len(in_range)
+        self.slots = resolve(in_range)
+
+    def free(self):
+        f = max(s for s, i in self.slots.items() if i["state"] == "APPLIED") + 1
+        while f in self.slots:
+            f += 1
+        return f
 
 
 def main():
@@ -338,19 +539,17 @@ def main():
         print("no migrations found -- check the path", file=sys.stderr)
         return 1
 
-    files = scan_files()
-    ev, echoes, negatives, fenced = scan_prose()
-    ceiling = max(e.slot for e in files if e.tier == APPLIED) + args.lookahead
-    in_range = [e for e in files + ev if 1 <= e.slot <= ceiling]
-    out_of_range = len(files) + len(ev) - len(in_range)
-    slots = resolve(in_range)
-
     if args.selftest:
-        return selftest(slots)
+        return selftest(args.lookahead)
 
-    free = report(slots, echoes, negatives, out_of_range, ceiling, fenced, args.verbose)
+    scan = Scan(args.lookahead)
+    slots = scan.slots
+    free, tally = report(slots, scan.echoes, scan.negatives, scan.out_of_range, scan.ceiling,
+                         scan.fenced, scan.releases, args.verbose)
 
-    rc = 0
+    # A release that failed is louder than a release that worked: somebody is acting on a slot the
+    # scanner still holds contested, or on a retraction that never happened.
+    rc = 4 if sum(tally.values()) - tally["HONORED"] else 0
     if args.claim:
         claim = norm(ISSUE_RE.search(args.claim).group(1)) if ISSUE_RE.search(args.claim) \
             else args.claim.upper()
@@ -367,8 +566,9 @@ def main():
                 print(f"  -> CONFIRMED: {want:04d} is yours. Non-zero exit means a hold exists, "
                       f"not that the slot is contested.")
             else:
-                print(f"  -> do NOT take {want:04d}. Use the slot you hold, or release it in the "
-                      f"document above first.")
+                print(f"  -> do NOT take {want:04d}. Use the slot you hold, or release it with a "
+                      f"`slot-release:` header pragma under that issue's own directory (grammar "
+                      f"and rules: the release block in this script's source).")
             rc |= 1
         elif weak:
             for slot, e in weak:
@@ -403,29 +603,115 @@ def main():
 # update the pair here and say so in the commit -- do not delete the control.
 INCIDENT = [("MAC-574", 46), ("MAC-598", 47), ("MAC-608", 50)]
 
+# MAC-683/MAC-684 release fixture, pinned to the live ruling, not to a synthetic file. `0053` was
+# skipped by MAC-663 §8 on a line the amend ban keeps verbatim, the CEO released it at `197e0e9`,
+# and the scanner went on printing `0053 CONTESTED unresolved` because there was no release verb.
+RELEASE_FIXTURE = {"slot": 53, "issue": "MAC-663", "keeps": 54,
+                   "doc": "operator_review/MAC-663/SLOT_RELEASE.md",
+                   "cite": "operator_review/MAC-663/CEO_RATIFICATION.md:179"}
+# The theft control. MAC-608 holds 0050 as a DRAFT FILE, so no pragma may move it. Anchored to the
+# draft's own filename so the control stays live if the draft is renamed under the same slot.
+THEFT = {"slot": 50, "issue": "MAC-608",
+         "cite": "db/migrations/_drafts/0050_mac608_watchguard_alias_entity_conflation.sql.draft",
+         "anchor": "0050_mac608"}
 
-def selftest(slots):
-    print("POSITIVE CONTROL -- MAC-674 live collision incident (2026-08-11)")
+
+def check(fails, name, ok, detail=""):
+    print(f"  {'PASS' if ok else 'FAIL'}  {name}{('  ' + detail) if detail else ''}")
+    if not ok:
+        fails.append(name)
+    return ok
+
+
+def synthetic(scan, doc, slot, issue, cite, anchor, fenced=True):
+    """Run one hand-built pragma through the real matcher against a fresh scan. The controls below
+    must exercise `apply_releases`, not a paraphrase of it, or they certify nothing."""
+    line = cite.rsplit(":", 1)
+    path, num = (line[0], line[1]) if len(line) == 2 and line[1].isdigit() else (cite, None)
+    r = Release(doc, 1, "<synthetic>", slot=slot, issue=issue, path=path,
+                line=int(num) if num else None, anchor=anchor)
+    apply_releases([r], scan.pool, set(scan.fenced) | ({doc} if fenced else set()))
+    return r
+
+
+def selftest(lookahead=LOOKAHEAD):
     fails = []
+    live, unreleased = Scan(lookahead), Scan(lookahead, honor_releases=False)
+    slots = live.slots
+
+    print("POSITIVE CONTROL A -- MAC-674 live collision incident (2026-08-11)")
     for issue, want in INCIDENT:
-        strong, weak = held_by(slots, issue)
+        strong, _ = held_by(slots, issue)
         got = [s for s, _ in strong]
-        ok = want in got
         src = next((e.where for s, e in strong if s == want), "-")
-        print(f"  {issue} -> expect {want:04d}  got {[f'{s:04d}' for s in got] or 'NONE'}  "
-              f"{'PASS' if ok else 'FAIL'}  {src}")
-        if not ok:
-            fails.append(f"{issue} does not hold {want:04d}")
+        check(fails, f"{issue} holds {want:04d}", want in got,
+              f"got {[f'{s:04d}' for s in got] or 'NONE'}  {src}")
     # The incident was not just a miss: all three were handed the SAME slot.
-    applied = sorted(s for s, i in slots.items() if i["state"] == "APPLIED")
-    free = max(applied) + 1
-    while free in slots:
-        free += 1
     collided = [i for i, _ in INCIDENT if not held_by(slots, i)[0]]
-    print(f"  no-collision: {free:04d} handed to {len(collided)} of {len(INCIDENT)} incident "
-          f"issues  {'PASS' if not collided else 'FAIL'}")
-    if collided:
-        fails.append(f"{free:04d} still handed to {collided}")
+    check(fails, f"no-collision: {live.free():04d} handed to 0 of {len(INCIDENT)} incident issues",
+          not collided, f"collided={collided}")
+
+    f = RELEASE_FIXTURE
+    slot, issue, keeps = f["slot"], f["issue"], f["keeps"]
+    print(f"\nPOSITIVE CONTROL B -- MAC-683 slot release ({slot:04d} freed by ruling, 2026-08-11)")
+    info = slots.get(slot)
+    check(fails, f"{slot:04d} resolves RELEASED", bool(info) and info["state"] == "RELEASED",
+          f"got {info['state'] if info else 'ABSENT'}")
+    check(fails, f"{slot:04d} names no holder", bool(info) and not info["holder"],
+          f"got {info['holder'] if info else '-'}")
+    check(fails, f"{issue} holds neither strongly nor weakly at {slot:04d}",
+          slot not in [s for s, _ in held_by(slots, issue)[0] + held_by(slots, issue)[1]])
+    # The ask was explicit: freed, NOT auto-reused. Both halves, or the fix overshoots.
+    check(fails, f"{slot:04d} is not auto-handed-out", live.free() != slot,
+          f"next free slot = {live.free():04d}")
+    check(fails, f"{slot:04d} still listed (a freed gap is reported, not erased)", slot in slots)
+    kinfo = slots.get(keeps)
+    check(fails, f"{keeps:04d} still resolves to {issue} (same line, other slot untouched)",
+          bool(kinfo) and kinfo["holder"] == issue, f"got {kinfo['holder'] if kinfo else '-'}")
+    check(fails, "the release itself is HONORED in the ledger",
+          any(r.took_effect and r.slot == slot and r.doc == f["doc"] for r in live.releases))
+
+    print("\nNON-VACUITY -- remove the release and the phantom must come back")
+    uinfo = unreleased.slots.get(slot)
+    check(fails, f"unreleased: {slot:04d} reads CONTESTED", bool(uinfo) and
+          uinfo["state"] == "CONTESTED", f"got {uinfo['state'] if uinfo else 'ABSENT'}")
+    check(fails, f"unreleased: {issue} weakly holds {slot:04d}",
+          slot in [s for s, _ in held_by(unreleased.slots, issue)[1]])
+
+    print("\nTHEFT CONTROLS -- a release must not be able to void a live claim")
+    t = synthetic(live, f"operator_review/{THEFT['issue']}/x.md", THEFT["slot"], THEFT["issue"],
+                  THEFT["cite"], THEFT["anchor"])
+    check(fails, f"a pragma targeting {THEFT['issue']}'s DRAFT FILE {THEFT['slot']:04d} is REFUSED",
+          t.disposition == "REFUSED", f"got {t.disposition}: {t.detail}")
+    check(fails, f"{THEFT['slot']:04d} still held by {THEFT['issue']} after the attempt",
+          Scan(lookahead).slots[THEFT["slot"]]["holder"] == THEFT["issue"])
+    bad = synthetic(Scan(lookahead), f["doc"], slot, issue, f["cite"], "no such bytes on that line")
+    check(fails, "a wrong anchor is UNMATCHED (the cite-paste is load-bearing)",
+          bad.disposition == "UNMATCHED", f"got {bad.disposition}: {bad.detail}")
+    far = synthetic(Scan(lookahead), "operator_review/MAC-999/steal.md", slot, issue, f["cite"],
+                    "deliberately skipped")
+    check(fails, "the same release from a foreign directory is REFUSED cross-lane",
+          far.disposition == "REFUSED", f"got {far.disposition}: {far.detail}")
+    # A doc in the right directory but NOT carrying `slot-scan: ignore`. Reusing f["doc"] would be
+    # vacuous: that file really is fenced on disk, so the flag could not switch anything off.
+    unf = synthetic(Scan(lookahead), "operator_review/MAC-663/unfenced_release.md", slot, issue,
+                    f["cite"], "deliberately skipped", fenced=False)
+    check(fails, "an unfenced release document is REFUSED (one fencing verb, declared out loud)",
+          unf.disposition == "REFUSED", f"got {unf.disposition}: {unf.detail}")
+
+    print("\nREADER CONTROLS -- a pragma the reader must never act on")
+    junk = parse_release(f["doc"], 1, "<!-- slot-release: 0053 is free now -->")
+    apply_releases([junk], live.pool, set(live.fenced))
+    check(fails, "a pragma that does not parse is MALFORMED and retracts nothing",
+          junk.disposition == "MALFORMED" and not junk.retracted, f"got {junk.disposition}")
+    # SLOT_RELEASE.md carries a second, byte-identical copy of its own pragma in its BODY. If the
+    # header rule ever broke, this count goes to 2 -- the MAC-674 quoting-vs-asserting bug, one
+    # level up: a document that merely SHOWS a release would perform one.
+    own = [r for r in live.releases if r.doc == f["doc"]]
+    check(fails, "the body copy of the pragma is invisible (a release is a HEADER pragma)",
+          len(own) == 1 and own[0].line_no <= FENCE_LINES,
+          f"got {len(own)} at lines {[r.line_no for r in own]}")
+
     print("PASS" if not fails else "FAIL: " + "; ".join(fails))
     return 0 if not fails else 1
 
