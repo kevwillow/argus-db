@@ -169,6 +169,17 @@ FILED_EXCLUSIONS = ("operator_review/MAC-541",)
 # carve-out for an oversight. Guard arm D fails if any prefix here matches nothing,
 # because a carve-out that narrows nothing still reads as though it narrowed something.
 #
+# NOT listed, deliberately: `exports/`. It carried a carve-out until MAC-716, held for
+# exactly one defect — the dead `6853780` commit cite at `exports/coverage_report.md:34`.
+# MAC-703 repaired that at the producer rather than at the gate: `export_lynceus.py:2099`
+# re-derives `matrix_sha256` from the same bytes it embeds, on every write. A commit cite
+# needed an external gate because the object graph moves underneath it; a content hash
+# re-derived at write time from the embedded bytes has no external object whose lifetime
+# it can outlive, so the export surface is owed no carve-out. Retiring the carve-out
+# widens coverage rather than narrowing it: `exports/` re-enters the repair scope, so a
+# writer change that reintroduces a dead commit cite into a generated artifact is caught
+# by arms A/B instead of suppressed.
+#
 # NOT listed, deliberately: `db/validation/export_lynceus.py`. The MAC-45 provenance
 # lane holds it dirty and its line 1596 discusses `6853780`, but it writes the sha
 # double-backticked (``6853780``) so the selector never matches it. Adding a carve-out
@@ -177,7 +188,6 @@ FILED_EXCLUSIONS = ("operator_review/MAC-541",)
 REPAIR_EXCLUSIONS = {
     "docs/internal/": "append-only heartbeat log; ratified verbatim prose is not edited in place",
     "operator_review/": "ratified operator artifacts; verbatim prose is not edited in place",
-    "exports/": "generated artifact; owned by check_export_commit_cites.py (MAC-703), not hand-edited",
 }
 
 
