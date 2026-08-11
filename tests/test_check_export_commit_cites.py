@@ -33,7 +33,7 @@ Argument defended in this file (in five parts):
       before reaching its scan (repaired at MAC-612, ``e3a5d1a``).
 
   T5  the shipped fix:  ``export_lynceus.py`` no longer contains the literal
-      ``commit `6853780``` and the coverage-report builder takes a
+      ``commit `6853780``` and the coverage-report builder takes a  (dead-cite exemplar)
       ``matrix_sha256`` content hash instead.
 
 Fixtures build their corpus in ``tmp_path`` so the test never depends on
@@ -79,7 +79,7 @@ def _run_gate(*args):
 
 def test_t1_matches_the_cite_form():
     found = gate_mod.COMMIT_CITE_RE.findall(
-        "the matrix at `x/y.md` (commit `6853780`). It is embedded verbatim."
+        "the matrix at `x/y.md` (commit `6853780`). It is embedded verbatim."  # dead-cite exemplar
     )
     assert found == ["6853780"]
 
@@ -144,7 +144,7 @@ def test_t2_blob_sha_is_not_accepted_as_a_commit():
 
 def test_t3_dead_cite_exits_one(tmp_path):
     art = tmp_path / "coverage_report.md"
-    art.write_text("matrix at `x.md` (commit `6853780`).\n", encoding="utf-8")
+    art.write_text("matrix at `x.md` (commit `6853780`).\n", encoding="utf-8")  # dead-cite exemplar
     rc, out = _run_gate(str(art))
     assert rc == gate_mod.EXIT_FAIL
     assert "DOES NOT RESOLVE" in out
@@ -205,7 +205,7 @@ def test_t4_positive_control_cannot_be_stranded_before_the_scan():
 
 def test_t5_exporter_no_longer_carries_the_dead_commit_cite():
     src = (REPO / "db" / "validation" / "export_lynceus.py").read_text(encoding="utf-8")
-    assert "commit `6853780`" not in src
+    assert "commit `6853780`" not in src  # dead-cite exemplar
 
 
 def test_t5_coverage_report_builder_takes_a_content_hash():
