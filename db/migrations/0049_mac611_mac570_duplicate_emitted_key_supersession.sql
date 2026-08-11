@@ -15,7 +15,7 @@
 --            This file originally took 0048: at the time it was written that
 --            slot was genuinely free, and MAC-537's claim landed in a CONCURRENT
 --            commit minutes later. Re-queried at commit time and moved to 0049.
---            A slot verified at write time is not a slot verified at write time.
+--            A slot verified at write time is not a slot verified at COMMIT time.
 -- schema_version: NOT bumped (data-only supersession + one category
 --            correction; no DDL). Stays at 35 (row 35 = 0045_mac580).
 --
@@ -139,11 +139,76 @@
 --        pre-guard requires EXACTLY 20 active targets — a second run finds 0
 --        and CHECK(ok=1) fails, rolling the whole transaction back with zero
 --        mutation.
+--        CORRECTION (MAC-661, 2026-08-11): until this commit that sentence was
+--        FALSE, and so was the "(all-or-nothing)" label on the pre-condition
+--        guard below. `CHECK(ok=1)` aborts only the offending INSERT — not the
+--        transaction and not the script — and `sqlite3 db < file` does not stop
+--        on error. The guard printed to stderr and every UPDATE below then
+--        committed anyway. The claim is true only because of the `.bail on` and
+--        the per-write gate added below; it was never true of the idiom alone.
+--        Left in place rather than deleted so the retraction is not orphaned.
 -- ============================================================================
+
+-- `.bail on` IS LOAD-BEARING, NOT COSMETIC — MAC-661.
+--
+-- `sqlite3 db < file` does not stop on error by default, and the assertion
+-- idiom used below (`CREATE TEMP TABLE t(ok INTEGER CHECK (ok = 1))` +
+-- `INSERT ... SELECT CASE`) raises a CHECK-constraint failure that aborts ONLY
+-- the offending INSERT. Without this line a FAILED PRECONDITION prints one line
+-- to stderr and then the 13 UPDATEs below run and COMMIT — which is strictly
+-- worse than having no precondition at all, because the artifact reads as
+-- protected. Not theoretical: MAC-642 hit the identical exposure in its own
+-- draft and reproduced it empirically (`operator_review/MAC-642/PROOF.md` §6.2),
+-- and this file's own fail-closed behaviour is proven in
+-- `operator_review/MAC-661/PROOF.md` — cell D applies this migration IN FULL on
+-- top of a deliberately failed PRE-2 with this line removed.
+--
+-- `.bail on` is a sqlite3 CLI dot-command and binds the CLI apply path only. It
+-- is a no-op under any client that does not parse dot-commands, which is why
+-- every UPDATE below ALSO carries `(SELECT COUNT(*) FROM _mig0049_pre) = 1` as
+-- a second, SQL-level arm. A failed pre-guard leaves that temp table empty, so
+-- the writes match zero rows even where this line is ignored or stripped. The
+-- two arms are proven independently in the PROOF (cells C and C2).
+.bail on
 
 BEGIN TRANSACTION;
 
+-- ---- apply-time baseline capture -------------------------------------------
+-- Captured BEFORE any UPDATE so post-conditions (6) and (8) can assert a DELTA
+-- against this run's own starting state instead of a number pinned from the
+-- snapshot the file was authored against.
+--
+-- Why this exists (CEO finding, 2026-07-30): (8) originally read
+-- `COUNT(*) WHERE superseded_by IS NULL = 43104`, i.e. 43124 - 20 measured at
+-- write time. MAC-537's ingest then landed, canonical moved to 43160 active,
+-- and the CHECK failed — the migration aborted inside its own transaction with
+-- zero collateral. It failed safe, but it failed. An absolute total is a
+-- correctness claim about every OTHER writer's behaviour, which this migration
+-- has no business asserting; the only thing it should promise is its own delta.
+--
+-- Neither number below is load-bearing any more. Recorded for provenance only:
+--   at write time      43124 active -> 43104 expected
+--   at 2026-07-30      43160 active -> 43140 expected
+CREATE TEMP TABLE _mig0049_baseline AS
+  SELECT (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL) AS active_before;
+
+-- Per-row confidence baseline over the full 32-row scope. Post-condition (6)
+-- promises the exact (id, confidence) MULTISET is unchanged; asserting that
+-- needs the per-row values, not an aggregate. See (6) for why the previous
+-- `SUM(confidence) = 2550` did not implement the promise it was written under.
+CREATE TEMP TABLE _mig0049_conf_before AS
+  SELECT id, confidence FROM identifiers
+   WHERE id IN (565,35666,23043,36588,36591,36597,36600,36603,36609,
+                36612,36615,438,22837,457,22840,447,22834,421,22833,
+                431,22832,439,22838,416,22831,22836,440,22839,22771,
+                22908,22772,22909);
+
 -- ---- strict pre-condition guard (all-or-nothing) ---------------------------
+-- "all-or-nothing" is a claim about the ENFORCEMENT MECHANISM, not about this
+-- CASE expression. What makes it true is `.bail on` above plus the
+-- `(SELECT COUNT(*) FROM _mig0049_pre) = 1` gate carried by each of the 13
+-- UPDATEs. On its own, a failing CHECK here aborts this INSERT and nothing
+-- else. See the MAC-661 correction in the header.
 -- (1) exactly 20 active target rows,
 -- (2) exactly 12 active keeper rows,
 -- (3) both Lane C rows still carry the contradicted 'alpr' category,
@@ -188,7 +253,8 @@ UPDATE identifiers SET superseded_by = 438,
     'keeper_cite','https://standards-oui.ieee.org/oui/oui.csv',
     'keeper_cite_paste','MA-L,00121C,PARROT SA,174 Quai de Jemmapes Paris  FR 75010 ',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22837 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22837 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 UPDATE identifiers SET superseded_by = 457,
   notes = json_set(notes, '$.mac611_supersession', json_object(
@@ -202,7 +268,8 @@ UPDATE identifiers SET superseded_by = 457,
     'keeper_cite','https://standards-oui.ieee.org/oui/oui.csv',
     'keeper_cite_paste','MA-L,00267E,PARROT SA,174 Quai de Jemmapes Paris  FR 75010 ',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22840 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22840 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 UPDATE identifiers SET superseded_by = 447,
   notes = json_set(notes, '$.mac611_supersession', json_object(
@@ -216,7 +283,8 @@ UPDATE identifiers SET superseded_by = 447,
     'keeper_cite','https://standards-oui.ieee.org/oui/oui.csv',
     'keeper_cite_paste','MA-L,34D262,"SZ DJI TECHNOLOGY CO.,LTD","DJI Sky City, No55 Xianyuan Road, Nanshan District Shenzhen Guangdong CN 518057 "',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22834 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22834 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 UPDATE identifiers SET superseded_by = 421,
   notes = json_set(notes, '$.mac611_supersession', json_object(
@@ -230,7 +298,8 @@ UPDATE identifiers SET superseded_by = 421,
     'keeper_cite','https://standards-oui.ieee.org/oui/oui.csv',
     'keeper_cite_paste','MA-L,481CB9,"SZ DJI TECHNOLOGY CO.,LTD","DJI Sky City, No55 Xianyuan Road, Nanshan District Shenzhen Guangdong CN 518057 "',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22833 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22833 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 UPDATE identifiers SET superseded_by = 431,
   notes = json_set(notes, '$.mac611_supersession', json_object(
@@ -244,7 +313,8 @@ UPDATE identifiers SET superseded_by = 431,
     'keeper_cite','https://standards-oui.ieee.org/oui/oui.csv',
     'keeper_cite_paste','MA-L,60601F,"SZ DJI TECHNOLOGY CO.,LTD","DJI Sky City, No55 Xianyuan Road, Nanshan District Shenzhen Guangdong CN 518057 "',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22832 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22832 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 UPDATE identifiers SET superseded_by = 439,
   notes = json_set(notes, '$.mac611_supersession', json_object(
@@ -258,7 +328,8 @@ UPDATE identifiers SET superseded_by = 439,
     'keeper_cite','https://standards-oui.ieee.org/oui/oui.csv',
     'keeper_cite_paste','MA-L,9003B7,PARROT SA,174 Quai de Jemmapes Paris  FR 75010 ',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22838 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22838 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 -- 90:3a:e6 is the only 3-row group in Lane A. Both losers fold to 416. The
 -- ASD-STAN-reserved (22831) vs Parrot-negative-fixture (22836) disagreement is
@@ -277,7 +348,8 @@ UPDATE identifiers SET superseded_by = 416,
     'keeper_cite_paste','MA-L,903AE6,PARROT SA,174 Quai de Jemmapes Paris  FR 75010 ',
     'group_disposition','3-row group: 22831 and 22836 both fold to 416',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22831 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22831 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 UPDATE identifiers SET superseded_by = 416,
   notes = json_set(notes, '$.mac611_supersession', json_object(
@@ -292,7 +364,8 @@ UPDATE identifiers SET superseded_by = 416,
     'keeper_cite_paste','MA-L,903AE6,PARROT SA,174 Quai de Jemmapes Paris  FR 75010 ',
     'group_disposition','3-row group: 22831 and 22836 both fold to 416',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22836 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22836 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 UPDATE identifiers SET superseded_by = 440,
   notes = json_set(notes, '$.mac611_supersession', json_object(
@@ -306,7 +379,8 @@ UPDATE identifiers SET superseded_by = 440,
     'keeper_cite','https://standards-oui.ieee.org/oui/oui.csv',
     'keeper_cite_paste','MA-L,A0143D,PARROT SA,174 Quai de Jemmapes Paris  FR 75010 ',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 22839 AND identifier_type = 'oui' AND superseded_by IS NULL;
+WHERE id = 22839 AND identifier_type = 'oui' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 -- ==== Lane B — DEDUP_MISS (9 rows -> 2 keepers) ==============================
 
@@ -321,7 +395,8 @@ UPDATE identifiers SET superseded_by = 35666,
     'reason','Identical normalized identifier, identifier_type, manufacturer and device_category to the surviving row 35666. §8.3 selects the higher-confidence row (35666, conf 85) as canonical. Source independence was NOT adjudicated in the MAC-570 triage, so §11 #8 proposes no confidence uplift.',
     'keeper_cite','https://github.com/colonelpanichacks/flock-you/blob/64f9b9e7cf116b6c40af8d4def85e4eebc1f28f8/datasets/FS+Ext+Battery_20240530_105846.csv#L2',
     'confidence_uplift','none','date','2026-07-29'))
-WHERE id = 565 AND identifier_type = 'ble_local_name' AND superseded_by IS NULL;
+WHERE id = 565 AND identifier_type = 'ble_local_name' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 -- Eight repeated observations of the SAME Hikvision HcpBluetoothServer code
 -- path. Repetition of one code path is not an independent-source basis, so
@@ -341,7 +416,8 @@ UPDATE identifiers SET superseded_by = 23043,
     'group_disposition','9-row group: 36588,36591,36597,36600,36603,36609,36612,36615 all fold to 23043',
     'confidence_uplift','none','date','2026-07-29'))
 WHERE id IN (36588,36591,36597,36600,36603,36609,36612,36615)
-  AND identifier_type = 'ble_service_uuid' AND superseded_by IS NULL;
+  AND identifier_type = 'ble_service_uuid' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 -- ==== Lane C — CATEGORY_CONTRADICTION (2 rows) ==============================
 -- NO notes write: both rows carry a CP39 text suffix after their JSON object,
@@ -351,11 +427,13 @@ WHERE id IN (36588,36591,36597,36600,36603,36609,36612,36615)
 
 UPDATE identifiers SET superseded_by = 22771, device_category = 'gunshot_detect'
 WHERE id = 22908 AND identifier_type = 'ssid_exact' AND identifier = 'Flock'
-  AND device_category = 'alpr' AND superseded_by IS NULL;
+  AND device_category = 'alpr' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 UPDATE identifiers SET superseded_by = 22772, device_category = 'gunshot_detect'
 WHERE id = 22909 AND identifier_type = 'ssid_exact' AND identifier = 'Flock-230503'
-  AND device_category = 'alpr' AND superseded_by IS NULL;
+  AND device_category = 'alpr' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0049_pre) = 1;
 
 -- ---- strict post-condition guard -------------------------------------------
 -- These predicates are deliberately NOT a restatement of the UPDATEs above. A
@@ -374,11 +452,20 @@ WHERE id = 22909 AND identifier_type = 'ssid_exact' AND identifier = 'Flock-2305
 --       scope have superseded_by = id.
 --   (5) Both Lane C rows now read gunshot_detect.
 --   (6) CONFIDENCE UNTOUCHED across the whole 32-row scope — the exact
---       multiset of (id, confidence) is unchanged from pre-apply.
+--       multiset of (id, confidence) is unchanged from pre-apply, asserted as a
+--       symmetric EXCEPT against the `_mig0049_conf_before` baseline plus a
+--       cardinality pin. This previously read `SUM(confidence) = 2550`, which
+--       did NOT implement the promise directly above it: a sum cannot see
+--       compensating edits (-5 on one row, +5 on another nets to zero), and the
+--       pinned total went stale the moment any in-scope confidence changed. The
+--       comment asserted a multiset; the code checked an aggregate.
 --   (7) notes stayed valid JSON on all 18 rows that were json_set, and the two
 --       Lane C rows were left byte-untouched (still invalid JSON, i.e. not
 --       silently rewritten).
---   (8) No collateral: the total active-row count fell by exactly 20.
+--   (8) No collateral: the total active-row count fell by exactly 20, asserted
+--       as `active_before - 20` against the `_mig0049_baseline` captured in this
+--       same transaction. NOT a pinned absolute — see the baseline block for the
+--       CEO finding that killed the pinned form.
 CREATE TEMP TABLE _mig0049_post (ok INTEGER CHECK (ok = 1));
 INSERT INTO _mig0049_post(ok) SELECT CASE WHEN (
       (SELECT COUNT(*) FROM (
@@ -415,16 +502,31 @@ INSERT INTO _mig0049_post(ok) SELECT CASE WHEN (
           AND json_extract(notes, '$.mac611_supersession.successor_id') IS NOT NULL) = 18
   AND (SELECT COUNT(*) FROM identifiers
         WHERE id IN (22908,22909) AND json_valid(notes) = 0) = 2
-  AND (SELECT SUM(confidence) FROM identifiers
-        WHERE id IN (565,35666,23043,36588,36591,36597,36600,36603,36609,
-                     36612,36615,438,22837,457,22840,447,22834,421,22833,
-                     431,22832,439,22838,416,22831,22836,440,22839,22771,
-                     22908,22772,22909)) = 2550
-  AND (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL) = 43104
+  AND (SELECT COUNT(*) FROM (
+          SELECT id, confidence FROM _mig0049_conf_before
+          EXCEPT
+          SELECT id, confidence FROM identifiers
+           WHERE id IN (565,35666,23043,36588,36591,36597,36600,36603,36609,
+                        36612,36615,438,22837,457,22840,447,22834,421,22833,
+                        431,22832,439,22838,416,22831,22836,440,22839,22771,
+                        22908,22772,22909))) = 0
+  AND (SELECT COUNT(*) FROM (
+          SELECT id, confidence FROM identifiers
+           WHERE id IN (565,35666,23043,36588,36591,36597,36600,36603,36609,
+                        36612,36615,438,22837,457,22840,447,22834,421,22833,
+                        431,22832,439,22838,416,22831,22836,440,22839,22771,
+                        22908,22772,22909)
+          EXCEPT
+          SELECT id, confidence FROM _mig0049_conf_before)) = 0
+  AND (SELECT COUNT(*) FROM _mig0049_conf_before) = 32
+  AND (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL)
+      = (SELECT active_before FROM _mig0049_baseline) - 20
 ) THEN 1 ELSE 0 END;
 
 DROP TABLE _mig0049_pre;
 DROP TABLE _mig0049_post;
+DROP TABLE _mig0049_baseline;
+DROP TABLE _mig0049_conf_before;
 
 COMMIT;
 
