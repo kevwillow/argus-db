@@ -7,28 +7,33 @@ exists. This script is the producing selector for that measurement, per
 ``operator_review/BRIEF_STANDARDS.md`` R9 — the number is not quotable unless the
 script that emits it is committed and carries a structural guard.
 
-Three classifications, and the distinction between the last two is the whole point:
+Four classifications, and the distinctions past the first two are the whole point:
 
-``live``     the token resolves to a ``commit`` object in this repository.
-``dead``     the token does not resolve, and the citing line claims it is an
-             argus commit. This is the defect.
-``foreign``  the token does not resolve *and never could*, because the citing line
-             says so: it pins a commit in someone else's repository. Counting these
-             as dead inflates the defect and sends the next reader chasing an object
-             that was never supposed to be here.
+``live``      the token resolves to a ``commit`` object in this repository.
+``dead``      the token does not resolve, and the citing line claims it is an
+              argus commit. This is the defect.
+``foreign``   the token does not resolve *and never could*, because the citing line
+              says so: it pins a commit in someone else's repository. Counting these
+              as dead inflates the defect and sends the next reader chasing an object
+              that was never supposed to be here.
+``exemplar``  the token is quoted rather than asserted — this script's own fixtures,
+              a gate's docstring showing the bytes it catches, a verbatim quotation
+              of someone's historical prose.
 
-``foreign`` is read off the citing line, never off a list inside this file. R9 bans
-a literal set where a dropped member would change the answer, and a hard-coded
-allowlist of foreign SHAs is exactly that shape: it goes stale the moment someone
-adds a sixteenth upstream pin. The line carries the marker; the scanner reads it.
+The exemptions are read off the citing line, never off a list inside this file. R9
+bans a literal set where a dropped member would change the answer, and a hard-coded
+allowlist of exempt SHAs is exactly that shape: it goes stale the moment someone adds
+a sixteenth upstream pin. The line carries the marker; the scanner reads it. And the
+exemption is **unanimous or it does not apply** — one undeclared argus-context cite
+keeps the SHA in the defect set no matter how many other sites are fenced.
 
 Two scopes, because the defect class is wider than what any one lane may repair:
 
 ``full``     the MAC-704 selector as filed. This is the honest denominator.
 ``repair``   ``full`` minus the paths this lane must not rewrite — append-only
-             heartbeat logs, ratified operator artifacts, generated exports, and
-             files a sibling lane holds dirty. Narrowing is stated, never silent:
-             ``--scope full`` always reports the residual.
+             heartbeat logs, ratified operator artifacts, generated exports.
+             Narrowing is stated, never silent: ``--scope full`` reports every
+             carve-out and its reason, and guard arm D fails if one goes stale.
 
 Usage::
 
@@ -106,9 +111,6 @@ FILED_EXCLUSIONS = ("operator_review/MAC-541",)
 
 # Excluded from the REPAIR scope only. Each entry names why the lane may not write
 # there; the reason is carried so that a later reader does not mistake a deliberate
-# carve-out for an oversight.
-# Excluded from the REPAIR scope only. Each entry names why the lane may not write
-# there; the reason is carried so that a later reader does not mistake a deliberate
 # carve-out for an oversight. Guard arm D fails if any prefix here matches nothing,
 # because a carve-out that narrows nothing still reads as though it narrowed something.
 #
@@ -184,22 +186,27 @@ def classify(hits: list[tuple[str, int, str]]) -> dict[str, dict]:
         for sha in extract(text):
             entry = by_sha.setdefault(
                 sha,
-                {"sha": sha, "sites": [], "marked": {k: 0 for k in MARKERS}},
+                {"sha": sha, "sites": [], "marked": {k: 0 for k in MARKERS}, "marked_sites": 0},
             )
             entry["sites"].append({"path": path, "line": lineno, "text": text.strip()})
+            hit = False
             for kind, marker in MARKERS.items():
                 if marker in text:
                     entry["marked"][kind] += 1
+                    hit = True
+            entry["marked_sites"] += 1 if hit else 0
     for entry in by_sha.values():
         n = len(entry["sites"])
         if resolves(entry["sha"]):
             entry["status"] = "live"
             continue
+        # Unanimity is about COVERAGE, not about agreeing on a class. A sha can be a
+        # foreign pin where it is used and an exemplar in this script's own fixtures;
+        # both sites are exempt, and demanding one label would wrongly re-arm it.
+        # What must hold is that no site is left unmarked.
         entry["status"] = "dead"
-        for kind in MARKERS:
-            if entry["marked"][kind] == n:
-                entry["status"] = kind
-                break
+        if entry["marked_sites"] == n and n:
+            entry["status"] = max(MARKERS, key=lambda k: entry["marked"][k])
     return by_sha
 
 
@@ -247,10 +254,10 @@ def assert_selector_covers_hits(
         status = entry.get("status")
         if status not in {"live", "dead", *MARKERS}:
             failures.append(f"B: {sha} unclassified (status={status!r})")
-        if status in MARKERS and entry["marked"][status] != len(entry["sites"]):
+        if status in MARKERS and entry["marked_sites"] != len(entry["sites"]):
             failures.append(
-                f"C: {sha} exempted as {status} on "
-                f"{entry['marked'][status]}/{len(entry['sites'])} sites"
+                f"C: {sha} exempted as {status} but only "
+                f"{entry['marked_sites']}/{len(entry['sites'])} sites carry a marker"
             )
 
     for prefix in REPAIR_EXCLUSIONS:  # arm D
@@ -272,26 +279,26 @@ def selftest() -> int:
         # arm A: a known-live SHA must classify live
         ("synthetic/live.md", 1, f"landed at commit `{head[:7]}` in this repo"),
         # arm B: a known-dead SHA must classify dead
-        ("synthetic/dead.md", 1, "landed at commit `0aa89a0` per the ledger"),
+        ("synthetic/dead.md", 1, "landed at commit `0aa89a0` per the ledger"),  # dead-cite exemplar
         # arm C: a declared foreign pin must NOT count as dead
         (
             "synthetic/foreign.md",
             1,
-            f"upstream pinned commit `d2468ad` ({FOREIGN_MARKER}; not an argus object)",
+            f"upstream pinned commit `d2468ad` ({FOREIGN_MARKER}; not an argus object)",  # dead-cite exemplar
         ),
         # arm D: a fenced exemplar must NOT count as dead
         (
             "synthetic/exemplar.md",
             1,
-            f"the gate exists because a doc wrote commit `598460e` ({EXEMPLAR_MARKER})",
+            f"the gate exists because a doc wrote commit `598460e` ({EXEMPLAR_MARKER})",  # dead-cite exemplar
         ),
         # arm E: the SAME sha unfenced must poison the exemption — a fence that can be
         # removed without consequence is not a fence.
-        ("synthetic/unfenced.md", 1, "landed at commit `8850ca6` per the ledger"),
-        ("synthetic/fenced.md", 1, f"quoted as commit `8850ca6` ({EXEMPLAR_MARKER})"),
+        ("synthetic/unfenced.md", 1, "landed at commit `8850ca6` per the ledger"),  # dead-cite exemplar
+        ("synthetic/fenced.md", 1, f"quoted as commit `8850ca6` ({EXEMPLAR_MARKER})"),  # dead-cite exemplar
         # arm F: the ledger header class, which FILED_RE structurally cannot see.
         # Without LEDGER_RE this line yields nothing and the sha reads as repaired.
-        ("synthetic/ledger.md", 1, "**Commit:** `b2a8dac` — `docs(bible): correction pass 5`"),
+        ("synthetic/ledger.md", 1, "**Commit:** `b2a8dac` — `docs(bible): correction pass 5`"),  # dead-cite exemplar
     ]
     got = classify(synthetic)
     expected = {
@@ -313,7 +320,7 @@ def selftest() -> int:
     # The guard must fail on an input it should reject, or it is decoration.
     mutated = assert_selector_covers_hits(
         [("synthetic/nocite.md", 1, "no cite token here")],
-        {"zzzz": {"sha": "zzzz", "sites": [], "marked": {k: 0 for k in MARKERS}, "status": "bogus"}},
+        {"zzzz": {"sha": "zzzz", "sites": [], "marked": {k: 0 for k in MARKERS}, "marked_sites": 0, "status": "bogus"}},
         set(),
     )
     fired = {f.split(":", 1)[0] for f in mutated}

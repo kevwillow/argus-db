@@ -51,33 +51,33 @@ class TestClassification:
         assert got[_head()]["status"] == "live"
 
     def test_dead_sha_classifies_dead(self):
-        got = cc.classify([("x.md", 1, "landed at commit `0aa89a0`")])
+        got = cc.classify([("x.md", 1, "landed at commit `0aa89a0`")])  # dead-cite exemplar
         assert got["0aa89a0"]["status"] == "dead"
 
     def test_foreign_marker_exempts(self):
         got = cc.classify(
-            [("x.md", 1, f"pinned commit `d2468ad` ({cc.FOREIGN_MARKER})")]
+            [("x.md", 1, f"pinned commit `d2468ad` ({cc.FOREIGN_MARKER})")]  # dead-cite exemplar
         )
         assert got["d2468ad"]["status"] == "foreign"
 
     def test_exemplar_marker_exempts(self):
         got = cc.classify(
-            [("x.md", 1, f"quoted commit `0aa89a0` ({cc.EXEMPLAR_MARKER})")]
+            [("x.md", 1, f"quoted commit `0aa89a0` ({cc.EXEMPLAR_MARKER})")]  # dead-cite exemplar
         )
         assert got["0aa89a0"]["status"] == "exemplar"
 
     def test_removing_the_fence_poisons(self):
         """Arm B of the fence rule: an unfenced line must re-arm the defect."""
-        got = cc.classify([("x.md", 1, "quoted commit `0aa89a0` with no marker")])
+        got = cc.classify([("x.md", 1, "quoted commit `0aa89a0` with no marker")])  # dead-cite exemplar
         assert got["0aa89a0"]["status"] == "dead"
 
     def test_exemption_requires_unanimity(self):
         """One undeclared argus-context cite outvotes any number of fenced ones."""
         got = cc.classify(
             [
-                ("a.md", 1, f"quoted commit `0aa89a0` ({cc.EXEMPLAR_MARKER})"),
-                ("b.md", 1, f"quoted commit `0aa89a0` ({cc.EXEMPLAR_MARKER})"),
-                ("c.md", 1, "landed at commit `0aa89a0`"),
+                ("a.md", 1, f"quoted commit `0aa89a0` ({cc.EXEMPLAR_MARKER})"),  # dead-cite exemplar
+                ("b.md", 1, f"quoted commit `0aa89a0` ({cc.EXEMPLAR_MARKER})"),  # dead-cite exemplar
+                ("c.md", 1, "landed at commit `0aa89a0`"),  # dead-cite exemplar
             ]
         )
         assert got["0aa89a0"]["status"] == "dead"
@@ -86,7 +86,7 @@ class TestClassification:
         """A fence is same-line only; otherwise its blast radius is unbounded."""
         got = cc.classify(
             [
-                ("x.md", 1, "landed at commit `0aa89a0`"),
+                ("x.md", 1, "landed at commit `0aa89a0`"),  # dead-cite exemplar
                 ("x.md", 2, f"...which is a {cc.EXEMPLAR_MARKER}"),
             ]
         )
@@ -96,7 +96,7 @@ class TestClassification:
 class TestLedgerPattern:
     def test_ledger_header_is_seen(self):
         """`**Commit:** <sha>` is invisible to the filed pattern by construction."""
-        line = "**Commit:** `b2a8dac` — `docs(bible): correction pass 5`"
+        line = "**Commit:** `b2a8dac` — `docs(bible): correction pass 5`"  # dead-cite exemplar
         assert cc.FILED_RE.findall(line) == []
         assert cc.LEDGER_RE.findall(line) == ["b2a8dac"]
         assert cc.extract(line) == ["b2a8dac"]
@@ -108,7 +108,7 @@ class TestLedgerPattern:
 
 class TestStructuralGuard:
     def test_guard_is_clean_on_wellformed_input(self):
-        hits = [("x.md", 1, "landed at commit `0aa89a0`")]
+        hits = [("x.md", 1, "landed at commit `0aa89a0`")]  # dead-cite exemplar
         by_sha = cc.classify(hits)
         # Arm D reads the FULL path set, so a well-formed call has to supply one in
         # which every carve-out still matches something.
@@ -122,7 +122,7 @@ class TestStructuralGuard:
         assert any(f.startswith("A:") for f in failures)
 
     def test_arm_b_fires_on_unclassified_sha(self):
-        bogus = {"z": {"sha": "z", "sites": [], "marked": {k: 0 for k in cc.MARKERS}, "status": "?"}}
+        bogus = {"z": {"sha": "z", "sites": [], "marked": {k: 0 for k in cc.MARKERS}, "marked_sites": 0, "status": "?"}}
         failures = cc.assert_selector_covers_hits([], bogus, set())
         assert any(f.startswith("B:") for f in failures)
 
@@ -132,6 +132,7 @@ class TestStructuralGuard:
                 "sha": "z",
                 "sites": [{"path": "a", "line": 1, "text": ""}, {"path": "b", "line": 1, "text": ""}],
                 "marked": {"foreign": 1, "exemplar": 0},
+                "marked_sites": 1,
                 "status": "foreign",
             }
         }
