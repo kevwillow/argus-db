@@ -23,7 +23,7 @@ Usage:
     python3 scripts/check_push_blob_sizes.py
     python3 scripts/check_push_blob_sizes.py --fetch
     python3 scripts/check_push_blob_sizes.py --base origin/main --head HEAD
-    python3 scripts/check_push_blob_sizes.py --max-bytes 20000000     # positive control
+    python3 scripts/check_push_blob_sizes.py --max-bytes 20000000 --warn-bytes 10000000  # positive control
 
 The base is NOT refreshed unless `--fetch` is given, and the resolved base sha is printed
 either way. An operator hand-push can move remote `main` out of band between one ratification
@@ -32,6 +32,10 @@ and the next, so a stale `origin/main` silently narrows the object set this swee
 R7 positive control: this check reports zero on a clean stack, and a zero-yield check that
 has never been shown firing is not evidence. `--max-bytes` exists so the ceiling can be
 dropped onto the same range until it fires. Do that before quoting a zero.
+
+Drop `--warn-bytes` with it. The warn default (50000000) must stay below the ceiling, so
+lowering `--max-bytes` alone below that default exits 2 (usage error), not 1 — the control
+never reaches the blob scan and certifies nothing. Exit 2 is not a firing instrument.
 
 Exit 0 = PASS or WARN. Exit 1 = at least one blob over the ceiling. Exit 2 = usage error.
 Exit 3 = SKIPPED: the range could not be resolved, so the stack is uncertified, not clean.
