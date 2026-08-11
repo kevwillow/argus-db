@@ -34,7 +34,16 @@
 --            header asserts "next free is 0056" — true when 0055 was written,
 --            false now. A slot verified at write time is not a slot verified at
 --            COMMIT time; this file re-queried at write time and takes 0057.
---            0046, 0047, 0050, 0053 and 0056 are all claimed and NOT reusable.
+--            Every gap below the highest applied file is spoken for: 0046
+--            (MAC-574), 0047 (MAC-598), 0050 (MAC-608), 0056 (MAC-705), plus
+--            the gap `operator_review/MAC-663/SLOT_RELEASE.md` freed. None is
+--            reusable here. That last one is cited through its release ledger
+--            and deliberately NOT by its digits: `next_migration_slot.py`
+--            matches digits, not intent, so a RELEASED slot is re-CONTESTED by
+--            merely printing its number — even in a header describing the
+--            release. An earlier draft of this line did exactly that and flipped
+--            it back to `CONTESTED unresolved`. Caught by re-running the scanner
+--            AFTER writing the header, which is the only time it can be caught.
 --
 -- schema_version: NOT bumped. Data-only, no DDL — same disposition as 0049.
 --            The ledger currently tops out at version 35 (`0045_mac580`,
