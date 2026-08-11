@@ -24,6 +24,10 @@ Two arms make it real, and a migration needs BOTH because the repo has two apply
 scripts/mac419_*, mac569_*, mac580_*_apply.py apply via conn.executescript(), so arm 1 alone
 forfeits protection on the path this repo actually uses most.
 
+Arm 2's guard table has TWO declaration forms and both fail closed -- see GUARD_DECL_CHECK /
+GUARD_DECL_CTAS below. Recognizing only the CHECK form is what made this gate exit 1 on
+mig-0057 (MAC-713): a genuinely fail-closed CTAS guard read as no guard at all.
+
 Usage:
     python3 scripts/check_migration_guards.py            # gate new/unratified migrations
     python3 scripts/check_migration_guards.py --all      # include grandfathered, exit 0
@@ -62,7 +66,29 @@ GRANDFATHERED = {
     "0048_mac537_ratified_harvest_ingest.sql",
 }
 
-GUARD_DECL = re.compile(r"CREATE\s+TEMP\s+TABLE\s+(\w+)\s*\(\s*ok\s+INTEGER\s+CHECK", re.I)
+# A guard table is declared in one of two forms. Both fail CLOSED; they differ only in
+# the mechanism, and the gate must recognize both or it reports a false positive.
+#
+#   form `check`  CREATE TEMP TABLE _x (ok INTEGER CHECK (ok = 1));
+#                 INSERT INTO _x(ok) SELECT CASE WHEN (<pre>) THEN 1 ELSE 0 END;
+#                 A failed precondition raises on the INSERT, leaving the table SHORT.
+#
+#   form `ctas`   CREATE TEMP TABLE _x AS SELECT 1 AS ok WHERE <pre>;
+#                 A false WHERE creates the table EMPTY. No INSERT, no CHECK, nothing
+#                 to raise -- but `COUNT(*) = 1` is still false, so every write carrying
+#                 that arm matches zero rows. mig-0057:200 (`_mac707_go`) is this form;
+#                 before MAC-713 it was invisible here and its one guarded UPDATE was
+#                 miscounted as unguarded.
+#
+# The trailing `WHERE` in GUARD_DECL_CTAS is LOAD-BEARING and deliberately mandatory.
+# `CREATE TEMP TABLE _x AS SELECT 1 AS ok;` is unconditional: it always holds exactly one
+# row, so a write gated on it can never be stopped. Accepting that form would convert this
+# fix into the hole it is closing. Snapshot CTASs (`_pre`, `_scope`, `_mig0049_baseline`)
+# do not select a literal `1 AS ok` and are correctly not guards.
+GUARD_DECL_CHECK = re.compile(
+    r"CREATE\s+TEMP\s+TABLE\s+(\w+)\s*\(\s*ok\s+INTEGER\s+CHECK", re.I)
+GUARD_DECL_CTAS = re.compile(
+    r"CREATE\s+TEMP\s+TABLE\s+(\w+)\s+AS\s+SELECT\s+1\s+AS\s+ok\s+WHERE\b", re.I)
 CHECK_OK = re.compile(r"CHECK\s*\(\s*ok\s*=\s*1\s*\)", re.I)
 BAIL = re.compile(r"^\.bail\s+on\s*$", re.M)
 WRITE = re.compile(r"^\s*(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+[\"']?(\w+)", re.I)
@@ -149,9 +175,19 @@ def canonical_tables() -> set[str]:
 def analyze(path: str, canon: set[str]) -> dict | None:
     raw = open(path, encoding="utf-8").read()
     code = strip_comments(raw)
-    if not CHECK_OK.search(code):
+    # Entry predicate. A CTAS-only migration carries no `CHECK (ok = 1)` anywhere, so
+    # testing CHECK_OK alone would skip such a file ENTIRELY -- blessing the CTAS form
+    # below while leaving the gate blind to a file that uses only it. Widening here is
+    # non-regressive by construction: it can only add files to the scan, never remove
+    # one. (Today it adds none; no migration in the tree is CTAS-guarded without also
+    # carrying CHECK-form _pre_Nfail tables.)
+    if not CHECK_OK.search(code) and not GUARD_DECL_CTAS.search(code):
         return None
-    guard_tbls = sorted(set(GUARD_DECL.findall(code)))
+    # Declaration form per table. Needed downstream: the guard-constant arm counts
+    # precondition INSERTs, and a `ctas` guard has none.
+    guard_kind = {t: "check" for t in GUARD_DECL_CHECK.findall(code)}
+    guard_kind.update({t: "ctas" for t in GUARD_DECL_CTAS.findall(code)})
+    guard_tbls = sorted(guard_kind)
     alt = "|".join(map(re.escape, guard_tbls)) or "__no_guard_table__"
     grx = re.compile(r"COUNT\(\*\)\s*FROM\s+(?:%s)\s*\)\s*=\s*\d+" % alt, re.I)
     pre_inserts = {
@@ -173,6 +209,7 @@ def analyze(path: str, canon: set[str]) -> dict | None:
         "path": path,
         "bail": bool(BAIL.search(code)),
         "guard_tbls": guard_tbls,
+        "guard_kind": guard_kind,
         "pre_inserts": pre_inserts,
         "writes": writes,
         "guarded": guarded,
@@ -195,6 +232,40 @@ def verdict(r: dict) -> tuple[str, bool]:
     if not r["bail"]:
         return "portable arm only — add `.bail on` for the CLI path", True
     return "FAIL-CLOSED (both arms)", False
+
+
+def guard_const_rows(r: dict, code: str) -> list[tuple[str, str, bool]]:
+    """-> [(guard_table, detail, ok)] for every guard table some write actually cites.
+
+    An off-by-one in `COUNT(*) FROM _x) = n` is a silently vacuous guard: too high and it
+    never matches, so the writes never fire; too low and it always matches, so they always
+    do. The sound constant depends on the DECLARATION FORM, so this dispatches on kind:
+
+      check   n must equal the number of precondition INSERTs into that table.
+
+      ctas    `SELECT 1 AS ok WHERE <pre>` yields exactly 0 or 1 rows, so the only sound
+              constant is 1. There are no INSERTs to count. Falling through to the `check`
+              rule would read `inserts=0`, compare it against `[1]`, and report a FALSE
+              MISMATCH; skipping the table on `inserts == 0` would instead print nothing
+              and go silently vacuous. Both are wrong, hence this explicit branch.
+
+    A guard table no write cites is not evaluated here and is omitted rather than printed
+    OK -- an unevaluated arm must never read as a pass. It is not lost: if no write cites
+    the guard, those writes are unguarded and fail in the verdict arm above.
+    """
+    rows: list[tuple[str, str, bool]] = []
+    for t in r["guard_tbls"]:
+        consts = sorted(set(
+            int(c) for c in re.findall(
+                r"COUNT\(\*\)\s*FROM\s+%s\s*\)\s*=\s*(\d+)" % re.escape(t), code, re.I)))
+        if not consts:
+            continue
+        if r["guard_kind"].get(t) == "ctas":
+            rows.append((t, f"CTAS(0-or-1 row) guard_consts={consts}", consts == [1]))
+        else:
+            n = r["pre_inserts"].get(t, 0)
+            rows.append((t, f"inserts={n} guard_consts={consts}", consts == [n]))
+    return rows
 
 
 def main() -> int:
@@ -232,17 +303,11 @@ def main() -> int:
     # Guard-constant sanity: COUNT(*)=<n> must equal the number of precondition INSERTs.
     # An off-by-one here is a silently vacuous guard -- it never matches, so the writes
     # never fire, or it always matches, so they always do.
-    print("\nguard-constant check (COUNT(*) = n  vs  number of precondition INSERTs):")
+    print("\nguard-constant check (COUNT(*) = n  vs  the guard's declaration form):")
     for r in results:
         code = strip_comments(open(r["path"], encoding="utf-8").read())
-        for t, n in r["pre_inserts"].items():
-            consts = sorted(set(
-                int(c) for c in re.findall(
-                    r"COUNT\(\*\)\s*FROM\s+%s\s*\)\s*=\s*(\d+)" % re.escape(t), code, re.I)))
-            if not consts:
-                continue
-            ok = consts == [n]
-            print(f"  {r['file']:<58} {t:<18} inserts={n} guard_consts={consts} "
+        for t, detail, ok in guard_const_rows(r, code):
+            print(f"  {r['file']:<58} {t:<18} {detail} "
                   f"{'OK' if ok else '*** MISMATCH ***'}")
             if not ok and r["file"] not in GRANDFATHERED:
                 failures.append(r)
