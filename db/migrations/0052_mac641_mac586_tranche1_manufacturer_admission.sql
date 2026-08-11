@@ -7,6 +7,33 @@
 -- GENERATED from operator_review/MAC-586/proposed_manufacturers.tsv by
 -- operator_review/MAC-641/gen_migration.py. Do not hand-edit; re-generate.
 -- `gen_migration.py --check` byte-compares this file against a fresh generation.
+-- Since the apply below, that comparison REQUIRES --db pointed at the pre-apply
+-- blob (`git cat-file -p e702de3:db/argus.db`); the generator now refuses rather
+-- than regenerate against the mutated state. See MAC-665.
+--
+-- ===================== STATUS: APPLIED (MAC-665) =========================
+-- APPLIED to the canonical db/argus.db. STAGE ONLY -- no push, no tag; the
+-- board reserves all pushes (MAC-424 standing rule). The apply is NOT yet
+-- committed: db/argus.db is dirty in the working tree.
+--
+-- The apply ran WITHOUT `.bail on` -- the line below was added afterwards, by
+-- MAC-665, and is the only executable byte this file has gained since it ran.
+-- It is recorded here rather than back-dated: what carried the apply was the
+-- SECOND arm, the `(SELECT COUNT(*) FROM _mig0052_pre) = 8` gate on every write,
+-- which was present at e702de3 and is present unchanged below.
+--
+-- That gate also RETRO-PROVES the apply was not a half-apply, and this is the
+-- load-bearing point: the 20 mints and 3 routings could only land if the gate
+-- read exactly 8, 8 rows could only exist if all 8 CHECK(ok=1) INSERTs were
+-- accepted, and a 0 can never be accepted. So the observed end state is itself
+-- the proof that all 8 preconditions held. Post-apply re-verification on
+-- canonical, MAC-665: 20 mints present / 260 rows / 3 routings byte-exact /
+-- 0 duplicate canonicals / json_valid=0 population still 34 / schema_version 35.
+--
+-- Fail-closed behaviour is PROVEN, not asserted:
+-- operator_review/MAC-665/bail_fail_closed_proof.sh + PROOF.md. The positive
+-- control lands the mutation through a failed precondition with both arms
+-- removed, so the zero-mutation cells are channel zeros, not capability zeros.
 --
 -- SCOPE, as corrected by MAC-641's P1 variant sweep:
 --   23 atlas_per_row_citation proposals
@@ -42,6 +69,31 @@
 -- 240 live rows are json_valid=0; the post-condition asserts that population is
 -- unchanged, proving the write degraded no JSON.
 
+-- `.bail on` IS LOAD-BEARING, NOT COSMETIC -- MAC-661 / MAC-665.
+--
+-- `sqlite3 db < file` does not stop on error by default, and the assertion
+-- idiom below (`CREATE TEMP TABLE t(ok INTEGER CHECK (ok = 1))` + `INSERT ...
+-- SELECT CASE`) raises a CHECK failure that aborts ONLY the offending INSERT.
+-- Without this line a failed precondition prints one line to stderr and the run
+-- walks on -- which is strictly worse than having no precondition at all,
+-- because the artifact reads as protected. MAC-661 reproduced exactly that on
+-- mig-0049 (positive control, 20 rows mutated and COMMITTED through a failed
+-- guard) and MAC-665 reproduces it on THIS file.
+--
+-- COST, measured rather than assumed (MAC-665): `.bail on` is a sqlite3 CLI
+-- dot-command, so `conn.executescript()` raises OperationalError: near ".":
+-- syntax error. An earlier draft of this header called that "breaks the python
+-- path"; that is imprecise and is corrected here. The line sits BEFORE
+-- `BEGIN IMMEDIATE`, so the raise happens at statement 1 with zero writes
+-- executed: the python path fails CLOSED and LOUD, it does not half-apply. A
+-- python applier must strip this line deliberately, and if it does, the count=8
+-- gate still holds -- proven independently as cell C2.
+--
+-- The fleet's own runner (db/init_db.py, executescript over db/migrations/*.sql
+-- in lexical order) never reaches this file: it stops at 0034, the first data
+-- migration, whose preconditions cannot hold on a virgin DB. Verified MAC-665.
+.bail on
+
 BEGIN IMMEDIATE;
 
 -- ============================ PRECONDITIONS =============================
@@ -54,10 +106,15 @@ BEGIN IMMEDIATE;
 -- What actually gates every write below is the SECOND arm, not this CHECK: each
 -- write carries `AND (SELECT COUNT(*) FROM _mig0052_pre) = 8`. A failed guard
 -- leaves this temp table short of 8 rows, so every write matches zero rows and the
--- migration degrades to a clean no-op. That arm is apply-method-independent -- it
--- holds under the bare CLI *and* under conn.executescript(), whereas `.bail on` is
--- a dot-command that breaks the python path. Do not copy this file's shape without
+-- migration degrades to a clean no-op. Do not copy this file's shape without
 -- copying the count=8 arm; the CHECK alone inherits the mig-0041 half-apply defect.
+--
+-- The two arms are a COMPOSITION, not redundant copies, and MAC-665 states the
+-- coupling explicitly because an earlier draft called the gate
+-- "apply-method-independent" on its own: the gate can only read a shortfall
+-- because CHECK(ok=1) REJECTED the failing row. Neuter the CHECK and the 0 row
+-- lands, the count reaches 8, and the gate opens on a violated precondition.
+-- Proven as cell P1. Keep both or neither.
 CREATE TEMP TABLE _mig0052_pre (ok INTEGER CHECK (ok = 1));
 
 -- schema_version is exactly 35 (no DDL migration has landed since)
@@ -153,7 +210,14 @@ INSERT INTO _mig0052_pre(ok) SELECT CASE WHEN (
 -- taking manufacturers 240 -> 260 with a precondition provably violated. The gate
 -- below turns that half-apply into a clean no-op under any runner.
 --
--- Apply with:  sqlite3 -bail db/argus.db < db/migrations/0052_....sql
+-- ALREADY APPLIED (MAC-665). Re-running this file is now a no-op: 5 of the 8
+-- preconditions fail against the post-apply state, the gate reads short of 8,
+-- and every write matches zero rows. Do not gate any re-run on the exit code --
+-- MAC-661 exited 1 both when nothing committed and when everything did. Gate on
+-- the post-state:  sqlite3 db/argus.db 'SELECT COUNT(*) FROM manufacturers'
+--                  240 = unapplied, 260 = applied.
+--
+-- Was applied with:  sqlite3 db/argus.db < db/migrations/0052_....sql
 
 -- ============================== MINT (20) ================================
 INSERT INTO manufacturers (canonical_name, aliases, primary_category, source_url, notes)
