@@ -14,9 +14,11 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
-## v1.7.0 - 2026-07-28
+## v1.7.0 - 2026-08-11
 
-Six lanes of finished work, shipped together. The board asked for one substantial release instead of a run of small ones, so everything that queued behind separate gates since v1.6.14 lands here: a false-positive fix to the SSID patterns, eight new identifiers, a junk-row cleanup, three new sources, and a large vendor-attribution import.
+Fifteen migrations of finished work, shipped together. The board asked for one substantial release instead of a run of small ones, so everything that queued behind separate gates since v1.6.14 lands here: a false-positive fix to the SSID patterns, new identifiers from two research harvests, a junk-row cleanup, three new sources, a large vendor-attribution import, and a run of correctness passes that deduplicate and repair rows the earlier cycles left inconsistent.
+
+This is a correctness release more than a coverage release. The registry gains 60 wire values and loses 29 to false-positive withdrawal, a net of +31 distinct values, while the raw active row count falls by 46 because redundant representations of rows already present collapse onto one another. Read the Data section for the split; the headline row count understates the gain and overstates nothing.
 
 **About the version gap.** A v1.6.15 was assembled and staged in late July, then pulled before publication when the board decided against shipping the false-positive fix on its own. No `v1.6.15` tag exists and nothing was released under that name. Its content ships here, so the public history runs v1.6.14 to v1.7.0.
 
@@ -32,7 +34,9 @@ The cost: an anchored stem misses a device whose SSID carries no delimiter. We a
 
 **Eight new identifiers**, ids 44659-44666 ([MAC-518](/MAC/issues/MAC-518), [MAC-519](/MAC/issues/MAC-519)). The DriveCam OUI `00:16:b2` and two Tianjin Hualai camera OUIs, `18:50:73` and `e4:aa:ec`, plus five FCC grantee codes covering Chipolo, Pebblebee, PB Inc, Netradyne and Nauto. The three OUIs reach the feeds; grantee codes do not, by design.
 
-**Feed totals.** Standard 977 to **981**, high-confidence **481** on both sides, behavioral **132** unchanged. The high-confidence total holding still conceals real movement: three Flock entries left (`Flock-*`, `flock`, `Penguin`) and the three new OUIs arrived.
+**Feed totals.** Standard 977 to **983**, high-confidence 481 to **501**, behavioral **132** unchanged. Both feed thresholds are unchanged, 30 for the standard feed and 70 for high-confidence, so nothing here comes from moving a floor.
+
+**What the high-confidence +20 actually is.** Twenty-five entries entered the feed and five left. **Only three of the five are withdrawals**: the `ssid` entry `Flock-*` and the `ssid_pattern` entries `flock` and `Penguin`, the false positives this release exists for. The other two are duplicate entries, not lost coverage. v1.6.14 shipped `Flock` and `Flock-230503` twice each because two identifier rows emitted the same feed key; migration `0049` collapsed the redundant rows, so each now appears once. Both patterns still ship. Of the twenty-five that arrived, **fourteen are new rows** that no earlier release held, all OUIs: eleven CCTV-camera vendors, two ALPR (IDEMIA, Ubicquia) and one fleet-telematics (DriveCam). The other **eleven are not new detections**. They are BLE service UUIDs for Axon, Verkada, Rhombus, Motive and Samsara that already sat in the database and shipped in no feed because their `confidence` and `geographic_scope` were both NULL. Migrations `0051` and `0054` supplied those two fields, which made rows we already had eligible for the first time. Counting them as new coverage would overstate what the release found, so we do not.
 
 ### Everything else
 
@@ -41,6 +45,22 @@ The cost: an anchored stem misses a device whose SSID carries no delimiter. We a
 **Three new sources**, 95 to 98. MuckRock's cell-site-simulator FOIA census and the ACLU's stingray disclosure compilation ([MAC-524](/MAC/issues/MAC-524), [MAC-526](/MAC/issues/MAC-526)) brought **7 procurement records** naming Harris and Digital Receiver Technology hardware at seven agencies, among them Rochester PD, Virginia State Police and Oakland PD. IPVM's public camera and VMS directory ([MAC-533](/MAC/issues/MAC-533)) is the third.
 
 **Vendor attribution, 156 manufacturers to 240** (migration `0041`). The 84 additions are OEM arms of Hikvision (52) and Dahua (32), the rebadging brands those two sell through. Six aliases were attached to Hikvision (EZVIZ, HiLook, Hikmicro, HiWatch, Annke, LaView), and Amcrest and Lorex were linked to Dahua as their parent. The arms are marked hidden by default, so they change how a camera traces back to its real maker without padding vendor lists. No identifiers changed: this is attribution, not new coverage. Forty-four former Dahua OEM brands and 242 unverified vendor leads were held back rather than ingested.
+
+### Later lanes
+
+These landed after the release was first assembled and before the tag. They are why the feed counts moved again.
+
+**Two research harvests, 44 OUIs admitted, 11 of them reaching a feed.** Migration `0044` promotes the 8 CTO-ratified `cctv_camera` OUIs from the MAC-523 Shodan Phase-1 pass ([MAC-523](/MAC/issues/MAC-523)); migration `0048` ingests the 36 ratified rows from the MAC-537 harvest ([MAC-537](/MAC/issues/MAC-537)). Of those 44, **11 reach the Lynceus feeds**, 8 from MAC-523 and 3 from MAC-537. The rest are admitted to the registry but drop at the export category gate, which is the normal outcome for a harvest and the reason we quote feed-reaching yield separately from rows ingested.
+
+**Eleven BLE service UUIDs made eligible** ([MAC-663](/MAC/issues/MAC-663), migration `0054`, after the retype in `0051`). Axon, Verkada, Rhombus, Motive and Samsara UUIDs sat in the database reaching no export because `confidence` was NULL and, for the high-confidence feed, `geographic_scope` was NULL too. Both fields are now populated and the rows ship. These are rows we already had, not devices we newly found.
+
+**Duplicate emitted keys collapsed** ([MAC-611](/MAC/issues/MAC-611), [MAC-570](/MAC/issues/MAC-570), migration `0049`). The registry held rows that emitted the same feed key from different identifier types, which shipped as duplicate entries in the JSON feeds. Migration `0049` supersedes the redundant rows. Migration `0057` ([MAC-707](/MAC/issues/MAC-707)) repairs the one fold in `0049` that was not information-preserving, carrying `geographic_scope` forward onto the surviving row.
+
+**Vendor-flag containment bug fixed** ([MAC-691](/MAC/issues/MAC-691), migration `0055`). `notes.surveillance_vendor_flag` had been set by a bare substring test, so `Ring` fired on `KOZO KEIKAKU ENGINEERING`, `Axon` on `MAXON INDUSTRIES` and `Tile` on `NINGBO FOTILE KITCHENWARE`. The flag is now anchored to entity boundaries. This field is metadata and gates no export, so no feed entry moves with it.
+
+**Twenty support-class vendors admitted** ([MAC-641](/MAC/issues/MAC-641), [MAC-586](/MAC/issues/MAC-586), migration `0052`), taking manufacturers 240 to 260. Attribution only, no identifiers.
+
+**Alias encoding normalized** ([MAC-569](/MAC/issues/MAC-569), [MAC-580](/MAC/issues/MAC-580), migrations `0043` and `0045`). Comma-bearing alias values are now RFC-4180-lite quoted, and standalone corporate-suffix tokens (`Ltd.`, `Inc.`, `LLC`) are merged back onto the name they belong to instead of floating as separate aliases. These are the two `schema_version` bumps.
 
 ### Distribution correction: the repo never shipped the database
 
@@ -52,15 +72,19 @@ This corrects the documentation only. No shipped identifier, feed entry or expor
 
 ### Schema
 
-- **No schema change.** `schema_version` stays **33** (last schema-changing migration `0033`, CP46). All four migrations this cycle, `0038` / `0039` / `0040` / `0041`, are data-only: no DDL, no new `identifier_type` or `device_category` values (the category enum stays at **20**).
+- **`schema_version` 33 → 35**, and no DDL ran. Both bumps record durable data-format normalizations of `manufacturers.aliases` rather than a shape change: `0043` ([MAC-569](/MAC/issues/MAC-569)) re-encodes every alias row into canonical RFC-4180-lite form so comma-bearing values are quoted, taking 33 → 34; `0045` ([MAC-580](/MAC/issues/MAC-580)) merges standalone corporate-suffix tokens back onto the name they belong to, taking 34 → 35. No table, column, `identifier_type` or `device_category` was added: the category enum stays at **20** and the identifier-type enum at **58**.
+- **Fifteen migrations this cycle**, all data-only: `0038` `0039` `0040` `0041` `0042` `0043` `0044` `0045` `0048` `0049` `0051` `0052` `0054` `0055` `0057`. The gaps at `0046`, `0047`, `0050`, `0053` and `0056` are slots claimed by dispatches that did not land; `0050` and `0056` remain drafts under `db/migrations/_drafts/`, and `0046`, `0047` and `0053` were never written.
 
 ### Data
 
-- **`identifiers` active:** 43,134 → **43,116** (net −18: +8 admitted, −9 false-positive stems, −1 dead `Flock-*`, −16 junk rows). Nothing is deleted; withdrawn rows stay as superseded history under the CP32 §9 self-loop.
-- **`identifiers` total:** 43,840 → **43,848** (+8, the Wave-6 admissions).
-- **`manufacturers`:** 156 → **240** (+84 OEM arms). **`sources`:** 95 → **98**. **behavioral signatures:** **214** (no change). **device-category enum:** **20** (no change). **`procurement_records` is deliberately not quoted as a coverage figure**; see "Known limitation" below.
-- **Lynceus standard feed:** 977 → **981** (+21 entries / −17 entries). **high-confidence feed:** **481** → **481** (+3 / −3). **behavioral-signatures feed:** **132** (entry set byte-identical). **CSV:** **43,116** rows, matching the active count.
-- **Fingerprint.** The standard and high-confidence feeds carry `argus_run_id` `06182438-91da-5a0d-91fa-6515dc86d921`; the behavioral feed carries `260b5777-99c8-5f75-8023-f4012242e7f4`. Canonical `db/argus.db` sha256 `b05c097b666ed0ae9c4034d5b77c0d532a397365a32cc20438b3d706c67cbbc0`. One consolidated regeneration ran against canonical after both database-write phases landed, and re-running it in an isolated directory reproduced all three consumer artifacts byte for byte.
+- **`identifiers` active:** 43,134 → **43,088** (net −46: 98 rows left the active set, 52 arrived). Nothing is deleted; withdrawn rows stay as superseded history under the CP32 §9 self-loop.
+- **Read that −46 as two separate movements, because the net hides them.** Of the 98 rows that left, **77 carried a value the registry still holds on another row**, so the row went and the coverage stayed. The largest block is **51 `ble_company_id` rows retyped onto their 128-bit `ble_service_uuid` form** by migration `0051`: `0xfc81` and `0000fc81-0000-1000-8000-00805f9b34fb` are one value written two ways and the registry had been carrying both. Migration `0049` accounts for most of the remaining 26 as duplicate emitted keys, with the rest falling out of the SSID refine and junk-row passes. Only **21 rows were genuine withdrawals**: 12 junk `vendor_controlled_hostname` rows, 5 false-positive `ssid_pattern` stems, 2 bad `network_endpoint` rows, the dead `ssid_exact` `Flock-*`, and the malformed `0x4C` whose four-digit `0x004C` survives. Against that, 52 rows arrived, **47 OUIs and 5 FCC grantee codes**, and 8 more `ssid_pattern` rows were rewritten in place into anchored forms.
+- **Counted as distinct wire values rather than rows, the registry grows:** 42,986 → **43,017**, a net **+31** from 60 values gained and 29 withdrawn. The two figures reconcile: the 29 lost are the 21 withdrawn rows plus the 8 old stems replaced in place, and the 60 gained are the 52 new rows plus the 8 anchored stems that replaced them. The row count falls while the value count rises because this cycle collapsed 77 redundant rows onto values already present.
+- **The instrument for that pair, because the obvious one gives the wrong answer.** A wire value is the `identifier` column of `exports/argus_export.csv` after two normalizations: BLE 16-bit short forms folded onto their 128-bit equivalents (`0xfc81` and `0000fc81-0000-1000-8000-00805f9b34fb` are one value), and case folded, since the downstream matcher compares case-insensitively. Run the same reduction over the v1.6.14 CSV and this one and you get 42,986 and 43,017. Skip the folding and a raw `COUNT(DISTINCT identifier)` reads 43,050 → 43,028, a *fall* of 22, because migration `0051`'s retype rewrites 706 short forms into 654 long ones and a string comparison counts every one of them as both a loss and a gain. Both endpoints must come from the same reduction or the delta is meaningless.
+- **`identifiers` total:** 43,840 → **43,892** (+52).
+- **`manufacturers`:** 156 → **260** (+84 OEM arms via `0041`, +20 support-class vendors via `0052`). 92 of the 260 are OEM arms, hidden from vendor lists by default. **`sources`:** 95 → **98**. **behavioral signatures:** **214** (no change). **device-category enum:** **20** (no change). **`procurement_records` is deliberately not quoted as a coverage figure**; see "Known limitation" below.
+- **Lynceus standard feed:** 977 → **983** (+43 entries / −37 entries). **high-confidence feed:** 481 → **501** (+25 / −5). **behavioral-signatures feed:** **132** (entry set byte-identical). **CSV:** **43,088** rows, matching the active count. Both JSON feeds ship with zero duplicate entries; the previously staged export carried 20 duplicated entries in the standard feed and 2 in high-confidence, which `0049` cleared.
+- **Fingerprint.** The standard and high-confidence feeds carry `argus_run_id` `e7800776-ef11-515a-a16b-2540c68c6940`; the behavioral feed carries `260b5777-99c8-5f75-8023-f4012242e7f4`. All three artifacts carry `exported_at` `2026-08-11T22:32:31Z` (behavioral `22:32:33Z`) at `schema_version` 35. Canonical `db/argus.db` sha256 `85f99b878c8f2ffc47472a687a7a11a1ea599d0173ef4d0c0b7ced17c26325ca`. Read export provenance from the `exported_at` field in each artifact, never from file mtime.
 
 ### Known limitation
 
@@ -102,7 +126,7 @@ reporting-only, and both are corrected at the next regeneration.
 
 ### Halts encountered
 
-- None. `coverage_matrix` `_reconcile` halts: **0**. The CSV reconciles to canonical active, 43,116 = 43,116. The export path took no database write, proved by identical sha256 before and after the regeneration.
+- None. `coverage_matrix` `_reconcile` halts: **0**. The CSV reconciles to canonical active, 43,088 = 43,088, re-checked by parsing the emitted CSV and counting its rows rather than trusting the `record_count` in its own meta header. The export path took no database write, proved by identical sha256 before and after the regeneration.
 
 ---
 

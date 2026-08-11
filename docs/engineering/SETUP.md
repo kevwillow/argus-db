@@ -168,6 +168,8 @@ At `schema_version=30`, against the v1.6.2 canonical database that produced that
 | `argus_export_behavioral_signatures.json` | 125 | sibling export for behavioral-signature consumers (Rayhunter target) |
 | `argus_export.csv` | 41,508 | rich-import feed; unfiltered active rows; consumers apply geographic / category / confidence filters at import |
 
+That table is a v1.6.2 anchor, kept because it is the state the numbers above were measured against. For the counts the current release ships, read the `record_count` in each artifact's own meta block, or see the export table in [`../USER_GUIDE.md`](../USER_GUIDE.md) §2, which tracks the shipped release (v1.7.0: 983 standard, 501 high-confidence, 132 behavioral, 43,088 CSV rows).
+
 The contract for each export is codified in [PROJECT_BIBLE.md](PROJECT_BIBLE.md) §7.5 (CP11 dual-artifact + CP18 behavioral_signatures sibling + CP19 high-conf source_type exclusion + CP22 canonical timestamp format).
 
 ## §7. Run the test suite (optional)
