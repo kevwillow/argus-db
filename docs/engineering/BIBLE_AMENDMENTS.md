@@ -22,8 +22,9 @@ The bible itself is the contract; this file is the changelog.
 
 ### Citing a commit in this ledger
 
-*Measured and applied at [MAC-704](/MAC/issues/MAC-704), 2026-08-11. The policy half of
-this section is **proposed, not ratified** — see the note at the end.*
+*Measured and applied at [MAC-704](/MAC/issues/MAC-704), 2026-08-11. **RATIFIED by CEO at
+[MAC-704](/MAC/issues/MAC-704), 2026-08-11**, with the uniqueness boundary added and
+enforced at [MAC-710](/MAC/issues/MAC-710) — see the note at the end.*
 
 A commit sha is a coordinate into the object graph, and the object graph is not stable.
 This repository's pre-v1.0.0 history was rewritten, and every sha minted before that
@@ -43,6 +44,12 @@ git log --format='%h %s' --fixed-strings --grep='<the subject line quoted in the
 So, for an entry in this ledger:
 
 - **Always** record the commit subject. That is the retrievable half.
+- **A subject is a valid handle only when it resolves to exactly one commit.** This is
+  the boundary added at [MAC-710](/MAC/issues/MAC-710), and it cuts both ways: zero
+  matches is a rotted anchor, and **two or more is an ambiguous one, which fails on the
+  same footing**. The reason to prefer a subject over a sha is that a reader can
+  *retrieve* the commit from it; a subject naming three commits retrieves none of them,
+  so "found something" is not the test. Before reusing a wording, check it.
 - **Prefer** the amendment's own number (CP*n* / SAR-*n*) when citing *across* entries —
   it is this ledger's primary key and needs no git access at all.
 - A sha is optional corroboration. Recording one is not wrong, but never let it be the
@@ -53,13 +60,32 @@ So, for an entry in this ledger:
 Gate: `python3 scripts/check_commit_cites.py`. Companion gate for generated export
 artifacts: `scripts/check_export_commit_cites.py` (MAC-703).
 
-**Proposed, pending board ratification.** The third bullet above softens *"Each amendment
-entry must link the git commit that applied the change"*, which is a standing user
-instruction from MAC-1 comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36).
-The six repairs already applied are inside that instruction's intent — a subject line
+**RATIFIED by CEO at [MAC-704](/MAC/issues/MAC-704), 2026-08-11.** The sha bullet softens
+*"Each amendment entry must link the git commit that applied the change"*, which is a
+standing user instruction from MAC-1 comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36).
+The six repairs applied at MAC-704 are inside that instruction's intent — a subject line
 still links the commit, and links it retrievably, where the sha it replaced linked
-nothing. Changing what *future* entries must carry is a board call and is not in force
-until ratified.
+nothing.
+
+**The flip waited for the enforcement, deliberately.** MAC-704 left this block marked
+*proposed* and the CEO found the reason while ratifying it: the gate had no arm that read
+a subject at all, so the ledger's six most-read entries carried a handle nothing checked.
+A rule marked ratified with nothing enforcing it is the same defect one level up — it
+reads as covered and is not. [MAC-710](/MAC/issues/MAC-710) built the arm, and this marker
+lands in the commit that lands it. Three consequences a later reader should not have to
+rediscover:
+
+- The gate now **fails at exit 1** when any anchor above resolves to a count other than
+  one, in either direction, and **exits 2** if a `**Commit:**` header is reworded into a
+  form the selector no longer reads — otherwise the tally would drop silently and the
+  green line would mean nothing.
+- Resolution is `--fixed-strings --grep` **followed by equality on `%s`**. The grep alone
+  matches anywhere in the whole message, so a truncated anchor would resolve against
+  whatever commit happens to quote it.
+- MAC-704's headline *6 dead → 0 dead* is qualified accordingly: the gate stopped seeing a
+  sha token on those six lines, so part of that delta was the instrument losing sight of
+  what it counts. Between MAC-704 and MAC-710 the correct reading was **durable but
+  unmeasured**; from MAC-710 it is durable and measured, at 6 unique.
 
 ---
 
