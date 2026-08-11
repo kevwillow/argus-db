@@ -188,12 +188,15 @@ def main() -> int:
         # ---- R7 positive control ---------------------------------------------------
         # Synthetic pre-repair payloads. If these do NOT trip audit_payload, the checks
         # above are inert and their silence means nothing.
+        # The `dead-cite exemplar` marker sits on each citing line, not above the block:
+        # check_commit_cites.py reads the fence off the citing line only, so a marker on a
+        # neighbouring line fences nothing. Learned the hard way at 859d8ba, which staged
+        # this file with the marker one line up and took the gate to exit 1.
         controls = {
-            # dead-cite exemplar — synthetic fixtures, not live argus cites.
-            "ctrl_key": (json.dumps({"amendments_applied": ["CP7"], "bible_commit": "0aa89a0"}),
+            "ctrl_key": (json.dumps({"amendments_applied": ["CP7"], "bible_commit": "0aa89a0"}),  # dead-cite exemplar
                          ["amendments_applied"]),
             "ctrl_prose": (json.dumps({"amendments_applied": ["CP7"],
-                                       "anchor": "MAC-104 + bible commit 8de7309"}),
+                                       "anchor": "MAC-104 + bible commit 8de7309"}),  # dead-cite exemplar
                            ["amendments_applied"]),
             "ctrl_no_anchor": (json.dumps({"stage": "x"}), ["amendments_applied"]),
         }
