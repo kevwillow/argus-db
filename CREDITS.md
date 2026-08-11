@@ -38,7 +38,10 @@ These are the authoritative registries run by standards bodies and regulators. T
 - **[Bluetooth SIG company-identifier registry](https://bitbucket.org/bluetooth-SIG/public/raw/main/assigned_numbers/company_identifiers/company_identifiers.yaml)**: the Bluetooth SIG's master list of two-byte company-ID allocations.
 - **[Wireshark `manuf` file](https://www.wireshark.org/download/automated/data/manuf)**: a community-maintained file matching hardware-address prefixes to vendor names, derived from the IEEE registries above. Argus uses it mainly to cross-check vendor names. It also surfaced three cases where IEEE and Wireshark disagreed on a vendor after an acquisition (for example, the prefix `00:03:74` now reads Schneider Electric, formerly Control Microsystems). Wireshark itself is licensed GPL-2.0-or-later; the data file is informational and derived from the public IEEE registries.
 - **[UK Companies House](https://api.company-information.service.gov.uk/)**: the UK government's official register of companies. Argus uses it to confirm corporate identities behind hardware-address registrations whose registrant name lacks a clear corporate suffix. To protect privacy, Argus never reads the officer, significant-control, or shareholder endpoints. **License: Open Government Licence v3.0 (OGL-3.0).** If you redistribute rows derived from this source, carry this exact attribution:
-  > "This information is licensed under the terms of the Open Government Licence v3.0 — https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+
+  ```
+  "This information is licensed under the terms of the Open Government Licence v3.0 — https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+  ```
 
 Three US state corporate registries are also registered, but their websites block automated access through CAPTCHAs, bot walls, or paid tiers. Lookups against them happen by hand through an operator-driven browser session, never by automation. The privacy rule is the same: no officer, agent, or shareholder lookups.
 
