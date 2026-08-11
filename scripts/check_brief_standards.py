@@ -4,8 +4,7 @@ operator_review/BRIEF_STANDARDS.md (R1-R3, R6, R7).
 
 Standing rules ratified by CEO on MAC-558 comment 6b298929. R6 and R7 are also STANDING: the CEO
 ratified R6 on MAC-573 and R7 on MAC-551, both 2026-07-29. Every rule this gate enforces is now
-ratified. R4/R5 are judgement calls and are not checked here -- see the authoring checklist in
-BRIEF_STANDARDS.md.
+ratified.
 
 Usage:  python3 scripts/check_brief_standards.py <brief.md> [<brief.md> ...]
 Exit 0 = all briefs pass. Exit 1 = at least one FAIL.
