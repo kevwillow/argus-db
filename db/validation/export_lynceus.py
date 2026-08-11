@@ -1582,6 +1582,7 @@ def _build_coverage_report_md(
     schema_version: int,
     argus_run_id: str,
     matrix_md: str,
+    matrix_sha256: str,
     coverage_matrix_report: dict[str, Any],
 ) -> str:
     """Stitch the §6 Phase 5 #4 + §9 item 9 coverage_report.md.
@@ -1589,6 +1590,17 @@ def _build_coverage_report_md(
     Embeds the MAC-45 matrix verbatim as the matrix section seed, then layers
     the §9 item 9 drop tally with full reconciliation against both Talos
     files' ``_meta.dropped_in_export`` blocks.
+
+    ``matrix_sha256`` is the provenance anchor for the embedded matrix and is
+    a CONTENT hash, not a commit cite (MAC-703). The line it feeds previously
+    read "(commit ``6853780``)"; that sha stopped resolving at the MAC-610
+    history rewrite, so a shipped artifact whose job is to document provenance
+    was carrying a provenance claim that no longer resolved. A content hash
+    survives a rewrite because it is a property of the bytes, not of the
+    object graph. The caller hashes the raw file bytes rather than
+    ``matrix_md.encode()`` so the printed value matches ``sha256sum`` even if
+    the file ever picks up CRLF, which ``Path.read_text`` would silently
+    translate away.
     """
 
     standard_meta = standard_payload["_meta"]
@@ -1857,7 +1869,8 @@ def _build_coverage_report_md(
     md_parts.append("")
     md_parts.append(
         "The matrix below is the MAC-45 coverage matrix at "
-        "`extraction_outputs/mac45/coverage_matrix.md` (commit `6853780`). It is "
+        f"`extraction_outputs/mac45/coverage_matrix.md` (sha256 `{matrix_sha256}`). "
+        "Verify with `sha256sum extraction_outputs/mac45/coverage_matrix.md`. It is "
         "embedded here verbatim per §9 item 3 ('coverage_report.md exists and shows "
         "category coverage with honest gap analysis'); the upstream module owns the "
         "matrix derivation."
@@ -2081,6 +2094,9 @@ def run(
     )
     drop_assignments = _load_drop_assignments(coverage_matrix_report_path)
     matrix_md = coverage_matrix_md_path.read_text(encoding="utf-8")
+    # Hash the raw bytes, not `matrix_md`: the value is printed into
+    # coverage_report.md for an operator to check with `sha256sum` (MAC-703).
+    matrix_sha256 = hashlib.sha256(coverage_matrix_md_path.read_bytes()).hexdigest()
 
     exports_dir.mkdir(parents=True, exist_ok=True)
     con = _open_readonly(db_path)
@@ -2139,6 +2155,7 @@ def run(
         schema_version=schema_version,
         argus_run_id=argus_run_id,
         matrix_md=matrix_md,
+        matrix_sha256=matrix_sha256,
         coverage_matrix_report=coverage_report_payload,
     )
     coverage_path = exports_dir / "coverage_report.md"

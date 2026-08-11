@@ -89,6 +89,13 @@ android_test/tools/env.sh
 # `coverage_matrix_report.json.pre_mac100_backup`, etc.
 exports/*.pre_*_backup
 extraction_outputs/**/*.pre_*_backup
+# Current naming is `<file>.pre_<topic>_<UTC-timestamp>` with NO `_backup` suffix, so the
+# two rules above do not match it — the same gap `db/argus.db.pre_*` closes for the DB
+# (MAC-362). It matters here because MAC-703 re-tracks `extraction_outputs/mac45/`: without
+# this rule a `git add extraction_outputs/mac45/` sweeps in four ~10MB point-in-time
+# snapshots alongside the two artifacts that are meant to be tracked.
+exports/*.pre_*
+extraction_outputs/**/*.pre_*
 
 # Agent control state (per-instance, do not commit)
 .claude-flow/
