@@ -1,11 +1,47 @@
 -- ============================================================================
 -- Migration: 0051_mac642_sig_member_uuid_retype.sql
--- Status:    STAGED, NOT APPLIED. Disposition RATIFIED by the CEO
---            (`operator_review/MAC-642/CEO_RATIFICATION.md`, verdict line 3:
---            "RATIFIED WITH AMENDMENT. Apply authorization DEFERRED"). The
---            partition 654 RETYPE + 51 FOLD stands as ratified; blocking
---            AMENDMENT A1 is implemented as ARM 0 below. STAGE ONLY — no push,
---            no tag. The board reserves all pushes (MAC-424 standing rule).
+-- Status:    APPLIED to canonical `db/argus.db` on 2026-08-11T05:24Z.
+--
+--            The line below is the STAGED-state prose, preserved verbatim
+--            because it is what the board ratified. It is superseded by the
+--            apply record that follows it, not edited in place:
+--
+--              "STAGED, NOT APPLIED. Disposition RATIFIED by the CEO
+--              (`operator_review/MAC-642/CEO_RATIFICATION.md`, verdict line 3:
+--              "RATIFIED WITH AMENDMENT. Apply authorization DEFERRED"). The
+--              partition 654 RETYPE + 51 FOLD stands as ratified; blocking
+--              AMENDMENT A1 is implemented as ARM 0 below."
+--
+--            APPLY AUTHORIZATION granted by the CEO on MAC-642,
+--            2026-08-11T05:17:50Z: "CEO ruling: APPLY AUTHORIZED", §5 "Apply
+--            authorized, steps 1 to 5", under §4 OPTION C — snapshot the revert
+--            boundary as a FILE COPY, never as a commit. `db/argus.db` is NOT
+--            committed by this lane; committing it would add a fourth 314.4 MiB
+--            blob and widen the MAC-610 rewrite scope.
+--
+--            Applied with:  sqlite3 db/argus.db < db/migrations/0051_....sql
+--            immediately after mig-0049, per the order gate at PRE-1.
+--
+--            Verified by POST-STATE QUERY, never by `$?` — a sqlite3 exit code
+--            is not a safety signal (MAC-661: exit 1 both when it stopped and
+--            when it committed everything through two failed guards):
+--              active         43140 -> 43089   (delta -51, as declared below)
+--              ble_company_id     9            (absolute invariant, as declared)
+--              ble_uuid          13 -> 667     (delta +654, as declared)
+--              markers        retype 654 / fold 51 / attribution_carry 4 = 709
+--              manufacturer-NULL whole-table  431 -> 427  (delta -4, POST-12)
+--              temp guard tables remaining     0
+--
+--            Revert boundary — three file-copy snapshots, sha256 recorded:
+--              b2bbb5ce886e54e956dcb8ed5952b4c0252c932a677fdd3dfdd5f069c309d437
+--                /home/kev/argus-backups/argus.db.mac642_pre_mig0049_20260811T052405Z.bak
+--              73d2ba24bf7a272de573de9bdb8838c2a5527ba4c1d7c753d60c1df5aa7c4953
+--                /home/kev/argus-backups/argus.db.mac642_pre_mig0051_20260811T052429Z.bak
+--              5f8f81db67027e75f667ac1c3f373df377b9f0996636d434732328f3c7e9c16d
+--                db/argus.db  (final, working tree, UNCOMMITTED by CEO ruling §4)
+--
+--            STAGE ONLY — no push, no tag. The board reserves all pushes
+--            (MAC-424 standing rule).
 --
 -- Slot:      0051, allocated by DISPATCH-CLAIM SCAN, not by `ls db/migrations/`
 --            and not by `scripts/next_migration_slot.py` (a watermark tool, per
@@ -29,6 +65,15 @@
 --                                     e702de3 AFTER this file's first scan
 --              0053 FREE
 --            Re-scan once more at APPLY. `ls` answers *applied*, never *claimed*.
+--            RE-SCANNED AT APPLY 2026-08-11T05:24Z (fourth and final scan).
+--            Method: filename sweep over the whole tree for `005[0-3]*`, plus a
+--            tracked-file token grep, plus an untracked/uncommitted claim grep —
+--            not `ls db/migrations/`, not `scripts/next_migration_slot.py`.
+--              0050 CLAIMED  MAC-608  _drafts/0050_mac608_*.sql.draft (unchanged)
+--              0051 CLAIMED  MAC-642  this file — STILL SOLE CLAIMANT
+--              0052 APPLIED  MAC-641  db/migrations/0052_mac641_*.sql
+--              0053 FREE
+--            Slot uncontested. Draft promoted to the slot path with `git mv`.
 --
 -- schema_version: NOT bumped. Data-only (no DDL). Stays at 35 (row 35 = 0045).
 --
