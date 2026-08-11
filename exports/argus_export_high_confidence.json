@@ -1,16 +1,16 @@
 {
   "_meta": {
-    "argus_version": "33",
-    "exported_at": "2026-07-28T16:34:51Z",
-    "record_count": 481,
+    "argus_version": "35",
+    "exported_at": "2026-08-11T22:32:31Z",
+    "record_count": 501,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "06182438-91da-5a0d-91fa-6515dc86d921",
-    "source_record_count": 43116,
+    "argus_run_id": "e7800776-ef11-515a-a16b-2540c68c6940",
+    "source_record_count": 43088,
     "dropped_in_export": {
-      "unknown_category": 33326,
+      "unknown_category": 33307,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 0,
       "ssid_pattern_fp_hold": 1,
@@ -61,9 +61,9 @@
       "imei_tac": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
-      "below_confidence_threshold": 69,
+      "below_confidence_threshold": 49,
       "excluded_source_type": 348,
-      "geographic_scope_mismatch": 84
+      "geographic_scope_mismatch": 75
     },
     "ssid_pattern_emission": {
       "surviving_ssid_rows": 1,
@@ -104,6 +104,12 @@
       "argus_record_id": "02ab3e52a5669fd4"
     },
     {
+      "pattern": "00:24:ae",
+      "pattern_type": "oui",
+      "description": "IDEMIA PUBLIC SECURITY FRANCE alpr",
+      "argus_record_id": "0300cee502f269c6"
+    },
+    {
       "pattern": "24:48:45",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -126,6 +132,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Dronetag drone",
       "argus_record_id": "05daa54a13cc6f18"
+    },
+    {
+      "pattern": "00:22:4e",
+      "pattern_type": "oui",
+      "description": "SEEnergy Corp. cctv_camera",
+      "argus_record_id": "063b9310efb7510f"
     },
     {
       "pattern": "00002760-08c2-11e1-9073-0e8ac72e0011",
@@ -252,6 +264,12 @@
       "pattern_type": "ble_uuid",
       "description": "Kwikset smart_lock",
       "argus_record_id": "0f1f0b7f8129d454"
+    },
+    {
+      "pattern": "0000fce5-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsara automotive_telematics",
+      "argus_record_id": "0f874f195198f69b"
     },
     {
       "pattern": "00:23:bd",
@@ -464,6 +482,12 @@
       "argus_record_id": "1cc3fb6677cf56cc"
     },
     {
+      "pattern": "0000fce4-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsara automotive_telematics",
+      "argus_record_id": "1d2b1194d892aad0"
+    },
+    {
       "pattern": "00:1b:d8",
       "pattern_type": "oui",
       "description": "Teledyne FLIR cctv_camera",
@@ -552,6 +576,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "24878ec45c235a6e"
+    },
+    {
+      "pattern": "e0:61:b2",
+      "pattern_type": "oui",
+      "description": "HANGZHOU ZENOINTEL TECHNOLOGY CO., LTD cctv_camera",
+      "argus_record_id": "252362a98f6ae774"
     },
     {
       "pattern": "00:10:be",
@@ -800,10 +830,22 @@
       "argus_record_id": "3af533072b5b0746"
     },
     {
+      "pattern": "0000fc81-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Axon body_cam",
+      "argus_record_id": "3be352e9a5dee8bd"
+    },
+    {
       "pattern": "00:06:ec",
       "pattern_type": "oui",
       "description": "Harris persistent_surveillance",
       "argus_record_id": "3c1b876628ba5c24"
+    },
+    {
+      "pattern": "0000fd3b-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "3cf3589f0841c21a"
     },
     {
       "pattern": "1748CH",
@@ -1016,6 +1058,12 @@
       "argus_record_id": "51e6bce55d8bbfa8"
     },
     {
+      "pattern": "00:1c:27",
+      "pattern_type": "oui",
+      "description": "Sunell Electronics Co. cctv_camera",
+      "argus_record_id": "51eae98e4173f60a"
+    },
+    {
       "pattern": "00:17:3d",
       "pattern_type": "oui",
       "description": "Neology alpr",
@@ -1068,6 +1116,12 @@
       "pattern_type": "ble_uuid",
       "description": "Ultraloq smart_lock",
       "argus_record_id": "5475c3e42095b303"
+    },
+    {
+      "pattern": "0000fd3a-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Verkada cctv_camera",
+      "argus_record_id": "54ac65736e101909"
     },
     {
       "pattern": "4a000000-0000-1000-8000-00805f4a494f",
@@ -1340,12 +1394,6 @@
       "argus_record_id": "69248a5dad0c2eab"
     },
     {
-      "pattern": "Flock",
-      "pattern_type": "ssid",
-      "description": "Flock Safety alpr",
-      "argus_record_id": "69248a5dad0c2eab"
-    },
-    {
       "pattern": "80:30:49",
       "pattern_type": "oui",
       "description": "Flock Safety alpr",
@@ -1482,6 +1530,12 @@
       "pattern_type": "oui",
       "description": "DJI drone",
       "argus_record_id": "759d22ae8c310a68"
+    },
+    {
+      "pattern": "0000fc86-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsara automotive_telematics",
+      "argus_record_id": "762d20861a740a4e"
     },
     {
       "pattern": "e4:7a:2c",
@@ -1644,6 +1698,12 @@
       "pattern_type": "ble_uuid",
       "description": "Fi (Barking Labs Corp) gps_tracker",
       "argus_record_id": "835c71a00bd64324"
+    },
+    {
+      "pattern": "0000fc87-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsara automotive_telematics",
+      "argus_record_id": "83a7a1aa05eace9b"
     },
     {
       "pattern": "00:1f:92",
@@ -1892,6 +1952,12 @@
       "argus_record_id": "970892ed3abaff14"
     },
     {
+      "pattern": "00:11:5f",
+      "pattern_type": "oui",
+      "description": "ITX Security Co., Ltd. cctv_camera",
+      "argus_record_id": "98032ec63c8672ef"
+    },
+    {
       "pattern": "64:db:8b",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -2024,6 +2090,18 @@
       "argus_record_id": "a485de2293db49f7"
     },
     {
+      "pattern": "88:23:64",
+      "pattern_type": "oui",
+      "description": "Watchnet DVR Inc cctv_camera",
+      "argus_record_id": "a65b191e5bf9e8bc"
+    },
+    {
+      "pattern": "00:a7:84",
+      "pattern_type": "oui",
+      "description": "ITX security cctv_camera",
+      "argus_record_id": "a7fb5071131f074d"
+    },
+    {
       "pattern": "10:12:fb",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -2034,6 +2112,12 @@
       "pattern_type": "oui",
       "description": "GeoVision cctv_camera",
       "argus_record_id": "a9885a22bc965ed3"
+    },
+    {
+      "pattern": "0000fc70-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Motive automotive_telematics",
+      "argus_record_id": "a994d56ba024e403"
     },
     {
       "pattern": "e295c551-69d0-11e4-b116-123b93f75cba",
@@ -2052,6 +2136,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Hylio drone",
       "argus_record_id": "ab906ca2c4ac9c71"
+    },
+    {
+      "pattern": "0000fda9-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Rhombus Systems cctv_camera",
+      "argus_record_id": "acc441687dbcbfd9"
     },
     {
       "pattern": "24:0f:9b",
@@ -2094,6 +2184,12 @@
       "pattern_type": "oui",
       "description": "Rhombus Systems cctv_camera",
       "argus_record_id": "b12d9744ecf76ce1"
+    },
+    {
+      "pattern": "0000fe9b-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Samsara automotive_telematics",
+      "argus_record_id": "b19c91a8226625e3"
     },
     {
       "pattern": "00:bc:99",
@@ -2292,6 +2388,12 @@
       "pattern_type": "ble_uuid",
       "description": "August smart_lock",
       "argus_record_id": "c9cf655a75f58969"
+    },
+    {
+      "pattern": "64:25:5e",
+      "pattern_type": "oui",
+      "description": "Observint Technologies, Inc. cctv_camera",
+      "argus_record_id": "ca63e31a3c6d73cc"
     },
     {
       "pattern": "4d050019-766c-42c4-8944-42bc98fc2d09",
@@ -2528,6 +2630,12 @@
       "argus_record_id": "dd9b9f36bd8d3ca3"
     },
     {
+      "pattern": "00:0e:53",
+      "pattern_type": "oui",
+      "description": "AV TECH CORPORATION cctv_camera",
+      "argus_record_id": "de3f4ff64fd0c27d"
+    },
+    {
       "pattern": "4d0500a0-766c-42c4-8944-42bc98fc2d09",
       "pattern_type": "ble_uuid",
       "description": "Kwikset smart_lock",
@@ -2714,6 +2822,12 @@
       "argus_record_id": "eabc1b042e9c9507"
     },
     {
+      "pattern": "00:1b:9d",
+      "pattern_type": "oui",
+      "description": "Novus Security Sp. z o.o. cctv_camera",
+      "argus_record_id": "ebe036b09b5441d9"
+    },
+    {
       "pattern": "1701ASPR1431121",
       "pattern_type": "drone_id_prefix",
       "description": "Percepto AirMax drone",
@@ -2768,12 +2882,6 @@
       "argus_record_id": "ef29f65fa5ed8a78"
     },
     {
-      "pattern": "Flock-230503",
-      "pattern_type": "ssid",
-      "description": "Flock Safety alpr",
-      "argus_record_id": "ef29f65fa5ed8a78"
-    },
-    {
       "pattern": "1668BE10JA00",
       "pattern_type": "drone_id_prefix",
       "description": "Skydio drone",
@@ -2790,6 +2898,12 @@
       "pattern_type": "ble_uuid",
       "description": "Fi (Barking Labs Corp) gps_tracker",
       "argus_record_id": "f06bf0e48de96e8d"
+    },
+    {
+      "pattern": "0000fc6d-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Motive automotive_telematics",
+      "argus_record_id": "f091044d294ac29c"
     },
     {
       "pattern": "1596A34",
@@ -2904,6 +3018,12 @@
       "pattern_type": "oui",
       "description": "Lytx automotive_telematics",
       "argus_record_id": "fbe1a2acc53e0d51"
+    },
+    {
+      "pattern": "94:7b:be",
+      "pattern_type": "oui",
+      "description": "Ubicquia LLC alpr",
+      "argus_record_id": "fc286d07d08296fd"
     },
     {
       "pattern": "00:40:7f",
