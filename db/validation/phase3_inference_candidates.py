@@ -753,7 +753,7 @@ def evaluate() -> dict[str, Any]:
         halt_flags = [
             {
                 "class": "new_disambig_class",
-                "status": "RESOLVED — SAR-8 codified (commit 811b4de)",
+                "status": "RESOLVED — SAR-8 codified (BIBLE_AMENDMENTS.md SAR-8)",
                 "description": (
                     "Vendor-name-disambig predicate now lives in "
                     "db/extraction/vendor_name_disambig.py and is consumed "

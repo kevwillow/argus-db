@@ -1098,7 +1098,7 @@ Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2
 
 **Resolved at CP5 sign-off (2026-05-06)**
 
-Board ratification via approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) 2026-05-06T20:17:10Z (CP5_BRIEF, commit `28bab20`, [MAC-47](/MAC/issues/MAC-47)).
+Board ratification via approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) 2026-05-06T20:17:10Z (CP5_BRIEF, [MAC-47](/MAC/issues/MAC-47)).
 
 - ~~**Project name.** "Argus" working name; final confirm at Checkpoint 5 alongside the coverage matrix.~~ Resolved: **"Argus" is the final v1 name.** Boundary: Argus owns identifier-canonical-state + Lynceus-bound exports; Lynceus owns scanner-side scanning + correlation. "MAC" is the Paperclip issue-prefix only.
 - ~~**`device_cluster_id` for vehicle / operator correlation.**~~ Resolved: **SAR-3 lean confirmed final**, Argus identifies, Lynceus correlates. No Argus-side schema change; correlation logic owned by Lynceus team.

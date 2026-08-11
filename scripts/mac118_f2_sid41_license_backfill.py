@@ -4,7 +4,11 @@
 Per CEO ratification on MAC-118 [comment b012ac69].
 
 Resolution:
-- sid=41 = GitHub: GainSec/anti-crime-ecosystem-research, pinned commit `d2468ad`
+- sid=41 = GitHub: GainSec/anti-crime-ecosystem-research, pinned commit `d2468ad` (foreign-repo SHA)
+  An object in GainSec/anti-crime-ecosystem-research, not in this repository.
+  `git cat-file` will never resolve it here and it must not be repointed; resolve
+  it upstream at
+  https://github.com/GainSec/anti-crime-ecosystem-research/commit/d2468ad
 - LICENSE verdict (from staged surfacing.md at raw/wave_a/GainSec_anti-crime-ecosystem-research/2026-05-11T05-31-51Z_surfacing.md):
     CC BY-NC-ND 4.0 + Research-Use clause, Copyright 2025 Jon "GainSec" Gaines.
     research-extract-permitted (factual identifiers, attribution-required,

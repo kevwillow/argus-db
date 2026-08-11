@@ -30,7 +30,7 @@ DB_PATH = Path(__file__).resolve().parents[1] / "db" / "argus.db"
 # ───────────────────────── SAR-7 #1 — CVE/CWE/NIST stop-list ────────────────
 
 class TestStopListSAR7_1:
-    """SAR-7 #1 codifies the existing CVE/CWE/NIST stop-list (commit aed1e96).
+    """SAR-7 #1 codifies the existing CVE/CWE/NIST stop-list (MAC-25 Wave-A close).
 
     Positive: stop-listed shape rejects.
     Negative: real FCC grantee shapes pass.

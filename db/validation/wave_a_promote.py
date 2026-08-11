@@ -76,7 +76,7 @@ def _ledger_notes(identifier_id: int) -> str:
         f"Board-ratified Option C confidence={RATIFIED_CONFIDENCE} via approval "
         f"{APPROVAL_ID} ({APPROVAL_TIMESTAMP}). "
         f"Promoted identifiers.id={identifier_id} from raw_observations.id={RAW_OBS_ROW_ID}. "
-        f"Step-3 cross-reference sweep (MAC-38 commit 8850ca6) returned ZERO "
+        f"Step-3 cross-reference sweep (MAC-38) returned ZERO "
         f"corroboration hits across Wave-B/B2/C/D/E for OUI e4:aa:ea; IEEE MA-L "
         f"(raw_observations.id=85781) + Wireshark manuf (id=216273) attribute the "
         f"OUI to Liteon Technology Corporation, consistent with the OEM-narrative "

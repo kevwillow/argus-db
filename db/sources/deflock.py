@@ -2,7 +2,7 @@
 
 Pulls the DeFlock-via-CDN ALPR camera dataset into Argus staging per
 PROJECT_BIBLE.md §6 Phase 2 + §7.2. Lands rows in `deployment_observations`
-(migration 0002 / CP4 commit `d81de3b`). No new migration.
+(migration 0002 / BIBLE_AMENDMENTS.md CP4). No new migration.
 
 Source — CEO-ratified at MAC-6 (2026-05-04):
 ──────────────────────────────────────────────────────────────────────

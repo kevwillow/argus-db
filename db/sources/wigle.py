@@ -117,7 +117,7 @@ Q2 ratified — header parser:
 ────────────────────────────────────────────────────────────────────────────
 PII redaction (SAR-5-by-analogy, applied unconditionally)
 ────────────────────────────────────────────────────────────────────────────
-SAR-5 (commit 598460e at 12:47Z 2026-05-04, ratified by board comment
+SAR-5 (BIBLE_AMENDMENTS.md, landed 12:47Z 2026-05-04, ratified by board comment
 7e827dca at 18:05Z "stands as written, no amendment") rule (5)
 "default-to-redact PII like MAC-5" binds verbatim to WiGLE SSID staging.
 WiGLE results' `ssid` field can carry PII shapes (home network names,

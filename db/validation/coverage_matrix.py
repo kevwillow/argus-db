@@ -101,10 +101,10 @@ IDENTIFIER_TYPES: tuple[str, ...] = (
     "product_family_codename",
     # CP16 (§4.4) — CP14 identifier_type cluster (migrations 0011/0013/0014).
     # 3 MAP entries (new pattern_types) + 12 DROPPED-with-reason entries.
-    # Coverage_matrix lag from sibling commit a4bc7b9 (export_lynceus.py CP16
-    # patch) caught by MAC-92 Wave-B Phase-B dry-run when first CP16 rows
-    # landed via Phase-A promotion. Same architectural-absorption gap class
-    # as commit a4bc7b9's Phase-3-claim correction.
+    # Coverage_matrix lag from the sibling export_lynceus.py CP16 patch, caught
+    # by MAC-92 Wave-B Phase-B dry-run when first CP16 rows landed via Phase-A
+    # promotion. Same architectural-absorption gap class as that patch's own
+    # Phase-3-claim correction.
     "ble_manufacturer_id",          # MAP
     "drone_id_prefix",              # MAP
     "wifi_aware_service_name",      # MAP

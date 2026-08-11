@@ -214,4 +214,4 @@ For the canonical Lynceus integration shape (file paths, refresh cadence, `sever
 
 ## Footnote: historical schema-version reference
 
-This document was originally authored against `schema_version=19` (v1.0.0 ship state, 2026-05-15, commit `33dc318`) with 22,532 active identifiers across 34 manufacturers and 43 sources. The post-v1.0.0 ship cycles (CP20 through CP37) substantially expanded the source corpus (+31 sources to 74), manufacturer cohort (+92 manufacturers to 126), and identifier-type vocabulary (+31 enum values to 58 CHECK-constrained types). The verified-working anchors above reflect v1.6.2 (`schema_version=30`) ship state at HEAD `def7b95`.
+This document was originally authored against `schema_version=19` (v1.0.0 ship state, 2026-05-15) with 22,532 active identifiers across 34 manufacturers and 43 sources. The post-v1.0.0 ship cycles (CP20 through CP37) substantially expanded the source corpus (+31 sources to 74), manufacturer cohort (+92 manufacturers to 126), and identifier-type vocabulary (+31 enum values to 58 CHECK-constrained types). The verified-working anchors above reflect v1.6.2 (`schema_version=30`) ship state at HEAD `def7b95`.

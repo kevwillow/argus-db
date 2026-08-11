@@ -9,7 +9,10 @@ Authority chain
 ---------------
 - BIBLE_AMENDMENTS.md CP7 (geographic_scope §12 #1 resolution + export-time filter).
 - BIBLE_AMENDMENTS.md CP10 (§11 #10 narrow-read v0.1 cutover — 17-row flip).
-- Bible commit `0aa89a0` — CP7 + CP8 + CP9 + CP10 + SAR-10 amendments landed.
+- BIBLE_AMENDMENTS.md CP8, CP9, SAR-10 — landed in the same coordinated
+  amendment pass as CP7 and CP10 above. Cite the amendment numbers, not that
+  pass's sha: the sha has not resolved since the pre-v1.0.0 history rewrite
+  (MAC-704), and the amendment numbers are the ledger's own primary key.
 - Board ratification: MAC-1 [`4f075253`] approved 2026-05-07T17:10:13Z
   (six-pick + two-halt-flag bundle).
 - MAC-48 dispatch (Validator).

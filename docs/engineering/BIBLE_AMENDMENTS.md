@@ -6,7 +6,7 @@ The amendment log for Argus's formal spec ([`PROJECT_BIBLE.md`](PROJECT_BIBLE.md
 
 Entries come in two classes. A **Correction Pass (CP)** is a numbered amendment with `§N` sub-sections that adds or refines a bible clause. Current ratified passes range from CP1 through CP33 (v1.5.0 ship state). A **Surprise Anti-Recurrence (SAR)** rule is a discipline pattern formalized after the n=3 occurrence threshold — it binds one or more sub-agent roles but does not necessarily edit the bible text. The current SAR roster runs SAR-1 through SAR-18 (v1.5.0 ship state).
 
-First-time readers should start with [`../USER_GUIDE.md`](../USER_GUIDE.md) for the dataset overview, or [`../../CHANGELOG.md`](../../CHANGELOG.md) for the per-version summary. This file is the formal amendment record — load-bearing precision over readability. Each entry pairs with its git commit hash and the case studies that drove its codification.
+First-time readers should start with [`../USER_GUIDE.md`](../USER_GUIDE.md) for the dataset overview, or [`../../CHANGELOG.md`](../../CHANGELOG.md) for the per-version summary. This file is the formal amendment record — load-bearing precision over readability. Each entry pairs with the commit that applied it and the case studies that drove its codification; see *Citing a commit in this ledger* below for which half of a commit reference is the durable one.
 
 ---
 
@@ -20,12 +20,53 @@ This file is the audit trail for every in-place edit to `PROJECT_BIBLE.md`. Per 
 
 The bible itself is the contract; this file is the changelog.
 
+### Citing a commit in this ledger
+
+*Measured and applied at [MAC-704](/MAC/issues/MAC-704), 2026-08-11. The policy half of
+this section is **proposed, not ratified** — see the note at the end.*
+
+A commit sha is a coordinate into the object graph, and the object graph is not stable.
+This repository's pre-v1.0.0 history was rewritten, and every sha minted before that
+rewrite stopped resolving in a single operation. Measured at MAC-704: of the 12 distinct
+shas carried in `**Commit:**` headers in this file, **6 did not resolve** — CP1 through
+CP6, the six oldest entries. A ledger is what someone reads to reconstruct why a rule
+exists, so a dead cite here costs more than it does anywhere else in the tree.
+
+**The durable anchor is the commit *subject*, not its sha.** A subject is a property of
+the message and survives any rewrite; every one of the six dead entries was recovered
+from its subject alone, each matching exactly one commit at HEAD. Resolve one with:
+
+```
+git log --format='%h %s' --fixed-strings --grep='<the subject line quoted in the entry>'
+```
+
+So, for an entry in this ledger:
+
+- **Always** record the commit subject. That is the retrievable half.
+- **Prefer** the amendment's own number (CP*n* / SAR-*n*) when citing *across* entries —
+  it is this ledger's primary key and needs no git access at all.
+- A sha is optional corroboration. Recording one is not wrong, but never let it be the
+  only handle: re-pinning a dead sha to a fresh one buys exactly one rewrite cycle.
+- `<this-commit>` is the established self-referential placeholder (CP31 §5 precedent).
+  It is not a defect; it resolves via `git log docs/engineering/BIBLE_AMENDMENTS.md`.
+
+Gate: `python3 scripts/check_commit_cites.py`. Companion gate for generated export
+artifacts: `scripts/check_export_commit_cites.py` (MAC-703).
+
+**Proposed, pending board ratification.** The third bullet above softens *"Each amendment
+entry must link the git commit that applied the change"*, which is a standing user
+instruction from MAC-1 comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36).
+The six repairs already applied are inside that instruction's intent — a subject line
+still links the commit, and links it retrievably, where the sha it replaced linked
+nothing. Changing what *future* entries must carry is a board call and is not in force
+until ratified.
+
 ---
 
 ## Correction Pass 1 — Talos export integration
 
 **Date:** 2026-05-04
-**Commit:** `26e44a3` — `docs(bible): correction pass — Talos export schema, severity mapping, false-positive guards`
+**Commit:** subject `docs(bible): correction pass — Talos export schema, severity mapping, false-positive guards` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
 **Source:** MAC-1 user comment [ab234b68](/MAC/issues/MAC-1#comment-ab234b68-9876-4ee9-9eb4-f2d9c3d0a7d8)
 **Status:** Acknowledged and approved by user in MAC-1 comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36)
 
@@ -61,7 +102,7 @@ New open question added by Correction 8 review:
 ## Correction Pass 2 — §11 #11 placeholder filled with bible-amendment-log discipline
 
 **Date:** 2026-05-04
-**Commit:** `1cfbbd4` — `docs(bible): fill §11 #11 placeholder — bible amendment log discipline`
+**Commit:** subject `docs(bible): fill §11 #11 placeholder — bible amendment log discipline` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
 **Source:** MAC-1 user comment [f08cd82b](/MAC/issues/MAC-1#comment-f08cd82b-747e-4b34-aa6a-11bbfd0cc067) decision #4
 **Status:** Applied as a normal in-place edit; logged here per §11 #11 (now self-binding).
 
@@ -86,7 +127,7 @@ None. §12 unchanged.
 ## Correction Pass 3 — §2.1 in-vehicle LTE/WiFi routers + §12 device_cluster_id question
 
 **Date:** 2026-05-04
-**Commit:** `76231f0` — `docs(bible): correction pass 3 — §2.1 in-vehicle LTE/WiFi routers + §12 device_cluster_id`
+**Commit:** subject `docs(bible): correction pass 3 — §2.1 in-vehicle LTE/WiFi routers + §12 device_cluster_id` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
 **Source:** MAC-1 user comment [d08ee4a8](/MAC/issues/MAC-1#comment-d08ee4a8-e525-4c19-9886-89f0f95bf1c3)
 **Status:** Approved by user in the same comment ("Approved as Correction Pass 3"). Bible edit applied; manufacturers seed updated (32 → 34); device_cluster_id question added to §12; research leads logged in PROJECT_STATE.md per same comment.
 
@@ -137,7 +178,7 @@ DBArchitect's MAC-2 comments referencing old §2.1 # numbering are immutable run
 ## Correction Pass 4 — §4.2 supporting-table addition: `deployment_observations`
 
 **Date:** 2026-05-04
-**Commit:** `d81de3b` — `docs(bible): correction pass 4 — §4.2 deployment_observations supporting-table addition`
+**Commit:** subject `docs(bible): correction pass 4 — §4.2 deployment_observations supporting-table addition` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
 **Source:** [MAC-5](/MAC/issues/MAC-5) SourceWorker schema-fit proposal comment [1037c17e](/MAC/issues/MAC-5#comment-1037c17e-48f4-4ab9-9df7-466af011dbbe); CEO ratification this heartbeat.
 **Status:** Bible §4.2 edit applied this commit. Migration `db/migrations/0002_deployment_observations.sql` to be authored by SourceWorker on resume; the bible-at-HEAD is the authoritative shape the migration must match.
 
@@ -188,7 +229,7 @@ These are routine §8.2 / §11 #3 / §7.2 applications, not bible edits — so t
 ## Correction Pass 5 — Phase 2 → Phase 3 ride-along: §4.1 in_vehicle_router enum + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope
 
 **Date:** 2026-05-04
-**Commit:** `b2a8dac` — `docs(bible): correction pass 5 — §4.1 in_vehicle_router + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope`
+**Commit:** subject `docs(bible): correction pass 5 — §4.1 in_vehicle_router + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
 **Source:** [MAC-1](/MAC/issues/MAC-1) user comment [a7edae6f](/MAC/issues/MAC-1#comment-a7edae6f-6c7a-493e-82f2-fa088942a1a9) (Checkpoint 2 sign-off + Phase 3 dispatch decisions)
 **Status:** Bible edits applied this commit; SAR-3 (separate entry below) ratifies the `device_cluster_id` lean as binding-but-not-final.
 
@@ -232,7 +273,7 @@ The board explicitly framed all four items as a single "bible-tidy ride-along" l
 ## Correction Pass 6 — §4.2 add `fcc_grantees` staging table; document stale-mirror handling pattern
 
 **Date:** 2026-05-04
-**Commit:** `35900f0` — `docs(bible): correction pass 6 — §4.2 add fcc_grantees + stale-mirror handling pattern (MAC-7)`
+**Commit:** subject `docs(bible): correction pass 6 — §4.2 add fcc_grantees + stale-mirror handling pattern (MAC-7)` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
 **Source:** [MAC-7](/MAC/issues/MAC-7) Step-2 ratification + Step-2 ingest delivery [comment 094eae0a](/MAC/issues/MAC-7#comment-094eae0a-701e-4925-97c7-11493a2af60e). CP6 ride-along reservation was made at Step-2 ratification (CEO-owned, lands at MAC-7 close per the dispatch contract).
 **Status:** Bible edit applied this commit. Two operational ratifications (§11 #3 corporate-comms read for FCC `contact_name`; staleness-ceiling notes-shape pattern) bundle as ride-along context inside this CP entry — NOT separate SARs (per the MAC-5 codification: routine §11 #3 / §7.2 / §8.2 applications inside a Correction Pass don't need SAR numbering).
 
@@ -267,8 +308,8 @@ CP6 derives from a single source-ingest delivery (MAC-7 Step 2) with one new sta
 
 ### Out-of-bible artifact updates that pair with this pass
 
-- **`db/migrations/0003_fcc_grantees.sql`** — applied at MAC-7 Step 2 (commit `b5df4e5`); 12 columns + UNIQUE backstop + 4 indexes. The migration shape was approved at Step 2 ratification ([comment 0e95c40a](/MAC/issues/MAC-7#comment-0e95c40a-54fd-4690-b582-e3892cfa8450)).
-- **`db/sources/fcc_id.py`** — applied at MAC-7 Step 2 (commit `b5df4e5`); mirrors `eff_atlas.py` shape; uses `--raw-subdir` flag for no-re-fetch idempotency replay (MAC-5/MAC-6 precedent).
+- **`db/migrations/0003_fcc_grantees.sql`** — applied at MAC-7 Step 2; 12 columns + UNIQUE backstop + 4 indexes. The migration shape was approved at Step 2 ratification ([comment 0e95c40a](/MAC/issues/MAC-7#comment-0e95c40a-54fd-4690-b582-e3892cfa8450)).
+- **`db/sources/fcc_id.py`** — applied at MAC-7 Step 2; mirrors `eff_atlas.py` shape; uses `--raw-subdir` flag for no-re-fetch idempotency replay (MAC-5/MAC-6 precedent).
 - **`PROJECT_STATE.md`** — flipped to reflect MAC-7 Step 2 closed + MAC-8 SAM.gov queued; CP6 entry logged in the bible-amendments status section; CP5's deferred-migration reference renumber noted (was `0003_*.sql`, now `0004_*.sql`).
 
 ---
@@ -450,7 +491,7 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
 
 #### SAR-7 #1 — CVE-FP allowlist (codification, already partially live)
 
-The CVE/CWE/NIST shape was implemented in `STOP_LIST_PATTERNS` of `db/extraction/fcc_grantees_allowlist.py` (Wave-A close, MAC-25 commit `aed1e96`) but never amendment-logged. SAR-7 #1 codifies the implementation under §11 #11 amendment-log discipline:
+The CVE/CWE/NIST shape was implemented in `STOP_LIST_PATTERNS` of `db/extraction/fcc_grantees_allowlist.py` (Wave-A close, [MAC-25](/MAC/issues/MAC-25)) but never amendment-logged. SAR-7 #1 codifies the implementation under §11 #11 amendment-log discipline:
 
 - Any `fcc_id_anchored` match that also matches `^CVE-\d{4}(-\d{4,7})?$`, `^CWE-\d{1,4}$`, or NIST NVD shape is rejected as `reason='cve_security_advisory_fp'`.
 - Wave-C ([MAC-28](/MAC/issues/MAC-28)) is the test case: 40-paper academic corpus with constant CVE references; the stop-list caught all of them. Wave-A Step-1.5b survey originally surfaced `CVE-2025` as one of 2 FP hits.
@@ -496,7 +537,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 - **§7.3 / §7.4 contractual surface unchanged.** SAR-7 is operational guidance for `db/extraction/fcc_grantees_allowlist.py` and the equivalent vendor-mention disambig surface.
 - **Why a SAR, not a Correction Pass.** No bible text is being edited. Mirrors SAR-1's relationship to §7.3 (interpretive guidance binding implementation, not contract) and SAR-3/SAR-4/SAR-5/SAR-6's pattern of single-decision interpretive bundles.
 
-**CP4 brief reference.** Full Phase-4 close + Phase-5 dispatch readiness context lives in `/home/kev/argus/CP4_BRIEF.md` (commit `dff9e6e`, board-ratified via approval [`bf95a897`](/MAC/approvals/bf95a897-834c-473e-99f1-63d6cefd4b06)).
+**CP4 brief reference.** Full Phase-4 close + Phase-5 dispatch readiness context lives in `CP4_BRIEF.md`, board-ratified via approval [`bf95a897`](/MAC/approvals/bf95a897-834c-473e-99f1-63d6cefd4b06). The approval is the durable anchor: the brief was never tracked in this repository, so no commit cite can retrieve it.
 
 ---
 
@@ -601,7 +642,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 ## Checkpoint 5 sign-off — Phase-5 close + §12 disposition slate
 
 **Date:** 2026-05-06
-**Source:** [MAC-47](/MAC/issues/MAC-47) CP5 brief authoring under CEO autonomy per board comprehensive forward-runway authorization at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z. Brief at `/home/kev/argus/CP5_BRIEF.md` (commit `28bab20`). Board ratification via approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) approved 2026-05-06T20:17:10Z.
+**Source:** [MAC-47](/MAC/issues/MAC-47) CP5 brief authoring under CEO autonomy per board comprehensive forward-runway authorization at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z. Brief at `CP5_BRIEF.md` (never tracked in this repository — the approval below is the durable anchor). Board ratification via approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) approved 2026-05-06T20:17:10Z.
 **Bible commit:** §12 dispositions land paired with this amendment-log entry (no §-text edits beyond §12 reorganization).
 
 **The disposition slate.** Board ratified CP5 brief as the Phase-5 close artifact. Per CP5_BRIEF §4 + §7, the §12 Open-Questions slate is reorganized as follows:
@@ -644,7 +685,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 
 **Why this is a checkpoint sign-off, not a Correction Pass / SAR.** No bible §-text edited; the §12 reorganization is the Open-Questions section being maintained per its own discipline. CP5 sign-off mirrors CP4 sign-off precedent (board-ratified close + bible-amendment-log entry recording the close + §12 disposition slate without bible §-text edit).
 
-**MAC-47 reference.** CP5 brief at `/home/kev/argus/CP5_BRIEF.md` (commit `28bab20`); approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d).
+**MAC-47 reference.** CP5 brief at `CP5_BRIEF.md`; approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d).
 
 ---
 
@@ -1000,7 +1041,7 @@ Cases the calibration surfaced but where author/Validator labels each instance i
 **Bible commit:** §8.2 `manufacturer_app` row + sub-banding table + §11 #15 new hard-rule + §12 three new open questions land paired with this amendment-log entry.
 **Binds:** SourceWorker (Wave G Step 0/1), ExtractionWorker (Wave G Step 2), Validator (Wave G post-Step-2 promotion), CEO orchestrator, future quarterly refresh routine.
 
-**Naming note.** The board comment authorized these amendments as "Correction Pass 11"; CP11 is already taken by the Lynceus dual-artifact contract (commit `c2ef963`). Landed here as **CP12** to preserve audit-trail uniqueness; surfaced for board acknowledgement at MAC-52 close. Substance unchanged from board direction.
+**Naming note.** The board comment authorized these amendments as "Correction Pass 11"; CP11 is already taken by the Lynceus dual-artifact contract (see the CP11 entry in this ledger). Landed here as **CP12** to preserve audit-trail uniqueness; surfaced for board acknowledgement at MAC-52 close. Substance unchanged from board direction.
 
 ### Corrections applied
 
@@ -1076,7 +1117,7 @@ Three new open questions added under a new "Wave G (Phase 6)" subhead per #3 abo
 
 ### Why this Correction Pass exists
 
-CP12 (commit `90132fa`, 2026-05-08) added `manufacturer_app` to §8.2 source_type sub-banding to define the confidence band for Wave G (Phase 6) vendor companion app static-analysis output, but did not land the sibling schema migration. The `identifiers.source_type` and `sources.source_type` CHECK constraints from `0001_initial.sql` (lines 71–75 and 120–124) still reject the value, structurally blocking Wave G narrow-scope promotion (21 candidates: 6 BLE UUIDs + 1 BLE local name + 14 Flock DeviceType taxonomy values).
+CP12 (2026-05-08, this ledger) added `manufacturer_app` to §8.2 source_type sub-banding to define the confidence band for Wave G (Phase 6) vendor companion app static-analysis output, but did not land the sibling schema migration. The `identifiers.source_type` and `sources.source_type` CHECK constraints from `0001_initial.sql` (lines 71–75 and 120–124) still reject the value, structurally blocking Wave G narrow-scope promotion (21 candidates: 6 BLE UUIDs + 1 BLE local name + 14 Flock DeviceType taxonomy values).
 
 In parallel, the Wave G pre-v1 deliverables (2026-05-10 HB56, MAC-1 [`5b000045`](/MAC/issues/MAC-1#comment-5b000045-1265-4be4-88b2-dfeaac46c6df)) surfaced three new identifier classes that do not fit the existing §4.1 `identifier_type` enum without semantic-loss collapse:
 
@@ -1746,7 +1787,7 @@ CEO authored TWO contradictory dispositions on MAC-118 — the second authored f
 | ... ~2h gap (parallel work on other MAC-101 items) ... | | | |
 | **17:23Z** | **CEO** | **[`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6)** | **SECOND CEO disposition: F2 → Option (b) defer-to-prose + F3 → spawn MAC-119 child for scrub.** Authored as if findings were still pending; did NOT paste-verify current state. |
 | 17:24Z | CEO | MAC-119 filed | Spuriously filed F3 scrub child (REDUNDANT — F3 already landed at 15:03Z) |
-| 17:28Z | Validator | [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) | MAC-119 surface-back: "scrub already landed (commit `106689b`); recommend done" |
+| 17:28Z | Validator | [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) | MAC-119 surface-back: "scrub already landed (commit `106689b`); recommend done" — quoted verbatim, not asserted; that sha has not resolved since the pre-v1.0.0 rewrite (dead-cite exemplar, MAC-704) |
 | 17:29Z | CEO | [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) | **CEO reconciliation comment** — self-identifies as "dispatch-preamble-live-state-verification miss on the disposition author's part — rule applies symmetrically to CEO dispositions, not just dispatches" |
 | 17:35Z | CEO | [`5789aeb8`](/MAC/issues/MAC-119#comment-5789aeb8) | MAC-119 → `done` (redundant scrub-already-done ratification) |
 

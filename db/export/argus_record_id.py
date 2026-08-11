@@ -5,7 +5,7 @@ Single function that derives the Lynceus-export upsert key for a canonical
 `normalized_identifier`).
 
 The algorithm is `sha256(f"{identifier_type}|{normalized_identifier}").hexdigest()[:16]`
-per BIBLE_AMENDMENTS.md SAR-10 (commit `0aa89a0`, board ratification
+per BIBLE_AMENDMENTS.md SAR-10 (board ratification
 [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012)).
 
 Stability properties (re-derived from SAR-10 entry):

@@ -13,9 +13,10 @@ Wave-A Step-1.5b survey surfaced 2 fcc_id_unique FP hits (`CVE-2025`,
 `NON-INFRINGEMENT`) — the stop-list catches CVE; the allowlist catches
 `NON-INFRINGEMENT` (since `NON` is not a real grantee prefix).
 
-SAR-7 (BIBLE_AMENDMENTS.md, commit `2c41e2b`) bundles three disambig sub-rules
+SAR-7 (BIBLE_AMENDMENTS.md) bundles three disambig sub-rules
 into this module:
-    #1  CVE/CWE/NIST stop-list (already implemented `aed1e96`; codified here).
+    #1  CVE/CWE/NIST stop-list (already implemented at the MAC-25 Wave-A close
+        in `STOP_LIST_PATTERNS` below; codified here).
     #2  is_country_jurisdiction_context_fp(vendor, context_text) — vendor-name
         vs. country/jurisdiction-token disambig (DJI vs. Djibouti class).
     #3  is_commercial_model_name_fp(match, context_text) — news/forum-prose

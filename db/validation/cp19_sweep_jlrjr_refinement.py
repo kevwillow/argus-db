@@ -1,7 +1,7 @@
 """CP19 Scope 2 jlrjr-sub-source refinement sub-sweep (MAC-96 post-handback).
 
-Refines the 335 Scope 2 rows from the parent CP19 sweep (`MAC-88-cp19-sweep-1`,
-commit c121bec) to point at the more precise jlrjr/faa-rid-lookup sub-source
+Refines the 335 Scope 2 rows from the parent CP19 sweep (extraction run
+`MAC-88-cp19-sweep-1`) to point at the more precise jlrjr/faa-rid-lookup sub-source
 rather than the top-level alphafox02/DragonSync wrapper.
 
 Authority chain:
@@ -67,7 +67,7 @@ def per_row_reason(identifier: str) -> str:
     """Substantive per-row rationale (board a1dab600 §2 convention)."""
     return (
         f"Refinement to more precise sub-source for identifier {identifier}: "
-        f"the parent CP19 Scope 2 sweep (MAC-88-cp19-sweep-1, commit c121bec) "
+        f"the parent CP19 Scope 2 sweep (extraction run MAC-88-cp19-sweep-1) "
         f"recorded source_url at the top-level alphafox02/DragonSync wrapper "
         f"per the documented fallback. Per CEO refinement on MAC-96 "
         f"(2026-05-14T02:30:07Z, MAC-88 board f253206b), worker has authority "
