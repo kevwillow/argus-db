@@ -1,11 +1,11 @@
-"""Mutation fixtures for `scripts/check_commit_cites.py` (MAC-704).
+"""Mutation fixtures for `scripts/check_commit_cites.py` (MAC-704, MAC-710).
 
 BRIEF_STANDARDS.md R9 requires the producing script to carry a structural guard and
 that the guard be shown failing on an input it should reject. The script's own
 `--selftest` is that demonstration; these tests pin it in CI so it cannot rot into
 decoration, and add the negative cases that matter most.
 
-The two that pay for themselves:
+The four that pay for themselves:
 
 * **fence removal must poison.** If deleting a marker left the SHA exempt, the fence
   would be inert and the gate would be certifying whatever the last annotator felt
@@ -13,6 +13,13 @@ The two that pay for themselves:
 * **the ledger pattern must be load-bearing.** `**Commit:** \\`sha\\`` is invisible to
   the filed selector. If `LEDGER_RE` regressed, the six repaired CP1–CP6 headers
   would read as clean because nothing looked at them.
+* **a substring match must not resolve a subject** (MAC-710). `--fixed-strings --grep`
+  matches anywhere in the whole message. Without the `%s` equality filter behind it, a
+  truncated or reworded anchor resolves to whatever commit happens to mention it and a
+  rotted handle reads as live — the false pass the arm exists to prevent.
+* **an ambiguous subject must fail like a rotted one** (MAC-710). A subject naming two
+  commits retrieves neither. Treating "found something" as success would license
+  exactly the anchors that cannot do the one job a citation has.
 """
 
 from __future__ import annotations
@@ -148,3 +155,169 @@ class TestStructuralGuard:
         live_paths = {p + "x.md" for p in cc.REPAIR_EXCLUSIONS}
         failures = cc.assert_selector_covers_hits([], {}, live_paths)
         assert not any(f.startswith("D:") for f in failures)
+
+    def test_arm_a_tolerates_a_subject_only_line(self):
+        """MAC-710 widened arm A. A ledger header citing a subject carries no sha, and
+        before the widening all six repaired CP1-CP6 headers would have failed arm A."""
+        line = "**Commit:** subject `whatever the wording is`"
+        assert cc.extract(line) == []
+        failures = cc.assert_selector_covers_hits([("x.md", 1, line)], {}, set())
+        assert not any(f.startswith("A:") for f in failures)
+
+
+def _tally():
+    return cc._subject_tally()
+
+
+def _a_unique_subject() -> str:
+    return sorted(s for s, n in _tally().items() if n == 1)[0]
+
+
+def _a_duplicate_subject() -> str:
+    return sorted(s for s, n in _tally().items() if n > 1)[0]
+
+
+class TestSubjectAnchors:
+    """MAC-710 — the arm that did not exist while the ledger already depended on it."""
+
+    def test_anchor_pattern_is_line_anchored(self):
+        """Only a header is a citation. A line that merely discusses the form -- this
+        file, the gate's own fixtures, the ledger's policy prose -- is not one."""
+        assert cc.extract_subjects("**Commit:** subject `x`") == ["x"]
+        assert cc.extract_subjects("    **Commit:** subject `x`") == []
+        assert cc.extract_subjects("see **Commit:** subject `x` for the form") == []
+
+    def test_unique_subject_classifies_unique(self):
+        subject = _a_unique_subject()
+        got = cc.classify_subjects([("x.md", 1, f"**Commit:** subject `{subject}`")])
+        assert got[subject]["status"] == "unique"
+        assert len(got[subject]["matches"]) == 1
+
+    def test_zero_match_subject_classifies_rotted(self):
+        subject = cc.ROTTED_SUBJECT_FIXTURE
+        got = cc.classify_subjects([("x.md", 1, f"**Commit:** subject `{subject}`")])
+        assert got[subject]["status"] == "rotted"
+        assert got[subject]["matches"] == []
+
+    def test_duplicate_subject_classifies_ambiguous(self):
+        """A handle that resolves to a set is not a handle."""
+        subject = _a_duplicate_subject()
+        got = cc.classify_subjects([("x.md", 1, f"**Commit:** subject `{subject}`")])
+        assert got[subject]["status"] == "ambiguous"
+        assert len(got[subject]["matches"]) >= 2
+
+    def test_substring_match_alone_does_not_resolve(self):
+        """The equality filter is load-bearing, not belt-and-braces.
+
+        A truncated anchor is still a substring of the real message, so
+        `--fixed-strings --grep` finds the commit. Only `%s` equality rejects it. Drop
+        that filter and every truncated or reworded anchor reads as live.
+        """
+        full = next(
+            s for s in sorted(v for v, n in _tally().items() if n == 1) if len(s) > 24
+        )
+        truncated = full[:16]
+        raw = subprocess.run(
+            ["git", "log", "--all", "--format=%H", "--fixed-strings", "--grep", truncated],
+            cwd=REPO, capture_output=True, text=True, check=True,
+        ).stdout.split()
+        assert raw, "fixture is not a substring of any commit message; test proves nothing"
+        assert cc.resolve_subject(full) != ()
+        assert cc.resolve_subject(truncated) == ()
+
+    def test_fence_exempts_a_quoted_subject(self):
+        subject = cc.FENCED_SUBJECT_FIXTURE
+        got = cc.classify_subjects(
+            [("x.md", 1, f"**Commit:** subject `{subject}` ({cc.EXEMPLAR_MARKER})")]
+        )
+        assert got[subject]["status"] == "exemplar"
+
+    def test_removing_the_fence_poisons_a_subject(self):
+        """Same unanimity rule as the sha arm: one unfenced site re-arms the defect."""
+        subject = cc.POISON_SUBJECT_FIXTURE
+        got = cc.classify_subjects(
+            [
+                ("a.md", 1, f"**Commit:** subject `{subject}` ({cc.EXEMPLAR_MARKER})"),
+                ("b.md", 1, f"**Commit:** subject `{subject}`"),
+            ]
+        )
+        assert got[subject]["status"] == "rotted"
+
+    def test_every_ledger_anchor_at_head_is_unique(self):
+        """The acceptance condition itself, read off the live tree rather than asserted."""
+        hits = cc.grep_lines()
+        got = cc.classify_subjects(hits)
+        assert got, "no subject anchors found; the selector lost the ledger"
+        broken = {s: e["status"] for s, e in got.items() if e["status"] in cc.SUBJECT_BROKEN}
+        assert broken == {}, broken
+
+
+class TestLedgerHeaderGuard:
+    """Arm E — the anti-vacuity guard. Without it, rewording the six headers into a form
+    the subject pattern misses would drop the tally to zero and print PASS."""
+
+    def test_arm_e_fires_on_a_header_with_no_handle(self):
+        failures = cc.assert_selector_covers_hits(
+            [], {}, {p + "x.md" for p in cc.REPAIR_EXCLUSIONS},
+            headers=[("x.md", 1, "**Commit:** landed sometime last spring")],
+        )
+        assert any(f.startswith("E:") for f in failures)
+
+    def test_arm_e_silent_on_each_accepted_form(self):
+        paths = {p + "x.md" for p in cc.REPAIR_EXCLUSIONS}
+        accepted = [
+            "**Commit:** `b2a8dac` — `docs(bible): correction pass 5`",  # dead-cite exemplar
+            "**Commit:** subject `docs(bible): correction pass 5`",
+            f"**Commit:** landed at `{cc.SELF_REF_PLACEHOLDER}`",
+            f"**Commit:** the form is illustrated here ({cc.EXEMPLAR_MARKER})",
+        ]
+        for line in accepted:
+            failures = cc.assert_selector_covers_hits([], {}, paths, headers=[("x.md", 1, line)])
+            assert not any(f.startswith("E:") for f in failures), line
+
+    def test_arm_e_covers_every_header_at_head(self):
+        """Non-vacuity: the arm has a real denominator in this repo, not zero rows."""
+        headers = cc.ledger_header_lines()
+        assert len(headers) >= 6, headers
+        failures = cc.assert_selector_covers_hits(
+            [], {}, {p + "x.md" for p in cc.REPAIR_EXCLUSIONS}, headers=headers
+        )
+        assert not any(f.startswith("E:") for f in failures), failures
+
+    def test_arm_f_fires_on_unclassified_subject(self):
+        rigged = {"s": {"subject": "s", "sites": [], "marked_sites": 0, "matches": [], "status": "?"}}
+        failures = cc.assert_selector_covers_hits(
+            [], {}, {p + "x.md" for p in cc.REPAIR_EXCLUSIONS}, by_subject=rigged
+        )
+        assert any(f.startswith("F:") for f in failures)
+
+
+class TestCarveOutDisclosure:
+    """MAC-710 deliverable 3 — a green gate must not read as full coverage."""
+
+    def test_disclosure_names_every_carve_out_and_counts_what_it_holds(self):
+        hits = cc.grep_lines()
+        disc = cc.carve_out_disclosure(hits, set())
+        assert [r["prefix"] for r in disc["carve_outs"]] == list(cc.REPAIR_EXCLUSIONS)
+        assert disc["held"], "carve-outs hold nothing; the disclosure would be vacuous"
+        # Nothing is reported in scope, so everything held is hidden from it.
+        assert disc["hidden_from_this_scope"] == disc["held"]
+
+    def test_hidden_shrinks_when_the_scope_already_reports_it(self):
+        """`hidden` is a set difference against what this scope shows, not a constant."""
+        hits = cc.grep_lines()
+        held = cc.carve_out_disclosure(hits, set())["held"]
+        disc = cc.carve_out_disclosure(hits, set(held))
+        assert disc["held"] == held
+        assert disc["hidden_from_this_scope"] == []
+
+    def test_both_scopes_print_the_carve_outs(self):
+        for scope in ("repair", "full"):
+            proc = subprocess.run(
+                [sys.executable, "scripts/check_commit_cites.py", "--scope", scope],
+                cwd=REPO, capture_output=True, text=True,
+            )
+            out = proc.stdout
+            assert "repair-scope carve-outs:" in out, out
+            for prefix in cc.REPAIR_EXCLUSIONS:
+                assert f"carve-out  {prefix}" in out, (scope, prefix)
