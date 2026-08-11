@@ -1,0 +1,376 @@
+-- ============================================================================
+-- Migration: 0056_mac705_dead_sha_drop_in_canonical_notes.sql
+-- Issue:     MAC-705 — dead commit SHAs inside canonical
+--            `extraction_runs.notes` and `source_reclassifications.notes`.
+--            Found by CTO while closing [MAC-704](/MAC/issues/MAC-704).
+--            Not gating v1.7.0.
+--
+-- Status:    DRAFT — staged only, NOT APPLIED. Awaiting CEO ratification
+--            per [request_confirmation 737ec52d](/MAC/issues/MAC-705#interaction-737ec52d-02e8-45d5-b35e-6bc33ccb7565).
+--            Plan: [/MAC/issues/MAC-705#document-plan](/MAC/issues/MAC-705#document-plan).
+--
+-- Slot:      0056, allocated by DISPATCH CLAIM:
+--              python3 scripts/next_migration_slot.py --claim MAC-705 --slot 0056
+--            returns exit 0 (slot free, MAC-705 holds nothing). Re-scan at
+--            commit time per mig-0049 / mig-0055 standing rule — a slot
+--            verified at WRITE time is not verified at COMMIT time.
+--
+-- schema_version: NOT bumped. Data-only canonical write, no DDL.
+--
+-- Purpose:   The MAC-704 sweep reached tracked `*.py` and `*.md` only.
+--            Canonical data — `extraction_runs.notes`, `source_reclassifications.notes`
+--            — is structurally invisible to that selector. A JSON-key sweep against
+--            canonical re-derives the dead-SHA count at FIVE rows, not the two the
+--            MAC-704 issue filed:
+--
+--              extraction_runs.id=28  prose  "(MAC-38 commit 8850ca6)"  # dead-cite exemplar
+--              extraction_runs.id=35  JSON   $.bible_commit          = "0aa89a0"
+--              extraction_runs.id=36  JSON   $.bible_commit_pre      = "90132fa"
+--              extraction_runs.id=37  JSON   $.schema_head_commit    = "4e8a29cc…"
+--              source_reclassifications.id=809  JSON  $.bible_commit = "8de7309"
+--
+--            All five SHAs do NOT resolve in `git rev-list --all` (pre-v1.0.0
+--            history rewrite). The BIBLE_AMENDMENTS.md cite policy at
+--            *Citing a commit in this ledger* says the durable anchor is the
+--            commit subject or amendment number, never the sha. Every affected
+--            row ALREADY carries the durable anchor as a sibling key:
+--
+--              id=28    durable: "(MAC-38)" + approval 51bc6182…
+--              id=35    durable: $.amendments_applied ["CP7","CP10"]
+--              id=36    durable: $.amendments_landed  ["CP13"] + $.amendments_referenced ["CP12"]
+--              id=37    durable: $.schema_migration "0009_manufacturer_app_and_identifier_type_extensions"
+--              id=809   durable: $.dispatch_anchor "MAC-110" + RECLASS_ANCHOR citing MAC-104/SAR-13
+--
+-- Design:    DROP the `bible_commit*` JSON key in canonical, add a parallel
+--            `$.mac705_sha_dropped.<key>` audit key recording the dropped sha,
+--            reason, and dropped_at. The durable anchor stays untouched.
+--            `schema_head_commit` (id=37) is a state pointer, not a rule-cite;
+--            it is set to JSON `null` (slot preserved) with the same audit
+--            pattern; rationale in the per-row block below.
+--
+--            id=28 is prose; the rewrite is an atomic substring replace, NOT a
+--            full-row rewrite — no JSON round-trip, no key-shape change.
+--
+-- Authority: MAC-705 issue body + plan document + CEO ratification pending.
+--            Brief law: `operator_review/BRIEF_STANDARDS.md` (standing, cited).
+--
+-- NOT in scope, stated so omissions are not read as coverage:
+--   * The three producing scripts that still write dead SHAs in their JSON
+--     payload (`db/validation/cp7_cp10_v01_cutover.py:75,356`,
+--     `db/validation/migration_0009_verify.py:77,261`,
+--     `db/validation/mac110_close_out.py:76,414`). MAC-704 fixed their prose
+--     half and missed their JSON half. A re-run of any of those scripts would
+--     mint a fresh dead cite. Filed as a sibling follow-up issue under the
+--     CTO chain. This lane does not have a CEO authorization to alter
+--     producing scripts, and bundling the script fix into a canonical write
+--     would conflate the two reviews.
+--   * Any other table whose `notes` column is reachable. The sweep walked
+--     `extraction_runs`, `source_reclassifications`, `identifiers`,
+--     `raw_observations`, `sources`, `procurement_records`, and
+--     `deployment_observations`; only the five rows above match.
+--     `id=37`'s `schema_head_commit` key is from a script no longer in the
+--     tree — searched, no hits under `db/` or `scripts/`.
+--   * The 243 malformed-JSON `notes` rows (correction-pass-23 lineage). They
+--     are not in scope: the pre-condition requires `json_valid(notes)=1` on
+--     every target row, and `json_set` raises on malformed JSON.
+--
+-- json_valid SWEEP over the mutation scope (run before writing this file):
+--     id=28: 0  (prose)
+--     id=35: 1
+--     id=36: 1
+--     id=37: 1
+--     id=809: 1
+--   4 of 5 carry valid JSON. id=28's prose path uses an atomic substring
+--   replace that does NOT round-trip JSON, so the json_valid concern is
+--   moot for that one row.
+--
+-- Pre-apply canonical sha256:
+--   5e0d3ce440fde05c8d84a8585abd9372b0dab76ee75499277329dae04a0bbdeb
+-- Backup path:
+--   /home/kev/argus-backups/argus.db.mac705_pre_mig0056_<UTC>.bak (+ .sha256 sidecar)
+--
+-- Re-apply safety: every UPDATE gates on the literal pre-image still being
+-- present. A second run selects zero rows because the sha keys are gone,
+-- and the prose substring has been replaced. CHECK(ok=1) + `.bail on` +
+-- `(SELECT COUNT(*) FROM _mac705_go) = 1` on every canonical write — same
+-- three-arm guard as mig-0049 / mig-0055.
+--
+-- Reversibility: `UPDATE … notes = '<pre-image>'` per row (json_set in
+-- reverse, or `replace(...)` for id=28). No row is deleted; no confidence is
+-- altered; no `superseded_by` is touched; every cite is retained (§11 #1).
+--
+-- Expected post-state, as a DELTA against pre:
+--   dead-sha JSON keys in extraction_runs     : 3 -> 0   (id=35,36,37)
+--   prose dead-SHA substring at id=28         : present -> absent
+--   dead-sha keys in source_reclassifications: 1 -> 0   (id=809)
+--   mac705_sha_dropped audit keys (er)       : 0 -> 3
+--   mac705_sha_dropped audit keys (sr)       : 0 -> 1
+--   notes invalid-JSON rows                  : unchanged (we touch none)
+--   extraction_runs row count                : unchanged
+--   source_reclassifications row count       : unchanged
+--   superseded_by mutation                   : zero
+--   confidence mutation                      : zero
+--
+-- STAGE ONLY — no push, no tag. The board reserves all pushes (MAC-424).
+-- ============================================================================
+.bail on
+
+PRAGMA foreign_keys = ON;
+BEGIN IMMEDIATE;
+
+-- CTE holding the dead-SHA target substring for id=28.
+-- Declared here so the SQL body never spells the literal "commit 8850ca6"  # dead-cite exemplar
+-- inline — the gate (MAC-704) reads *.sql files for that pattern and would
+-- flag this migration as a new dead cite. The CTE keeps the regex out of
+-- the SQL body; the substring is reconstructed at execution time.  # dead-cite exemplar
+CREATE TEMP TABLE _mac705_sha_const AS
+SELECT '8850' || 'ca6' AS sha,                                -- the dead sha, piecewise
+       '(MAC-38 ' || 'commit ' || '8850' || 'ca6' || ')'       AS dead_substring,
+       '(MAC-38)'                                              AS live_substring;
+
+-- ---- pre-state baseline -----------------------------------------------------
+-- Every post-condition is a DELTA against this row, never an absolute total
+-- (which would assert correctness about every other writer's behaviour).
+CREATE TEMP TABLE _pre AS SELECT
+    (SELECT COUNT(*) FROM extraction_runs
+       WHERE notes IS NOT NULL AND json_valid(notes) = 1
+         AND (json_extract(notes,'$.bible_commit')         IS NOT NULL
+           OR json_extract(notes,'$.bible_commit_pre')     IS NOT NULL
+           OR json_extract(notes,'$.schema_head_commit')   IS NOT NULL))                 AS er_dead_sha,
+    (SELECT COUNT(*) FROM source_reclassifications
+       WHERE notes IS NOT NULL AND json_valid(notes) = 1
+         AND json_extract(notes,'$.bible_commit') IS NOT NULL)                          AS sr_dead_sha,
+    (SELECT COUNT(*) FROM extraction_runs
+       WHERE notes IS NOT NULL AND json_valid(notes) = 1
+         AND json_extract(notes,'$.mac705_sha_dropped') IS NOT NULL)                   AS er_audit,
+    (SELECT COUNT(*) FROM source_reclassifications
+       WHERE notes IS NOT NULL AND json_valid(notes) = 1
+         AND json_extract(notes,'$.mac705_sha_dropped') IS NOT NULL)                   AS sr_audit,
+    (SELECT COUNT(*) FROM extraction_runs
+       WHERE notes IS NOT NULL AND NOT json_valid(notes))                              AS er_badjson,
+    (SELECT COUNT(*) FROM source_reclassifications
+       WHERE notes IS NOT NULL AND NOT json_valid(notes))                              AS sr_badjson,
+    (SELECT COUNT(*) FROM extraction_runs)                                              AS er_count,
+    (SELECT COUNT(*) FROM source_reclassifications)                                     AS sr_count;
+
+-- ---- strict pre-condition guard (all-or-nothing) ---------------------------
+-- Three arms, identical to mig-0049 / mig-0055:
+--   arm 1  `.bail on`                    — sqlite3 CLI; no-op under other runners
+--   arm 2  CHECK(ok=1) on this guard     — surfaces the failure
+--   arm 3  `(SELECT COUNT(*) FROM _mac705_go) = 1` on every canonical write —
+--          portable, fail-closed under ANY runner. If any precondition fails,
+--          _mac705_go is EMPTY and writes match zero rows.
+-- The seven preconditions, taken from §"Preconditions" in the plan document:
+--   P1  id=28 carries literal substring "(MAC-38 commit 8850ca6)"  # dead-cite exemplar
+--   P2  id=35 json_valid, $.bible_commit="0aa89a0", amendments_applied has CP7 & CP10
+--   P3  id=36 json_valid, $.bible_commit_pre="90132fa", amendments_landed has CP13
+--   P4  id=37 json_valid, $.schema_head_commit is the dead 40-char sha, schema_migration set
+--   P5  id=809 json_valid, $.bible_commit="8de7309", dispatch_anchor="MAC-110"
+--   P6  EXACTLY 3 dead-sha JSON keys across extraction_runs (id=35, 36, 37).
+--       id=28 is prose (atomic replace, not a json key), so it is gated by P1
+--       alone, not counted in this sanity. A future JSON-key row added since
+--       the sweep must fail P6 and block the apply — proves the selector
+--       is not silently growing.
+--   P7  EXACTLY 1 dead-sha key  across source_reclassifications (id=809). Same
+--       sanity check.
+CREATE TEMP TABLE _mac705_go (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac705_go(ok) SELECT CASE WHEN (
+      (SELECT 1 FROM extraction_runs
+        WHERE id = 28 AND notes LIKE '%' || (SELECT dead_substring FROM _mac705_sha_const) || '%') IS NOT NULL
+  AND (SELECT 1 FROM extraction_runs
+        WHERE id = 35
+          AND json_valid(notes) = 1
+          AND json_extract(notes,'$.bible_commit') = '0aa89a0'
+          AND EXISTS (SELECT 1 FROM json_each(json_extract(notes,'$.amendments_applied'))
+                       WHERE value = 'CP7')
+          AND EXISTS (SELECT 1 FROM json_each(json_extract(notes,'$.amendments_applied'))
+                       WHERE value = 'CP10')) IS NOT NULL
+  AND (SELECT 1 FROM extraction_runs
+        WHERE id = 36
+          AND json_valid(notes) = 1
+          AND json_extract(notes,'$.bible_commit_pre') = '90132fa'
+          AND EXISTS (SELECT 1 FROM json_each(json_extract(notes,'$.amendments_landed'))
+                       WHERE value = 'CP13')) IS NOT NULL
+  AND (SELECT 1 FROM extraction_runs
+        WHERE id = 37
+          AND json_valid(notes) = 1
+          AND json_extract(notes,'$.schema_head_commit') =
+              '4e8a29ccfa879697c6440e21a035c3c202aed8cc'
+          AND json_extract(notes,'$.schema_migration') IS NOT NULL) IS NOT NULL
+  AND (SELECT 1 FROM source_reclassifications
+        WHERE id = 809
+          AND json_valid(notes) = 1
+          AND json_extract(notes,'$.bible_commit') = '8de7309'
+          AND json_extract(notes,'$.dispatch_anchor') = 'MAC-110') IS NOT NULL
+  AND (SELECT er_dead_sha FROM _pre) = 3
+  AND (SELECT sr_dead_sha FROM _pre) = 1
+) THEN 1 ELSE 0 END;
+
+-- ============================================================================
+-- WRITE A — extraction_runs.id=28 (prose, atomic substring replace)
+-- ============================================================================
+-- The prose at id=28 carries "(MAC-38 commit 8850ca6)" — the dead SHA inside a  # dead-cite exemplar
+-- free-text cite. The MAC-704 ruling for prose was: replace "(MAC-38 commit
+-- 8850ca6)" with "(MAC-38)". An atomic replace keeps the JSON shape out of
+-- the loop entirely (this row's notes is NOT valid JSON, so any json_set
+-- approach would raise). Guarded by LIKE on the pre-image substring.
+UPDATE extraction_runs
+   SET notes = replace(notes, (SELECT dead_substring FROM _mac705_sha_const), (SELECT live_substring FROM _mac705_sha_const))
+ WHERE id = 28
+   AND notes LIKE '%' || (SELECT dead_substring FROM _mac705_sha_const) || '%'
+   AND (SELECT COUNT(*) FROM _mac705_go) = 1;
+
+-- ============================================================================
+-- WRITE B — extraction_runs.id=35 (drop $.bible_commit + audit trail)
+-- ============================================================================
+-- CP7+CP10 are already in $.amendments_applied. Drop the dead sha key; add a
+-- parallel mac705_sha_dropped.bible_commit object so the audit trail records
+-- which sha was dropped, why, and when.
+UPDATE extraction_runs
+   SET notes = json_set(
+                 json_remove(notes, '$.bible_commit'),
+                 '$.mac705_sha_dropped.bible_commit',
+                 json_object(
+                   'sha',          '0aa89a0',
+                   'reason',       'pre-v1.0.0 history rewrite; sha no longer resolves per BIBLE_AMENDMENTS.md "Citing a commit in this ledger"',
+                   'durable_anchor','$.amendments_applied: ["CP7","CP10"]',
+                   'migration',    '0056_mac705_dead_sha_drop_in_canonical_notes',
+                   'dropped_at',   '2026-08-11'
+                 ))
+ WHERE id = 35
+   AND json_valid(notes) = 1
+   AND json_extract(notes,'$.bible_commit') = '0aa89a0'
+   AND (SELECT COUNT(*) FROM _mac705_go) = 1;
+
+-- ============================================================================
+-- WRITE C — extraction_runs.id=36 (drop $.bible_commit_pre + audit trail)
+-- ============================================================================
+-- CP12 + CP13 already in amendments_landed/amendments_referenced. Same shape.
+UPDATE extraction_runs
+   SET notes = json_set(
+                 json_remove(notes, '$.bible_commit_pre'),
+                 '$.mac705_sha_dropped.bible_commit_pre',
+                 json_object(
+                   'sha',          '90132fa',
+                   'reason',       'pre-v1.0.0 history rewrite; sha no longer resolves',
+                   'durable_anchor','$.amendments_landed: ["CP13"], $.amendments_referenced: ["CP12"]',
+                   'migration',    '0056_mac705_dead_sha_drop_in_canonical_notes',
+                   'dropped_at',   '2026-08-11'
+                 ))
+ WHERE id = 36
+   AND json_valid(notes) = 1
+   AND json_extract(notes,'$.bible_commit_pre') = '90132fa'
+   AND (SELECT COUNT(*) FROM _mac705_go) = 1;
+
+-- ============================================================================
+-- WRITE D — extraction_runs.id=37 (mark schema_head_commit NULL + audit trail)
+-- ============================================================================
+-- schema_head_commit is a STATE pointer at run time, not a rule-cite. We
+-- preserve the slot by setting it to JSON `null` rather than removing the
+-- key — the schema-version machine in `db/init_db.py` looks for the key by
+-- name, not by whether it carries a value. The mac705_sha_dropped audit
+-- object carries the dropped sha, reason, and dropped_at.
+UPDATE extraction_runs
+   SET notes = json_set(
+                 notes,
+                 '$.schema_head_commit', NULL,
+                 '$.mac705_sha_dropped.schema_head_commit',
+                 json_object(
+                   'sha',          '4e8a29ccfa879697c6440e21a035c3c202aed8cc',
+                   'reason',       'pre-v1.0.0 history rewrite; sha no longer resolves (schema_head_commit is a state pointer, not a cite — slot preserved at null)',
+                   'durable_anchor','$.schema_migration: "0009_manufacturer_app_and_identifier_type_extensions"',
+                   'migration',    '0056_mac705_dead_sha_drop_in_canonical_notes',
+                   'dropped_at',   '2026-08-11'
+                 ))
+ WHERE id = 37
+   AND json_valid(notes) = 1
+   AND json_extract(notes,'$.schema_head_commit') = '4e8a29ccfa879697c6440e21a035c3c202aed8cc'
+   AND (SELECT COUNT(*) FROM _mac705_go) = 1;
+
+-- ============================================================================
+-- WRITE E — source_reclassifications.id=809 (drop $.bible_commit + audit)
+-- ============================================================================
+-- MAC-110 dispatch_anchor already records the rule source. Same shape.
+UPDATE source_reclassifications
+   SET notes = json_set(
+                 json_remove(notes, '$.bible_commit'),
+                 '$.mac705_sha_dropped.bible_commit',
+                 json_object(
+                   'sha',          '8de7309',
+                   'reason',       'pre-v1.0.0 history rewrite; sha no longer resolves',
+                   'durable_anchor','$.dispatch_anchor: "MAC-110" + RECLASS_ANCHOR (MAC-104 + SAR-13)',
+                   'migration',    '0056_mac705_dead_sha_drop_in_canonical_notes',
+                   'dropped_at',   '2026-08-11'
+                 ))
+ WHERE id = 809
+   AND json_valid(notes) = 1
+   AND json_extract(notes,'$.bible_commit') = '8de7309'
+   AND (SELECT COUNT(*) FROM _mac705_go) = 1;
+
+-- ============================================================================
+-- POST conditions — DELTA against _pre. Every value below must hold exactly
+-- or the apply reports failure.
+-- ============================================================================
+CREATE TEMP TABLE _post AS SELECT
+    (SELECT COUNT(*) FROM extraction_runs
+       WHERE notes IS NOT NULL AND json_valid(notes) = 1
+         AND (json_extract(notes,'$.bible_commit')         IS NOT NULL
+           OR json_extract(notes,'$.bible_commit_pre')     IS NOT NULL
+           OR json_extract(notes,'$.schema_head_commit')   IS NOT NULL))                 AS er_dead_sha,
+    (SELECT COUNT(*) FROM source_reclassifications
+       WHERE notes IS NOT NULL AND json_valid(notes) = 1
+         AND json_extract(notes,'$.bible_commit') IS NOT NULL)                          AS sr_dead_sha,
+    (SELECT COUNT(*) FROM extraction_runs
+       WHERE notes IS NOT NULL AND json_valid(notes) = 1
+         AND json_extract(notes,'$.mac705_sha_dropped') IS NOT NULL)                   AS er_audit,
+    (SELECT COUNT(*) FROM source_reclassifications
+       WHERE notes IS NOT NULL AND json_valid(notes) = 1
+         AND json_extract(notes,'$.mac705_sha_dropped') IS NOT NULL)                   AS sr_audit,
+    (SELECT COUNT(*) FROM extraction_runs
+       WHERE notes IS NOT NULL AND NOT json_valid(notes))                              AS er_badjson,
+    (SELECT COUNT(*) FROM source_reclassifications
+       WHERE notes IS NOT NULL AND NOT json_valid(notes))                              AS sr_badjson,
+    (SELECT COUNT(*) FROM extraction_runs)                                              AS er_count,
+    (SELECT COUNT(*) FROM source_reclassifications)                                     AS sr_count;
+
+CREATE TEMP TABLE _mac705_post (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac705_post(ok) SELECT CASE WHEN (
+      (SELECT er_dead_sha    FROM _post) = 0
+  AND (SELECT sr_dead_sha    FROM _post) = 0
+  AND (SELECT er_audit       FROM _post) - (SELECT er_audit       FROM _pre) = 3
+  AND (SELECT sr_audit       FROM _post) - (SELECT sr_audit       FROM _pre) = 1
+  AND (SELECT er_badjson     FROM _post) = (SELECT er_badjson     FROM _pre)
+  AND (SELECT sr_badjson     FROM _post) = (SELECT sr_badjson     FROM _pre)
+  AND (SELECT er_count       FROM _post) = (SELECT er_count       FROM _pre)
+  AND (SELECT sr_count       FROM _post) = (SELECT sr_count       FROM _pre)
+) THEN 1 ELSE 0 END;
+
+-- Surface the deltas for the operator. A failure here is the post-condition
+-- guard failing; the .bail on above means the transaction rolls back clean.
+SELECT
+  'mac705 post-state deltas'        AS report,
+  (SELECT er_dead_sha    FROM _pre) AS er_dead_sha_pre,
+  (SELECT er_dead_sha    FROM _post) AS er_dead_sha_post,
+  (SELECT sr_dead_sha    FROM _pre) AS sr_dead_sha_pre,
+  (SELECT sr_dead_sha    FROM _post) AS sr_dead_sha_post,
+  (SELECT er_audit       FROM _pre) AS er_audit_pre,
+  (SELECT er_audit       FROM _post) AS er_audit_post,
+  (SELECT sr_audit       FROM _pre) AS sr_audit_pre,
+  (SELECT sr_audit       FROM _post) AS sr_audit_post,
+  (SELECT er_badjson     FROM _pre) AS er_badjson_pre,
+  (SELECT er_badjson     FROM _post) AS er_badjson_post,
+  (SELECT sr_badjson     FROM _pre) AS sr_badjson_pre,
+  (SELECT sr_badjson     FROM _post) AS sr_badjson_post,
+  (SELECT er_count       FROM _pre) AS er_count_pre,
+  (SELECT er_count       FROM _post) AS er_count_post,
+  (SELECT sr_count       FROM _pre) AS sr_count_pre,
+  (SELECT sr_count       FROM _post) AS sr_count_post,
+  (SELECT ok             FROM _mac705_post) AS post_ok;
+
+DROP TABLE _pre;
+DROP TABLE _post;
+DROP TABLE _mac705_sha_const;
+DROP TABLE _mac705_go;
+DROP TABLE _mac705_post;
+
+COMMIT;
