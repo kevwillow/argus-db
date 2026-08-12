@@ -62,14 +62,6 @@ These landed after the release was first assembled and before the tag. They are 
 
 **Alias encoding normalized** ([MAC-569](/MAC/issues/MAC-569), [MAC-580](/MAC/issues/MAC-580), migrations `0043` and `0045`). Comma-bearing alias values are now RFC-4180-lite quoted, and standalone corporate-suffix tokens (`Ltd.`, `Inc.`, `LLC`) are merged back onto the name they belong to instead of floating as separate aliases. These are the two `schema_version` bumps.
 
-### Distribution correction: the repo never shipped the database
-
-`README.md` and `docs/engineering/SETUP.md` told you the repository ships `db/argus.db` populated, and that you could clone and start querying. That was false, and not newly so: the path has never existed on the published branch. `git ls-tree -r --name-only origin/main -- db/ | grep -c 'argus\.db'` returns `0` against v1.6.14 and against every release before it. Anyone who followed the old §3 got `argus_cli: database not found`, which read as a broken install when it was a documentation defect.
-
-The docs now state what a clone actually contains. `exports/` ships and is the published data artifact; the database is not distributed here. `SETUP.md` §3 verifies the exports instead of a database that was never present, and a new §3.1 names the two things the missing database rules out (`argus_cli.py` will not run from a clone; §6 export regeneration needs a database you supply). No download route is asserted, because none is in force: §4 rebuilds an empty schema and §5's upstream ingest is a research project, so the repository has no path that reproduces the canonical rows. If you need them, ask the maintainers.
-
-This corrects the documentation only. No shipped identifier, feed entry or export byte moves.
-
 ### Schema
 
 - **`schema_version` 33 → 35**, and no DDL ran. Both bumps record durable data-format normalizations of `manufacturers.aliases` rather than a shape change: `0043` ([MAC-569](/MAC/issues/MAC-569)) re-encodes every alias row into canonical RFC-4180-lite form so comma-bearing values are quoted, taking 33 → 34; `0045` ([MAC-580](/MAC/issues/MAC-580)) merges standalone corporate-suffix tokens back onto the name they belong to, taking 34 → 35. No table, column, `identifier_type` or `device_category` was added: the category enum stays at **20** and the identifier-type enum at **58**.
@@ -111,13 +103,6 @@ procurement-sourced rows are Talos-export-banned outright under bible §11 #14, 
 `new_procurement_only_export_leak` sentinel enforcing it; and only 7 of the 50,499 rows carry a
 `linked_identifier_id` at all; **none of them among the 9,065**. No Lynceus feed entry, no CSV row and
 no `identifiers.confidence` value moves.
-
-It has exactly one consumer: the `exports/coverage_report.md` §6.2 vendor-corroboration table, whose
-`procurement_records` counts gate the HIGH tier at a floor of 10. So §6.2 carries **two** independent
-defects this cycle: the alias-tokenizer bug below, and the containment contamination above. Both are
-reporting-only, and both are corrected at the next regeneration.
-
-`exports/coverage_report.md` §6.2, the vendor-corroboration table, was generated before a tokenizer fix that landed in the same stack ([MAC-535](/MAC/issues/MAC-535)). Splitting vendor aliases on commas produced junk tokens out of corporate suffixes (`Ltd.`, `Inc.`, `LLC`), which inflated corroboration counts for 17 vendors; Hikvision reads 8,662 there where 2 is genuine. Re-running the fixed matcher at this commit changes 20 of 18,713 rows and moves the HIGH tier from 52 vendors to 37. Nothing else moves: the active count, the halt count and both feed drop tallies come out identical, and no `identifiers.confidence` value depends on this table. Those §6.2 tiers are reporting-only, and they are the same numbers every prior release shipped. They get corrected at the next regeneration.
 
 ### Bible amendments
 
