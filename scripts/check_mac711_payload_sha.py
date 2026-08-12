@@ -190,7 +190,7 @@ def main() -> int:
         # above are inert and their silence means nothing.
         # The `dead-cite exemplar` marker sits on each citing line, not above the block:
         # check_commit_cites.py reads the fence off the citing line only, so a marker on a
-        # neighbouring line fences nothing. Learned the hard way at 859d8ba, which staged
+        # neighbouring line fences nothing. Learned the hard way at 7273a12, which staged
         # this file with the marker one line up and took the gate to exit 1.
         controls = {
             "ctrl_key": (json.dumps({"amendments_applied": ["CP7"], "bible_commit": "0aa89a0"}),  # dead-cite exemplar

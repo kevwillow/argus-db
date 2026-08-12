@@ -139,3 +139,11 @@ HANDOFF_*.md
 _patch_cycle_*/
 _v1_*_pretag*/
 _probe_log.md
+
+# MAC-717: raw captured HTTP/scan response bodies must never be tracked. They carry
+# whatever the scanned host was serving, which has included live third-party
+# credentials and PII (shodan_raw/F1_upnp_module.json embedded a Google OAuth secret,
+# purged from history). The promoted output of a harvest is tracked; the raw layer is
+# not. Content of the removed files is preserved by sha256 in the sibling *_MANIFEST.md.
+extraction_outputs/**/shodan_raw/
+extraction_outputs/**/*_raw/

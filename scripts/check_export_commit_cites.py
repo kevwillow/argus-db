@@ -77,7 +77,7 @@ touches `exports/`.
 
 The control must reach the scan to certify anything. `check_push_blob_sizes.py` shipped a
 control that died at exit 2 on a usage error before the scan ran (repaired at MAC-612,
-`e3a5d1a`) -- exit 2 is not a firing instrument. `--positive-control` therefore takes no
+`eedd9a7`) -- exit 2 is not a firing instrument. `--positive-control` therefore takes no
 other arguments and builds its own corpus, so there is no argument combination that can
 strand it short of the scan.
 

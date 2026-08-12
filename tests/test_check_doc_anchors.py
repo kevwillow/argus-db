@@ -284,7 +284,7 @@ def test_t3_class_b_and_c_carry_no_line_numbers():
 
     A skip-list that points at the wrong line is a skip nobody can audit.
     Four of the seven original Class B pins had already slid onto unrelated
-    text by HEAD 7b0d8f9.
+    text by HEAD 8ca4268.
     """
     for site in list(gate_mod.CLASS_B_SITES) + list(gate_mod.CLASS_C_SITES):
         assert "line" not in site, f"{site} carries a positional pin"

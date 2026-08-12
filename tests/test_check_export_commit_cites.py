@@ -30,7 +30,7 @@ Argument defended in this file (in five parts):
       only when the scanner returned 1. A second arm asserts the control
       cannot be stranded short of the scan by an argument combination --
       ``check_push_blob_sizes.py`` shipped a control that died at exit 2
-      before reaching its scan (repaired at MAC-612, ``e3a5d1a``).
+      before reaching its scan (repaired at MAC-612, ``eedd9a7``).
 
   T5  the shipped fix:  ``export_lynceus.py`` no longer contains the literal
       ``commit `6853780``` and the coverage-report builder takes a  (dead-cite exemplar)

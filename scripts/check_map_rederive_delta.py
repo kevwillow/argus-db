@@ -22,10 +22,10 @@ step 2 baseline before step 2 reads it. This gate always re-derives into a
 scratch directory and takes the baseline from git (``git show REV:PATH``),
 so the comparison is against an immutable object rather than a file that
 the previous command just clobbered. Before MAC-703 committed the map at
-``7759b2a`` there was no git copy at all and the baseline was unrecoverable.
+``0e5c2d6`` there was no git copy at all and the baseline was unrecoverable.
 
 Trap 2 (an empty delta is UNEVALUATED, not PASS).  Measured 2026-08-11: the
-tracked baseline at ``7759b2a`` is byte-identical to a fresh re-derive from
+tracked baseline at ``0e5c2d6`` is byte-identical to a fresh re-derive from
 canonical ``5e0d3ce4`` (both sha256 ``59306900...``), so the changed-id set
 is empty and the authorized set is empty, and a naive ``changed ==
 authorized`` prints PASS while exercising nothing. The 12 ids the CEO cited
