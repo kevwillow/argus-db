@@ -1,4 +1,4 @@
-"""MAC-699 -- proof fixtures for ``scripts/check_doc_anchors.py``.
+"""MAC-699 / MAC-717 -- proof fixtures for ``scripts/check_doc_anchors.py``.
 
 The gate's job is to make the v1.7.0 doc surface's headline numeric claims
 mechanically checkable, the way ``scripts/check_prose_dashes.py`` made the
@@ -7,44 +7,59 @@ failing on an input it should reject, and per R7 a green result is not
 evidence the gate works. Every check therefore has a positive control
 beside the negative control it must clear.
 
-Argument defended in this file (in five parts):
+Argument defended in this file (in seven parts):
 
-  T1  bundle shape:  the module holds a frozen bundle of 13 settling queries,
-      keyed by metric, with one CHECK-parsing key per enum cardinality and
-      ``is_arm=1`` for the OEM arm count (NOT ``parent_manufacturer_id
-      IS NOT NULL``, which over-reports by 2 -- Trap 2 in the brief).
+  T1  bundle shape:  a frozen bundle of 13 settling queries keyed by metric,
+      with one CHECK-parsing key per enum cardinality and ``is_arm=1`` for
+      the OEM arm count (NOT ``parent_manufacturer_id IS NOT NULL``, which
+      over-reports by 2 -- Trap 2). Plus the 4 settling ARTIFACTS, and the
+      structural guarantee that no feed count is settled by SQL (Trap 4).
 
   T2  settling queries run read-only:  the runner opens ``db/argus.db`` via
       ``file:...?mode=ro`` and never executes an INSERT / UPDATE / DELETE /
       COMMIT. The fixture asserts the SQLite connection is read-only by
       catching a ``sqlite3.OperationalError`` on a probe write.
 
-  T3  Class A claim extraction:  each Class A site has a regex that extracts
-      the claimed integer from the doc line. Each fixture gives the regex a
-      representative line and asserts the extracted integer.
+  T3  claim registry and extraction:  every Class A site carries a content
+      anchor (never a line number -- MAC-717) and a regex that extracts the
+      claimed integer. Each fixture gives the regex a representative line
+      and asserts the extracted integer.
 
-  T4  comparator:  extracted integer vs settling-query result. Equal -> PASS,
-      not equal -> FAIL. ``NO_SETTLING_QUERY`` claims (no entry in the
-      bundle) are listed in the report but never FAIL.
+  T4  artifact counters:  the JSON entry counter and the CSV data-row
+      counter, each checked against a known-good input AND against the
+      naive instruments that get it wrong (``len(rows) - 1``, physical
+      line count, ``#``-prefix filtering).
 
-  T5  positive control:  an arm that runs the gate against a scratch copy
-      of the doc surface where every Class A claim has been rewritten to
-      match the live settling-query result. The arm asserts the gate exits
-      zero. A second arm mutates one Class A claim in the scratch copy and
-      asserts the gate exits non-zero.
+  T5  resolution semantics:  a content anchor resolves only when it matches
+      exactly one line in its window. Zero matches and two-or-more matches
+      are both ERROR. The section scope is load-bearing: the CHANGELOG's
+      per-release line formats repeat verbatim across every prior release,
+      so an unscoped anchor would bind to a historical section.
 
-The fixtures use ``tmp_path`` copies of the Tier 1 files so the test never
-depends on the on-disk state of the repo -- if the running tree is drifted
-(post-MAC-516 sweep or otherwise) the rejection positive control will fail
-loudly instead of looking green, which is the right failure mode.
+  T6  per-site positive control:  for EVERY settleable Class A site,
+      perturb that site's number in a scratch copy of the real doc surface
+      and assert the gate reports FAIL *at that site*. This is what makes
+      the MAC-717 re-pin a fix rather than a relocation of the blindness --
+      a re-pin that points at a line the gate cannot fail on has moved the
+      blind spot, not removed it.
+
+  T7  artifact-side positive control:  perturb the emitted artifact and
+      leave the docs untouched. The doc sites bound to that artifact must
+      go red, and the sites bound to canonical must NOT -- which is also
+      the proof that the two settling instruments are genuinely distinct
+      rather than two readings of the same number.
+
+The scratch repo is a copy of the LIVE doc surface, not a synthetic one, so
+these controls exercise the real anchors against the real prose. The 26 MB
+CSV is symlinked rather than copied; no test writes through the link.
 """
 from __future__ import annotations
 
 import importlib.util
+import json
 import re
 import sqlite3
 import sys
-import textwrap
 from pathlib import Path
 
 import pytest
@@ -67,9 +82,9 @@ gate_mod = _load_gate_module()
 
 
 # ---------------------------------------------------------------------------
-# T1: bundle shape -- the 13 settling queries, the CHECK-parsing keys, the
-# `is_arm=1` discipline (Trap 2), and the absence of any COUNT(DISTINCT)
-# discipline for the enum-cardinality entries (Trap 1).
+# T1: bundle shape -- the 13 settling queries, the 4 settling artifacts, the
+# CHECK-parsing keys (Trap 1), the `is_arm=1` discipline (Trap 2), and the
+# structural ban on settling a feed count with SQL (Trap 4).
 # ---------------------------------------------------------------------------
 
 
@@ -117,23 +132,60 @@ def test_t1_arm_count_uses_is_arm_not_parent_link():
 def test_t1_enum_cardinality_uses_check_constraint_not_distinct():
     """Trap 1: enum cardinality parses the CHECK constraint, never COUNT(DISTINCT).
 
-    README.md line 32 (20 device categories) and line 33 (58 identifier types)
-    are correct as CHECK-enum cardinality. COUNT(DISTINCT) would yield 19 and
-    51 respectively on the live DB and would confidently propose regressions.
-    The bundle entries for the two enum-cardinality keys must NOT be plain
-    `SELECT COUNT(DISTINCT ...)` queries -- they must invoke the CHECK parser.
+    The README device-category and identifier-type claims are correct as
+    CHECK-enum cardinality. COUNT(DISTINCT) would yield 19 and 51 on the live
+    DB and would confidently propose regressions. The bundle entries for the
+    two enum-cardinality keys must NOT be plain `SELECT COUNT(DISTINCT ...)`
+    queries -- they must invoke the CHECK parser.
     """
     cat_key = gate_mod.SETTLE_QUERIES["device_category_enum"]
     type_key = gate_mod.SETTLE_QUERIES["identifier_type_enum"]
-    # Both enum-cardinality entries must NOT be a `SELECT COUNT(DISTINCT ...)`
-    # string (it would silently "fix" the live 19/51 cardinality into the doc
-    # claim of 20/58 and produce a regression).
     assert "COUNT(DISTINCT" not in cat_key, (
         f"device_category_enum must not use COUNT(DISTINCT); got {cat_key!r}"
     )
     assert "COUNT(DISTINCT" not in type_key, (
         f"identifier_type_enum must not use COUNT(DISTINCT); got {type_key!r}"
     )
+    assert cat_key.startswith("PARSE_CHECK:")
+    assert type_key.startswith("PARSE_CHECK:")
+
+
+def test_t1_settle_artifacts_shape():
+    """The 4 settling artifacts: three feeds by JSON entry count, CSV by rows."""
+    arts = gate_mod.SETTLE_ARTIFACTS
+    assert set(arts) == {
+        "feed_standard",
+        "feed_high_confidence",
+        "feed_behavioral",
+        "csv_data_rows",
+    }
+    for key in ("feed_standard", "feed_high_confidence", "feed_behavioral"):
+        relpath, kind = arts[key]
+        assert kind == "json_entries", f"{key} must settle by JSON entry count"
+        assert relpath.startswith("exports/")
+    assert arts["csv_data_rows"] == ("exports/argus_export.csv", "csv_data_rows")
+
+
+def test_t1_no_feed_count_is_settled_by_sql():
+    """Trap 4: a feed count has no DB-side answer, so no SQL may claim to give one.
+
+    A row can clear the confidence floor and still bin out before the feed
+    (`device_category='unknown'` bins out first; `geographic_scope IS NULL`
+    passes the standard feed and fails high-confidence). Any query that
+    resembles the export predicate disagrees with the product. The structural
+    guarantee is that the feed keys live in SETTLE_ARTIFACTS and nowhere in
+    SETTLE_QUERIES.
+    """
+    feed_keys = {"feed_standard", "feed_high_confidence", "feed_behavioral"}
+    assert not (feed_keys & set(gate_mod.SETTLE_QUERIES)), (
+        "a feed count must never be settled by a SQL query"
+    )
+    # And every claim printing a feed count must reference an artifact key.
+    for claim in gate_mod.CLASS_A_CLAIMS:
+        if "feed" in claim["description"] or "export rows" in claim["description"]:
+            assert claim["settle_key"] not in gate_mod.SETTLE_QUERIES, (
+                f"{claim['description']!r} settles a feed count against SQL"
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -141,7 +193,7 @@ def test_t1_enum_cardinality_uses_check_constraint_not_distinct():
 # ---------------------------------------------------------------------------
 
 
-def test_t2_settling_runner_opens_db_read_only(tmp_path):
+def test_t2_settling_runner_opens_db_read_only():
     """The runner opens `db/argus.db` via the `file:...?mode=ro` URI form.
 
     A probe write inside the same connection must raise OperationalError.
@@ -161,24 +213,16 @@ def test_t2_gate_source_contains_no_sql_write_ops():
     """The gate's source has no INSERT/UPDATE/DELETE/COMMIT outside docstrings.
 
     The brief explicitly forbids writes. A reviewer grepping for SQL write
-    operations should find only docstring mentions and a docstring note in
-    `_open_db_ro` about the probe-write invariant. We strip comments and
+    operations should find only docstring mentions. We strip comments and
     docstrings before grepping so this remains a load-bearing structural
     invariant rather than a comment-policing test.
     """
-    import re as _re
     src = GATE.read_text(encoding="utf-8")
-    # Strip triple-quoted docstrings (best-effort).
-    src = _re.sub(r'"""[\s\S]*?"""', "", src)
-    src = _re.sub(r"'''[\s\S]*?'''", "", src)
-    # Strip line comments.
+    src = re.sub(r'"""[\s\S]*?"""', "", src)
+    src = re.sub(r"'''[\s\S]*?'''", "", src)
     src = "\n".join(
         line for line in src.splitlines() if not line.lstrip().startswith("#")
     )
-    # The brief allows probe-write mention in the docstring (already stripped
-    # above) and forbids it everywhere else. A bare `commit()` or
-    # `executemany` is forbidden; `INSERT/UPDATE/DELETE` SQL keywords are
-    # forbidden.
     assert "INSERT" not in src, "gate source contains INSERT"
     assert "DELETE" not in src, "gate source contains DELETE"
     assert "UPDATE" not in src, "gate source contains UPDATE"
@@ -191,169 +235,289 @@ def test_t2_settling_runner_returns_expected_keys():
     two CHECK-parsing entries. Each CHECK-parsing entry's value is the int
     cardinality of the parsed CHECK clause.
     """
-    db_path = REPO / "db" / "argus.db"
-    results = gate_mod.run_settling_queries(db_path)
+    results = gate_mod.run_settling_queries(REPO / "db" / "argus.db")
     for k in gate_mod.SETTLE_QUERIES:
         assert k in results, f"missing result for settling-query key {k!r}"
-    # The two CHECK-parsing entries must be ints (parsed cardinality).
     assert isinstance(results["device_category_enum"], int)
     assert isinstance(results["identifier_type_enum"], int)
 
 
+def test_t2_artifact_runner_returns_every_key_with_no_problems():
+    """Against the live tree, every settling artifact parses cleanly."""
+    results, problems = gate_mod.run_settling_artifacts(REPO)
+    assert problems == {}, f"unreadable settling artifacts: {problems}"
+    assert set(results) == set(gate_mod.SETTLE_ARTIFACTS)
+    for key, value in results.items():
+        assert isinstance(value, int) and value > 0, f"{key} settled to {value!r}"
+
+
 # ---------------------------------------------------------------------------
-# T3: claim extraction -- each Class A site has a regex that pulls the
-# claimed integer from the doc line. These tests pin the regex shape and
-# catch silent drift in the extraction logic.
+# T3: claim registry shape and extraction regexes.
 # ---------------------------------------------------------------------------
 
 
-def test_t3_each_class_a_claim_has_extract_pattern():
-    """Every Class A claim site carries an extract pattern, a settle key
-    (or NO_SETTLING_QUERY), a file, and a line number. The brief is explicit
-    that the class assignment per site is in the source, not implied.
+def test_t3_every_class_a_claim_is_content_anchored():
+    """Every Class A site carries a content anchor and NO line number.
+
+    MAC-717: positional pins slid off their claim sites when MAC-708
+    renumbered CHANGELOG.md. A `line` key reappearing here is the
+    regression this test exists to catch.
     """
+    settleable = set(gate_mod.SETTLE_QUERIES) | set(gate_mod.SETTLE_ARTIFACTS)
     for claim in gate_mod.CLASS_A_CLAIMS:
         assert "file" in claim
-        assert "line" in claim
         assert "description" in claim
         assert "extract_pattern" in claim
-        # Settle key is either one of the bundle keys or NO_SETTLING_QUERY.
+        assert claim.get("anchor"), f"{claim['description']!r} has no content anchor"
+        assert "line" not in claim, (
+            f"{claim['description']!r} carries a positional pin; MAC-717 removed these"
+        )
         sk = claim.get("settle_key")
-        assert sk in gate_mod.SETTLE_QUERIES or sk == gate_mod.NO_SETTLING_QUERY, (
-            f"claim {claim['description']!r} has settle_key={sk!r}, "
-            f"which is neither a bundle key nor NO_SETTLING_QUERY"
+        assert sk in settleable or sk == gate_mod.NO_SETTLING_QUERY, (
+            f"claim {claim['description']!r} has settle_key={sk!r}, which is "
+            f"neither a settling key nor NO_SETTLING_QUERY"
         )
 
 
-def test_t3_extract_active_identifiers():
-    """README.md line 29 (first clause): `**43,116 active canonical identifiers`."""
-    claim = _find_claim("README.md", 29, "active canonical identifiers")
-    text = "**43,116 active canonical identifiers**, the things you query against"
-    extracted = _extract(claim, text)
-    assert extracted == 43116
+def test_t3_class_b_and_c_carry_no_line_numbers():
+    """Skip-list entries are described by content locator, not line number.
+
+    A skip-list that points at the wrong line is a skip nobody can audit.
+    Four of the seven original Class B pins had already slid onto unrelated
+    text by HEAD 7b0d8f9.
+    """
+    for site in list(gate_mod.CLASS_B_SITES) + list(gate_mod.CLASS_C_SITES):
+        assert "line" not in site, f"{site} carries a positional pin"
+        assert site.get("locator"), f"{site} has no content locator"
+        assert site.get("reason"), f"{site} has no skip reason"
 
 
-def test_t3_extract_total_manufacturers():
-    """README.md line 30: `**240 manufacturers`."""
-    claim = _find_claim("README.md", 30, "total manufacturers")
-    text = "**240 manufacturers**, surveillance vendors classified by what they make"
-    extracted = _extract(claim, text)
-    assert extracted == 240
+def test_t3_class_a_descriptions_are_unique_per_file():
+    """(file, description) identifies a claim site -- the tests key on it."""
+    seen = set()
+    for claim in gate_mod.CLASS_A_CLAIMS:
+        key = (claim["file"], claim["description"])
+        assert key not in seen, f"duplicate claim site {key}"
+        seen.add(key)
 
 
-def test_t3_extract_oem_arms_first_phrase():
-    """README.md line 30: `92 of those are OEM arms`."""
-    claim = _find_claim("README.md", 30, "OEM arms (first)")
-    text = "92 of those are OEM arms, the rebadging brands a parent vendor sells through"
-    extracted = _extract(claim, text)
-    assert extracted == 92
+# One representative line per Class A site, and the integer its regex must
+# pull out. Shared by the extraction fixtures and by the coverage test that
+# forbids adding a Class A site without one.
+_EXTRACT_FIXTURES = [
+        (
+            "README.md", "active canonical identifiers",
+            "- **43,116 active canonical identifiers**, the things you query against",
+            43116,
+        ),
+        (
+            "README.md", "total manufacturers",
+            "- **240 manufacturers**, surveillance vendors classified by what they make",
+            240,
+        ),
+        (
+            "README.md", "OEM arms (first)",
+            "92 of those are OEM arms, the rebadging brands a parent vendor sells through",
+            92,
+        ),
+        (
+            "README.md", "vendors",
+            "Argus lists 240 vendors, 92 of them OEM arms that exist to attribute",
+            240,
+        ),
+        (
+            "README.md", "OEM arms (second)",
+            "Argus lists 240 vendors, 92 of them OEM arms that exist to attribute",
+            92,
+        ),
+        (
+            "README.md", "CSV export row count",
+            "| `exports/argus_export.csv` | 43,116 | Bulk import, analysis, or re-derivation. |",
+            43116,
+        ),
+        (
+            "README.md", "high-conf feed",
+            "| `exports/argus_export_high_confidence.json` | 481 | Runtime scanners (Lynceus). |",
+            481,
+        ),
+        (
+            "README.md", "standard feed",
+            "| `exports/argus_export.json` | 981 | Broader scanner watchlists. |",
+            981,
+        ),
+        (
+            "README.md", "behavioral feed",
+            "| `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners. |",
+            132,
+        ),
+        (
+            "CHANGELOG.md", "standard feed (CHANGELOG feed-totals)",
+            "**Feed totals.** Standard 977 to **983**, high-confidence 481 to **501**, behavioral **132** unchanged.",
+            983,
+        ),
+        (
+            "CHANGELOG.md", "high-conf feed (CHANGELOG feed-totals)",
+            "**Feed totals.** Standard 977 to **983**, high-confidence 481 to **501**, behavioral **132** unchanged.",
+            501,
+        ),
+        (
+            "CHANGELOG.md", "behavioral feed (CHANGELOG feed-totals)",
+            "**Feed totals.** Standard 977 to **983**, high-confidence 481 to **501**, behavioral **132** unchanged.",
+            132,
+        ),
+        (
+            "CHANGELOG.md", "standard feed (CHANGELOG data line)",
+            "- **Lynceus standard feed:** 977 → **983** (+43 / −37). **high-confidence feed:** 481 → **501** (+25 / −5). **behavioral-signatures feed:** **132**. **CSV:** **43,088** rows.",
+            983,
+        ),
+        (
+            "CHANGELOG.md", "high-conf feed (CHANGELOG data line)",
+            "- **Lynceus standard feed:** 977 → **983** (+43 / −37). **high-confidence feed:** 481 → **501** (+25 / −5). **behavioral-signatures feed:** **132**. **CSV:** **43,088** rows.",
+            501,
+        ),
+        (
+            "CHANGELOG.md", "behavioral feed (CHANGELOG data line)",
+            "- **Lynceus standard feed:** 977 → **983** (+43 / −37). **high-confidence feed:** 481 → **501** (+25 / −5). **behavioral-signatures feed:** **132**. **CSV:** **43,088** rows.",
+            132,
+        ),
+        (
+            "CHANGELOG.md", "CSV row count (CHANGELOG)",
+            "- **Lynceus standard feed:** 977 → **983** (+43 / −37). **high-confidence feed:** 481 → **501** (+25 / −5). **behavioral-signatures feed:** **132**. **CSV:** **43,088** rows.",
+            43088,
+        ),
+        (
+            "CHANGELOG.md", "halts",
+            "- None. `coverage_matrix` `_reconcile` halts: **0**. The CSV reconciles to canonical active, 43,088 = 43,088.",
+            0,
+        ),
+        (
+            "CHANGELOG.md", "reconciliation, CSV side",
+            "- None. `coverage_matrix` `_reconcile` halts: **0**. The CSV reconciles to canonical active, 43,088 = 43,090.",
+            43088,
+        ),
+        (
+            "CHANGELOG.md", "reconciliation, canonical side",
+            "- None. `coverage_matrix` `_reconcile` halts: **0**. The CSV reconciles to canonical active, 43,088 = 43,090.",
+            43090,
+        ),
+        (
+            "docs/USER_GUIDE.md", "high-conf export rows (USER_GUIDE)",
+            "### `exports/argus_export_high_confidence.json` (501 rows at v1.7.0)",
+            501,
+        ),
+        (
+            "docs/USER_GUIDE.md", "standard export rows (USER_GUIDE)",
+            "### `exports/argus_export.json` (983 rows at v1.7.0)",
+            983,
+        ),
+        (
+            "docs/USER_GUIDE.md", "CSV data rows (USER_GUIDE)",
+            "### `exports/argus_export.csv` (43,088 data rows at v1.7.0)",
+            43088,
+        ),
+]
 
 
-def test_t3_extract_oem_arms_second_phrase():
-    """README.md line 85: `92 of them OEM arms` (no 'are' between 'them' and 'OEM')."""
-    claim = _find_claim("README.md", 85, "OEM arms (second)")
-    text = "Argus lists 240 vendors, 92 of them OEM arms that exist to attribute"
-    extracted = _extract(claim, text)
-    assert extracted == 92
+@pytest.mark.parametrize("file, description, text, expected", _EXTRACT_FIXTURES)
+def test_t3_extract(file, description, text, expected):
+    """Each Class A regex pulls the right integer out of a representative line.
+
+    The two reconciliation cases use DIFFERENT operands (43,088 = 43,090) on
+    purpose: a pattern that captured the wrong side would still look correct
+    against the real line, where both operands are equal.
+    """
+    claim = _find_claim(file, description)
+    assert gate_mod.extract_claim(claim, text) == expected
 
 
-def test_t3_extract_vendors_count():
-    """README.md line 85: `Argus lists 240 vendors`."""
-    claim = _find_claim("README.md", 85, "vendors")
-    text = "Coverage is intentionally narrow per category. Argus lists 240 vendors, 92 of them are OEM arms"
-    extracted = _extract(claim, text)
-    assert extracted == 240
-
-
-def test_t3_extract_csv_row_count():
-    """README.md line 48: `argus_export.csv | 43,116 | Bulk import`."""
-    claim = _find_claim("README.md", 48, "CSV export row count")
-    text = "| `exports/argus_export.csv` | 43,116 | Bulk import, analysis, or re-derivation. All active rows. |"
-    extracted = _extract(claim, text)
-    assert extracted == 43116
-
-
-def test_t3_extract_high_conf_feed_count():
-    """README.md line 46: `argus_export_high_confidence.json | 481 |`."""
-    claim = _find_claim("README.md", 46, "high-conf feed")
-    text = "| `exports/argus_export_high_confidence.json` | 481 | Runtime scanners (Lynceus). Strict confidence floor (>=70); |"
-    extracted = _extract(claim, text)
-    assert extracted == 481
-
-
-def test_t3_extract_standard_feed_count():
-    """README.md line 47: `argus_export.json | 981 |`."""
-    claim = _find_claim("README.md", 47, "standard feed")
-    text = "| `exports/argus_export.json` | 981 | Broader scanner watchlists. Looser confidence floor (>=30); US scope filter. |"
-    extracted = _extract(claim, text)
-    assert extracted == 981
-
-
-def test_t3_extract_behavioral_feed_count():
-    """README.md line 49: `argus_export_behavioral_signatures.json | 132 |`."""
-    claim = _find_claim("README.md", 49, "behavioral feed")
-    text = "| `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |"
-    extracted = _claim_extract(claim, text)
-    assert extracted == 132
-
-
-def test_t3_extract_changelog_csv_count():
-    """CHANGELOG.md line 54: `CSV: 43,116 rows`."""
-    claim = _find_claim("CHANGELOG.md", 54, "CSV row count (CHANGELOG)")
-    text = "**CSV:** **43,116** rows, matching the active count."
-    extracted = _extract(claim, text)
-    assert extracted == 43116
-
-
-def test_t3_extract_changelog_standard_feed():
-    """CHANGELOG.md line 54: `standard feed: 977 → 981`."""
-    claim = _find_claim("CHANGELOG.md", 54, "standard feed (CHANGELOG)")
-    text = "**Lynceus standard feed:** 977 → **981** (+21 entries / −17 entries)."
-    extracted = _extract(claim, text)
-    assert extracted == 981
-
-
-def test_t3_extract_changelog_high_conf_feed():
-    """CHANGELOG.md line 54: `high-confidence feed: 481 → 481`."""
-    claim = _find_claim("CHANGELOG.md", 54, "high-conf feed (CHANGELOG)")
-    text = "**high-confidence feed:** **481** → **481** (+3 / −3)."
-    extracted = _extract(claim, text)
-    assert extracted == 481
-
-
-def test_t3_extract_changelog_behavioral_feed():
-    """CHANGELOG.md line 54: `behavioral-signatures feed: 132`."""
-    claim = _find_claim("CHANGELOG.md", 54, "behavioral feed (CHANGELOG)")
-    text = "**behavioral-signatures feed:** **132** (entry set byte-identical)."
-    extracted = _extract(claim, text)
-    assert extracted == 132
-
-
-def test_t3_extract_changelog_reconcile_line():
-    """CHANGELOG.md line 97: `43,116 = 43,116`."""
-    claim = _find_claim("CHANGELOG.md", 97, "CSV reconciles to canonical active")
-    text = "The CSV reconciles to canonical active, 43,116 = 43,116."
-    extracted = _extract(claim, text)
-    assert extracted == 43116
-
-
-def test_t3_extract_changelog_halts():
-    """CHANGELOG.md line 97: `coverage_matrix _reconcile halts: 0`."""
-    claim = _find_claim("CHANGELOG.md", 97, "halts")
-    text = "coverage_matrix `_reconcile` halts: **0**."
-    extracted = _extract(claim, text)
-    assert extracted == 0
+def test_t3_every_class_a_site_is_covered_by_an_extract_fixture():
+    """No Class A site may be added without an extraction fixture beside it."""
+    covered = {(file, description) for file, description, _, _ in _EXTRACT_FIXTURES}
+    registered = {(c["file"], c["description"]) for c in gate_mod.CLASS_A_CLAIMS}
+    assert registered <= covered, f"Class A sites with no extract fixture: {registered - covered}"
 
 
 # ---------------------------------------------------------------------------
-# T4: comparator -- extracted int vs settling-query result.
+# T4: artifact counters, each against a known-good AND a known-bad instrument.
+# ---------------------------------------------------------------------------
+
+
+def test_t4_json_entry_counter(tmp_path):
+    """The counter reads the `entries` key (the on-disk shape), not `_meta`."""
+    path = tmp_path / "feed.json"
+    path.write_text(
+        json.dumps(
+            {
+                "_meta": {"record_count": 999},
+                "entries": [
+                    {"pattern": "a", "pattern_type": "oui"},
+                    {"pattern": "b", "pattern_type": "oui"},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    # Known-good: two entries. Known-bad: the artifact's own `record_count`
+    # meta field says 999, which is exactly the number the CHANGELOG's
+    # reconciliation line says not to trust.
+    assert gate_mod.count_json_entries(path) == 2
+
+
+def test_t4_csv_data_row_counter_skips_meta_and_header(tmp_path):
+    """Known-good vs the three naive instruments that get this wrong.
+
+    The real CSV opens with a `# meta:` provenance comment (row 0), then the
+    column header (row 1). Some `source_excerpt` values contain embedded
+    newlines, so physical lines outnumber records and a wrapped line can
+    itself begin with `#`.
+    """
+    path = tmp_path / "argus_export.csv"
+    path.write_text(
+        "# meta: schema_version=35, record_count=3\n"
+        "argus_record_id,identifier,source_excerpt\n"
+        "aaa,00:11:22,plain\n"
+        'bbb,33:44:55,"wrapped excerpt\n'
+        '# this continuation line begins with a hash"\n'
+        "ccc,66:77:88,plain\n",
+        encoding="utf-8",
+    )
+    assert gate_mod.count_csv_data_rows(path) == 3
+
+    # Known-bad instrument 1: physical line count (over-counts the wrap).
+    physical = len(path.read_text(encoding="utf-8").splitlines())
+    assert physical == 6 and physical != 3
+
+    # Known-bad instrument 2: `len(rows) - 1` treats the meta row as the
+    # header and double-counts one row.
+    import csv as _csv
+    with path.open(newline="", encoding="utf-8") as fh:
+        naive = len(list(_csv.reader(fh))) - 1
+    assert naive == 4 and naive != 3
+
+    # Known-bad instrument 3: dropping every line that starts with `#`
+    # eats the wrapped excerpt continuation and corrupts the parse.
+    hash_filtered = [
+        ln for ln in path.read_text(encoding="utf-8").splitlines()
+        if not ln.startswith("#")
+    ]
+    assert len(hash_filtered) == 4  # header + 3 -- right count, corrupted data
+
+
+def test_t4_artifact_runner_reports_missing_artifact_without_raising(tmp_path):
+    """A missing export lands in `problems`, never as a traceback."""
+    results, problems = gate_mod.run_settling_artifacts(tmp_path)
+    assert results == {}
+    assert set(problems) == set(gate_mod.SETTLE_ARTIFACTS)
+
+
+# ---------------------------------------------------------------------------
+# T4b: comparator -- extracted int vs settled value.
 # ---------------------------------------------------------------------------
 
 
 def test_t4_comparator_passes_on_match():
-    """extracted int == settling-query result -> PASS, no failure entry."""
     res = gate_mod.compare_claim(
-        {"file": "TEST.md", "line": 1, "description": "test", "settle_key": "sources"},
+        {"file": "TEST.md", "description": "test", "settle_key": "sources"},
         extracted=98,
         settle_results={"sources": 98},
     )
@@ -362,9 +526,8 @@ def test_t4_comparator_passes_on_match():
 
 
 def test_t4_comparator_fails_on_mismatch():
-    """extracted int != settling-query result -> FAIL, exit code 1."""
     res = gate_mod.compare_claim(
-        {"file": "TEST.md", "line": 1, "description": "test", "settle_key": "sources"},
+        {"file": "TEST.md", "description": "test", "settle_key": "sources"},
         extracted=42,
         settle_results={"sources": 98},
     )
@@ -373,243 +536,141 @@ def test_t4_comparator_fails_on_mismatch():
     assert res.settle_value == 98
 
 
-def test_t4_comparator_unsettled_never_fails():
-    """A claim with settle_key=NO_SETTLING_QUERY must NOT register a FAIL.
+def test_t4_comparator_errors_when_settling_key_is_absent():
+    """An unreadable artifact must surface as ERROR, not as a silent PASS."""
+    res = gate_mod.compare_claim(
+        {"file": "TEST.md", "description": "test", "settle_key": "feed_standard"},
+        extracted=983,
+        settle_results={},
+    )
+    assert res.status == "ERROR"
 
-    The Class A claim sites that have no settling query in the bundle
-    (export counts, SHA256, halts count) are listed in the report so the
-    closing comment can name them, but they don't fail the gate -- the
-    brief says the bundle is frozen.
-    """
+
+def test_t4_comparator_unsettled_never_fails():
+    """A NO_SETTLING_QUERY claim is reported but must not FAIL the gate."""
     res = gate_mod.compare_claim(
         {
-            "file": "README.md",
-            "line": 46,
-            "description": "high-conf feed",
+            "file": "CHANGELOG.md",
+            "description": "halts",
             "settle_key": gate_mod.NO_SETTLING_QUERY,
         },
-        extracted=481,
+        extracted=0,
         settle_results={"sources": 98},
     )
     assert res.status == "UNSETTLED"
 
 
 # ---------------------------------------------------------------------------
-# T5: positive control -- run the gate against a scratch copy of the doc
-# surface. Two arms:
-#
-#   arm_pass:  rewrite every Class A claim to match the live settling-query
-#               result. Gate must exit zero.
-#   arm_fail:  take the same scratch copy and mutate one Class A claim.
-#               Gate must exit non-zero.
-#
-# This is the load-bearing proof that a zero-finding run is non-vacuous --
-# the regex is reaching the right numbers and the comparator is comparing
-# them. A gate that reports PASS because its regex matched nothing is the
-# failure mode the brief asks us to rule out.
+# T5: resolution semantics -- unique, missing, ambiguous, section-scoped.
 # ---------------------------------------------------------------------------
 
 
-def _seed_repo_with_synthetic_tier1(tmp_path: Path, claims: list[dict]) -> Path:
-    """Write a Tier 1 corpus into ``tmp_path`` whose README.md and CHANGELOG.md
-    carry the supplied Class A claims at the brief's line numbers. All other
-    Tier 1 files are minimal stubs. The gate's source is copied alongside so
-    REPO resolves to tmp_path when the gate's main() runs.
+def test_t5_unique_anchor_resolves():
+    claim = gate_mod._claim("F.md", "d", "sources", r"count (\d+)")
+    res = gate_mod.resolve_claim_site(claim, ["alpha", "count 98", "omega"])
+    assert (res.line, res.error) == (2, "")
+
+
+def test_t5_missing_anchor_is_an_error():
+    claim = gate_mod._claim("F.md", "d", "sources", r"count (\d+)")
+    res = gate_mod.resolve_claim_site(claim, ["alpha", "omega"])
+    assert res.line is None and "matched no line" in res.error
+
+
+def test_t5_ambiguous_anchor_is_an_error_not_a_first_match():
+    """Two matches must ERROR. Taking the first would move the blindness."""
+    claim = gate_mod._claim("F.md", "d", "sources", r"count (\d+)")
+    res = gate_mod.resolve_claim_site(claim, ["count 98", "count 42"])
+    assert res.line is None
+    assert "ambiguous" in res.error and "1, 2" in res.error
+
+
+def test_t5_section_scope_disambiguates_repeated_release_formats():
+    """The load-bearing case: the same line format in every release section.
+
+    Unscoped, this anchor matches both releases and must ERROR. Scoped to
+    v1.7.0 it resolves to the current release's line and nothing else.
     """
-    work = tmp_path
-    (work / "scripts").mkdir(parents=True, exist_ok=True)
-    (work / "docs" / "engineering").mkdir(parents=True, exist_ok=True)
-    (work / "docs").mkdir(parents=True, exist_ok=True)
+    lines = [
+        "## v1.7.0 - 2026-08-11",
+        "- **Lynceus standard feed:** 977 → **983**",
+        "## v1.6.14 - 2026-07-21",
+        "- **Lynceus standard feed:** 945 → **977**",
+    ]
+    pattern = r"\*\*Lynceus standard feed:\*\*\s*[\d,]+\s*→\s*\*\*([\d,]+)\*\*"
 
-    # Build the README line-by-line using a 1-based sparse dict so claim
-    # line numbers map directly to file line numbers (not array indices).
-    # Pad with empty lines so line 200 exists.
-    readme_lines: dict[int, str] = {}
-    readme_lines[29] = _render_readme_line_29(claims)
-    readme_lines[30] = _render_readme_line_30(claims)
-    readme_lines[46] = _render_readme_line_46(claims)
-    readme_lines[47] = _render_readme_line_47(claims)
-    readme_lines[48] = _render_readme_line_48(claims)
-    readme_lines[49] = _render_readme_line_49(claims)
-    readme_lines[85] = _render_readme_line_85(claims)
-    readme = _render_with_1based_lines(readme_lines, 200)
-    (work / "README.md").write_text(readme, encoding="utf-8")
+    unscoped = gate_mod._claim("CHANGELOG.md", "d", "feed_standard", pattern)
+    assert "ambiguous" in gate_mod.resolve_claim_site(unscoped, lines).error
 
-    cl_lines: dict[int, str] = {}
-    cl_lines[54] = _render_changelog_line_54(claims)
-    cl_lines[97] = _render_changelog_line_97(claims)
-    cl = _render_with_1based_lines(cl_lines, 200)
-    (work / "CHANGELOG.md").write_text(cl, encoding="utf-8")
-
-    # Tier 1 stubs (no Class A claims outside README / CHANGELOG).
-    (work / "CREDITS.md").write_text("credits\n", encoding="utf-8")
-    (work / "docs" / "USER_GUIDE.md").write_text("user\n", encoding="utf-8")
-    (work / "docs" / "engineering" / "SETUP.md").write_text("setup\n", encoding="utf-8")
-    (work / "docs" / "engineering" / "DATA_DICTIONARY.md").write_text("data\n", encoding="utf-8")
-    (work / "docs" / "engineering" / "METHODOLOGY.md").write_text("meth\n", encoding="utf-8")
-    (work / "docs" / "engineering" / "PROJECT_BIBLE.md").write_text("bible\n", encoding="utf-8")
-
-    # Copy the gate so REPO resolves to the scratch repo.
-    (work / "scripts" / "check_doc_anchors.py").write_text(
-        GATE.read_text(encoding="utf-8"), encoding="utf-8"
+    scoped = gate_mod._claim(
+        "CHANGELOG.md", "d", "feed_standard", pattern, section=gate_mod.SECTION_V170
     )
+    res = gate_mod.resolve_claim_site(scoped, lines)
+    assert res.line == 2
+    assert gate_mod.extract_claim(scoped, res.text) == 983
+
+
+def test_t5_missing_section_heading_is_an_error():
+    """If the release block is renamed, the gate says so instead of passing."""
+    claim = gate_mod._claim(
+        "CHANGELOG.md", "d", "feed_standard", r"feed (\d+)", section=gate_mod.SECTION_V170
+    )
+    res = gate_mod.resolve_claim_site(claim, ["## v1.6.14", "feed 977"])
+    assert res.line is None and "matched 0 headings" in res.error
+
+
+def test_t5_section_window_stops_at_the_next_h2_not_at_an_h3():
+    """An `### ` subheading inside a release must not truncate the window."""
+    lines = ["## v1.7.0", "### Data", "feed 983", "## v1.6.14", "feed 977"]
+    claim = gate_mod._claim(
+        "CHANGELOG.md", "d", "feed_standard", r"feed (\d+)", section=gate_mod.SECTION_V170
+    )
+    res = gate_mod.resolve_claim_site(claim, lines)
+    assert res.line == 3
+
+
+def test_t5_live_tree_resolves_every_class_a_site_uniquely():
+    """Against the real doc surface, all 22 anchors resolve with no ERROR."""
+    results = gate_mod.scan_docs(_live_settle(), REPO)
+    errors = [r for r in results if r.status == "ERROR"]
+    assert not errors, "\n".join(gate_mod._format_result(r) for r in errors)
+
+
+# ---------------------------------------------------------------------------
+# T6 / T7: positive controls against a scratch copy of the LIVE doc surface.
+# ---------------------------------------------------------------------------
+
+
+_DOC_FILES = sorted({c["file"] for c in gate_mod.CLASS_A_CLAIMS})
+
+
+def _scratch_repo(tmp_path: Path) -> Path:
+    """Copy the live doc surface + gate into ``tmp_path``; symlink exports.
+
+    The exports are symlinked because ``argus_export.csv`` is 26 MB. No test
+    writes through a link -- the artifact-perturbation control replaces the
+    link with a real file first.
+    """
+    work = tmp_path / "repo"
+    (work / "scripts").mkdir(parents=True)
+    (work / "exports").mkdir(parents=True)
+    for rel in _DOC_FILES:
+        dst = work / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes((REPO / rel).read_bytes())
+    for relpath, _kind in gate_mod.SETTLE_ARTIFACTS.values():
+        (work / relpath).symlink_to(REPO / relpath)
+    (work / "scripts" / "check_doc_anchors.py").write_bytes(GATE.read_bytes())
     return work
 
 
-def _render_with_1based_lines(lines: dict[int, str], max_line: int) -> str:
-    """Render a 1-based sparse line dict into a newline-terminated file body.
-
-    Keys in ``lines`` are 1-based line numbers; missing keys render as empty
-    strings. ``max_line`` is the total line count we materialise; the file
-    ends with a trailing newline.
-    """
-    out: list[str] = []
-    for n in range(1, max_line + 1):
-        out.append(lines.get(n, ""))
-    return "\n".join(out) + "\n"
-
-
-def _render_readme_line_29(claims):
-    active = _claim_value(claims, "README.md", 29, "active canonical identifiers")
-    return f"- **{active:,} active canonical identifiers**, the things you query against. See release notes below."
-
-
-def _render_readme_line_30(claims):
-    total = _claim_value(claims, "README.md", 30, "total manufacturers")
-    arms = _claim_value(claims, "README.md", 30, "OEM arms (first)")
-    return (
-        f"- **{total} manufacturers**, surveillance vendors. "
-        f"{arms} of those are OEM arms, the rebadging brands a parent vendor sells through."
-    )
-
-
-def _render_readme_line_46(claims):
-    val = _claim_value(claims, "README.md", 46, "high-conf feed")
-    return (
-        f"| `exports/argus_export_high_confidence.json` | {val} | "
-        "Runtime scanners (Lynceus). Strict confidence floor (>=70); |"
-    )
-
-
-def _render_readme_line_47(claims):
-    val = _claim_value(claims, "README.md", 47, "standard feed")
-    return (
-        f"| `exports/argus_export.json` | {val} | "
-        "Broader scanner watchlists. Looser confidence floor (>=30); US scope filter. |"
-    )
-
-
-def _render_readme_line_48(claims):
-    val = _claim_value(claims, "README.md", 48, "CSV export row count")
-    return (
-        f"| `exports/argus_export.csv` | {val} | "
-        "Bulk import, analysis, or re-derivation. All active rows. |"
-    )
-
-
-def _render_readme_line_49(claims):
-    val = _claim_value(claims, "README.md", 49, "behavioral feed")
-    return (
-        f"| `exports/argus_export_behavioral_signatures.json` | {val} | "
-        "Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |"
-    )
-
-
-def _render_readme_line_85(claims):
-    vendors = _claim_value(claims, "README.md", 85, "vendors")
-    arms = _claim_value(claims, "README.md", 85, "OEM arms (second)")
-    return (
-        f"Coverage is intentionally narrow per category. Argus lists {vendors} vendors, "
-        f"{arms} of them OEM arms that exist to attribute a rebadged device back to its real maker."
-    )
-
-
-def _render_changelog_line_54(claims):
-    std = _claim_value(claims, "CHANGELOG.md", 54, "standard feed (CHANGELOG)")
-    hc = _claim_value(claims, "CHANGELOG.md", 54, "high-conf feed (CHANGELOG)")
-    beh = _claim_value(claims, "CHANGELOG.md", 54, "behavioral feed (CHANGELOG)")
-    csv = _claim_value(claims, "CHANGELOG.md", 54, "CSV row count (CHANGELOG)")
-    return (
-        f"- **Lynceus standard feed:** 977 -> **{std}** (+21 entries / -17 entries). "
-        f"**high-confidence feed:** **{hc}** -> **{hc}** (+3 / -3). "
-        f"**behavioral-signatures feed:** **{beh}** (entry set byte-identical). "
-        f"**CSV:** **{csv}** rows, matching the active count."
-    )
-
-
-def _render_changelog_line_97(claims):
-    halts = _claim_value(claims, "CHANGELOG.md", 97, "halts")
-    reconcile = _claim_value(claims, "CHANGELOG.md", 97, "CSV reconciles to canonical active")
-    return (
-        f"- None. coverage_matrix `_reconcile` halts: **{halts}**. "
-        f"The CSV reconciles to canonical active, {reconcile:,} = {reconcile:,}."
-    )
-
-
-def _claim_value(claims, file, line, description):
-    for c in claims:
-        if c["file"] == file and c["line"] == line and c["description"] == description:
-            return c["value"]
-    raise KeyError(f"no claim for {(file, line, description)}")
-
-
-def _synthetic_claim_set(active, total_manuf, arms, vendors, hc_feed, std_feed, csv_rows, beh_feed, hc_changelog, std_changelog, beh_changelog, csv_changelog, halts, reconcile):
-    """Return the full Class A claim set with values the live DB agrees with."""
-    return [
-        _claim("README.md", 29, "active canonical identifiers", "identifiers_active", active),
-        _claim("README.md", 30, "total manufacturers", "manufacturers", total_manuf),
-        _claim("README.md", 30, "OEM arms (first)", "manufacturers_arms", arms),
-        _claim("README.md", 46, "high-conf feed", gate_mod.NO_SETTLING_QUERY, hc_feed),
-        _claim("README.md", 47, "standard feed", gate_mod.NO_SETTLING_QUERY, std_feed),
-        _claim("README.md", 48, "CSV export row count", "identifiers_active", csv_rows),
-        _claim("README.md", 49, "behavioral feed", gate_mod.NO_SETTLING_QUERY, beh_feed),
-        _claim("README.md", 85, "vendors", "manufacturers", vendors),
-        _claim("README.md", 85, "OEM arms (second)", "manufacturers_arms", arms),
-        _claim("CHANGELOG.md", 54, "standard feed (CHANGELOG)", gate_mod.NO_SETTLING_QUERY, std_changelog),
-        _claim("CHANGELOG.md", 54, "high-conf feed (CHANGELOG)", gate_mod.NO_SETTLING_QUERY, hc_changelog),
-        _claim("CHANGELOG.md", 54, "behavioral feed (CHANGELOG)", gate_mod.NO_SETTLING_QUERY, beh_changelog),
-        _claim("CHANGELOG.md", 54, "CSV row count (CHANGELOG)", "identifiers_active", csv_changelog),
-        _claim("CHANGELOG.md", 97, "halts", gate_mod.NO_SETTLING_QUERY, halts),
-        _claim("CHANGELOG.md", 97, "CSV reconciles to canonical active", "identifiers_active", reconcile),
-    ]
-
-
-def _claim(file, line, description, settle_key, value):
-    return {"file": file, "line": line, "description": description, "settle_key": settle_key, "value": value}
-
-
-def _live_settle_results():
-    """Run the gate's settling-query machinery against canonical, return a
-    dict keyed by every bundle key. The positive-control arms use this to
-    build a synthetic Tier 1 surface whose claims all match live values.
-    """
-    return gate_mod.run_settling_queries(REPO / "db" / "argus.db")
-
-
-def _synthetic_claim_set_from_live():
-    live = _live_settle_results()
-    return _synthetic_claim_set(
-        active=live["identifiers_active"],
-        total_manuf=live["manufacturers"],
-        arms=live["manufacturers_arms"],
-        vendors=live["manufacturers"],
-        hc_feed=481,  # export count, no settle; leave the README claim at 481
-        std_feed=981,
-        csv_rows=live["identifiers_active"],
-        beh_feed=132,
-        hc_changelog=481,
-        std_changelog=981,
-        beh_changelog=132,
-        csv_changelog=live["identifiers_active"],
-        halts=0,
-        reconcile=live["identifiers_active"],
-    )
-
-
-def _run_gate(work: Path, args: list[str]) -> tuple[int, str, str]:
+def _run_gate(work: Path) -> tuple[int, str, str]:
     import subprocess
     result = subprocess.run(
-        [sys.executable, "scripts/check_doc_anchors.py", *args],
+        [
+            sys.executable, "scripts/check_doc_anchors.py", "--list",
+            "--db-path", str(REPO / "db" / "argus.db"),
+        ],
         cwd=work,
         capture_output=True,
         text=True,
@@ -617,32 +678,164 @@ def _run_gate(work: Path, args: list[str]) -> tuple[int, str, str]:
     return result.returncode, result.stdout, result.stderr
 
 
-def test_t5_positive_control_pass(tmp_path):
-    """Synthetic Tier 1 with all Class A claims matching live values exits 0."""
-    claims = _synthetic_claim_set_from_live()
-    work = _seed_repo_with_synthetic_tier1(tmp_path, claims)
-    rc, out, err = _run_gate(
-        work,
-        ["--db-path", str(REPO / "db" / "argus.db")],
+def _status_of(stdout: str, claim: dict) -> str:
+    """Pull the reported status for one claim site out of `--list` output."""
+    for line in stdout.splitlines():
+        status, _, rest = line.partition("  ")
+        if rest.strip().startswith(f"{claim['file']}:") and claim["description"] in rest:
+            return status.strip()
+    raise AssertionError(
+        f"no report line for {claim['file']}:{claim['description']!r}\n{stdout}"
     )
-    assert rc == 0, f"stdout={out!r} stderr={err!r}"
 
 
-def test_t5_positive_control_fail_on_mutation(tmp_path):
-    """Mutating a known-good Class A claim forces the gate to exit non-zero."""
-    claims = _synthetic_claim_set_from_live()
-    # Mutate: README line 30 total manufacturers by -1.
-    for c in claims:
-        if c["file"] == "README.md" and c["line"] == 30 and c["description"] == "total manufacturers":
-            c["value"] = c["value"] - 1
-            break
-    work = _seed_repo_with_synthetic_tier1(tmp_path, claims)
-    rc, out, err = _run_gate(
-        work,
-        ["--db-path", str(REPO / "db" / "argus.db")],
+def _perturb_site(work: Path, claim: dict) -> tuple[int, int]:
+    """Change the integer at ``claim``'s resolved site by +1, in place."""
+    path = work / claim["file"]
+    lines = path.read_text(encoding="utf-8").split("\n")
+    res = gate_mod.resolve_claim_site(claim, lines)
+    assert res.error == "", res.error
+    m = re.search(claim["extract_pattern"], res.text)
+    assert m, f"pattern did not match resolved line for {claim['description']!r}"
+    group = next(i for i in range(1, (m.lastindex or 0) + 1) if m.group(i) is not None)
+    raw = m.group(group)
+    original = int(raw.replace(",", ""))
+    mutated = original + 1
+    rendered = f"{mutated:,}" if "," in raw else str(mutated)
+    start, end = m.span(group)
+    lines[res.line - 1] = res.text[:start] + rendered + res.text[end:]
+    path.write_text("\n".join(lines), encoding="utf-8")
+    return original, mutated
+
+
+def _live_settle() -> dict:
+    settle = gate_mod.run_settling_queries(REPO / "db" / "argus.db")
+    artifacts, problems = gate_mod.run_settling_artifacts(REPO)
+    assert problems == {}, problems
+    settle.update(artifacts)
+    return settle
+
+
+_SETTLEABLE = [
+    c for c in gate_mod.CLASS_A_CLAIMS if c["settle_key"] != gate_mod.NO_SETTLING_QUERY
+]
+
+
+def test_t6_negative_control_unperturbed_scratch_copy_is_green(tmp_path):
+    """The scratch copy of the live docs exits 0 -- so a red arm means the
+    perturbation, not the copy."""
+    rc, out, err = _run_gate(_scratch_repo(tmp_path))
+    assert rc == 0, f"stdout={out}\nstderr={err}"
+    assert "0 ERROR" in out or "0 ERROR" in err
+
+
+@pytest.mark.parametrize(
+    "claim", _SETTLEABLE, ids=[f"{c['file']}::{c['description']}" for c in _SETTLEABLE]
+)
+def test_t6_every_settleable_site_goes_red_when_perturbed(claim, tmp_path):
+    """Per-site positive control (MAC-717 acceptance #4).
+
+    Perturb this site's number in a scratch copy of the real doc surface and
+    require the gate to report FAIL *at this site*. A site that cannot be
+    made to fail is a blind spot wearing a PASS.
+    """
+    work = _scratch_repo(tmp_path)
+    original, mutated = _perturb_site(work, claim)
+    rc, out, err = _run_gate(work)
+    assert rc != 0, f"gate stayed green after {original} -> {mutated}\n{out}\n{err}"
+    assert _status_of(out, claim) == "FAIL", (
+        f"perturbing {original} -> {mutated} did not fail its own site\n{out}"
     )
-    assert rc != 0, f"gate should have failed on mutated claim; stdout={out!r} stderr={err!r}"
-    assert "FAIL" in out or "FAIL" in err
+
+
+def test_t6_halts_is_the_only_unsettleable_site(tmp_path):
+    """The one remaining hole, pinned so a future site cannot quietly join it.
+
+    The `_reconcile` halt tally has no settling instrument: the export path
+    emits no machine-readable halt count, and the only tallies on disk are
+    two HB-numbered prose lines in exports/coverage_report.md. Perturbing it
+    therefore cannot go red -- which is exactly why it reports UNSETTLED and
+    not PASS.
+    """
+    unsettleable = [
+        c for c in gate_mod.CLASS_A_CLAIMS
+        if c["settle_key"] == gate_mod.NO_SETTLING_QUERY
+    ]
+    assert [c["description"] for c in unsettleable] == ["halts"]
+
+    work = _scratch_repo(tmp_path)
+    claim = unsettleable[0]
+    _perturb_site(work, claim)
+    rc, out, _ = _run_gate(work)
+    assert rc == 0
+    assert _status_of(out, claim) == "UNSETTLED"
+
+
+def test_t7_perturbing_the_standard_feed_artifact_reddens_its_doc_sites(tmp_path):
+    """Artifact-side positive control: docs untouched, artifact moved.
+
+    Proves the feed settling actually reads the emitted artifact. Without
+    this arm, a PASS could come from an instrument that never opened the
+    export at all.
+    """
+    work = _scratch_repo(tmp_path)
+    relpath = gate_mod.SETTLE_ARTIFACTS["feed_standard"][0]
+    doc = json.loads((REPO / relpath).read_text(encoding="utf-8"))
+    doc["entries"] = doc["entries"][:-1]  # drop one entry
+    (work / relpath).unlink()
+    (work / relpath).write_text(json.dumps(doc), encoding="utf-8")
+
+    rc, out, err = _run_gate(work)
+    assert rc != 0, f"{out}\n{err}"
+    bound = [c for c in gate_mod.CLASS_A_CLAIMS if c["settle_key"] == "feed_standard"]
+    assert len(bound) == 4, [c["description"] for c in bound]
+    for claim in bound:
+        assert _status_of(out, claim) == "FAIL", claim["description"]
+
+
+def test_t7_csv_and_canonical_are_distinct_instruments(tmp_path):
+    """Perturbing the CSV artifact must NOT move the canonical-settled sites.
+
+    README's CSV row is settled against canonical ("All active rows"); the
+    CHANGELOG CSV sites are settled against the emitted file. If both were
+    reading the same number, this arm could not distinguish them -- which is
+    the whole point of settling the reconciliation sentence on both sides.
+    """
+    work = _scratch_repo(tmp_path)
+    relpath = gate_mod.SETTLE_ARTIFACTS["csv_data_rows"][0]
+    (work / relpath).unlink()
+    (work / relpath).write_text(
+        "# meta: schema_version=35, record_count=3\n"
+        "argus_record_id,identifier\n"
+        "aaa,00:11:22\n"
+        "bbb,33:44:55\n"
+        "ccc,66:77:88\n",
+        encoding="utf-8",
+    )
+    rc, out, err = _run_gate(work)
+    assert rc != 0, f"{out}\n{err}"
+
+    for claim in gate_mod.CLASS_A_CLAIMS:
+        expected = "FAIL" if claim["settle_key"] == "csv_data_rows" else None
+        if expected:
+            assert _status_of(out, claim) == "FAIL", claim["description"]
+    readme_csv = _find_claim("README.md", "CSV export row count")
+    assert _status_of(out, readme_csv) == "PASS", (
+        "README's CSV row is settled against canonical and must be unmoved "
+        "by an artifact-only perturbation"
+    )
+
+
+def test_t7_missing_artifact_errors_rather_than_crashing(tmp_path):
+    """A deleted export names the claims it could not settle, exit 1, no traceback."""
+    work = _scratch_repo(tmp_path)
+    (work / gate_mod.SETTLE_ARTIFACTS["feed_behavioral"][0]).unlink()
+    rc, out, err = _run_gate(work)
+    assert rc == 1
+    assert "Traceback" not in err
+    assert "feed_behavioral" in err
+    claim = _find_claim("README.md", "behavioral feed")
+    assert _status_of(out, claim) == "ERROR"
 
 
 # ---------------------------------------------------------------------------
@@ -650,35 +843,13 @@ def test_t5_positive_control_fail_on_mutation(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def _find_claim(file, line, description):
-    """Find a Class A claim by file + line + description; raise if not found."""
+def _find_claim(file, description):
+    """Find a Class A claim by file + description; raise if not found."""
     for c in gate_mod.CLASS_A_CLAIMS:
-        if c["file"] == file and c["line"] == line and c["description"] == description:
+        if c["file"] == file and c["description"] == description:
             return c
-    raise KeyError(f"no Class A claim for {(file, line, description)}")
+    raise KeyError(f"no Class A claim for {(file, description)}")
 
 
-def _claim_extract(claim, text):
-    return _extract(claim, text)
-
-
-def _extract(claim, text):
-    """Run the claim's regex against ``text`` and return the first integer.
-
-    The claim's `extract_pattern` must have exactly one capturing group that
-    captures the integer (with optional thousands separators). Returns the
-    int after stripping commas.
-    """
-    pat = claim["extract_pattern"]
-    m = re.search(pat, text)
-    if not m:
-        raise AssertionError(
-            f"pattern {pat!r} did not match text {text!r} for {claim['description']!r}"
-        )
-    raw = m.group(1)
-    return int(raw.replace(",", ""))
-
-
-# Sanity check: the gate must be importable and module-level.
 def test_gate_module_imports():
     assert gate_mod is not None
