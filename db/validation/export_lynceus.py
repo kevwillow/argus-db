@@ -479,6 +479,92 @@ DESCRIPTION_VENDOR_UNATTRIBUTED = "Unattributed identifier"
 # CP7 default geographic_scope filter (US-deployed Lynceus instances).
 DEFAULT_GEOGRAPHIC_SCOPE_FILTER: tuple[str, ...] = ("US",)
 
+# ---------------------------------------------------------------------------
+# MAC-742 item 3 — continent rollup, as a RUNTIME expansion.
+#
+# BE HONEST ABOUT THE YIELD: this returns 0 additional rows today, and that is
+# measured, not estimated. Across 43,088 active rows the registry holds exactly
+# one non-US regional code (`GB`, id 23042) and that row is
+# `device_category='unknown'`, which is binned before the geography gate is ever
+# reached. Every other row is NULL, `global`, or `US`. This parameter is
+# capability for data we do not have yet, not a yield lever. Do not cite it as
+# one.
+#
+# Why a rollup and not a stored value: continent-as-stored-value was REJECTED by
+# CEO ruling 1c34bdf7-76e2-41f9-9b65-38b56093b240. A continent token in the
+# column would be a fourth vocabulary in an already-mixed column, and it does not
+# compare against an ISO token in EITHER direction — a row stamped `EU` fails a
+# filter of ('US','GB','DE'), and a row stamped `DE` fails a filter of ('EU',).
+# The comparison is an exact match after a comma split (`_passes_geographic_scope`
+# below), so the expansion has to happen before that function sees anything.
+# `_passes_geographic_scope` is deliberately UNCHANGED by MAC-742.
+#
+# Note the token collision this design sidesteps: `AF`, `AS`, `NA` and `SA` are
+# BOTH continent codes here and assigned ISO-3166 alpha-2 country codes
+# (Afghanistan, American Samoa, Namibia, Saudi Arabia). They are disambiguated by
+# living behind a SEPARATE flag rather than by sharing one token space with
+# country codes — which is a second, independent argument for the rollup over a
+# stored continent value.
+#
+# Membership follows the common 7-continent assignment of ISO-3166-1 alpha-2,
+# dependencies included with their governing region. 246 codes.
+# ---------------------------------------------------------------------------
+CONTINENT_ISO3166_ALPHA2: dict[str, tuple[str, ...]] = {
+    "AF": (  # Africa (58)
+        "DZ", "AO", "BJ", "BW", "BF", "BI", "CM", "CV", "CF", "TD", "KM", "CG",
+        "CD", "CI", "DJ", "EG", "GQ", "ER", "ET", "GA", "GM", "GH", "GN", "GW",
+        "KE", "LS", "LR", "LY", "MG", "MW", "ML", "MR", "MU", "YT", "MA", "MZ",
+        "NA", "NE", "NG", "RE", "RW", "SH", "ST", "SN", "SC", "SL", "SO", "ZA",
+        "SS", "SD", "SZ", "TZ", "TG", "TN", "UG", "EH", "ZM", "ZW",
+    ),
+    "AN": ("AQ", "BV", "GS", "HM", "TF"),  # Antarctica (5)
+    "AS": (  # Asia (51)
+        "AF", "AM", "AZ", "BH", "BD", "BT", "BN", "KH", "CN", "CY", "GE", "HK",
+        "IN", "ID", "IR", "IQ", "IL", "JP", "JO", "KZ", "KP", "KR", "KW", "KG",
+        "LA", "LB", "MO", "MY", "MV", "MN", "MM", "NP", "OM", "PK", "PS", "PH",
+        "QA", "SA", "SG", "LK", "SY", "TW", "TJ", "TH", "TL", "TR", "TM", "AE",
+        "UZ", "VN", "YE",
+    ),
+    "EU": (  # Europe (51)
+        "AL", "AD", "AT", "BY", "BE", "BA", "BG", "HR", "CZ", "DK", "EE", "FO",
+        "FI", "FR", "DE", "GI", "GR", "GG", "HU", "IS", "IE", "IM", "IT", "JE",
+        "LV", "LI", "LT", "LU", "MT", "MD", "MC", "ME", "NL", "MK", "NO", "PL",
+        "PT", "RO", "RU", "SM", "RS", "SK", "SI", "ES", "SJ", "SE", "CH", "UA",
+        "GB", "VA", "AX",
+    ),
+    "NA": (  # North America, incl. Central America and the Caribbean (41)
+        "AI", "AG", "AW", "BS", "BB", "BZ", "BM", "BQ", "VG", "CA", "KY", "CR",
+        "CU", "CW", "DM", "DO", "SV", "GL", "GD", "GP", "GT", "HT", "HN", "JM",
+        "MQ", "MX", "MS", "NI", "PA", "PR", "BL", "KN", "LC", "MF", "PM", "VC",
+        "SX", "TT", "TC", "US", "VI",
+    ),
+    "OC": (  # Oceania (26)
+        "AS", "AU", "CK", "FJ", "PF", "GU", "KI", "MH", "FM", "NR", "NC", "NZ",
+        "NU", "NF", "MP", "PW", "PG", "PN", "WS", "SB", "TK", "TO", "TV", "UM",
+        "VU", "WF",
+    ),
+    "SA": (  # South America (14)
+        "AR", "BO", "BR", "CL", "CO", "EC", "FK", "GF", "GY", "PY", "PE", "SR",
+        "UY", "VE",
+    ),
+}
+
+
+def expand_continent_filter(continents: tuple[str, ...]) -> tuple[str, ...]:
+    """Expand continent codes to their ISO-3166 alpha-2 children, deduped.
+
+    Pure and total: no DB access, no I/O. The returned tuple is sorted so an
+    export's ``_meta.geographic_scope_filter`` is byte-stable across runs — an
+    unordered set would make two identical exports diff.
+
+    Raises ``KeyError`` on an unknown continent code; callers surface that as a
+    CLI error rather than silently exporting a narrower feed than asked for.
+    """
+    out: set[str] = set()
+    for code in continents:
+        out.update(CONTINENT_ISO3166_ALPHA2[code])
+    return tuple(sorted(out))
+
 # Deterministic UUID5 namespace anchor — locks ``argus_run_id`` to the data.
 # This namespace UUID itself is a UUID5(NAMESPACE_DNS, "argus.export.v1") so
 # the choice is reproducible from this codebase alone (no opaque magic value).
@@ -2211,20 +2297,70 @@ def main() -> None:
     parser.add_argument(
         "--geographic-scope-filter",
         type=str,
-        default=",".join(DEFAULT_GEOGRAPHIC_SCOPE_FILTER),
+        default=None,
         help=(
             "CP7 export-time filter on identifiers.geographic_scope. "
             "Comma-separated ISO codes (e.g. 'US' or 'NL,AU'). Default: 'US'."
         ),
     )
-    args = parser.parse_args()
-    geographic_scope_filter = tuple(
-        part.strip() for part in args.geographic_scope_filter.split(",") if part.strip()
+    parser.add_argument(
+        "--continent-filter",
+        type=str,
+        default=None,
+        help=(
+            "Roll a continent up to its ISO-3166 alpha-2 children and filter on "
+            "those (MAC-742). Comma-separated, from "
+            f"{{{', '.join(sorted(CONTINENT_ISO3166_ALPHA2))}}}. Expanded at "
+            "argument-parse time; the stored column is never compared against a "
+            "continent token. Given alone it REPLACES the 'US' default; combined "
+            "with --geographic-scope-filter the two are unioned. Yields 0 "
+            "additional rows against canonical today -- see "
+            "CONTINENT_ISO3166_ALPHA2."
+        ),
     )
-    if not geographic_scope_filter:
+    args = parser.parse_args()
+
+    scope_codes = tuple(
+        part.strip()
+        for part in (args.geographic_scope_filter or "").split(",")
+        if part.strip()
+    )
+    continent_codes = tuple(
+        part.strip().upper()
+        for part in (args.continent_filter or "").split(",")
+        if part.strip()
+    )
+
+    # `default=None` distinguishes "flag absent" from "flag present but empty".
+    # Collapsing those two would make `--geographic-scope-filter ''` silently
+    # export the 'US' default instead of erroring, which is the behaviour this
+    # branch had before --continent-filter existed. Preserved deliberately.
+    if args.geographic_scope_filter is not None and not scope_codes:
         raise SystemExit(
             "--geographic-scope-filter must contain at least one ISO code."
         )
+    if args.continent_filter is not None and not continent_codes:
+        raise SystemExit(
+            "--continent-filter must contain at least one continent code."
+        )
+
+    if continent_codes:
+        unknown = [c for c in continent_codes if c not in CONTINENT_ISO3166_ALPHA2]
+        if unknown:
+            raise SystemExit(
+                f"--continent-filter: unknown continent code(s) {', '.join(unknown)}. "
+                f"Known: {', '.join(sorted(CONTINENT_ISO3166_ALPHA2))}."
+            )
+        # A continent given ALONE replaces the 'US' default rather than unioning
+        # with it: defaulting is not choosing, and silently keeping US in an
+        # export somebody asked to scope to Europe would be a wrong feed, not a
+        # generous one. An EXPLICIT --geographic-scope-filter is a choice, so
+        # that one is honoured and unioned.
+        scope_codes = tuple(
+            sorted(set(scope_codes) | set(expand_continent_filter(continent_codes)))
+        )
+
+    geographic_scope_filter = scope_codes or DEFAULT_GEOGRAPHIC_SCOPE_FILTER
     summary = run(
         db_path=args.db,
         exports_dir=args.exports_dir,

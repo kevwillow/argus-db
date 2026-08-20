@@ -1,0 +1,647 @@
+-- ============================================================================
+-- Script:    0061_mac742_geographic_scope_vocabulary_check.sql
+-- Issue:     MAC-742. Ratified out of MAC-739 (F3) by CEO ruling
+--            1c34bdf7-76e2-41f9-9b65-38b56093b240. Packet + ruling at §0:
+--            operator_review/MAC-726/F3_geographic_scope_proposal.md
+-- Status:    STAGE ONLY — no push, no tag. The board reserves all pushes
+--            (MAC-424 standing rule).
+--
+-- Purpose:   Close `identifiers.geographic_scope` to its ratified vocabulary
+--            {ISO-3166 alpha-2, 'global', NULL}, and carry the two rows that
+--            violate it, in ONE atomic apply so the constraint never lands
+--            while a violating row exists (MAC-742 item 2, verbatim).
+--
+-- Slot:      0061, allocated by DISPATCH CLAIM via
+--            `python3 scripts/next_migration_slot.py --claim MAC-742`, exit 0:
+--                "MAC-742 holds no slot"
+--                "proposed slot 0061 is free; claim it in a COMMITTED file"
+--            NOT by `ls db/migrations/`, which reports *applied* and never
+--            *claimed*. The scanner's own first line calls 0061 the "naive next
+--            (WRONG)"; the full-range scan is what clears it. Every gap below
+--            the highest applied file is spoken for and none is reusable here:
+--            0046 DISPUTED (MAC-537/MAC-574), 0047 CLAIMED (MAC-598),
+--            0050 CLAIMED (MAC-608), 0053 CONTESTED unresolved,
+--            0056 CLAIMED (MAC-705), 0058 CLAIMED (MAC-712).
+--
+-- ---------------------------------------------------------------------------
+-- SEQUENCING — the reason this issue is CTO-class, and what was measured.
+-- ---------------------------------------------------------------------------
+-- Two migrations are STAGED-BUT-UNAPPLIED at this basis. A CHECK constraint is
+-- retroactive to every future write, so a constraint that lands before an
+-- unapplied ingest can abort that ingest months later. Both were opened and
+-- measured rather than assumed:
+--
+--   0059_mac731_wave9_carveout_ingest.sql   — INSERTs, and it DOES bind
+--        `geographic_scope` (`json_extract(line,'$.geographic_scope')` at :173).
+--        Its payload is NOT inline: it is `readfile()` of
+--        `operator_review/MAC-731/landing_set_38.jsonl`. Grepping the .sql alone
+--        returns zero hits and is a FALSE NEGATIVE. Opening the payload: all 38
+--        rows carry `"geographic_scope": null`. NULL is inside the vocabulary.
+--   0060_mac737_strict_8_4_amendment_landing.sql — zero occurrences of the
+--        token `geographic_scope`; it writes one UPDATE, at :349, to other
+--        columns. Cannot interact.
+--
+-- Therefore this CHECK is safe under EITHER apply order (0059/0060 before or
+-- after 0061). Applied-ness was established from DATA MARKERS, not from
+-- `schema_version` — that ledger tops out at row 35 (`0045_mac580`) and does not
+-- record 0048-0060, so reading it would have said "unapplied" for migrations
+-- whose effects are demonstrably present.
+--
+-- ---------------------------------------------------------------------------
+-- GLOB vs strict allow-list — MAC-742 asked for both to be evaluated.
+-- ---------------------------------------------------------------------------
+-- Ruled: GLOB shape here, enumerated allow-list in the test battery. Not a
+-- compromise — a placement decision, on reversibility.
+--
+--   * Amending THIS clause costs a second full table recreate: 43,892 rows,
+--     seven indexes, six FK-referencing tables, an AUTOINCREMENT sequence. It is
+--     the expensive, one-way artifact, so it should carry only the rule that
+--     never changes. "An ISO-3166 alpha-2 code is two uppercase letters" is true
+--     by definition of the standard and cannot go stale.
+--   * WHICH of the 676 two-letter pairs are actually assigned is the volatile
+--     half — ISO revises the list (CS, AN, and SS within living memory). Pinning
+--     249 tokens in DDL puts the volatile rule in the immovable artifact, and a
+--     future country becomes a table recreate.
+--   * So the residual gap — GLOB admits ~427 unassigned pairs such as 'XX', 'ZZ',
+--     'CB' — is closed one layer up, in
+--     `tests/test_geographic_scope_vocabulary.py`, where amending the list is a
+--     one-line diff with no data movement.
+--
+-- What the shape rule already buys, measured against the defect that prompted
+-- this: it REJECTS 'US-CBP' (hyphen, 6 chars), 'us' (case), 'USA' (length),
+-- '' (empty). Proven by execution, both arms, in
+-- operator_review/MAC-742/probe_recreate.py.
+--
+-- KNOWN NARROWING — escalated, not silently resolved. `_passes_geographic_scope`
+-- (db/validation/export_lynceus.py:1059-1061) explicitly supports a
+-- comma-separated list per §4.1:
+--        row_codes = {part.strip() for part in raw.split(",") if part.strip()}
+-- This CHECK REJECTS 'US,GB'. Zero rows use that form today (the live domain is
+-- exactly NULL / global / US / US-CBP / GB), so the clause is consistent with all
+-- 43,892 rows — but it does close the column narrower than the exporter can read.
+-- The CEO ratified singular tokens ("{ISO-3166 alpha-2, 'global', NULL}"), so
+-- this file implements what was ratified and does NOT widen on its own authority.
+-- Flagged to the board in the MAC-742 hand-up as an open question.
+--
+-- ---------------------------------------------------------------------------
+-- Value provenance — INHERITED, NOT INVENTED.
+-- ---------------------------------------------------------------------------
+-- ids 35777 / 35778 ('ABF68A' / 'ABFDF8', icao_24bit_address, General Atomics,
+-- confidence 90, device_category persistent_surveillance) carry the agency
+-- string 'US-CBP' in a COUNTRY column. 'US' is not invented: it is the country
+-- component of the value already stored. The agency half ('CBP' — US Customs and
+-- Border Protection Air and Marine Operations, tails N870CB / N872CB) is not
+-- discarded, it is preserved in `notes.mac742_scope_carry.carried_from_value`.
+-- PRE-2 makes the exact stored string a precondition, so if the basis ever moves
+-- the write stops instead of stamping a country onto a row it never described.
+--
+-- ---------------------------------------------------------------------------
+-- Expected effect, as a DELTA. No pinned absolute total is asserted post-write.
+-- ---------------------------------------------------------------------------
+--   active row count                    : + 0 / - 0
+--   total row count                     : + 0 / - 0
+--   geographic_scope = 'US'             : + 2   (delta only)
+--   geographic_scope = 'US-CBP'         : - 2   (to zero; the value leaves the table)
+--   geographic_scope IS NULL / 'global' : + 0 / - 0
+--   argus_export.json (standard)        : + 0 / - 0 entries
+--   argus_export_high_confidence.json   : + 0 / - 0 entries
+--        Both rows are §4.4-DROPPED at `icao_24bit_address` BEFORE the geography
+--        gate is reached, so no feed entry can move. Regeneration is not required
+--        by this migration and is not claimed by it.
+--   argus_export.csv                    : exactly 2 cells change, 'US-CBP' -> 'US'.
+--        The CSV is unfiltered and carries all 43,088 active rows. This is the
+--        only consumer-visible effect, and it is a strict improvement: 'US-CBP'
+--        is a token Lynceus cannot match on either side of the comma split.
+--
+-- ---------------------------------------------------------------------------
+-- APPLY PATH — CLI ONLY. This is a hard constraint, not a preference.
+-- ---------------------------------------------------------------------------
+-- Apply with:  sqlite3 db/argus.db < db/migrations/0061_....sql
+-- Do NOT apply via `conn.executescript()`.
+--
+-- Why, stated honestly rather than papered over: `DROP TABLE identifiers` and
+-- `ALTER TABLE ... RENAME` are DDL. DDL cannot carry a
+-- `AND (SELECT COUNT(*) FROM _mac742_go) = 1` arm the way an UPDATE or INSERT
+-- can, so arm 2 physically cannot protect the destructive window. Arm 1
+-- (`.bail on`) can, and does — a failed precondition raises on the guard INSERT
+-- and the CLI exits before the DROP is ever reached, leaving the file
+-- byte-identical. That is measured, not asserted: see the negative control in
+-- operator_review/MAC-742/PROOF.md.
+--
+-- A `RAISE(ROLLBACK)` TEMP trigger was built and tested as a portable substitute
+-- so the destructive window could be guarded on BOTH apply paths. It was
+-- REJECTED BY MEASUREMENT: on a scratch copy it left the database with the
+-- `identifiers` table dropped and the bytes moved. It does not fail closed.
+-- Do not reintroduce it.
+--
+-- The runbook therefore mandates a `cp` backup before apply. That backup is the
+-- recovery path for the DDL window, and it is not optional.
+--
+-- ASSERTION MODEL — the three arms, per the house idiom:
+--   1. `.bail on`  — stops the CLI on the FIRST error. Load-bearing here.
+--   2. `CHECK (ok = 1)` on TEMP tables — aborts the offending INSERT only.
+--   3. a per-write `(SELECT COUNT(*) FROM _mac742_go) = 1` arm on every
+--      DML write (the carry UPDATE and the table-copy INSERT), so a moved basis
+--      cannot land data even if arms 1 and 2 are both defeated.
+--   Post-conditions are DELTAS against `_pre` / `_pre_all`, never pinned totals.
+--
+-- schema_version: NOT bumped, following 0057's disposition. The ledger tops out
+--   at version 35 (`0045_mac580`) and does not record 0048, 0049, 0051, 0052,
+--   0054, 0055, 0057, 0059 or 0060. Adding a row for 0061 alone would make the
+--   ledger MORE misleading — it would read as though 0061 followed 0045
+--   directly. The gap is real and belongs to MAC-712 (slot 0058, the migration
+--   ledger), not to this file.
+-- ============================================================================
+.bail on
+
+-- Required for the table recreate: the 12-step procedure copies rows while six
+-- tables hold REFERENCES into `identifiers`. Must be set OUTSIDE a transaction.
+PRAGMA foreign_keys = OFF;
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- PRE-STATE. Every post-condition below is a DELTA against these.
+-- ---------------------------------------------------------------------------
+CREATE TEMP TABLE _pre AS SELECT
+    (SELECT COUNT(*) FROM identifiers)                                          AS total,
+    (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL)              AS active,
+    (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NOT NULL)          AS edges,
+    (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'US')            AS us_all,
+    (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'US-CBP')        AS uscbp_all,
+    (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'global')        AS global_all,
+    (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'GB')            AS gb_all,
+    (SELECT COUNT(*) FROM identifiers WHERE geographic_scope IS NULL)           AS null_all,
+    (SELECT COUNT(*) FROM identifiers WHERE notes IS NOT NULL
+       AND NOT json_valid(notes))                                               AS badjson,
+    (SELECT seq FROM sqlite_sequence WHERE name = 'identifiers')                AS seq,
+    (SELECT COUNT(*) FROM pragma_index_list('identifiers') WHERE origin = 'c')  AS idxc;
+
+-- FULL content pre-image. A path-set or scope-local check is vacuous against an
+-- in-path sweep, and a table RECREATE is the widest possible in-path sweep:
+-- every row is rewritten. POST-5 diffs every column of every row against this.
+CREATE TEMP TABLE _pre_all AS SELECT * FROM identifiers;
+
+-- Load-bearing for RUNTIME, not correctness. POST-5 and POST-6 join this
+-- 43,892-row pre-image against the recreated table; without an index on the
+-- join key SQLite picks a nested loop and the apply does not finish in two
+-- minutes. Measured: with this index the whole migration applies in seconds.
+CREATE INDEX _pre_all_id ON _pre_all(id);
+
+-- ---------------------------------------------------------------------------
+-- PRECONDITIONS. Each is phrased so that ok=0 means THE FINDING MOVED.
+-- ---------------------------------------------------------------------------
+
+-- PRE-1 FAIL: canonical is not the DB this was measured against. The whole
+-- ratified domain is pinned, not just the total — the vocabulary claim is a
+-- claim about the DOMAIN, so the domain is the basis.
+CREATE TEMP TABLE _mac742_pre_1fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_pre_1fail(ok) SELECT CASE WHEN (
+       (SELECT active     FROM _pre) <> 43088
+    OR (SELECT null_all   FROM _pre) <> 36017
+    OR (SELECT global_all FROM _pre) <> 6240
+    OR (SELECT us_all     FROM _pre) <> 1632
+    OR (SELECT uscbp_all  FROM _pre) <> 2
+    OR (SELECT gb_all     FROM _pre) <> 1) THEN 0 ELSE 1 END;
+
+-- PRE-2 FAIL: the two carry rows are not in the state MAC-739 measured. Every
+-- column named in the adjudication is in the predicate, not just the one being
+-- written: a row whose confidence or category has since moved is a different
+-- adjudication and must stop the write.
+CREATE TEMP TABLE _mac742_pre_2fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_pre_2fail(ok) SELECT CASE WHEN ((SELECT COUNT(*) FROM identifiers
+   WHERE id IN (35777, 35778)
+     AND identifier_type  = 'icao_24bit_address'
+     AND device_category  = 'persistent_surveillance'
+     AND manufacturer     = 'General Atomics'
+     AND confidence       = 90
+     AND source_type      = 'regulatory'
+     AND geographic_scope = 'US-CBP'
+     AND superseded_by    IS NULL
+     AND notes IS NOT NULL AND json_valid(notes)) <> 2) THEN 0 ELSE 1 END;
+
+-- PRE-3 FAIL: the identifiers themselves moved. Pinned by VALUE, not by id
+-- alone — an id is a handle, the hex is the evidence.
+CREATE TEMP TABLE _mac742_pre_3fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_pre_3fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM identifiers WHERE id = 35777 AND identifier = 'ABF68A') <> 1
+    OR (SELECT COUNT(*) FROM identifiers WHERE id = 35778 AND identifier = 'ABFDF8') <> 1)
+  THEN 0 ELSE 1 END;
+
+-- PRE-4 FAIL: the write predicate is not single-valued. 'US-CBP' must be held by
+-- EXACTLY the two adjudicated ids and nothing else, across the WHOLE table
+-- (not just the active slice) — the CHECK binds superseded rows too, and a
+-- third holder would be carried sight-unseen by a value-shaped UPDATE.
+CREATE TEMP TABLE _mac742_pre_4fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_pre_4fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'US-CBP') <> 2
+    OR (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'US-CBP'
+          AND id NOT IN (35777, 35778)) <> 0) THEN 0 ELSE 1 END;
+
+-- PRE-5 FAIL: some row OTHER than the two being carried would violate the new
+-- CHECK. This is the precondition that makes the constraint landable at all. It
+-- is deliberately evaluated over EVERY row including superseded ones, and it
+-- re-expresses the CHECK predicate rather than trusting the domain counts in
+-- PRE-1 — counts and predicates can agree on a basis and disagree on an edge.
+-- If this fires, the vocabulary is wrong or the data moved; do not widen the
+-- clause to make it pass without a ruling.
+CREATE TEMP TABLE _mac742_pre_5fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_pre_5fail(ok) SELECT CASE WHEN ((SELECT COUNT(*) FROM identifiers
+   WHERE id NOT IN (35777, 35778)
+     AND NOT (geographic_scope IS NULL
+              OR geographic_scope = 'global'
+              OR geographic_scope GLOB '[A-Z][A-Z]')) <> 0) THEN 0 ELSE 1 END;
+
+-- PRE-6 FAIL: the constraint is already present, or the DDL this file was
+-- generated against has moved. `build_migration.py` rewrote the CREATE TABLE by
+-- a single anchored substitution on `geographic_scope  TEXT,`; if that anchor is
+-- no longer unique-and-present in canonical's DDL, the embedded table shape below
+-- is stale and recreating from it would silently revert whatever changed it.
+-- Also the idempotence guard: re-running this migration must stop, not re-copy.
+CREATE TEMP TABLE _mac742_pre_6fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_pre_6fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'identifiers'
+          AND sql LIKE '%geographic_scope  TEXT,%') <> 1
+    OR (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'identifiers'
+          AND sql LIKE '%geographic_scope  TEXT CHECK%') <> 0) THEN 0 ELSE 1 END;
+
+-- PRE-7 FAIL: the schema around the recreate is not what was probed — seven
+-- CHECK-origin indexes, a live AUTOINCREMENT sequence, and a clean FK graph
+-- BEFORE we touch anything. Without the last one, POST-9's clean
+-- `foreign_key_check` would be uninformative: it could be reporting a
+-- pre-existing zero rather than an absence of damage this file caused.
+CREATE TEMP TABLE _mac742_pre_7fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_pre_7fail(ok) SELECT CASE WHEN (
+       (SELECT idxc FROM _pre) <> 7
+    OR (SELECT seq  FROM _pre) IS NULL
+    OR (SELECT COUNT(*) FROM pragma_foreign_key_check) <> 0) THEN 0 ELSE 1 END;
+
+-- ARM 3. `_mac742_go` holds exactly one row iff EVERY precondition above holds.
+-- Re-derived from the source predicates, deliberately NOT by reading the
+-- _pre_Nfail tables back: reading those would assert that the assertions RAN,
+-- not that the conditions HOLD.
+CREATE TEMP TABLE _mac742_go AS
+SELECT 1 AS ok WHERE
+       (SELECT active    FROM _pre) = 43088
+   AND (SELECT uscbp_all FROM _pre) = 2
+   AND (SELECT COUNT(*) FROM identifiers
+         WHERE id IN (35777, 35778) AND geographic_scope = 'US-CBP'
+           AND identifier_type = 'icao_24bit_address'
+           AND manufacturer = 'General Atomics' AND confidence = 90
+           AND superseded_by IS NULL
+           AND notes IS NOT NULL AND json_valid(notes)) = 2
+   AND (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'US-CBP'
+         AND id NOT IN (35777, 35778)) = 0
+   AND (SELECT COUNT(*) FROM identifiers
+         WHERE id NOT IN (35777, 35778)
+           AND NOT (geographic_scope IS NULL OR geographic_scope = 'global'
+                    OR geographic_scope GLOB '[A-Z][A-Z]')) = 0
+   AND (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'identifiers'
+         AND sql LIKE '%geographic_scope  TEXT,%') = 1
+   AND (SELECT COUNT(*) FROM pragma_foreign_key_check) = 0;
+
+-- ---------------------------------------------------------------------------
+-- WRITE 1 — the carry. MUST precede the recreate: the constraint must never
+-- land while a violating row exists (MAC-742 item 2).
+-- `json_set` merges by property — never a text-suffix concat, which is how a
+-- prior CP39 write corrupted a notes blob.
+-- ---------------------------------------------------------------------------
+UPDATE identifiers
+   SET geographic_scope = 'US',
+       notes = json_set(notes, '$.mac742_scope_carry', json_object(
+                 'issue',               'MAC-742',
+                 'ruling',              '1c34bdf7-76e2-41f9-9b65-38b56093b240',
+                 'spec_issue',          'MAC-739',
+                 'carried_from_value',  'US-CBP',
+                 'value',               'US',
+                 'basis',               'country component of the agency string already stored; not invented',
+                 'agency',              'US Customs and Border Protection, Air and Marine Operations',
+                 'defect',              'an agency string occupied a country column, outside the ratified vocabulary {ISO-3166 alpha-2, global, NULL}',
+                 'consumer_effect',     'Lynceus cannot match US-CBP on either side of the §4.1 comma split; US is matchable',
+                 'model_migration',     '0057_mac707_geographic_scope_carry_forward.sql',
+                 'not_a_promotion',     1))
+ WHERE id IN (35777, 35778)
+   AND geographic_scope = 'US-CBP'
+   AND superseded_by IS NULL
+   AND (SELECT COUNT(*) FROM _mac742_go) = 1;
+
+-- ---------------------------------------------------------------------------
+-- WRITE 2 — the recreate. SQLite cannot add a CHECK in place; this is the
+-- documented 12-step, in the form migrations 0009-0033 have used on this exact
+-- table (0033 is the most recent precedent, CP46).
+--
+-- Two deliberate departures from 0033's form, both to close a real gap:
+--   * an EXPLICIT column list instead of `INSERT INTO identifiers_new SELECT *`.
+--     `SELECT *` binds by column ORDER; if canonical's column order ever drifts
+--     from the embedded DDL the copy silently transposes columns of compatible
+--     type. The named list fails loudly instead.
+--   * a `_mac742_go` arm on the copy, so a moved basis copies zero rows and the
+--     POST guards below catch it before COMMIT.
+--
+-- `legacy_alter_table` is deliberately NOT set. It was tested as a counterfactual
+-- on a scratch copy: with and without it, all six FK-referencing tables keep
+-- their `REFERENCES identifiers` text byte-for-byte, because the name being
+-- renamed away from (`identifiers_new`) is referenced by nothing. Adding a pragma
+-- that changes nothing would be cargo cult; 0033 omits it for the same reason.
+-- ---------------------------------------------------------------------------
+CREATE TABLE identifiers_new (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    identifier        TEXT NOT NULL,
+    identifier_type   TEXT NOT NULL CHECK (identifier_type IN (
+                          -- Pre-CP13 (0001 initial) — 9 values
+                          'oui', 'mac', 'mac_range', 'bssid',
+                          'ssid_exact', 'ssid_pattern',
+                          'ble_uuid', 'ble_service',
+                          'device_fingerprint',
+                          -- CP13 (migration 0009) — Wave G structural fidelity (3)
+                          'ble_local_name', 'ble_characteristic',
+                          'product_family_codename',
+                          -- CP14 (migration 0011) — G-3 BLE SIG manufacturer IDs (1)
+                          'ble_manufacturer_id',
+                          -- CP14 (migration 0013) — Drone-RID + proprietary
+                          -- protocol cluster (13)
+                          'drone_id_prefix',
+                          'icao_24bit_address',
+                          'rf_channel',
+                          'burst_cadence_ms',
+                          'bandwidth_mhz',
+                          'device_class_id',
+                          'rf_burst_duration',
+                          'rf_protocol_constant',
+                          'wifi_aware_service_name',
+                          'wifi_ie_element_id',
+                          'bluetooth_le_pdu_type',
+                          'wifi_frame_control_subtype',
+                          'wifi_nan_param_signature',
+                          -- CP14 (migration 0014) — surveillance metadata (1)
+                          'alpr_model',
+                          -- CP20 (migration 0018) — SAR-13 §S.3 vendor-anchored
+                          -- / device-naming cluster (14)
+                          'ble_protocol_byte_table',
+                          'ble_service_uuid',
+                          'ble_company_id',
+                          'frequency_band',
+                          'ble_protocol_byte',
+                          'operator_profile',
+                          'x509_cert_sha256_prefix',
+                          'ble_adv_interval',
+                          'ble_payload_offset',
+                          'firmware_sha256_hash',
+                          'network_endpoint',
+                          'firmware_image_variant',
+                          'qualcomm_chip_format_id',
+                          'firmware_branded_string',
+                          -- MAC-117 (migration 0019) — round-2 vocab
+                          -- extension (7) per §1 routing slate (A)
+                          'asdstan_message_type',
+                          'asdstan_enum_value',
+                          'dji_protocol_struct_format',
+                          'gpt_partition_uuid',
+                          'chipset_codename',
+                          'firmware_build_string',
+                          'firmware_build_uuid',
+                          -- CP28 (migration 0023) — Wave H desktop-axis vendor-
+                          -- registered non-BLE cluster (3)
+                          'windows_installer_productcode_vendor_registered',
+                          'windows_com_clsid_vendor_registered',
+                          'vendor_document_uuid_cloud_reference',
+                          -- CP29 (migration 0024) — Wave I/I.5/I.6/I.7 vendor
+                          -- cloud-infrastructure hostname corpus (3)
+                          'vendor_controlled_hostname',
+                          'vendor_cloud_endpoint_url',
+                          'vendor_controlled_hostname_deprecated',
+                          -- CP31 (migration 0025) — FCC EAS identifier-type
+                          -- cluster (2)
+                          'fcc_grantee_code',
+                          'equipment_class_code',
+                          -- CP33 (migration 0027) — GSMA TAC cluster (1)
+                          'imei_tac',
+                          -- CP34 (migration 0028) — Wave G/H v1 CCTV camera-
+                          -- discovery protocol pattern (1)
+                          'network_discovery_protocol_pattern'
+                      )),
+    device_category   TEXT NOT NULL CHECK (device_category IN (
+                          -- 0001 initial — 12 values
+                          'alpr', 'imsi_catcher', 'body_cam', 'police_radio',
+                          'drone', 'gunshot_detect', 'hacking_tool',
+                          'covert_cam', 'gps_tracker', 'face_recog',
+                          'drone_detect', 'unknown',
+                          -- CP32 (migration 0026) — automotive telematics arm cluster
+                          'automotive_telematics',
+                          -- CP33 (migration 0027) — v1.5.0 cohort lexicon expansion (+3)
+                          'cctv_camera',
+                          'persistent_surveillance',
+                          'through_wall_radar',
+                          -- CP37 (migration 0030) — Wave K cohort 3 lawful-intercept /
+                          -- network-surveillance platforms
+                          'network_surveillance',
+                          -- CP45 (migration 0032 — THIS migration) — MAC-363 cohort-1
+                          -- consumer BLE item-finder trackers (Apple AirTag / Find My,
+                          -- Tile, Chipolo, Samsung SmartTag). PROMOTING category:
+                          -- §11 #13 unknown-export ban does NOT apply once a row is
+                          -- recategorized into it (parity with network_surveillance).
+                          'bluetooth_tracker',
+                          'smart_lock', 'smart_home_hub'
+                      )),
+    manufacturer      TEXT,
+    model             TEXT,
+    confidence        INTEGER CHECK (confidence BETWEEN 0 AND 100),
+    source_url        TEXT NOT NULL,
+    source_type       TEXT NOT NULL CHECK (source_type IN (
+                          -- Pre-CP13 (0001 initial; 8 values)
+                          'official', 'regulatory', 'procurement',
+                          'academic', 'foia', 'crowdsourced',
+                          'inferred', 'manufacturer_doc',
+                          -- CP13 (migration 0009)
+                          'manufacturer_app',
+                          -- CP15 (migration 0015)
+                          'primary_registry',
+                          -- CP35 (migration 0029) — enum parity with sources.source_type
+                          'judicial_filing',
+                          'disclosure_filing',
+                          'procurement_disclosure'
+                      )),
+    source_excerpt    TEXT CHECK (source_excerpt IS NULL OR length(source_excerpt) <= 200),
+    geographic_scope  TEXT CHECK (
+                          -- MAC-742: ratified vocabulary {ISO-3166 alpha-2, 'global', NULL}.
+                          -- SHAPE rule only, deliberately. See the header's
+                          -- "GLOB vs allow-list" section: the enumerable half of
+                          -- the vocabulary lives in tests/test_geographic_scope_vocabulary.py,
+                          -- which is cheap to amend; this clause is not.
+                          geographic_scope IS NULL
+                          OR geographic_scope = 'global'
+                          OR geographic_scope GLOB '[A-Z][A-Z]'
+                      ),
+    first_seen        DATETIME,
+    last_verified     DATETIME,
+    notes             TEXT,
+    superseded_by     INTEGER REFERENCES identifiers(id) ON DELETE SET NULL,
+    -- CP14 (migration 0012) — paired-identifier discipline
+    paired_identifier_id INTEGER REFERENCES identifiers(id) ON DELETE SET NULL,
+    pair_kind            TEXT CHECK (
+                             pair_kind IS NULL
+                             OR pair_kind IN (
+                                 'la_bit_flip',
+                                 'frdid_sibling',
+                                 'vendor_as_container',
+                                 'firmware_generation',
+                                 -- CP31 (migration 0025) — FCC EAS structural pairing
+                                 'fcc_grantee_equipment_class'
+                             )
+                         ),
+    -- ─── CP39 (migration 0031) — severity column (carried verbatim) ───────────
+    -- Orthogonal axis to confidence. Confidence = identifier-veracity (intake
+    -- side). Severity = surveillance-impact class (downstream consumer side).
+    severity             TEXT CHECK (
+                             severity IS NULL
+                             OR severity IN ('high', 'medium', 'low')
+                         )
+);
+
+INSERT INTO identifiers_new (
+    id, identifier, identifier_type, device_category, manufacturer, model,
+    confidence, source_url, source_type, source_excerpt, geographic_scope,
+    first_seen, last_verified, notes, superseded_by, paired_identifier_id,
+    pair_kind, severity)
+SELECT
+    id, identifier, identifier_type, device_category, manufacturer, model,
+    confidence, source_url, source_type, source_excerpt, geographic_scope,
+    first_seen, last_verified, notes, superseded_by, paired_identifier_id,
+    pair_kind, severity
+  FROM identifiers
+ WHERE (SELECT COUNT(*) FROM _mac742_go) = 1;
+
+DROP TABLE identifiers;
+ALTER TABLE identifiers_new RENAME TO identifiers;
+
+-- Indexes are dropped with the table and must be rebuilt by name. Same seven,
+-- same definitions, carried verbatim from 0033:194-200.
+CREATE INDEX IF NOT EXISTS idx_identifiers_category   ON identifiers(device_category);
+CREATE INDEX IF NOT EXISTS idx_identifiers_ident_type ON identifiers(identifier, identifier_type);
+CREATE INDEX IF NOT EXISTS idx_identifiers_identifier ON identifiers(identifier);
+CREATE INDEX IF NOT EXISTS idx_identifiers_paired     ON identifiers(paired_identifier_id);
+CREATE INDEX IF NOT EXISTS idx_identifiers_severity   ON identifiers(severity);
+CREATE INDEX IF NOT EXISTS idx_identifiers_superseded ON identifiers(superseded_by);
+CREATE INDEX IF NOT EXISTS idx_identifiers_type       ON identifiers(identifier_type);
+
+-- ---------------------------------------------------------------------------
+-- POST-CONDITIONS. Deltas against `_pre` / `_pre_all`. Deliberately NOT a
+-- restatement of the transform: asserting "the rows I set to 'US' are 'US'"
+-- mirrors the write and is vacuous. What is asserted is the POPULATION effect,
+-- the SHAPE of the recreated table, and the ABSENCE of collateral change.
+-- ---------------------------------------------------------------------------
+
+-- POST-1 FAIL: the carry did not land, or landed without its provenance block.
+-- An inherited value with no record of what it was inherited from is
+-- indistinguishable from an invented one.
+CREATE TEMP TABLE _mac742_post_1fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_1fail(ok) SELECT CASE WHEN ((SELECT COUNT(*) FROM identifiers
+   WHERE id IN (35777, 35778)
+     AND geographic_scope = 'US'
+     AND json_valid(notes)
+     AND json_extract(notes, '$.mac742_scope_carry.issue')              = 'MAC-742'
+     AND json_extract(notes, '$.mac742_scope_carry.carried_from_value') = 'US-CBP'
+     AND json_extract(notes, '$.mac742_scope_carry.value')              = 'US') <> 2)
+  THEN 0 ELSE 1 END;
+
+-- POST-2 FAIL: the scope populations did not move by exactly two rows, in
+-- exactly the two expected buckets, with the other three untouched. DELTA.
+CREATE TEMP TABLE _mac742_post_2fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_2fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'US')
+         <> (SELECT us_all     FROM _pre) + 2
+    OR (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'US-CBP')
+         <> (SELECT uscbp_all  FROM _pre) - 2
+    OR (SELECT COUNT(*) FROM identifiers WHERE geographic_scope IS NULL)
+         <> (SELECT null_all   FROM _pre)
+    OR (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'global')
+         <> (SELECT global_all FROM _pre)
+    OR (SELECT COUNT(*) FROM identifiers WHERE geographic_scope = 'GB')
+         <> (SELECT gb_all     FROM _pre)) THEN 0 ELSE 1 END;
+
+-- POST-3 FAIL: the recreate lost or duplicated rows, or moved the supersession
+-- topology. A table copy is the failure mode that loses rows silently.
+CREATE TEMP TABLE _mac742_post_3fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_3fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM identifiers)                              <> (SELECT total  FROM _pre)
+    OR (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL)  <> (SELECT active FROM _pre)
+    OR (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NOT NULL)
+                                                                       <> (SELECT edges  FROM _pre))
+  THEN 0 ELSE 1 END;
+
+-- POST-4 FAIL: `json_set` corrupted a notes blob ANYWHERE. Swept table-wide as a
+-- delta, not over the mutation scope — a json_set bug that damaged an unrelated
+-- row is invisible to a scope-local check.
+CREATE TEMP TABLE _mac742_post_4fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_4fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM identifiers WHERE notes IS NOT NULL
+          AND NOT json_valid(notes)) <> (SELECT badjson FROM _pre)) THEN 0 ELSE 1 END;
+
+-- POST-5 FAIL: the recreate changed ANY cell of ANY row other than the two
+-- intended `geographic_scope` cells and their two `notes` blobs. Diffed column
+-- by column against the full pre-image, so a transposed copy, a dropped row or
+-- an in-path sweep cannot hide. `IS NOT` is the null-safe comparison; `<>` would
+-- silently skip every NULL-valued cell, and this table has 36,017 NULL scopes
+-- alone.
+CREATE TEMP TABLE _mac742_post_5fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_5fail(ok) SELECT CASE WHEN ((SELECT COUNT(*)
+     FROM identifiers i JOIN _pre_all p ON p.id = i.id
+    WHERE i.identifier           IS NOT p.identifier
+       OR i.identifier_type      IS NOT p.identifier_type
+       OR i.device_category      IS NOT p.device_category
+       OR i.manufacturer         IS NOT p.manufacturer
+       OR i.model                IS NOT p.model
+       OR i.confidence           IS NOT p.confidence
+       OR i.source_url           IS NOT p.source_url
+       OR i.source_type          IS NOT p.source_type
+       OR i.source_excerpt       IS NOT p.source_excerpt
+       OR i.first_seen           IS NOT p.first_seen
+       OR i.last_verified        IS NOT p.last_verified
+       OR i.superseded_by        IS NOT p.superseded_by
+       OR i.paired_identifier_id IS NOT p.paired_identifier_id
+       OR i.pair_kind            IS NOT p.pair_kind
+       OR i.severity             IS NOT p.severity
+       OR (i.id NOT IN (35777, 35778)
+           AND (i.geographic_scope IS NOT p.geographic_scope
+                OR i.notes         IS NOT p.notes))) <> 0) THEN 0 ELSE 1 END;
+
+-- POST-6 FAIL: every pre-image id must still be present, and no id invented.
+-- POST-5's JOIN is inner: a row deleted by the copy simply drops out of it and
+-- the diff still reads zero. Set-equality on the key closes that.
+CREATE TEMP TABLE _mac742_post_6fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_6fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM _pre_all p
+         WHERE NOT EXISTS (SELECT 1 FROM identifiers i WHERE i.id = p.id)) <> 0
+    OR (SELECT COUNT(*) FROM identifiers i
+         WHERE NOT EXISTS (SELECT 1 FROM _pre_all p WHERE p.id = i.id)) <> 0)
+  THEN 0 ELSE 1 END;
+
+-- POST-7 FAIL: the constraint is not actually on the table. The whole point of
+-- the migration; asserted against the stored DDL, not inferred from the apply
+-- having run without error.
+CREATE TEMP TABLE _mac742_post_7fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_7fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'identifiers'
+          AND sql LIKE '%geographic_scope  TEXT CHECK%'
+          AND sql LIKE '%GLOB ''[A-Z][A-Z]''%') <> 1) THEN 0 ELSE 1 END;
+
+-- POST-8 FAIL: the recreate lost the indexes or the AUTOINCREMENT high-water
+-- mark. A reset sequence would let a future INSERT reuse a retired id, which on
+-- this registry means a dead id in a published cite.
+CREATE TEMP TABLE _mac742_post_8fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_8fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM pragma_index_list('identifiers') WHERE origin = 'c')
+         <> (SELECT idxc FROM _pre)
+    OR (SELECT seq FROM sqlite_sequence WHERE name = 'identifiers')
+         <> (SELECT seq FROM _pre)) THEN 0 ELSE 1 END;
+
+-- POST-9 FAIL: the recreate broke the FK graph. Six tables hold REFERENCES into
+-- `identifiers`, two of them from `identifiers` itself. PRE-7 established this
+-- was zero before, so a zero here is an absence of damage, not a vacuous pass.
+CREATE TEMP TABLE _mac742_post_9fail (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mac742_post_9fail(ok) SELECT CASE WHEN (
+       (SELECT COUNT(*) FROM pragma_foreign_key_check) <> 0) THEN 0 ELSE 1 END;
+
+COMMIT;
+
+PRAGMA foreign_keys = ON;
