@@ -18,6 +18,14 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
+# MAC-755: read frozen extraction-time canonical, not live db/argus.db. The 53
+# ble_service_uuid rows and the Whistle OUI have since been promoted, and
+# build() ABORTS on a non-net-new candidate — which is why a live read reddened
+# the byte-faithfulness and FP-triage tests too. See tests/cohort_frozen_db.py.
+from cohort_frozen_db import freeze_cohort_db  # noqa: E402
+
+freeze_cohort_db()
+
 from db.sources import cohort6_petkid as c6  # noqa: E402
 
 RAW_PRESENT = all((REPO / a["rel_path"]).exists() for a in c6.APKS.values()) and \

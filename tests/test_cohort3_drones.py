@@ -12,7 +12,15 @@ import re
 
 import pytest
 
-from db.sources import cohort3_drones as c3
+# MAC-755: read frozen extraction-time canonical, not live db/argus.db. The
+# grantee misattributions and recategorizations this cohort surfaced have since
+# been remediated, so a live read empties the conflict set the tests assert on.
+# See tests/cohort_frozen_db.py.
+from cohort_frozen_db import freeze_cohort_db
+
+freeze_cohort_db()
+
+from db.sources import cohort3_drones as c3  # noqa: E402
 
 RESULT = c3.build()
 CANDS = RESULT["candidates"]

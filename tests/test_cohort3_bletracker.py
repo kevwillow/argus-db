@@ -16,6 +16,13 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
+# MAC-755: read frozen extraction-time canonical, not live db/argus.db. The
+# Pebblebee 0xFA25 candidate has since been promoted, so a live read makes the
+# net-new verdict below permanently false. See tests/cohort_frozen_db.py.
+from cohort_frozen_db import freeze_cohort_db  # noqa: E402
+
+freeze_cohort_db()
+
 from db.sources import cohort3_bletracker as c3  # noqa: E402
 
 RAW_PRESENT = (REPO / c3.A_AIRGUARD_PB).exists() and (REPO / c3.APK_PEBBLEBEE["artifact"]).exists()

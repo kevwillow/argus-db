@@ -11,7 +11,8 @@ Anti-hallucination + §4.3/§7/§8.3 discipline guards (positive + negative):
 - SAR-1 LAA-bit N/A: zero MAC/oui candidates emitted.
 - No PII (no '@' e-mail token) leaks into any excerpt.
 - needs_new_source_row set ONLY when the PRIMARY source is academic:*.
-- already_in_db matches a fresh live-DB lookup.
+- already_in_db matches a fresh lookup against the SAME canonical snapshot the
+  extractor read (MAC-755: frozen extraction-time snapshot, not live canonical).
 - canon_uuid / locate raise rather than fabricate (negative tests).
 - Reproducible counts.
 """
@@ -23,7 +24,14 @@ from pathlib import Path
 
 import pytest
 
-from db.sources import cohort1_ble_trackers as mod
+# MAC-755: read frozen extraction-time canonical, not live db/argus.db. These
+# candidates have since been promoted, so a live read makes every net-new
+# assertion below permanently false. See tests/cohort_frozen_db.py.
+from cohort_frozen_db import freeze_cohort_db
+
+freeze_cohort_db()
+
+from db.sources import cohort1_ble_trackers as mod  # noqa: E402
 
 CANDIDATES, BEHAVIORAL = mod.build()
 ALL_ITEMS = CANDIDATES + BEHAVIORAL

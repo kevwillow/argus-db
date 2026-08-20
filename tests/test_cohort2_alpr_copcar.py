@@ -11,7 +11,14 @@ import re
 
 import pytest
 
-from db.sources import cohort2_alpr_copcar as c2
+# MAC-755: read frozen extraction-time canonical, not live db/argus.db. These
+# candidates have since been promoted, so a live read makes every net-new
+# assertion below permanently false. See tests/cohort_frozen_db.py.
+from cohort_frozen_db import freeze_cohort_db
+
+freeze_cohort_db()
+
+from db.sources import cohort2_alpr_copcar as c2  # noqa: E402
 
 RESULT = c2.build()
 CANDS = RESULT["candidates"]

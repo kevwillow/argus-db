@@ -18,6 +18,14 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
+# MAC-755: read frozen extraction-time canonical, not live db/argus.db. These
+# GATT UUIDs and OUIs have since been promoted, and build() ABORTS on a
+# non-net-new candidate — which is why a live read errored every test in this
+# module, not just the net-new one. See tests/cohort_frozen_db.py.
+from cohort_frozen_db import freeze_cohort_db  # noqa: E402
+
+freeze_cohort_db()
+
 from db.sources import cohort4_smartlock as c4  # noqa: E402
 
 RAW_PRESENT = (REPO / c4.A_OUI).exists() and all((REPO / a["artifact"]).exists() for a in c4.APKS)

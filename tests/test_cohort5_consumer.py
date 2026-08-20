@@ -1,8 +1,9 @@
 """MAC-376 — Cohort 5 (Consumer surveillance) extraction tests.
 
-Locks the integrity catches + cite-paste counts against the raw artifacts and
-the live DB. Skips cleanly if the raw artifacts are absent (CI without the
-gitignored raw/ tree).
+Locks the integrity catches + cite-paste counts against the raw artifacts and a
+frozen extraction-time canonical snapshot (MAC-755 — NOT live canonical; the 26
+net-new OUIs have since been promoted). Skips cleanly if the raw artifacts are
+absent (CI without the gitignored raw/ tree).
 """
 from __future__ import annotations
 
@@ -10,7 +11,14 @@ import sqlite3
 
 import pytest
 
-from db.sources import cohort5_consumer as c5
+# MAC-755: read frozen extraction-time canonical, not live db/argus.db. A live
+# read makes db_presence_oui() report every one of the 26 net-new OUIs as
+# already-held, collapsing the tallies to 0. See tests/cohort_frozen_db.py.
+from cohort_frozen_db import freeze_cohort_db
+
+freeze_cohort_db()
+
+from db.sources import cohort5_consumer as c5  # noqa: E402
 
 pytestmark = pytest.mark.skipif(
     not (c5.OUI_FILES["MA-L"].exists() and c5.SIG_YAML.exists()
