@@ -643,3 +643,65 @@ def test_every_exclude_class_cite_names_its_own_class() -> None:
             checked += 1
     # Non-vacuity: an empty sweep would pass silently.
     assert checked >= 40, f"control swept only {checked} tokens"
+
+
+# ---- MAC-722 (ported by MAC-758): Rule 5's brand_tokens scan ---------------
+#
+# MAC-753 made every substring-matched set scan total, and MAC-756 put a class
+# rank in front of the exclude-token scans. Both are covered above — but every
+# one of those tests enters through `_ranked_exclude_tokens`, i.e. Rule 3 or
+# Rule 6. Rule 5 reads `brand_tokens`, a single undifferentiated class that has
+# no class rank to apply and therefore no `_ranked_exclude_tokens` test to ride
+# on. It is the one substring-matched scan with no cite-order coverage.
+#
+# That gap is not hypothetical. MAC-722 measured the generator over all 394
+# clusters under 12 PYTHONHASHSEEDs and found exactly three rows still moving
+# after MAC-719's Rule 3 fix, and all three were Rule 5 `brand_tokens`:
+# Berla BERLA IVE vs IVE VEHICLE FORENSIC, DJI MAVIC vs PHANTOM, Getac
+# GETAC B360 vs GETAC F110. The t2 suite was green under all 12 seeds the whole
+# time, because no test in it reached a multi-token match on a description-basis
+# brand rule. These are those three rows, as tests.
+#
+# Each case matches at least TWO registry brand tokens and pins the one the
+# documented order selects (-len, then lexicographic). The verdict is asserted
+# alongside the cite to keep the MAC-753 invariant visible: the scan order
+# chooses the citation, never the KEEP/DROP.
+
+
+def test_rule5_brand_token_cite_is_the_longest_match_dji() -> None:
+    # Excerpt matches brand tokens MAVIC (5) and PHANTOM (7).
+    v, ev = t2_adjudicate.adjudicate_cluster(
+        "DJI", "FLORIDA DRONE SUPPLY, INC.", basis="description",
+        sample_excerpt="QUADCOPTER AIRFRAME KIT, MAVIC AND PHANTOM SERIES",
+    )
+    assert v == "KEEP"
+    assert ev == "description excerpt contains 'PHANTOM' (registry product marker for DJI)"
+    assert "MAVIC" not in ev
+
+
+def test_rule5_brand_token_cite_is_the_longest_match_getac() -> None:
+    # GETAC B360 and GETAC F110 are both 10 chars — the lexicographic tiebreak
+    # is what makes this total rather than merely length-ordered. This is the
+    # equal-length case for `brand_tokens` specifically; MAC-753's helper test
+    # covers equal length only on a synthetic {"AAA", "BBB"} pair.
+    v, ev = t2_adjudicate.adjudicate_cluster(
+        "Getac", "GOVCONNECTION INC", basis="description",
+        sample_excerpt="RUGGED TABLETS: GETAC B360 AND GETAC F110",
+    )
+    assert v == "KEEP"
+    assert ev == (
+        "description excerpt contains 'GETAC B360' (registry product marker for Getac)"
+    )
+
+
+def test_rule5_brand_token_cite_is_the_longest_match_berla() -> None:
+    # One excerpt matching BERLA IVE (9) and IVE VEHICLE FORENSIC (20).
+    v, ev = t2_adjudicate.adjudicate_cluster(
+        "Berla", "AUGUST SCHELL ENTERPRISES, INC.", basis="description",
+        sample_excerpt="BERLA IVE VEHICLE FORENSIC KIT",
+    )
+    assert v == "KEEP"
+    assert ev == (
+        "description excerpt contains 'IVE VEHICLE FORENSIC' "
+        "(registry product marker for Berla)"
+    )
