@@ -368,3 +368,48 @@ def test_empty_canonical_is_not_common_word() -> None:
 
 def test_already_lowercase_stop_is_common_word_canonical() -> None:
     assert t2_adjudicate.is_common_word_canonical("stop") is True
+
+
+# ---- MAC-753: the multi-match tiebreak is a total order ------------------
+#
+# `exclude_tokens` / `brand_tokens` are sets. When several members matched, the
+# bare iteration that used to back these rules returned an arbitrary one, so the
+# cite-pasted evidence string moved with PYTHONHASHSEED. These pin the order.
+
+
+def test_multi_match_exclude_token_cites_the_longest_match() -> None:
+    # "PRI/DJI, A SERVICES JV" matches four DJI exclude tokens at once:
+    # 'A SERVICES JV', 'SERVICES', 'PRI/DJI', 'JV'. The longest wins.
+    _, ev = t2_adjudicate.adjudicate_cluster("DJI", "PRI/DJI, A SERVICES JV")
+    assert "'A SERVICES JV'" in ev
+
+
+def test_multi_match_exclude_token_prefers_specific_over_substring() -> None:
+    # 'BIOSCIENCES' and 'BIOSCIENCE' both match; the longer is the apter cite.
+    _, ev = t2_adjudicate.adjudicate_cluster("Reveal", "REVEAL BIOSCIENCES INC")
+    assert "'BIOSCIENCES'" in ev
+
+
+def test_tiebreak_helper_orders_by_length_then_lexically() -> None:
+    tokens = {"JV", "SERVICES", "A SERVICES JV", "PRI/DJI"}
+    got = t2_adjudicate._first_match_longest_then_lexical(
+        tokens, "PRI/DJI, A SERVICES JV"
+    )
+    assert got == "A SERVICES JV"
+    # Equal length → lexicographic, so the result never depends on set order.
+    assert t2_adjudicate._first_match_longest_then_lexical(
+        {"BBB", "AAA"}, "XX AAA BBB XX"
+    ) == "AAA"
+    assert t2_adjudicate._first_match_longest_then_lexical({"ZZZ"}, "NOPE") is None
+
+
+def test_verdict_is_invariant_to_which_token_matched() -> None:
+    # The point of the tiebreak: it selects the citation, never the verdict.
+    # Every one of these matches a different number of exclude tokens.
+    for vendor in (
+        "PRI/DJI, A SERVICES JV",
+        "PRI-DJI A CONSTRUCTION JV",
+        "PRI/DJI A RECONSTRUCTION JV",
+        "KMK-DJI JV",
+    ):
+        assert t2_adjudicate.adjudicate_cluster("DJI", vendor)[0] == "DROP"
