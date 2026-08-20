@@ -395,13 +395,29 @@ def test_ssid_pattern_to_substring_post_group_concat_mac752() -> None:
 def test_ssid_pattern_to_substring_branch_internal_metachar_renders_fully_mac752() -> None:
     # MAC-752 (CEO Finding B follow-up) — a branch whose own leading
     # literal is truncated by an internal metachar is RENDERED FULLY, not
-    # silently shipped as the bare prefix.  The Hak5 row's
-    # `wifi[_-]?pineapple` branch now emits `wifipineapple` (13 chars,
-    # distinctive), preserving the Hak5 product coverage.  CEO allowed
-    # "either render it fully or FP-hold the row"; rendering fully wins.
-    assert _ssid_pattern_to_substring("(?i)^(pineapple|hak5|wifi[_-]?pineapple).*") == [
-        "pineapple", "hak5", "wifipineapple",
+    # silently shipped as the bare prefix.  The mechanism is unchanged; the
+    # synthetic inputs below exercise it in isolation.
+    assert _ssid_pattern_to_substring("(?i)^(verkada|axon[_-]?body).*") == [
+        "verkada", "axonbody",
     ]
+
+
+def test_ssid_pattern_to_substring_hak5_row_is_fp_held_mac761() -> None:
+    # SUPERSEDES the MAC-752 disposition this test used to assert.  MAC-752
+    # read: "the Hak5 row's `wifi[_-]?pineapple` branch now emits
+    # `wifipineapple` (13 chars, distinctive), preserving the Hak5 product
+    # coverage.  CEO allowed 'either render it fully or FP-hold the row';
+    # rendering fully wins."  The board re-made that call at MAC-761 and took
+    # the other arm: bare `pineapple` shipped with
+    # `device_category='hacking_tool'`, so under Lynceus 0.9.2 substring
+    # semantics `Pineapple Cafe WiFi` was labelled an attack tool.
+    #
+    # The FP-hold check rejects the WHOLE row on its first held branch, so the
+    # `hak5` and `wifipineapple` branches withdraw with it and Hak5 ships in
+    # neither feed.  That cost was measured (1,017 -> 1,014) and accepted, not
+    # discovered afterwards.  Rendering fully is still the behaviour for every
+    # branch whose base is not in the hold-set — see the test above.
+    assert _ssid_pattern_to_substring("(?i)^(pineapple|hak5|wifi[_-]?pineapple).*") is None
 
 
 def test_ssid_pattern_to_substring_mandatory_post_group_alternation_mac752() -> None:
