@@ -404,9 +404,15 @@ CLASS_B_SITES: list[dict] = [
     {"file": "CHANGELOG.md", "locator": "Counted as distinct wire values rather than rows",
      "description": "wire values 42,996 -> 43,028 (net +32) and its stated reduction",
      "reason": "delta pair valid only alongside the reduction that produced it"},
-    {"file": "README.md", "locator": "Active moves 43,134 -> 43,088 (second clause of the active-identifiers bullet)",
-     "description": "Active moves 43,134 -> 43,088, standard feed 977 -> 983, high-confidence 481 -> 501",
-     "reason": "delta and provenance line anchored to v1.7.0 migration"},
+    # Re-pointed (MAC-747): the v1.7.0 delta clause this entry described was
+    # rewritten to v1.8.0's by MAC-748/MAC-749, so the old locator named prose
+    # that no longer exists. Still Class B, and for the structural reason rather
+    # than the provenance one: settling a delta needs BOTH endpoints and only the
+    # current one is on disk. The v1.7.0 figures survive at README.md:105, which
+    # is the separate Class B entry below.
+    {"file": "README.md", "locator": "Active moves 43,088 -> 43,126 (delta clause of the active-identifiers bullet)",
+     "description": "Active moves 43,088 -> 43,126, standard feed 983 -> 1,014, high-confidence 501 -> 504",
+     "reason": "delta line: settling requires both endpoints, only the current one is on disk"},
     {"file": "README.md", "locator": "The rest: **8 new identifiers**",
      "description": "8 new identifiers / 44 more OUIs / three new sources / 84 OEM camera brands",
      "reason": "delta and provenance lines anchored to v1.7.0 migration"},
