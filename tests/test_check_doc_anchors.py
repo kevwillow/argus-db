@@ -1,6 +1,6 @@
 """MAC-699 / MAC-717 -- proof fixtures for ``scripts/check_doc_anchors.py``.
 
-The gate's job is to make the v1.7.0 doc surface's headline numeric claims
+The gate's job is to make the current-release doc surface's headline numeric claims
 mechanically checkable, the way ``scripts/check_prose_dashes.py`` made the
 em-dash ban mechanical. Per R9 the gate is decoration until it is shown
 failing on an input it should reject, and per R7 a green result is not
@@ -589,13 +589,13 @@ def test_t5_section_scope_disambiguates_repeated_release_formats():
     """The load-bearing case: the same line format in every release section.
 
     Unscoped, this anchor matches both releases and must ERROR. Scoped to
-    v1.7.0 it resolves to the current release's line and nothing else.
+    the current release it resolves to that block's line and nothing else.
     """
     lines = [
+        "## v1.8.0 - 2026-08-20",
+        "- **Lynceus standard feed:** 983 → **1,014**",
         "## v1.7.0 - 2026-08-11",
         "- **Lynceus standard feed:** 977 → **983**",
-        "## v1.6.14 - 2026-07-21",
-        "- **Lynceus standard feed:** 945 → **977**",
     ]
     pattern = r"\*\*Lynceus standard feed:\*\*\s*[\d,]+\s*→\s*\*\*([\d,]+)\*\*"
 
@@ -603,17 +603,17 @@ def test_t5_section_scope_disambiguates_repeated_release_formats():
     assert "ambiguous" in gate_mod.resolve_claim_site(unscoped, lines).error
 
     scoped = gate_mod._claim(
-        "CHANGELOG.md", "d", "feed_standard", pattern, section=gate_mod.SECTION_V170
+        "CHANGELOG.md", "d", "feed_standard", pattern, section=gate_mod.SECTION_CURRENT_RELEASE
     )
     res = gate_mod.resolve_claim_site(scoped, lines)
     assert res.line == 2
-    assert gate_mod.extract_claim(scoped, res.text) == 983
+    assert gate_mod.extract_claim(scoped, res.text) == 1014
 
 
 def test_t5_missing_section_heading_is_an_error():
     """If the release block is renamed, the gate says so instead of passing."""
     claim = gate_mod._claim(
-        "CHANGELOG.md", "d", "feed_standard", r"feed (\d+)", section=gate_mod.SECTION_V170
+        "CHANGELOG.md", "d", "feed_standard", r"feed (\d+)", section=gate_mod.SECTION_CURRENT_RELEASE
     )
     res = gate_mod.resolve_claim_site(claim, ["## v1.6.14", "feed 977"])
     assert res.line is None and "matched 0 headings" in res.error
@@ -621,9 +621,9 @@ def test_t5_missing_section_heading_is_an_error():
 
 def test_t5_section_window_stops_at_the_next_h2_not_at_an_h3():
     """An `### ` subheading inside a release must not truncate the window."""
-    lines = ["## v1.7.0", "### Data", "feed 983", "## v1.6.14", "feed 977"]
+    lines = ["## v1.8.0", "### Data", "feed 1014", "## v1.7.0", "feed 983"]
     claim = gate_mod._claim(
-        "CHANGELOG.md", "d", "feed_standard", r"feed (\d+)", section=gate_mod.SECTION_V170
+        "CHANGELOG.md", "d", "feed_standard", r"feed (\d+)", section=gate_mod.SECTION_CURRENT_RELEASE
     )
     res = gate_mod.resolve_claim_site(claim, lines)
     assert res.line == 3
