@@ -16,7 +16,7 @@ ARGUS IS IN ACTIVE DEVELOPMENT AND IS NOT COMPLETE. MAY NOT BE 100% ACCURATE AND
 
 Argus tracks the model numbers, MAC ranges, FCC grantee codes, hostnames, certificate identifiers, and BLE company IDs of surveillance equipment used by US law enforcement and adjacent operators. That includes **Hikvision CCTV cameras**, **Cellebrite forensic extraction devices**, **Anduril counter-drone systems**, **Flock Safety license plate readers**, **Geotab fleet telematics**, **Rohde & Schwarz IMSI catchers**, and dozens of other surveillance vendor categories.
 
-Argus is a database rather than a real-time monitor. It lists the wireless and regulatory fingerprints of fixed and mobile surveillance equipment so that downstream tools (Lynceus, Rayhunter, or any other RF scanner) can alert when a matching device is detected nearby. Every entry comes from public sources: regulatory registries, public-records procurement data, open-source intelligence repositories, manufacturer documentation, and academic research.
+Argus is a database rather than a real-time monitor. It lists the wireless and regulatory fingerprints of fixed and mobile surveillance equipment so that downstream tools (Lynceus, Rayhunter, or any other RF scanner) can alert when a matching device appears nearby. Every entry comes from public sources: regulatory registries, public-records procurement data, open-source intelligence repositories, manufacturer documentation, and academic research.
 
 Tools to surveil people are abundant; tools to detect surveillance are not. The asymmetry favors the surveillor. Argus narrows the gap by making vendor identifiers queryable in a single place with full provenance for every row.
 
@@ -122,15 +122,15 @@ A v1.6.15 was assembled in late July and then pulled before publication in favou
 
 ### Prior release, v1.6.9
 
-**v1.6.9** was the dedicated BLE-tracker fast-follow (MAC-387): it minted the `bluetooth_tracker` device category (schema_version 31 → 32) and made 46 captured tracker rows (AirTag, Tile, Samsung SmartTag, Chipolo, AirGuard) export-visible by absorbing the MAC-359 `ble_service_uuid → ble_uuid` map, with no net-new identifiers (active unchanged at 43,123). The standard export grew 737 → 900 and the high-confidence export 348 → 351. The Apple/Google Exposure-Notification UUID `0xFD6F`, a cross-vendor false-positive magnet, was caught in validation and held at `unknown`, absent from both feeds. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
+**v1.6.9** minted the `bluetooth_tracker` device category (schema_version 31 → 32) and made 46 captured tracker rows (AirTag, Tile, Samsung SmartTag, Chipolo, AirGuard) export-visible by absorbing the MAC-359 `ble_service_uuid → ble_uuid` map, with no net-new identifiers (active unchanged at 43,123). The standard export grew 737 → 900 and the high-confidence export 348 → 351. Validation held the Apple/Google Exposure-Notification UUID `0xFD6F` (a cross-vendor false-positive magnet) at `unknown`, absent from both feeds. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
 ### Prior release, v1.6.8
 
-**v1.6.8** was the widest-net sourcing cycle the project has run: **81 net-new identifiers** across five device cohorts (Bluetooth trackers and stalkerware, ALPR and cop-car, drones, body cams and acoustic, consumer surveillance) plus a deferred-revival cleanup, with 25 bad OUIs withdrawn from the standard feed (active 43,213 → 43,123). The 26 consumer-camera OUIs (Ring, Wyze, Arlo, Blink) grew the high-confidence export 322 → 348; the Bluetooth-tracker rows landed captured-but-suppressed, with their feed-visibility deferred to the v1.6.9 fast-follow above. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
+**v1.6.8** ran the widest-net sourcing cycle to date: **81 net-new identifiers** across five device cohorts (Bluetooth trackers and stalkerware, ALPR and cop-car, drones, body cams and acoustic, consumer surveillance) plus a deferred-revival cleanup, with 25 bad OUIs withdrawn from the standard feed (active 43,213 → 43,123). The 26 consumer-camera OUIs (Ring, Wyze, Arlo, Blink) grew the high-confidence export 322 → 348; the Bluetooth-tracker rows arrived captured-but-suppressed, with their feed-visibility deferred to the v1.6.9 fast-follow above. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
 ### Prior release, v1.6.7
 
-**v1.6.7** layered +290 identifiers on v1.6.6 across two cohorts: the R2 SoC chipset set and the Flock/cop-car Android-app static-analysis cluster (active 42,923 → 43,213). The JSON feeds held flat because every new row was an Argus-internal type outside the Lynceus watchlist schema. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
+**v1.6.7** layered +290 identifiers on v1.6.6 across two cohorts: the R2 SoC chipset set and the Flock/cop-car Android-app static-analysis cluster (active 42,923 → 43,213). The JSON feeds held flat because every new row remained an Argus-internal type outside the Lynceus watchlist schema. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
 
 ### Prior release, v1.6.6
 
@@ -206,29 +206,29 @@ Every active identifier traces back to:
 
 ## How I built this
 
-Argus is the result of many long days and longer nights of iterative work across multiple machines: Windows dev boxes for some scraping and analysis, Linux dev machines and a Linux server for the database, orchestration, and most agent work. The build spans research, scraping, validation, schema design, license posture, the discipline framework, and the audit trail that backs every entry. The dataset grew from a 514-row baseline to over 41,000 active identifiers across roughly five-plus weeks of compressed work; the framework that makes those entries trustworthy took longer.
+Argus is the result of many long days and longer nights of iterative work across multiple machines: Windows dev boxes for some scraping and analysis, Linux dev machines and a Linux server for the database, orchestration, and most agent work. The build spans research, scraping, validation, schema design, license posture, the discipline framework, and the audit trail that backs every entry. The dataset grew from a 514-row baseline to over 41,000 active identifiers in five-plus weeks of compressed work; the framework that makes those entries trustworthy took longer.
 
 ### Operator-led orchestration
 
-I plan and orchestrate this project myself, using Claude chat as a strategic-planning collaborator, paperclipai as the agent orchestration layer, and Claude Code as the execution agent across several specialist roles (data extraction, source gathering, validation, schema design, and overall coordination). I have final decision authority on everything that lands in this repo. Strategic direction, architectural decisions, source-admission disputes, license posture, schema changes, and discipline-framework evolution are all operator-ratified before they commit.
+I plan and orchestrate this project myself. Claude provides strategic planning and execution; paperclipai orchestrates the agents. I have final decision authority on everything that lands in this repo: strategic direction, architectural decisions, source-admission disputes, license posture, schema changes, and discipline-framework evolution all require operator ratification before they commit.
 
 The AI agents are highly capable executors with substantial scoping autonomy inside the constraints I set. They surface findings, propose decompositions, escalate when something needs ratification, and run extensive verification work I couldn't do at scale manually. But they don't decide canonical contract. I do.
 
-This was not vibe-coded. Argus has 38 documented amendments to its canonical contract and 18 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists precisely because building a surveillance-equipment identification database is the kind of work where "looks roughly right" isn't good enough. Provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
+This was not vibe-coded. Argus has 38 documented amendments to its canonical contract and 18 sub-agent rules governing how the build process itself operates. Every active identifier traces back to a verifiable public source via the audit trail. The discipline framework exists because building a surveillance-equipment identification database requires accuracy; "looks right" isn't good enough. Provenance, confidence, and false-positive resistance all need to be load-bearing, not afterthoughts.
 
 ### Notable technical work
 
-Two areas surfaced data that wasn't otherwise aggregated anywhere queryable:
+Two areas surfaced data nobody had aggregated in a single queryable place:
 
 **Vendor app decompilation.** I downloaded Android APKs of setup and admin apps published by surveillance-equipment vendors (Flock Safety, Hikvision Hik-Connect, Dahua DMSS, Motorola WAVE PTT, Parrot FreeFlight 6, DJI Industry Pilot) and analyzed the binaries for embedded identifier patterns: BLE service UUIDs, MAC address prefixes, vendor-specific protocol fields, and default device names. Vendor setup apps need to recognize and connect to their own equipment, so they ship with the identifiers needed to do that. Decompiling public app-store binaries surfaced this information directly. This is legal reverse-engineering of publicly-distributed software under 17 USC §1201(j) + 37 CFR §201.40(b), but it required doing the work rather than waiting for vendors to publish identifier schemas (they don't).
 
-**GitHub researcher-repo aggregation.** Surveillance equipment has been studied by independent researchers for years: drone RID protocol work (alphafox02/DragonSync), cellular intercept detection (EFForg/rayhunter), BLE stalking-tracker research (seemoo-lab/AirGuard), FAA Remote ID database mirrors (jlrjr's wrapper), and more. The data exists across these projects but had never been pulled into a single queryable database with provenance discipline. Argus aggregates it: every identifier traces back to the specific researcher repo, the specific commit, the specific file path, with proper attribution under the original licenses. This is meta-research synthesis rather than primary discovery, but it makes a large amount of distributed researcher work actually usable.
+**GitHub researcher-repo aggregation.** Surveillance equipment has been studied by independent researchers for years: drone RID protocol work (alphafox02/DragonSync), cellular intercept detection (EFForg/rayhunter), BLE stalking-tracker research (seemoo-lab/AirGuard), FAA Remote ID database mirrors (jlrjr's wrapper), and more. The data exists across these projects but had never been pulled into a single queryable database with provenance discipline. Argus aggregates it: every identifier traces back to the specific researcher repo, the specific commit, the specific file path, with proper attribution under the original licenses. This is meta-research synthesis rather than primary discovery, but it makes distributed researcher work usable at scale.
 
 ### The discipline framework
 
-The most substantial thing I built is the framework that makes the database verifiable, more than the database itself.
+The verifiability framework matters more than the raw database.
 
-Every active identifier carries source attribution, confidence scoring, source-type classification, and a chain of corroboration. The framework includes hard rules that prevent fabrication (every identifier must trace to a concrete public source), PII discipline (individual-attributed registrations stay held, not promoted), and downstream-consumer protection (downstream scanners receive only high-confidence canonical data). The framework evolved with the work, each substantive amendment is documented with case studies showing what went wrong (or could have gone wrong) and why the rule exists.
+Every active identifier carries source attribution, confidence scoring, source-type classification, and a chain of corroboration. The framework includes hard rules that prevent fabrication (every identifier must trace to a concrete public source), PII discipline (individual-attributed registrations stay held, not promoted), and downstream-consumer protection (downstream scanners receive only high-confidence canonical data). Each substantive amendment is documented with case studies: what went wrong, what could go wrong, and why the rule exists.
 
 Building this with AI tools is what made it possible at the scale and velocity it happened. Building it deliberately, with operator-final-say discipline and a binding correctness framework, is what makes the output trustworthy.
 
