@@ -5954,9 +5954,12 @@ barred by the §11 #13 `unknown`-export ban. Export eligibility still requires t
 
 **HELD / NOT minted (board-ruled).** `voice_assistant` (cohort-5, empty — no
 admissible identifier) is HELD. `wearable` (cohort-7, zero net-new + privacy
-one-way-door) is DEFERRED. Nest OUIs `64:16:66` / `18:b4:30` (cohort-5) are HELD
-(absent; board: do NOT promote as new). The 4 FP-magnet spy-cam SSID prefixes
-(`IPCAM-`/`SKYEYE`/`HCAM`/`BVCAM`) are HELD pending precision-narrowing. The 16
+one-way-door) is DEFERRED. ~~Nest OUIs `64:16:66` / `18:b4:30` (cohort-5) are HELD
+(absent; board: do NOT promote as new).~~ — **REVERSED** by interaction `f69a79a6`
+q3=`q3a` (2026-08-19, MAC-737). The two Nest OUIs now carry
+`device_category='cctv_camera'` under the strict-8.4 amendment ratified at MAC-733,
+and the §11 #13 export ban no longer applies to them. The 4 FP-magnet spy-cam SSID
+prefixes (`IPCAM-`/`SKYEYE`/`HCAM`/`BVCAM`) are HELD pending precision-narrowing. The 16
 net-new MA-L SoC OUIs (cohort-1) are NOT ingested (no insert-ready provenance in the
 staged artifacts; §8.4 / §11 #13 export-banned regardless); the 6 already-held
 MA-M/MA-S registrations route to `conflicts reason='potential_dedup_step_5'`.
