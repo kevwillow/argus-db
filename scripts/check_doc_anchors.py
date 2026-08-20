@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MAC-699 -- mechanical gate for the v1.7.0 doc-surface numeric claims.
+"""MAC-699 -- mechanical gate for the current-release doc-surface numeric claims.
 
 The v1.7.0 doc surface drifts from canonical and it took a CEO-directed
 manual sweep (MAC-516) plus a hand-built inventory to find it. That does
@@ -44,9 +44,10 @@ The window matters. ``**Lynceus standard feed:**`` appears on 7 lines of
 ``CHANGELOG.md`` -- every prior release repeats the format -- so a bare
 content anchor would bind to a historical release and pass against the
 wrong numbers. CHANGELOG claims therefore carry a ``section`` regex that
-scopes the search to the v1.7.0 release block (from its ``## v1.7.0``
+scopes the search to the current release block (from its ``## vX.Y.Z``
 heading to the next ``## `` heading). The section regex must itself
-match exactly one heading.
+match exactly one heading. That pin moves at every release; see
+``SECTION_CURRENT_RELEASE``.
 
 Class B (delta and provenance lines anchored to a named migration) and
 Class C (historical pins to a past release) are listed in the source for
@@ -128,10 +129,14 @@ REPO = Path(__file__).resolve().parents[1]
 # comment can name them, but they don't fail the gate.
 NO_SETTLING_QUERY = "__no_settling_query__"
 
-# Scopes a CHANGELOG claim to the v1.7.0 release block. Required: the
+# Scopes a CHANGELOG claim to the CURRENT release block. Required: the
 # per-release line formats repeat verbatim across every prior release,
 # so an unscoped content anchor would bind to a historical section.
-SECTION_V170 = r"^## v1\.7\.0\b"
+#
+# This pin MOVES at every release. The current release block carries the
+# live headline totals; every prior release block is historical record
+# and is Class C by the rationale above. Re-point it when you cut a tag.
+SECTION_CURRENT_RELEASE = r"^## v1\.8\.0\b"
 
 # ---------------------------------------------------------------------------
 # Frozen bundle of 13 settling queries. Shapes are frozen; targets are
@@ -295,51 +300,51 @@ CLASS_A_CLAIMS: list[dict] = [
         r"(\d+)\s+of\s+them\s+OEM\s+arms",
         anchor=_A_README_VENDORS,
     ),
-    # --- CHANGELOG.md "Feed totals." summary line (v1.7.0 section) ---
+    # --- CHANGELOG.md "Feed totals." summary line (current release section) ---
     _claim(
         "CHANGELOG.md", "standard feed (CHANGELOG feed-totals)", "feed_standard",
         r"Standard\s+[\d,]+\s+to\s+\*\*([\d,]+)\*\*",
-        anchor=_A_CL_FEED_TOTALS, section=SECTION_V170,
+        anchor=_A_CL_FEED_TOTALS, section=SECTION_CURRENT_RELEASE,
     ),
     _claim(
         "CHANGELOG.md", "high-conf feed (CHANGELOG feed-totals)", "feed_high_confidence",
         r"high-confidence\s+[\d,]+\s+to\s+\*\*([\d,]+)\*\*",
-        anchor=_A_CL_FEED_TOTALS, section=SECTION_V170,
+        anchor=_A_CL_FEED_TOTALS, section=SECTION_CURRENT_RELEASE,
     ),
     _claim(
         "CHANGELOG.md", "behavioral feed (CHANGELOG feed-totals)", "feed_behavioral",
         r"behavioral\s+\*\*([\d,]+)\*\*\s+unchanged",
-        anchor=_A_CL_FEED_TOTALS, section=SECTION_V170,
+        anchor=_A_CL_FEED_TOTALS, section=SECTION_CURRENT_RELEASE,
     ),
-    # --- CHANGELOG.md Data-section feed line (v1.7.0 section) ---
+    # --- CHANGELOG.md Data-section feed line (current release section) ---
     # All four claims below live on one physical line, so they share an
     # anchor. Capture the AFTER value of each arrow; the BEFORE value is
     # Class B / delta territory.
     _claim(
         "CHANGELOG.md", "standard feed (CHANGELOG data line)", "feed_standard",
         r"\*\*Lynceus standard feed:\*\*\s*[\d,]+\s*→\s*\*\*([\d,]+)\*\*",
-        anchor=_A_CL_DATA_FEEDS, section=SECTION_V170,
+        anchor=_A_CL_DATA_FEEDS, section=SECTION_CURRENT_RELEASE,
     ),
     _claim(
         "CHANGELOG.md", "high-conf feed (CHANGELOG data line)", "feed_high_confidence",
         r"\*\*high-confidence feed:\*\*\s*[\d,]+\s*→\s*\*\*([\d,]+)\*\*",
-        anchor=_A_CL_DATA_FEEDS, section=SECTION_V170,
+        anchor=_A_CL_DATA_FEEDS, section=SECTION_CURRENT_RELEASE,
     ),
     _claim(
         "CHANGELOG.md", "behavioral feed (CHANGELOG data line)", "feed_behavioral",
         r"\*\*behavioral-signatures feed:\*\*\s*\*\*([\d,]+)\*\*",
-        anchor=_A_CL_DATA_FEEDS, section=SECTION_V170,
+        anchor=_A_CL_DATA_FEEDS, section=SECTION_CURRENT_RELEASE,
     ),
     _claim(
         "CHANGELOG.md", "CSV row count (CHANGELOG)", "csv_data_rows",
         r"\*\*CSV:\*\*\s*\*\*([\d,]+)\*\*",
-        anchor=_A_CL_DATA_FEEDS, section=SECTION_V170,
+        anchor=_A_CL_DATA_FEEDS, section=SECTION_CURRENT_RELEASE,
     ),
-    # --- CHANGELOG.md "Halts encountered" (v1.7.0 section) ---
+    # --- CHANGELOG.md "Halts encountered" (current release section) ---
     _claim(
         "CHANGELOG.md", "halts", NO_SETTLING_QUERY,
         r"halts:\s*\*\*([\d,]+)\*\*",
-        anchor=_A_CL_RECONCILE, section=SECTION_V170,
+        anchor=_A_CL_RECONCILE, section=SECTION_CURRENT_RELEASE,
     ),
     # The reconciliation sentence asserts CSV-rows == canonical-active.
     # Settle each side against the instrument it names: the left operand
@@ -349,12 +354,12 @@ CLASS_A_CLAIMS: list[dict] = [
     _claim(
         "CHANGELOG.md", "reconciliation, CSV side", "csv_data_rows",
         r"canonical active,\s*([\d,]+)\s*=\s*[\d,]+",
-        anchor=_A_CL_RECONCILE, section=SECTION_V170,
+        anchor=_A_CL_RECONCILE, section=SECTION_CURRENT_RELEASE,
     ),
     _claim(
         "CHANGELOG.md", "reconciliation, canonical side", "identifiers_active",
         r"canonical active,\s*[\d,]+\s*=\s*([\d,]+)",
-        anchor=_A_CL_RECONCILE, section=SECTION_V170,
+        anchor=_A_CL_RECONCILE, section=SECTION_CURRENT_RELEASE,
     ),
     # --- docs/USER_GUIDE.md section 2 export headings ---
     # Promoted from Class C at MAC-717. The Class C entries described
