@@ -1,10 +1,10 @@
 # SETUP.md: Argus
 
-> **TL;DR.** Argus ships the pre-generated export files under `exports/`. It does **not** ship the SQLite database: `db/argus.db` is absent from the published tree, so a fresh clone has no database to query and `argus_cli.py` will not run until you supply one. The exports are the published data artifact and need no pipeline run, so clone the repo and read them. This document covers the developer setup path: clone, verify the shipped exports, build the schema from migrations, run the tests, and regenerate the exports against a database you supply. If you just want to use the data, the [USER_GUIDE.md](../USER_GUIDE.md) is a better starting point; this document is for contributors and downstream-integration developers.
+> **TL;DR.** Argus ships pre-generated export files under `exports/`. It does not ship the SQLite database; `db/argus.db` is absent from the published tree. A fresh clone has no database, so `argus_cli.py` won't run until you supply one. The exports are the published data artifact; they need no pipeline run. Clone the repo and read them. This document covers the developer setup path: clone, verify the shipped exports, build the schema from migrations, run the tests, and regenerate the exports. To use the data only, read [USER_GUIDE.md](../USER_GUIDE.md) instead; this document is for contributors and downstream-integration developers.
 
-Audience: someone who just cloned the repo and wants to read the exports, or to extend the database once they have one. This includes downstream consumers (Lynceus, Rayhunter, other scanners), research collaborators, and developers extending Argus.
+This guide is for anyone who cloned the repo and wants to read the exports or extend the database. That includes downstream consumers (Lynceus, Rayhunter, other scanners), research collaborators, and developers extending Argus.
 
-Verified-working against `schema_version=30` (v1.6.2 ship state, CP37 ratified). Time-to-setup for a first-time user with Python 3.11+ already installed: about 2 minutes for the export verification path in §3. The paths that need a populated database (`argus_cli.py`, export regeneration in §6) are not reachable from a clone alone; see §3.1.
+Verified against `schema_version=30` (v1.6.2 ship state, CP37 ratified). With Python 3.11+ already installed, export verification (§3) takes about 2 minutes. Paths requiring a populated database (`argus_cli.py`, export regeneration in §6) are not reachable from a clone alone; see §3.1.
 
 For semantics (confidence bands, dedup logic, provenance discipline), read [METHODOLOGY.md](METHODOLOGY.md). For the schema (every table + every column), read [DATA_DICTIONARY.md](DATA_DICTIONARY.md).
 
