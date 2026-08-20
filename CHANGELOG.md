@@ -22,36 +22,39 @@ release adds 38 identifiers and recategorizes 7 that Argus already held.
 
 ### If you consume the feeds, read this part
 
-**The standard feed grows by 34 entries and one pre-existing entry's stem is re-rendered (autel → autelevo + autelrobotics, +1 net).** Active identifiers move
+**The standard feed grows by 31 entries and one pre-existing entry's stem is re-rendered (autel → autelevo + autelrobotics, +1 net).** Active identifiers move
 43,088 → **43,126**, a clean +38 with no withdrawals: total rows move 43,892 → **43,930** by the same
 +38, so no row was superseded this cycle. If you diff v1.7.0's feed against this one, every v1.7.0
 entry is still present (the 0059 ble_service_uuid 44745-44748 are net new; the 0060 un-binned
 seven are net new; the 0059 ssid_pattern stemmer expansion is net new; the `autel` re-render
 replaces one entry with two, +1 net).
 
-**Where the 34 came from, and it is three different things.** Migration `0059` contributes **26**:
-11 surviving `ssid_pattern` rows that split-expand into 22 entries (post-MAC-752 follow-up: 44714
+**Where the 31 came from, and it is three different things.** Migration `0059` contributes **23**:
+10 surviving `ssid_pattern` rows that split-expand into 19 entries (post-MAC-752 follow-up: 44714
 hail/king/queen becomes hailstorm/kingstorm/queenstorm; 44721 wyze becomes wyzecam/wyzedoorbell/
 wyzesetup; 44722 arlo becomes arlocam/arlopro/arloultra/arlosetup; 44723 eufy becomes eufycam/
-eufydoorbell/eufysecurity; 44726 pineapple|hak5|wifi[_-]?pineapple becomes pineapple/hak5/
-wifipineapple with the wifi branch rendered fully; the other 6 rows emit one stem each), plus
+eufydoorbell/eufysecurity; the other 6 rows emit one stem each), plus
 4 `ble_service_uuid` rows emitted as `ble_uuid`. Migration `0060` contributes **7**. The remaining
 **+1** is the MAC-752 follow-up side effect on a pre-existing row: 35604 `autel[-_]?(evo|robotics).*`
 shipped the bare prefix `autel` in v1.7.0; the same row now emits `autelevo` + `autelrobotics` (the
 mandatory post-group alternation is split and concatenated, same mechanism the 0059 mandatory-group
-rows use). There is no unattributed residue; 26 + 7 + 1 = 34.
+rows use). There is no unattributed residue; 23 + 7 + 1 = 31.
 
-**`0059` admits 38 rows but only 15 of them reach the feed.** Of the 38, 18 `ble_local_name` rows
-drop at the CP50 template gate and 5 `ssid_pattern` rows route to `ssid_pattern_fp_hold` (the
+**`0059` admits 38 rows but only 14 of them reach the feed.** Of the 38, 18 `ble_local_name` rows
+drop at the CP50 template gate and 6 `ssid_pattern` rows route to `ssid_pattern_fp_hold` (the
 pre-MAC-752 `1` is `(harris|xg)[_-]?[0-9]+.*` whose `xg` branch is shorter than the 3-char floor;
 the 4 added under MAC-752 are `(?i)^flock[_-]?.*`, `(?i)^digital[_-]?ally[_-]?.*`,
 `(?i)^(msab|xry)[_-]?.*`, and `(?i)^stingray[_-]?.*`; the fifth post-Finding-B is `stingray`,
 held on defense-in-depth grounds because the anchored `^stingray` becomes unanchored `stingray`
 under Lynceus 0.9.2 substring matching and "Stingray" is also a Chevrolet, an animal, and a
-movie). The `wifi[_-]?pineapple` branch of the Hak5 pattern is rendered fully as `wifipineapple`
-rather than the bare `wifi` magnet (CEO Finding B "render fully or FP-hold"; rendering fully
-preserves the Hak5 product coverage). That is the false-positive discipline
-from v1.7.0 doing its job on a fresh harvest, not a shortfall.
+movie). The sixth is the Hak5 row 44726 `(?i)^(pineapple|hak5|wifi[_-]?pineapple).*`, held under
+MAC-761. An earlier draft of these notes said the `wifi[_-]?pineapple` branch rendering fully as
+`wifipineapple` preserved the Hak5 product coverage. It does not. The FP-hold check rejects the
+whole row on its first held branch, so holding the bare `pineapple` stem (a common English noun
+shipped with `device_category='hacking_tool'`, which labelled `Pineapple Cafe WiFi` an attack tool)
+withdraws `hak5` and `wifipineapple` with it. **Hak5 ships in neither feed at v1.8.0.** The board
+took that cost knowingly, on the same bar that withdrew `flock`. That is the false-positive
+discipline from v1.7.0 doing its job on a fresh harvest, not a shortfall.
 
 **The high-confidence +3 is not new coverage, and we will not present it as one.** All 38 of
 `0059`'s rows are `crowdsourced` under CP19 and carry NULL `geographic_scope` under CP7, so none of
@@ -62,7 +65,7 @@ them a category, so they became eligible for the first time. Counting that as ne
 overstate what this release found, the same way it would have in v1.7.0 for migrations `0051` and
 `0054`.
 
-**Feed totals.** Standard 983 to **1,017**, high-confidence 501 to **504**, behavioral **132** unchanged. Both feed thresholds are unchanged, 30 for the standard feed and 70 for high-confidence, so nothing here comes from moving a floor.
+**Feed totals.** Standard 983 to **1,014**, high-confidence 501 to **504**, behavioral **132** unchanged. Both feed thresholds are unchanged, 30 for the standard feed and 70 for high-confidence, so nothing here comes from moving a floor.
 
 ### Schema
 
@@ -85,7 +88,7 @@ overstate what this release found, the same way it would have in v1.7.0 for migr
   arms, hidden from vendor lists by default, so the visible curated list moves 168 → **169**.
 - **`sources`:** **98** (no change). **behavioral signatures:** **214** (no change).
   **device-category enum:** **20** (no change).
-- **Lynceus standard feed:** 983 → **1,017** (+34 entries, 1 re-rendered pre-existing `autel` → `autelevo` + `autelrobotics`). **high-confidence feed:** 501 → **504** (+3 / −0). **behavioral-signatures feed:** **132** (entry set unchanged). **CSV:** **43,126** rows, matching the active count.
+- **Lynceus standard feed:** 983 → **1,014** (+31 entries, 1 re-rendered pre-existing `autel` → `autelevo` + `autelrobotics`). The MAC-761 FP hold on `pineapple` withdraws 3 `ssid_pattern` stems that an earlier draft of these notes counted as shipping: `pineapple`, `hak5` and `wifipineapple`, all three alternation branches of row 44726. **high-confidence feed:** 501 → **504** (+3 / −0). **behavioral-signatures feed:** **132** (entry set unchanged). **CSV:** **43,126** rows, matching the active count.
 - **Fingerprint.** The standard and high-confidence feeds carry `argus_run_id`
   `78b127fe-7dab-5d27-9c83-a93e8c80f46d` and `exported_at` `2026-08-20T09:21:20Z`; the behavioral
   feed carries `260b5777-99c8-5f75-8023-f4012242e7f4` at `2026-08-20T09:21:20Z`. All three ship at

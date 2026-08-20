@@ -904,6 +904,13 @@ def _ble_local_name_is_template(value: str) -> bool:
 # defense-in-depth grounds: Lynceus 0.9.2 substring matching against
 # `[_-]?` patterns turns the anchored `^stingray` into an unanchored
 # `stingray` that matches Chevrolet, the animal, the movie, etc.).
+# MAC-761 extends the hold-set to `pineapple` (9-char Hak5 product name
+# that is also a common English noun): shipped bare with
+# `description: "Hak5 hacking_tool"`, so under Lynceus 0.9.2 substring
+# semantics `Pineapple Cafe WiFi` is labelled an attack tool.  The
+# siblings `hak5` and `wifipineapple` carry the identical vendor claim,
+# so the coverage cost is near-zero — the same bar under which the board
+# withdrew `flock`.
 # MUST be byte-identical to coverage_matrix.py::_ssid_pattern_to_substring
 # — the `_reconcile` map-vs-writer cross-check halts on any divergence.
 _SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")
@@ -916,6 +923,10 @@ _SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({
     "stingray", # 9-char Harris IMSI-catcher product + generic English word
                 # (CEO Finding B, 2026-08-20; held on defense-in-depth
                 # grounds rather than risk an unanchored bare-stem FP)
+    "pineapple",# 9-char Hak5 product + common English noun; ships bare with
+                # `Hak5 hacking_tool`, so `Pineapple Cafe WiFi` reads as an
+                # attack tool. Siblings `hak5` / `wifipineapple` keep the
+                # detection (CEO ruling Option A, MAC-761, 2026-08-20)
 })
 _SSID_STEM_MIN_LEN = 3
 

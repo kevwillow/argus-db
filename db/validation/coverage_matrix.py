@@ -690,6 +690,8 @@ _SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({
     "xry",      # 3-char acronym; matches base64xryrandom (MAC-752)
     "stingray", # 9-char Harris IMSI-catcher product + generic English word
                 # (CEO Finding B, 2026-08-20)
+    "pineapple",# 9-char Hak5 product + common English noun; ships bare with
+                # `Hak5 hacking_tool` (CEO ruling Option A, MAC-761)
 })
 _SSID_STEM_MIN_LEN = 3
 

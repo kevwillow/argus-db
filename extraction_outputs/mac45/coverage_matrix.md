@@ -18885,7 +18885,7 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `procurement_only` (§11 #14) | 6 |
 | `device_fingerprint` (§4.4) | 6 |
 | `ssid_pattern` (§4.4) | 0 |
-| `ssid_pattern_fp_hold` (§4.4 CP51 MAC-517) | 6 |
+| `ssid_pattern_fp_hold` (§4.4 CP51 MAC-517) | 7 |
 | `ble_local_name` (§4.4 CP13) | 32 |
 | `ble_characteristic` (§4.4 CP13) | 20 |
 | `product_family_codename` (§4.4 CP13) | 156 |
@@ -18933,9 +18933,9 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
 | `below_confidence_threshold` (§7.5) | 0 |
 | `excluded_source_type` (§7.5 CP19) | 0 |
-| **sum(bins)** | **42131** |
-| **survivors → eligible entries** | **995** |
-| **reconciliation** | **43126 − 42131 = 995** ✅ |
+| **sum(bins)** | **42132** |
+| **survivors → eligible entries** | **994** |
+| **reconciliation** | **43126 − 42132 = 994** ✅ |
 
 ### `argus_export_high_confidence.json` (confidence ≥ 70; Pi self-exclude drop = True)
 
@@ -18946,7 +18946,7 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `procurement_only` (§11 #14) | 6 |
 | `device_fingerprint` (§4.4) | 6 |
 | `ssid_pattern` (§4.4) | 0 |
-| `ssid_pattern_fp_hold` (§4.4 CP51 MAC-517) | 6 |
+| `ssid_pattern_fp_hold` (§4.4 CP51 MAC-517) | 7 |
 | `ble_local_name` (§4.4 CP13) | 32 |
 | `ble_characteristic` (§4.4 CP13) | 20 |
 | `product_family_codename` (§4.4 CP13) | 156 |
@@ -18994,9 +18994,9 @@ Each row is assigned to AT MOST one drop bin (priority order: `procurement_only`
 | `self_exclude_oui` (§8.4 / §11 #12) | 0 |
 | `below_confidence_threshold` (§7.5) | 49 |
 | `excluded_source_type` (§7.5 CP19) | 352 |
-| **sum(bins)** | **42532** |
-| **survivors → eligible entries** | **594** |
-| **reconciliation** | **43126 − 42532 = 594** ✅ |
+| **sum(bins)** | **42533** |
+| **survivors → eligible entries** | **593** |
+| **reconciliation** | **43126 − 42533 = 593** ✅ |
 
 
 ### mac_range secondary-constraint note (CP5 board-class, refreshed MAC-596)

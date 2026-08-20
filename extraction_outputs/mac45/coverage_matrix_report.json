@@ -252487,7 +252487,7 @@
       "below_confidence_threshold": 0,
       "oversized_mac_range": 49,
       "ssid_pattern": 0,
-      "ssid_pattern_fp_hold": 6,
+      "ssid_pattern_fp_hold": 7,
       "device_fingerprint": 6,
       "ble_local_name": 32,
       "ble_characteristic": 20,
@@ -252534,7 +252534,7 @@
       "imei_tac": 0,
       "excluded_source_type": 0
     },
-    "survivors": 995,
+    "survivors": 994,
     "reconciles": 43126,
     "drop_assignments": {
       "420": "unknown_category",
@@ -294650,6 +294650,7 @@
       "44715": "ssid_pattern_fp_hold",
       "44716": "ssid_pattern_fp_hold",
       "44720": "ssid_pattern_fp_hold",
+      "44726": "ssid_pattern_fp_hold",
       "44727": "ble_local_name",
       "44728": "ble_local_name",
       "44729": "ble_local_name",
@@ -294682,7 +294683,7 @@
       "below_confidence_threshold": 49,
       "oversized_mac_range": 49,
       "ssid_pattern": 0,
-      "ssid_pattern_fp_hold": 6,
+      "ssid_pattern_fp_hold": 7,
       "device_fingerprint": 6,
       "ble_local_name": 32,
       "ble_characteristic": 20,
@@ -294729,7 +294730,7 @@
       "imei_tac": 0,
       "excluded_source_type": 352
     },
-    "survivors": 594,
+    "survivors": 593,
     "reconciles": 43126,
     "drop_assignments": {
       "1": "excluded_source_type",
@@ -337242,6 +337243,7 @@
       "44715": "ssid_pattern_fp_hold",
       "44716": "ssid_pattern_fp_hold",
       "44720": "ssid_pattern_fp_hold",
+      "44726": "ssid_pattern_fp_hold",
       "44727": "ble_local_name",
       "44728": "ble_local_name",
       "44729": "ble_local_name",

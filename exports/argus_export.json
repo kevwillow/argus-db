@@ -1,8 +1,8 @@
 {
   "_meta": {
     "argus_version": "35",
-    "exported_at": "2026-08-20T09:38:53Z",
-    "record_count": 1017,
+    "exported_at": "2026-08-20T17:48:20Z",
+    "record_count": 1014,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
@@ -13,7 +13,7 @@
       "unknown_category": 33300,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 0,
-      "ssid_pattern_fp_hold": 6,
+      "ssid_pattern_fp_hold": 7,
       "device_fingerprint": 6,
       "ble_local_name": 32,
       "ble_characteristic": 20,
@@ -66,9 +66,9 @@
       "geographic_scope_mismatch": 0
     },
     "ssid_pattern_emission": {
-      "surviving_ssid_rows": 35,
-      "substring_records": 57,
-      "split_expansions": 22,
+      "surviving_ssid_rows": 34,
+      "substring_records": 54,
+      "split_expansions": 20,
       "nocase_deduped": 0
     }
   },
@@ -1610,12 +1610,6 @@
       "argus_record_id": "3b469cb8e2160fbe"
     },
     {
-      "pattern": "pineapple",
-      "pattern_type": "ssid_pattern",
-      "description": "Hak5 hacking_tool",
-      "argus_record_id": "3b4f190b259f3d06"
-    },
-    {
       "pattern": "1895BX7R000000",
       "pattern_type": "drone_id_prefix",
       "description": "EXO drone",
@@ -1932,12 +1926,6 @@
       "pattern_type": "ble_local_name",
       "description": "Flock Safety alpr",
       "argus_record_id": "4c190755453769a3"
-    },
-    {
-      "pattern": "wifipineapple",
-      "pattern_type": "ssid_pattern",
-      "description": "Hak5 hacking_tool",
-      "argus_record_id": "4c2a31f7394b14d4"
     },
     {
       "pattern": "1889ESPP",
@@ -2394,12 +2382,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "Tofect drone",
       "argus_record_id": "5cc0a58aa405670e"
-    },
-    {
-      "pattern": "hak5",
-      "pattern_type": "ssid_pattern",
-      "description": "Hak5 hacking_tool",
-      "argus_record_id": "5d0b9b36519a4379"
     },
     {
       "pattern": "4d050091-766c-42c4-8944-42bc98fc2d09",
