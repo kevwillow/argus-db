@@ -392,12 +392,63 @@ def test_ssid_pattern_to_substring_post_group_concat_mac752() -> None:
     ]
 
 
-def test_ssid_pattern_to_substring_branch_internal_metachar_holds_mac752() -> None:
-    # MAC-752 — a branch whose own leading literal is truncated by an internal
-    # metachar must not silently ship the prefix. Whole row is FP-held.
-    # (pineapple|hak5|wifi[_-]?pineapple).* -> None (the `wifi[_-]?pineapple`
-    # branch has an internal `[` that would otherwise ship `wifi` as a magnet).
-    assert _ssid_pattern_to_substring("(?i)^(pineapple|hak5|wifi[_-]?pineapple).*") is None
+def test_ssid_pattern_to_substring_branch_internal_metachar_renders_fully_mac752() -> None:
+    # MAC-752 (CEO Finding B follow-up) — a branch whose own leading
+    # literal is truncated by an internal metachar is RENDERED FULLY, not
+    # silently shipped as the bare prefix.  The Hak5 row's
+    # `wifi[_-]?pineapple` branch now emits `wifipineapple` (13 chars,
+    # distinctive), preserving the Hak5 product coverage.  CEO allowed
+    # "either render it fully or FP-hold the row"; rendering fully wins.
+    assert _ssid_pattern_to_substring("(?i)^(pineapple|hak5|wifi[_-]?pineapple).*") == [
+        "pineapple", "hak5", "wifipineapple",
+    ]
+
+
+def test_ssid_pattern_to_substring_mandatory_post_group_alternation_mac752() -> None:
+    # MAC-752 (CEO Finding B follow-up) — a mandatory post-group alternation
+    # is split and concatenated with the prefix.  These three rows were the
+    # bare-prefix magnets (`arlo` matched Charlotte / Carlo / Marlon /
+    # Harlow; `wyze` and `eufy` were lower-FP but unanchored).  Post-Fix
+    # they emit the rendered-stem cartesian product.
+    assert _ssid_pattern_to_substring("(?i)^arlo[_-]?(cam|pro|ultra|setup).*") == [
+        "arlocam", "arlopro", "arloultra", "arlosetup",
+    ]
+    assert _ssid_pattern_to_substring("(?i)^wyze[_-]?(cam|doorbell|setup).*") == [
+        "wyzecam", "wyzedoorbell", "wyzesetup",
+    ]
+    assert _ssid_pattern_to_substring("(?i)^eufy[_-]?(cam|doorbell|security).*") == [
+        "eufycam", "eufydoorbell", "eufysecurity",
+    ]
+
+
+def test_ssid_pattern_to_substring_leading_and_post_group_alternation_mac752() -> None:
+    # MAC-752 — a leading alternation AND a mandatory post-group
+    # alternation multiply: 2 leading branches × 2 mandatory branches = 4
+    # emitted stems.  Pure regression check on the cartesian product.
+    assert _ssid_pattern_to_substring("(?i)^(arlo|wyze)[_-]?(cam|doorbell).*") == [
+        "arlocam", "arlodoorbell", "wyzecam", "wyzedoorbell",
+    ]
+
+
+def test_ssid_pattern_to_substring_stingray_held_mac752() -> None:
+    # MAC-752 (CEO Finding B explicit "your call") — `stingray` is held
+    # on defense-in-depth grounds.  The stored regex anchors `^stingray`
+    # but the stemmer emits unanchored `stingray`, and the Lynceus 0.9.2
+    # substring matcher turns that into "matches Chevrolet, the animal,
+    # the movie, etc.".  `stingray` is added to the FP-hold set in
+    # MAC-752 follow-up.
+    assert _ssid_pattern_to_substring("(?i)^stingray[_-]?.*") is None
+
+
+def test_ssid_pattern_to_substring_branch_internal_metachar_in_branch_holds_mac752() -> None:
+    # MAC-752 — a branch whose own body has an internal metachar BEYOND
+    # the leading run, where the body cannot be cleanly rendered through
+    # optional `[_-]?` blocks either, FP-holds the whole row.  The
+    # `(?:foo|bar|cd+ef).*` third branch's `cd+ef` cannot be safely
+    # rendered as a substring (the `+` would also match `cdddef` /
+    # `cdddddef` etc., and the substring `cdef` would not), so the row
+    # is FP-held rather than ship `cd`.
+    assert _ssid_pattern_to_substring("(?i)^(foo|bar|cd+ef).*") is None
 
 
 def test_ssid_pattern_to_substring_non_alternation_extends_mac752() -> None:

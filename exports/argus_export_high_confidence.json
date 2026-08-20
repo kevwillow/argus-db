@@ -1,7 +1,7 @@
 {
   "_meta": {
     "argus_version": "35",
-    "exported_at": "2026-08-20T09:21:20Z",
+    "exported_at": "2026-08-20T09:38:53Z",
     "record_count": 504,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
@@ -63,7 +63,7 @@
       "self_exclude_oui": 0,
       "below_confidence_threshold": 49,
       "excluded_source_type": 352,
-      "geographic_scope_mismatch": 92
+      "geographic_scope_mismatch": 101
     },
     "ssid_pattern_emission": {
       "surviving_ssid_rows": 1,

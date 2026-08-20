@@ -683,18 +683,19 @@ def _ble_local_name_is_template(value: str) -> bool:
 # returned substrings.
 _SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")
 _SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({
-    "lpr",     # License Plate Reader generic acronym (MAC-517)
-    "digital", # 7-char generic prefix; survives as magnet (MAC-752)
-    "flock",   # 5-char generic English/German word (MAC-752)
-    "msab",    # 4-char acronym; matches williamsabc / WPAHMSABMVA (MAC-752)
-    "xry",     # 3-char acronym; matches base64xryrandom (MAC-752)
+    "lpr",      # License Plate Reader generic acronym (MAC-517)
+    "digital",  # 7-char generic prefix; survives as magnet (MAC-752)
+    "flock",    # 5-char generic English/German word (MAC-752)
+    "msab",     # 4-char acronym; matches williamsabc / WPAHMSABMVA (MAC-752)
+    "xry",      # 3-char acronym; matches base64xryrandom (MAC-752)
+    "stingray", # 9-char Harris IMSI-catcher product + generic English word
+                # (CEO Finding B, 2026-08-20)
 })
 _SSID_STEM_MIN_LEN = 3
 
 
-def _leading_literal_strict(s: str) -> str:
-    """Strict leading-literal run, stops at the first metachar (no
-    `[_-]?` extension).  MAC-752.
+def _strict_base(s: str) -> str:
+    """Strict leading-literal run, stops at the first metachar.  MAC-752.
     """
     out: list[str] = []
     for ch in s:
@@ -704,29 +705,100 @@ def _leading_literal_strict(s: str) -> str:
     return "".join(out).strip()
 
 
-def _leading_literal_skip_optional(s: str) -> str:
-    """Take the leading literal of ``s``, skipping `[_-]?` optional
-    delimiter blocks.  Stops at any other metachar.  MAC-752.
+def _parse_stems(s: str) -> list[str] | None:
+    """Walk ``s`` collecting emitted stems.  See the canonical rule in
+    db/validation/export_lynceus.py.  MAC-752.
     """
-    out: list[str] = []
-    i = 0
+    stems: list[str] = [""]
+    pos = 0
     n = len(s)
-    while i < n:
-        ch = s[i]
+    while pos < n:
+        ch = s[pos]
+        if ch == "(":
+            depth = 0
+            close: int | None = None
+            for i in range(pos, n):
+                if s[i] == "(":
+                    depth += 1
+                elif s[i] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        close = i
+                        break
+            if close is None:
+                break
+            if close + 1 < n and s[close + 1] == "?":
+                pos = close + 2
+                continue
+            inner = s[pos + 1:close]
+            if inner.startswith("?"):
+                pos = close + 1
+                continue
+            if "|" in inner:
+                branches = inner.split("|")
+                new_stems: list[str] = []
+                for prefix in stems:
+                    for branch in branches:
+                        branch_chars: list[str] = []
+                        has_metachar = False
+                        for c in branch:
+                            if c in _SSID_STEM_METACHARS:
+                                has_metachar = True
+                                break
+                            branch_chars.append(c)
+                        if has_metachar:
+                            full_branch_chars: list[str] = list(prefix)
+                            bpos = 0
+                            bn = len(branch)
+                            while bpos < bn:
+                                bc = branch[bpos]
+                                if bc == "[":
+                                    bend = branch.find("]", bpos)
+                                    if bend == -1:
+                                        return None
+                                    binner = branch[bpos + 1:bend]
+                                    if (
+                                        set(binner) <= {"_", "-"}
+                                        and bend + 1 < bn
+                                        and branch[bend + 1] == "?"
+                                    ):
+                                        bpos = bend + 2
+                                        continue
+                                    else:
+                                        return None
+                                elif bc in _SSID_STEM_METACHARS:
+                                    return None
+                                full_branch_chars.append(bc)
+                                bpos += 1
+                            full_branch = "".join(full_branch_chars).strip()
+                            if not full_branch:
+                                return None
+                            new_stems.append(full_branch)
+                        else:
+                            branch_stem = "".join(branch_chars).strip()
+                            if not branch_stem:
+                                return None
+                            new_stems.append(prefix + branch_stem)
+                stems = new_stems
+                pos = close + 1
+                continue
+            pos = close + 1
+            continue
         if ch == "[":
-            end = s.find("]", i)
+            end = s.find("]", pos)
             if end == -1:
                 break
-            inner = s[i + 1:end]
+            inner = s[pos + 1:end]
             if set(inner) <= {"_", "-"} and end + 1 < n and s[end + 1] == "?":
-                i = end + 2
+                pos = end + 2
                 continue
             break
         if ch in _SSID_STEM_METACHARS:
             break
-        out.append(ch)
-        i += 1
-    return "".join(out)
+        for i in range(len(stems)):
+            stems[i] = stems[i] + ch
+        pos += 1
+    return stems
 
 
 def _ssid_pattern_to_substring(value: str) -> list[str] | None:
@@ -741,11 +813,12 @@ def _ssid_pattern_to_substring(value: str) -> list[str] | None:
         s = s[4:]
     if s.startswith("^"):
         s = s[1:]
+
     branches: list[str] | None = None
-    post_group_literal = ""
+    post_group_start = len(s)
     if s.startswith("("):
         depth = 0
-        close = None
+        close: int | None = None
         for i, ch in enumerate(s):
             if ch == "(":
                 depth += 1
@@ -758,33 +831,31 @@ def _ssid_pattern_to_substring(value: str) -> list[str] | None:
             inner = s[1:close]
             if inner and not inner.startswith("?") and "|" in inner:
                 branches = inner.split("|")
-                post_group_literal = _leading_literal_skip_optional(s[close + 1:])
-    if branches is None:
-        base = _leading_literal_strict(s)
-        if base.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
-            return None
-        extended = _leading_literal_skip_optional(s)
-        if len(extended) < _SSID_STEM_MIN_LEN:
-            return None
-        return [extended]
-    out: list[str] = []
-    for branch in branches:
-        base_chars: list[str] = []
-        has_internal_metachar = False
-        for ch in branch:
-            if ch in _SSID_STEM_METACHARS:
-                has_internal_metachar = True
-                break
-            base_chars.append(ch)
-        if has_internal_metachar:
-            return None
-        base_stem = "".join(base_chars).strip()
-        if base_stem.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
-            return None
-        if len(base_stem) < _SSID_STEM_MIN_LEN:
-            return None
-        out.append(base_stem + post_group_literal)
-    return out or None
+                post_group_start = close + 1
+
+    if branches is not None:
+        out: list[str] = []
+        for branch in branches:
+            stems = _parse_stems(branch + s[post_group_start:])
+            if stems is None:
+                return None
+            sb = _strict_base(branch)
+            if sb.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+                return None
+            if len(sb) < _SSID_STEM_MIN_LEN:
+                return None
+            out.extend(stems)
+        return out or None
+
+    stems = _parse_stems(s)
+    if stems is None:
+        return None
+    sb = _strict_base(s)
+    if sb.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+        return None
+    if len(sb) < _SSID_STEM_MIN_LEN:
+        return None
+    return stems or None
 
 
 def _assign_drop_bin(

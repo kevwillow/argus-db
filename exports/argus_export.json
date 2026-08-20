@@ -1,8 +1,8 @@
 {
   "_meta": {
     "argus_version": "35",
-    "exported_at": "2026-08-20T09:21:20Z",
-    "record_count": 1007,
+    "exported_at": "2026-08-20T09:38:53Z",
+    "record_count": 1017,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
@@ -67,8 +67,8 @@
     },
     "ssid_pattern_emission": {
       "surviving_ssid_rows": 35,
-      "substring_records": 47,
-      "split_expansions": 12,
+      "substring_records": 57,
+      "split_expansions": 22,
       "nocase_deduped": 0
     }
   },
@@ -152,6 +152,12 @@
       "argus_record_id": "03cce0106e92d5ae"
     },
     {
+      "pattern": "wyzesetup",
+      "pattern_type": "ssid_pattern",
+      "description": "Wyze cctv_camera",
+      "argus_record_id": "045880528a110703"
+    },
+    {
       "pattern": "dc:c0:eb",
       "pattern_type": "oui",
       "description": "ASSA ABLOY COTE PICARDE smart_lock",
@@ -192,6 +198,12 @@
       "pattern_type": "oui",
       "description": "SEEnergy Corp. cctv_camera",
       "argus_record_id": "063b9310efb7510f"
+    },
+    {
+      "pattern": "arlocam",
+      "pattern_type": "ssid_pattern",
+      "description": "Arlo cctv_camera",
+      "argus_record_id": "066db205b2e4037e"
     },
     {
       "pattern": "19069B080140",
@@ -1064,12 +1076,6 @@
       "argus_record_id": "244ce9a1646a5443"
     },
     {
-      "pattern": "autel",
-      "pattern_type": "ssid_pattern",
-      "description": "Autel Robotics drone",
-      "argus_record_id": "245d687507b53c58"
-    },
-    {
       "pattern": "80:be:af",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -1134,6 +1140,12 @@
       "pattern_type": "oui",
       "description": "Ring cctv_camera",
       "argus_record_id": "2863cf8c1d407326"
+    },
+    {
+      "pattern": "eufydoorbell",
+      "pattern_type": "ssid_pattern",
+      "description": "Eufy/Anker cctv_camera",
+      "argus_record_id": "2875d3e73b3fadbb"
     },
     {
       "pattern": "01ff5550-ba5e-f4ee-5ca1-eb1e5e4b1ce0",
@@ -1598,6 +1610,12 @@
       "argus_record_id": "3b469cb8e2160fbe"
     },
     {
+      "pattern": "pineapple",
+      "pattern_type": "ssid_pattern",
+      "description": "Hak5 hacking_tool",
+      "argus_record_id": "3b4f190b259f3d06"
+    },
+    {
       "pattern": "1895BX7R000000",
       "pattern_type": "drone_id_prefix",
       "description": "EXO drone",
@@ -1916,6 +1934,12 @@
       "argus_record_id": "4c190755453769a3"
     },
     {
+      "pattern": "wifipineapple",
+      "pattern_type": "ssid_pattern",
+      "description": "Hak5 hacking_tool",
+      "argus_record_id": "4c2a31f7394b14d4"
+    },
+    {
       "pattern": "1889ESPP",
       "pattern_type": "drone_id_prefix",
       "description": "WISPR drone",
@@ -2150,12 +2174,6 @@
       "argus_record_id": "540be52b9e8446d8"
     },
     {
-      "pattern": "eufy",
-      "pattern_type": "ssid_pattern",
-      "description": "Eufy/Anker cctv_camera",
-      "argus_record_id": "540ddda9d4e77681"
-    },
-    {
       "pattern": "84:9a:40",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -2336,12 +2354,6 @@
       "argus_record_id": "5b57d950e08d5ae7"
     },
     {
-      "pattern": "wyze",
-      "pattern_type": "ssid_pattern",
-      "description": "Wyze cctv_camera",
-      "argus_record_id": "5b6f5fd20b72f7a2"
-    },
-    {
       "pattern": "1795F350ZS",
       "pattern_type": "drone_id_prefix",
       "description": "Zephyr Systems drone",
@@ -2382,6 +2394,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Tofect drone",
       "argus_record_id": "5cc0a58aa405670e"
+    },
+    {
+      "pattern": "hak5",
+      "pattern_type": "ssid_pattern",
+      "description": "Hak5 hacking_tool",
+      "argus_record_id": "5d0b9b36519a4379"
     },
     {
       "pattern": "4d050091-766c-42c4-8944-42bc98fc2d09",
@@ -2712,12 +2730,6 @@
       "pattern_type": "drone_id_prefix",
       "description": "SkySpecs drone",
       "argus_record_id": "6d294022d4dad810"
-    },
-    {
-      "pattern": "arlo",
-      "pattern_type": "ssid_pattern",
-      "description": "Arlo cctv_camera",
-      "argus_record_id": "6d7c30b49e5901f4"
     },
     {
       "pattern": "90:35:ea",
@@ -3464,6 +3476,12 @@
       "argus_record_id": "8b4c4b0cdefe9b3a"
     },
     {
+      "pattern": "autelrobotics",
+      "pattern_type": "ssid_pattern",
+      "description": "Autel Robotics drone",
+      "argus_record_id": "8b71dbb973f9775c"
+    },
+    {
       "pattern": "09c8245c-829e-91b9-e34d-c7acb15a89d7",
       "pattern_type": "ble_uuid",
       "description": "Whistle Labs, Inc. (Mars Petcare) gps_tracker",
@@ -3474,6 +3492,12 @@
       "pattern_type": "oui",
       "description": "Amcrest cctv_camera",
       "argus_record_id": "8b9e5c15186c8ca9"
+    },
+    {
+      "pattern": "wyzecam",
+      "pattern_type": "ssid_pattern",
+      "description": "Wyze cctv_camera",
+      "argus_record_id": "8bc10688c240a1ea"
     },
     {
       "pattern": "00:09:bc",
@@ -3504,6 +3528,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Gleesfun drone",
       "argus_record_id": "8d2b6577754817d2"
+    },
+    {
+      "pattern": "wyzedoorbell",
+      "pattern_type": "ssid_pattern",
+      "description": "Wyze cctv_camera",
+      "argus_record_id": "8db93609e891ce6a"
     },
     {
       "pattern": "3c:a0:70",
@@ -3788,6 +3818,12 @@
       "argus_record_id": "971d2137b9dcb212"
     },
     {
+      "pattern": "arlosetup",
+      "pattern_type": "ssid_pattern",
+      "description": "Arlo cctv_camera",
+      "argus_record_id": "97f9c8269d9a11aa"
+    },
+    {
       "pattern": "00:11:5f",
       "pattern_type": "oui",
       "description": "ITX Security Co., Ltd. cctv_camera",
@@ -3888,6 +3924,12 @@
       "pattern_type": "ble_uuid",
       "description": "Kwikset smart_lock",
       "argus_record_id": "9c02c9b710483bd0"
+    },
+    {
+      "pattern": "eufycam",
+      "pattern_type": "ssid_pattern",
+      "description": "Eufy/Anker cctv_camera",
+      "argus_record_id": "9c1e218976ae3d34"
     },
     {
       "pattern": "4d455452-4f50-4f4c-4953-444556494345",
@@ -4472,6 +4514,12 @@
       "argus_record_id": "b8dc5442a7656937"
     },
     {
+      "pattern": "eufysecurity",
+      "pattern_type": "ssid_pattern",
+      "description": "Eufy/Anker cctv_camera",
+      "argus_record_id": "b99e989779dcd94a"
+    },
+    {
       "pattern": "16635",
       "pattern_type": "drone_id_prefix",
       "description": "Wing Aviation LLC drone",
@@ -4730,6 +4778,12 @@
       "argus_record_id": "c58227f4af0fc09d"
     },
     {
+      "pattern": "arlopro",
+      "pattern_type": "ssid_pattern",
+      "description": "Arlo cctv_camera",
+      "argus_record_id": "c5cdc9afeb729641"
+    },
+    {
       "pattern": "1968FS22220P",
       "pattern_type": "drone_id_prefix",
       "description": "Light Quadcopter UAV drone",
@@ -4964,12 +5018,6 @@
       "argus_record_id": "cfdb3f5717736a8b"
     },
     {
-      "pattern": "stingray",
-      "pattern_type": "ssid_pattern",
-      "description": "L3Harris Technologies imsi_catcher",
-      "argus_record_id": "cfe05f05b900c8a0"
-    },
-    {
       "pattern": "0000fe24-0000-1000-8000-00805f9b34fb",
       "pattern_type": "ble_uuid",
       "description": "August Home Inc smart_lock",
@@ -5010,6 +5058,12 @@
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
       "argus_record_id": "d0bd67e3f86468fc"
+    },
+    {
+      "pattern": "arloultra",
+      "pattern_type": "ssid_pattern",
+      "description": "Arlo cctv_camera",
+      "argus_record_id": "d0ed71cb7c666cfd"
     },
     {
       "pattern": "57b40214-2528-d6bc-b043-b49af0ec06c1",
@@ -5730,6 +5784,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Event38 Unmanned Systems drone",
       "argus_record_id": "ed0975625bfe4dac"
+    },
+    {
+      "pattern": "autelevo",
+      "pattern_type": "ssid_pattern",
+      "description": "Autel Robotics drone",
+      "argus_record_id": "ed6de3c80c4370a6"
     },
     {
       "pattern": "1836FF1E01",

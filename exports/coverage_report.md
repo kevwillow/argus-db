@@ -19106,10 +19106,10 @@ Pre-tally source: MAC-45 `coverage_matrix_report.json` (`drop_tally_standard` + 
 | geographic_scope_mismatch (CP7) | 0 |
 | **sum(dropped_in_export)** | **42131** |
 | **survivor rows** (source − dropped) | **995** |
-| ssid_pattern SPLIT expansions (+) | +12 |
+| ssid_pattern SPLIT expansions (+) | +22 |
 | ssid_pattern NOCASE dedup (−) | −0 |
-| **entries.length** (feed records) | **1007** |
-| **reconciliation** | **43126 − 42131 + 12 − 0 = 1007** ✅ |
+| **entries.length** (feed records) | **1017** |
+| **reconciliation** | **43126 − 42131 + 22 − 0 = 1017** ✅ |
 
 #### `argus_export_high_confidence.json` (confidence ≥ 70)
 
@@ -19168,20 +19168,20 @@ Pre-tally source: MAC-45 `coverage_matrix_report.json` (`drop_tally_standard` + 
 | self_exclude_oui (§8.4 / §11 #12) | 0 |
 | below_confidence_threshold (§7.5) | 49 |
 | excluded_source_type (§7.5 CP19) | 352 |
-| geographic_scope_mismatch (CP7) | 92 |
-| **sum(dropped_in_export)** | **42624** |
-| **survivor rows** (source − dropped) | **502** |
+| geographic_scope_mismatch (CP7) | 101 |
+| **sum(dropped_in_export)** | **42633** |
+| **survivor rows** (source − dropped) | **493** |
 | ssid_pattern SPLIT expansions (+) | +0 |
 | ssid_pattern NOCASE dedup (−) | −0 |
 | **entries.length** (feed records) | **504** |
-| **reconciliation** | **43126 − 42624 + 0 − 0 = 502** ❌ |
+| **reconciliation** | **43126 − 42633 + 0 − 0 = 493** ❌ |
 
 ### MAC-45 ↔ Step-6 cross-check
 
 - MAC-45 `drop_tally_standard.bins` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 0, "ble_adv_interval": 0, "ble_characteristic": 20, "ble_local_name": 32, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 95, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 7, "excluded_source_type": 0, "fcc_grantee_code": 143, "firmware_branded_string": 141, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 880, "frequency_band": 32, "generic_reserved_uuid": 0, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3540, "operator_profile": 3, "oversized_mac_range": 49, "procurement_only": 6, "product_family_codename": 156, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 0, "ssid_pattern_fp_hold": 6, "unknown_category": 33300, "vendor_cloud_endpoint_url": 2, "vendor_controlled_hostname": 3290, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 995 (reconciles 43126).
-- Step-6 `argus_export.json._meta.dropped_in_export` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 0, "ble_adv_interval": 0, "ble_characteristic": 20, "ble_local_name": 32, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 95, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 7, "excluded_source_type": 0, "fcc_grantee_code": 143, "firmware_branded_string": 141, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 880, "frequency_band": 32, "generic_reserved_uuid": 0, "geographic_scope_mismatch": 0, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3540, "operator_profile": 3, "oversized_mac_range": 49, "procurement_only": 6, "product_family_codename": 156, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 0, "ssid_pattern_fp_hold": 6, "unknown_category": 33300, "vendor_cloud_endpoint_url": 2, "vendor_controlled_hostname": 3290, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivor rows 995 (reconciles 43126); feed records 1007 after CP51 ssid_pattern emission {"nocase_deduped": 0, "split_expansions": 12, "substring_records": 47, "surviving_ssid_rows": 35}.
+- Step-6 `argus_export.json._meta.dropped_in_export` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 0, "ble_adv_interval": 0, "ble_characteristic": 20, "ble_local_name": 32, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 95, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 7, "excluded_source_type": 0, "fcc_grantee_code": 143, "firmware_branded_string": 141, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 880, "frequency_band": 32, "generic_reserved_uuid": 0, "geographic_scope_mismatch": 0, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3540, "operator_profile": 3, "oversized_mac_range": 49, "procurement_only": 6, "product_family_codename": 156, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 0, "ssid_pattern_fp_hold": 6, "unknown_category": 33300, "vendor_cloud_endpoint_url": 2, "vendor_controlled_hostname": 3290, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivor rows 995 (reconciles 43126); feed records 1017 after CP51 ssid_pattern emission {"nocase_deduped": 0, "split_expansions": 22, "substring_records": 57, "surviving_ssid_rows": 35}.
 - MAC-45 `drop_tally_high_confidence.bins` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 49, "ble_adv_interval": 0, "ble_characteristic": 20, "ble_local_name": 32, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 95, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 7, "excluded_source_type": 352, "fcc_grantee_code": 143, "firmware_branded_string": 141, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 880, "frequency_band": 32, "generic_reserved_uuid": 0, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3540, "operator_profile": 3, "oversized_mac_range": 49, "procurement_only": 6, "product_family_codename": 156, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 0, "ssid_pattern_fp_hold": 6, "unknown_category": 33300, "vendor_cloud_endpoint_url": 2, "vendor_controlled_hostname": 3290, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivors 594 (reconciles 43126).
-- Step-6 `argus_export_high_confidence.json._meta.dropped_in_export` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 49, "ble_adv_interval": 0, "ble_characteristic": 20, "ble_local_name": 32, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 95, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 7, "excluded_source_type": 352, "fcc_grantee_code": 143, "firmware_branded_string": 141, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 880, "frequency_band": 32, "generic_reserved_uuid": 0, "geographic_scope_mismatch": 92, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3540, "operator_profile": 3, "oversized_mac_range": 49, "procurement_only": 6, "product_family_codename": 156, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 0, "ssid_pattern_fp_hold": 6, "unknown_category": 33300, "vendor_cloud_endpoint_url": 2, "vendor_controlled_hostname": 3290, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivor rows 502 (reconciles 43126); feed records 504 after CP51 ssid_pattern emission {"nocase_deduped": 0, "split_expansions": 0, "substring_records": 1, "surviving_ssid_rows": 1}.
+- Step-6 `argus_export_high_confidence.json._meta.dropped_in_export` = {"alpr_model": 11, "asdstan_enum_value": 18, "asdstan_message_type": 7, "bandwidth_mhz": 3, "below_confidence_threshold": 49, "ble_adv_interval": 0, "ble_characteristic": 20, "ble_local_name": 32, "ble_payload_offset": 0, "ble_protocol_byte": 0, "ble_protocol_byte_table": 0, "bluetooth_le_pdu_type": 0, "burst_cadence_ms": 0, "chipset_codename": 95, "device_class_id": 50, "device_fingerprint": 6, "dji_protocol_struct_format": 2, "equipment_class_code": 7, "excluded_source_type": 352, "fcc_grantee_code": 143, "firmware_branded_string": 141, "firmware_build_string": 19, "firmware_build_uuid": 1, "firmware_image_variant": 3, "firmware_sha256_hash": 880, "frequency_band": 32, "generic_reserved_uuid": 0, "geographic_scope_mismatch": 101, "gpt_partition_uuid": 3, "icao_24bit_address": 2, "imei_tac": 0, "network_discovery_protocol_pattern": 11, "network_endpoint": 3540, "operator_profile": 3, "oversized_mac_range": 49, "procurement_only": 6, "product_family_codename": 156, "qualcomm_chip_format_id": 1, "rf_burst_duration": 1, "rf_channel": 24, "rf_protocol_constant": 5, "self_exclude_oui": 0, "ssid_pattern": 0, "ssid_pattern_fp_hold": 6, "unknown_category": 33300, "vendor_cloud_endpoint_url": 2, "vendor_controlled_hostname": 3290, "vendor_controlled_hostname_deprecated": 4, "wifi_frame_control_subtype": 0, "wifi_ie_element_id": 0, "wifi_nan_param_signature": 0, "windows_com_clsid_vendor_registered": 1, "windows_installer_productcode_vendor_registered": 2, "x509_cert_sha256_prefix": 255} → survivor rows 493 (reconciles 43126); feed records 504 after CP51 ssid_pattern emission {"nocase_deduped": 0, "split_expansions": 0, "substring_records": 1, "surviving_ssid_rows": 1}.
 - Conclusion: per-bin equality + per-row `drop_assignments` equality verified by `_reconcile()` for both files; halts at 0.
 
 ## §6.3 distribution summary (Step-6 layer over the matrix)
@@ -19213,6 +19213,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 0300cee502f269c6 | `IDEMIA PUBLIC SECURITY FRANCE alpr` | 34 |
 | 03bb5ecf7bc6e5c2 | `Hikvision cctv_camera` | 21 |
 | 03cce0106e92d5ae | `Flightwave drone` | 16 |
+| 045880528a110703 | `Wyze cctv_camera` | 16 |
 | 04a50d98b0e9b92f | `ASSA ABLOY COTE PICARDE smart_lock` | 34 |
 | 04d20dbd1827e144 | `Apple, Inc. bluetooth_tracker` | 29 |
 | 0523969063b0126e | `Flock Safety alpr` | 17 |
@@ -19220,6 +19221,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 05d1fc3ff6918f63 | `August smart_lock` | 17 |
 | 05daa54a13cc6f18 | `Dronetag drone` | 14 |
 | 063b9310efb7510f | `SEEnergy Corp. cctv_camera` | 26 |
+| 066db205b2e4037e | `Arlo cctv_camera` | 16 |
 | 0680a811442e6c14 | `Aurelia drone` | 13 |
 | 06c32e0b9a1a133f | `Whistle Labs, Inc. (Mars Petcare) gps_tracker` | 45 |
 | 07a6d6d62ac0e85a | `Fi (Barking Labs Corp) gps_tracker` | 34 |
@@ -19365,7 +19367,6 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 232efab03a39e1d7 | `Apple, Inc. bluetooth_tracker` | 29 |
 | 24493d61823561a3 | `Flock Safety alpr` | 17 |
 | 244ce9a1646a5443 | `Flock Safety alpr` | 17 |
-| 245d687507b53c58 | `Autel Robotics drone` | 20 |
 | 24878ec45c235a6e | `Hikvision cctv_camera` | 21 |
 | 2506f3f55bf6eb96 | `Holy Stone drone` | 16 |
 | 252035d8a6632b05 | `Flock Safety alpr` | 17 |
@@ -19377,6 +19378,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 2787b8b2b2f71ba4 | `Aurelia drone` | 13 |
 | 282d2fbc725db511 | `Hikvision cctv_camera` | 21 |
 | 2863cf8c1d407326 | `Ring cctv_camera` | 16 |
+| 2875d3e73b3fadbb | `Eufy/Anker cctv_camera` | 22 |
 | 28aafff555249dea | `Ultraloq smart_lock` | 19 |
 | 28d2d7e0233dcbac | `Light Quadcopter UAV drone` | 26 |
 | 28f109a4c015a1cb | `BlackLens (ESNAPP) cctv_camera` | 30 |
@@ -19454,6 +19456,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 3af533072b5b0746 | `Hikvision cctv_camera` | 21 |
 | 3b2aa5cec810f493 | `SJRC drone` | 10 |
 | 3b469cb8e2160fbe | `SwellPro drone` | 14 |
+| 3b4f190b259f3d06 | `Hak5 hacking_tool` | 17 |
 | 3b644d530b2e3c66 | `EXO drone` | 9 |
 | 3b7af7c3109c875d | `Percepto AirMax drone` | 21 |
 | 3b97bc5c21cd8030 | `Flock Safety alpr` | 17 |
@@ -19507,6 +19510,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 4b9424d14d84cd92 | `Autel Robotics drone` | 20 |
 | 4be8bef7e0dc0ff7 | `Percepto AirMax drone` | 21 |
 | 4c190755453769a3 | `Flock Safety alpr` | 17 |
+| 4c2a31f7394b14d4 | `Hak5 hacking_tool` | 17 |
 | 4c2ffc898634f54e | `WISPR drone` | 11 |
 | 4c3df3f743f4fec7 | `Ultraloq smart_lock` | 19 |
 | 4c7bb36a27ae3ffb | `Apple Inc. bluetooth_tracker` | 28 |
@@ -19546,7 +19550,6 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 53ec75d4dee81c8c | `Global Drone drone` | 18 |
 | 540aeb87474dbf1f | `Hikvision cctv_camera` | 21 |
 | 540be52b9e8446d8 | `Blackswift Technologies drone` | 29 |
-| 540ddda9d4e77681 | `Eufy/Anker cctv_camera` | 22 |
 | 54439bd204a957fd | `Hikvision cctv_camera` | 21 |
 | 5472ad39f69e9afc | `Holyton drone` | 13 |
 | 5475c3e42095b303 | `Ultraloq smart_lock` | 19 |
@@ -19577,7 +19580,6 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 5a6f3fe4cacc08a5 | `DJI drone` | 9 |
 | 5b064c08aeac66a6 | `Camflite drone` | 14 |
 | 5b57d950e08d5ae7 | `Arlo Technologies cctv_camera` | 29 |
-| 5b6f5fd20b72f7a2 | `Wyze cctv_camera` | 16 |
 | 5b8b12afae01b312 | `Zephyr Systems drone` | 20 |
 | 5bc587a7ef8446e9 | `Hikvision cctv_camera` | 21 |
 | 5c4fdd8899cb87cd | `Hikvision cctv_camera` | 21 |
@@ -19585,6 +19587,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 5c81e2e758befad5 | `Vision Aerial drone` | 19 |
 | 5c9301df572ebbaa | `Lorex (Dahua OEM) cctv_camera` | 29 |
 | 5cc0a58aa405670e | `Tofect drone` | 12 |
+| 5d0b9b36519a4379 | `Hak5 hacking_tool` | 17 |
 | 5db6ddfcd40732a0 | `Kwikset smart_lock` | 18 |
 | 5e3430aacafbd6c8 | `DJI drone` | 9 |
 | 5ed7a90faba9f4b6 | `Autel Robotics drone` | 20 |
@@ -19640,7 +19643,6 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 6c4b29db1a087054 | `Hikvision cctv_camera` | 21 |
 | 6cfbd9c35775bf98 | `FIMI X8 SE 2022 Drone drone` | 27 |
 | 6d294022d4dad810 | `SkySpecs drone` | 14 |
-| 6d7c30b49e5901f4 | `Arlo cctv_camera` | 16 |
 | 6dcc7e8573a2ae85 | `Flock Safety alpr` | 17 |
 | 6dd3a9bd7404f92d | `Verizon Telematics automotive_telematics` | 40 |
 | 6e777837e609cc61 | `Commaris drone` | 14 |
@@ -19765,13 +19767,16 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 8b21bc19f126b789 | `Blink (Amazon) cctv_camera` | 26 |
 | 8b240a3ad909ab11 | `Mobotix cctv_camera` | 19 |
 | 8b4c4b0cdefe9b3a | `Sentera drone` | 13 |
+| 8b71dbb973f9775c | `Autel Robotics drone` | 20 |
 | 8b941a5da99a29c6 | `Whistle Labs, Inc. (Mars Petcare) gps_tracker` | 45 |
 | 8b9e5c15186c8ca9 | `Amcrest cctv_camera` | 19 |
+| 8bc10688c240a1ea | `Wyze cctv_camera` | 16 |
 | 8c5e7e6c49e85ebd | `Utility, Inc body_cam` | 21 |
 | 8cbaacf55d2e6182 | `Jiobit (Life360, Inc.) gps_tracker` | 34 |
 | 8cce5a2a31af924a | `Freefly Systems drone` | 21 |
 | 8d248575207873de | `Motorola Solutions gps_tracker` | 30 |
 | 8d2b6577754817d2 | `Gleesfun drone` | 14 |
+| 8db93609e891ce6a | `Wyze cctv_camera` | 16 |
 | 8ddc334330aada58 | `Blink (Amazon) cctv_camera` | 26 |
 | 8dddb2aea51a2fb2 | `Hylio drone` | 11 |
 | 8e0cd9d9e65b7b7e | `Microdrones drone` | 17 |
@@ -19819,6 +19824,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 96f6b02fc7c5b611 | `Aerostar Dynamics drone` | 23 |
 | 970892ed3abaff14 | `DJI drone` | 9 |
 | 971d2137b9dcb212 | `ShenZhen C-Fly Intelligent Technology Co.,Ltd drone` | 51 |
+| 97f9c8269d9a11aa | `Arlo cctv_camera` | 16 |
 | 98032ec63c8672ef | `ITX Security Co., Ltd. cctv_camera` | 34 |
 | 982f0481e7c60063 | `Hikvision cctv_camera` | 21 |
 | 984d66721a4131cc | `XAG drone` | 9 |
@@ -19836,6 +19842,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | 9b2464d083ba9aa5 | `DJI drone` | 9 |
 | 9b4dd7e3dfb02e49 | `Amazon Prime Air drone` | 22 |
 | 9c02c9b710483bd0 | `Kwikset smart_lock` | 18 |
+| 9c1e218976ae3d34 | `Eufy/Anker cctv_camera` | 22 |
 | 9c8fe37423a0a82a | `Axon body_cam` | 13 |
 | 9c9537eea6a1de2d | `Flytrex drone` | 13 |
 | 9ce0cb8033fd5d0c | `Flock Safety alpr` | 17 |
@@ -19933,6 +19940,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | b818a552744cc21f | `Bwine drone` | 11 |
 | b888a5613cd04f96 | `Bwine drone` | 11 |
 | b8dc5442a7656937 | `DJI drone` | 9 |
+| b99e989779dcd94a | `Eufy/Anker cctv_camera` | 22 |
 | b9b9224825a81449 | `Wing Aviation LLC drone` | 23 |
 | b9d48e142aa83700 | `Tianjin Hualai Technology Co., Ltd. cctv_camera` | 47 |
 | b9fcedd5f9baffbc | `SmartThings, Inc. smart_home_hub` | 32 |
@@ -19976,6 +19984,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | c49371783f888694 | `Ring cctv_camera` | 16 |
 | c50119899214856b | `Percepto AirMax drone` | 21 |
 | c58227f4af0fc09d | `Flock Safety alpr` | 17 |
+| c5cdc9afeb729641 | `Arlo cctv_camera` | 16 |
 | c5cfa1894f1d1744 | `Light Quadcopter UAV drone` | 26 |
 | c5fc69c7bc6559f9 | `Wing Aviation LLC drone` | 23 |
 | c6ca1d72f40fc6c5 | `Autel Robotics drone` | 20 |
@@ -20015,7 +20024,6 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | cfb68e8fcc541684 | `ZERO ZERO ROBOTICS drone` | 24 |
 | cfd0cccaf1a19196 | `Dahua cctv_camera` | 17 |
 | cfdb3f5717736a8b | `Avigilon cctv_camera` | 20 |
-| cfe05f05b900c8a0 | `L3Harris Technologies imsi_catcher` | 34 |
 | d0232d5e13f058ac | `August Home Inc smart_lock` | 26 |
 | d06ea18f60b1f866 | `Dronetag drone` | 14 |
 | d06f873cda9220db | `Percepto drone` | 14 |
@@ -20023,6 +20031,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | d0928fe69fc0f5a9 | `Global Drone drone` | 18 |
 | d0b57b563b21dcae | `BlueMark drone` | 14 |
 | d0bd67e3f86468fc | `Hikvision cctv_camera` | 21 |
+| d0ed71cb7c666cfd | `Arlo cctv_camera` | 16 |
 | d110bbbdcfeef0f2 | `Fi (Barking Labs Corp) gps_tracker` | 34 |
 | d139924c258dac1b | `Percepto AirMax drone` | 21 |
 | d1bc8cf55cc2b226 | `Ultraloq smart_lock` | 19 |
@@ -20143,6 +20152,7 @@ Every surviving entry's `description` field was checked against the §7.5 ≤80-
 | ec0fba115c1155ef | `Percepto AirMax drone` | 21 |
 | ec251088bab72011 | `Flock Safety alpr` | 17 |
 | ed0975625bfe4dac | `Event38 Unmanned Systems drone` | 30 |
+| ed6de3c80c4370a6 | `Autel Robotics drone` | 20 |
 | edabbffbf2d13adf | `Coretronic Intelligent Robotics Corporation drone` | 49 |
 | edbac6b416864b33 | `DJI drone` | 9 |
 | edd0165db61ffb18 | `Jiobit (Life360, Inc.) gps_tracker` | 34 |
@@ -20223,8 +20233,30 @@ These items were flagged by the MAC-45 coverage matrix as CP5 board-class but ar
 
 | File | Path | record_count | source_record_count |
 |---|---|---|---|
-| Talos standard | `argus/exports/argus_export.json` | 1007 | 43126 |
+| Talos standard | `argus/exports/argus_export.json` | 1017 | 43126 |
 | Talos high-conf | `argus/exports/argus_export_high_confidence.json` | 504 | 43126 |
 | CSV (full canonical) | `argus/exports/argus_export.csv` | 43126 | 43126 |
 | Coverage matrix (MAC-45) | `extraction_outputs/mac45/coverage_matrix.md` | (matrix) | 43126 |
 
+<!-- BEGIN behavioral_signatures section (CP18) -->
+
+## Behavioral-signatures export reconciliation (§9 item 9, CP18)
+
+Sibling export `argus_export_behavioral_signatures.json` per §7.5 CP18.
+`argus_run_id`: `260b5777-99c8-5f75-8023-f4012242e7f4` (deterministic UUID5; stable across re-runs).
+
+- Source record count: **214** (rows in `behavioral_signatures` table)
+- Confidence threshold: **≥ 70**
+- Exported entries: **132** (in `argus_export_behavioral_signatures.json`)
+
+### Dropped from sibling export
+
+| Bin | Count |
+|---|---|
+| `below_confidence_threshold` | 76 |
+| `unknown_category` | 6 |
+| **TOTAL DROPPED** | **82** |
+
+Reconciliation: 214 source − 82 dropped = 132 entries ✓
+
+<!-- END behavioral_signatures section (CP18) -->

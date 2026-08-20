@@ -864,53 +864,67 @@ def _ble_local_name_is_template(value: str) -> bool:
 #   1. strip a leading `(?i)` inline flag and a leading `^` anchor;
 #   2. if the value is a leading alternation `(a|b|...)`, SPLIT into one
 #      substring per branch AND APPEND the leading literal of the post-group
-#      remainder (skipping `[_-]?` optional delimiter blocks) — e.g.
-#      `(?i)^(hail|king|queen)storm[_-]?.*` →
+#      remainder — e.g. `(?i)^(hail|king|queen)storm[_-]?.*` →
 #      ["hailstorm", "kingstorm", "queenstorm"] (MAC-752).  This stops the
 #      pre-MAC-752 bug where the alternation kept only the inner branches
 #      and dropped the literal after the group, producing bare-word FP
 #      magnets (`hail` / `king` / `queen` matching "Thailand", "Viking",
 #      "Parking" etc.);
-#   3. for non-alternation rows the same `_leading_literal_skip_optional`
-#      helper extends the stem through optional `[_-]?` delimiter blocks
-#      so `digital[_-]?ally[_-]?.*` → `digitalally` rather than `digital`
-#      (MAC-752).  A REQUIRED `[abc]` bracket (no `?` after) is not a
-#      delimiter block and the leading-literal run stops at `[`;
+#   3. for non-alternation rows the leading literal extends through
+#      `[_-]?` optional delimiter blocks AND through mandatory
+#      `(a|b|...)` groups (the MAC-752 follow-up to fix CEO Finding B).
+#      `(?i)^arlo[_-]?(cam|pro|ultra|setup).*` →
+#      ["arlocam", "arlopro", "arloultra", "arlosetup"] — concatenating
+#      the prefix with each branch of the mandatory post-group alternation.
+#      A REQUIRED `[abc]` bracket (no `?` after) is not a delimiter block
+#      and the leading-literal run stops at `[`;
 #   4. a branch whose own leading literal is truncated by an INTERNAL
 #      metachar (e.g. `wifi[_-]?pineapple` → leading run `wifi`, truncated
-#      at `[`) does NOT silently ship the prefix.  The whole row is
-#      FP-held — the truncated branch is not safely renderable (MAC-752);
-#   5. FP gate (post-extension): each branch's BASE leading literal is
-#      checked against `_SSID_PATTERN_FP_HOLD_STEMS`.  Holding the BASE
-#      (not the concatenated stem) preserves the MAC-517 disposition that
-#      `lpr` holds a `(?i)^lpr[_-]?cam.*` row regardless of how far the
-#      `[_-]?` extension would reach.  A stem shorter than
-#      `_SSID_STEM_MIN_LEN` is also FP-held.
+#      at `[`) is rendered fully, not FP-held — the `wifi[_-]?pineapple`
+#      branch of the Hak5 alternation now emits `wifipineapple` rather
+#      than the bare `wifi` magnet.  The CEO call (Finding B comment,
+#      2026-08-20) was "either render it fully or FP-hold the row";
+#      rendering fully preserves the Hak5 product coverage;
+#   5. FP gate (post-extension): the STRICT BASE leading literal of each
+#      branch (the run of literal chars before any `[_-]?` block or
+#      `(...)` group) is checked against `_SSID_PATTERN_FP_HOLD_STEMS`.
+#      Holding the BASE (not the concatenated stem) preserves the
+#      MAC-517 disposition that `lpr` holds a `(?i)^lpr[_-]?cam.*` row
+#      regardless of how far the `[_-]?` extension would reach.  A stem
+#      shorter than `_SSID_STEM_MIN_LEN` is also FP-held.
 # Board disposition (MAC-517 plan) ships the distinctive 3-char brand
 # tokens `dji` / `xry` but holds the generic acronym `lpr` (License
 # Plate Reader); MAC-752 extends the hold-set to `digital` (7-char
-# generic prefix that survives as a magnet in `digital[_-]?ally[_-]?.*`),
-# `flock` (5-char generic English/German word that matches
-# "Schneeflocke" / "RockFlock"), and the 3-4 char acronyms `msab` and
-# `xry` (which match `williamsabc` / `WPAHMSABMVA` / `base64xryrandom`
-# when shipped bare from id 44720's unsafe `(msab|xry)[_-]?.*` shape —
-# the safe pre-0059 shape `(msab_|xry_).*` is unaffected).  MUST be
-# byte-identical to coverage_matrix.py::_ssid_pattern_to_substring —
-# the `_reconcile` map-vs-writer cross-check halts on any divergence.
+# generic prefix), `flock` (5-char generic English/German word matching
+# "Schneeflocke" / "RockFlock"), the 3-4 char acronyms `msab` and `xry`
+# (matching `williamsabc` / `WPAHMSABMVA` / `base64xryrandom` when
+# shipped bare from id 44720's unsafe `(msab|xry)[_-]?.*` shape), and
+# `stingray` (9-char Harris IMSI-catcher product name that is also a
+# generic English word — CEO Finding B explicit "your call"; held on
+# defense-in-depth grounds: Lynceus 0.9.2 substring matching against
+# `[_-]?` patterns turns the anchored `^stingray` into an unanchored
+# `stingray` that matches Chevrolet, the animal, the movie, etc.).
+# MUST be byte-identical to coverage_matrix.py::_ssid_pattern_to_substring
+# — the `_reconcile` map-vs-writer cross-check halts on any divergence.
 _SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")
 _SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({
-    "lpr",     # License Plate Reader generic acronym (MAC-517)
-    "digital", # 7-char generic prefix; survives as magnet (MAC-752)
-    "flock",   # 5-char generic English/German word (MAC-752)
-    "msab",    # 4-char acronym; matches williamsabc / WPAHMSABMVA (MAC-752)
-    "xry",     # 3-char acronym; matches base64xryrandom (MAC-752)
+    "lpr",      # License Plate Reader generic acronym (MAC-517)
+    "digital",  # 7-char generic prefix; survives as magnet (MAC-752)
+    "flock",    # 5-char generic English/German word (MAC-752)
+    "msab",     # 4-char acronym; matches williamsabc / WPAHMSABMVA (MAC-752)
+    "xry",      # 3-char acronym; matches base64xryrandom (MAC-752)
+    "stingray", # 9-char Harris IMSI-catcher product + generic English word
+                # (CEO Finding B, 2026-08-20; held on defense-in-depth
+                # grounds rather than risk an unanchored bare-stem FP)
 })
 _SSID_STEM_MIN_LEN = 3
 
 
-def _leading_literal_strict(s: str) -> str:
-    """Strict leading-literal run, stops at the first metachar (no
-    `[_-]?` extension).  MAC-752.
+def _strict_base(s: str) -> str:
+    """Strict leading-literal run of ``s`` (no extension), stops at the first
+    metachar.  Used to identify the FP-hold-checked base of each branch
+    regardless of how far the post-base extension would otherwise reach.
+    MAC-752.
     """
     out: list[str] = []
     for ch in s:
@@ -920,40 +934,140 @@ def _leading_literal_strict(s: str) -> str:
     return "".join(out).strip()
 
 
-def _leading_literal_skip_optional(s: str) -> str:
-    """Take the leading literal of ``s``, skipping `[_-]?` optional delimiter
-    blocks.  Stops at any other metachar (required `[abc]`, `.`, `^`, `*`,
-    `+`, `?`, `|`, `$`, `%`, backslash, etc.).  Returns just the leading
-    literal (no suffix, no FP-hold decision).  MAC-752.
+def _parse_stems(s: str) -> list[str] | None:
+    """Walk ``s`` collecting emitted stems.
+
+    Skips `[_-]?` optional delimiter blocks.  Splits on mandatory
+    `(a|b|...)` groups (each branch must be a literal run; any branch
+    whose own leading literal is truncated by an internal metachar
+    returns None — the row is FP-held, because that branch is not
+    safely renderable as a substring stem).
+
+    Returns the list of emitted stems (one per branch in the cartesian
+    product of nested alternations), or ``None`` when FP-held.  MAC-752.
     """
-    out: list[str] = []
-    i = 0
+    stems: list[str] = [""]
+    pos = 0
     n = len(s)
-    while i < n:
-        ch = s[i]
+    while pos < n:
+        ch = s[pos]
+        if ch == "(":
+            # Find matching close paren (depth-balanced).
+            depth = 0
+            close: int | None = None
+            for i in range(pos, n):
+                if s[i] == "(":
+                    depth += 1
+                elif s[i] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        close = i
+                        break
+            if close is None:
+                break
+            # Optional group `(...)`?  Skip the whole thing.
+            if close + 1 < n and s[close + 1] == "?":
+                pos = close + 2
+                continue
+            inner = s[pos + 1:close]
+            # Non-capturing / flag group `(?:...)` or `(??...)`?  Skip the
+            # body but stay at the close paren so trailing content can still
+            # attach.
+            if inner.startswith("?"):
+                pos = close + 1
+                continue
+            if "|" in inner:
+                # Mandatory alternation: split into branches and concat.
+                branches = inner.split("|")
+                new_stems: list[str] = []
+                for prefix in stems:
+                    for branch in branches:
+                        branch_chars: list[str] = []
+                        has_metachar = False
+                        for c in branch:
+                            if c in _SSID_STEM_METACHARS:
+                                has_metachar = True
+                                break
+                            branch_chars.append(c)
+                        # Branch whose own leading literal is truncated by
+                        # an internal metachar: the bare prefix is a magnet.
+                        # The CEO allowed "render fully OR FP-hold the row"
+                        # (Finding B).  We render fully (concat the prefix
+                        # with the rest of the branch up to the next
+                        # metachar) — the truncated bare prefix never ships.
+                        # But if the branch has its OWN internal metachar
+                        # beyond the leading run (e.g. `wifi[_-]?pineapple`
+                        # → leading `wifi`, internal `[`), the branch
+                        # stem after the prefix concatenation would itself
+                        # truncate.  We continue past the metachar by
+                        # walking through optional blocks the same way the
+                        # main loop does; if that walk also hits a
+                        # non-optional metachar, we return None below.
+                        if has_metachar:
+                            # Try to render the branch FULLY: walk past
+                            # `[_-]?` optional blocks inside the branch.
+                            full_branch_chars: list[str] = list(prefix)
+                            bpos = 0
+                            bn = len(branch)
+                            while bpos < bn:
+                                bc = branch[bpos]
+                                if bc == "[":
+                                    bend = branch.find("]", bpos)
+                                    if bend == -1:
+                                        return None
+                                    binner = branch[bpos + 1:bend]
+                                    if (
+                                        set(binner) <= {"_", "-"}
+                                        and bend + 1 < bn
+                                        and branch[bend + 1] == "?"
+                                    ):
+                                        bpos = bend + 2
+                                        continue
+                                    else:
+                                        return None
+                                elif bc in _SSID_STEM_METACHARS:
+                                    return None
+                                full_branch_chars.append(bc)
+                                bpos += 1
+                            full_branch = "".join(full_branch_chars).strip()
+                            if not full_branch:
+                                return None
+                            new_stems.append(full_branch)
+                        else:
+                            branch_stem = "".join(branch_chars).strip()
+                            if not branch_stem:
+                                return None
+                            new_stems.append(prefix + branch_stem)
+                stems = new_stems
+                pos = close + 1
+                continue
+            # Mandatory group without alternation: skip the body.
+            pos = close + 1
+            continue
         if ch == "[":
-            end = s.find("]", i)
+            end = s.find("]", pos)
             if end == -1:
                 break
-            inner = s[i + 1:end]
+            inner = s[pos + 1:end]
             if set(inner) <= {"_", "-"} and end + 1 < n and s[end + 1] == "?":
-                i = end + 2  # skip the `[_-]?` block
+                pos = end + 2  # skip the `[_-]?` block
                 continue
-            break  # required bracket — leading-literal run ends here
+            break  # required `[abc]` bracket — leading-literal run ends here
         if ch in _SSID_STEM_METACHARS:
             break
-        out.append(ch)
-        i += 1
-    return "".join(out)
+        # Literal char — extend every emitted stem.
+        for i in range(len(stems)):
+            stems[i] = stems[i] + ch
+        pos += 1
+    return stems
 
 
 def _ssid_pattern_to_substring(value: str) -> list[str] | None:
     """Convert an ``ssid_pattern`` value to Lynceus-0.9.2 substring(s).
 
-    Returns the list of case-insensitive substrings to emit (usually one; more
-    than one only for a leading-alternation SPLIT), or ``None`` when the row is
-    FP-held and must drop to the ``ssid_pattern_fp_hold`` bin. See the module
-    comment above for the deterministic rule.
+    Returns the list of case-insensitive substrings to emit, or ``None`` when
+    the row is FP-held and must drop to the ``ssid_pattern_fp_hold`` bin.
+    See the module comment above for the deterministic rule.
     """
 
     s = value.strip()
@@ -961,11 +1075,16 @@ def _ssid_pattern_to_substring(value: str) -> list[str] | None:
         s = s[4:]
     if s.startswith("^"):
         s = s[1:]
+
+    # Detect a LEADING alternation `(a|b|...)`.  We split into branches
+    # and re-parse each branch against the post-group remainder, so the
+    # post-group `[_-]?` blocks and mandatory `(...)` groups apply to
+    # every emitted stem.
     branches: list[str] | None = None
-    post_group_literal = ""
+    post_group_start = len(s)
     if s.startswith("("):
         depth = 0
-        close = None
+        close: int | None = None
         for i, ch in enumerate(s):
             if ch == "(":
                 depth += 1
@@ -977,58 +1096,43 @@ def _ssid_pattern_to_substring(value: str) -> list[str] | None:
         if close is not None:
             inner = s[1:close]
             # Only a simple capturing alternation `(a|b|...)` splits; a
-            # non-capturing / flag group `(?...)` or a group with no `|` falls
-            # through to leading-literal stemming on the whole string.
+            # non-capturing / flag group `(?...)` or a group with no `|`
+            # falls through to single-stem processing.
             if inner and not inner.startswith("?") and "|" in inner:
                 branches = inner.split("|")
-                # MAC-752 — append the leading literal of the post-group
-                # remainder (skipping optional `[_-]?` delimiter blocks) to
-                # each branch.  `(hail|king|queen)storm[_-]?.*` ->
-                # `hailstorm` / `kingstorm` / `queenstorm` instead of the
-                # pre-fix bare `hail` / `king` / `queen` magnets.
-                post_group_literal = _leading_literal_skip_optional(s[close + 1:])
-    if branches is None:
-        # Non-alternation path: extend the leading literal of the whole
-        # string through optional `[_-]?` delimiter blocks.  The FP-hold
-        # check is on the STRICT base (so `lpr[_-]?cam.*` holds via the
-        # `lpr` base entry, `digital[_-]?ally[_-]?.*` holds via the
-        # `digital` base entry added in MAC-752).
-        base = _leading_literal_strict(s)
-        if base.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
-            return None
-        extended = _leading_literal_skip_optional(s)
-        if len(extended) < _SSID_STEM_MIN_LEN:
-            return None
-        return [extended]
-    out: list[str] = []
-    for branch in branches:
-        # Alternation path: take the strict base of the branch and append
-        # the post-group literal.  A branch whose own leading literal is
-        # truncated by an INTERNAL metachar (e.g. `wifi[_-]?pineapple` ->
-        # base `wifi`, internal `[`) is not safely renderable; the whole
-        # row is FP-held rather than shipping the bare `wifi` prefix.
-        # MAC-752.
-        base_chars: list[str] = []
-        has_internal_metachar = False
-        for ch in branch:
-            if ch in _SSID_STEM_METACHARS:
-                has_internal_metachar = True
-                break
-            base_chars.append(ch)
-        if has_internal_metachar:
-            return None
-        base_stem = "".join(base_chars).strip()
-        # FP-hold check on the BASE (not the concatenated stem) so the
-        # MAC-517 `lpr` disposition and the MAC-752 `digital` / `flock` /
-        # `msab` / `xry` entries continue to hold for any pattern whose
-        # strict base is a generic term — regardless of how far the
-        # post-group extension would otherwise reach.
-        if base_stem.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
-            return None
-        if len(base_stem) < _SSID_STEM_MIN_LEN:
-            return None
-        out.append(base_stem + post_group_literal)
-    return out or None
+                post_group_start = close + 1
+
+    if branches is not None:
+        # Leading alternation path: each branch is parsed against the
+        # post-group remainder.  Branches whose STRICT BASE is in the FP
+        # hold set are skipped at the row level — one held base holds the
+        # whole row.
+        out: list[str] = []
+        for branch in branches:
+            stems = _parse_stems(branch + s[post_group_start:])
+            if stems is None:
+                return None
+            sb = _strict_base(branch)
+            if sb.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+                return None
+            if len(sb) < _SSID_STEM_MIN_LEN:
+                return None
+            out.extend(stems)
+        return out or None
+
+    # Single-stem path: parse the whole string.  FP-hold check is on the
+    # strict base of the WHOLE string so the MAC-517 `lpr` disposition
+    # continues to hold for `lpr[_-]?cam.*` regardless of how far the
+    # `[_-]?` extension reaches.
+    stems = _parse_stems(s)
+    if stems is None:
+        return None
+    sb = _strict_base(s)
+    if sb.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+        return None
+    if len(sb) < _SSID_STEM_MIN_LEN:
+        return None
+    return stems or None
 
 
 def _classify_row(
