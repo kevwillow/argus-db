@@ -347,15 +347,30 @@ def test_classify_ssid_pattern_fp_hold_cp51() -> None:
 
 def test_classify_ssid_pattern_alternation_split_cp51() -> None:
     # CP51 — a leading `(a|b)` alternation SPLITs into one entry per branch.
+    # MAC-752: the branches are now the post-group-concatenated stems.
     bin_label, entries = _classify_row(
-        _row(identifier="(?i)^(msab|xry)[_-]?.*", identifier_type="ssid_pattern", device_category="hacking_tool"),
+        _row(identifier="(?i)^(hail|king|queen)storm[_-]?.*",
+             identifier_type="ssid_pattern", device_category="imsi_catcher"),
         confidence_threshold=30,
         apply_pi_self_exclude=False,
     )
     assert bin_label is None
-    assert sorted(e.pattern for e in entries) == ["msab", "xry"]
+    assert sorted(e.pattern for e in entries) == ["hailstorm", "kingstorm", "queenstorm"]
     # distinct, re-run-stable record ids per emitted substring (no collision)
-    assert len({e.argus_record_id for e in entries}) == 2
+    assert len({e.argus_record_id for e in entries}) == 3
+
+
+def test_classify_ssid_pattern_alternation_split_fp_hold_mac752() -> None:
+    # MAC-752 — `(?i)^(msab|xry)[_-]?.*` (id 44720): the branch bases `msab`
+    # and `xry` are 3-4 char generic acronyms; they are FP-held.
+    bin_label, entries = _classify_row(
+        _row(identifier="(?i)^(msab|xry)[_-]?.*",
+             identifier_type="ssid_pattern", device_category="hacking_tool"),
+        confidence_threshold=30,
+        apply_pi_self_exclude=False,
+    )
+    assert bin_label == "ssid_pattern_fp_hold"
+    assert entries == []
 
 
 def test_ssid_pattern_to_substring_unit_cp51() -> None:
@@ -366,6 +381,54 @@ def test_ssid_pattern_to_substring_unit_cp51() -> None:
     assert _ssid_pattern_to_substring("(?i)^lpr[_-]?cam.*") is None  # generic acronym holds
     assert _ssid_pattern_to_substring("xy") is None  # <3 chars holds
     assert _ssid_pattern_to_substring("(?:foo|bar).*") is None  # non-capturing group holds
+
+
+def test_ssid_pattern_to_substring_post_group_concat_mac752() -> None:
+    # MAC-752 — when an alternation splits, the leading literal of the
+    # post-group remainder is appended to each branch stem.
+    # (hail|king|queen)storm[_-]?.* -> hailstorm / kingstorm / queenstorm
+    assert _ssid_pattern_to_substring("(?i)^(hail|king|queen)storm[_-]?.*") == [
+        "hailstorm", "kingstorm", "queenstorm",
+    ]
+
+
+def test_ssid_pattern_to_substring_branch_internal_metachar_holds_mac752() -> None:
+    # MAC-752 — a branch whose own leading literal is truncated by an internal
+    # metachar must not silently ship the prefix. Whole row is FP-held.
+    # (pineapple|hak5|wifi[_-]?pineapple).* -> None (the `wifi[_-]?pineapple`
+    # branch has an internal `[` that would otherwise ship `wifi` as a magnet).
+    assert _ssid_pattern_to_substring("(?i)^(pineapple|hak5|wifi[_-]?pineapple).*") is None
+
+
+def test_ssid_pattern_to_substring_non_alternation_extends_mac752() -> None:
+    # MAC-752 — for non-alternation rows the stem extends through
+    # `[_-]?` optional delimiter blocks. digital[_-]?ally[_-]?.* -> digitalally.
+    # `digital` is a generic 7-char word and is added to the FP-hold set, so
+    # this row is FP-held under MAC-752.
+    assert _ssid_pattern_to_substring("(?i)^digital[_-]?ally[_-]?.*") is None
+
+
+def test_ssid_pattern_to_substring_required_bracket_not_skipped_mac752() -> None:
+    # MAC-752 — a REQUIRED `[abc]` (no `?` after) is not a delimiter block;
+    # the leading-literal extension stops at `[`.
+    # dji[-_].+ -> dji (the bracket is required, not optional).
+    assert _ssid_pattern_to_substring("dji[-_].+") == ["dji"]
+
+
+def test_ssid_pattern_to_substring_optional_bracket_then_literal_mac752() -> None:
+    # MAC-752 — `[_-]?` is an optional delimiter block; the next literal run
+    # is appended to the leading literal.
+    # flock[_-]?.* -> flock. `flock` is a 5-char generic word and is added
+    # to the FP-hold set, so this row is FP-held under MAC-752.
+    assert _ssid_pattern_to_substring("(?i)^flock[_-]?.*") is None
+
+
+def test_ssid_pattern_to_substring_already_safe_alternation_mac752() -> None:
+    # MAC-752 — the post-`0059` defective alternation shape drops literals
+    # the pre-`0059` safe alternation shape retained. The safe shape (mandatory
+    # delimiter inside each branch) still works.
+    # (mavic_|mavic-).*  -> mavic_ , mavic-    SAFE
+    assert _ssid_pattern_to_substring("(?i)^(mavic_|mavic-).*") == ["mavic_", "mavic-"]
 
 
 def test_classify_device_fingerprint_drops_section_44() -> None:

@@ -673,16 +673,60 @@ def _ble_local_name_is_template(value: str) -> bool:
     return any(ch in value for ch in _BLE_LOCAL_NAME_TEMPLATE_CHARS)
 
 
-# CP51 (§4.4, MAC-517) — ssid_pattern → Lynceus 0.9.2 substring conversion.
-# MUST be byte-identical to
-# db/validation/export_lynceus.py::_ssid_pattern_to_substring (the
-# export_lynceus.py `_reconcile` map-vs-writer cross-check halts on any
-# divergence). coverage_matrix.py only needs the is-None (FP-hold) decision to
-# assign the `ssid_pattern_fp_hold` drop bin; the exporter additionally emits
-# the returned substrings. See the exporter's module comment for the rule.
+# CP51 (§4.4, MAC-517, MAC-752) — ssid_pattern → Lynceus 0.9.2 substring
+# conversion.  See the canonical comment block in
+# db/validation/export_lynceus.py for the full rule; the two functions
+# MUST be byte-identical (the export_lynceus.py `_reconcile`
+# map-vs-writer cross-check halts on any divergence).  coverage_matrix.py
+# only needs the is-None (FP-hold) decision to assign the
+# `ssid_pattern_fp_hold` drop bin; the exporter additionally emits the
+# returned substrings.
 _SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")
-_SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({"lpr"})
+_SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({
+    "lpr",     # License Plate Reader generic acronym (MAC-517)
+    "digital", # 7-char generic prefix; survives as magnet (MAC-752)
+    "flock",   # 5-char generic English/German word (MAC-752)
+    "msab",    # 4-char acronym; matches williamsabc / WPAHMSABMVA (MAC-752)
+    "xry",     # 3-char acronym; matches base64xryrandom (MAC-752)
+})
 _SSID_STEM_MIN_LEN = 3
+
+
+def _leading_literal_strict(s: str) -> str:
+    """Strict leading-literal run, stops at the first metachar (no
+    `[_-]?` extension).  MAC-752.
+    """
+    out: list[str] = []
+    for ch in s:
+        if ch in _SSID_STEM_METACHARS:
+            break
+        out.append(ch)
+    return "".join(out).strip()
+
+
+def _leading_literal_skip_optional(s: str) -> str:
+    """Take the leading literal of ``s``, skipping `[_-]?` optional
+    delimiter blocks.  Stops at any other metachar.  MAC-752.
+    """
+    out: list[str] = []
+    i = 0
+    n = len(s)
+    while i < n:
+        ch = s[i]
+        if ch == "[":
+            end = s.find("]", i)
+            if end == -1:
+                break
+            inner = s[i + 1:end]
+            if set(inner) <= {"_", "-"} and end + 1 < n and s[end + 1] == "?":
+                i = end + 2
+                continue
+            break
+        if ch in _SSID_STEM_METACHARS:
+            break
+        out.append(ch)
+        i += 1
+    return "".join(out)
 
 
 def _ssid_pattern_to_substring(value: str) -> list[str] | None:
@@ -698,6 +742,7 @@ def _ssid_pattern_to_substring(value: str) -> list[str] | None:
     if s.startswith("^"):
         s = s[1:]
     branches: list[str] | None = None
+    post_group_literal = ""
     if s.startswith("("):
         depth = 0
         close = None
@@ -713,19 +758,32 @@ def _ssid_pattern_to_substring(value: str) -> list[str] | None:
             inner = s[1:close]
             if inner and not inner.startswith("?") and "|" in inner:
                 branches = inner.split("|")
+                post_group_literal = _leading_literal_skip_optional(s[close + 1:])
     if branches is None:
-        branches = [s]
+        base = _leading_literal_strict(s)
+        if base.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+            return None
+        extended = _leading_literal_skip_optional(s)
+        if len(extended) < _SSID_STEM_MIN_LEN:
+            return None
+        return [extended]
     out: list[str] = []
     for branch in branches:
-        stem_chars: list[str] = []
+        base_chars: list[str] = []
+        has_internal_metachar = False
         for ch in branch:
             if ch in _SSID_STEM_METACHARS:
+                has_internal_metachar = True
                 break
-            stem_chars.append(ch)
-        stem = "".join(stem_chars).strip()
-        if len(stem) < _SSID_STEM_MIN_LEN or stem.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+            base_chars.append(ch)
+        if has_internal_metachar:
             return None
-        out.append(stem)
+        base_stem = "".join(base_chars).strip()
+        if base_stem.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+            return None
+        if len(base_stem) < _SSID_STEM_MIN_LEN:
+            return None
+        out.append(base_stem + post_group_literal)
     return out or None
 
 

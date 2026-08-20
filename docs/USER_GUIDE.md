@@ -42,7 +42,7 @@ This is the strict export. It only contains rows where:
 
 **Use this export when:** you're feeding a runtime scanner (Lynceus) that's going to alert on matches. You want the false-positive rate to be as close to zero as feasible.
 
-### `exports/argus_export.json` (1,014 rows at v1.8.0)
+### `exports/argus_export.json` (1,007 rows at v1.8.0)
 
 The standard export. Same shape as the high-confidence export, but with a looser confidence floor (≥30) and a US-scope filter applied.
 

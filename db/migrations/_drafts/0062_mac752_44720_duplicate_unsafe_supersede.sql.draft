@@ -1,0 +1,216 @@
+-- ============================================================================
+-- Script:    0062_mac752_44720_duplicate_unsafe_supersede.sql
+-- Status:    DRAFT, STAGED ONLY. NOT APPLIED. Filed from
+--            [/MAC/issues/MAC-752](/MAC/issues/MAC-752) which the CTO
+--            [filed from MAC-747](/MAC/issues/MAC-747) and which is
+--            gating the v1.8.0 tag.
+--
+--            The stemmer fix in db/validation/export_lynceus.py and the
+--            mirror in db/validation/coverage_matrix.py is enough to
+--            clear the FP-magnet control (rc=0) under the current set of
+--            active rows, and it lands with the v1.8.0 tag. This draft
+--            is the PROPOSED canonical correction to a row that ships
+--            in the registry only because the 0059 WAVE-9 harvest
+--            re-admitted a pattern that the v1.7.0 SSID rework had
+--            already remediated into a delimiter-anchored form.
+--
+--            The decision to apply this draft is a CEO/board ruling.
+--            The DB Architect (this agent) does not hold apply
+--            authority on canonical rows.
+--
+-- Slot:      0062, allocated by DISPATCH CLAIM:
+--              python3 scripts/next_migration_slot.py --claim MAC-752
+--            returns "proposed slot 0062 is free; claim it in a COMMITTED
+--            file (a draft under db/migrations/_drafts/ counts)". Slot
+--            0061 is held by MAC-742 (geography defers to v2.0 by CEO
+--            ruling; the standing rule "do NOT apply 0061 / MAC-742"
+--            from MAC-752 stands regardless of slot choice here).
+--            Re-scan at commit time per mig-0049 / mig-0055 standing
+--            rule — a slot verified at WRITE time is not verified at
+--            COMMIT time.
+--
+-- schema_version: NOT bumped (data-only supersession; no DDL). Stays
+--            at 35.
+--
+-- Purpose:   Remove the v1.8.0-era `ssid_pattern` row 44720, which
+--            duplicates the v1.7.0-era row 39613 in an unsafe shape.
+--            Row 44720 carries the regex
+--                (?i)^(msab|xry)[_-]?.*
+--            The leading-literal stemmer renders the two branches
+--            (post-MAC-752) as the bare 4-char and 3-char tokens
+--            `msab` and `xry`, and the Lynceus 0.9.2 matcher
+--            (`? LIKE '%'||needle||'%' COLLATE NOCASE`) hits
+--            `base64xryrandom` and `williamsabc` and `WPAHMSABMVA`
+--            against ordinary network names. MAC-752 FP-holds the
+--            row in the EXPORT (the stemmer-side control is in
+--            `db/validation/export_lynceus.py` and its byte-mirror in
+--            `db/validation/coverage_matrix.py`); the canonical
+--            correction this draft proposes is to remove the source.
+--
+--            Row 39613 carries the SAME two brands in a safe shape:
+--                (?i)^(msab_|msab-|xry_|xry-).*
+--            Each branch terminates with a mandatory `_` or `-`
+--            delimiter, so the emitted stems are `msab_` / `msab-` /
+--            `xry_` / `xry-` and require a word boundary. Row 39613
+--            was admitted in MAC-522 (the v1.7.0 SSID rework) and is
+--            the canonical keeper. 0059's WAVE-9 harvest re-admitted
+--            44720 with the unsafe `(msab|xry)[_-]?` shape, which
+--            re-opens the magnets the v1.7.0 rework closed.
+--
+-- superseded_by SEMANTICS — stated explicitly per the tri-semantic rule
+--            (NULL = active / <other_id> = successor / self-loop =
+--            withdrawn) from CP32 §9: this draft uses <other_id>
+--            SUCCESSOR semantics. Row 44720 points to row 39613 (the
+--            safe keeper). The MSSB/XRY vendor coverage is preserved
+--            via the keeper; the unsafe duplicate is folded.
+--
+-- Confidence: deliberately UNCHANGED on the superseded side. mig-0037
+--            / mig-0040 set `confidence = 0` on withdrawn rows; this
+--            draft is a <other_id> SUCCESSOR fold, not a withdrawal,
+--            and the superseded row's confidence is preserved as a
+--            prior-band signal. The keeper (39613) confidence is also
+--            untouched; there is no §8.3 uplift because the
+--            independent-source basis was not re-adjudicated here.
+--
+-- Scope:     1 row superseded; 1 row stays active (39613). Net active
+--            count change: -1.
+--
+-- Fan-out:   re-queried at write time — 0 rows reference 44720 via
+--            `superseded_by`, and 0 via `paired_identifier_id`.
+--
+-- Reversibility: to revert: `superseded_by = NULL` and remove the
+--            `$.mac752_supersession` key from notes. No row is
+--            deleted; no confidence is altered; every cite is retained
+--            (§11 #1).
+--
+-- Re-apply safety: the UPDATE pins `superseded_by IS NULL` and the
+--            strict pre-guard requires EXACTLY 1 active target — a
+--            second run finds 0 and CHECK(ok=1) fails, rolling the
+--            whole transaction back with zero mutation. `.bail on` and
+--            the per-write gate mirror mig-0049.
+-- ============================================================================
+
+.bail on
+
+BEGIN TRANSACTION;
+
+-- ---- apply-time baseline capture -------------------------------------------
+CREATE TEMP TABLE _mig0062_baseline AS
+  SELECT (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL) AS active_before;
+
+CREATE TEMP TABLE _mig0062_conf_before AS
+  SELECT id, confidence FROM identifiers
+   WHERE id IN (44720, 39613);
+
+-- ---- strict pre-condition guard (all-or-nothing) ---------------------------
+-- (1) exactly 1 active target (44720), active and not yet superseded;
+-- (2) exactly 1 active keeper (39613), active and not yet superseded;
+-- (3) 44720's identifier still reads `(?i)^(msab|xry)[_-]?.*`;
+-- (4) 39613's identifier still reads `(?i)^(msab_|msab-|xry_|xry-).*`;
+-- (5) 44720's notes are valid JSON (so the json_set below is safe);
+-- (6) 39613's notes are valid JSON (so the keeper audit-write is safe).
+CREATE TEMP TABLE _mig0062_pre (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mig0062_pre(ok) SELECT CASE WHEN (
+      (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44720 AND identifier_type = 'ssid_pattern'
+          AND identifier = '(?i)^(msab|xry)[_-]?.*'
+          AND superseded_by IS NULL) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 39613 AND identifier_type = 'ssid_pattern'
+          AND identifier = '(?i)^(msab_|msab-|xry_|xry-).*'
+          AND superseded_by IS NULL) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44720 AND json_valid(notes) = 1) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 39613 AND json_valid(notes) = 1) = 1
+) THEN 1 ELSE 0 END;
+
+-- ==== Single fold: 44720 -> 39613 ===========================================
+-- The unsafe `(msab|xry)[_-]?.*` shape (id 44720) is folded onto the safe
+-- `(msab_|msab-|xry_|xry-).*` shape (id 39613) admitted in MAC-522.
+
+UPDATE identifiers SET superseded_by = 39613,
+  notes = json_set(notes, '$.mac752_supersession', json_object(
+    'audit_issue','MAC-752','source_issue','MAC-747',
+    'mig','0062_mac752_44720_duplicate_unsafe_supersede',
+    'mechanism','cp32_sec9_superseded_with_successor_other_id',
+    'successor_id',39613,'lane','duplicate_unsafe_shape',
+    'collision_class','DUPLICATE_UNSAFE_SHAPE',
+    'emitted_keys','ssid_pattern|msab,ssid_pattern|xry',
+    'reason','Same vendor coverage (MSAB / XRY) as the v1.7.0-era safe keeper 39613, but in an unsafe shape: the optional `[_-]?` delimiter drops on every match, so the post-MAC-752 bare-word stems `msab` and `xry` match ordinary network names (`williamsabc`, `WPAHMSABMVA`, `base64xryrandom`). The v1.7.0 SSID rework (MAC-522, migration 0038) admitted row 39613 with mandatory `_`/`-` delimiters to close the same magnet class; 0059''s WAVE-9 harvest re-opened it under id 44720. The stemmer-side control in `db/validation/export_lynceus.py` (and its byte-mirror in `db/validation/coverage_matrix.py`) FP-holds the row in the export; this fold is the canonical correction.',
+    'keeper_cite','db/migrations/0038_mac522_wigle_ssid_validation.sql',
+    'keeper_pattern','(?i)^(msab_|msab-|xry_|xry-).*',
+    'mac752_stemmer_holds','flock,digital,msab,xry',
+    'mac752_stemmer_extension',
+        'post-group literal concatenated to each alternation branch; '
+        '`[_-]?` optional delimiter block skipped on extension; '
+        'branch with internal metachar FP-held; '
+        'FP-hold set extended to {lpr, digital, flock, msab, xry}.',
+    'confidence_uplift','none','date','2026-08-20'))
+WHERE id = 44720 AND identifier_type = 'ssid_pattern' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0062_pre) = 1;
+
+-- Audit key on the keeper: records that the MAC-752 fold landed here, so a
+-- future lane auditing 39613's notes can see why a row was folded onto it.
+UPDATE identifiers SET
+  notes = json_set(notes, '$.mac752_keeper_for', json_object(
+    'audit_issue','MAC-752','mig','0062_mac752_44720_duplicate_unsafe_supersede',
+    'successor_for',44720,
+    'reason','MAC-752 fold: 44720 (`(?i)^(msab|xry)[_-]?.*`) is folded onto this row''s safe delimiter-anchored shape. This row is the canonical keeper for MSAB / XRY SSID coverage.','date','2026-08-20'))
+WHERE id = 39613 AND identifier_type = 'ssid_pattern' AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0062_pre) = 1;
+
+-- ---- strict post-condition guard -------------------------------------------
+-- (1) DEFECT CLASS GONE — no active row carries the unsafe identifier
+--     `(?i)^(msab|xry)[_-]?.*`.
+-- (2) 44720 is now superseded; 39613 is still active.
+-- (3) NOT ONE self-loop: 44720 has superseded_by = 39613, not 44720.
+-- (4) notes stayed valid JSON on both rows.
+-- (5) CONFIDENCE UNTOUCHED across the 2-row scope — the exact multiset of
+--     (id, confidence) is unchanged.
+-- (6) No collateral: the total active-row count fell by exactly 1.
+CREATE TEMP TABLE _mig0062_post (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mig0062_post(ok) SELECT CASE WHEN (
+      (SELECT COUNT(*) FROM identifiers
+        WHERE identifier = '(?i)^(msab|xry)[_-]?.*'
+          AND superseded_by IS NULL) = 0
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44720 AND superseded_by = 39613) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 39613 AND superseded_by IS NULL) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44720 AND superseded_by = 44720) = 0
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id IN (44720,39613) AND json_valid(notes) = 1) = 2
+  AND (SELECT COUNT(*) FROM (
+          SELECT id, confidence FROM _mig0062_conf_before
+          EXCEPT
+          SELECT id, confidence FROM identifiers
+           WHERE id IN (44720,39613))) = 0
+  AND (SELECT COUNT(*) FROM (
+          SELECT id, confidence FROM identifiers
+           WHERE id IN (44720,39613)
+          EXCEPT
+          SELECT id, confidence FROM _mig0062_conf_before)) = 0
+  AND (SELECT COUNT(*) FROM _mig0062_conf_before) = 2
+  AND (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL)
+      = (SELECT active_before FROM _mig0062_baseline) - 1
+) THEN 1 ELSE 0 END;
+
+DROP TABLE _mig0062_pre;
+DROP TABLE _mig0062_post;
+DROP TABLE _mig0062_baseline;
+DROP TABLE _mig0062_conf_before;
+
+COMMIT;
+
+-- Post-apply expected state:
+--   Active identifiers 43126 -> 43125 (exactly -1).
+--   Row 44720 now carries superseded_by = 39613 (not 44720).
+--   Row 39613 still active, still carrying the safe shape.
+--   No schema change (schema_version stays 35). No confidence altered.
+--   Lynceus standard feed: 1,007 -> 1,005 (the 2 unsafe stems `msab` and
+--   `xry` are no longer emitted; row 39613's 4 safe stems continue to
+--   ship). Lynceus high-conf feed: unchanged at 504 (row 44720 is
+--   `crowdsourced` and was already excluded by CP19).
+--   behavioral-signatures feed: unchanged at 132.

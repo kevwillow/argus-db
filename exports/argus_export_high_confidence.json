@@ -1,7 +1,7 @@
 {
   "_meta": {
     "argus_version": "35",
-    "exported_at": "2026-08-20T07:15:23Z",
+    "exported_at": "2026-08-20T09:21:20Z",
     "record_count": 504,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
@@ -13,7 +13,7 @@
       "unknown_category": 33300,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 0,
-      "ssid_pattern_fp_hold": 2,
+      "ssid_pattern_fp_hold": 6,
       "device_fingerprint": 6,
       "ble_local_name": 32,
       "ble_characteristic": 20,
@@ -63,7 +63,7 @@
       "self_exclude_oui": 0,
       "below_confidence_threshold": 49,
       "excluded_source_type": 352,
-      "geographic_scope_mismatch": 99
+      "geographic_scope_mismatch": 92
     },
     "ssid_pattern_emission": {
       "surviving_ssid_rows": 1,

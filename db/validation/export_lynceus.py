@@ -856,30 +856,95 @@ def _ble_local_name_is_template(value: str) -> bool:
     return any(ch in value for ch in _BLE_LOCAL_NAME_TEMPLATE_CHARS)
 
 
-# CP51 (§4.4, MAC-517) — ssid_pattern → Lynceus 0.9.2 substring conversion.
-# Lynceus 0.9.2 matches `ssid_pattern` as a case-insensitive SUBSTRING
-# (`? LIKE '%'||needle||'%' COLLATE NOCASE`, db.py:1126) — NOT regex/PCRE/POSIX/
-# glob (board-confirmed at MAC-516). This helper reduces each stored
-# `ssid_pattern` value to the Lynceus-safe substring(s) to emit:
+# CP51 (§4.4, MAC-517, MAC-752) — ssid_pattern → Lynceus 0.9.2 substring
+# conversion.  Lynceus 0.9.2 matches `ssid_pattern` as a case-insensitive
+# SUBSTRING (`? LIKE '%'||needle||'%' COLLATE NOCASE`, db.py:1126) — NOT
+# regex/PCRE/POSIX/glob (board-confirmed at MAC-516).  This helper reduces
+# each stored `ssid_pattern` value to the Lynceus-safe substring(s) to emit:
 #   1. strip a leading `(?i)` inline flag and a leading `^` anchor;
 #   2. if the value is a leading alternation `(a|b|...)`, SPLIT into one
-#      substring per branch (e.g. `(msab|xry)…` → ["msab", "xry"]);
-#   3. otherwise take the longest LEADING literal run up to the first regex/SQL
-#      metachar as the stem (trailing `$`/`.*`/`%` fall away naturally);
-#   4. FP gate: a stem shorter than `_SSID_STEM_MIN_LEN`, OR a generic
-#      device-class term in `_SSID_PATTERN_FP_HOLD_STEMS`, returns None → the
-#      whole row is FP-held (drop-bin `ssid_pattern_fp_hold`) for a
-#      tighter-stem / confidence follow-up.
-# Board disposition (MAC-517 plan) ships the distinctive 3-char brand tokens
-# `dji` / `xry` but holds the generic acronym `lpr` (License Plate Reader), so
-# the plan's prose "stem len<4 → hold" is superseded by a min-len-3 floor plus
-# an explicit generic-term hold-set (apply-time correction; per-row disposition
-# is authoritative). MUST be byte-identical to
-# coverage_matrix.py::_ssid_pattern_to_substring — the `_reconcile` map-vs-writer
-# cross-check halts on any divergence.
+#      substring per branch AND APPEND the leading literal of the post-group
+#      remainder (skipping `[_-]?` optional delimiter blocks) — e.g.
+#      `(?i)^(hail|king|queen)storm[_-]?.*` →
+#      ["hailstorm", "kingstorm", "queenstorm"] (MAC-752).  This stops the
+#      pre-MAC-752 bug where the alternation kept only the inner branches
+#      and dropped the literal after the group, producing bare-word FP
+#      magnets (`hail` / `king` / `queen` matching "Thailand", "Viking",
+#      "Parking" etc.);
+#   3. for non-alternation rows the same `_leading_literal_skip_optional`
+#      helper extends the stem through optional `[_-]?` delimiter blocks
+#      so `digital[_-]?ally[_-]?.*` → `digitalally` rather than `digital`
+#      (MAC-752).  A REQUIRED `[abc]` bracket (no `?` after) is not a
+#      delimiter block and the leading-literal run stops at `[`;
+#   4. a branch whose own leading literal is truncated by an INTERNAL
+#      metachar (e.g. `wifi[_-]?pineapple` → leading run `wifi`, truncated
+#      at `[`) does NOT silently ship the prefix.  The whole row is
+#      FP-held — the truncated branch is not safely renderable (MAC-752);
+#   5. FP gate (post-extension): each branch's BASE leading literal is
+#      checked against `_SSID_PATTERN_FP_HOLD_STEMS`.  Holding the BASE
+#      (not the concatenated stem) preserves the MAC-517 disposition that
+#      `lpr` holds a `(?i)^lpr[_-]?cam.*` row regardless of how far the
+#      `[_-]?` extension would reach.  A stem shorter than
+#      `_SSID_STEM_MIN_LEN` is also FP-held.
+# Board disposition (MAC-517 plan) ships the distinctive 3-char brand
+# tokens `dji` / `xry` but holds the generic acronym `lpr` (License
+# Plate Reader); MAC-752 extends the hold-set to `digital` (7-char
+# generic prefix that survives as a magnet in `digital[_-]?ally[_-]?.*`),
+# `flock` (5-char generic English/German word that matches
+# "Schneeflocke" / "RockFlock"), and the 3-4 char acronyms `msab` and
+# `xry` (which match `williamsabc` / `WPAHMSABMVA` / `base64xryrandom`
+# when shipped bare from id 44720's unsafe `(msab|xry)[_-]?.*` shape —
+# the safe pre-0059 shape `(msab_|xry_).*` is unaffected).  MUST be
+# byte-identical to coverage_matrix.py::_ssid_pattern_to_substring —
+# the `_reconcile` map-vs-writer cross-check halts on any divergence.
 _SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")
-_SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({"lpr"})
+_SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({
+    "lpr",     # License Plate Reader generic acronym (MAC-517)
+    "digital", # 7-char generic prefix; survives as magnet (MAC-752)
+    "flock",   # 5-char generic English/German word (MAC-752)
+    "msab",    # 4-char acronym; matches williamsabc / WPAHMSABMVA (MAC-752)
+    "xry",     # 3-char acronym; matches base64xryrandom (MAC-752)
+})
 _SSID_STEM_MIN_LEN = 3
+
+
+def _leading_literal_strict(s: str) -> str:
+    """Strict leading-literal run, stops at the first metachar (no
+    `[_-]?` extension).  MAC-752.
+    """
+    out: list[str] = []
+    for ch in s:
+        if ch in _SSID_STEM_METACHARS:
+            break
+        out.append(ch)
+    return "".join(out).strip()
+
+
+def _leading_literal_skip_optional(s: str) -> str:
+    """Take the leading literal of ``s``, skipping `[_-]?` optional delimiter
+    blocks.  Stops at any other metachar (required `[abc]`, `.`, `^`, `*`,
+    `+`, `?`, `|`, `$`, `%`, backslash, etc.).  Returns just the leading
+    literal (no suffix, no FP-hold decision).  MAC-752.
+    """
+    out: list[str] = []
+    i = 0
+    n = len(s)
+    while i < n:
+        ch = s[i]
+        if ch == "[":
+            end = s.find("]", i)
+            if end == -1:
+                break
+            inner = s[i + 1:end]
+            if set(inner) <= {"_", "-"} and end + 1 < n and s[end + 1] == "?":
+                i = end + 2  # skip the `[_-]?` block
+                continue
+            break  # required bracket — leading-literal run ends here
+        if ch in _SSID_STEM_METACHARS:
+            break
+        out.append(ch)
+        i += 1
+    return "".join(out)
 
 
 def _ssid_pattern_to_substring(value: str) -> list[str] | None:
@@ -897,6 +962,7 @@ def _ssid_pattern_to_substring(value: str) -> list[str] | None:
     if s.startswith("^"):
         s = s[1:]
     branches: list[str] | None = None
+    post_group_literal = ""
     if s.startswith("("):
         depth = 0
         close = None
@@ -915,19 +981,53 @@ def _ssid_pattern_to_substring(value: str) -> list[str] | None:
             # through to leading-literal stemming on the whole string.
             if inner and not inner.startswith("?") and "|" in inner:
                 branches = inner.split("|")
+                # MAC-752 — append the leading literal of the post-group
+                # remainder (skipping optional `[_-]?` delimiter blocks) to
+                # each branch.  `(hail|king|queen)storm[_-]?.*` ->
+                # `hailstorm` / `kingstorm` / `queenstorm` instead of the
+                # pre-fix bare `hail` / `king` / `queen` magnets.
+                post_group_literal = _leading_literal_skip_optional(s[close + 1:])
     if branches is None:
-        branches = [s]
+        # Non-alternation path: extend the leading literal of the whole
+        # string through optional `[_-]?` delimiter blocks.  The FP-hold
+        # check is on the STRICT base (so `lpr[_-]?cam.*` holds via the
+        # `lpr` base entry, `digital[_-]?ally[_-]?.*` holds via the
+        # `digital` base entry added in MAC-752).
+        base = _leading_literal_strict(s)
+        if base.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+            return None
+        extended = _leading_literal_skip_optional(s)
+        if len(extended) < _SSID_STEM_MIN_LEN:
+            return None
+        return [extended]
     out: list[str] = []
     for branch in branches:
-        stem_chars: list[str] = []
+        # Alternation path: take the strict base of the branch and append
+        # the post-group literal.  A branch whose own leading literal is
+        # truncated by an INTERNAL metachar (e.g. `wifi[_-]?pineapple` ->
+        # base `wifi`, internal `[`) is not safely renderable; the whole
+        # row is FP-held rather than shipping the bare `wifi` prefix.
+        # MAC-752.
+        base_chars: list[str] = []
+        has_internal_metachar = False
         for ch in branch:
             if ch in _SSID_STEM_METACHARS:
+                has_internal_metachar = True
                 break
-            stem_chars.append(ch)
-        stem = "".join(stem_chars).strip()
-        if len(stem) < _SSID_STEM_MIN_LEN or stem.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+            base_chars.append(ch)
+        if has_internal_metachar:
             return None
-        out.append(stem)
+        base_stem = "".join(base_chars).strip()
+        # FP-hold check on the BASE (not the concatenated stem) so the
+        # MAC-517 `lpr` disposition and the MAC-752 `digital` / `flock` /
+        # `msab` / `xry` entries continue to hold for any pattern whose
+        # strict base is a generic term — regardless of how far the
+        # post-group extension would otherwise reach.
+        if base_stem.lower() in _SSID_PATTERN_FP_HOLD_STEMS:
+            return None
+        if len(base_stem) < _SSID_STEM_MIN_LEN:
+            return None
+        out.append(base_stem + post_group_literal)
     return out or None
 
 

@@ -22,19 +22,24 @@ release adds 38 identifiers and recategorizes 7 that Argus already held.
 
 ### If you consume the feeds, read this part
 
-**The standard feed grows by 31 entries and nothing leaves it.** Active identifiers move
+**The standard feed grows by 24 entries and nothing leaves it.** Active identifiers move
 43,088 → **43,126**, a clean +38 with no withdrawals: total rows move 43,892 → **43,930** by the same
 +38, so no row was superseded this cycle. If you diff v1.7.0's feed against this one, every v1.7.0
 entry is still present.
 
-**Where the 31 came from, and it is two different things.** Migration `0059` contributes **24**:
-15 surviving `ssid_pattern` rows that split-expand into 20 entries, plus 4 `ble_service_uuid` rows
+**Where the 24 came from, and it is two different things.** Migration `0059` contributes **17**:
+11 surviving `ssid_pattern` rows that split-expand into 13 entries, plus 4 `ble_service_uuid` rows
 emitted as `ble_uuid`. Migration `0060` contributes the other **7**. There is no unattributed
-residue; 24 + 7 = 31.
+residue; 17 + 7 = 24.
 
-**`0059` admits 38 rows but only 19 of them reach the feed.** Of the 38, 18 `ble_local_name` rows
-drop at the CP50 template gate and 1 `ssid_pattern` row routes to `ssid_pattern_fp_hold`. That is the
-false-positive discipline from v1.7.0 doing its job on a fresh harvest, not a shortfall.
+**`0059` admits 38 rows but only 15 of them reach the feed.** Of the 38, 18 `ble_local_name` rows
+drop at the CP50 template gate and 5 `ssid_pattern` rows route to `ssid_pattern_fp_hold` (the
+pre-MAC-752 `1` is `(harris|xg)[_-]?[0-9]+.*` whose `xg` branch is shorter than the 3-char floor;
+the 4 added under MAC-752 are `(?i)^flock[_-]?.*`, `(?i)^digital[_-]?ally[_-]?.*`,
+`(?i)^(msab|xry)[_-]?.*`, and `(?i)^(pineapple|hak5|wifi[_-]?pineapple).*`; each was emitting a
+bare word or 3-4 char token that the Lynceus 0.9.2 substring matcher was flagging in ordinary
+network names; MAC-752 fixes the stemmer, not the rows). That is the false-positive discipline
+from v1.7.0 doing its job on a fresh harvest, not a shortfall.
 
 **The high-confidence +3 is not new coverage, and we will not present it as one.** All 38 of
 `0059`'s rows are `crowdsourced` under CP19 and carry NULL `geographic_scope` under CP7, so none of
@@ -45,7 +50,7 @@ them a category, so they became eligible for the first time. Counting that as ne
 overstate what this release found, the same way it would have in v1.7.0 for migrations `0051` and
 `0054`.
 
-**Feed totals.** Standard 983 to **1,014**, high-confidence 501 to **504**, behavioral **132** unchanged. Both feed thresholds are unchanged, 30 for the standard feed and 70 for high-confidence, so nothing here comes from moving a floor.
+**Feed totals.** Standard 983 to **1,007**, high-confidence 501 to **504**, behavioral **132** unchanged. Both feed thresholds are unchanged, 30 for the standard feed and 70 for high-confidence, so nothing here comes from moving a floor.
 
 ### Schema
 
@@ -68,10 +73,10 @@ overstate what this release found, the same way it would have in v1.7.0 for migr
   arms, hidden from vendor lists by default, so the visible curated list moves 168 → **169**.
 - **`sources`:** **98** (no change). **behavioral signatures:** **214** (no change).
   **device-category enum:** **20** (no change).
-- **Lynceus standard feed:** 983 → **1,014** (+31 entries, 0 removed). **high-confidence feed:** 501 → **504** (+3 / −0). **behavioral-signatures feed:** **132** (entry set unchanged). **CSV:** **43,126** rows, matching the active count.
+- **Lynceus standard feed:** 983 → **1,007** (+24 entries, 0 removed). **high-confidence feed:** 501 → **504** (+3 / −0). **behavioral-signatures feed:** **132** (entry set unchanged). **CSV:** **43,126** rows, matching the active count.
 - **Fingerprint.** The standard and high-confidence feeds carry `argus_run_id`
-  `78b127fe-7dab-5d27-9c83-a93e8c80f46d` and `exported_at` `2026-08-20T07:15:23Z`; the behavioral
-  feed carries `260b5777-99c8-5f75-8023-f4012242e7f4` at `2026-08-20T07:15:25Z`. All three ship at
+  `78b127fe-7dab-5d27-9c83-a93e8c80f46d` and `exported_at` `2026-08-20T09:21:20Z`; the behavioral
+  feed carries `260b5777-99c8-5f75-8023-f4012242e7f4` at `2026-08-20T09:21:20Z`. All three ship at
   `schema_version` 35. Canonical `db/argus.db` sha256
   `6e6581ecdbd4b5911db1974a762282442cad05adccd3eb5f11f31df48b3cdebe`. Read export provenance from
   the `exported_at` field in each artifact, never from file mtime.
