@@ -884,7 +884,12 @@ def _ble_local_name_is_template(value: str) -> bool:
 #      branch of the Hak5 alternation now emits `wifipineapple` rather
 #      than the bare `wifi` magnet.  The CEO call (Finding B comment,
 #      2026-08-20) was "either render it fully or FP-hold the row";
-#      rendering fully preserves the Hak5 product coverage;
+#      rendering fully preserved the Hak5 product coverage AT MAC-752.
+#      SUPERSEDED at MAC-761: rule 5 below now FP-holds the whole row on
+#      its `pineapple` branch, so nothing from id 44726 is emitted and
+#      this rendering no longer preserves any Hak5 coverage.  The
+#      rendering rule itself still stands; only its coverage consequence
+#      is void.  See the MAC-761 paragraph below;
 #   5. FP gate (post-extension): the STRICT BASE leading literal of each
 #      branch (the run of literal chars before any `[_-]?` block or
 #      `(...)` group) is checked against `_SSID_PATTERN_FP_HOLD_STEMS`.
@@ -907,10 +912,26 @@ def _ble_local_name_is_template(value: str) -> bool:
 # MAC-761 extends the hold-set to `pineapple` (9-char Hak5 product name
 # that is also a common English noun): shipped bare with
 # `description: "Hak5 hacking_tool"`, so under Lynceus 0.9.2 substring
-# semantics `Pineapple Cafe WiFi` is labelled an attack tool.  The
-# siblings `hak5` and `wifipineapple` carry the identical vendor claim,
-# so the coverage cost is near-zero — the same bar under which the board
-# withdrew `flock`.
+# semantics `Pineapple Cafe WiFi` is labelled an attack tool.
+# COST, MEASURED — NOT near-zero.  The board's original ruling assumed
+# `hak5` and `wifipineapple` were siblings that would survive the hold.
+# They are not siblings: all three are alternation branches of the SINGLE
+# canonical row id 44726, `(?i)^(pineapple|hak5|wifi[_-]?pineapple).*`.
+# The FP gate sits in the per-branch loop and returns None for the WHOLE
+# row on its first held base, so holding `pineapple` withdraws `hak5`,
+# `pineapple` and `wifipineapple` together — three emitted entries, not
+# one (the ssid_pattern split-expansion).  Measured residual Hak5
+# coverage at v1.8.0 is ZERO in both feeds: the `ble_local_name` rows are
+# templates and drop at CP50, and the `hak5.org`
+# `vendor_controlled_hostname` rows are export-dropped by type.  Hak5
+# ships in no v1.8.0 feed.
+# That cost is ACCEPTED, on the board's stated bar: a mislabelled
+# `Pineapple Cafe WiFi` is a lie the consumer cannot detect, while a
+# coverage gap is one Lynceus can.  Restoring the two safe branches
+# requires refining row 44726 to `(?i)^(hak5|wifi[_-]?pineapple).*`,
+# which is a DATA change and a migration, not a hold-set change — the
+# hold-set is row-level and cannot express it.  MAC-765 owns that
+# restoration.
 # MUST be byte-identical to coverage_matrix.py::_ssid_pattern_to_substring
 # — the `_reconcile` map-vs-writer cross-check halts on any divergence.
 _SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")
@@ -925,8 +946,10 @@ _SSID_PATTERN_FP_HOLD_STEMS: frozenset[str] = frozenset({
                 # grounds rather than risk an unanchored bare-stem FP)
     "pineapple",# 9-char Hak5 product + common English noun; ships bare with
                 # `Hak5 hacking_tool`, so `Pineapple Cafe WiFi` reads as an
-                # attack tool. Siblings `hak5` / `wifipineapple` keep the
-                # detection (CEO ruling Option A, MAC-761, 2026-08-20)
+                # attack tool. Co-branches `hak5` / `wifipineapple` are on
+                # the SAME row 44726 and drop WITH it: Hak5 ships in no
+                # v1.8.0 feed. Cost accepted; MAC-765 owns restoration
+                # (CEO ruling Option A, MAC-761, 2026-08-20)
 })
 _SSID_STEM_MIN_LEN = 3
 
