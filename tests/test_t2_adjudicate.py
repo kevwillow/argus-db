@@ -425,15 +425,18 @@ def test_verdict_is_invariant_to_which_token_matched() -> None:
 # false about what it had matched, on 40 rows under Rule 3's label plus 5 more
 # under Rule 6's "(different industry)".
 #
-# MAC-724 fixed this on `v1.8.0-stage`, which never reached the release line;
+# MAC-724 fixed this on the branch then named `v1.8.0-stage` — HISTORICAL name,
+# renamed to `parked/wave-widenet-undrained` by MAC-757 on 2026-08-20 because the
+# `v1.8.0` token read as a release line and no such tag exists. It never reached
+# the release line;
 # MAC-753 then independently re-derived a FLAT (-len, token) order on `main`.
 # Entity names are systematically longer than industry words, so the flat proxy
 # promoted exactly the tokens that are not industries. MAC-756 ports the class
 # rank onto `main`.
 #
 # The split is guarded in both directions against a frozen literal of the sets as
-# they stood at c9f7e44 (`main`, pre-port) — verified equal to `v1.8.0-stage`'s
-# own pre-split literal at 503ed1c. A reclassification that silently drops a token
+# they stood at c9f7e44 (`main`, pre-port) — verified equal to that parked
+# branch's own pre-split literal at 503ed1c. A reclassification that silently drops a token
 # would change verdicts while looking like a relabel, so set identity is the first
 # control, not an afterthought.
 
