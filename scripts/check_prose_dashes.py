@@ -39,11 +39,16 @@ quotes, and the reviewer is responsible for sanity-checking the residue.
 
 Tier list:
 
-  Tier 1  reader-facing prose, handed-in here.
-  Tier 2  generated artifact (coverage_report.md) and the append-only
-          ratification ledger (BIBLE_AMENDMENTS.md). Add to the constant below
-          when the generators and the ledger's forward-write path are
-          themselves dash-clean.
+  Tier 1  reader-facing prose, handed-in here. Includes the generated
+          ``exports/coverage_report.md`` since MAC-744: its generator prose
+          template is dash-clean, so the artifact regenerates clean and never
+          needs a hand-edit. Do NOT hand-edit it; fix
+          ``db/validation/export_lynceus.py`` and regenerate.
+  Tier 2  the append-only ratification ledger (BIBLE_AMENDMENTS.md). It stays
+          Tier 2 permanently, not provisionally: the board ratifies verbatim
+          prose, so the ~1.2k historical dashes are cite bytes that must NOT be
+          rewritten. Its forward-write path is gated by ``--added-only`` below,
+          which holds NEW entries dash-clean without touching history.
   Tier 3  internal docs that do not ship with the release. Out of scope for the
           MAC-686 sweep; add later.
 
@@ -52,17 +57,21 @@ Usage:
   python3 scripts/check_prose_dashes.py            # exit 0 = clean, else 1
   python3 scripts/check_prose_dashes.py --list     # print file:line:context per hit
   python3 scripts/check_prose_dashes.py --paths path/to/file.md   # ad-hoc paths
+  python3 scripts/check_prose_dashes.py --tier 2 --added-only HEAD
+                                                   # forward-write gate: only
+                                                   # lines ADDED since the ref
 
 Exit codes:
 
   0   no dashes in carve-out-violating positions across the tier files
   1   at least one dash in a carve-out-violating position
-  2   usage error (unknown flag, no such file)
+  2   usage error (unknown flag, no such file, git unavailable for --added-only)
 """
 from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -78,13 +87,26 @@ TIER_1 = (
     "docs/engineering/DATA_DICTIONARY.md",
     "docs/engineering/METHODOLOGY.md",
     "docs/engineering/PROJECT_BIBLE.md",
+    # Promoted from Tier 2 at MAC-744. NEVER hand-edit this file: it is emitted
+    # by ``db/validation/export_lynceus.py``. The 19 U+2014 that used to sit in
+    # the emitted prose template were removed generator-side, so a regen lands
+    # clean. The dashes that REMAIN in the artifact are all inside the
+    # ```markdown fence at Section 1, which embeds
+    # ``extraction_outputs/mac45/coverage_matrix.md`` VERBATIM under the sha256
+    # printed one line above the fence. They are cite bytes of a frozen upstream
+    # baseline, not editorial choices, and the fenced-code carve-out already
+    # skips them. Cleaning them would break both the sha256 assertion and the
+    # "embedded verbatim per §9 item 3" contract.
+    "exports/coverage_report.md",
 )
 
-# Tier 2 (reserved -- do not hand-edit, regenerate instead). Listed here so the
-# constant-based extension story stays consistent. The Tier 2 fix is to clean the
-# generator / write-side of the ledger, NOT to edit the bytes of the artifact.
+# Tier 2: the append-only ratification ledger, and only that. This is a
+# PERMANENT placement, not a staging area (MAC-744). The board ratifies verbatim
+# prose, so the historical dashes are cite bytes; rewriting them would rewrite
+# ratified history. The forward-write path is gated instead, via
+# ``--tier 2 --added-only <ref>``, which holds NEW entries dash-clean while
+# leaving every already-ratified byte alone.
 TIER_2 = (
-    "exports/coverage_report.md",
     "docs/engineering/BIBLE_AMENDMENTS.md",
 )
 
@@ -118,6 +140,9 @@ INLINE_CODE_BACKTICK_RE = re.compile(r"`[^`\n]*`")
 # separately. The carve-out covers both so an inline `https://...` and a
 # reference-style `[label](https://...)` target both clear the gate.
 URL_RE = re.compile(r"https?://[^\s)<>\"'`]+")
+
+# `git diff -U0` hunk header: @@ -old,oldcount +new,newcount @@
+HUNK_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
 
 def _is_in_fenced_code(lines: list[str], line_no: int) -> bool:
@@ -280,6 +305,41 @@ def _scan_file(path: Path) -> list[tuple[int, str, str]]:
     return hits
 
 
+def _added_line_numbers(rel: str, ref: str) -> set[int]:
+    """Return the 1-based line numbers in ``rel`` that are ADDED relative to ``ref``.
+
+    This is the forward-write gate for the append-only ratification ledger
+    (BIBLE_AMENDMENTS.md). Rewriting a ratified amendment is forbidden, so the
+    gate cannot look at the whole file; it looks only at what a change ADDS.
+
+    Parsing note: ``git diff -U0`` emits ``@@ -a,b +c,d @@`` hunk headers. ``c``
+    is the first added line number in the NEW file and ``d`` the count (absent
+    ``d`` means 1, and ``d == 0`` means a pure deletion, which contributes no
+    new lines). Line numbers therefore index the CURRENT file, which is exactly
+    what ``_scan_file`` reports against.
+    """
+    proc = subprocess.run(
+        ["git", "diff", "-U0", ref, "--", rel],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"git diff {ref} -- {rel} failed (rc={proc.returncode}): "
+            f"{proc.stderr.strip()}"
+        )
+    added: set[int] = set()
+    for line in proc.stdout.split("\n"):
+        m = HUNK_RE.match(line)
+        if not m:
+            continue
+        start = int(m.group(1))
+        count = int(m.group(2)) if m.group(2) is not None else 1
+        added.update(range(start, start + count))
+    return added
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description="Argus prose dash gate (MAC-686).")
     parser.add_argument(
@@ -299,6 +359,17 @@ def main(argv: list[str]) -> int:
         default="1",
         help="Which tier to scan. Default 1.",
     )
+    parser.add_argument(
+        "--added-only",
+        metavar="REF",
+        default=None,
+        help=(
+            "Forward-write gate: report only dashes on lines ADDED relative to "
+            "the given git ref. Intended for the append-only ratification "
+            "ledger (Tier 2), where already-ratified prose is cite bytes that "
+            "must not be rewritten but NEW entries must land dash-clean."
+        ),
+    )
     args = parser.parse_args(argv)
 
     if args.paths is not None:
@@ -316,6 +387,13 @@ def main(argv: list[str]) -> int:
     for rel in files:
         path = REPO / rel
         hits = _scan_file(path)
+        if args.added_only is not None:
+            try:
+                added = _added_line_numbers(rel, args.added_only)
+            except (RuntimeError, OSError) as exc:
+                print(f"check_prose_dashes: {exc}", file=sys.stderr)
+                return 2
+            hits = [h for h in hits if h[0] in added]
         for line_no, ch, raw in hits:
             total += 1
             if args.list:
