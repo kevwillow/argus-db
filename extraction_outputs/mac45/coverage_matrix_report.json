@@ -1,5 +1,5 @@
 {
-  "pre_active_count": 43088,
+  "pre_active_count": 43126,
   "device_categories": [
     "alpr",
     "imsi_catcher",
@@ -154,19 +154,20 @@
     {
       "device_category": "alpr",
       "identifier_type": "ssid_pattern",
-      "n": 5,
+      "n": 6,
       "n_by_source_type": {
-        "crowdsourced": 5
+        "crowdsourced": 6
       },
       "min_conf": 70,
       "max_conf": 75,
-      "median_conf": 75,
+      "median_conf": 75.0,
       "row_ids": [
         562,
         44466,
         44467,
         44468,
-        44470
+        44470,
+        44711
       ]
     },
     {
@@ -506,12 +507,17 @@
     {
       "device_category": "imsi_catcher",
       "identifier_type": "ssid_pattern",
-      "n": 0,
-      "n_by_source_type": {},
-      "min_conf": null,
-      "max_conf": null,
-      "median_conf": null,
-      "row_ids": []
+      "n": 2,
+      "n_by_source_type": {
+        "crowdsourced": 2
+      },
+      "min_conf": 75,
+      "max_conf": 75,
+      "median_conf": 75.0,
+      "row_ids": [
+        44713,
+        44714
+      ]
     },
     {
       "device_category": "imsi_catcher",
@@ -798,12 +804,18 @@
     {
       "device_category": "body_cam",
       "identifier_type": "ssid_pattern",
-      "n": 0,
-      "n_by_source_type": {},
-      "min_conf": null,
-      "max_conf": null,
-      "median_conf": null,
-      "row_ids": []
+      "n": 3,
+      "n_by_source_type": {
+        "crowdsourced": 3
+      },
+      "min_conf": 75,
+      "max_conf": 75,
+      "median_conf": 75,
+      "row_ids": [
+        44712,
+        44716,
+        44717
+      ]
     },
     {
       "device_category": "body_cam",
@@ -1114,12 +1126,16 @@
     {
       "device_category": "police_radio",
       "identifier_type": "ssid_pattern",
-      "n": 0,
-      "n_by_source_type": {},
-      "min_conf": null,
-      "max_conf": null,
-      "median_conf": null,
-      "row_ids": []
+      "n": 1,
+      "n_by_source_type": {
+        "crowdsourced": 1
+      },
+      "min_conf": 75,
+      "max_conf": 75,
+      "median_conf": 75,
+      "row_ids": [
+        44715
+      ]
     },
     {
       "device_category": "police_radio",
@@ -2316,17 +2332,18 @@
     {
       "device_category": "gunshot_detect",
       "identifier_type": "ble_local_name",
-      "n": 3,
+      "n": 4,
       "n_by_source_type": {
-        "crowdsourced": 3
+        "crowdsourced": 4
       },
-      "min_conf": 85,
+      "min_conf": 75,
       "max_conf": 85,
-      "median_conf": 85,
+      "median_conf": 85.0,
       "row_ids": [
         35607,
         35608,
-        35609
+        35609,
+        44732
       ]
     },
     {
@@ -2573,17 +2590,22 @@
     {
       "device_category": "hacking_tool",
       "identifier_type": "ssid_pattern",
-      "n": 3,
+      "n": 7,
       "n_by_source_type": {
+        "crowdsourced": 4,
         "inferred": 3
       },
       "min_conf": 50,
-      "max_conf": 50,
-      "median_conf": 50,
+      "max_conf": 75,
+      "median_conf": 75,
       "row_ids": [
         39582,
         39583,
-        39613
+        39613,
+        44718,
+        44719,
+        44720,
+        44726
       ]
     },
     {
@@ -2623,9 +2645,9 @@
     {
       "device_category": "hacking_tool",
       "identifier_type": "ble_local_name",
-      "n": 2,
+      "n": 14,
       "n_by_source_type": {
-        "crowdsourced": 1,
+        "crowdsourced": 13,
         "manufacturer_app": 1
       },
       "min_conf": 65,
@@ -2633,7 +2655,19 @@
       "median_conf": 75.0,
       "row_ids": [
         35615,
-        39538
+        39538,
+        44733,
+        44734,
+        44735,
+        44736,
+        44737,
+        44738,
+        44739,
+        44740,
+        44741,
+        44742,
+        44743,
+        44744
       ]
     },
     {
@@ -4020,14 +4054,14 @@
     {
       "device_category": "unknown",
       "identifier_type": "oui",
-      "n": 345,
+      "n": 342,
       "n_by_source_type": {
         "crowdsourced": 294,
-        "primary_registry": 51
+        "primary_registry": 48
       },
       "min_conf": 75,
       "max_conf": 95,
-      "median_conf": 75,
+      "median_conf": 75.0,
       "row_ids": [
         420,
         429,
@@ -4328,7 +4362,6 @@
         37035,
         37036,
         42709,
-        42711,
         42713,
         42714,
         42715,
@@ -4336,8 +4369,6 @@
         43104,
         43105,
         43110,
-        44642,
-        44643,
         44644,
         44645,
         44646,
@@ -22222,9 +22253,9 @@
     {
       "device_category": "unknown",
       "identifier_type": "ble_uuid",
-      "n": 654,
+      "n": 652,
       "n_by_source_type": {
-        "primary_registry": 654
+        "primary_registry": 652
       },
       "min_conf": 75,
       "max_conf": 75,
@@ -22421,7 +22452,6 @@
         37934,
         37935,
         37936,
-        37938,
         37939,
         37940,
         37941,
@@ -22635,7 +22665,6 @@
         38163,
         38164,
         38165,
-        38166,
         38167,
         38170,
         38171,
@@ -22949,9 +22978,9 @@
     {
       "device_category": "unknown",
       "identifier_type": "ble_manufacturer_id",
-      "n": 3967,
+      "n": 3965,
       "n_by_source_type": {
-        "primary_registry": 3967
+        "primary_registry": 3965
       },
       "min_conf": 85,
       "max_conf": 95,
@@ -24664,7 +24693,6 @@
         2687,
         2688,
         2689,
-        2690,
         2691,
         2692,
         2693,
@@ -26480,7 +26508,6 @@
         4504,
         4505,
         4506,
-        4507,
         4508,
         4509,
         4510,
@@ -41833,6 +41860,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Apple",
+      "aliases_used": [
+        "Apple"
+      ],
+      "fcc_grantees_count": 5,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Apple Inc.",
       "aliases_used": [
         "Apple Inc."
@@ -42767,6 +42806,18 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Arlo",
+      "aliases_used": [
+        "Arlo"
+      ],
+      "fcc_grantees_count": 1,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
     },
     {
       "canonical_name": "Arlo Technologies",
@@ -62930,7 +62981,7 @@
       "deployment_observations_count": 1,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 16
+      "active_identifier_count": 18
     },
     {
       "canonical_name": "Celliber Technologies Pvt Limited",
@@ -77676,7 +77727,7 @@
       "deployment_observations_count": 11,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 2
+      "active_identifier_count": 4
     },
     {
       "canonical_name": "Digital Audio Labs",
@@ -89711,6 +89762,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Eufy/Anker",
+      "aliases_used": [
+        "Eufy/Anker"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
       "canonical_name": "Eugster Frismag AG",
       "aliases_used": [
         "Eugster Frismag AG"
@@ -94859,6 +94922,30 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Flipper Devices",
+      "aliases_used": [
+        "Flipper Devices"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 4
+    },
+    {
+      "canonical_name": "Flipper Devices (Custom FW)",
+      "aliases_used": [
+        "Flipper Devices (Custom FW)"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Flipper Devices Inc.",
       "aliases_used": [
         "Flipper Devices Inc."
@@ -94946,7 +95033,7 @@
       "deployment_observations_count": 86462,
       "council_minutes_matters_count": 1,
       "high_corroboration": true,
-      "active_identifier_count": 223
+      "active_identifier_count": 224
     },
     {
       "canonical_name": "Florida R&D Associates LLC",
@@ -103003,12 +103090,24 @@
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 9
+      "active_identifier_count": 10
     },
     {
       "canonical_name": "Great Lite International",
       "aliases_used": [
         "Great Lite International"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Great Scott Gadgets",
+      "aliases_used": [
+        "Great Scott Gadgets"
       ],
       "fcc_grantees_count": 0,
       "procurement_records_count": 0,
@@ -107723,6 +107822,18 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "Hak5",
+      "aliases_used": [
+        "Hak5"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 5
     },
     {
       "canonical_name": "Hala Systems, Inc.",
@@ -130638,6 +130749,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "L3Harris Technologies",
+      "aliases_used": [
+        "L3Harris Technologies"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 8483,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 3
+    },
+    {
       "canonical_name": "LA Clippers",
       "aliases_used": [
         "LA Clippers"
@@ -140517,7 +140640,7 @@
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 6
+      "active_identifier_count": 7
     },
     {
       "canonical_name": "MSB Elektronik und Geraetebau GmbH",
@@ -148056,6 +148179,18 @@
       "council_minutes_matters_count": 1,
       "high_corroboration": true,
       "active_identifier_count": 171
+    },
+    {
+      "canonical_name": "Motorola Solutions (WatchGuard)",
+      "aliases_used": [
+        "Motorola Solutions (WatchGuard)"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 2,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
     },
     {
       "canonical_name": "Motorola Solutions, Inc.",
@@ -171168,6 +171303,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Proxmark",
+      "aliases_used": [
+        "Proxmark"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Prozone",
       "aliases_used": [
         "Prozone"
@@ -189004,6 +189151,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Samsung",
+      "aliases_used": [
+        "Samsung"
+      ],
+      "fcc_grantees_count": 31,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Samsung Electronics (UK) Ltd",
       "aliases_used": [
         "Samsung Electronics (UK) Ltd"
@@ -203343,7 +203502,7 @@
       "deployment_observations_count": 0,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 1
+      "active_identifier_count": 2
     },
     {
       "canonical_name": "SimpliSafe, Inc.",
@@ -206819,7 +206978,7 @@
       "deployment_observations_count": 936,
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
-      "active_identifier_count": 12
+      "active_identifier_count": 13
     },
     {
       "canonical_name": "Soundbrenner Limited",
@@ -211073,6 +211232,18 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 1
+    },
+    {
+      "canonical_name": "SwitchBot (Woan Technology)",
+      "aliases_used": [
+        "SwitchBot (Woan Technology)"
+      ],
+      "fcc_grantees_count": 0,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
     },
     {
       "canonical_name": "Swoop Aero",
@@ -231524,6 +231695,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "Vivint",
+      "aliases_used": [
+        "Vivint"
+      ],
+      "fcc_grantees_count": 2,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 1
+    },
+    {
       "canonical_name": "Vivint, Inc.",
       "aliases_used": [
         "Vivint, Inc."
@@ -237278,6 +237461,18 @@
       "council_minutes_matters_count": 0,
       "high_corroboration": false,
       "active_identifier_count": 3
+    },
+    {
+      "canonical_name": "Wyze",
+      "aliases_used": [
+        "Wyze"
+      ],
+      "fcc_grantees_count": 2,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
     },
     {
       "canonical_name": "Wyze Labs",
@@ -244888,6 +245083,18 @@
       "active_identifier_count": 1
     },
     {
+      "canonical_name": "dormakaba",
+      "aliases_used": [
+        "dormakaba"
+      ],
+      "fcc_grantees_count": 9,
+      "procurement_records_count": 0,
+      "deployment_observations_count": 0,
+      "council_minutes_matters_count": 0,
+      "high_corroboration": false,
+      "active_identifier_count": 2
+    },
+    {
       "canonical_name": "dormakaba Holding AG",
       "aliases_used": [
         "dormakaba Holding AG"
@@ -252273,16 +252480,16 @@
     "confidence_floor": 30,
     "drop_pi_self_exclude": false,
     "bins": {
-      "unknown_category": 33307,
+      "unknown_category": 33300,
       "generic_reserved_uuid": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 0,
       "oversized_mac_range": 49,
       "ssid_pattern": 0,
-      "ssid_pattern_fp_hold": 1,
+      "ssid_pattern_fp_hold": 2,
       "device_fingerprint": 6,
-      "ble_local_name": 14,
+      "ble_local_name": 32,
       "ble_characteristic": 20,
       "product_family_codename": 156,
       "icao_24bit_address": 2,
@@ -252327,8 +252534,8 @@
       "imei_tac": 0,
       "excluded_source_type": 0
     },
-    "survivors": 973,
-    "reconciles": 43088,
+    "survivors": 999,
+    "reconciles": 43126,
     "drop_assignments": {
       "420": "unknown_category",
       "429": "unknown_category",
@@ -254066,7 +254273,6 @@
       "2687": "unknown_category",
       "2688": "unknown_category",
       "2689": "unknown_category",
-      "2690": "unknown_category",
       "2691": "unknown_category",
       "2692": "unknown_category",
       "2693": "unknown_category",
@@ -255882,7 +256088,6 @@
       "4504": "unknown_category",
       "4505": "unknown_category",
       "4506": "unknown_category",
-      "4507": "unknown_category",
       "4508": "unknown_category",
       "4509": "unknown_category",
       "4510": "unknown_category",
@@ -288641,7 +288846,6 @@
       "37934": "unknown_category",
       "37935": "unknown_category",
       "37936": "unknown_category",
-      "37938": "unknown_category",
       "37939": "unknown_category",
       "37940": "unknown_category",
       "37941": "unknown_category",
@@ -288855,7 +289059,6 @@
       "38163": "unknown_category",
       "38164": "unknown_category",
       "38165": "unknown_category",
-      "38166": "unknown_category",
       "38167": "unknown_category",
       "38170": "unknown_category",
       "38171": "unknown_category",
@@ -292859,7 +293062,6 @@
       "42707": "oversized_mac_range",
       "42708": "oversized_mac_range",
       "42709": "unknown_category",
-      "42711": "unknown_category",
       "42713": "unknown_category",
       "42714": "unknown_category",
       "42715": "unknown_category",
@@ -294401,8 +294603,6 @@
       "44499": "ble_characteristic",
       "44500": "ble_characteristic",
       "44501": "ble_characteristic",
-      "44642": "unknown_category",
-      "44643": "unknown_category",
       "44644": "unknown_category",
       "44645": "unknown_category",
       "44646": "unknown_category",
@@ -294444,7 +294644,26 @@
       "44707": "unknown_category",
       "44708": "unknown_category",
       "44709": "unknown_category",
-      "44710": "unknown_category"
+      "44710": "unknown_category",
+      "44715": "ssid_pattern_fp_hold",
+      "44727": "ble_local_name",
+      "44728": "ble_local_name",
+      "44729": "ble_local_name",
+      "44730": "ble_local_name",
+      "44731": "ble_local_name",
+      "44732": "ble_local_name",
+      "44733": "ble_local_name",
+      "44734": "ble_local_name",
+      "44735": "ble_local_name",
+      "44736": "ble_local_name",
+      "44737": "ble_local_name",
+      "44738": "ble_local_name",
+      "44739": "ble_local_name",
+      "44740": "ble_local_name",
+      "44741": "ble_local_name",
+      "44742": "ble_local_name",
+      "44743": "ble_local_name",
+      "44744": "ble_local_name"
     }
   },
   "drop_tally_high_confidence": {
@@ -294452,16 +294671,16 @@
     "confidence_floor": 70,
     "drop_pi_self_exclude": true,
     "bins": {
-      "unknown_category": 33307,
+      "unknown_category": 33300,
       "generic_reserved_uuid": 0,
       "procurement_only": 6,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 49,
       "oversized_mac_range": 49,
       "ssid_pattern": 0,
-      "ssid_pattern_fp_hold": 1,
+      "ssid_pattern_fp_hold": 2,
       "device_fingerprint": 6,
-      "ble_local_name": 14,
+      "ble_local_name": 32,
       "ble_characteristic": 20,
       "product_family_codename": 156,
       "icao_24bit_address": 2,
@@ -294504,10 +294723,10 @@
       "equipment_class_code": 7,
       "network_discovery_protocol_pattern": 11,
       "imei_tac": 0,
-      "excluded_source_type": 348
+      "excluded_source_type": 352
     },
-    "survivors": 576,
-    "reconciles": 43088,
+    "survivors": 598,
+    "reconciles": 43126,
     "drop_assignments": {
       "1": "excluded_source_type",
       "420": "unknown_category",
@@ -296582,7 +296801,6 @@
       "2687": "unknown_category",
       "2688": "unknown_category",
       "2689": "unknown_category",
-      "2690": "unknown_category",
       "2691": "unknown_category",
       "2692": "unknown_category",
       "2693": "unknown_category",
@@ -298398,7 +298616,6 @@
       "4504": "unknown_category",
       "4505": "unknown_category",
       "4506": "unknown_category",
-      "4507": "unknown_category",
       "4508": "unknown_category",
       "4509": "unknown_category",
       "4510": "unknown_category",
@@ -331192,7 +331409,6 @@
       "37934": "unknown_category",
       "37935": "unknown_category",
       "37936": "unknown_category",
-      "37938": "unknown_category",
       "37939": "unknown_category",
       "37940": "unknown_category",
       "37941": "unknown_category",
@@ -331406,7 +331622,6 @@
       "38163": "unknown_category",
       "38164": "unknown_category",
       "38165": "unknown_category",
-      "38166": "unknown_category",
       "38167": "unknown_category",
       "38170": "unknown_category",
       "38171": "unknown_category",
@@ -335417,7 +335632,6 @@
       "42707": "oversized_mac_range",
       "42708": "oversized_mac_range",
       "42709": "unknown_category",
-      "42711": "unknown_category",
       "42713": "unknown_category",
       "42714": "unknown_category",
       "42715": "unknown_category",
@@ -336977,8 +337191,6 @@
       "44626": "excluded_source_type",
       "44627": "excluded_source_type",
       "44628": "below_confidence_threshold",
-      "44642": "unknown_category",
-      "44643": "unknown_category",
       "44644": "unknown_category",
       "44645": "unknown_category",
       "44646": "unknown_category",
@@ -337020,7 +337232,30 @@
       "44707": "unknown_category",
       "44708": "unknown_category",
       "44709": "unknown_category",
-      "44710": "unknown_category"
+      "44710": "unknown_category",
+      "44715": "ssid_pattern_fp_hold",
+      "44727": "ble_local_name",
+      "44728": "ble_local_name",
+      "44729": "ble_local_name",
+      "44730": "ble_local_name",
+      "44731": "ble_local_name",
+      "44732": "ble_local_name",
+      "44733": "ble_local_name",
+      "44734": "ble_local_name",
+      "44735": "ble_local_name",
+      "44736": "ble_local_name",
+      "44737": "ble_local_name",
+      "44738": "ble_local_name",
+      "44739": "ble_local_name",
+      "44740": "ble_local_name",
+      "44741": "ble_local_name",
+      "44742": "ble_local_name",
+      "44743": "ble_local_name",
+      "44744": "ble_local_name",
+      "44745": "excluded_source_type",
+      "44746": "excluded_source_type",
+      "44747": "excluded_source_type",
+      "44748": "excluded_source_type"
     }
   },
   "halts": []

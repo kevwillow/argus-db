@@ -1,21 +1,21 @@
 {
   "_meta": {
     "argus_version": "35",
-    "exported_at": "2026-08-11T22:32:31Z",
-    "record_count": 501,
+    "exported_at": "2026-08-20T07:15:23Z",
+    "record_count": 504,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "e7800776-ef11-515a-a16b-2540c68c6940",
-    "source_record_count": 43088,
+    "argus_run_id": "78b127fe-7dab-5d27-9c83-a93e8c80f46d",
+    "source_record_count": 43126,
     "dropped_in_export": {
-      "unknown_category": 33307,
+      "unknown_category": 33300,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 0,
-      "ssid_pattern_fp_hold": 1,
+      "ssid_pattern_fp_hold": 2,
       "device_fingerprint": 6,
-      "ble_local_name": 14,
+      "ble_local_name": 32,
       "ble_characteristic": 20,
       "product_family_codename": 156,
       "oversized_mac_range": 49,
@@ -62,8 +62,8 @@
       "procurement_only": 6,
       "self_exclude_oui": 0,
       "below_confidence_threshold": 49,
-      "excluded_source_type": 348,
-      "geographic_scope_mismatch": 75
+      "excluded_source_type": 352,
+      "geographic_scope_mismatch": 99
     },
     "ssid_pattern_emission": {
       "surviving_ssid_rows": 1,
@@ -446,6 +446,12 @@
       "argus_record_id": "1a12b495b1e624d6"
     },
     {
+      "pattern": "00:04:63",
+      "pattern_type": "oui",
+      "description": "Bosch Security Systems smart_home_hub",
+      "argus_record_id": "1a95006a14817e64"
+    },
+    {
       "pattern": "8c:22:d2",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -756,6 +762,12 @@
       "pattern_type": "ble_uuid",
       "description": "Fi (Barking Labs Corp) gps_tracker",
       "argus_record_id": "345707d2e292a3d4"
+    },
+    {
+      "pattern": "0000fd3d-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Woan Technology (Shenzhen) Co., Ltd. smart_lock",
+      "argus_record_id": "34d449fbc6d4b588"
     },
     {
       "pattern": "01ff5551-ba5e-f4ee-5ca1-eb1e5e4b1ce0",
@@ -2466,6 +2478,12 @@
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
       "argus_record_id": "cfd0cccaf1a19196"
+    },
+    {
+      "pattern": "0000fe24-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "August Home Inc smart_lock",
+      "argus_record_id": "d0232d5e13f058ac"
     },
     {
       "pattern": "1596F35",

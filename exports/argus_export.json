@@ -1,21 +1,21 @@
 {
   "_meta": {
     "argus_version": "35",
-    "exported_at": "2026-08-11T22:32:31Z",
-    "record_count": 983,
+    "exported_at": "2026-08-20T07:15:23Z",
+    "record_count": 1014,
     "confidence_threshold": 30,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "e7800776-ef11-515a-a16b-2540c68c6940",
-    "source_record_count": 43088,
+    "argus_run_id": "78b127fe-7dab-5d27-9c83-a93e8c80f46d",
+    "source_record_count": 43126,
     "dropped_in_export": {
-      "unknown_category": 33307,
+      "unknown_category": 33300,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 0,
-      "ssid_pattern_fp_hold": 1,
+      "ssid_pattern_fp_hold": 2,
       "device_fingerprint": 6,
-      "ble_local_name": 14,
+      "ble_local_name": 32,
       "ble_characteristic": 20,
       "product_family_codename": 156,
       "oversized_mac_range": 49,
@@ -66,9 +66,9 @@
       "geographic_scope_mismatch": 0
     },
     "ssid_pattern_emission": {
-      "surviving_ssid_rows": 24,
-      "substring_records": 34,
-      "split_expansions": 10,
+      "surviving_ssid_rows": 39,
+      "substring_records": 54,
+      "split_expansions": 15,
       "nocase_deduped": 0
     }
   },
@@ -170,6 +170,12 @@
       "argus_record_id": "0523969063b0126e"
     },
     {
+      "pattern": "simplisafe",
+      "pattern_type": "ssid_pattern",
+      "description": "SimpliSafe smart_home_hub",
+      "argus_record_id": "059cbd161c25c52e"
+    },
+    {
       "pattern": "edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
       "pattern_type": "ble_uuid",
       "description": "August smart_lock",
@@ -252,6 +258,12 @@
       "pattern_type": "oui",
       "description": "Sierra Wireless automotive_telematics",
       "argus_record_id": "08ba884cc4bbaa57"
+    },
+    {
+      "pattern": "watchguard",
+      "pattern_type": "ssid_pattern",
+      "description": "Motorola Solutions (WatchGuard) body_cam",
+      "argus_record_id": "08ff0e5d007ee93e"
     },
     {
       "pattern": "HDMiniCam",
@@ -686,6 +698,12 @@
       "argus_record_id": "16f810b92a2695b1"
     },
     {
+      "pattern": "e7a60000-6639-429f-94fd-86de8ea26897",
+      "pattern_type": "ble_uuid",
+      "description": "dormakaba smart_lock",
+      "argus_record_id": "1702512aa7d7fa72"
+    },
+    {
       "pattern": "57b4000d-2528-d6bc-b043-b49af0ec06c1",
       "pattern_type": "ble_uuid",
       "description": "Fi (Barking Labs Corp) gps_tracker",
@@ -782,6 +800,12 @@
       "argus_record_id": "1a4c7e6974f9b09a"
     },
     {
+      "pattern": "00:04:63",
+      "pattern_type": "oui",
+      "description": "Bosch Security Systems smart_home_hub",
+      "argus_record_id": "1a95006a14817e64"
+    },
+    {
       "pattern": "C4:2F:90",
       "pattern_type": "oui",
       "description": "Hikvision cctv_camera",
@@ -852,6 +876,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Zing Drone Solutions drone",
       "argus_record_id": "1c641dc6527e6368"
+    },
+    {
+      "pattern": "cellebrite",
+      "pattern_type": "ssid_pattern",
+      "description": "Cellebrite hacking_tool",
+      "argus_record_id": "1c6b7654a5daa6d2"
     },
     {
       "pattern": "4d050070-766c-42c4-8944-42bc98fc2d09",
@@ -1400,6 +1430,12 @@
       "argus_record_id": "34acd1c82fabb21e"
     },
     {
+      "pattern": "0000fd3d-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "Woan Technology (Shenzhen) Co., Ltd. smart_lock",
+      "argus_record_id": "34d449fbc6d4b588"
+    },
+    {
       "pattern": "1748CLTG9214910",
       "pattern_type": "drone_id_prefix",
       "description": "Autel Robotics drone",
@@ -1460,6 +1496,12 @@
       "argus_record_id": "36ccd84dab2f103b"
     },
     {
+      "pattern": "ufed",
+      "pattern_type": "ssid_pattern",
+      "description": "Cellebrite hacking_tool",
+      "argus_record_id": "36fdcc3dc511794b"
+    },
+    {
       "pattern": "4C:11:BF",
       "pattern_type": "oui",
       "description": "Dahua cctv_camera",
@@ -1494,6 +1536,12 @@
       "pattern_type": "oui",
       "description": "Reolink cctv_camera",
       "argus_record_id": "38c4f74ddde48c4b"
+    },
+    {
+      "pattern": "flock",
+      "pattern_type": "ssid_pattern",
+      "description": "Flock Safety alpr",
+      "argus_record_id": "38e079023241122f"
     },
     {
       "pattern": "1587A051000152S",
@@ -1542,6 +1590,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "SwellPro drone",
       "argus_record_id": "3b469cb8e2160fbe"
+    },
+    {
+      "pattern": "pineapple",
+      "pattern_type": "ssid_pattern",
+      "description": "Hak5 hacking_tool",
+      "argus_record_id": "3b4f190b259f3d06"
     },
     {
       "pattern": "1895BX7R000000",
@@ -1790,6 +1844,12 @@
       "argus_record_id": "4909d9d99eecd713"
     },
     {
+      "pattern": "king",
+      "pattern_type": "ssid_pattern",
+      "description": "L3Harris Technologies imsi_catcher",
+      "argus_record_id": "492b95b77d226c70"
+    },
+    {
       "pattern": "1871CCRDSE100",
       "pattern_type": "drone_id_prefix",
       "description": "Camflite drone",
@@ -1952,6 +2012,12 @@
       "argus_record_id": "4f0af62510035b6d"
     },
     {
+      "pattern": "0x0969",
+      "pattern_type": "ble_manufacturer_id",
+      "description": "Woan Technology (Shenzhen) Co., Ltd. smart_lock",
+      "argus_record_id": "5082f08a51bbc093"
+    },
+    {
       "pattern": "38:1d:14",
       "pattern_type": "oui",
       "description": "Skydio drone",
@@ -2088,6 +2154,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Blackswift Technologies drone",
       "argus_record_id": "540be52b9e8446d8"
+    },
+    {
+      "pattern": "eufy",
+      "pattern_type": "ssid_pattern",
+      "description": "Eufy/Anker cctv_camera",
+      "argus_record_id": "540ddda9d4e77681"
     },
     {
       "pattern": "84:9a:40",
@@ -2270,10 +2342,22 @@
       "argus_record_id": "5b57d950e08d5ae7"
     },
     {
+      "pattern": "wyze",
+      "pattern_type": "ssid_pattern",
+      "description": "Wyze cctv_camera",
+      "argus_record_id": "5b6f5fd20b72f7a2"
+    },
+    {
       "pattern": "1795F350ZS",
       "pattern_type": "drone_id_prefix",
       "description": "Zephyr Systems drone",
       "argus_record_id": "5b8b12afae01b312"
+    },
+    {
+      "pattern": "wifi",
+      "pattern_type": "ssid_pattern",
+      "description": "Hak5 hacking_tool",
+      "argus_record_id": "5b9ebde7e71e1805"
     },
     {
       "pattern": "e4:d5:8b",
@@ -2310,6 +2394,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Tofect drone",
       "argus_record_id": "5cc0a58aa405670e"
+    },
+    {
+      "pattern": "hak5",
+      "pattern_type": "ssid_pattern",
+      "description": "Hak5 hacking_tool",
+      "argus_record_id": "5d0b9b36519a4379"
     },
     {
       "pattern": "4d050091-766c-42c4-8944-42bc98fc2d09",
@@ -2516,6 +2606,12 @@
       "argus_record_id": "6788a0227b54e0ee"
     },
     {
+      "pattern": "0x01D1",
+      "pattern_type": "ble_manufacturer_id",
+      "description": "August Home, Inc smart_lock",
+      "argus_record_id": "67ab91dd10b0f604"
+    },
+    {
       "pattern": "1581F9DE",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -2634,6 +2730,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "SkySpecs drone",
       "argus_record_id": "6d294022d4dad810"
+    },
+    {
+      "pattern": "arlo",
+      "pattern_type": "ssid_pattern",
+      "description": "Arlo cctv_camera",
+      "argus_record_id": "6d7c30b49e5901f4"
     },
     {
       "pattern": "90:35:ea",
@@ -2886,6 +2988,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "A2Z drone",
       "argus_record_id": "781238de5a12ca12"
+    },
+    {
+      "pattern": "msab",
+      "pattern_type": "ssid_pattern",
+      "description": "MSAB hacking_tool",
+      "argus_record_id": "787d1c71f10fb651"
     },
     {
       "pattern": "2046DSKRXB003",
@@ -3248,6 +3356,12 @@
       "argus_record_id": "86a2f879e4a87d4a"
     },
     {
+      "pattern": "18:b4:30",
+      "pattern_type": "oui",
+      "description": "Nest Labs Inc. cctv_camera",
+      "argus_record_id": "8738269267470fe9"
+    },
+    {
       "pattern": "1900AT7000000",
       "pattern_type": "drone_id_prefix",
       "description": "Tucok drone",
@@ -3276,6 +3390,12 @@
       "pattern_type": "oui",
       "description": "Samsara automotive_telematics",
       "argus_record_id": "87fcd374188f2ba7"
+    },
+    {
+      "pattern": "00000d00-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "SwitchBot (Woan Technology) smart_lock",
+      "argus_record_id": "883ca6b30c6aea58"
     },
     {
       "pattern": "a4:11:62",
@@ -3884,6 +4004,12 @@
       "argus_record_id": "a090d3ed5ada4e98"
     },
     {
+      "pattern": "cba20d00-224d-11e6-9fb8-0002a5d5c51b",
+      "pattern_type": "ble_uuid",
+      "description": "SwitchBot (Woan Technology) smart_lock",
+      "argus_record_id": "a0ccf6bb4b74f551"
+    },
+    {
       "pattern": "00:0a:99",
       "pattern_type": "oui",
       "description": "CalAmp Wireless Networks Inc automotive_telematics",
@@ -3924,6 +4050,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Applied Aeronautics drone",
       "argus_record_id": "a22b218f37826650"
+    },
+    {
+      "pattern": "queen",
+      "pattern_type": "ssid_pattern",
+      "description": "L3Harris Technologies imsi_catcher",
+      "argus_record_id": "a24997fb186624ce"
     },
     {
       "pattern": "FS Ext Battery",
@@ -4212,6 +4344,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Censys Technologies drone",
       "argus_record_id": "aff35fce3b6875e1"
+    },
+    {
+      "pattern": "firstvu",
+      "pattern_type": "ssid_pattern",
+      "description": "Digital Ally body_cam",
+      "argus_record_id": "b07d31f8211b81e2"
     },
     {
       "pattern": "4d0500a2-766c-42c4-8944-42bc98fc2d09",
@@ -4706,6 +4844,12 @@
       "argus_record_id": "c91bc2f44736e7d3"
     },
     {
+      "pattern": "e7a60001-6639-429f-94fd-86de8ea26897",
+      "pattern_type": "ble_uuid",
+      "description": "dormakaba smart_lock",
+      "argus_record_id": "c9874217eaa14114"
+    },
+    {
       "pattern": "84:70:03",
       "pattern_type": "oui",
       "description": "Axon body_cam",
@@ -4844,6 +4988,18 @@
       "argus_record_id": "cfdb3f5717736a8b"
     },
     {
+      "pattern": "stingray",
+      "pattern_type": "ssid_pattern",
+      "description": "L3Harris Technologies imsi_catcher",
+      "argus_record_id": "cfe05f05b900c8a0"
+    },
+    {
+      "pattern": "0000fe24-0000-1000-8000-00805f9b34fb",
+      "pattern_type": "ble_uuid",
+      "description": "August Home Inc smart_lock",
+      "argus_record_id": "d0232d5e13f058ac"
+    },
+    {
       "pattern": "1596F35",
       "pattern_type": "drone_id_prefix",
       "description": "Dronetag drone",
@@ -4962,6 +5118,12 @@
       "pattern_type": "ble_uuid",
       "description": "Flock Safety gunshot_detect",
       "argus_record_id": "d3548b94fac0f910"
+    },
+    {
+      "pattern": "xry",
+      "pattern_type": "ssid_pattern",
+      "description": "MSAB hacking_tool",
+      "argus_record_id": "d379e0349467a3c4"
     },
     {
       "pattern": "16988ER0",
@@ -5096,6 +5258,12 @@
       "argus_record_id": "d8da682f601c59b5"
     },
     {
+      "pattern": "vivint",
+      "pattern_type": "ssid_pattern",
+      "description": "Vivint smart_home_hub",
+      "argus_record_id": "d8fc53bd44f68b2d"
+    },
+    {
       "pattern": "1787F12BM",
       "pattern_type": "drone_id_prefix",
       "description": "BlueMark drone",
@@ -5184,6 +5352,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "AgEagle (senseFly) drone",
       "argus_record_id": "dd37795a7f8ed41d"
+    },
+    {
+      "pattern": "digital",
+      "pattern_type": "ssid_pattern",
+      "description": "Digital Ally body_cam",
+      "argus_record_id": "dd4b789b29ce345d"
     },
     {
       "pattern": "84:db:2f",
@@ -5532,6 +5706,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Potensic drone",
       "argus_record_id": "e933a2c9fd8924ad"
+    },
+    {
+      "pattern": "64:16:66",
+      "pattern_type": "oui",
+      "description": "Nest Labs Inc. cctv_camera",
+      "argus_record_id": "e95a3769b292ccaa"
     },
     {
       "pattern": "1785C0000000010",
@@ -5904,6 +6084,12 @@
       "pattern_type": "ble_uuid",
       "description": "Kwikset smart_lock",
       "argus_record_id": "fd6fb74b78d73d22"
+    },
+    {
+      "pattern": "hail",
+      "pattern_type": "ssid_pattern",
+      "description": "L3Harris Technologies imsi_catcher",
+      "argus_record_id": "fdab9b483c140b60"
     },
     {
       "pattern": "6e04eae1-ed32-4fc6-8977-a882b581f021",
