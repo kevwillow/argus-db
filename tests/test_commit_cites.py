@@ -146,15 +146,32 @@ class TestStructuralGuard:
         failures = cc.assert_selector_covers_hits([], rigged, {"a"})
         assert any(f.startswith("C:") for f in failures)
 
+    # MAC-763 emptied REPAIR_EXCLUSIONS -- both carved trees stopped shipping. These
+    # two arms used to read the production dict, so an empty dict made the first
+    # unfirable and the second vacuously true. They inject their own carve-out now, so
+    # arm D keeps a real positive control no matter what the production config holds.
+    STALE = {"synthetic/stale-carve-out/": "fixture: matches no path, by design"}
+
     def test_arm_d_fires_on_stale_carve_out(self):
         """A carve-out matching nothing narrows nothing while looking like it does."""
-        failures = cc.assert_selector_covers_hits([], {}, {"some/other/path.md"})
+        failures = cc.assert_selector_covers_hits(
+            [], {}, {"some/other/path.md"}, exclusions=self.STALE
+        )
         assert any(f.startswith("D:") for f in failures)
 
     def test_arm_d_silent_when_carve_outs_all_match(self):
-        live_paths = {p + "x.md" for p in cc.REPAIR_EXCLUSIONS}
-        failures = cc.assert_selector_covers_hits([], {}, live_paths)
+        live_paths = {p + "x.md" for p in self.STALE}
+        failures = cc.assert_selector_covers_hits(
+            [], {}, live_paths, exclusions=self.STALE
+        )
         assert not any(f.startswith("D:") for f in failures)
+
+    def test_arm_d_still_reads_production_config_by_default(self):
+        """The injection point must not detach the guard from the real config."""
+        failures = cc.assert_selector_covers_hits([], {}, {"some/other/path.md"})
+        expected = [f"D: repair carve-out {p!r} matches no path in the full scope"
+                    for p in cc.REPAIR_EXCLUSIONS]
+        assert [f for f in failures if f.startswith("D:")] == expected
 
     def test_arm_a_tolerates_a_subject_only_line(self):
         """MAC-710 widened arm A. A ledger header citing a subject carries no sha, and
@@ -296,12 +313,24 @@ class TestCarveOutDisclosure:
     """MAC-710 deliverable 3 — a green gate must not read as full coverage."""
 
     def test_disclosure_names_every_carve_out_and_counts_what_it_holds(self):
-        hits = cc.grep_lines()
-        disc = cc.carve_out_disclosure(hits, set())
-        assert [r["prefix"] for r in disc["carve_outs"]] == list(cc.REPAIR_EXCLUSIONS)
+        # Injected fixture, not the production config: MAC-763 emptied the real dict,
+        # and a disclosure asserted against an empty config asserts nothing. The
+        # invariant under test -- names every carve-out, counts what it holds, hides
+        # what this scope does not report -- is unchanged.
+        carved = {"synthetic/carved/": "fixture: ratified prose, not repairable in place"}
+        hits = [
+            ("synthetic/carved/doc.md", 1, "landed at commit `0aa89a0` per the ledger"),  # dead-cite exemplar
+        ]
+        disc = cc.carve_out_disclosure(hits, set(), exclusions=carved)
+        assert [r["prefix"] for r in disc["carve_outs"]] == list(carved)
         assert disc["held"], "carve-outs hold nothing; the disclosure would be vacuous"
         # Nothing is reported in scope, so everything held is hidden from it.
         assert disc["hidden_from_this_scope"] == disc["held"]
+
+    def test_disclosure_matches_production_config(self):
+        """Default path still reflects the real config, empty or not."""
+        disc = cc.carve_out_disclosure(cc.grep_lines(), set())
+        assert [r["prefix"] for r in disc["carve_outs"]] == list(cc.REPAIR_EXCLUSIONS)
 
     def test_hidden_shrinks_when_the_scope_already_reports_it(self):
         """`hidden` is a set difference against what this scope shows, not a constant."""

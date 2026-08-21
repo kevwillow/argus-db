@@ -110,10 +110,20 @@ TIER_2 = (
     "docs/engineering/BIBLE_AMENDMENTS.md",
 )
 
-# Tier 3 (internal, not shipped with the release).
-TIER_3 = (
-    "docs/internal/PROJECT_STATE.md",
-    "docs/internal/PLANNED_AND_FUTURE_UPDATES.md",
+# Tier 3 is RETIRED as of MAC-763. It gated exactly two files, both under
+# ``docs/internal/``, and that tree is no longer tracked -- the board ruled
+# internal planning material out of the shipped release.
+#
+# Retired rather than emptied, because an empty tier is the dangerous shape:
+# ``_scan_file`` returns [] for a path that does not exist and ``main`` returns
+# 1 only ``if total``, so ``--tier 3`` printed rc=0 while opening nothing. A
+# gate that certifies prose it never read is worse than no gate. ``--tier 3``
+# now says so instead of printing green. To lint those files in a working
+# checkout that still has them on disk, name them: ``--files docs/internal/...``.
+TIER_3_RETIRED_NOTE = (
+    "tier 3 is retired: it gated docs/internal/, which is no longer tracked "
+    "(MAC-763). A green here would certify files this tree does not contain. "
+    "To scan them in a checkout that still has them, use --files."
 )
 
 # The four top-level stubs (DATA_DICTIONARY.md / METHODOLOGY.md /
@@ -379,9 +389,10 @@ def main(argv: list[str]) -> int:
     elif args.tier == "2":
         files = TIER_2
     elif args.tier == "3":
-        files = TIER_3
+        print(f"check_prose_dashes: {TIER_3_RETIRED_NOTE}", file=sys.stderr)
+        return 2
     else:
-        files = TIER_1 + TIER_2 + TIER_3
+        files = TIER_1 + TIER_2
 
     total = 0
     for rel in files:

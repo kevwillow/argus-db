@@ -147,3 +147,13 @@ _probe_log.md
 # not. Content of the removed files is preserved by sha256 in the sibling *_MANIFEST.md.
 extraction_outputs/**/shodan_raw/
 extraction_outputs/**/*_raw/
+
+# --- MAC-763: internal / planning material, excluded from the shipped tree ---
+# Board ruling on MAC-726 (2026-08-20): runbooks, dispatch briefs, ratification
+# proofs, attestations, session/wave notes and planning docs do not ship.
+# NOTE: the release gates formerly at operator_review/MAC-516 and MAC-532 were
+# relocated to scripts/ by this same commit -- they are PRODUCT verification and
+# must remain tracked. Do not re-add them here.
+operator_review/
+docs/internal/
+docs/_archive/redirect-stubs/

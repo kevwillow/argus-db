@@ -1,0 +1,103 @@
+id	verdict	reason
+43684	FP	NeuraLace "Axon Therapy System" — transcutaneous magnetic neuromodulation device
+43716	FP	Informatica Axon data-governance developer/administrator contract (same POC/POP family as 43826/43837/44319)
+43767	TP	Axon Enterprise CEW: "AXON X26P TASERS"
+43805	FP	Synthes/DePuy TI AXON(TM) orthopaedic implant instrument set
+43818	TP	Axon Enterprise body cameras, Pentagon Force Protection Agency, reseller M. C. DEAN
+43826	FP	Informatica Axon Data Governance annual subscription
+43835	TP	Axon Enterprise CEW: "AXON/TASER PRODUCTS FOR ERO"
+43837	FP	Informatica Axon Govern license
+43857	FP	Synthes TI AXON(TM) auxiliary screw set
+43883	FP	Synthes 3.5MM TI cancellous AXON(TM) screw
+43895	FP	Coherent AXON 920-1 TPC femtosecond laser
+43920	TP	"AXON CAMERA ASSEMBLY OFFLINE AXON" via defence reseller ADS — Axon Enterprise camera line (AMBIGUOUS-leaning-TP; no competing AXON camera product exists)
+43935	FP	Zeiss AxioImager microscope, NINDS — neuroscience "axon" context
+43936	FP	Synthes AXON(TM) instrument set
+43937	FP	Molecular Devices Axon GenePix 4300 microarray scanner
+43939	FP	Spirent Axon network analyzer kit
+43943	FP	Synthes 3.5MM TI AXON(TM) screw
+43949	TP	Axon Enterprise CEW: "AXON/TASER PRODUCTS FOR FPS"
+43980	FP	Coherent AXON 920-1 TPC femtosecond laser
+43982	FP	Ottobock Axon-Bus prosthetic system
+43990	TP	Axon Enterprise CEW: "AXON TASERS AND ACCESSORIES FOR 142 SFS OREGON AIR NATIONAL GUARD"
+43998	FP	Coherent AXON 920-1 TPC femtosecond laser
+44003	FP	6-ft "AXON" HDMI cables (commodity cable brand)
+44021	FP	Unity Tactical AXON LED light/remote-switch accessory
+44052	FP	Ottobock C-Leg / Axon prosthetic system
+44061	FP	Ottobock Axon tube adapter (2R19)
+44074	FP	Molecular Devices Axon GenePix 4100A scanner
+44092	FP	Axon Instruments MultiClamp 700B electrophysiology amplifier
+44102	TP	Axon Enterprise: "AXON BODY CAMERAS" via PRO-VISION SOLUTIONS
+44105	TP	Axon Enterprise CEW: "AXON/TASER PRODUCTS FOR HSI SPECIAL AGENTS"
+44110	FP	Axon Instruments microelectrode amplifier
+44115	FP	Axon Instruments Digidata + amplifier
+44135	FP	Medical Device Depot "Axon II" vascular/ABI diagnostic system
+44149	FP	Ottobock Axon tube adapter
+44153	TP	Axon Enterprise CEW: "AXON TASER 7 REPLACEMENTS AND ACCESSORIES"
+44182	FP	Axon Digital Design broadcast router IP (Utah Scientific)
+44199	FP	Unity Tactical AXON SYNC weapon-light remote switch
+44210	FP	Synthes 3.5MM TI cancellous AXON(TM) screw
+44213	TP	Axon Enterprise: "POLICE&SECURITY IN-CAR CAMERA RECORDING SYSTEM (AXON)" via CARAHSOFT
+44220	TP	Axon Enterprise CEW: "AXON TASER X2"
+44222	TP	Axon Enterprise: "AXON CAMERA ASSEMBLY"
+44226	FP	Mercury Systems AXON 3.0 PCIe carrier board
+44231	FP	"AXON GROUND ROBOT-CONTROL SYSTEM AND DRONE PARTS" — no Axon Enterprise ground-robot product (AMBIGUOUS-leaning-FP)
+44232	FP	Ottobock Axon tube adapter
+44234	FP	Ottobock Axon tube adapter
+44240	FP	Ottobock Axon-Bus prosthetic system (L7009/8K5000)
+44265	TP	Axon Enterprise: "AXON II BODY CAMERA" (Axon Body 2)
+44276	FP	Ottobock Axon tube adapter w/ torsion
+44277	FP	Ottobock Axon tube adapter for X3 knee
+44291	FP	Ottobock Axon tube adapter, C-Leg repair
+44294	FP	Synthes 3.5MM TI AXON(TM) shaft screw
+44298	TP	Axon Enterprise CEW: "ROMO AXON (TASER) ORDER"
+44299	FP	"AXON SKYHERO LIPO BATTERY FOR LOKI 2" — UAS battery, not Axon Enterprise (AMBIGUOUS-leaning-FP)
+44303	FP	Synthes 3.5MM TI cancellous AXON(TM) screw
+44307	TP	Axon Enterprise: "AXON BODY FLEX CAMERAS FOR NER SETT TEAM"
+44309	FP	Axon Instruments Digidata
+44315	FP	Synthes TI AXON(TM) locking screw stardrive
+44319	FP	Informatica Axon plugins / MS 2019 software refresh
+44322	TP	Axon Enterprise: "AXON X26/X26P TRAINING CARTRIDGES" via PROFORCE MARKETING
+44341	FP	Ottobock Axon tube adapter / Evanto prosthetic foot
+44343	FP	Synthes Synapse (AXON upgrade) spinal system
+44345	FP	Molecular Devices Axon Digidata 1550B
+44346	TP	Axon Enterprise CEW: "WICA FY23 AXON TASER X26P PURCHASE"
+44347	TP	Axon Enterprise CEW: "SUPPLIES, TAZER AXON 2 FOR NPS"
+44349	FP	Unity Tactical AXON XL weapon-light remote switch
+44356	FP	Ottobock Axon tube adapter & remote control
+44358	FP	Ottobock Axon tube adapter
+44362	TP	Axon Enterprise: "AXON TASER HOLSTERS", DC Superior Court
+44368	FP	Ottobock 2R19 Axon tube adapter
+44369	FP	Ottobock Axon tube replacement
+44370	FP	Ottobock Axon tube adaptor
+44375	FP	Ottobock 2R21 Axon tube adapter w/ torsion
+44376	TP	Axon Enterprise CEW: "ROMO FY23 AXON TASER X2"
+44389	FP	Ottobock 2R21 Axon tube adapter
+44390	FP	Ottobock Axon tube adapter
+44392	FP	Synthes 3.5MM TI AXON(TM) screw
+44393	FP	Ottobock Axon tube adapter / C-Leg charger
+44394	FP	Ottobock 2R21 Axon tube adapter w/ torsion
+44396	FP	Ottobock Axon tube adapter
+44397	FP	Unity Tactical AXON + Surefire crane laser
+44398	FP	Molecular Devices Axon Digidata 1550
+44399	FP	Axon Instruments Digidata system
+44402	FP	Ottobock Axon tube adapter microprocessor, prosthetic leg
+44422	TP	Axon Enterprise: "BLRI AXON FLEET 2 INSTALL - SOUTH" (Axon Fleet 2 in-car camera)
+44432	FP	Unity Tactical AXON RapidLock MOLLE mount
+44433	FP	Axon Instruments pCLAMP 10 license
+44434	FP	Axon Instruments pCLAMP 10 license
+44451	TP	Axon Enterprise CEW: "AXON TASERS X26P&ACCESSORIES FOR GRAND TETON NATIONAL PARK"
+44456	FP	Capsule Tech "Axon" medical device-data concentrator
+44466	FP	Unity Tactical AXON + Surefire crane laser
+44467	FP	Synthes 3.5MM TI cancellous AXON(TM) screw
+44472	FP	Molecular Devices Axon GenePix Pro 7
+44482	TP	Axon Enterprise CEW: "IGF AXON/TASER PURCHASE 2018 AND EQUIPMENT"
+44484	TP	Axon Enterprise CEW: "NPS LAW ENFORCEMENT - AXON/TASER PURCHASE"
+44498	TP	Axon Enterprise: "SUPPLY, TASER AXON BODY CAMERA FOR NPS"
+44499	FP	Axon Medical (Blackstone Medical) bone hemostasis — same entity as vendor-basis AXON MEDICAL INC
+44510	TP	Axon Enterprise CEW: "WRST/NO PMIS/AXON TASER"
+44525	TP	Axon Enterprise: "G:ESTAR, 2019 AXON CARTRIDGE ORDER" (CEW cartridges)
+44529	FP	"BARCODE SCANNER AXON CS-3300" — Axon-branded barcode scanner
+44546	TP	Axon Enterprise CEW: "AXON TASER X2"
+44628	TP	Axon Enterprise CEW: "AXON GUARD TASER"
+44633	FP	2004 foreign-awardee "AXON MAINT AGREEMENT" — predates the Axon Enterprise brand (TASER International until 2017) (AMBIGUOUS-leaning-FP)

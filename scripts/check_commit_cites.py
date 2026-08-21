@@ -185,10 +185,14 @@ FILED_EXCLUSIONS = ("operator_review/MAC-541",)
 # double-backticked (``6853780``) so the selector never matches it. Adding a carve-out
 # for a path the selector cannot reach is the stale-carve-out defect arm D exists to
 # catch — it was tried here first, and arm D rejected it.
-REPAIR_EXCLUSIONS = {
-    "docs/internal/": "append-only heartbeat log; ratified verbatim prose is not edited in place",
-    "operator_review/": "ratified operator artifacts; verbatim prose is not edited in place",
-}
+# MAC-763 untracked ``docs/internal/`` and ``operator_review/``, so the two
+# carve-outs that used to live here no longer match any shipped path. Arm D
+# fails a carve-out that matches nothing, which is exactly what it should do --
+# so the entries drop in the same commit as the removal rather than the guard
+# being loosened. Removing a carve-out makes this gate STRICTER, not blinder:
+# every cite still in the tree is now in full scope. Re-add an entry here only
+# alongside a path that actually ships.
+REPAIR_EXCLUSIONS: dict[str, str] = {}
 
 
 def _git(*args: str) -> str:
@@ -396,6 +400,7 @@ def assert_selector_covers_hits(
     all_paths: set[str],
     by_subject: dict[str, dict] | None = None,
     headers: list[tuple[str, int, str]] | None = None,
+    exclusions: dict[str, str] | None = None,
 ) -> list[str]:
     """Structural guard, per R9 — a post-condition, not an inspection note.
 
@@ -461,7 +466,12 @@ def assert_selector_covers_hits(
                 f"{entry['marked_sites']}/{len(entry['sites'])} sites carry a marker"
             )
 
-    for prefix in REPAIR_EXCLUSIONS:  # arm D
+    # MAC-763 emptied REPAIR_EXCLUSIONS (both carved trees stopped shipping). Arm D
+    # loops the production dict by default, so an empty dict would mean arm D can
+    # NEVER fire -- a guard that cannot fire is decoration, and the R7 selftest caught
+    # exactly that. ``exclusions`` lets the selftest and the tests arm this arm with a
+    # synthetic stale carve-out, so the control survives an empty production config.
+    for prefix in (REPAIR_EXCLUSIONS if exclusions is None else exclusions):  # arm D
         if not any(p.startswith(prefix) for p in all_paths):
             failures.append(f"D: repair carve-out {prefix!r} matches no path in the full scope")
 
@@ -743,6 +753,10 @@ def selftest() -> int:
             }
         },
         headers=[("synthetic/header.md", 1, "**Commit:** landed somewhere, no handle at all")],
+        # A carve-out that matches nothing is precisely what arm D exists to reject.
+        # Injected rather than borrowed from REPAIR_EXCLUSIONS so this control does not
+        # go vacuous whenever the production config is empty (MAC-763).
+        exclusions={"synthetic/stale-carve-out/": "R7 fixture: matches no path, by design"},
     )
     fired = {f.split(":", 1)[0] for f in mutated}
     want_arms = {"A", "B", "D", "E", "F"}
@@ -764,6 +778,7 @@ def selftest() -> int:
 def carve_out_disclosure(
     all_hits: list[tuple[str, int, str]],
     scope_broken: set[str],
+    exclusions: dict[str, str] | None = None,
 ) -> dict:
     """What the repair carve-outs are holding — computed once, printed under EVERY scope.
 
@@ -794,8 +809,12 @@ def carve_out_disclosure(
         if entry["status"] in SUBJECT_BROKEN:
             sites_of[key] = entry["sites"]
 
+    # Injectable for the same reason as arm D (MAC-763): the production config is now
+    # empty, and a disclosure test that can only read an empty config asserts nothing.
+    active = REPAIR_EXCLUSIONS if exclusions is None else exclusions
+
     rows = []
-    for prefix, reason in REPAIR_EXCLUSIONS.items():
+    for prefix, reason in active.items():
         inside = sorted(
             k for k, sites in sites_of.items() if any(s["path"].startswith(prefix) for s in sites)
         )
@@ -813,8 +832,11 @@ def carve_out_disclosure(
             }
         )
 
+    def _carved(path: str) -> bool:
+        return any(path.startswith(prefix) for prefix in active)
+
     held = sorted(
-        k for k, sites in sites_of.items() if any(in_repair_scope(s["path"]) for s in sites)
+        k for k, sites in sites_of.items() if any(_carved(s["path"]) for s in sites)
     )
     return {
         "carve_outs": rows,

@@ -1,0 +1,149 @@
+canonical_name	current_query_default	is_common_word	current_match_count	sample_fp_procurement_id	sample_fp_vendor	sample_fp_source_excerpt	recommended_action	reason
+ACTi	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Aaronia AG	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+AeroDefense	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Aerodome	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Allwinner	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Ambarella	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Amcrest	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Anduril Industries	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+AnyVision / Oosto	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Anyka	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Attenti	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Autel Robotics	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Axis Communications	visible	no	36	43606	PRESIDIO GOVERNMENT SOLUTIONS LLC	VARIOUS LENEL AND AXIS COMMUNICATIONS BRAND NAME PARTS	KEEP	not a common-word canonical; match count 36 is within expected proportion for this vendor
+Axon	visible	no	1014	43627	AXON ENTERPRISE, INC.	AWARD OF IDVRS-BODY WORN CAMERAS	REFINE	short single-token canonical (4 chars); boundary-matches 1014 rows, risk of re-contamination on next sweep
+BI Incorporated	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+BRINC	visible	no	4	44702	BRINC DRONES, INC	LEMUR II DRONE	KEEP	not a common-word canonical; match count 4 is within expected proportion for this vendor
+Berla	visible	no	209	44775	BERLA CORPORATION	IGF::OT::IGF VEHICLE&INFORTAINMENT SYSTEM FORENSICS	REFINE	short single-token canonical (5 chars); boundary-matches 209 rows, risk of re-contamination on next sweep
+Black Sage Technologies	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+BluePoint Alert	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Bosch Security Systems	visible	no	348	89649	BOSCH SECURITY SYSTEMS, INC.	SURVEILLANCE CAMERA | Department of Defense	KEEP	not a common-word canonical; match count 348 is within expected proportion for this vendor
+BriefCam	visible	no	24	45003	BRIEFCAM, INC.	IGF::OT::IGF FOR OTHER FUNCTIONS - BRIEFCAM LICENSES, MAINTENANCE AND TRAINING.	KEEP	not a common-word canonical; match count 24 is within expected proportion for this vendor
+Brivo	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+CACI SkyTracker	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Camero	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Candiru	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Cellebrite	visible	no	3294	45024	REDHAWK IT SOLUTIONS, LLC	PROCUREMENT OF CELLEBRITE  MOBILE FORENSICS SUITE	KEEP	not a common-word canonical; match count 3294 is within expected proportion for this vendor
+Cisco Meraki	visible	no	1	89577	CACI IDT, LLC	CISCO MERAKI VIDEO SURVEILLANCE CAMERAS | Department of Defense	KEEP	not a common-word canonical; match count 1 is within expected proportion for this vendor
+Citadel Defense	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Clearview AI	visible	no	32	47736	CLEARVIEW AI, INC.	THIS AWARD PROCURES FACIAL RECOGNITION SOFTWARE, WHICH SUPPORTS HOMELAND SECURITY INVESTIGATIONS WITH CAPABILITIES OF IDENTIFYING VICTIMS AND OFFENDERS IN CHILD SEXUAL EXPLOITATION CASES AND ASSAULTS 	KEEP	not a common-word canonical; match count 32 is within expected proportion for this vendor
+Coban Technologies	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Cognitec Systems	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Cognyte	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Compelson	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Cradlepoint	visible	no	425	47763	ATLANTIC DIVING SUPPLY, INC.	4559062216!TUCK19 CRADLEPOINT 1900 BASE CONFIG BATT	KEEP	not a common-word canonical; match count 425 is within expected proportion for this vendor
+Cytrox / Intellexa	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+D-Fend Solutions	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+DJI	visible	no	638	48233	PRI/DJI, A SERVICES JV	FACILITIES SUPPORT SERVICES	REFINE	short single-token canonical (3 chars); boundary-matches 638 rows, risk of re-contamination on next sweep
+Dahua	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+DataWorks Plus	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Dedrone	visible	no	24	43815	AXON ENTERPRISE, INC.	JCO DEMO 6 PRIZE MONEY-DEDRONE	KEEP	not a common-word canonical; match count 24 is within expected proportion for this vendor
+Detego	visible	no	1	45028	LEIDOS, INC.	S-20-1-4 DETEGO AND CELLEBRITE LICENSES	KEEP	not a common-word canonical; match count 1 is within expected proportion for this vendor
+Digital Ally	visible	no	3	89724	DIGITAL ALLY INC	VEHICLE SURVEILLANCE CAMERAS FOR LAW ENFORCEMENT. | Department of the Interior	KEEP	not a common-word canonical; match count 3 is within expected proportion for this vendor
+Digital Receiver Technology	visible	no	700	51415	DIGITAL RECEIVER TECHNOLOGY, INC.	FFP PROJECTS	KEEP	not a common-word canonical; match count 700 is within expected proportion for this vendor
+Digital Watchdog	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+DroneShield	visible	no	14	52101	DRONESHIELD LLC	CONTRACT AWARDED AT PITCH DAY EVENT FOR DRONE DETECTION AND DEFEAT CAPABILITIES	KEEP	not a common-word canonical; match count 14 is within expected proportion for this vendor
+Eagle Eye Networks	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Echodyne	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Elbit Systems of America	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Engility	visible	no	6319	52113	ENGILITY LLC		KEEP	not a common-word canonical; match count 6319 is within expected proportion for this vendor
+Epirus Inc.	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+FaceFirst	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Fleetio	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Flipper Devices Inc.	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Flock Safety	visible	no	4	58421	FLOCK GROUP INC	THE UNITED STATES PARK POLICE (USPP) HAS A REQUIREMENT TO ACQUIRE AND DEPLOY A FLOCK SAFETY AUTOMATED LICENSE PLATE READER (ALPR) SYSTEM IN THE GREATER WASHINGTON, DC METROPOLITAN AREA (WMA).	KEEP	not a common-word canonical; match count 4 is within expected proportion for this vendor
+Fortem Technologies	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Fullhan	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Gamma Group	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+General Atomics	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Genetec	visible	no	84	58423	COMSONICS, INC.	GENETEC AUTOVU LICENSE PLATE READERS	KEEP	not a common-word canonical; match count 84 is within expected proportion for this vendor
+GeoVision	visible	no	2	92598	CCTV CAMERA PROS, LLC	PRO- PCP16 GEOVISION CCTV DVR SYTEM | Department of Defense	KEEP	not a common-word canonical; match count 2 is within expected proportion for this vendor
+Geotab	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Getac	visible	no	1179	45401	CELLEBRITE INC	UFED 4PC ULTIMATE LAPTOP/TABLET GETAC S4	REFINE	short single-token canonical (5 chars); boundary-matches 1179 rows, risk of re-contamination on next sweep
+Goke Microelectronics	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+GrainMedia	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+HID Global	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Hacking Team / Memento Labs	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Hak5	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Hanwha Vision	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Harris	visible	no	3049	48349	L3HARRIS TECHNOLOGIES, INC.	COUNTRY DIRECTED, SOLE SOURCE PROCUREMENT OF HARRIS RADIOS AND SERVICES FOR THE COUNTRY OF DJIBOUTI; FMS: QE-B-UAB, ARP: EX19015.	REFINE	short single-token canonical (6 chars); boundary-matches 3049 rows, risk of re-contamination on next sweep
+HiSilicon	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Hidden Level Inc.	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Hikvision	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Honeywell	visible	no	2	58444	WARFEATHER, LLC	76 SWEG REQUIRES DESIGN, PURCHASE, AND INSTALLATION OF ONE (1) GENETEC ACCESS CONTROL SYSTEM (ACS), ONE (1) HONEYWELL INTRUSION DETECTION SYSTEMS (IDS), AND CLOSED-CIRCUIT TELEVISION (CCTV) IN ACCORDA	KEEP	not a common-word canonical; match count 2 is within expected proportion for this vendor
+Idemia	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Ingenic	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Jacobs	visible	no	2803	48362	JACOBS ENGINEERING GROUP INC.	DJIBOUTI - PE & QA SERVICES	REFINE	short single-token canonical (6 chars); boundary-matches 2803 rows, risk of re-contamination on next sweep
+Johnson Matthey PLC	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Kenwood	visible	no	799	64310	JVCKENWOOD USA CORPORATION	KENWOOD RADIO EQUIP ORDER.	KEEP	not a common-word canonical; match count 799 is within expected proportion for this vendor
+KeyW	visible	no	411	45097	THE KEYW CORPORATION	CELLEBRITE UFED 4PC ULTIMATE KIT ANNUAL	REFINE	short single-token canonical (4 chars); boundary-matches 411 rows, risk of re-contamination on next sweep
+L3Harris	visible	no	10383	48349	L3HARRIS TECHNOLOGIES, INC.	COUNTRY DIRECTED, SOLE SOURCE PROCUREMENT OF HARRIS RADIOS AND SERVICES FOR THE COUNTRY OF DJIBOUTI; FMS: QE-B-UAB, ARP: EX19015.	KEEP	not a common-word canonical; match count 10383 is within expected proportion for this vendor
+Lenel	visible	no	5	43500	STAR COMMUNICATION INC.	THE CONTRACTOR MUST PROVIDE 24/7 SUPPORT, MAINTENANCE AND REPAIRS TO THE EXISTING LENEL ONGUARD PACS AND AVIGILON VIDEO SURVEILLANCE (AVIGILON CCTV) SYSTEMS INSTALLED AT THE PITC.	KEEP	not a common-word canonical; match count 5 is within expected proportion for this vendor
+Liteye Systems	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Lockheed Martin	visible	no	2	58509	LOCKHEED MARTIN CORPORATION	2383 GETAC PROCURE AND STORE	KEEP	not a common-word canonical; match count 2 is within expected proportion for this vendor
+Lorex	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Lytx	visible	no	1	89821	LYTX, INC.	DRIVECAM FOR TAXICAB SURVEILLANCE CAMERA STUDY FOR DSR | Department of Health and Human Services	KEEP	not a common-word canonical; match count 1 is within expected proportion for this vendor
+MSAB	visible	no	8	44786	MSAB INCORPORATED	BERLA IVE TOOLKITS, LICENSES, AND TRAINING SERVICES	KEEP	not a common-word canonical; match count 8 is within expected proportion for this vendor
+Magnet Forensics	visible	no	595	75411	MAGNET FORENSICS, LLC	GRAYKEY LICENSES	KEEP	not a common-word canonical; match count 595 is within expected proportion for this vendor
+March Networks	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Milestone Systems	visible	no	8	93967	MILESTONE SYSTEMS, INC.	XPROTECT ENTERPRISE CAMERA SOFTWARE LICENSE | Department of Homeland Security	KEEP	not a common-word canonical; match count 8 is within expected proportion for this vendor
+Mobotix	visible	no	1	92537	MISCELLANEOUS FOREIGN AWARDEES	RSO REQUEST CCTV CAMERA MOBOTIX M24-IT | Department of State	KEEP	not a common-word canonical; match count 1 is within expected proportion for this vendor
+Motive	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Motorola Solutions	visible	no	9724	43494	MOTOROLA SOLUTIONS, INC.	AVIGILON SURVEILLANCE SYSTEM, YOKOTA AIR BASE, JAPAN	KEEP	not a common-word canonical; match count 9724 is within expected proportion for this vendor
+MyDefence Communications	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+NEC NeoFace	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+NIITEK	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+NSO Group	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Northrop Grumman	visible	no	51	48314	NORTHROP GRUMMAN SYSTEMS CORPORATION	UPGRADE OF FORCE PROTECTION FOR USNAVCENT CAMP LEMONIER, DJIBOUTI	KEEP	not a common-word canonical; match count 51 is within expected proportion for this vendor
+Novatek	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Omnitracs	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Openpath	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Oxygen Forensics	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+PIPS Technology	visible	no	1	92353	PIPS TECHNOLOGY, INC.	SLATE-LE-S POLICE ALPR PAGIS UNIT TO INCLUDE TWO (2) SLATE DUAL LENS CAMERAS W/INFRARED AND COLOR OVERVIEW; CABLING; GPS MODULE;SOFTWARE INSTALLED; BOSS MAP-SEE QUOTE FOR EXACT WORDING. | Department o	KEEP	not a common-word canonical; match count 1 is within expected proportion for this vendor
+Paravision	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Parrot	visible	no	228	85660	W S DARLEY & CO	4562365159!PARROT ANAFI USA MIL DRONE	REFINE	short single-token canonical (6 chars); boundary-matches 228 rows, risk of re-contamination on next sweep
+Pen-Link	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Persistent Surveillance Systems	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Polaris Wireless	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+QuaDream	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Qualcomm	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Rank One Computing	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Rekor	visible	no	91	85955	REKOR RECOGNITION SYSTEMS, INC.	ELECTRONIC CITATION SYSTEM	REFINE	short single-token canonical (5 chars); boundary-matches 91 rows, risk of re-contamination on next sweep
+Reolink	visible	no	1	93167	ADORAMA INC.	CODE 410B REOLINK 4K CC CAMERA (MICRO-PURCHASE) | Department of Defense	KEEP	not a common-word canonical; match count 1 is within expected proportion for this vendor
+Reveal	visible	yes	70	86058	REVEAL MEDIA USA INC	AWARD	DEMOTE_AND_REFINE	common English word (6 chars, single token); boundary-matches 70 procurement_records rows, including FPs unrelated to the registry vendor
+Rhombus Systems	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Robin Radar Systems	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Rockchip	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Rohde & Schwarz	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+SS8 Networks	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+STOP	visible	yes	11	48793	STOP ONE	CONSTRUCT MIDDLE SCHOOL IN DJIBIDIONE, SENEGAL.	DEMOTE_AND_REFINE	common English word (4 chars, single token); boundary-matches 11 procurement_records rows, including FPs unrelated to the registry vendor
+Samsara	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Sensofusion	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Sentinel Offender Services	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Septier	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Sierra Wireless	visible	no	96	47781	CDW GOVERNMENT LLC	IGF::CL::IGF TRIPP LITE 8-PORT CONSOLE SERVER BUILD-IN MODEM DUAL GBE NETGEAR 8 PORT GIGABIT ETHERNET UNMANAGED SWITCH SIERRA WIRELESS AIRLINK RAVEN RV50 - GATEWAY CRADLEPOINT COR IBR600 - WIRELESS RO	KEEP	not a common-word canonical; match count 96 is within expected proportion for this vendor
+SigmaStar	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Skydio	visible	no	691	86154	ATLANTIC DIVING SUPPLY, INC.	4569817368!SKYDIO X10D KIT  VT300Z	REFINE	short single-token canonical (6 chars); boundary-matches 691 rows, risk of re-contamination on next sweep
+SoundThinking	visible	no	24	86737	SOUNDTHINKING, INC.	BASE YEAR FOR NEW MULTI-YEAR CONTRACT (BASE + 4OPTION YEARS) FOR CONTINUANCE OF GUNSHOT DETECTION SERVICES IN SUPPORT OF PROJECT SAWTOOTH.	KEEP	not a common-word canonical; match count 24 is within expected proportion for this vendor
+Speco	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Swann	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+TCOM	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Teledyne FLIR	visible	no	4	89532	TELEDYNE FLIR DEFENSE, INC.	DAY/NIGHT THERMAL SURVEILLANCE CAMERAS FOR THE JORDAN BORDER SECURITY PROGRAM (JBSP), FMS CASE JO-B-YFJ. | Department of Defense	KEEP	not a common-word canonical; match count 4 is within expected proportion for this vendor
+Texas Instruments	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+TiaLinx	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Tiandy	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Track Group	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Trimble	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Trovicor	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Uniview	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Utility Inc	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Utimaco	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Verizon Connect	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Verkada	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+Vigilant Solutions	visible	no	63	81335	MOTOROLA SOLUTIONS, INC.	VIGILANT SOLUTIONS LICENSE PLATE READER	KEEP	not a common-word canonical; match count 63 is within expected proportion for this vendor
+Vivotek	visible	no	1	92673	CCTV CAMERA PROS, LLC	VIVOTEK CAMERAS PART NUMBER SD8313E | Department of Defense	KEEP	not a common-word canonical; match count 1 is within expected proportion for this vendor
+WatchGuard	visible	no	168	86813	CDW GOVERNMENT LLC	WATCHGUARD FIREBOX M440 W/ 3 YR LIVE SECURITY	KEEP	not a common-word canonical; match count 168 is within expected proportion for this vendor
+Wolfcom	visible	no	1	93013	WOLFCOM ENTERPRISES	POLICE BODY-WORN CAMERAS | Department of Defense	KEEP	not a common-word canonical; match count 1 is within expected proportion for this vendor
+Xiongmai (XM)	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor
+i-PRO	visible	no	0				KEEP	not a common-word canonical; match count 0 is within expected proportion for this vendor

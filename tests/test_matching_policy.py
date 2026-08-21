@@ -45,8 +45,8 @@ from db.matching_policy import (
 )
 
 REPO = Path(__file__).resolve().parents[1]
-T2_TSV = REPO / "operator_review/MAC-542/T2_query_default_demotion_proposal.tsv"
-ADJ_TSV = REPO / "operator_review/MAC-588/adjudication.tsv"
+T2_TSV = REPO / "tests/fixtures/t2/T2_query_default_demotion_proposal.tsv"
+ADJ_TSV = REPO / "tests/fixtures/t2/adjudication.tsv"
 DB = REPO / "db/argus.db"
 
 
@@ -766,7 +766,7 @@ def test_description_basis_drop_cohort_is_recomputed_and_reconciles():
     """
     if not DB.exists():
         pytest.skip("db/argus.db not present")
-    cohort = json.loads((REPO / "operator_review/MAC-588/cohort.json").read_text())
+    cohort = json.loads((REPO / "tests/fixtures/t2/cohort.json").read_text())
 
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row

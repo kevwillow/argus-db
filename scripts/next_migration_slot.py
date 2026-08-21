@@ -459,6 +459,19 @@ def print_ledger(releases):
 def report(slots, echoes, negatives, out_of_range, ceiling, fenced, releases, verbose=False):
     applied = sorted(s for s, i in slots.items() if i["state"] == "APPLIED")
     highest_file = max(applied)
+    # MAC-763 untracked ``operator_review/``, one of SCAN_DIRS. The headline answer
+    # (next free slot) is unaffected -- verified identical, 0063, in a scrubbed and an
+    # unscrubbed clone -- but ATTRIBUTION degrades silently at rc=0: honored slot
+    # releases drop 1 -> 0, and gaps 0047/0058 fall back from ``CLAIMED <owner>`` to
+    # ``CONTESTED unresolved``. Reclaiming a gap is meant to be a deliberate NAMED
+    # decision, so a reader must be told the tool can no longer name the holder rather
+    # than inferring the holder never existed. Disclose, do not fail: picking a slot in
+    # a fresh clone must keep working.
+    absent = [d for d in SCAN_DIRS if not (ROOT / d).exists()]
+    if absent:
+        print(f"scan scope INCOMPLETE  : {', '.join(absent)} not present in this tree; "
+              f"slot attribution below is partial -- a gap may read CONTESTED because its "
+              f"claiming document is not shipped, not because no one claimed it")
     print(f"highest file on disk : {highest_file:04d}")
     print(f"naive next (WRONG)   : {highest_file + 1:04d}   <- what `ls db/migrations/` tells you")
     print(f"mentions dropped     : {echoes} echo, {negatives} negative, "

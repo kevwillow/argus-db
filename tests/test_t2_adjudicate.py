@@ -13,7 +13,7 @@ from pathlib import Path
 
 # `operator_review/MAC-542/` is not a regular Python package (hyphens in path).
 # Add it to sys.path so the predicate module can be imported by name.
-_T2_DIR = Path(__file__).resolve().parents[1] / "operator_review" / "MAC-542"
+_T2_DIR = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(_T2_DIR))
 
 import t2_adjudicate  # noqa: E402
