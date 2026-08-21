@@ -1,6 +1,6 @@
 # MAC-403 — Cohort 3 EXTRACTION: Bluetooth tracker
 
-**Worker:** ExtractionWorker · **Phase:** extraction (STAGE ONLY — no DB write, no ingest, no push) · **Parent:** [MAC-393](/MAC/issues/MAC-393) · **Upstream:** harvest [MAC-396](/MAC/issues/MAC-396) (CTO-ratified)
+**Worker:** ExtractionWorker · **Phase:** extraction (STAGE ONLY — no DB write, no ingest, no push) · **Parent:** [MAC-393](<TRACKER_URL>issues/MAC-393) · **Upstream:** harvest [MAC-396](<TRACKER_URL>issues/MAC-396) (CTO-ratified)
 **Module:** `db/sources/cohort3_bletracker.py` · **Tests:** `tests/test_cohort3_bletracker.py` (12 passed) · **Output:** `extraction_outputs/mac393_c3_bletracker/candidates.json`
 
 ---
@@ -48,7 +48,7 @@ Both APKs fetched via apkcombo→pureapk (Cloudflare-gated; headless-chromium re
 
 ## 5. Export-meaningfulness (carry to ship gate)
 
-`bluetooth_tracker` is an **exported** category (wave-1 MAC-387/388). A promoted Pebblebee `0xFA25` row **WOULD reach the Lynceus feed** → ingest+regen is a **CEO one-way door** (mirrors cohort-1 [MAC-373](/MAC/issues/MAC-373)). Single new exported row.
+`bluetooth_tracker` is an **exported** category (wave-1 MAC-387/388). A promoted Pebblebee `0xFA25` row **WOULD reach the Lynceus feed** → ingest+regen is a **CEO one-way door** (mirrors cohort-1 [MAC-373](<TRACKER_URL>issues/MAC-373)). Single new exported row.
 
 ## 6. Handback
 

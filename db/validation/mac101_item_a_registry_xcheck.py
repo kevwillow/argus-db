@@ -1,6 +1,6 @@
 """MAC-101 Item A — multi-registry positive-evidence xcheck for Class B clearance.
 
-Per CEO ratification (option β) at MAC-102 [`ad5a564d`](/MAC/issues/MAC-102#comment-ad5a564d)
+Per CEO ratification (option β) at MAC-102 [`ad5a564d`](<TRACKER_URL>issues/MAC-102#comment-ad5a564d)
 2026-05-14: re-triage the 75 ``individual_attributed_pii_sustain`` Class B
 ``raw_observations`` rows against ``manufacturers`` (§2.1 lexicon) +
 ``fcc_grantees.grantee_name`` (50,153 rows) for corporate-entity

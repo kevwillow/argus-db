@@ -18,7 +18,7 @@ Format: JSON. Manifest carries `regions: [...]` list of `{lat}/{lon}` keys
         wikimedia_commons.
 
 Discovery & Path B (CDN) rationale (MAC-6 ratification, comment
-[ed4a5465-…](/MAC/issues/MAC-6#comment-ed4a5465)):
+[ed4a5465-…](<TRACKER_URL>issues/MAC-6#comment-ed4a5465)):
 
   * Path A (`deflock.org/api/`) is dead under §11 #6 — robots.txt
     `User-agent: * / Disallow: /api/`.

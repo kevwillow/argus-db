@@ -10,7 +10,7 @@ First-time readers should start with [`../USER_GUIDE.md`](../USER_GUIDE.md) for 
 
 ---
 
-This file is the audit trail for every in-place edit to `PROJECT_BIBLE.md`. Per user instruction (MAC-1 comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36) on 2026-05-04):
+This file is the audit trail for every in-place edit to `PROJECT_BIBLE.md`. Per user instruction (MAC-1 comment [5d75988d](<TRACKER_URL>issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36) on 2026-05-04):
 
 - Every in-place bible edit pairs with an amendment-log entry.
 - Sub-agent-level rule additions and interpretive guidance also go here, even when they do not modify the bible text itself.
@@ -22,9 +22,9 @@ The bible itself is the contract; this file is the changelog.
 
 ### Citing a commit in this ledger
 
-*Measured and applied at [MAC-704](/MAC/issues/MAC-704), 2026-08-11. **RATIFIED by CEO at
-[MAC-704](/MAC/issues/MAC-704), 2026-08-11**, with the uniqueness boundary added and
-enforced at [MAC-710](/MAC/issues/MAC-710) — see the note at the end.*
+*Measured and applied at [MAC-704](<TRACKER_URL>issues/MAC-704), 2026-08-11. **RATIFIED by CEO at
+[MAC-704](<TRACKER_URL>issues/MAC-704), 2026-08-11**, with the uniqueness boundary added and
+enforced at [MAC-710](<TRACKER_URL>issues/MAC-710) — see the note at the end.*
 
 A commit sha is a coordinate into the object graph, and the object graph is not stable.
 This repository's pre-v1.0.0 history was rewritten, and every sha minted before that
@@ -45,7 +45,7 @@ So, for an entry in this ledger:
 
 - **Always** record the commit subject. That is the retrievable half.
 - **A subject is a valid handle only when it resolves to exactly one commit.** This is
-  the boundary added at [MAC-710](/MAC/issues/MAC-710), and it cuts both ways: zero
+  the boundary added at [MAC-710](<TRACKER_URL>issues/MAC-710), and it cuts both ways: zero
   matches is a rotted anchor, and **two or more is an ambiguous one, which fails on the
   same footing**. The reason to prefer a subject over a sha is that a reader can
   *retrieve* the commit from it; a subject naming three commits retrieves none of them,
@@ -60,9 +60,9 @@ So, for an entry in this ledger:
 Gate: `python3 scripts/check_commit_cites.py`. Companion gate for generated export
 artifacts: `scripts/check_export_commit_cites.py` (MAC-703).
 
-**RATIFIED by CEO at [MAC-704](/MAC/issues/MAC-704), 2026-08-11.** The sha bullet softens
+**RATIFIED by CEO at [MAC-704](<TRACKER_URL>issues/MAC-704), 2026-08-11.** The sha bullet softens
 *"Each amendment entry must link the git commit that applied the change"*, which is a
-standing user instruction from MAC-1 comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36).
+standing user instruction from MAC-1 comment [5d75988d](<TRACKER_URL>issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36).
 The six repairs applied at MAC-704 are inside that instruction's intent — a subject line
 still links the commit, and links it retrievably, where the sha it replaced linked
 nothing.
@@ -71,7 +71,7 @@ nothing.
 *proposed* and the CEO found the reason while ratifying it: the gate had no arm that read
 a subject at all, so the ledger's six most-read entries carried a handle nothing checked.
 A rule marked ratified with nothing enforcing it is the same defect one level up — it
-reads as covered and is not. [MAC-710](/MAC/issues/MAC-710) built the arm, and this marker
+reads as covered and is not. [MAC-710](<TRACKER_URL>issues/MAC-710) built the arm, and this marker
 lands in the commit that lands it. Three consequences a later reader should not have to
 rediscover:
 
@@ -93,8 +93,8 @@ rediscover:
 
 **Date:** 2026-05-04
 **Commit:** subject `docs(bible): correction pass — Talos export schema, severity mapping, false-positive guards` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
-**Source:** MAC-1 user comment [ab234b68](/MAC/issues/MAC-1#comment-ab234b68-9876-4ee9-9eb4-f2d9c3d0a7d8)
-**Status:** Acknowledged and approved by user in MAC-1 comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36)
+**Source:** MAC-1 user comment [ab234b68](<TRACKER_URL>issues/MAC-1#comment-ab234b68-9876-4ee9-9eb4-f2d9c3d0a7d8)
+**Status:** Acknowledged and approved by user in MAC-1 comment [5d75988d](<TRACKER_URL>issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36)
 
 ### Corrections applied
 
@@ -129,7 +129,7 @@ New open question added by Correction 8 review:
 
 **Date:** 2026-05-04
 **Commit:** subject `docs(bible): fill §11 #11 placeholder — bible amendment log discipline` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
-**Source:** MAC-1 user comment [f08cd82b](/MAC/issues/MAC-1#comment-f08cd82b-747e-4b34-aa6a-11bbfd0cc067) decision #4
+**Source:** MAC-1 user comment [f08cd82b](<TRACKER_URL>issues/MAC-1#comment-f08cd82b-747e-4b34-aa6a-11bbfd0cc067) decision #4
 **Status:** Applied as a normal in-place edit; logged here per §11 #11 (now self-binding).
 
 ### Correction applied
@@ -154,7 +154,7 @@ None. §12 unchanged.
 
 **Date:** 2026-05-04
 **Commit:** subject `docs(bible): correction pass 3 — §2.1 in-vehicle LTE/WiFi routers + §12 device_cluster_id` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
-**Source:** MAC-1 user comment [d08ee4a8](/MAC/issues/MAC-1#comment-d08ee4a8-e525-4c19-9886-89f0f95bf1c3)
+**Source:** MAC-1 user comment [d08ee4a8](<TRACKER_URL>issues/MAC-1#comment-d08ee4a8-e525-4c19-9886-89f0f95bf1c3)
 **Status:** Approved by user in the same comment ("Approved as Correction Pass 3"). Bible edit applied; manufacturers seed updated (32 → 34); device_cluster_id question added to §12; research leads logged in PROJECT_STATE.md per same comment.
 
 ### Corrections applied
@@ -205,7 +205,7 @@ DBArchitect's MAC-2 comments referencing old §2.1 # numbering are immutable run
 
 **Date:** 2026-05-04
 **Commit:** subject `docs(bible): correction pass 4 — §4.2 deployment_observations supporting-table addition` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
-**Source:** [MAC-5](/MAC/issues/MAC-5) SourceWorker schema-fit proposal comment [1037c17e](/MAC/issues/MAC-5#comment-1037c17e-48f4-4ab9-9df7-466af011dbbe); CEO ratification this heartbeat.
+**Source:** [MAC-5](<TRACKER_URL>issues/MAC-5) SourceWorker schema-fit proposal comment [1037c17e](<TRACKER_URL>issues/MAC-5#comment-1037c17e-48f4-4ab9-9df7-466af011dbbe); CEO ratification this heartbeat.
 **Status:** Bible §4.2 edit applied this commit. Migration `db/migrations/0002_deployment_observations.sql` to be authored by SourceWorker on resume; the bible-at-HEAD is the authoritative shape the migration must match.
 
 ### Correction applied
@@ -256,7 +256,7 @@ These are routine §8.2 / §11 #3 / §7.2 applications, not bible edits — so t
 
 **Date:** 2026-05-04
 **Commit:** subject `docs(bible): correction pass 5 — §4.1 in_vehicle_router + §4.5 severity + §4.2 procurement_records doc + §12 geographic_scope` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
-**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [a7edae6f](/MAC/issues/MAC-1#comment-a7edae6f-6c7a-493e-82f2-fa088942a1a9) (Checkpoint 2 sign-off + Phase 3 dispatch decisions)
+**Source:** [MAC-1](<TRACKER_URL>issues/MAC-1) user comment [a7edae6f](<TRACKER_URL>issues/MAC-1#comment-a7edae6f-6c7a-493e-82f2-fa088942a1a9) (Checkpoint 2 sign-off + Phase 3 dispatch decisions)
 **Status:** Bible edits applied this commit; SAR-3 (separate entry below) ratifies the `device_cluster_id` lean as binding-but-not-final.
 
 ### Corrections applied
@@ -300,7 +300,7 @@ The board explicitly framed all four items as a single "bible-tidy ride-along" l
 
 **Date:** 2026-05-04
 **Commit:** subject `docs(bible): correction pass 6 — §4.2 add fcc_grantees + stale-mirror handling pattern (MAC-7)` (pre-v1.0.0 sha dropped at MAC-704 — see *Citing a commit in this ledger*)
-**Source:** [MAC-7](/MAC/issues/MAC-7) Step-2 ratification + Step-2 ingest delivery [comment 094eae0a](/MAC/issues/MAC-7#comment-094eae0a-701e-4925-97c7-11493a2af60e). CP6 ride-along reservation was made at Step-2 ratification (CEO-owned, lands at MAC-7 close per the dispatch contract).
+**Source:** [MAC-7](<TRACKER_URL>issues/MAC-7) Step-2 ratification + Step-2 ingest delivery [comment 094eae0a](<TRACKER_URL>issues/MAC-7#comment-094eae0a-701e-4925-97c7-11493a2af60e). CP6 ride-along reservation was made at Step-2 ratification (CEO-owned, lands at MAC-7 close per the dispatch contract).
 **Status:** Bible edit applied this commit. Two operational ratifications (§11 #3 corporate-comms read for FCC `contact_name`; staleness-ceiling notes-shape pattern) bundle as ride-along context inside this CP entry — NOT separate SARs (per the MAC-5 codification: routine §11 #3 / §7.2 / §8.2 applications inside a Correction Pass don't need SAR numbering).
 
 ### Corrections applied
@@ -334,7 +334,7 @@ CP6 derives from a single source-ingest delivery (MAC-7 Step 2) with one new sta
 
 ### Out-of-bible artifact updates that pair with this pass
 
-- **`db/migrations/0003_fcc_grantees.sql`** — applied at MAC-7 Step 2; 12 columns + UNIQUE backstop + 4 indexes. The migration shape was approved at Step 2 ratification ([comment 0e95c40a](/MAC/issues/MAC-7#comment-0e95c40a-54fd-4690-b582-e3892cfa8450)).
+- **`db/migrations/0003_fcc_grantees.sql`** — applied at MAC-7 Step 2; 12 columns + UNIQUE backstop + 4 indexes. The migration shape was approved at Step 2 ratification ([comment 0e95c40a](<TRACKER_URL>issues/MAC-7#comment-0e95c40a-54fd-4690-b582-e3892cfa8450)).
 - **`db/sources/fcc_id.py`** — applied at MAC-7 Step 2; mirrors `eff_atlas.py` shape; uses `--raw-subdir` flag for no-re-fetch idempotency replay (MAC-5/MAC-6 precedent).
 - **`PROJECT_STATE.md`** — flipped to reflect MAC-7 Step 2 closed + MAC-8 SAM.gov queued; CP6 entry logged in the bible-amendments status section; CP5's deferred-migration reference renumber noted (was `0003_*.sql`, now `0004_*.sql`).
 
@@ -347,7 +347,7 @@ This section captures rules that bind sub-agents but do not edit the bible text.
 ### SAR-1 — §7.3 LAA-bit examples are illustrative, not exhaustive
 
 **Date:** 2026-05-04
-**Source:** MAC-1 user comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36)
+**Source:** MAC-1 user comment [5d75988d](<TRACKER_URL>issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36)
 **Bible commit:** none (no edit required)
 **Binds:** Extraction Worker (§7.3), Validator (§7.4), DB Architect when wiring fake-MAC checks
 
@@ -363,7 +363,7 @@ Any first-octet value where `(octet & 0x02) != 0` is locally-administered (e.g. 
 ### SAR-2 — Talos `argus_record_id` upsert semantics: human's lean is upsert
 
 **Date:** 2026-05-04
-**Source:** MAC-1 user comment [5d75988d](/MAC/issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36)
+**Source:** MAC-1 user comment [5d75988d](<TRACKER_URL>issues/MAC-1#comment-5d75988d-c267-4e0d-982c-0007a6f2fa36)
 **Bible commit:** none (no edit; tracked in §12 already)
 **Binds:** DB Architect (when designing `argus_record_id` stability), future Export Worker, downstream Talos design
 
@@ -376,7 +376,7 @@ The user's stated lean for the open question on Talos v0.2 upsert semantics is *
 ### SAR-3 — `device_cluster_id` lean is scanner-side: Argus identifies, Talos correlates
 
 **Date:** 2026-05-04
-**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [a7edae6f](/MAC/issues/MAC-1#comment-a7edae6f-6c7a-493e-82f2-fa088942a1a9) (Checkpoint 2 sign-off, decision #3 second bullet)
+**Source:** [MAC-1](<TRACKER_URL>issues/MAC-1) user comment [a7edae6f](<TRACKER_URL>issues/MAC-1#comment-a7edae6f-6c7a-493e-82f2-fa088942a1a9) (Checkpoint 2 sign-off, decision #3 second bullet)
 **Bible commit:** paired with CP5 (no §12 edit — the question stays open per the user's "lean = scanner-side, but holding for explicit Phase 5 close" framing)
 **Binds:** future Export Worker (when hired for Phase 5), DBArchitect (when designing the export shape and any cluster-correlation join), Phase 5 export design generally
 
@@ -392,7 +392,7 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
 ### SAR-4 — §11 #6 robots.txt routing rule: legitimate alternatives only, never ignore
 
 **Date:** 2026-05-04
-**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [ae94e4eb](/MAC/issues/MAC-1#comment-ae94e4eb-e56e-4d2e-9141-2171b438ae0a)
+**Source:** [MAC-1](<TRACKER_URL>issues/MAC-1) user comment [ae94e4eb](<TRACKER_URL>issues/MAC-1#comment-ae94e4eb-e56e-4d2e-9141-2171b438ae0a)
 **Bible commit:** none (codifies the §11 #6 application standard for source discovery; no §11 text edit needed — the hard rule already exists, this entry binds the implementation pattern)
 **Binds:** Source Worker (during source discovery + Step-1 ratification proposal), DBArchitect (when designing source-discovery flow or evaluating new endpoints), future Extraction Worker (when discovering supplementary sources), CEO (when ratifying source-fit proposals that mention robots.txt friction)
 
@@ -408,14 +408,14 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
 
 **Application precedent recorded:** MAC-6 DeFlock — `deflock.org/robots.txt` carries `Disallow: /api/` for `User-agent: *`; SourceWorker chose Path B (`cdn.deflock.me`, the DeFlock-published frontend's own CDN host) over Path A (`deflock.org/api/`, blocked); CEO ratified at 2026-05-04T~05:38Z; Phase 2 source 4/4 staged 101,597 deployment records under this rule. SAR-4 codifies the implementation pattern that worked.
 
-### SAR-5 — [MAC-11](/MAC/issues/MAC-11) council-minutes scope discipline: format-fit cap, not jurisdiction-count cap
+### SAR-5 — [MAC-11](<TRACKER_URL>issues/MAC-11) council-minutes scope discipline: format-fit cap, not jurisdiction-count cap
 
 **Date:** 2026-05-04
-**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [1c5831f3](/MAC/issues/MAC-1#comment-1c5831f3-a673-4da2-a449-f3a47683a68a)
+**Source:** [MAC-1](<TRACKER_URL>issues/MAC-1) user comment [1c5831f3](<TRACKER_URL>issues/MAC-1#comment-1c5831f3-a673-4da2-a449-f3a47683a68a)
 **Bible commit:** none (no §6 / §7.2 / §11 edit; binds the implementation pattern for the MAC-11 dispatch + Step-1 ratification + Step-2 ingest). Codified at user direction ("Codify the revised scope as a SAR before `MAC-11` dispatch.")
 **Binds:** Source Worker (MAC-11 source discovery, Step-1 ratification proposal, Step-2 ingest), CEO (when ratifying Step-1 proposal and Step-2 delivery)
 
-**The rule (board-stated, paraphrased decision-bearing language verbatim).** For [MAC-11](/MAC/issues/MAC-11) (city/county council minutes + municipal procurement portals — Phase 3 source 4/4), the scope discipline is **format-fit, not jurisdiction-count**. The earlier "top-10 jurisdiction cap" framing is rescinded ("that was overcautious on my part"). The 10-jurisdiction list below is a **starting batch**, not a ceiling.
+**The rule (board-stated, paraphrased decision-bearing language verbatim).** For [MAC-11](<TRACKER_URL>issues/MAC-11) (city/county council minutes + municipal procurement portals — Phase 3 source 4/4), the scope discipline is **format-fit, not jurisdiction-count**. The earlier "top-10 jurisdiction cap" framing is rescinded ("that was overcautious on my part"). The 10-jurisdiction list below is a **starting batch**, not a ceiling.
 
 **How to apply:**
 
@@ -436,26 +436,26 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
 2. **Format restriction is the real cap.** Structured procurement portals and machine-readable agendas only. If a jurisdiction's data is PDF-locked or requires OCR/LLM extraction, **stop and relocate that jurisdiction to Phase 4** (LLM extraction worker). Do not invent in-Phase-3 OCR pipelines for individual jurisdictions.
    - **Why:** Phase 3 owns structured public-data ingest. PDF / OCR / LLM extraction is the Phase-4 pattern per §6 and the Phase-4 worker is designed for it. Forcing PDF mining inside Phase 3 erodes the structural distinction between phases and inflates the per-jurisdiction effort budget past calibration.
 
-3. **Vendor sweep restriction.** Use the existing 24-vendor target list from [MAC-8](/MAC/issues/MAC-8) (Group A + Group B union, including the 16 [MAC-7](/MAC/issues/MAC-7)-gap vendors). Do **not** run open-ended `"ALPR"` / `"surveillance"` / similar generic keyword queries against jurisdiction portals.
-   - **Why:** Argus is a vendor-attribution database, not a generic surveillance-mention database. Vendor-name keyword discipline has held since [MAC-3](/MAC/issues/MAC-3) and stays binding here.
+3. **Vendor sweep restriction.** Use the existing 24-vendor target list from [MAC-8](<TRACKER_URL>issues/MAC-8) (Group A + Group B union, including the 16 [MAC-7](<TRACKER_URL>issues/MAC-7)-gap vendors). Do **not** run open-ended `"ALPR"` / `"surveillance"` / similar generic keyword queries against jurisdiction portals.
+   - **Why:** Argus is a vendor-attribution database, not a generic surveillance-mention database. Vendor-name keyword discipline has held since [MAC-3](<TRACKER_URL>issues/MAC-3) and stays binding here.
 
 4. **Per-jurisdiction effort stop rule (worker-defined, ratified at Step 1).** The Source Worker MUST propose a concrete per-jurisdiction extraction-effort budget in the Step-1 ratification proposal (units worker-chosen — e.g., HTTP-call count, wall-clock minutes, parser-line count, retries, page-cap, or a composite). The CEO ratifies the budget at Step-1. Once Step-2 begins, if a jurisdiction's structured-data extraction exceeds the ratified budget, **stop, log the partial state in `extraction_runs.notes`, and move on**. The effort/yield ratio is the cap, not raw row count.
    - **Why:** A small town with one record at low extraction cost is fine; a mid-size city requiring custom per-page parsing is not. Yield-per-effort is the load-bearing fitness signal. Worker-defined budget keeps the cap calibrated to actual jurisdiction data shapes the worker discovers, rather than CEO-guessed numbers ahead of discovery.
 
-5. **No PII surfacing — §11 #3 same posture as [MAC-5](/MAC/issues/MAC-5).** Aggressive person-regex redaction. Log redaction sites in `extraction_runs.notes` (count + site descriptors, never raw redacted strings). Raw artifacts preserved per §7.2 audit trail. The §11 #3 corporate-comms read carved out at [MAC-7](/MAC/issues/MAC-7) for FCC `contact_name` does **not** apply here — council minutes name elected officials, contracting officers, citizen commenters, and police-department personnel, all squarely inside §11 #3's worked-example shape ("officer's name, badge, home address"). Default-to-redact, not stage-as-is.
+5. **No PII surfacing — §11 #3 same posture as [MAC-5](<TRACKER_URL>issues/MAC-5).** Aggressive person-regex redaction. Log redaction sites in `extraction_runs.notes` (count + site descriptors, never raw redacted strings). Raw artifacts preserved per §7.2 audit trail. The §11 #3 corporate-comms read carved out at [MAC-7](<TRACKER_URL>issues/MAC-7) for FCC `contact_name` does **not** apply here — council minutes name elected officials, contracting officers, citizen commenters, and police-department personnel, all squarely inside §11 #3's worked-example shape ("officer's name, badge, home address"). Default-to-redact, not stage-as-is.
    - **Why:** Council minutes mix structured procurement metadata with unstructured public-comment narrative; the §11 #3 surveillance-target framing applies. The recall-first redaction posture from MAC-5 ("redact even at FP cost when source can carry PII") is the calibrated choice, not the zero-PII whitelist posture from MAC-6 (which presumed a PII-excluding source schema) or the corporate-comms carve-out from MAC-7 (which presumed a federal-regulatory disclosure surface).
 
 6. **Discovery approach (worker-proposed at Step-1).** The Source Worker MUST propose a strategy in the Step-1 ratification proposal for *finding* US jurisdictions with structured procurement portals or machine-readable agendas beyond the top-10 starting batch. Concrete starting points the board named: USA.gov state and local government directory, Munirevs, Granicus, OpenGov, or whatever directory infrastructure the worker discovers. Do **not** attempt to enumerate every US municipality manually.
    - **Why:** A "find every US municipality with a structured portal" enumeration is multiplicatively expensive and brittle. Directory-driven discovery (vendor-of-vendors infrastructure like Granicus / OpenGov / Munirevs) lets one HTTP call return many qualifying jurisdictions. The worker proposes the discovery approach because they will be the one running it; CEO ratifies it.
 
-**Application timing.** SAR-5 binds at **MAC-11 dispatch** (the council-minutes / municipal-procurement source). It does NOT bind [MAC-10](/MAC/issues/MAC-10) (DeFlock vendor-attribution backfill — derivation against existing `procurement_records` reseller chains, no jurisdiction-portal scraping). Sequence per board direction at [comment 1c5831f3](/MAC/issues/MAC-1#comment-1c5831f3-a673-4da2-a449-f3a47683a68a): [MAC-9](/MAC/issues/MAC-9) (WiGLE Step-0 budget, `in_progress`) continues in parallel; [MAC-10](/MAC/issues/MAC-10) (easy win) → [MAC-11](/MAC/issues/MAC-11) (council minutes, this SAR binds).
+**Application timing.** SAR-5 binds at **MAC-11 dispatch** (the council-minutes / municipal-procurement source). It does NOT bind [MAC-10](<TRACKER_URL>issues/MAC-10) (DeFlock vendor-attribution backfill — derivation against existing `procurement_records` reseller chains, no jurisdiction-portal scraping). Sequence per board direction at [comment 1c5831f3](<TRACKER_URL>issues/MAC-1#comment-1c5831f3-a673-4da2-a449-f3a47683a68a): [MAC-9](<TRACKER_URL>issues/MAC-9) (WiGLE Step-0 budget, `in_progress`) continues in parallel; [MAC-10](<TRACKER_URL>issues/MAC-10) (easy win) → [MAC-11](<TRACKER_URL>issues/MAC-11) (council minutes, this SAR binds).
 
 **Why this is a SAR, not a Correction Pass.** No bible text is being edited. The bible's existing §6 Phase 3 / §7.2 source-discovery / §11 #3 PII / §11 #6 robots.txt rules already cover the contractual surface; SAR-5 captures the implementation pattern for the council-minutes source-class specifically. CP convention is reserved for in-place bible edits + multi-edit bundles from a single user decision (see CP1–CP6 precedent); SAR convention covers single-source-class operational guidance (see SAR-3 / SAR-4 precedent).
 
 ### SAR-6 — Phase 4 per-wave checkpoint discipline (Step 0 ratification, status-class wave-end comment, ~50% yield-per-heartbeat stop-line)
 
 **Date:** 2026-05-04
-**Source:** [MAC-1](/MAC/issues/MAC-1) user comment [05af14d6](/MAC/issues/MAC-1#comment-05af14d6-2c0c-45b8-b166-647d27e35c9e) (Checkpoint 3 sign-off + Phase 4 dispatch authorization). Codified at user direction ("One additional discipline for Phase 4 (not a blocker, just lock it in)").
+**Source:** [MAC-1](<TRACKER_URL>issues/MAC-1) user comment [05af14d6](<TRACKER_URL>issues/MAC-1#comment-05af14d6-2c0c-45b8-b166-647d27e35c9e) (Checkpoint 3 sign-off + Phase 4 dispatch authorization). Codified at user direction ("One additional discipline for Phase 4 (not a blocker, just lock it in)").
 **Bible commit:** none (binds Phase 4 implementation pattern; no §6 Phase 4 / §7 / §8 / §11 text edit needed — the bible's existing Phase 4 wave-list, §7.3 Extraction Worker spec, and §10 "ship narrow, then widen" / yield-per-effort posture already cover the contractual surface; SAR-6 captures the operational discipline the board added at Phase 4 dispatch authorization)
 **Binds:** Source Worker (when assigned Phase 4 wave components within their structural-format competence), Extraction Worker (when hired/assigned for Phase 4 PDF/HTML/text mining waves per §7.3), CEO (per-wave Step-0 ratification + status-class wave-end review + stop-line authorization decisions)
 
@@ -477,12 +477,12 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
    - **Schema-fit recommendation** with draft DDL if a new staging table is needed (mirroring MAC-5 / MAC-6 / MAC-7 / MAC-11 Step-1 shape; CP ride-along reserved if new §4.2 entry warranted).
    CEO ratifies before any extraction fires. **No code commits, DB writes, migration authoring, or network fetches between dispatch and ratification.** Step 0 is non-fire by construction.
 
-2. **Status-class wave-end comments (visibility, not action-required).** On wave close (success-end OR stop-line trip), the worker posts a status comment to the wave's [MAC-N](/MAC/issues/MAC-1) (and a one-line summary to MAC-1 for board visibility). Verbatim format the board prescribed:
+2. **Status-class wave-end comments (visibility, not action-required).** On wave close (success-end OR stop-line trip), the worker posts a status comment to the wave's [MAC-N](<TRACKER_URL>issues/MAC-1) (and a one-line summary to MAC-1 for board visibility). Verbatim format the board prescribed:
    - **Records added** (count by `source_type`, `device_category`, `identifier_type`)
    - **Confidence distribution** (bucketed against §8.2 bands — `≥90`, `75–89`, `50–74`, `<50`)
    - **Vendor coverage delta vs prior waves** (which §2.1 vendors gained identifier-bearing rows that did not have them before this wave)
    - **Time elapsed** (heartbeats consumed; CEO-class clock, not wall-clock)
-   These comments are **status-class, not wake-class**. Board reads them on the standing wake-board cadence per board steer [`31445dcf`](/MAC/issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) — they do **not** trigger immediate board action.
+   These comments are **status-class, not wake-class**. Board reads them on the standing wake-board cadence per board steer [`31445dcf`](<TRACKER_URL>issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) — they do **not** trigger immediate board action.
 
 3. **~50% yield-per-heartbeat stop-line (worker-derived baseline, ratified at Step 0).** The "expected" baseline is the worker's own Step-0 yield projection (item 1 above). If observed yield-per-heartbeat falls **below ~50% of that projection** sustained across the measurement window the worker proposed at Step 0, the worker MUST:
    - **Stop** further extraction in the wave.
@@ -497,19 +497,19 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
    - **Compounding effect.** Each wave's output anchors the next wave's search. Wave A's GitHub discovery uses Wave B's SSID/UUID/model lexicon. Wave C's academic search uses cumulative B+A vendor-specific terminology. Wave D's court/FOIA targeting uses cumulative B+A+C deployment-and-vendor knowledge. Wave E's news/forum cap inherits all prior precision.
    - **Step-0 dispatches reuse this lexicon:** the Step-0 proposal for waves A onward MUST include "search anchors derived from prior waves" as part of the scope justification. CEO ratifies the anchor list at each wave's Step 0.
 
-5. **CEO autonomy class for Phase 4 (consistent with board steer [`31445dcf`](/MAC/issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) 21:40Z + Phase 4 dispatch authorization at this comment).**
+5. **CEO autonomy class for Phase 4 (consistent with board steer [`31445dcf`](<TRACKER_URL>issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) 21:40Z + Phase 4 dispatch authorization at this comment).**
    - **CEO-class (autonomous, no board wake):** per-wave Step-0 ratifications, mid-wave Step-1/Step-2 ratifications on the existing two-step shape, wave success-end status comments (status-class), CP4 brief authoring at Phase 4 close, and CP6+ ride-along bible amendments triggered by per-wave schema-fit decisions.
    - **Board-class (wake-board criteria):** wave stop-line trips (CEO comments on wave + MAC-1 with the stop-line + recommended path; board authorizes early-cut / scope adjustment / abandonment), CP4 sign-off at Phase 4 close, and §11 hard-rule triggers within a wave (PII surface beyond bounded redaction, ToS violation, recurrent fabrication).
    - **Status-class (visibility, not action-required):** per-wave wave-end status comments (item 2 above), including stop-line-adjacent informational reports the worker chooses to surface that don't trip the stop-line definition.
 
-**Application timing.** SAR-6 binds at **Wave B Step 0 dispatch** (this heartbeat, post-CP3 sign-off) and applies to every subsequent Phase 4 wave (A, C, D, E) until CP4 closes Phase 4. It does **not** retroactively bind Phase 3 (closed at MAC-11 ratification per board steer [`31445dcf`](/MAC/issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) 21:40Z). It does **not** alter the WiGLE deferred-enrichment posture (independent decision frame, 2026-05-18 timeout, see [`feedback_wigle_deferred_enrichment.md`](feedback_wigle_deferred_enrichment.md)).
+**Application timing.** SAR-6 binds at **Wave B Step 0 dispatch** (this heartbeat, post-CP3 sign-off) and applies to every subsequent Phase 4 wave (A, C, D, E) until CP4 closes Phase 4. It does **not** retroactively bind Phase 3 (closed at MAC-11 ratification per board steer [`31445dcf`](<TRACKER_URL>issues/MAC-1#comment-31445dcf-5e4f-40ce-92c1-0d3a7fd35bae) 21:40Z). It does **not** alter the WiGLE deferred-enrichment posture (independent decision frame, 2026-05-18 timeout, see [`feedback_wigle_deferred_enrichment.md`](feedback_wigle_deferred_enrichment.md)).
 
 **Why this is a SAR, not a Correction Pass.** No bible text is edited. The bible's existing §6 Phase 4 wave list (A/B/C/D/E definition), §7.3 Extraction Worker spec, §8.2 confidence bands, §10 ship-narrow-then-widen / yield-per-effort posture, and §11 #1/#7/#8 hard rules already define the structural surface; SAR-6 captures the per-wave operational discipline the board added at Phase 4 dispatch authorization. Mirrors SAR-5's relationship to §6 Phase 3 / §7.2 / §11 (single-phase-class operational guidance bundle, board-stated, no in-place edit). The CP convention remains reserved for in-place bible edits driven by per-wave schema-fit decisions during Phase 4 (e.g., a future CP7 if Wave B chooses a new `vendor_doc_observations` staging table).
 
 ### SAR-7 — Step-2.0 disambig bundle (CVE-FP allowlist + DJI/Djibouti FP class + news/forum-prose-FP class)
 
 **Date:** 2026-05-06
-**Source:** [MAC-35](/MAC/issues/MAC-35) CP4 brief authoring under CEO autonomy per HB27 sign-off [`0c252e39`](/MAC/issues/MAC-1#comment-0c252e39-f552-4996-8492-4148bf8284a4); board ratification via approval [`bf95a897`](/MAC/approvals/bf95a897-834c-473e-99f1-63d6cefd4b06) at 2026-05-06T11:43:05Z.
+**Source:** [MAC-35](<TRACKER_URL>issues/MAC-35) CP4 brief authoring under CEO autonomy per HB27 sign-off [`0c252e39`](<TRACKER_URL>issues/MAC-1#comment-0c252e39-f552-4996-8492-4148bf8284a4); board ratification via approval [`bf95a897`](<TRACKER_URL>approvals/bf95a897-834c-473e-99f1-63d6cefd4b06) at 2026-05-06T11:43:05Z.
 **Bible commit:** SAR-7 entry committed paired with this amendment-log landing; no bible-text edit.
 **Binds:** Extraction Worker (§7.3), Validator (§7.4), `db/extraction/fcc_grantees_allowlist.py` and equivalent vendor-mention disambig surfaces.
 
@@ -517,10 +517,10 @@ The §12 entry stays open under the strategic-steers-as-soft-priors discipline �
 
 #### SAR-7 #1 — CVE-FP allowlist (codification, already partially live)
 
-The CVE/CWE/NIST shape was implemented in `STOP_LIST_PATTERNS` of `db/extraction/fcc_grantees_allowlist.py` (Wave-A close, [MAC-25](/MAC/issues/MAC-25)) but never amendment-logged. SAR-7 #1 codifies the implementation under §11 #11 amendment-log discipline:
+The CVE/CWE/NIST shape was implemented in `STOP_LIST_PATTERNS` of `db/extraction/fcc_grantees_allowlist.py` (Wave-A close, [MAC-25](<TRACKER_URL>issues/MAC-25)) but never amendment-logged. SAR-7 #1 codifies the implementation under §11 #11 amendment-log discipline:
 
 - Any `fcc_id_anchored` match that also matches `^CVE-\d{4}(-\d{4,7})?$`, `^CWE-\d{1,4}$`, or NIST NVD shape is rejected as `reason='cve_security_advisory_fp'`.
-- Wave-C ([MAC-28](/MAC/issues/MAC-28)) is the test case: 40-paper academic corpus with constant CVE references; the stop-list caught all of them. Wave-A Step-1.5b survey originally surfaced `CVE-2025` as one of 2 FP hits.
+- Wave-C ([MAC-28](<TRACKER_URL>issues/MAC-28)) is the test case: 40-paper academic corpus with constant CVE references; the stop-list caught all of them. Wave-A Step-1.5b survey originally surfaced `CVE-2025` as one of 2 FP hits.
 
 **Reasoning.** Academic and security-research literature uses CVE/CWE shape constantly; without the stop-list, every paper citing a CVE would surface as an `fcc_id_anchored` hit and pollute Phase-5 promotion candidates.
 
@@ -532,7 +532,7 @@ When a `vendor_mention` regex pass counts string occurrences of `DJI` (the §2.1
 - Court-filing jurisdictional context (`District of DJI`, `case venue DJI`)
 - FOIA-released document jurisdictional metadata block
 
-**Reasoning.** `DJI` is both the drone vendor and the ISO 3166-1 alpha-3 code for Djibouti. Wave-D ([MAC-31](/MAC/issues/MAC-31)) court/FOIA prose and Wave-E ([MAC-33](/MAC/issues/MAC-33)) news prose carry both contexts. Wave-D survey (`raw/court_foia/20260506T030500Z/_step1_5b_survey.json`) produced 0 `fcc_id_anchored` hits for DJI — but vendor-mention density count (which feeds Phase-5 cross-reference scoring) is FP-prone without this gate. `DJI` is also a real FCC grantee code (`Seragen Diagnostics`, unrelated to drones) — the grantee allowlist gate alone never disambiguates the drone-vs-country-vs-grantee cases.
+**Reasoning.** `DJI` is both the drone vendor and the ISO 3166-1 alpha-3 code for Djibouti. Wave-D ([MAC-31](<TRACKER_URL>issues/MAC-31)) court/FOIA prose and Wave-E ([MAC-33](<TRACKER_URL>issues/MAC-33)) news prose carry both contexts. Wave-D survey (`raw/court_foia/20260506T030500Z/_step1_5b_survey.json`) produced 0 `fcc_id_anchored` hits for DJI — but vendor-mention density count (which feeds Phase-5 cross-reference scoring) is FP-prone without this gate. `DJI` is also a real FCC grantee code (`Seragen Diagnostics`, unrelated to drones) — the grantee allowlist gate alone never disambiguates the drone-vs-country-vs-grantee cases.
 
 **False-negative leaning.** A real DJI drone FCC filing (post-2013 applicant) would have a 5-char grantee prefix (e.g., `2AGUI-…`), not the 3-char `DJI` shape — so this rule does not interfere with real DJI drone identifier promotion. Phase-5 Validator + standing-advisory cross-reference catches anything missed.
 
@@ -548,7 +548,7 @@ If a `fcc_id_anchored` regex match has surrounding ±50-char context matching `<
 
 Then reject as `reason='commercial_model_name_fp'` and route to a count-only disambig drop log (analogous to `fcc_id_grantee_allowlist_drops`).
 
-**Source.** Surfaced by [MAC-33](/MAC/issues/MAC-33) Wave-E Step-1.5b survey (`raw/news_forums/20260506T052423Z/_step1_5b_survey.json`, run log `logs/mac33_step1_5b_run_20260506T054543Z.log`). 2 strict-gate hits in `e5_stackexchange/queries/Cradlepoint_serverfault/search.json`: `MBR-1200` and `MBR-1000`. `MBR` is a real FCC grantee code (`Esselte Dymo N V`, label printers) but surrounding prose says `Cradlepoint MBR-1200` — the Cradlepoint Mobile Broadband Router product line, not an FCC ID.
+**Source.** Surfaced by [MAC-33](<TRACKER_URL>issues/MAC-33) Wave-E Step-1.5b survey (`raw/news_forums/20260506T052423Z/_step1_5b_survey.json`, run log `logs/mac33_step1_5b_run_20260506T054543Z.log`). 2 strict-gate hits in `e5_stackexchange/queries/Cradlepoint_serverfault/search.json`: `MBR-1200` and `MBR-1000`. `MBR` is a real FCC grantee code (`Esselte Dymo N V`, label printers) but surrounding prose says `Cradlepoint MBR-1200` — the Cradlepoint Mobile Broadband Router product line, not an FCC ID.
 
 **Sibling cases to specify defensively.** Cradlepoint IBR-N family, Sierra Wireless GX-/RV-/MG-series, Motorola APX-series (`APX-6000`/`APX-7000`/`APX-8000`), Cisco/Juniper router model nomenclature. Rule shape catches the class, not just the seed.
 
@@ -559,18 +559,18 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 #### SAR-7 catch-all — application timing and binding scope
 
 - **Binds at Phase-5 Validator dispatch.** SAR-7 is codified now (CP4 sign-off) but the implementation lands as Phase-5 Validator scope (separate issue, dispatched on this same CP4 ratification).
-- **Does not retroactively rewrite Phase-4 wave dispositions.** Wave-B/B2/C/D/E early-cuts stand as ratified; SAR-7 explains and codifies the FP classes that were observed but does not reopen the path-decisions. Wave-E `MBR-1200`/`MBR-1000` reclassify retroactively as `fcc_id_commercial_model_name_fp_drops` (count-only); the path-(a) early-cut already-ratified by approval [`4444343b`](/MAC/approvals/4444343b-d02d-4e8c-a6a3-06b3f8935b51) stands.
+- **Does not retroactively rewrite Phase-4 wave dispositions.** Wave-B/B2/C/D/E early-cuts stand as ratified; SAR-7 explains and codifies the FP classes that were observed but does not reopen the path-decisions. Wave-E `MBR-1200`/`MBR-1000` reclassify retroactively as `fcc_id_commercial_model_name_fp_drops` (count-only); the path-(a) early-cut already-ratified by approval [`4444343b`](<TRACKER_URL>approvals/4444343b-d02d-4e8c-a6a3-06b3f8935b51) stands.
 - **§7.3 / §7.4 contractual surface unchanged.** SAR-7 is operational guidance for `db/extraction/fcc_grantees_allowlist.py` and the equivalent vendor-mention disambig surface.
 - **Why a SAR, not a Correction Pass.** No bible text is being edited. Mirrors SAR-1's relationship to §7.3 (interpretive guidance binding implementation, not contract) and SAR-3/SAR-4/SAR-5/SAR-6's pattern of single-decision interpretive bundles.
 
-**CP4 brief reference.** Full Phase-4 close + Phase-5 dispatch readiness context lives in `CP4_BRIEF.md`, board-ratified via approval [`bf95a897`](/MAC/approvals/bf95a897-834c-473e-99f1-63d6cefd4b06). The approval is the durable anchor: the brief was never tracked in this repository, so no commit cite can retrieve it.
+**CP4 brief reference.** Full Phase-4 close + Phase-5 dispatch readiness context lives in `CP4_BRIEF.md`, board-ratified via approval [`bf95a897`](<TRACKER_URL>approvals/bf95a897-834c-473e-99f1-63d6cefd4b06). The approval is the durable anchor: the brief was never tracked in this repository, so no commit cite can retrieve it.
 
 ---
 
 ### SAR-8 — Vendor-name-disambig predicate (alias allowlist + geographic-prefix handling)
 
 **Date:** 2026-05-06
-**Source:** [MAC-39](/MAC/issues/MAC-39) Phase-5 Step-4 halt-flag #1 surfaced by Validator at [`dd521ad3`](/MAC/issues/MAC-39#comment-dd521ad3-11f5-4c3c-855b-b84429ebbcb3) 2026-05-06T15:20:07Z; CEO surfaced to board at MAC-1 [`4bd6644c`](/MAC/issues/MAC-1#comment-4bd6644c-e2be-42f9-9acf-7856b828e1dd) 16:40:29Z; board ratification via MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z, approving option (a)+(c) combined and rejecting (b) ("mixing confidence-band signals with FP-flagging signals at the wrong layer").
+**Source:** [MAC-39](<TRACKER_URL>issues/MAC-39) Phase-5 Step-4 halt-flag #1 surfaced by Validator at [`dd521ad3`](<TRACKER_URL>issues/MAC-39#comment-dd521ad3-11f5-4c3c-855b-b84429ebbcb3) 2026-05-06T15:20:07Z; CEO surfaced to board at MAC-1 [`4bd6644c`](<TRACKER_URL>issues/MAC-1#comment-4bd6644c-e2be-42f9-9acf-7856b828e1dd) 16:40:29Z; board ratification via MAC-1 [`613ec532`](<TRACKER_URL>issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z, approving option (a)+(c) combined and rejecting (b) ("mixing confidence-band signals with FP-flagging signals at the wrong layer").
 **Bible commit:** SAR-8 entry committed paired with this amendment-log landing; no bible-text edit.
 **Binds:** Extraction Worker (§7.3), Validator (§7.4), new `db/extraction/vendor_name_disambig.py` module + future extractor passes.
 
@@ -604,7 +604,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 
 **False-negative leaning.** The allowlist is an explicit-add predicate. Vendors with ambiguous corporate naming (e.g., overseas subsidiaries with significant rebranding) require explicit alias entries. Phase-5 inference sweep surfaces unknown-alias counts in the bulk-staging deliverable comment.
 
-**Rejected option (b) — for the record.** Emit permissive-only matches at confidence ≤ 30 as FP-pending was rejected by board reasoning: "mixing confidence-band signals with FP-flagging signals at the wrong layer. Confidence reflects source/methodology certainty; FP review is a separate discipline. Keep them clean." (MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d)).
+**Rejected option (b) — for the record.** Emit permissive-only matches at confidence ≤ 30 as FP-pending was rejected by board reasoning: "mixing confidence-band signals with FP-flagging signals at the wrong layer. Confidence reflects source/methodology certainty; FP review is a separate discipline. Keep them clean." (MAC-1 [`613ec532`](<TRACKER_URL>issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d)).
 
 **Application timing and binding scope.**
 - **Binds at Phase-5 Step-4 follow-on dispatch.** SAR-8 codified now; implementation lands as Validator-execution against MAC-39 candidate set.
@@ -612,12 +612,12 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 - **§7.3 / §7.4 contractual surface unchanged.** SAR-8 is operational guidance for the new disambig module + future extractor pass surfaces.
 - **Why a SAR, not a Correction Pass.** No bible text is being edited. Mirrors SAR-7's relationship to §7.3/§7.4 (operational guidance binding implementation, not contract).
 
-**MAC-39 reference.** Full halt-flag context + per-source candidate counts lives in MAC-39 Validator deliverable [`dd521ad3`](/MAC/issues/MAC-39#comment-dd521ad3-11f5-4c3c-855b-b84429ebbcb3); CEO halt-flag surface to board at MAC-1 [`4bd6644c`](/MAC/issues/MAC-1#comment-4bd6644c-e2be-42f9-9acf-7856b828e1dd); board ratification at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d).
+**MAC-39 reference.** Full halt-flag context + per-source candidate counts lives in MAC-39 Validator deliverable [`dd521ad3`](<TRACKER_URL>issues/MAC-39#comment-dd521ad3-11f5-4c3c-855b-b84429ebbcb3); CEO halt-flag surface to board at MAC-1 [`4bd6644c`](<TRACKER_URL>issues/MAC-1#comment-4bd6644c-e2be-42f9-9acf-7856b828e1dd); board ratification at MAC-1 [`613ec532`](<TRACKER_URL>issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d).
 
 ### SAR-9 — Motorola Mobility/Solutions corporate-split FP class (+ SAR-8 alias-iteration bug-fix + WatchGuard Technologies/Video disambig)
 
 **Date:** 2026-05-06
-**Source:** [MAC-41](/MAC/issues/MAC-41) Phase-5 Step-4 follow-on bulk-stage halt-flag surfaced by Validator post-staging spot-check (3 commits 1d684ce/65860f4/d317550, 411 inferred rows staged then rolled back); halt-flag artifact at `extraction_outputs/mac41/sar8_bulk_stage_halt_flag.json`. Board ratification via approval [`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23) approved 2026-05-06T18:05:53Z, bundling SAR-9 codification + SAR-8 alias-iteration bug-fix + WatchGuard Technologies hard-reject.
+**Source:** [MAC-41](<TRACKER_URL>issues/MAC-41) Phase-5 Step-4 follow-on bulk-stage halt-flag surfaced by Validator post-staging spot-check (3 commits 1d684ce/65860f4/d317550, 411 inferred rows staged then rolled back); halt-flag artifact at `extraction_outputs/mac41/sar8_bulk_stage_halt_flag.json`. Board ratification via approval [`234faaa7`](<TRACKER_URL>approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23) approved 2026-05-06T18:05:53Z, bundling SAR-9 codification + SAR-8 alias-iteration bug-fix + WatchGuard Technologies hard-reject.
 **Bible commit:** SAR-9 entry committed paired with this amendment-log landing; no bible-text edit. §2.1 lexicon `Motorola Solutions` aliases column re-scoped per item (1) below.
 **Binds:** Extraction Worker (§7.3), Validator (§7.4), `db/extraction/vendor_name_disambig.py` module (extends SAR-8 list contents + restructures caller surface).
 
@@ -639,7 +639,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 
 **Reasoning.** MAC-41 Step-4 follow-on bulk-stage (411 rows inserted at strict §8.4 / `device_category='unknown'`) tripped a post-staging spot-check halt under the dispatch's stop-the-line clause ("New disambig class beyond SAR-8 → halt + comment; do NOT bundle silently"). Validator rolled back all 411 rows under §11 #11 discipline (audit ledger row inserted, `raw_observations.promoted_identifier_id` pointers cleared, Wave-A canonical `identifiers.id=1` preserved) and surfaced 3 halt-flags rather than silently bundling them into the staged set. The 66% FP rate on Motorola alone is non-trivial corpus-density signal — propose-don't-promote was the right discipline. Post-fix expected staged count drops from 411 to ~135 TPs (still a thin Phase-5 outcome — acceptable per §11 #8 propose-don't-promote-without-second-source).
 
-**Implementation directive (per board approval [`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23)).**
+**Implementation directive (per board approval [`234faaa7`](<TRACKER_URL>approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23)).**
 - Update `db/extraction/vendor_name_disambig.py`:
     - Extend `VENDOR_FP_LIST['Motorola Solutions']` with substring-reject entries for `mobility`, `(wuhan)`, `lenovo`.
     - Add bare-`Motorola` flag-for-review semantics (third return state, mirrors GENETEC Corporation handling at SAR-8).
@@ -659,16 +659,16 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 
 **Bundling rationale.** Bundling SAR-8 alias-iteration bug-fix with SAR-9 codification (single ratification gate, single commit) was board-approved despite covering one amendment-log change (SAR-9) and one implementation-class change (alias-bug). Reasoning: the alias-bug fix is a caller-restructure that touches the same SAR-8 surface as the Motorola/WatchGuard FP-list extensions; bundling keeps blast radius contained at one validator-execution dispatch.
 
-**Validator-quality acknowledgment.** This is the second consecutive halt-flag surface from Validator (SAR-8 at [MAC-39](/MAC/issues/MAC-39), SAR-9 here at [MAC-41](/MAC/issues/MAC-41)). Pattern is the §11 #11 + propose-don't-promote contract working as specified, not a Validator-process problem. Surface-and-ratify discipline is exactly what bounded-but-not-fully-enumerated SAR-N-class disambig classes require.
+**Validator-quality acknowledgment.** This is the second consecutive halt-flag surface from Validator (SAR-8 at [MAC-39](<TRACKER_URL>issues/MAC-39), SAR-9 here at [MAC-41](<TRACKER_URL>issues/MAC-41)). Pattern is the §11 #11 + propose-don't-promote contract working as specified, not a Validator-process problem. Surface-and-ratify discipline is exactly what bounded-but-not-fully-enumerated SAR-N-class disambig classes require.
 
-**MAC-41 reference.** Full halt-flag context + per-class FP/TP/ambiguous counts + rollback ledger lives in `extraction_outputs/mac41/sar8_bulk_stage_halt_flag.json`; Validator deliverable comment at MAC-41 [`a9404b0c`](/MAC/issues/MAC-41#comment-a9404b0c-33bc-490f-9b8a-4402d2ae8630); board approval at [`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23).
+**MAC-41 reference.** Full halt-flag context + per-class FP/TP/ambiguous counts + rollback ledger lives in `extraction_outputs/mac41/sar8_bulk_stage_halt_flag.json`; Validator deliverable comment at MAC-41 [`a9404b0c`](<TRACKER_URL>issues/MAC-41#comment-a9404b0c-33bc-490f-9b8a-4402d2ae8630); board approval at [`234faaa7`](<TRACKER_URL>approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23).
 
 ---
 
 ## Checkpoint 5 sign-off — Phase-5 close + §12 disposition slate
 
 **Date:** 2026-05-06
-**Source:** [MAC-47](/MAC/issues/MAC-47) CP5 brief authoring under CEO autonomy per board comprehensive forward-runway authorization at MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z. Brief at `CP5_BRIEF.md` (never tracked in this repository — the approval below is the durable anchor). Board ratification via approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) approved 2026-05-06T20:17:10Z.
+**Source:** [MAC-47](<TRACKER_URL>issues/MAC-47) CP5 brief authoring under CEO autonomy per board comprehensive forward-runway authorization at MAC-1 [`613ec532`](<TRACKER_URL>issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z. Brief at `CP5_BRIEF.md` (never tracked in this repository — the approval below is the durable anchor). Board ratification via approval [`71ef8139`](<TRACKER_URL>approvals/71ef8139-c76c-4b1b-8971-b22720b7363d) approved 2026-05-06T20:17:10Z.
 **Bible commit:** §12 dispositions land paired with this amendment-log entry (no §-text edits beyond §12 reorganization).
 
 **The disposition slate.** Board ratified CP5 brief as the Phase-5 close artifact. Per CP5_BRIEF §4 + §7, the §12 Open-Questions slate is reorganized as follows:
@@ -679,7 +679,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 |---|---|---|
 | Project name "Argus" | **RESOLVED — final v1 name.** | Argus owns identifier-canonical-state + Talos-bound exports; Talos owns scanner-side scanning + correlation; "MAC" is the Paperclip issue-prefix only. |
 | `device_cluster_id` schema column | **RESOLVED — SAR-3 lean confirmed final.** | Argus identifies, Talos correlates. No Argus-side schema change; correlation logic owned by Talos team. |
-| MuckRock API vs search | **RESOLVED — moot.** | Phase-4 Wave-D path-(a) early-cut ([MAC-31](/MAC/issues/MAC-31)) used search; corpus-ceiling held at 0. |
+| MuckRock API vs search | **RESOLVED — moot.** | Phase-4 Wave-D path-(a) early-cut ([MAC-31](<TRACKER_URL>issues/MAC-31)) used search; corpus-ceiling held at 0. |
 | Inference 70-cap binding | **RESOLVED — 70-cap binding for inferred rows confirmed final.** | No current row pressure on the cap (all Phase-5 inferred rows landed at 50–55 per SAR-1 LAA-bit penalty + strict §8.4 conf=50 starting band). |
 | Single-product §2.1 vendor OUI categorization (narrow §11 #10 vs strict §8.4) | **DEFERRED — to Wave-F / Phase-6.** | CP5_BRIEF §3.1 surfaced row-count visibility per disposition: ~18 of 62 inferred rows would flip under narrow read; all 17 stay below conf=70 high-conf band. Board ratified CEO path-(a): accept v0.1 with strict §8.4. Narrow-read carve-out queued for Wave-F / Phase-6 once model-level evidence raises a vendor cluster's per-row band into 70-cap territory. |
 | §4.4 256-entry `mac_range` expansion ceiling | **DEFERRED — to Talos integration handoff.** | All 8 active `mac_range` rows are OUI-28/OUI-36 sub-allocations vastly exceeding §4.4's expansion ceiling. Board ratified CEO path-(c): defer routing semantics to Talos integration handoff (jointly bound between Argus export shape and Talos seeder protocol). |
@@ -711,14 +711,14 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 
 **Why this is a checkpoint sign-off, not a Correction Pass / SAR.** No bible §-text edited; the §12 reorganization is the Open-Questions section being maintained per its own discipline. CP5 sign-off mirrors CP4 sign-off precedent (board-ratified close + bible-amendment-log entry recording the close + §12 disposition slate without bible §-text edit).
 
-**MAC-47 reference.** CP5 brief at `CP5_BRIEF.md`; approval [`71ef8139`](/MAC/approvals/71ef8139-c76c-4b1b-8971-b22720b7363d).
+**MAC-47 reference.** CP5 brief at `CP5_BRIEF.md`; approval [`71ef8139`](<TRACKER_URL>approvals/71ef8139-c76c-4b1b-8971-b22720b7363d).
 
 ---
 
 ## Correction Pass 7 — `geographic_scope` §12 #1 resolution + export-time filter
 
 **Date:** 2026-05-07
-**Source:** Lynceus v0.3 integration handoff bundle (path-γ); HB39 10-item bundled ratification proposal at MAC-1 [`f6c6e206`](/MAC/issues/MAC-1#comment-f6c6e206-51f5-4bee-a7db-b062d96cdf41); doc [`lynceus_v03_integration`](/MAC/issues/MAC-1#document-lynceus_v03_integration). Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (six-pick + two-halt-flag bundle approved as recommended).
+**Source:** Lynceus v0.3 integration handoff bundle (path-γ); HB39 10-item bundled ratification proposal at MAC-1 [`f6c6e206`](<TRACKER_URL>issues/MAC-1#comment-f6c6e206-51f5-4bee-a7db-b062d96cdf41); doc [`lynceus_v03_integration`](<TRACKER_URL>issues/MAC-1#document-lynceus_v03_integration). Board ratification via comment [`4f075253`](<TRACKER_URL>issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (six-pick + two-halt-flag bundle approved as recommended).
 **Bible commit:** §12 #1 (Open) resolution + §7.5 export-time filter directive land paired with this amendment-log entry. Schema unchanged — `identifiers.geographic_scope TEXT` exists in 0001 schema since CP-0 (line 77 of `db/migrations/0001_initial.sql`).
 
 **The resolution.** CP7 closes the §12 question "Configurable `geographic_scope` filter for the high-confidence Lynceus export." Resolution: **export-time categorical filter on `identifiers.geographic_scope`, default-on for high-confidence export, configurable.** Records remain in canonical DB regardless; only the export shape filters.
@@ -742,7 +742,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 ## Correction Pass 8 — Description ceiling + §4.5 severity reframe-as-historical + §12 SAR-2 carry-forward amendment
 
 **Date:** 2026-05-07
-**Source:** Lynceus v0.3 integration handoff bundle (path-γ) — Lynceus engineer's Section 3 (description shape) + Section 4 (severity ownership) verbatim asks. Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Halt-flag #2 ✅ + Pick #2 ✅ + Pick #4 ✅).
+**Source:** Lynceus v0.3 integration handoff bundle (path-γ) — Lynceus engineer's Section 3 (description shape) + Section 4 (severity ownership) verbatim asks. Board ratification via comment [`4f075253`](<TRACKER_URL>issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Halt-flag #2 ✅ + Pick #2 ✅ + Pick #4 ✅).
 **Bible commit:** §7.5 description-format directive update + §4.5 superseded-historical banner land paired with this amendment-log entry.
 **Binds:** Export Worker (§7.5), all future export modules; Lynceus integration test cycle.
 
@@ -782,7 +782,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 ## Correction Pass 9 — Talos → Lynceus rename slate (forward-looking contract surface)
 
 **Date:** 2026-05-07
-**Source:** Lynceus v0.3 integration handoff (path-γ) — Lynceus is the canonical name for the downstream consumer (Raspberry Pi RF security monitor; formerly working-name "Talos"). Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Pick #5 ✅ — α: keep `argus_export*.json` filenames + bible `Talos`→`Lynceus` rename throughout).
+**Source:** Lynceus v0.3 integration handoff (path-γ) — Lynceus is the canonical name for the downstream consumer (Raspberry Pi RF security monitor; formerly working-name "Talos"). Board ratification via comment [`4f075253`](<TRACKER_URL>issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Pick #5 ✅ — α: keep `argus_export*.json` filenames + bible `Talos`→`Lynceus` rename throughout).
 **Bible commit:** §-by-§ rename of `Talos`→`Lynceus` in PROJECT_BIBLE.md forward-looking contract surface lands paired with this amendment-log entry.
 **Binds:** All future Argus documentation, exports, comments, integration artifacts.
 
@@ -819,7 +819,7 @@ Then reject as `reason='commercial_model_name_fp'` and route to a count-only dis
 ## Correction Pass 10 — §11 #10 narrow-read v0.1 cutover + operator-override-as-FP-layer principle
 
 **Date:** 2026-05-07
-**Source:** Lynceus v0.3 integration handoff (path-γ) — board override of CP5 path-(a) deferral via Lynceus's `severity_overrides.yaml` operator-side architecture making FP-suppression revisable space. Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Pick #6 ✅ — full 17-row flip approved).
+**Source:** Lynceus v0.3 integration handoff (path-γ) — board override of CP5 path-(a) deferral via Lynceus's `severity_overrides.yaml` operator-side architecture making FP-suppression revisable space. Board ratification via comment [`4f075253`](<TRACKER_URL>issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Pick #6 ✅ — full 17-row flip approved).
 **Bible commit:** §11 #10 narrow-read carve-out codification + §-text update lands paired with this amendment-log entry. Argus DB row mutation: 17 rows flip `device_category` from `unknown` to specific category at v0.1 cutover.
 
 ### The codification (CP10 verbatim per board)
@@ -880,7 +880,7 @@ vendor_overrides:
 ## Correction Pass 11 — Lynceus integration: dual-artifact contract (JSON-as-operational-feed + CSV-as-rich-import)
 
 **Date:** 2026-05-07
-**Source:** HB46 board JSON-vs-CSV reconciliation question at MAC-1 [`3e612a85`](/MAC/issues/MAC-1#comment-3e612a85-e2b4-4922-89ed-3552062cc25e) 19:35:34Z + CEO HB46 CP11 ratification proposal at [`447781e0`](/MAC/issues/MAC-1#comment-447781e0-d17d-4da3-a4dd-39f8552ed9b7) 19:41:23Z. Board ratification via comment [`cf5eeb79`](/MAC/issues/MAC-1#comment-cf5eeb79-d5dd-4ee2-b9ed-d148d224c533) 2026-05-07T20:08:08Z (sub-A + sub-B + sub-C bundle approved, with sub-A expanded to include `first_seen` + `last_verified`; `fcc_id` deferred to v1.1).
+**Source:** HB46 board JSON-vs-CSV reconciliation question at MAC-1 [`3e612a85`](<TRACKER_URL>issues/MAC-1#comment-3e612a85-e2b4-4922-89ed-3552062cc25e) 19:35:34Z + CEO HB46 CP11 ratification proposal at [`447781e0`](<TRACKER_URL>issues/MAC-1#comment-447781e0-d17d-4da3-a4dd-39f8552ed9b7) 19:41:23Z. Board ratification via comment [`cf5eeb79`](<TRACKER_URL>issues/MAC-1#comment-cf5eeb79-d5dd-4ee2-b9ed-d148d224c533) 2026-05-07T20:08:08Z (sub-A + sub-B + sub-C bundle approved, with sub-A expanded to include `first_seen` + `last_verified`; `fcc_id` deferred to v1.1).
 **Bible commit:** §7.5 dual-artifact contract sub-section + §6 Phase 5 #4 CSV description update land paired with this amendment-log entry.
 **Binds:** Export Worker (§7.5), Lynceus integration test cycle, `lynceus-import-argus` v0.3 import CLI consumer.
 
@@ -946,7 +946,7 @@ The change. §6 Phase 5 #4 line currently reading `argus_export.csv (human-reada
 ## SAR-10 — `argus_record_id` algorithm: `sha256(type|identifier)[:16]`
 
 **Date:** 2026-05-07
-**Source:** Lynceus v0.3 integration handoff (path-γ) — Halt-flag #1 surfaced at HB39 (`argus_record_id` divergence between Wave-A snapshot hex `d4bfc29b7d63f7b1` and v1 Talos integer-id export; integer NOT stable under §8.3 dedup-driven supersede + reattribution per Lynceus's expected events). Board ratification via comment [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Halt-flag #1 ✅ — strong endorsement; codify as SAR-10 + CP8 §12 carry-forward text amendment).
+**Source:** Lynceus v0.3 integration handoff (path-γ) — Halt-flag #1 surfaced at HB39 (`argus_record_id` divergence between Wave-A snapshot hex `d4bfc29b7d63f7b1` and v1 Talos integer-id export; integer NOT stable under §8.3 dedup-driven supersede + reattribution per Lynceus's expected events). Board ratification via comment [`4f075253`](<TRACKER_URL>issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012) 2026-05-07T17:10:13Z (Halt-flag #1 ✅ — strong endorsement; codify as SAR-10 + CP8 §12 carry-forward text amendment).
 **Bible commit:** SAR-10 amendment-log entry lands paired with CP8 §12 carry-forward text amendment (above). No further bible §-text edit.
 **Binds:** Export Worker (§7.5), all future export modules, Lynceus seeder integration handoff.
 
@@ -995,14 +995,14 @@ The change. §6 Phase 5 #4 line currently reading `argus_export.csv (human-reada
 
 **Why a SAR, not a Correction Pass.** Operational rule binding export module implementation; no bible §-text contract change beyond §12 disposition reorg (handled by CP8 sub-correction C). Mirrors SAR-1/SAR-7/SAR-8/SAR-9 precedent for module-binding operational rules.
 
-**Bundling rationale (CP7 + CP8 + CP9 + CP10 + SAR-10).** Five amendments bundled at one ratification gate per board's six-pick + two-halt-flag bundled approval at [`4f075253`](/MAC/issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012). Reasoning: all five derive from the same Lynceus v0.3 integration handoff document; landing them as a coordinated commit preserves the audit trail's single-source attribution; Lynceus integration test cycle (downstream item) gates on all five being landed before a Lynceus-shaped sample export can be produced.
+**Bundling rationale (CP7 + CP8 + CP9 + CP10 + SAR-10).** Five amendments bundled at one ratification gate per board's six-pick + two-halt-flag bundled approval at [`4f075253`](<TRACKER_URL>issues/MAC-1#comment-4f075253-2eae-4ea3-9db5-c67c6f02e012). Reasoning: all five derive from the same Lynceus v0.3 integration handoff document; landing them as a coordinated commit preserves the audit trail's single-source attribution; Lynceus integration test cycle (downstream item) gates on all five being landed before a Lynceus-shaped sample export can be produced.
 
 ---
 
 ## SAR-11 — Wave G framework-UUID + third-party-library FP suppression (chunked Priority A/B/C/D)
 
 **Date:** 2026-05-13
-**Source:** Wave G pre-v1 autonomous static-analysis session 2026-05-10 (MAC-52 [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b); deliverables surfaced at MAC-1 [`5b000045`](/MAC/issues/MAC-1#comment-5b000045-1265-4be4-88b2-dfeaac46c6df) HB56). Board-ratified chunking structure at MAC-1 [`e492ac66`](/MAC/issues/MAC-1#comment-e492ac66-7109-412a-acb3-8db1d247310d) HB57 §E.2. SAR-11 codification landed at CP17 coordinated commit per HB99/HB101 drafts.
+**Source:** Wave G pre-v1 autonomous static-analysis session 2026-05-10 (MAC-52 [`ddc193cd`](<TRACKER_URL>issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b); deliverables surfaced at MAC-1 [`5b000045`](<TRACKER_URL>issues/MAC-1#comment-5b000045-1265-4be4-88b2-dfeaac46c6df) HB56). Board-ratified chunking structure at MAC-1 [`e492ac66`](<TRACKER_URL>issues/MAC-1#comment-e492ac66-7109-412a-acb3-8db1d247310d) HB57 §E.2. SAR-11 codification landed at CP17 coordinated commit per HB99/HB101 drafts.
 **Bible commit:** SAR-11 amendment-log entry lands paired with CP17 coordinated commit (this entry).
 **Binds:** ExtractionWorker (Wave G `wave_g_extractor.py` FP-filter pipeline + `looks_like_third_party_lib()` path heuristic), Validator (§11 #7 promotion gate — pre-v1 candidates classified per these FP-classes at promotion-time).
 
@@ -1063,7 +1063,7 @@ Cases the calibration surfaced but where author/Validator labels each instance i
 ## Correction Pass 12 — Wave G (Phase 6) vendor companion app static analysis: §8.2 `manufacturer_app` confidence bands + §11 #15 license-posture rule + §12 three open questions
 
 **Date:** 2026-05-08
-**Source:** [MAC-52](/MAC/issues/MAC-52) — Wave G ratification proposal at plan document rev 1 (`c4c12502`); board ratification via comment [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b) 2026-05-08T05:24:21Z (request_confirmation `df6ce24d` auto-superseded by ratifying board comment per `supersedeOnUserComment: true`; comment text is the authoritative ratification with detailed direction across all 10 §11 decision points).
+**Source:** [MAC-52](<TRACKER_URL>issues/MAC-52) — Wave G ratification proposal at plan document rev 1 (`c4c12502`); board ratification via comment [`ddc193cd`](<TRACKER_URL>issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b) 2026-05-08T05:24:21Z (request_confirmation `df6ce24d` auto-superseded by ratifying board comment per `supersedeOnUserComment: true`; comment text is the authoritative ratification with detailed direction across all 10 §11 decision points).
 **Bible commit:** §8.2 `manufacturer_app` row + sub-banding table + §11 #15 new hard-rule + §12 three new open questions land paired with this amendment-log entry.
 **Binds:** SourceWorker (Wave G Step 0/1), ExtractionWorker (Wave G Step 2), Validator (Wave G post-Step-2 promotion), CEO orchestrator, future quarterly refresh routine.
 
@@ -1093,10 +1093,10 @@ This entry is itself the §11 #11 amendment-log entry pairing for the §8.2 + §
 
 ### Wave G dispatch sequencing (board-ratified, executed across heartbeats post-CP12)
 
-Per board ratification comment [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b):
+Per board ratification comment [`ddc193cd`](<TRACKER_URL>issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b):
 
 1. CP12 lands (this commit) — coordinated bible amendment.
-2. CEO creates Wave G Step 0 child issue under MAC-1 (`status=backlog`, assignee=SourceWorker `9cf8ff12-…`). **No execution.** Wave G holds in backlog until: (i) Lynceus integration test confirms (engineer-side; board-routed); (ii) [MAC-50](/MAC/issues/MAC-50) public-release planning deliverables document lands; (iii) public release v1.0.0 ships.
+2. CEO creates Wave G Step 0 child issue under MAC-1 (`status=backlog`, assignee=SourceWorker `9cf8ff12-…`). **No execution.** Wave G holds in backlog until: (i) Lynceus integration test confirms (engineer-side; board-routed); (ii) [MAC-50](<TRACKER_URL>issues/MAC-50) public-release planning deliverables document lands; (iii) public release v1.0.0 ships.
 3. Post-v1.0.0 ship: Wave G Step 0 dispatch fires as fresh board-class proposal (autonomous mode expired at CP5; CEO honors that).
 4. Steps 1+2 follow standard wave pattern under sustained-execution + chain-don't-exit; calibration window = first 2 vendor apps fully processed; SAR-11 codified if Step-2 calibration shows >5% framework-UUID FP rate.
 5. Validator promotes Wave G findings to Layer 1 per §11 #8 gate.
@@ -1105,7 +1105,7 @@ Per board ratification comment [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-
 
 ### Decision points ratified at this gate (board direction recorded for audit trail)
 
-Quoting board direction at [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b) verbatim per decision point:
+Quoting board direction at [`ddc193cd`](<TRACKER_URL>issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b) verbatim per decision point:
 
 1. **Download channel** — APKMirror primary; APKPure secondary; `gplay-api` / `gplaycli` tertiary (only if APK unavailable on archives; document Google ToS gray-area exposure per-vendor); vendor direct download quaternary (preferred when available — vendor-attested distribution). Per-vendor channel selection ratified at Step 0 close.
 2. **Vendor list** — 20 Android-first + 5 indirect (per plan §2). Step 0's first deliverable is per-vendor availability ground-truth; flag vendors with no public Android app for Wave G.5 (iOS-only) deferred scope. Board edge-case direction recorded: Cellebrite (predominantly enterprise; surface availability + recommended scope), Hak5 (consumer/maker; ground-truth at Step 0), Harris (almost zero consumer footprint; defer to Wave G.5 with FOIA-firmware path), DJI (multi-app footprint — DJI Fly, GO 4, RC, Matrice — analyze all in scope; cohort by app rather than collapsing).
@@ -1113,7 +1113,7 @@ Quoting board direction at [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec
 4. **Retention threshold** — 5 GB LFS escalation gate approved (20–40 apps × ~100 MB ≈ 2–4 GB raw + ~1–2 GB multi-version + ~1 GB iOS headroom). If Step 1 download volume approaches 5 GB, worker stops + reassigns CEO; CEO surfaces LFS-vs-prune decision to board.
 5. **Cadence** — quarterly cron `0 9 1 */3 *` approved, skip-on-overlap + no-catch-up; runtime budget per cron ≤4h wall-clock; halt + alert on overrun.
 6. **Kill-switch** — approved. Trip criteria: 0 BLE UUIDs across first 2 apps after FP filtering = trip; 0 SSIDs after FP filtering = trip; 0 credentials after FP filtering = trip. Any single class tripping = surface to board (don't auto-continue). All three tripping = strong signal hypothesis is wrong; board reassesses sequencing.
-7. **Sequencing — Path A (sequential, not interleaved).** Wave G executes AFTER public release v1.0.0 ships. Wave G yield ships as v1.1.0. Strict order: Lynceus integration test confirms → [MAC-50](/MAC/issues/MAC-50) deliverables document lands → public-release prep work executes → v1.0.0 ships → Wave G Step 0 fires as fresh board-class proposal → Steps 1+2 + calibration + ratification → SAR-11 codified if needed → Validator promotion → v1.1.0 release with Wave G yield. Wave G remains in `backlog` until v1.0.0 ships.
+7. **Sequencing — Path A (sequential, not interleaved).** Wave G executes AFTER public release v1.0.0 ships. Wave G yield ships as v1.1.0. Strict order: Lynceus integration test confirms → [MAC-50](<TRACKER_URL>issues/MAC-50) deliverables document lands → public-release prep work executes → v1.0.0 ships → Wave G Step 0 fires as fresh board-class proposal → Steps 1+2 + calibration + ratification → SAR-11 codified if needed → Validator promotion → v1.1.0 release with Wave G yield. Wave G remains in `backlog` until v1.0.0 ships.
 8. **EULA conflict policy** — DMCA §1201 security-research exemption + §201.40(b) cover static analysis of legally-acquired binaries. Per-vendor judgment criteria recorded under §12 EULA-conflict-policy entry. Document §1201 reliance in `wave_g/LEGAL_POSTURE.md`; cross-reference from `THREAT_MODEL.md` at public-release prep.
 9. **iOS scope** — deferred to Wave G.5 / Phase 7 (Apple FairPlay encryption + Android-first vendor coverage justification). Specific exception: Step 0 surfaces a vendor with iOS-only significant-yield → flag for targeted Wave G.5 dispatch.
 10. **Budget envelope** — Step 0 ≤5 heartbeats; Step 1 ≤10 heartbeats (sustained-execution covers ~5–10 vendor downloads per heartbeat); Step 2 ≤30 heartbeats; total ≤50 heartbeats wall-clock for Steps 0–2 combined. Budget overrun trip: any stage exceeds its cap by >50% → worker halts + surfaces to CEO. Estimated wall-clock with sustained-execution + chain-don't-exit active: 2–4 days.
@@ -1137,7 +1137,7 @@ Three new open questions added under a new "Wave G (Phase 6)" subhead per #3 abo
 ## Correction Pass 13 — CP12 schema sibling: §4.1 `identifier_type` + `source_type` enum extensions (Wave G structural fidelity)
 
 **Date:** 2026-05-10
-**Source:** [MAC-54](/MAC/issues/MAC-54) — Validator dispatch authored to close the §11 #11 amendment-log gap surfaced at HB62 (pre-flight Step-0 schema-enum BLOCKER: CP12 added `manufacturer_app` to §8.2 source_type sub-banding without a sibling schema migration). Board ratification of Path X (single coordinated migration) at MAC-1 [`9d568fa7`](/MAC/issues/MAC-1#comment-9d568fa7-edc0-4d68-a7dd-fb40d4cd919e) 2026-05-10 HB63. CEO Step-0 ratification of the dispatch at MAC-54 [`34c908b8`](/MAC/issues/MAC-54#comment-34c908b8-0a66-4a6f-a3a5-4aa6d2bc5470) 2026-05-10.
+**Source:** [MAC-54](<TRACKER_URL>issues/MAC-54) — Validator dispatch authored to close the §11 #11 amendment-log gap surfaced at HB62 (pre-flight Step-0 schema-enum BLOCKER: CP12 added `manufacturer_app` to §8.2 source_type sub-banding without a sibling schema migration). Board ratification of Path X (single coordinated migration) at MAC-1 [`9d568fa7`](<TRACKER_URL>issues/MAC-1#comment-9d568fa7-edc0-4d68-a7dd-fb40d4cd919e) 2026-05-10 HB63. CEO Step-0 ratification of the dispatch at MAC-54 [`34c908b8`](<TRACKER_URL>issues/MAC-54#comment-34c908b8-0a66-4a6f-a3a5-4aa6d2bc5470) 2026-05-10.
 **Bible commit:** §4.1 `identifier_type` enum row + §4.1 `source_type` enum row + §4.4 Lynceus-mapping new-row entries land paired with this amendment-log entry; migration `db/migrations/0009_manufacturer_app_and_identifier_type_extensions.sql` + wrapper `db/validation/migration_0009_verify.py` land in the same coordinated commit.
 **Binds:** Validator (§11 #7 promotion gate, §7.4 record validation), ExtractionWorker (raw_observations staging shape for Wave G outputs), Export Worker (§7.5 / §4.4 Lynceus mapping for the three new identifier types — all DROPPED-class per analytical-only fidelity), SourceWorker (registers vendor companion app sources with `source_type='manufacturer_app'`).
 
@@ -1145,7 +1145,7 @@ Three new open questions added under a new "Wave G (Phase 6)" subhead per #3 abo
 
 CP12 (2026-05-08, this ledger) added `manufacturer_app` to §8.2 source_type sub-banding to define the confidence band for Wave G (Phase 6) vendor companion app static-analysis output, but did not land the sibling schema migration. The `identifiers.source_type` and `sources.source_type` CHECK constraints from `0001_initial.sql` (lines 71–75 and 120–124) still reject the value, structurally blocking Wave G narrow-scope promotion (21 candidates: 6 BLE UUIDs + 1 BLE local name + 14 Flock DeviceType taxonomy values).
 
-In parallel, the Wave G pre-v1 deliverables (2026-05-10 HB56, MAC-1 [`5b000045`](/MAC/issues/MAC-1#comment-5b000045-1265-4be4-88b2-dfeaac46c6df)) surfaced three new identifier classes that do not fit the existing §4.1 `identifier_type` enum without semantic-loss collapse:
+In parallel, the Wave G pre-v1 deliverables (2026-05-10 HB56, MAC-1 [`5b000045`](<TRACKER_URL>issues/MAC-1#comment-5b000045-1265-4be4-88b2-dfeaac46c6df)) surfaced three new identifier classes that do not fit the existing §4.1 `identifier_type` enum without semantic-loss collapse:
 
 - **BLE local name** (the literal string `Penguin` broadcast over GAP scan response) — distinct from a service or characteristic UUID; collapsing to `ble_uuid` or `ssid_pattern` would falsify the structural surface.
 - **BLE characteristic UUID** (paired with the `ble_service` UUID in GATT, surfaced as distinct in the Wave G handoff) — distinct from a service-level UUID; preserving the distinction matches §4.4's DROPPED-class analytical-only fidelity convention.
@@ -1210,7 +1210,7 @@ This entry is itself the §11 #11 amendment-log pairing for the §4.1 / §4.4 in
 ## Correction Pass 14 — Wave-A close: §8.4 four-amendment batch (G-1/G-4/G-13.3/G-15) + §11 #12 expansion + 5 schema migrations
 
 **Date:** 2026-05-11
-**Source:** [MAC-63](/MAC/issues/MAC-63) — Wave-A CEO Ratification Run. Human-CEO (Kev) delegated Bible §11 #11 amendment authority to CEO Claude for this run because they wanted to review the *output* rather than the *inputs* one-by-one. Phase 1 (drafting) ratified by board comment [`02ad16b0`](/MAC/issues/MAC-63#comment-02ad16b0-c8a2-47cd-831d-26e067c8a822); Phase 2 (CEO-skeptic self-review with §8.2 vs §8.3 catch + 4 revisions) ratified by board [`bbb71be5`](/MAC/issues/MAC-63#comment-bbb71be5-67fa-48ea-8c4c-8a1fc3797c0a); Phase 3 DDL fold-in ratified by board [`6516a9af`](/MAC/issues/MAC-63#comment-6516a9af-9d73-4134-b8f4-cc44085e63ef); Phase 3 application + this coordinated commit at heartbeat 2026-05-11.
+**Source:** [MAC-63](<TRACKER_URL>issues/MAC-63) — Wave-A CEO Ratification Run. Human-CEO (Kev) delegated Bible §11 #11 amendment authority to CEO Claude for this run because they wanted to review the *output* rather than the *inputs* one-by-one. Phase 1 (drafting) ratified by board comment [`02ad16b0`](<TRACKER_URL>issues/MAC-63#comment-02ad16b0-c8a2-47cd-831d-26e067c8a822); Phase 2 (CEO-skeptic self-review with §8.2 vs §8.3 catch + 4 revisions) ratified by board [`bbb71be5`](<TRACKER_URL>issues/MAC-63#comment-bbb71be5-67fa-48ea-8c4c-8a1fc3797c0a); Phase 3 DDL fold-in ratified by board [`6516a9af`](<TRACKER_URL>issues/MAC-63#comment-6516a9af-9d73-4134-b8f4-cc44085e63ef); Phase 3 application + this coordinated commit at heartbeat 2026-05-11.
 **Bible commit:** PROJECT_BIBLE.md §8.4 four-amendment batch + §11 #12 expansion + BIBLE_AMENDMENTS.md CP14 entry (this entry) + 4 draft files moved from `raw/wave_a/_bible_amendment_*` to `bible/history/cp14/` for audit trail. Single coordinated commit titled "CP14: §8.4 four-amendment batch (G-1/G-4/G-13.3/G-15)".
 **Schema-sibling commits (5 separate migration commits per dispatch §3.1):**
   - `db/migrations/0010_behavioral_signatures.sql` (new TABLE per MAC-58 §5 Option B)
@@ -1301,7 +1301,7 @@ This entry is itself the §11 #11 amendment-log pairing for the §8.4 four-amend
 ## Correction Pass 15 — §8.2 `primary_registry` source-type band (resolves FAA RID + SIG-registry structural-equivalence finding)
 
 **Date:** 2026-05-11
-**Source:** [MAC-63](/MAC/issues/MAC-63) reopened-via-comment dispatch [`c0e91b23`](/MAC/issues/MAC-63#comment-c0e91b23-ba74-4ebe-8d3e-e6fe94c67f0e) 2026-05-11 with fresh §11 #11 delegation scoped to: CP15 ratification (with 3 board-flagged refinements to the Phase-5 draft) + migration 0015 + promotion-cycle-2 (483 rows) + final handoff. Original surfacing: Wave-A Phase 3a 481 FAA RID `drone_id_prefix` rows (alphafox02/DragonSync) + Wave-A 1a/2+ Apple `0x004C` + XUNTONG `0x09C8` `ble_manufacturer_id` rows. Board's reframe at MAC-63 [`fe2beeee`](/MAC/issues/MAC-63#comment-fe2beeee-2571-475e-86f6-edc99f99ecad) 2026-05-11. Phase-1 ratification at MAC-63 [`f00e9120`](/MAC/issues/MAC-63#comment-f00e9120-e92d-4226-af25-60bd075951b7).
+**Source:** [MAC-63](<TRACKER_URL>issues/MAC-63) reopened-via-comment dispatch [`c0e91b23`](<TRACKER_URL>issues/MAC-63#comment-c0e91b23-ba74-4ebe-8d3e-e6fe94c67f0e) 2026-05-11 with fresh §11 #11 delegation scoped to: CP15 ratification (with 3 board-flagged refinements to the Phase-5 draft) + migration 0015 + promotion-cycle-2 (483 rows) + final handoff. Original surfacing: Wave-A Phase 3a 481 FAA RID `drone_id_prefix` rows (alphafox02/DragonSync) + Wave-A 1a/2+ Apple `0x004C` + XUNTONG `0x09C8` `ble_manufacturer_id` rows. Board's reframe at MAC-63 [`fe2beeee`](<TRACKER_URL>issues/MAC-63#comment-fe2beeee-2571-475e-86f6-edc99f99ecad) 2026-05-11. Phase-1 ratification at MAC-63 [`f00e9120`](<TRACKER_URL>issues/MAC-63#comment-f00e9120-e92d-4226-af25-60bd075951b7).
 **Bible commit:** PROJECT_BIBLE.md §8.2 source-band table edit (insert `primary_registry` row + narrow `official` description) + new §8.2 `primary_registry` sub-rule + PROJECT_BIBLE.md §12 FAA RID question `RESOLVED by CP15 2026-05-11` append + BIBLE_AMENDMENTS.md CP15 entry (this entry) + draft moved from `raw/wave_a/_bible_amendment_cp15_primary_registry_draft_2026-05-11.md` to `bible/history/cp15/`. Single coordinated commit titled "CP15: §8.2 primary_registry source-type band (resolves FAA RID + SIG-registry structural-equivalence finding)".
 **Binds:** Validator (§11 #7 promotion gate — promotion-cycle-2 will sweep the 483-row HOLD batch at conf=85 single-source under the new band), Export Worker (§7.5 — `primary_registry` rows flow to Lynceus high-confidence export when `device_category ≠ 'unknown'` per §11 #13; FAA RID `drone_id_prefix` rows with category=`drone` qualify, SIG company-IDs at category=`unknown` excluded by §11 #13 carveout), SourceWorker (post-CP15 ingest of registry-direct citations classifies under `primary_registry`).
 
@@ -1342,7 +1342,7 @@ Three refinements applied before this coordinated commit:
 2. **§11 #8 reclassification tightening (closed the "ancestry chain" loophole)** — replaced the draft's permissive "WHEN the row's ancestry chain establishes the registry-issuer citation" phrasing with a strict-direct-source_url requirement. A third-party citation chain reaching a registry no longer qualifies; a new raw_observations row citing the registry directly is required.
 3. **§3.1 multi-registry narrow** — dropped the draft's speculative "higher-authority registry" framing (which would have required CP15 to legislate registry-authority-ranking without precedent) in favor of "most-direct citation wins"; registry-internal reassignment routes to conflicts table.
 
-Phase-1 verification report at MAC-63 [`7642f54a`](/MAC/issues/MAC-63#comment-7642f54a-cc85-4740-9436-e376a7f56815). Board's pre-Phase-2 grep check at `f00e9120` caught a `§2.2 / §2.3 drift` (the tightened reclassification rule was in §2.3 audit-stub but missing from §2.2 bible-text); fixed before this coordinated commit so the bible-binding portion carries the same tightened rule as the audit-trail entry.
+Phase-1 verification report at MAC-63 [`7642f54a`](<TRACKER_URL>issues/MAC-63#comment-7642f54a-cc85-4740-9436-e376a7f56815). Board's pre-Phase-2 grep check at `f00e9120` caught a `§2.2 / §2.3 drift` (the tightened reclassification rule was in §2.3 audit-stub but missing from §2.2 bible-text); fixed before this coordinated commit so the bible-binding portion carries the same tightened rule as the audit-trail entry.
 
 ### §11 hard-rule discipline
 
@@ -1381,8 +1381,8 @@ This entry is itself the §11 #11 amendment-log pairing for the §8.2 edits in t
 ## Correction Pass 16 — §4.4 Lynceus mapping for CP14 identifier_type cluster
 
 **Date:** 2026-05-12
-**Source:** [MAC-75](/MAC/issues/MAC-75) CP16 dispatch. Trigger: MAC-63 Phase 5 HALT (CP14→§4.4 downstream-consumer gap; second post-memo recurrence of the bible-amendment-downstream-consumer-update pattern after CP12→CP13 + CP13→MAC-57). Six-phase verify-and-halt dispatch under fresh CEO §11 #11 delegation 2026-05-12. Phase ratifications at: Phase 1 [`ee60c712`](/MAC/issues/MAC-75#comment-ee60c712-fcef-4795-a1ac-8727e70b8045), Phase 2 [`5b9212ce`](/MAC/issues/MAC-75#comment-5b9212ce-5276-4fb6-9bd7-dae62d2e53f3), Phase 3 [`369cb7c7`](/MAC/issues/MAC-75#comment-369cb7c7-269d-48fe-a0b6-e2d5cd369a15), Phase 4 [`dbfb5da6`](/MAC/issues/MAC-75#comment-dbfb5da6-a3a2-4434-99d7-da9b46d9acd8).
-**Authority:** Fresh CEO §11 #11 delegation 2026-05-12 (MAC-75 wake comment [`017df17b`](/MAC/issues/MAC-75#comment-017df17b-1798-4606-bdae-5723bdb7ef25)).
+**Source:** [MAC-75](<TRACKER_URL>issues/MAC-75) CP16 dispatch. Trigger: MAC-63 Phase 5 HALT (CP14→§4.4 downstream-consumer gap; second post-memo recurrence of the bible-amendment-downstream-consumer-update pattern after CP12→CP13 + CP13→MAC-57). Six-phase verify-and-halt dispatch under fresh CEO §11 #11 delegation 2026-05-12. Phase ratifications at: Phase 1 [`ee60c712`](<TRACKER_URL>issues/MAC-75#comment-ee60c712-fcef-4795-a1ac-8727e70b8045), Phase 2 [`5b9212ce`](<TRACKER_URL>issues/MAC-75#comment-5b9212ce-5276-4fb6-9bd7-dae62d2e53f3), Phase 3 [`369cb7c7`](<TRACKER_URL>issues/MAC-75#comment-369cb7c7-269d-48fe-a0b6-e2d5cd369a15), Phase 4 [`dbfb5da6`](<TRACKER_URL>issues/MAC-75#comment-dbfb5da6-a3a2-4434-99d7-da9b46d9acd8).
+**Authority:** Fresh CEO §11 #11 delegation 2026-05-12 (MAC-75 wake comment [`017df17b`](<TRACKER_URL>issues/MAC-75#comment-017df17b-1798-4606-bdae-5723bdb7ef25)).
 **Bible commit:** PROJECT_BIBLE.md §4.4 (15 new mapping rows + 3 new pattern_type introductions + architectural-separation paragraph) + BIBLE_AMENDMENTS.md CP16 entry (this entry) + bible-amendment draft moved from `raw/wave_a/_bible_amendment_cp16_lynceus_mapping_draft_2026-05-12.md` to `bible/history/cp16/`. Single coordinated commit titled "CP16: §4.4 Lynceus mapping for CP14 identifier_type cluster".
 **Code-sibling commit (paired, second commit per CP14/CP15 precedent):** `db/validation/export_lynceus.py` (3 MAP dict additions + new `DROPPED_REASONS` dict + new `_classify_row` branch + `bins` initializer expansion + `fmt_bin_table` rendering expansion + `mac_range` stale-comment refresh) + `tests/test_export_lynceus.py` (union-assertion + structural-invariant + new MAP/DROPPED assertions) + `feedback_bible_amendment_downstream_consumer_audit.md` (memory-rule strengthening: S.1 case-study + S.2 + S.3 + S.4 + S.5 + S.6). Code-patch draft retired from `db/validation/_drafts/` (first instance of code-patch staging mirroring `db/migrations/_drafts/` shape per new memo S.5). Commit titled "chore(export): CP16 Lynceus mapping coordinated patch + memory-rule strengthening".
 **Binds:** Export Worker (§7.5 — 3 new pattern_type values + 12 DROPPED-reason buckets in coverage report; runtime aggregation/reconciliation surfaces extended), Validator (§11 #7 promotion-cycle-2 sweep of 417 HOLD candidates now unblocked post-CP16), Lynceus integration team (independent sequencing of the 3 new pattern_types into v0.4+ scanner-config schema; consumer-carries-capability-state posture explicit).
@@ -1448,19 +1448,19 @@ This CP16 entry is the §11 #11 amendment-log pairing for the §4.4 amendment in
 ## Correction Pass 17 — §8.2 manufacturer_app coalesce-pass + SAR-11 chunked codification + WAVE_G_RUNBOOK §3 + §11 #7 + scan-ignore landing
 
 **Date:** 2026-05-13
-**Source:** Track E CP16 proposal-shape surfaced at MAC-1 [`a8b17428`](/MAC/issues/MAC-1#comment-a8b17428-0032-49ed-9f56-e9b4b6ac018c) HB73 2026-05-11 (12-unit envelope; HB70 9 high-level → expanded per HB73). CP16-1 through CP16-7 META decisions ratified at HB74 [`bb5c58a8`](/MAC/issues/MAC-1#comment-bb5c58a8-0723-4afa-b5a8-618f4b7dafd4) 2026-05-12 (12-unit enumeration locked + single coordinated commit + §8.2 coalesce-pass + single SAR-11 row with A/B/C sub-rules + Runbook §3 corrections + path-γ MAC-53 re-base + slot-0016 verify-wrapper test). **Renumbered to CP17 at HB98 [`71077702`](/MAC/issues/MAC-1#comment-71077702-c932-4121-a2b0-646272829404) 2026-05-13** post-bible-CP16-numbering-collision finding: bible CP16 had already committed at `d37e9dc` for §4.4 Lynceus mapping (MAC-75 dispatch). Track E retained the META ratifications carried forward as CP17 META. CP17 scope-refresh per HB98 status audit collapsed the original 12-unit envelope to 4 components (CP17-A SAR-11 + CP17-B §8.2 coalesce + CP17-C Runbook + CP17-D coordinated-commit-composition) plus 1 paired code-sibling. Composition surfaced HB102 [`f63db2dd-placeholder`]; board prose-quality ratification batch HB103 [`e7405643`](/MAC/issues/MAC-1#comment-e7405643-77f2-4635-a97e-4ca661f8cd65); commit-firing HB104.
+**Source:** Track E CP16 proposal-shape surfaced at MAC-1 [`a8b17428`](<TRACKER_URL>issues/MAC-1#comment-a8b17428-0032-49ed-9f56-e9b4b6ac018c) HB73 2026-05-11 (12-unit envelope; HB70 9 high-level → expanded per HB73). CP16-1 through CP16-7 META decisions ratified at HB74 [`bb5c58a8`](<TRACKER_URL>issues/MAC-1#comment-bb5c58a8-0723-4afa-b5a8-618f4b7dafd4) 2026-05-12 (12-unit enumeration locked + single coordinated commit + §8.2 coalesce-pass + single SAR-11 row with A/B/C sub-rules + Runbook §3 corrections + path-γ MAC-53 re-base + slot-0016 verify-wrapper test). **Renumbered to CP17 at HB98 [`71077702`](<TRACKER_URL>issues/MAC-1#comment-71077702-c932-4121-a2b0-646272829404) 2026-05-13** post-bible-CP16-numbering-collision finding: bible CP16 had already committed at `d37e9dc` for §4.4 Lynceus mapping (MAC-75 dispatch). Track E retained the META ratifications carried forward as CP17 META. CP17 scope-refresh per HB98 status audit collapsed the original 12-unit envelope to 4 components (CP17-A SAR-11 + CP17-B §8.2 coalesce + CP17-C Runbook + CP17-D coordinated-commit-composition) plus 1 paired code-sibling. Composition surfaced HB102 [`f63db2dd-placeholder`]; board prose-quality ratification batch HB103 [`e7405643`](<TRACKER_URL>issues/MAC-1#comment-e7405643-77f2-4635-a97e-4ca661f8cd65); commit-firing HB104.
 **Bible commit:** This entry + SAR-11 row insert into BIBLE_AMENDMENTS.md § Sub-agent rule additions + PROJECT_BIBLE.md §8.2 manufacturer_app block replacement + android_test/WAVE_G_RUNBOOK.md §3 + §11 #7 + .gitleaksignore + .trufflehogignore + .gitignore §11 #15 carveout) + paired code-sibling commit (android_test/tools/extraction/wave_g_extractor.py Priority A bug fix, already-applied during Wave G calibration 2026-05-10; this commit is the first-git-tracked occurrence) + state-rotation commit (PROJECT_STATE.md HB102+HB103+HB104 close).
 **Binds:** ExtractionWorker (Wave G `wave_g_extractor.py` FP-filter pipeline + cohort-distinction queue-ordering + `vendor_template_namespace_uuid` extraction logic per §8.2 sub-banding rule + SAR-11 Priority A/B/C FP-class disambig at extraction-time), Validator (§11 #7 promotion gate + SAR-11 Priority D Validator-judgment per-candidate labeling + short-ID-walking inference for `vendor_template_namespace_uuid` templates per §8.2 sub-rule), Lynceus integration team (no immediate consumer-side effect; `vendor_template_namespace_uuid` identifier_type lands at first-promotion-time with schema sibling per `feedback_enum_amendment_needs_schema_migration_sibling.md` forward-looking-codification caveat).
 
 ### Why this Correction Pass exists
 
-Wave G pre-v1 autonomous static-analysis session 2026-05-10 (MAC-52 [`ddc193cd`](/MAC/issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b)) surfaced two structural findings + one large operational artifact set: (a) the operator-vs-installer cohort distinction (operator apps yield product-family taxonomy ONLY; installer/pairing apps yield BLE/SSID/credential identifiers), (b) the `vendor_template_namespace_uuid` sub-class observation (Getac BWC Viewer's 2-UUID shared-suffix `-1b7f-430ea194e6cf` pattern), (c) the 23 novel FP classes + 1 Priority-A bug fix (path-filter `looks_like_third_party_lib()` leading-slash mismatch) from the calibration-window + cohort-B-E analysis. HB57 §E ladder [`e492ac66`](/MAC/issues/MAC-1#comment-e492ac66-7109-412a-acb3-8db1d247310d) ratified the 8-item bundle for CP14 coordinated commit; CP14's actual commit body landed only the §8.4 four-amendment batch + §11 #12 expansion + 5 schema migrations, deferring SAR-11 + §8.2 sub-amends + Runbook corrections to a future CP. Track E proposal-shape surfaced the deferred bundle at HB73 with 12-unit envelope expansion; HB74 META-ratified the chunked structure; HB98 surfaced + resolved the bible-CP16-vs-Track-E-CP16 numbering collision; HB99-HB101 drafted the four CP17-A/B/C/D component §-texts; HB102 composed the 3-commit coordinated landing; HB103 dispositioned two structural-integrity flags (hunk-staging discipline + decompile-carveout scope-narrowing). This CP17 lands the deferred bundle.
+Wave G pre-v1 autonomous static-analysis session 2026-05-10 (MAC-52 [`ddc193cd`](<TRACKER_URL>issues/MAC-52#comment-ddc193cd-0dec-4fab-a83c-30b04f79506b)) surfaced two structural findings + one large operational artifact set: (a) the operator-vs-installer cohort distinction (operator apps yield product-family taxonomy ONLY; installer/pairing apps yield BLE/SSID/credential identifiers), (b) the `vendor_template_namespace_uuid` sub-class observation (Getac BWC Viewer's 2-UUID shared-suffix `-1b7f-430ea194e6cf` pattern), (c) the 23 novel FP classes + 1 Priority-A bug fix (path-filter `looks_like_third_party_lib()` leading-slash mismatch) from the calibration-window + cohort-B-E analysis. HB57 §E ladder [`e492ac66`](<TRACKER_URL>issues/MAC-1#comment-e492ac66-7109-412a-acb3-8db1d247310d) ratified the 8-item bundle for CP14 coordinated commit; CP14's actual commit body landed only the §8.4 four-amendment batch + §11 #12 expansion + 5 schema migrations, deferring SAR-11 + §8.2 sub-amends + Runbook corrections to a future CP. Track E proposal-shape surfaced the deferred bundle at HB73 with 12-unit envelope expansion; HB74 META-ratified the chunked structure; HB98 surfaced + resolved the bible-CP16-vs-Track-E-CP16 numbering collision; HB99-HB101 drafted the four CP17-A/B/C/D component §-texts; HB102 composed the 3-commit coordinated landing; HB103 dispositioned two structural-integrity flags (hunk-staging discipline + decompile-carveout scope-narrowing). This CP17 lands the deferred bundle.
 
 ### Corrections applied
 
-1. **SAR-11 chunked codification (CP17-A; HB99 [`d1588ea1`](/MAC/issues/MAC-1#comment-d1588ea1-8da5-4195-a2b8-e8153e786042)).** New SAR-11 row in BIBLE_AMENDMENTS.md § Sub-agent rule additions, structured per HB57 §E.2 board-ratified chunking (Priority A `looks_like_third_party_lib()` jadx/apktool/prefix-without-leading-slash three-layout support; Priority B 8 high-evidence FP classes; Priority C 15 lower-evidence + cohort-B-E FP classes; Priority D Validator-judgment per-author labeling). Authoritative machine-readable scope at `android_test/extraction_outputs/wave_g_pre_v1/calibration/proposed_fp_classes.json`.
+1. **SAR-11 chunked codification (CP17-A; HB99 [`d1588ea1`](<TRACKER_URL>issues/MAC-1#comment-d1588ea1-8da5-4195-a2b8-e8153e786042)).** New SAR-11 row in BIBLE_AMENDMENTS.md § Sub-agent rule additions, structured per HB57 §E.2 board-ratified chunking (Priority A `looks_like_third_party_lib()` jadx/apktool/prefix-without-leading-slash three-layout support; Priority B 8 high-evidence FP classes; Priority C 15 lower-evidence + cohort-B-E FP classes; Priority D Validator-judgment per-author labeling). Authoritative machine-readable scope at `android_test/extraction_outputs/wave_g_pre_v1/calibration/proposed_fp_classes.json`.
 
-2. **§8.2 manufacturer_app coalesce-pass (CP17-B; HB100 ratified at MAC-1 [`cd305c6a`](/MAC/issues/MAC-1#comment-cd305c6a-30f9-4133-a855-498643dcf890)).** PROJECT_BIBLE.md §8.2 `manufacturer_app sub-banding` block replaced verbatim by expanded block. Four sub-amends folded into single forward-write per CP16-3 META carried as CP17-3: (a) cohort distinction paragraph (operator-facing vs installer/pairing/technician; Wave G evidence base of 8 operator apps yielding 0 BLE UUIDs vs 2 installer apps yielding 6 unique vendor BLE UUIDs), (b) new `vendor_template_namespace_uuid` sub-band 75-90 + ExtractionWorker 4-step recipe, (c) product-family taxonomy row split into three rows (`marketing_name` / `internal_codename` / `device_type_enum_value`; all at 90-95 sub-band), (d) closing-paragraph SAR-11 reference updated from "(proposed; gated on Step-2 calibration)" to "(ratified at Correction Pass 17, 2026-05-13)" + new "Typical cohort" column on sub-banding table.
+2. **§8.2 manufacturer_app coalesce-pass (CP17-B; HB100 ratified at MAC-1 [`cd305c6a`](<TRACKER_URL>issues/MAC-1#comment-cd305c6a-30f9-4133-a855-498643dcf890)).** PROJECT_BIBLE.md §8.2 `manufacturer_app sub-banding` block replaced verbatim by expanded block. Four sub-amends folded into single forward-write per CP16-3 META carried as CP17-3: (a) cohort distinction paragraph (operator-facing vs installer/pairing/technician; Wave G evidence base of 8 operator apps yielding 0 BLE UUIDs vs 2 installer apps yielding 6 unique vendor BLE UUIDs), (b) new `vendor_template_namespace_uuid` sub-band 75-90 + ExtractionWorker 4-step recipe, (c) product-family taxonomy row split into three rows (`marketing_name` / `internal_codename` / `device_type_enum_value`; all at 90-95 sub-band), (d) closing-paragraph SAR-11 reference updated from "(proposed; gated on Step-2 calibration)" to "(ratified at Correction Pass 17, 2026-05-13)" + new "Typical cohort" column on sub-banding table.
 
 3. **WAVE_G_RUNBOOK §3 8 package-name corrections + vendor-unavailable block (CP17-C 2a; HB101).** Runbook §3 vendor target list updated with Wave G calibration discoveries: Flock Safety (operator + installer two-app deployment); SoundThinking (`alerts` not `respondr`); Axon (`com.evidence` + `com.evidence.flex` LE-only; View XL Windows-platform-mismatch); Cradlepoint (`.manager` suffix); Hak5 (`org.hak5.pineappleconnector`; Cloud C2 desktop/web platform-mismatch); Autel Robotics (`com.autelrobotics.explorer`); Avigilon (`com.avigilon.acc_mobile`); Genetec (`com.genetec.platformmobile`). Vendor-unavailable-on-Android documentation block absorbs 11 vendors per HB57 §E.8.
 
@@ -1792,7 +1792,7 @@ Anchor:
 
 Demonstrates a structurally new sub-class: **decomposition-time-projection-stale** — distinct from prior class (a)/(b)/(c) sub-classes. The dispatch authoring did the aggregate-level live-state pre-flight correctly (per S.7 §6.0 5%-divergence threshold) but failed to run per-sub-item count queries at decomposition time. Aggregate baselines can match while per-sub-item cohorts have already drifted to post-state from prior sweeps. The refinement: when DECOMPOSING an aggregate dispatch into per-sub-item child issues with §0 baseline counts, the decomposing agent (CEO or sub-CEO) MUST run each per-sub-item count query at decomposition time, not just the aggregate-level baseline. Validator's §6.0 check is the final defense; this rule prevents the Validator round-trip in the first place.
 
-This is also the **first sources-row vs identifiers-row band-labeling inconsistency** surfaced (sub-item (d)). Sources 1/2/3/7 carry historic `regulatory` band assertions in `sources.source_type` while the identifiers-row data has been correctly labeled `primary_registry` post-CP15. Deferred to single-purpose post-ship work per CEO recommendation + board MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c) ratification — not ship-blocking (identifiers-row data correctly labeled, exports unaffected); requires downstream-consumer audit before flip per S.1; new sub-rule (sources-row metadata vs identifiers-row reclassification) needs explicit codification that benefits from its own dedicated heartbeat. Documented in README §3.2 (per dispatch §3.2 contribution-guidance section) as "known sources-row metadata discrepancy (pre-CP15 vestige; identifiers-row data correctly labeled; cleanup queued post-ship)".
+This is also the **first sources-row vs identifiers-row band-labeling inconsistency** surfaced (sub-item (d)). Sources 1/2/3/7 carry historic `regulatory` band assertions in `sources.source_type` while the identifiers-row data has been correctly labeled `primary_registry` post-CP15. Deferred to single-purpose post-ship work per CEO recommendation + board MAC-101 [`dd7bd55c`](<TRACKER_URL>issues/MAC-101#comment-dd7bd55c) ratification — not ship-blocking (identifiers-row data correctly labeled, exports unaffected); requires downstream-consumer audit before flip per S.1; new sub-rule (sources-row metadata vs identifiers-row reclassification) needs explicit codification that benefits from its own dedicated heartbeat. Documented in README §3.2 (per dispatch §3.2 contribution-guidance section) as "known sources-row metadata discrepancy (pre-CP15 vestige; identifiers-row data correctly labeled; cleanup queued post-ship)".
 
 Codified in CEO sibling memo `feedback_db_verify_dispatch_claims.md` recurrence #2 (extension to the dispatch-claim-verification rule covering decomposition-time-projection too, not just dispatch-authoring-time).
 
@@ -1804,35 +1804,35 @@ CEO authored TWO contradictory dispositions on MAC-118 — the second authored f
 
 | Time | Actor | Surface | Event |
 |---|---|---|---|
-| 14:49Z | Validator (da137694) | [`7110a211`](/MAC/issues/MAC-118#comment-7110a211) | MAC-118 audit surface-back: F1 sentinel-key consistency + F2 sid=41 `<verify-in-mapper-from-LICENSE-file>` placeholder + F3 operator-path scrub (193 occurrences / 77 files) |
-| **14:53Z** | **CEO** | **[`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69)** | **First CEO ratification:** F1 → defer CP21 + F2 → Option (a) verify-in-mapper + F3 → Option B1+B2 scrub with carveouts |
+| 14:49Z | Validator (da137694) | [`7110a211`](<TRACKER_URL>issues/MAC-118#comment-7110a211) | MAC-118 audit surface-back: F1 sentinel-key consistency + F2 sid=41 `<verify-in-mapper-from-LICENSE-file>` placeholder + F3 operator-path scrub (193 occurrences / 77 files) |
+| **14:53Z** | **CEO** | **[`b012ac69`](<TRACKER_URL>issues/MAC-118#comment-b012ac69)** | **First CEO ratification:** F1 → defer CP21 + F2 → Option (a) verify-in-mapper + F3 → Option B1+B2 scrub with carveouts |
 | 15:03Z | Validator (commit) | [`106689b`](https://github.com/kevwillow/argus-db/commit/106689b) | F3 path scrub: 34 tracked files (23 Python B1 + 7 prose B2 + B2-extended); bible / §8.4 / wigle-grant-response carveouts preserved |
 | 15:05Z | Validator (commit) | [`18c3d23`](https://github.com/kevwillow/argus-db/commit/18c3d23) | F2 sid=41 backfill: posture = `CC-BY-NC-ND-4.0_with_research_use_clause` + 14 promoted identifiers backfilled with `notes.upstream_license_posture` (canonical key per F1 deferred-ratification) |
-| 15:08Z | Validator | [`ed4a51af`](/MAC/issues/MAC-118#comment-ed4a51af) | Surface-back: F2 + F3 commits landed; pre-ship gate PASS |
-| 15:11Z | CEO | [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) | Ratification close: MAC-118 → `done` |
+| 15:08Z | Validator | [`ed4a51af`](<TRACKER_URL>issues/MAC-118#comment-ed4a51af) | Surface-back: F2 + F3 commits landed; pre-ship gate PASS |
+| 15:11Z | CEO | [`aeb1160d`](<TRACKER_URL>issues/MAC-118#comment-aeb1160d) | Ratification close: MAC-118 → `done` |
 | ... ~2h gap (parallel work on other MAC-101 items) ... | | | |
-| **17:23Z** | **CEO** | **[`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6)** | **SECOND CEO disposition: F2 → Option (b) defer-to-prose + F3 → spawn MAC-119 child for scrub.** Authored as if findings were still pending; did NOT paste-verify current state. |
+| **17:23Z** | **CEO** | **[`7547e0d6`](<TRACKER_URL>issues/MAC-118#comment-7547e0d6)** | **SECOND CEO disposition: F2 → Option (b) defer-to-prose + F3 → spawn MAC-119 child for scrub.** Authored as if findings were still pending; did NOT paste-verify current state. |
 | 17:24Z | CEO | MAC-119 filed | Spuriously filed F3 scrub child (REDUNDANT — F3 already landed at 15:03Z) |
-| 17:28Z | Validator | [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) | MAC-119 surface-back: "scrub already landed (commit `106689b`); recommend done" — quoted verbatim, not asserted; that sha has not resolved since the pre-v1.0.0 rewrite (dead-cite exemplar, MAC-704) |
-| 17:29Z | CEO | [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) | **CEO reconciliation comment** — self-identifies as "dispatch-preamble-live-state-verification miss on the disposition author's part — rule applies symmetrically to CEO dispositions, not just dispatches" |
-| 17:35Z | CEO | [`5789aeb8`](/MAC/issues/MAC-119#comment-5789aeb8) | MAC-119 → `done` (redundant scrub-already-done ratification) |
+| 17:28Z | Validator | [`91ecbb3e`](<TRACKER_URL>issues/MAC-119#comment-91ecbb3e) | MAC-119 surface-back: "scrub already landed (commit `106689b`); recommend done" — quoted verbatim, not asserted; that sha has not resolved since the pre-v1.0.0 rewrite (dead-cite exemplar, MAC-704) |
+| 17:29Z | CEO | [`fc284872`](<TRACKER_URL>issues/MAC-118#comment-fc284872) | **CEO reconciliation comment** — self-identifies as "dispatch-preamble-live-state-verification miss on the disposition author's part — rule applies symmetrically to CEO dispositions, not just dispatches" |
+| 17:35Z | CEO | [`5789aeb8`](<TRACKER_URL>issues/MAC-119#comment-5789aeb8) | MAC-119 → `done` (redundant scrub-already-done ratification) |
 
 Anchor:
-  MAC-118 thread [`7110a211`](/MAC/issues/MAC-118#comment-7110a211) → [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) → [`ed4a51af`](/MAC/issues/MAC-118#comment-ed4a51af) → [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) → [`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6) → [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) + commits [`18c3d23`](https://github.com/kevwillow/argus-db/commit/18c3d23) + [`106689b`](https://github.com/kevwillow/argus-db/commit/106689b) + CEO investigation surface-back MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) + board ratification MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125)
+  MAC-118 thread [`7110a211`](<TRACKER_URL>issues/MAC-118#comment-7110a211) → [`b012ac69`](<TRACKER_URL>issues/MAC-118#comment-b012ac69) → [`ed4a51af`](<TRACKER_URL>issues/MAC-118#comment-ed4a51af) → [`aeb1160d`](<TRACKER_URL>issues/MAC-118#comment-aeb1160d) → [`7547e0d6`](<TRACKER_URL>issues/MAC-118#comment-7547e0d6) → [`fc284872`](<TRACKER_URL>issues/MAC-118#comment-fc284872) + commits [`18c3d23`](https://github.com/kevwillow/argus-db/commit/18c3d23) + [`106689b`](https://github.com/kevwillow/argus-db/commit/106689b) + CEO investigation surface-back MAC-101 [`78653abe`](<TRACKER_URL>issues/MAC-101#comment-78653abe) + board ratification MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125)
 
 **Class (e) ratifier-disposition-stale-state sub-class designation:** when a ratifier (CEO or board) authors a SECOND disposition on an issue that has already been ratified, executed, and closed at an earlier surface, without paste-verifying current state. Structurally distinct from class (d) decomposition-time-projection-stale (which is dispatch-authoring-time projection against live data; this is post-resolution disposition against already-landed reality).
 
-Actor-neutral framing preferred per board ratification (MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125) §2): "ratifier-disposition-stale-state" applies symmetrically to CEO and board ratifications.
+Actor-neutral framing preferred per board ratification (MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125) §2): "ratifier-disposition-stale-state" applies symmetrically to CEO and board ratifications.
 
-**Failure-mode classification** (per CEO investigation [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §2 + board ratification §1): the board's pre-investigation hypotheses — (i) worker-applied-without-surfacing / (ii) manual-edit-outside-dispatch / (iii) unrecorded-dispatch — were each explicitly tested against the evidence and none applied. The actual mode is class (e): CEO authored both dispositions; the second was authored from a stale mental model.
+**Failure-mode classification** (per CEO investigation [`78653abe`](<TRACKER_URL>issues/MAC-101#comment-78653abe) §2 + board ratification §1): the board's pre-investigation hypotheses — (i) worker-applied-without-surfacing / (ii) manual-edit-outside-dispatch / (iii) unrecorded-dispatch — were each explicitly tested against the evidence and none applied. The actual mode is class (e): CEO authored both dispositions; the second was authored from a stale mental model.
 
 **Substantive outcome (zero harm):**
 
 - 17:23Z second disposition did not propagate
-- MAC-119 redundant filing caught by Validator surface-back at [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) within 5 minutes
+- MAC-119 redundant filing caught by Validator surface-back at [`91ecbb3e`](<TRACKER_URL>issues/MAC-119#comment-91ecbb3e) within 5 minutes
 - Canonical state stays clean: sid=41 = `CC-BY-NC-ND-4.0_with_research_use_clause`, CREDITS.md (commit [`f1a3405`](https://github.com/kevwillow/argus-db/commit/f1a3405)) reflects, LICENSE-DATA §2.1 (commit [`ead49a3`](https://github.com/kevwillow/argus-db/commit/ead49a3)) references correctly
 - No §11 hard-rule trip, no data corruption, no consumer-facing impact
-- [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) reconciliation comment captures the discipline lesson in audit-trail surface
+- [`fc284872`](<TRACKER_URL>issues/MAC-118#comment-fc284872) reconciliation comment captures the discipline lesson in audit-trail surface
 
 **Discipline-self-catch shape:** the 17:29Z reconciliation comment self-identified the discipline failure without board intervention. This is the discipline-self-catch shape that makes S.7's audit-trail mechanism load-bearing — recurrence #11 represents the discipline working as designed (Validator + CEO + reconciliation chain caught the drift; canonical state stays clean).
 
@@ -1842,7 +1842,7 @@ Whether to extend S.7's authoring rule explicitly to ratifier-class actions is t
 
 CEO authored a fabricated GitHub URL `https://github.com/CascadeForge/argus[.git OR /commit/<sha>]` across multiple bible-text edits, audit-trail entries, repo-doc edits, and memory files. The canonical operator URL is `https://github.com/kevwillow/argus-db`. The fabricated `CascadeForge` org-name is an operator-other-project-employee handle that propagated into Argus context across 25 in-repo + 11 in-memory occurrences before operator caught it at consumption time.
 
-**Surfaced:** Board finding at MAC-124 [`e539cd41`](/MAC/issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704) (2026-05-15) reviewing commit `81931d7`. The fabrication had been propagating since commit [`f45657d`](https://github.com/kevwillow/argus-db/commit/f45657d) (2026-05-14, prior CEO heartbeat).
+**Surfaced:** Board finding at MAC-124 [`e539cd41`](<TRACKER_URL>issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704) (2026-05-15) reviewing commit `81931d7`. The fabrication had been propagating since commit [`f45657d`](https://github.com/kevwillow/argus-db/commit/f45657d) (2026-05-14, prior CEO heartbeat).
 
 **Origin + propagation chain:**
 
@@ -1852,9 +1852,9 @@ CEO authored a fabricated GitHub URL `https://github.com/CascadeForge/argus[.git
 | 2026-05-14 (subsequent prior heartbeats) | commits [`dfdb052`](https://github.com/kevwillow/argus-db/commit/dfdb052), [`bd1e0e1`](https://github.com/kevwillow/argus-db/commit/bd1e0e1), [`4803ccf`](https://github.com/kevwillow/argus-db/commit/4803ccf), [`47403e3`](https://github.com/kevwillow/argus-db/commit/47403e3), [`da8f21c`](https://github.com/kevwillow/argus-db/commit/da8f21c), [`9295af8`](https://github.com/kevwillow/argus-db/commit/9295af8) | Pattern propagated into BIBLE_AMENDMENTS.md (16×), PROJECT_STATE.md (4×), README.md (3× — 2 shields.io badges + 1 clone URL) |
 | 2026-05-14 22:06Z | commit [`c9109de`](https://github.com/kevwillow/argus-db/commit/c9109de) | CEO (this session) introduced 1 new occurrence in SETUP.md Quickstart by drawing the pattern from the existing README clone-URL line as established convention |
 | 2026-05-15 02:55Z | commit [`81931d7`](https://github.com/kevwillow/argus-db/commit/81931d7) | CEO modified README.md Quickstart `pip install` line; did NOT touch the existing CascadeForge clone-URL line because edit was scoped to `pip install` only — the fabrication survived intact |
-| 2026-05-15 03:04Z | MAC-124 [`e539cd41`](/MAC/issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704) | Board surface-back: "Commit 81931d7 introduced a fabricated GitHub URL... CascadeForge does not refer to anything in the Argus project" |
-| 2026-05-15 03:05Z | MAC-124 [`acbf4eaa`](/MAC/issues/MAC-124#comment-acbf4eaa-8075-4876-bf19-9527acae433c) | CEO Phase 1 manifest: 25 in-repo + 11 in-memory occurrences traced + bidirectional leak-path identified |
-| 2026-05-15 03:16Z | MAC-124 [`06e328ea`](/MAC/issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) | Board ratifies replacement values + GO Phase 2 bundled fix |
+| 2026-05-15 03:04Z | MAC-124 [`e539cd41`](<TRACKER_URL>issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704) | Board surface-back: "Commit 81931d7 introduced a fabricated GitHub URL... CascadeForge does not refer to anything in the Argus project" |
+| 2026-05-15 03:05Z | MAC-124 [`acbf4eaa`](<TRACKER_URL>issues/MAC-124#comment-acbf4eaa-8075-4876-bf19-9527acae433c) | CEO Phase 1 manifest: 25 in-repo + 11 in-memory occurrences traced + bidirectional leak-path identified |
+| 2026-05-15 03:16Z | MAC-124 [`06e328ea`](<TRACKER_URL>issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) | Board ratifies replacement values + GO Phase 2 bundled fix |
 | 2026-05-15 (this commit) | this entry | Phase 2 fix landed: 24 in-repo replacements (25 minus 1 dropped CI badge) + 11 in-memory replacements + SAR-12 §4 Case 12 + §6 recurrence #12 + sub-rule clarification |
 
 **Class (b) field-value sub-class designation:** distinct from prior (b) sub-classes. Recurrence #8 was rule-scope (`§11 #13 unknown-cat exclusion scope`); recurrence #9 was table-scope (`manufacturers` semantics); the pre-codification recurrences were field-name (FAA `documentNumber` → `trackingNumber`). This is **field-value** — the assertion is about the value of a variable inside a deterministic template (the `<org>` variable in the `https://github.com/<org>/<repo>/commit/<sha>` template). The template structure was stable; the variable substitution was fabricated.
@@ -1901,7 +1901,7 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
     mismatch class — class (a) baseline cited at one counting
     granularity but consumed at another. Informational, not
     blocking; CEO surfaced + proceeded with 80/335 per board
-    ratification at MAC-88 [`a1dab600`](/MAC/issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05).
+    ratification at MAC-88 [`a1dab600`](<TRACKER_URL>issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05).
     First post-codification recurrence; 2 more before meta-revision
     trigger per §6 threshold.
   - Recurrence #8 (post-codification, MAC-100 dispatch §2
@@ -1944,7 +1944,7 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
     check predicate) asserted `manufacturers` table as a corporate-
     entity registry with expected ~60/75 clears under canonical-
     exact + alias-exact + compound-token tolerance. Validator
-    paste-verified at MAC-102 [`7260d2d9`](/MAC/issues/MAC-102#comment-7260d2d9): `manufacturers` is the
+    paste-verified at MAC-102 [`7260d2d9`](<TRACKER_URL>issues/MAC-102#comment-7260d2d9): `manufacturers` is the
     §2.1 surveillance-tech canonical lexicon (34 curated rows —
     Avigilon, Axon, Cellebrite, DJI, Flock Safety, etc.), not a
     general corporate-entity registry. None of the 75 Class B
@@ -1956,7 +1956,7 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
     have silently consumed the re-entry surface for future
     broader sweeps. CEO ratified option β (multi-registry positive-
     evidence: extend xcheck to `fcc_grantees` 50,153 rows +
-    `procurement_records.recipient_name`) at MAC-102 [`ad5a564d`](/MAC/issues/MAC-102#comment-ad5a564d).
+    `procurement_records.recipient_name`) at MAC-102 [`ad5a564d`](<TRACKER_URL>issues/MAC-102#comment-ad5a564d).
     Final outcome: 13/75 cleared (all via `fcc_grantees`).
 
     Table-scope sub-class structurally distinct from field-name
@@ -1969,7 +1969,7 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
     claim. Worth tracking the sub-class taxonomy for future
     S.7 audit-trail granularity if recurrences continue.
 
-    Board ratification at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) (2026-05-14):
+    Board ratification at MAC-101 [`4c7144b8`](<TRACKER_URL>issues/MAC-101#comment-4c7144b8) (2026-05-14):
     "class (b)-adjacent SAR-12 recurrence #9 — table-scope sub-
     class rather than field-name or rule-scope. Worth tracking
     in the recurrence chain. **Two more before §6 meta-revision
@@ -2015,7 +2015,7 @@ S.3 sub-rule level of feedback_bible_amendment_downstream_consumer_audit.md:
     (a) cardinality-mismatch, (b) rule-scope, (c) table-scope,
     (d) decomposition-time-projection-stale.
 
-    Board ratification at MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c) 2026-05-14:
+    Board ratification at MAC-101 [`dd7bd55c`](<TRACKER_URL>issues/MAC-101#comment-dd7bd55c) 2026-05-14:
     "decomposition-time-projection-stale is structurally distinct
     sub-class from #7 cardinality / #8 rule-scope / #9 table-scope.
     The class (a)/(b) sub-class taxonomy continues to bifurcate.
@@ -2036,7 +2036,7 @@ this list with anchor + class.
 A CP-class revision of S.7 itself triggers when three SAME-sub-class
 recurrences accumulate post-codification — not three total post-
 codification recurrences. This codifies the board's recurrence #9
-framing at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) ("two more before §6 meta-revision
+framing at MAC-101 [`4c7144b8`](<TRACKER_URL>issues/MAC-101#comment-4c7144b8) ("two more before §6 meta-revision
 trigger" said in the context of recurrence #9 + the (c) table-scope
 sub-class first instance). The sub-class-aware count is the load-
 bearing rule; the prior "three total post-codification" framing is
@@ -2045,14 +2045,14 @@ historical and not binding.
   - Recurrence #11 (post-codification, MAC-118 F2/F3 second-disposition
     2026-05-14): class **(e) ratifier-disposition-stale-state** sub-
     class first instance. CEO authored TWO contradictory dispositions
-    on MAC-118: first ratification at [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) 14:53Z (F2 → Option (a)
+    on MAC-118: first ratification at [`b012ac69`](<TRACKER_URL>issues/MAC-118#comment-b012ac69) 14:53Z (F2 → Option (a)
     verify-in-mapper); Validator executed at commits [`18c3d23`](https://github.com/kevwillow/argus-db/commit/18c3d23) + [`106689b`](https://github.com/kevwillow/argus-db/commit/106689b)
-    (15:03Z–15:05Z); CEO closed issue at [`aeb1160d`](/MAC/issues/MAC-118#comment-aeb1160d) (15:11Z). HOURS
-    later at [`7547e0d6`](/MAC/issues/MAC-118#comment-7547e0d6) (17:23Z) CEO authored SECOND disposition
+    (15:03Z–15:05Z); CEO closed issue at [`aeb1160d`](<TRACKER_URL>issues/MAC-118#comment-aeb1160d) (15:11Z). HOURS
+    later at [`7547e0d6`](<TRACKER_URL>issues/MAC-118#comment-7547e0d6) (17:23Z) CEO authored SECOND disposition
     (F2 → Option (b) defer-to-prose + F3 → spawn child) as if findings
     were still pending; spuriously filed MAC-119 redundant scrub child.
-    Validator caught redundancy at [`91ecbb3e`](/MAC/issues/MAC-119#comment-91ecbb3e) (17:28Z); CEO posted
-    reconciliation at [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) (17:29Z) self-identifying the
+    Validator caught redundancy at [`91ecbb3e`](<TRACKER_URL>issues/MAC-119#comment-91ecbb3e) (17:28Z); CEO posted
+    reconciliation at [`fc284872`](<TRACKER_URL>issues/MAC-118#comment-fc284872) (17:29Z) self-identifying the
     discipline failure ("dispatch-preamble-live-state-verification
     miss on the disposition author's part — rule applies symmetrically
     to CEO dispositions, not just dispatches"). Full case study at
@@ -2065,7 +2065,7 @@ historical and not binding.
     time-projection-stale (which is dispatch-authoring-time projection
     against live data; class (e) is post-resolution disposition
     against already-landed reality). Actor-neutral framing per board
-    ratification (MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2):
+    ratification (MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2):
     "ratifier-disposition-stale-state" applies symmetrically to CEO
     and board ratifications.
 
@@ -2075,13 +2075,13 @@ historical and not binding.
     CREDITS.md + LICENSE-DATA §2.1 reflect accurately); fc284872
     reconciliation captures discipline lesson in audit-trail.
 
-    Board ratification at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) 2026-05-14: "Confirm
+    Board ratification at MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) 2026-05-14: "Confirm
     SAR-12 recurrence #11 = class (e) CEO-disposition-stale-state.
     New sub-class first instance. Actor-neutral framing preferred:
     'ratifier-disposition-stale-state' applies symmetrically to CEO
     and board ratifications. Land canonical class (e) wording with
     the actor-neutral framing."
-  - Recurrence #12 (post-codification, MAC-124 [`e539cd41`](/MAC/issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704)
+  - Recurrence #12 (post-codification, MAC-124 [`e539cd41`](<TRACKER_URL>issues/MAC-124#comment-e539cd41-0653-46e4-bdb1-b295eba13704)
     2026-05-15): class **(b) field-value** sub-class first instance.
     CEO authored fabricated `https://github.com/CascadeForge/argus[.git
     OR /commit/<sha>]` URL across multiple bible-text edits, audit-
@@ -2115,7 +2115,7 @@ historical and not binding.
     ~24 hours across multiple commits, multiple memory files, and
     multiple agent heartbeats before operator caught it.
 
-    Board ratification at MAC-124 [`06e328ea`](/MAC/issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) 2026-05-15:
+    Board ratification at MAC-124 [`06e328ea`](<TRACKER_URL>issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) 2026-05-15:
     "Investigation discipline reads clean. Bundle Phase 2 commit
     covering URL fix + memory cleanup + SAR-12 §4 Case 12 + §6
     recurrence #12 + sub-rule clarification per [§6 deterministic-
@@ -2123,7 +2123,7 @@ historical and not binding.
     flagged but not codified now (defer larger memory-isolation
     question to separate strategic conversation)."
 
-**Sub-class taxonomy so far (post-codification; actor-neutral framing per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2):**
+**Sub-class taxonomy so far (post-codification; actor-neutral framing per board MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2):**
 
   - (a) cardinality-mismatch class — recurrence #7 (one occurrence) — MAC-88 sweep FAA partition-count drift
   - (b) rule-scope class — recurrence #8 (one occurrence) — MAC-100 §11 #13 unknown-cat exclusion scope
@@ -2132,7 +2132,7 @@ historical and not binding.
   - (d) decomposition-time-projection-stale class — recurrence #10 (one occurrence) — MAC-116 §2.3 sweep all 4 sub-items
   - (e) **ratifier-disposition-stale-state class** — recurrence #11 (one occurrence) — MAC-118 F2/F3 second-disposition
 
-**Meta-pattern observation (board flagged at MAC-101 [`63b72454`](/MAC/issues/MAC-101#comment-63b72454-5555-4c71-adb6-1f15f7ebdc83) 2026-05-14 + threshold-crossing confirmed at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b)):**
+**Meta-pattern observation (board flagged at MAC-101 [`63b72454`](<TRACKER_URL>issues/MAC-101#comment-63b72454-5555-4c71-adb6-1f15f7ebdc83) 2026-05-14 + threshold-crossing confirmed at MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b)):**
 each post-codification recurrence (#7 through #11) has been a distinct
 sub-class first instance. No sub-class has yet accumulated a second
 occurrence, let alone hit the three-recurrence meta-revision threshold.
@@ -2142,7 +2142,7 @@ within-sub-class repeats — itself an interesting meta-pattern.
 The five-class taxonomy threshold has been crossed: at recurrence #11
 the meta-pattern is empirically established (5 first instances; 0
 within-sub-class repeats). Two competing interpretations were
-identified at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4:
+identified at MAC-101 [`78653abe`](<TRACKER_URL>issues/MAC-101#comment-78653abe) §4:
 
   - (α) S.7's broad-strokes coverage is correct; sub-class bifurcation
     is the right audit-trail granularity; the discipline is succeeding
@@ -2156,11 +2156,11 @@ identified at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4:
     cover ratifier-class actions (or whatever the next surfacing
     sub-class is).
 
-**Board ratification (α) selected with explicit (β) escalation trigger** at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) 2026-05-14 §3 (CEO had recommended (β) at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4):
+**Board ratification (α) selected with explicit (β) escalation trigger** at MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) 2026-05-14 §3 (CEO had recommended (β) at MAC-101 [`78653abe`](<TRACKER_URL>issues/MAC-101#comment-78653abe) §4):
 
 **(α) reasoning (board-articulated):** the load-bearing question isn't "is the pattern common"; it's "does the pattern produce substantive harm that the existing audit-trail mechanism doesn't catch." Recurrence #11 produced zero substantive harm (17:23Z second disposition didn't propagate; MAC-119 caught within 5 minutes; canonical state stayed clean; fc284872 reconciliation captures the lesson). If the pattern is operationally common AND produces zero substantive harm because the discipline mechanism catches it, that's evidence the discipline is appropriately scoped — not evidence it needs tightening. Codifying a CP-class S.7 extension on n=1 for class (e) is heavy; better to escalate to (β) on n=2 if the (e) pattern recurs specifically.
 
-**(β) escalation trigger (pre-committed at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.2):** if a second class (e) recurrence (ratifier-disposition-stale-state) surfaces within the next 10 board+CEO heartbeats from this codification, escalate to (β) without further board deliberation. CP21 (or subsequent CP) extends S.7's authoring rule:
+**(β) escalation trigger (pre-committed at MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.2):** if a second class (e) recurrence (ratifier-disposition-stale-state) surfaces within the next 10 board+CEO heartbeats from this codification, escalate to (β) without further board deliberation. CP21 (or subsequent CP) extends S.7's authoring rule:
 
 > "Any ratifier-class action (CEO or board) authoring forward-looking
 > direction on an issue with existing audit-trail comments MUST paste-
@@ -2171,12 +2171,12 @@ Trigger condition: **second class (e) recurrence specifically.** NOT "any sub-cl
 
 If the (β) trigger fires, CEO authors the extension dispatch without re-asking board — board's pre-commitment under (α) makes the (β) path conditional but pre-authorized.
 
-**Board-vs-CEO divergence preservation note (per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.3 + §6):**
-this codification represents the **first substantive board-vs-CEO ratification divergence on a discipline-evolution question** since the architecture took current shape. CEO recommended (β) with strong reasoning at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4; board considered, weighed evidence differently, selected (α) at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.
+**Board-vs-CEO divergence preservation note (per board MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.3 + §6):**
+this codification represents the **first substantive board-vs-CEO ratification divergence on a discipline-evolution question** since the architecture took current shape. CEO recommended (β) with strong reasoning at MAC-101 [`78653abe`](<TRACKER_URL>issues/MAC-101#comment-78653abe) §4; board considered, weighed evidence differently, selected (α) at MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.
 
 Healthy deference shape: CEO surfaces (β) with clear argument → board considers, weights differently → board lands (α) with explicit (β) trigger → CEO honors ratification, doesn't relitigate. The architecture has decision authority on canonical contract changes resting with board; CEO surfaces best reasoning; board decides; CEO honors. Future discipline-evolution questions inherit this shape: recommendation + ratification + honored disposition + audit-trail preservation of the divergence reasoning. The discipline doesn't require board+CEO to always agree; it requires the divergence to be visible and the decision authority to be respected.
 
-**Deterministic-template sub-rule clarification (codified per MAC-124 [`06e328ea`](/MAC/issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) board direction; recurrence #12 case study):**
+**Deterministic-template sub-rule clarification (codified per MAC-124 [`06e328ea`](<TRACKER_URL>issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) board direction; recurrence #12 case study):**
 
 URLs that follow deterministic templates (e.g., `https://github.com/<org>/<repo>/commit/<sha>`, `https://archive.org/wayback/<url>`, `https://api.fcc.gov/.../<id>`, etc.) require class (b) field-value verification on the variable parts (`<org>`, `<repo>`, root URL host) even when the template structure is itself stable. The deterministic shape masks the assertion as "just construction from facts" when the underlying facts themselves need verification.
 
@@ -2184,7 +2184,7 @@ The failure mode the recurrence #12 case study surfaces: the template `https://g
 
 **Verification discipline:** when authoring deterministic-template URLs (or any deterministic-template asserted values where the variable parts are class (b) field-value claims), paste-verify the variable parts at consumption time. For GitHub URLs specifically, the canonical `<org>/<repo>` value comes from `git config --get remote.origin.url` (or operator confirmation when no remote is configured) — NOT from grepping prior repo commits for the established pattern. Established repo convention can be a propagated fabrication; remote-URL inspection is the source-of-truth.
 
-**Bidirectional propagation surface:** when a fabricated deterministic-template variable lands in a repo, downstream agent memory captures the value as "established repo state" and reinforces it in subsequent authoring. Memory-side cleanup is therefore part of the fix discipline (per MAC-124 [`06e328ea`](/MAC/issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) §3 board direction: "Memory and repo must stay consistent — bidirectional leak path means bidirectional fix"). Repo-only fixes leave the propagation pump primed for recurrence.
+**Bidirectional propagation surface:** when a fabricated deterministic-template variable lands in a repo, downstream agent memory captures the value as "established repo state" and reinforces it in subsequent authoring. Memory-side cleanup is therefore part of the fix discipline (per MAC-124 [`06e328ea`](<TRACKER_URL>issues/MAC-124#comment-06e328ea-97ea-4377-a6b9-9b3d7c924755) §3 board direction: "Memory and repo must stay consistent — bidirectional leak path means bidirectional fix"). Repo-only fixes leave the propagation pump primed for recurrence.
 
 This sub-rule is a class (b) refinement, not a sixth top-level class. Future recurrences of class (b) field-value type get appended to §6 recurrence chain under existing class (b) accounting; the "third same-sub-class recurrence triggers meta-revision" rule applies to (b) field-value as it does to (b) rule-scope and (b) table-scope.
 
@@ -2237,7 +2237,7 @@ Correction Pass 18 — §7.5 + §9 behavioral_signatures sibling export
 ## Correction Pass 18 — §7.5 + §9 behavioral_signatures sibling export file (`argus_export_behavioral_signatures.json`)
 
 **Date:** 2026-05-13
-**Source:** Board MAC-88 ratification dispatch [`459daaca`](/MAC/issues/MAC-88#comment-459daaca-ef04-46b1-b337-4480e548ca0a) §3 Item A (board selected Option 2 over CEO's Option 1 at MAC-88 surface-back).
+**Source:** Board MAC-88 ratification dispatch [`459daaca`](<TRACKER_URL>issues/MAC-88#comment-459daaca-ef04-46b1-b337-4480e548ca0a) §3 Item A (board selected Option 2 over CEO's Option 1 at MAC-88 surface-back).
 **Bible commit:** This entry + PROJECT_BIBLE.md §7.5 "Behavioral-signatures sibling export — CP18 directive" block insertion + §7.5 Don't bullet addition + §9 deliverables list addition (`argus_export_behavioral_signatures.json`) + §9 item 9 reconciliation-arithmetic section-naming extension. Bible HEAD bumps from `d33491c` to this CP18 commit.
 **Status:** Ratified by board at MAC-88 reopen-via-comment 2026-05-13T23:58Z. CEO authors the §-text amendment + amendment-log entry; worker dispatch (ExtractionWorker) lands the export-script code-sibling commit + first generated `argus_export_behavioral_signatures.json` + coverage report extension. Phase C closes at MAC-88 surface-back on worker completion.
 **Binds:** ExtractionWorker (new export-script code-sibling commit implementing the §7.5 CP18 shape; first run; reconciliation arithmetic against `behavioral_signatures` table state; coverage-report extension), Validator (no change; behavioral_signatures promotion gates were ratified at MAC-91 Wave-B promotion-cycle-3 close), Lynceus integration team (no change; new export file is Rayhunter-bound not Lynceus-bound), Rayhunter integration (downstream consumer; out-of-Argus migration to read from the new export file lands at Rayhunter v0.X work — surface as separate MAC issue if/when needed).
@@ -2308,7 +2308,7 @@ Correction Pass 19 — §4.2 source_reclassifications + §7.5 source_type exclus
 ## Correction Pass 19 — §4.2 + §7.5 + §11 #8 — coordinated audit-trail + source_type exclusion landing
 
 **Date:** 2026-05-14
-**Source:** MAC-88 board ratification dispatch [`a1dab600`](/MAC/issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05) (§2 audit-trail framing Option α ratified + §5 high-conf source_type exclusion A3 ratified). CEO pre-flight at [`99bb1438`](/MAC/issues/MAC-88#comment-99bb1438-30a5-4e69-9164-69cacbda649a) surfaced both items.
+**Source:** MAC-88 board ratification dispatch [`a1dab600`](<TRACKER_URL>issues/MAC-88#comment-a1dab600-e64b-4327-89b3-4a4e3ee4ef05) (§2 audit-trail framing Option α ratified + §5 high-conf source_type exclusion A3 ratified). CEO pre-flight at [`99bb1438`](<TRACKER_URL>issues/MAC-88#comment-99bb1438-30a5-4e69-9164-69cacbda649a) surfaced both items.
 **Bible commit:** This entry + PROJECT_BIBLE.md §4.2 supporting-table addition + §7.5 source-type exclusion sub-block + §7.5 Don't bullet + §11 #8 sub-rule + migration 0017 (db/migrations/0017_source_reclassifications.sql). Coordinated commit per board explicit bundling.
 **Status:** Ratified at MAC-88 a1dab600 2026-05-14. Worker dispatches (Validator full sweep + ExtractionWorker export regen) block on this commit landing.
 **Binds:** Validator (sweep execution writes source_reclassifications audit entries per row in same transaction as identifier-row UPDATEs; per-row reclassification_reason must be substantive), ExtractionWorker (post-sweep Lynceus high-conf export regen MUST honor CP19 source_type exclusion + new excluded_source_type _meta key), DBArchitect (migration 0017 sibling commit per established CP14/15/16 pattern), CEO (Phase C surface-back enumerates first population stats + reconciliation arithmetic + architectural firsts).
@@ -2378,7 +2378,7 @@ Correction Pass 20 — SAR-13 per-shape mapper precedent + §11 #16 facts-only p
 ## Correction Pass 20 — SAR-13 per-shape mapper precedent + §11 #16 facts-only promotion from public-but-unlicensed sources
 
 **Date:** 2026-05-14
-**Source:** MAC-104 Validator surface-back [`3e34d5d0`](/MAC/issues/MAC-104#comment-3e34d5d0-c5b6-4e88-b5aa-220266c3cc04) §6.4 + §6.5 Q1/Q2/Q4/Q6 batched ratification slate. Originating dispatch: MAC-101 Item C Phase 2 [`c81b8df5`](/MAC/issues/MAC-101#comment-c81b8df5-38a5-473f-9638-518c74e47849). Validator commit at staging: [`0921003`](/MAC/issues/MAC-104) (365 deferred-dir rows triaged; 0 promotions; 1 §7.3 reject; 364 HOLDs).
+**Source:** MAC-104 Validator surface-back [`3e34d5d0`](<TRACKER_URL>issues/MAC-104#comment-3e34d5d0-c5b6-4e88-b5aa-220266c3cc04) §6.4 + §6.5 Q1/Q2/Q4/Q6 batched ratification slate. Originating dispatch: MAC-101 Item C Phase 2 [`c81b8df5`](<TRACKER_URL>issues/MAC-101#comment-c81b8df5-38a5-473f-9638-518c74e47849). Validator commit at staging: [`0921003`](<TRACKER_URL>issues/MAC-104) (365 deferred-dir rows triaged; 0 promotions; 1 §7.3 reject; 364 HOLDs).
 **Bible commit:** This entry + PROJECT_BIBLE.md §11 #16 (new hard rule) + SAR-13 section addition. Coordinated commit per established CP14/15/16/19 bible-pairing pattern.
 **Status:** Ratified at MAC-104 CEO response 2026-05-14. Sibling commits (child issues MAC-108 Phase-1 mapper rerun, MAC-109 migration 0011 identifier_types extension + bx_sig routing, MAC-110 Validator close-out) block on this commit landing.
 **Binds:** ExtractionWorker (Phase-1 mapper template per SAR-13 §S.2; rerun against 199 source-url-direct violations), DBArchitect (migration 0011 identifier_types CHECK enum extension per Q1 18-type slate; behavioral_signatures backfill per S.3 routing for 6 detector-internal types), Validator (Q3 Flock-attribution promotion, Q4 facts-only promotion per new §11 #16, Q5 §8.3 e4:aa:ea uplift with CP19 audit entry, Q7 attribution_conflict file; post-MAC-108/109 re-triage of 199+85 unblocked rows), CEO (MAC-101 close aggregation pending child landings).
@@ -2458,7 +2458,7 @@ This CP20 entry is the §11 #11 amendment-log pairing for the SAR-13 section add
 
 ## SAR-13 — Per-shape mapper precedent + URL template + identifier_type vs behavioral_signatures routing
 
-**Origin:** MAC-104 Validator surface-back [`3e34d5d0`](/MAC/issues/MAC-104#comment-3e34d5d0-c5b6-4e88-b5aa-220266c3cc04) §6.4 Q6 + Q2 + Q1 batched ratification slate. CEO ratified at MAC-104 close 2026-05-14. Bible-binding: SAR-13 carries three sub-rules (S.1, S.2, S.3) per CP20 §A above. Verbatim §S.1 / §S.2 / §S.3 text lives under CP20 §A — this header anchors SAR-13 in the sub-agent rule catalog. Future deferred-dir cohort dispatches cite SAR-13 in their Phase-1 mapper acceptance criteria.
+**Origin:** MAC-104 Validator surface-back [`3e34d5d0`](<TRACKER_URL>issues/MAC-104#comment-3e34d5d0-c5b6-4e88-b5aa-220266c3cc04) §6.4 Q6 + Q2 + Q1 batched ratification slate. CEO ratified at MAC-104 close 2026-05-14. Bible-binding: SAR-13 carries three sub-rules (S.1, S.2, S.3) per CP20 §A above. Verbatim §S.1 / §S.2 / §S.3 text lives under CP20 §A — this header anchors SAR-13 in the sub-agent rule catalog. Future deferred-dir cohort dispatches cite SAR-13 in their Phase-1 mapper acceptance criteria.
 
 ### S.1 — Per-shape mapper decomposition for community-research-repo cohorts
 
@@ -2476,7 +2476,7 @@ This CP20 entry is the §11 #11 amendment-log pairing for the SAR-13 section add
 
 ## SAR-14 — Bible-amendment child-issue-ID-ordering discipline
 
-**Origin:** CP20 [`8de7309`](https://github.com/kevwillow/argus-db/commit/8de7309) drafted bible-text referencing downstream child issues by DRAFT IDs (MAC-105/106/107) before the Paperclip system assigned actual IDs. System assigned MAC-108/MAC-109/MAC-110 to the three CEO-spawned children. Required fix commit [`dd26b59`](https://github.com/kevwillow/argus-db/commit/dd26b59) to remap the bible references to landed reality per `feedback_bible_amendment_downstream_consumer_audit.md` discipline. Pattern surfaced at MAC-101 close §6.3.f; board flagged as "worth a small SAR-class refinement at next memo-refinement cycle" at MAC-101 [`4c7144b8`](/MAC/issues/MAC-101#comment-4c7144b8) 2026-05-14. Codified here per MAC-101 §2.1(c) dispatch directive.
+**Origin:** CP20 [`8de7309`](https://github.com/kevwillow/argus-db/commit/8de7309) drafted bible-text referencing downstream child issues by DRAFT IDs (MAC-105/106/107) before the Paperclip system assigned actual IDs. System assigned MAC-108/MAC-109/MAC-110 to the three CEO-spawned children. Required fix commit [`dd26b59`](https://github.com/kevwillow/argus-db/commit/dd26b59) to remap the bible references to landed reality per `feedback_bible_amendment_downstream_consumer_audit.md` discipline. Pattern surfaced at MAC-101 close §6.3.f; board flagged as "worth a small SAR-class refinement at next memo-refinement cycle" at MAC-101 [`4c7144b8`](<TRACKER_URL>issues/MAC-101#comment-4c7144b8) 2026-05-14. Codified here per MAC-101 §2.1(c) dispatch directive.
 
 **Bible-binding:** SAR-14 binds bible-amendment authors (CEO, sub-CEO, and workers when surfacing bible-class changes via halt-and-surface). It pairs with `feedback_bible_amendment_downstream_consumer_audit.md` (S.8 append-don't-mutate sub-rule) — the existing downstream-consumer-audit memo covers the FIX behavior when a collision is found; SAR-14 covers the PREVENT behavior to avoid the collision in the first place.
 
@@ -2542,16 +2542,16 @@ Correction Pass 21 — coordinated amendment: §4.4 MAP entries + §11 #16 canon
 ## Correction Pass 21 — coordinated CP21 amendment
 
 **Date:** 2026-05-14
-**Source:** MAC-101 pre-ship dispatch [`fd6146a3`](/MAC/issues/MAC-101#comment-fd6146a3-ee4b-4d9a-a38d-623ba0cdb463) §2.6 coordinated CP21 directive; consolidating multiple board-ratified amendments into a single coordinated commit per dispatch §2.6 framing.
+**Source:** MAC-101 pre-ship dispatch [`fd6146a3`](<TRACKER_URL>issues/MAC-101#comment-fd6146a3-ee4b-4d9a-a38d-623ba0cdb463) §2.6 coordinated CP21 directive; consolidating multiple board-ratified amendments into a single coordinated commit per dispatch §2.6 framing.
 
 Specific items + ratification anchors:
 
-- **§4.4 MAP entries (2 MAP + 12 DROP from mig-0018 + 7 DROP from mig-0019):** CEO §2.5 recommendation at MAC-101 [`4367e10b`](/MAC/issues/MAC-101#comment-4367e10b-ff72-486c-84e8-98f3fd7ac75d) + board ratification at MAC-101 [`e246a32a`](/MAC/issues/MAC-101#comment-e246a32a-5a28-467d-b20e-72901a5a3d88). MAC-117 closed at commits [`41da1d6`](https://github.com/kevwillow/argus-db/commit/41da1d6) (migration 0019) + [`30a0252`](https://github.com/kevwillow/argus-db/commit/30a0252) (routing execution); the 7 net-new identifier_types from mig-0019 fold into this CP21 batch per the same DROP framework.
-- **§11 #16 canonical sentinel-key (`notes.upstream_license_posture`):** MAC-118 F1 CEO ratification at MAC-118 [`b012ac69`](/MAC/issues/MAC-118#comment-b012ac69) + reconfirmed at MAC-118 [`fc284872`](/MAC/issues/MAC-118#comment-fc284872) reconciliation + LICENSE-DATA §3 cross-reference at commit [`ead49a3`](https://github.com/kevwillow/argus-db/commit/ead49a3).
-- **§8.2 strict-reading acknowledgment:** MAC-116 §2.3(d) sources.id=7 direction-reversal finding (dispatch projected `regulatory`, strict reading produces `primary_registry`) + board ratification at MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c) §2.
-- **SAR-12 §4 Case 11 + §6 recurrence #11 + sub-class taxonomy extension (a/b/c/d/e):** CEO investigation surface-back at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) + board ratification + actor-neutral framing directive at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b). Sub-class (e) ratifier-disposition-stale-state codified.
-- **(α)/(β) decision + (β) escalation trigger pre-commitment:** board selected (α) at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3 (diverging from CEO recommendation of (β) at MAC-101 [`78653abe`](/MAC/issues/MAC-101#comment-78653abe) §4). (β) escalation trigger armed: second class (e) recurrence within next 10 board+CEO heartbeats from this codification escalates to (β) without further board deliberation.
-- **Board-vs-CEO divergence preservation note:** first substantive board-vs-CEO ratification divergence on a discipline-evolution question since the architecture took current shape; per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.3 + §6.
+- **§4.4 MAP entries (2 MAP + 12 DROP from mig-0018 + 7 DROP from mig-0019):** CEO §2.5 recommendation at MAC-101 [`4367e10b`](<TRACKER_URL>issues/MAC-101#comment-4367e10b-ff72-486c-84e8-98f3fd7ac75d) + board ratification at MAC-101 [`e246a32a`](<TRACKER_URL>issues/MAC-101#comment-e246a32a-5a28-467d-b20e-72901a5a3d88). MAC-117 closed at commits [`41da1d6`](https://github.com/kevwillow/argus-db/commit/41da1d6) (migration 0019) + [`30a0252`](https://github.com/kevwillow/argus-db/commit/30a0252) (routing execution); the 7 net-new identifier_types from mig-0019 fold into this CP21 batch per the same DROP framework.
+- **§11 #16 canonical sentinel-key (`notes.upstream_license_posture`):** MAC-118 F1 CEO ratification at MAC-118 [`b012ac69`](<TRACKER_URL>issues/MAC-118#comment-b012ac69) + reconfirmed at MAC-118 [`fc284872`](<TRACKER_URL>issues/MAC-118#comment-fc284872) reconciliation + LICENSE-DATA §3 cross-reference at commit [`ead49a3`](https://github.com/kevwillow/argus-db/commit/ead49a3).
+- **§8.2 strict-reading acknowledgment:** MAC-116 §2.3(d) sources.id=7 direction-reversal finding (dispatch projected `regulatory`, strict reading produces `primary_registry`) + board ratification at MAC-101 [`dd7bd55c`](<TRACKER_URL>issues/MAC-101#comment-dd7bd55c) §2.
+- **SAR-12 §4 Case 11 + §6 recurrence #11 + sub-class taxonomy extension (a/b/c/d/e):** CEO investigation surface-back at MAC-101 [`78653abe`](<TRACKER_URL>issues/MAC-101#comment-78653abe) + board ratification + actor-neutral framing directive at MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b). Sub-class (e) ratifier-disposition-stale-state codified.
+- **(α)/(β) decision + (β) escalation trigger pre-commitment:** board selected (α) at MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3 (diverging from CEO recommendation of (β) at MAC-101 [`78653abe`](<TRACKER_URL>issues/MAC-101#comment-78653abe) §4). (β) escalation trigger armed: second class (e) recurrence within next 10 board+CEO heartbeats from this codification escalates to (β) without further board deliberation.
+- **Board-vs-CEO divergence preservation note:** first substantive board-vs-CEO ratification divergence on a discipline-evolution question since the architecture took current shape; per board MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3.3 + §6.
 
 **Bible commit:** This entry + PROJECT_BIBLE.md §4.4 +21 mapping rows + §11 #16 canonical sentinel-key sub-rule + §8.2 strict-reading acknowledgment + BIBLE_AMENDMENTS.md SAR-12 §4 Case 11 + §6 recurrence #11 + §6 sub-class taxonomy actor-neutral extension + §6 (α)/(β) decision + escalation trigger pre-commitment + board-vs-CEO divergence preservation note. Bible HEAD bumps from [`9979015`](https://github.com/kevwillow/argus-db/commit/9979015) (§6 threshold cleanup) → this CP21 commit.
 
@@ -2561,7 +2561,7 @@ Specific items + ratification anchors:
 
 ### Why this Correction Pass exists
 
-MAC-101 pre-ship dispatch [`fd6146a3`](/MAC/issues/MAC-101#comment-fd6146a3-ee4b-4d9a-a38d-623ba0cdb463) authorized §2.6 coordinated CP21 amendment to bundle multiple bible-text touches that emerged across Stream 1 sub-items + Stream 2 surface-backs + the MAC-118 F1/F2/F3 investigation chain. Per dispatch §2.6: "Anything touching §-text in PROJECT_BIBLE.md coordinates as one CP if there are multiple touches; anything that's pure code or pure docs lands separately."
+MAC-101 pre-ship dispatch [`fd6146a3`](<TRACKER_URL>issues/MAC-101#comment-fd6146a3-ee4b-4d9a-a38d-623ba0cdb463) authorized §2.6 coordinated CP21 amendment to bundle multiple bible-text touches that emerged across Stream 1 sub-items + Stream 2 surface-backs + the MAC-118 F1/F2/F3 investigation chain. Per dispatch §2.6: "Anything touching §-text in PROJECT_BIBLE.md coordinates as one CP if there are multiple touches; anything that's pure code or pure docs lands separately."
 
 Five distinct touches consolidated:
 
@@ -2583,9 +2583,9 @@ Each touch has independent ratification anchor (per Source enumeration above). T
 2. **PROJECT_BIBLE.md §11 #16 canonical sentinel-key sub-rule** appended to the §11 #16 entry. Canonical key: `notes.upstream_license_posture` (more discoverable than alt-key `notes.facts_only_basis`; alphabetically first in serializations; literal posture-value semantics). Alt-key form preserved on extant rows (no rewrite); new promotions land on canonical form forward-only.
 3. **PROJECT_BIBLE.md §8.2 strict-reading acknowledgment** appended after the CP15 §8.2 `primary_registry` sub-banding section. When historical assertions place a source in `regulatory` band but CP15 §8.2 strict reading produces `primary_registry`, the CP15 strict reading governs. Sources 1/2/3/7 sources-row metadata cleanup queued post-ship; identifier-row data already correctly labeled.
 4. **BIBLE_AMENDMENTS.md SAR-12 §4 Case 11** anchored case study (MAC-118 F2/F3 second-disposition-from-stale-mental-model with full provenance chain through 11 timestamped events from 14:49Z to 17:35Z). Demonstrates class (e) sub-class structural distinction from prior classes (a)/(b)/(c)/(d).
-5. **BIBLE_AMENDMENTS.md SAR-12 §6 recurrence #11** with class (e) ratifier-disposition-stale-state designation (actor-neutral framing per board MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2 directive).
+5. **BIBLE_AMENDMENTS.md SAR-12 §6 recurrence #11** with class (e) ratifier-disposition-stale-state designation (actor-neutral framing per board MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §2 directive).
 6. **BIBLE_AMENDMENTS.md SAR-12 §6 sub-class taxonomy section** extended from 4 to 5 sub-classes with actor-neutral framing across all 5: (a) cardinality-mismatch / (b) rule-scope / (c) table-scope / (d) decomposition-time-projection-stale / (e) ratifier-disposition-stale-state.
-7. **BIBLE_AMENDMENTS.md SAR-12 §6 (α)/(β) decision + (β) escalation trigger pre-commitment** codified. Board selected (α) at MAC-101 [`5d6a8125`](/MAC/issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3 with explicit (β) trigger: second class (e) recurrence within next 10 board+CEO heartbeats escalates to (β) without further board deliberation. (β) text drafted in bible for pre-commitment honor.
+7. **BIBLE_AMENDMENTS.md SAR-12 §6 (α)/(β) decision + (β) escalation trigger pre-commitment** codified. Board selected (α) at MAC-101 [`5d6a8125`](<TRACKER_URL>issues/MAC-101#comment-5d6a8125-5d4b-43bc-a136-b8353366f36b) §3 with explicit (β) trigger: second class (e) recurrence within next 10 board+CEO heartbeats escalates to (β) without further board deliberation. (β) text drafted in bible for pre-commitment honor.
 8. **BIBLE_AMENDMENTS.md SAR-12 §6 board-vs-CEO divergence preservation note** captured. First substantive board-vs-CEO ratification divergence on a discipline-evolution question since architecture took current shape. CEO recommended (β); board selected (α); CEO honored. Healthy deference shape documented for future inheritance.
 
 ### Composition with §11 hard rules
@@ -2609,7 +2609,7 @@ Each touch has independent ratification anchor (per Source enumeration above). T
 - **§4.4 MAP entries for mig-0018 + mig-0019 net-new identifier_types** — RESOLVED at CP21 per CEO §2.5 recommendation + board ratification. 14 + 7 = 21 net-new entries; all dispositioned (2 MAP + 19 DROP).
 - **§11 #16 sentinel-key canonical form** — RESOLVED at CP21 per MAC-118 F1 board ratification.
 - **§8.2 strict-reading vs historical assertion conflicts** — RESOLVED at CP21 per MAC-116 §2.3(d) finding + board ratification.
-- **Sources 1/2/3/7 sources-row metadata cleanup** — DEFERRED post-ship per CEO recommendation + board ratification at MAC-101 [`dd7bd55c`](/MAC/issues/MAC-101#comment-dd7bd55c); CP21 §8.2 acknowledgment documents the disposition.
+- **Sources 1/2/3/7 sources-row metadata cleanup** — DEFERRED post-ship per CEO recommendation + board ratification at MAC-101 [`dd7bd55c`](<TRACKER_URL>issues/MAC-101#comment-dd7bd55c); CP21 §8.2 acknowledgment documents the disposition.
 
 ### §11 #11 self-binding satisfied
 
@@ -2621,17 +2621,17 @@ This CP21 entry is the §11 #11 amendment-log pairing for the §4.4 + §11 #16 +
 ## Correction Pass 22 — §7.5 CSV timestamp canonical format (`first_seen` / `last_verified` ISO-8601 UTC `Z`)
 
 **Date:** 2026-05-14
-**Source:** MAC-124 F6 surface-back ([`1b4b77b4`](/MAC/issues/MAC-124#comment-1b4b77b4-91e2-4471-b2f0-8ea081379397)) + board ratification of Option (c) — Argus normalizes + Lynceus tolerates + bible codifies — at MAC-124 [`c077ba04`](/MAC/issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60).
+**Source:** MAC-124 F6 surface-back ([`1b4b77b4`](<TRACKER_URL>issues/MAC-124#comment-1b4b77b4-91e2-4471-b2f0-8ea081379397)) + board ratification of Option (c) — Argus normalizes + Lynceus tolerates + bible codifies — at MAC-124 [`c077ba04`](<TRACKER_URL>issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60).
 
 **Bible commit:** This entry + PROJECT_BIBLE.md §7.5 sub-amend (canonical timestamp format directive + §7.5-column shape-vs-format audit findings) + `db/validation/export_lynceus.py::_normalize_datetime` helper + helper applied at CSV writer + `tests/test_export_lynceus.py` 7 new `_normalize_datetime` unit tests + 1 updated CP11 first_seen-shape assertion. Bible HEAD bumps from [previous CP21 HEAD] → this CP22 commit.
 
-**Status:** Ratified by board at MAC-124 [`c077ba04`](/MAC/issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60). CEO authored coordinated bible-text + Argus-side normalization helper + Lynceus-side `_parse_date` multi-format tolerance (defense in depth) + paired test coverage on both sides; no schema change; no migration; no worker dispatch.
+**Status:** Ratified by board at MAC-124 [`c077ba04`](<TRACKER_URL>issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60). CEO authored coordinated bible-text + Argus-side normalization helper + Lynceus-side `_parse_date` multi-format tolerance (defense in depth) + paired test coverage on both sides; no schema change; no migration; no worker dispatch.
 
 **Binds:** Validator (no execution — §7.5 sub-amend is export-discipline reference; helper applied at export_lynceus.py CSV writer time), DBArchitect (none — no migration), ExtractionWorker (none — write paths continue to emit any-shape DATETIME values; `_normalize_datetime` coerces at CSV emission time only), Lynceus integration team (informational — `_parse_date` extended to 4-format tolerant; canonical Z form is the v1.0+ contract; archived pre-CP22 exports continue to import via tolerance).
 
 ### Why this Correction Pass exists
 
-The MAC-124 F6 smoke test (`lynceus-import-argus --dry-run` against `argus_export.csv` HEAD `851f76b`, board-authorized at MAC-124 [`330573f0`](/MAC/issues/MAC-124#comment-330573f0-97e5-40c5-9dcf-000af16c782e)) produced unexpected divergence from the §6.3 prediction: 50 imported / 53 errors instead of the predicted 103 imported / 0 errors. **All 53 errors were timestamp parse failures** rooted in a v0.3 contract gap the HB39 Lynceus-handoff bundle missed: `identifiers.first_seen` / `identifiers.last_verified` SQLite columns carry type `DATETIME` (typeless TEXT, no SQL constraint) and historical Argus write paths emit at least four distinct shapes — but Lynceus's `_parse_date` (with comment "UTC timestamps in Argus exports use this format") accepted only the space-separated `"%Y-%m-%d %H:%M:%S"` form, present in only 1 of 22,532 rows.
+The MAC-124 F6 smoke test (`lynceus-import-argus --dry-run` against `argus_export.csv` HEAD `851f76b`, board-authorized at MAC-124 [`330573f0`](<TRACKER_URL>issues/MAC-124#comment-330573f0-97e5-40c5-9dcf-000af16c782e)) produced unexpected divergence from the §6.3 prediction: 50 imported / 53 errors instead of the predicted 103 imported / 0 errors. **All 53 errors were timestamp parse failures** rooted in a v0.3 contract gap the HB39 Lynceus-handoff bundle missed: `identifiers.first_seen` / `identifiers.last_verified` SQLite columns carry type `DATETIME` (typeless TEXT, no SQL constraint) and historical Argus write paths emit at least four distinct shapes — but Lynceus's `_parse_date` (with comment "UTC timestamps in Argus exports use this format") accepted only the space-separated `"%Y-%m-%d %H:%M:%S"` form, present in only 1 of 22,532 rows.
 
 CP22 codifies the canonical CSV timestamp format, lands the Argus-side normalization, lands the Lynceus-side multi-format tolerance for backward compatibility, and surfaces adjacent §7.5 column shape-vs-format gaps as audit findings.
 
@@ -2661,7 +2661,7 @@ CP22 codifies the canonical CSV timestamp format, lands the Argus-side normaliza
 1. **CP22 ratifies at this commit.** Bible HEAD bumps to CP22 commit SHA. Schema unchanged; no migration; no worker dispatch.
 2. **CSV regen runs as Step 4 of F6 dispatch** to capture post-CP22 `argus_export.csv` with normalized `first_seen` / `last_verified` columns and a fresh sha256 anchor.
 3. **Smoke test re-runs as Step 5 of F6 dispatch** (`lynceus-import-argus --dry-run` against the regenerated CSV). Expected output: Total 22,532 / Imported **103** / Errors **0** / mac_range 17,794 / unknown_type 4,635 / reconciliation holds.
-4. **Decisions A1/A2/B1/B2 (enum extension scope + source_type discipline placement)** stay deferred per board direction at MAC-124 [`c077ba04`](/MAC/issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60); CP22 unblocks the 103-row clean baseline that A1/A2/B1/B2 builds on.
+4. **Decisions A1/A2/B1/B2 (enum extension scope + source_type discipline placement)** stay deferred per board direction at MAC-124 [`c077ba04`](<TRACKER_URL>issues/MAC-124#comment-c077ba04-5bda-4df2-bbd3-6003e50d2a60); CP22 unblocks the 103-row clean baseline that A1/A2/B1/B2 builds on.
 
 ### §12 Open Questions impact
 
@@ -2894,7 +2894,7 @@ This CP23 entry is the §11 #11 amendment-log pairing for the §4.2/§4.3/§8.2/
 ## Correction Pass 24 — §11 #8 within-source re-extraction sub-rule + CP19 spirit-extension to `procurement_records` + "§5.2 +5 boost" citation hygiene
 
 **Date:** 2026-05-17
-**Source:** MAC-172 CEO ratification dispatch [`8db00702`](/MAC/issues/MAC-172#comment-8db00702-c710-49de-ac3f-d4d054d3dba8) (Read B canon ruling on §11 #8 strict reading of within-source re-extraction; partial ratify + 180-row rollback dispatch + CP24 bible amendment scope). CEO dispatch followed Validator partial-ratification surface at MAC-172 [`00329646`](/MAC/issues/MAC-172#comment-00329646-4455-4280-9f19-6c77fe35b701) (§11 #8 reconciliation question flagged Read A as-applied + Read B rollback path) post the MAC-172 P4 USAspending deep-extension ingest at HEAD [`4a3f6dd`](https://github.com/kevwillow/argus-db/commit/4a3f6dd) (5 disjoint write paths landed: sid=8 notes merge + 2,555 net-new INSERTs + 180 corroboration UPDATEs lifted 85→90 + 2 RG5 cross-corroboration markers + 264-row residue staged).
+**Source:** MAC-172 CEO ratification dispatch [`8db00702`](<TRACKER_URL>issues/MAC-172#comment-8db00702-c710-49de-ac3f-d4d054d3dba8) (Read B canon ruling on §11 #8 strict reading of within-source re-extraction; partial ratify + 180-row rollback dispatch + CP24 bible amendment scope). CEO dispatch followed Validator partial-ratification surface at MAC-172 [`00329646`](<TRACKER_URL>issues/MAC-172#comment-00329646-4455-4280-9f19-6c77fe35b701) (§11 #8 reconciliation question flagged Read A as-applied + Read B rollback path) post the MAC-172 P4 USAspending deep-extension ingest at HEAD [`4a3f6dd`](https://github.com/kevwillow/argus-db/commit/4a3f6dd) (5 disjoint write paths landed: sid=8 notes merge + 2,555 net-new INSERTs + 180 corroboration UPDATEs lifted 85→90 + 2 RG5 cross-corroboration markers + 264-row residue staged).
 **Bible commit:** This entry + PROJECT_BIBLE.md §11 #8 three new sub-rules + 180-row rollback artifact (`db/validation/usaspending_deep_admission/rollback_lift.py`) + per-row `notes.confidence_history[]` audit on the 180 rolled-back rows. Coordinated commit per established CP19/CP20/CP21/CP23 bible-pairing pattern.
 **Status:** Ratified at MAC-172 8db00702 2026-05-17. Rollback execution lands in the same commit-set; per-row audit-trail discipline takes effect immediately for the `procurement_records` table.
 **Binds:** Validator (P4-class procurement-record corroboration UPDATEs after CP24: provenance merge only, no +5 lift unless the corroborating source is a genuinely independent collector from the originating source; per-row `notes.confidence_history[]` audit on every `procurement_records.confidence` UPDATE), CEO + DBArchitect (future runguides + dispatches + handoffs cite **`§8.3 + §11 #8`** for corroboration-lift rule, NOT "§5.2 +5 boost"), ExtractionWorker (future deeper-extraction runguides classify their output as "provenance enrichment cycle" vs "cross-source corroboration cycle" at runguide-§-text time; the two are not interchangeable under CP24 strict reading).
@@ -2973,7 +2973,7 @@ This CP24 entry is the §11 #11 amendment-log pairing for the §11 #8 three new 
 ## Correction Pass 25 — `cross_source_corroboration_reversals[]` audit-trail + CP24 §12 n-recount supersession + within-source-FP discipline-evolution carry-forward
 
 **Date:** 2026-05-17
-**Source:** MAC-171 CEO ratification dispatch [`35ebb1bf`](/MAC/issues/MAC-171#comment-35ebb1bf-d99b-46d3-b31b-c15b2399dfa5) (adjudications on the §7.4 validation report's four §H open questions; Q3 specifically authorized CP25 as a standalone single-sub-rule amendment over folding into CP24 per §S.8 append-don't-mutate). Validator §7.4 walk-through at MAC-171 [`727ffcf0`](/MAC/issues/MAC-171#comment-727ffcf0-8875-4580-a4b8-908a06ee81cb) surfaced three stop-the-line items in the SEC EDGAR P3 dispatch: 3 of 9 named-customer extractions were §11 #1 false-positives (SSTI×ICE about competitors, SSTI×DHS Item 1A about Congressional IG-investigation request, Rekor×FBI about CJIS compliance), 1 was ambiguous under the 30-word fair-use cap (SSTI×FBI Item 1A), and the 2 "STRONG" cross-source corroborations on USAspending procurement rows (id=86738 + 86741/86743/86744/86745/86747) were therefore invalid (FP) or undetermined (ambiguous). MAC-172's pre-existing `notes.cross_source_corroboration[]` marker on id=86738 required reversal under §11 #1.
+**Source:** MAC-171 CEO ratification dispatch [`35ebb1bf`](<TRACKER_URL>issues/MAC-171#comment-35ebb1bf-d99b-46d3-b31b-c15b2399dfa5) (adjudications on the §7.4 validation report's four §H open questions; Q3 specifically authorized CP25 as a standalone single-sub-rule amendment over folding into CP24 per §S.8 append-don't-mutate). Validator §7.4 walk-through at MAC-171 [`727ffcf0`](<TRACKER_URL>issues/MAC-171#comment-727ffcf0-8875-4580-a4b8-908a06ee81cb) surfaced three stop-the-line items in the SEC EDGAR P3 dispatch: 3 of 9 named-customer extractions were §11 #1 false-positives (SSTI×ICE about competitors, SSTI×DHS Item 1A about Congressional IG-investigation request, Rekor×FBI about CJIS compliance), 1 was ambiguous under the 30-word fair-use cap (SSTI×FBI Item 1A), and the 2 "STRONG" cross-source corroborations on USAspending procurement rows (id=86738 + 86741/86743/86744/86745/86747) were therefore invalid (FP) or undetermined (ambiguous). MAC-172's pre-existing `notes.cross_source_corroboration[]` marker on id=86738 required reversal under §11 #1.
 **Bible commit:** This entry only. Schema version unchanged (CP25 is §-text + row-local notes-pattern; no schema migration). DB writes that consume CP25 §1 (the MAC-171 reversal UPDATE on id=86738) land in the immediately-following MAC-171 ingest commit per CEO's ordered execution-sequencing (bible CP first, DB writes second, disk-stage third).
 **Status:** Ratified at MAC-171 35ebb1bf 2026-05-17. CP25 §1 schema is the contract that the MAC-171 reversal UPDATE writes against; CP25 §2 documents the SEC × USAspending `n` recount that the same UPDATE produces; CP25 §3 captures the observation that within-source FP identification at validation time is now a recurring CEO-class adjudication pattern.
 **Binds:** Validator (any future retraction of a `notes.cross_source_corroboration[]` marker under §11 #1 or §11 #8 review MUST append a parallel `notes.cross_source_corroboration_reversals[]` audit entry per CP25 §1 schema in the same transaction as the corroboration-array UPDATE); CEO + ExtractionWorker (future runguide §-text avoids the within-source FP failure mode by including the §11 #1 customer-relationship-vs-textual-mention disambiguation as a default §4 match-scoring step rather than punting to validator-time review).
@@ -3035,7 +3035,7 @@ Post-reversal state: `notes.cross_source_corroboration[]` empty (or key absent);
 
 1. **CP25 ratifies at this commit.** Bible HEAD bumps from the CP24 commit to this CP25 commit. Schema version unchanged (21 → 21; CP25 is §-text + row-local notes-pattern; no schema migration).
 2. **MAC-171 ingest commit lands next.** The id=86738 reversal UPDATE consumes the CP25 §1 schema as its write contract. Same commit also carries the 1 source INSERT + 21 manufacturer-enrichment UPSERT + 5 net-new procurement_records + disk-stage operator-review files per CEO's authorized write-set.
-3. **MAC-171 close.** Validator reassigns to CEO with `in_review` after the CP25 commit + MAC-171 ingest commit land; close comment carries the paste-not-cite state-row preamble per [feedback_dispatch_preamble_live_state_verification](/MAC/agents/ceo).
+3. **MAC-171 close.** Validator reassigns to CEO with `in_review` after the CP25 commit + MAC-171 ingest commit land; close comment carries the paste-not-cite state-row preamble per [feedback_dispatch_preamble_live_state_verification](<TRACKER_URL>agents/ceo).
 4. **No paired state-rotation commit needed.** PROJECT_STATE.md will refresh organically at the next post-MAC-171 close (CP25 + MAC-171 land together as the coordinated end-state).
 
 ### §12 Open Questions impact
@@ -3154,9 +3154,9 @@ This CP26 entry is the §11 #11 amendment-log pairing for the §11 #8 sub-rule (
 ## Correction Pass 27 — §2.4 Empirical-Premise Verification Precondition
 
 **Date:** 2026-05-18
-**Source:** Cycle-7 autonomous overnight wave (2026-05-17→2026-05-18) per [MAC-177](/MAC/issues/MAC-177) parent + [MAC-178](/MAC/issues/MAC-178) integration. Six concrete failure-mode anchors surfaced inside a single 8-hour window — 5 external web-scrape runguides ([MAC-102](/MAC/issues/MAC-102) ISED Canada REL, [MAC-103](/MAC/issues/MAC-103) BT SIG Qualified Designs, [MAC-105](/MAC/issues/MAC-105) USPTO Patent Text Mining, [MAC-107](/MAC/issues/MAC-107) GitHub Code Search, [MAC-110](/MAC/issues/MAC-110) Ofcom UK) all halted at empirically-falsified load-bearing premises, and 1 internal extraction patch ([MAC-101](/MAC/issues/MAC-101) PC1.7 `application_id`-vs-`grant_id` identifier-field-name miscall) caught the same class of failure mid-flight. The empirical density alone is the codification trigger.
+**Source:** Cycle-7 autonomous overnight wave (2026-05-17→2026-05-18) per [MAC-177](<TRACKER_URL>issues/MAC-177) parent + [MAC-178](<TRACKER_URL>issues/MAC-178) integration. Six concrete failure-mode anchors surfaced inside a single 8-hour window — 5 external web-scrape runguides ([MAC-102](<TRACKER_URL>issues/MAC-102) ISED Canada REL, [MAC-103](<TRACKER_URL>issues/MAC-103) BT SIG Qualified Designs, [MAC-105](<TRACKER_URL>issues/MAC-105) USPTO Patent Text Mining, [MAC-107](<TRACKER_URL>issues/MAC-107) GitHub Code Search, [MAC-110](<TRACKER_URL>issues/MAC-110) Ofcom UK) all halted at empirically-falsified load-bearing premises, and 1 internal extraction patch ([MAC-101](<TRACKER_URL>issues/MAC-101) PC1.7 `application_id`-vs-`grant_id` identifier-field-name miscall) caught the same class of failure mid-flight. The empirical density alone is the codification trigger.
 **Bible commit:** This entry + the §2.4 insert into `PROJECT_BIBLE.md` (placed after §2.3 A Note on Ambition; before §3 Architecture). Schema version unchanged (22 → 22; CP27 is §-text only — process amendment, no migration, no notes_json convention).
-**Status:** Ratified at MAC-178 dispatch 2026-05-18 per CEO disposition [3029e567](/MAC/issues/MAC-178#comment-3029e567-c4e7-4dac-aff8-cd03b8c9a48a) (response to Validator draft [60301e62](/MAC/issues/MAC-178#comment-60301e62-da2e-4007-b975-b40caaf2c923)). Draft ratified verbatim — no refinements applied to the §2.4 text or the 10-runguide downstream-consumer audit. The §4.4 DROPPED-class disposition surface raised at MAC-178 Priority 8 is **explicitly deferred** to a separate future CP cycle (candidate slot: CP28); it is NOT part of CP27.
+**Status:** Ratified at MAC-178 dispatch 2026-05-18 per CEO disposition [3029e567](<TRACKER_URL>issues/MAC-178#comment-3029e567-c4e7-4dac-aff8-cd03b8c9a48a) (response to Validator draft [60301e62](<TRACKER_URL>issues/MAC-178#comment-60301e62-da2e-4007-b975-b40caaf2c923)). Draft ratified verbatim — no refinements applied to the §2.4 text or the 10-runguide downstream-consumer audit. The §4.4 DROPPED-class disposition surface raised at MAC-178 Priority 8 is **explicitly deferred** to a separate future CP cycle (candidate slot: CP28); it is NOT part of CP27.
 **Binds:** CEO (any future runguide dispatch authorization MUST verify §3.0 verification-probe completion CLEAN POSITIVE before signing off on §3.1 bulk-extraction fire); Validator + ExtractionWorker (any pre-existing runguide being re-dispatched MUST re-run §3.0 probes at re-dispatch time regardless of prior calibration); Researcher (any new runguide drafted post-CP27 MUST ship a §3.0 verification-probe section as a published structural slot before any §3.1 dispatch fires).
 
 ### Why this Correction Pass exists
@@ -3165,12 +3165,12 @@ The cycle-7 autonomous wave (2026-05-17→2026-05-18, ~8 hours of autonomous ext
 
 | Runguide / pass | Failure mode | Falsified load-bearing premise |
 |---|---|---|
-| [MAC-102](/MAC/issues/MAC-102) ISED Canada REL | Oracle PL/SQL gateway → Spring Web Flow migration | URL template + HTTP method + session model (form-flow `execution=...` token) |
-| [MAC-103](/MAC/issues/MAC-103) BT SIG Qualified Designs | Launch Studio domain rename + auth-gate added | URL domain (`qualification.bluetooth.com` 301) + auth posture (`Layers` endpoint 401) + response-shape (Vue SPA vs server-rendered) |
-| [MAC-105](/MAC/issues/MAC-105) USPTO PatFT | PatFT decommissioned ~2022; NXDOMAIN | endpoint existence (URL host no longer resolves) |
-| [MAC-107](/MAC/issues/MAC-107) GitHub Code Search | Auth-required for ALL queries since 2022 GA | auth posture (unauthenticated 401, was 200) |
-| [MAC-110](/MAC/issues/MAC-110) Ofcom UK | Cloudflare managed challenge JS gate added | request-shape (curl-able → JS-required) |
-| [MAC-101](/MAC/issues/MAC-101) PC1.7 (fccid.io) | `application_id` field assumption empirically wrong | identifier-field name (Grant ID is the actual identifier, not Application ID) |
+| [MAC-102](<TRACKER_URL>issues/MAC-102) ISED Canada REL | Oracle PL/SQL gateway → Spring Web Flow migration | URL template + HTTP method + session model (form-flow `execution=...` token) |
+| [MAC-103](<TRACKER_URL>issues/MAC-103) BT SIG Qualified Designs | Launch Studio domain rename + auth-gate added | URL domain (`qualification.bluetooth.com` 301) + auth posture (`Layers` endpoint 401) + response-shape (Vue SPA vs server-rendered) |
+| [MAC-105](<TRACKER_URL>issues/MAC-105) USPTO PatFT | PatFT decommissioned ~2022; NXDOMAIN | endpoint existence (URL host no longer resolves) |
+| [MAC-107](<TRACKER_URL>issues/MAC-107) GitHub Code Search | Auth-required for ALL queries since 2022 GA | auth posture (unauthenticated 401, was 200) |
+| [MAC-110](<TRACKER_URL>issues/MAC-110) Ofcom UK | Cloudflare managed challenge JS gate added | request-shape (curl-able → JS-required) |
+| [MAC-101](<TRACKER_URL>issues/MAC-101) PC1.7 (fccid.io) | `application_id` field assumption empirically wrong | identifier-field name (Grant ID is the actual identifier, not Application ID) |
 
 5 separate external runguides + 1 internal patch = 6 concrete failure-mode anchors across 5 organizations in a single autonomous-wave window. The discipline the wave kept evolving in real-time — runguide patch cycles + a mid-flight extraction-script fix — is the canonical bible expression of the discipline going forward. CP27 codifies it as a precondition on §3.1 dispatch.
 
@@ -3195,7 +3195,7 @@ The cycle-7 autonomous wave (2026-05-17→2026-05-18, ~8 hours of autonomous ext
 
 3. **§6 #5 halt-criteria composition.** §2.4 §3.0 probe outcomes integrate cleanly with the existing §6 #5 halt-criteria framework. CLEAN NEGATIVE and INCONCLUSIVE outcomes are first-class halt triggers; the runguide returns to drafting per the patch-cycle convention; CEO disposition is required before any re-fire of §3.1. No additional §6 amendment is needed — §6 #5 is the existing halt-criteria contract; §2.4 §3.0 just generates new triggers under it.
 
-### Downstream-consumer audit (per [feedback_bible_amendment_downstream_consumer_audit](/MAC/issues/MAC-178#comment-3029e567-c4e7-4dac-aff8-cd03b8c9a48a) standing rule)
+### Downstream-consumer audit (per [feedback_bible_amendment_downstream_consumer_audit](<TRACKER_URL>issues/MAC-178#comment-3029e567-c4e7-4dac-aff8-cd03b8c9a48a) standing rule)
 
 CP27 is a process amendment. No schema migration sibling. No code-path sibling (`export_lynceus.py` / `coverage_matrix.py` / `IDENTIFIER_TYPE_TO_PATTERN_TYPE` unaffected — discipline, not enum). No test-fixture sibling. **Consumer surface is runguides only.**
 
@@ -3203,15 +3203,15 @@ Ten runguides need retroactive §3.0 verification-probe sections — the 5 halte
 
 | Runguide | MAC | Status | §3.0 priority | Suggested §3.0 probes |
 |---|---|---|---|---|
-| `ised_rel_admission_runguide.md` | [MAC-102](/MAC/issues/MAC-102) | halted | **Must, before v2 re-fire** | Spring-Web-Flow URL probe + form-field exfil + `execution=...` token shape |
-| `bt_sig_qualified_designs_admission_runguide.md` | [MAC-103](/MAC/issues/MAC-103) | halted | **Must, before v2 re-fire** | `qualification.bluetooth.com` 301 chase + `Platform/Listings/Submission/{id}/Layers` 401 auth probe |
-| `patent_text_mining_admission_runguide.md` | [MAC-105](/MAC/issues/MAC-105) | halted | **Must, before v2 re-fire** | NXDOMAIN check on USPTO PatFT; EPO Espacenet 403 vs OPS 200 probe; Google Patents JS-vs-XHR probe |
-| `github_mass_search_admission_runguide.md` | [MAC-107](/MAC/issues/MAC-107) | halted | **Must, before v2 re-fire** | Unauthenticated Code Search probe (expect 401) + auth-tier probe with PAT |
-| `ofcom_acma_admission_runguide.md` | [MAC-110](/MAC/issues/MAC-110) | halted | **Must, before v2 re-fire** | Cloudflare-challenge JS probe + Azure APIM vs public-API probe + ACMA RRL-vs-equipment-register schema probe |
-| `fccid_io_admission_runguide.md` | [MAC-101](/MAC/issues/MAC-101) | completed (PC1.7 mid-flight patch) | **Should, post-hoc** | Formalize PC1.7's `application_id`-vs-`grant_id` probe as §3.0 |
-| `wave_g_v2_playstore_expansion_runguide.md` | [MAC-104](/MAC/issues/MAC-104) | completed | **Should, post-hoc** | Codify apk-pure vs apk-mirror reachability + manifest BLE-permissions probe |
-| `conference_proceedings_admission_runguide.md` | [MAC-108](/MAC/issues/MAC-108) | drafted, never dispatched | **Must, before first dispatch** | tesseract availability probe; PDF-archive reachability probe; OCR-grade self-test |
-| `muckrock_foia_admission_runguide.md` | [MAC-109](/MAC/issues/MAC-109) | drafted, deferred (PII pre-pass safety) | **Must, before first dispatch** | MuckRock public-feed probe; PII-pre-pass tooling probe; FOIA-document schema probe |
+| `ised_rel_admission_runguide.md` | [MAC-102](<TRACKER_URL>issues/MAC-102) | halted | **Must, before v2 re-fire** | Spring-Web-Flow URL probe + form-field exfil + `execution=...` token shape |
+| `bt_sig_qualified_designs_admission_runguide.md` | [MAC-103](<TRACKER_URL>issues/MAC-103) | halted | **Must, before v2 re-fire** | `qualification.bluetooth.com` 301 chase + `Platform/Listings/Submission/{id}/Layers` 401 auth probe |
+| `patent_text_mining_admission_runguide.md` | [MAC-105](<TRACKER_URL>issues/MAC-105) | halted | **Must, before v2 re-fire** | NXDOMAIN check on USPTO PatFT; EPO Espacenet 403 vs OPS 200 probe; Google Patents JS-vs-XHR probe |
+| `github_mass_search_admission_runguide.md` | [MAC-107](<TRACKER_URL>issues/MAC-107) | halted | **Must, before v2 re-fire** | Unauthenticated Code Search probe (expect 401) + auth-tier probe with PAT |
+| `ofcom_acma_admission_runguide.md` | [MAC-110](<TRACKER_URL>issues/MAC-110) | halted | **Must, before v2 re-fire** | Cloudflare-challenge JS probe + Azure APIM vs public-API probe + ACMA RRL-vs-equipment-register schema probe |
+| `fccid_io_admission_runguide.md` | [MAC-101](<TRACKER_URL>issues/MAC-101) | completed (PC1.7 mid-flight patch) | **Should, post-hoc** | Formalize PC1.7's `application_id`-vs-`grant_id` probe as §3.0 |
+| `wave_g_v2_playstore_expansion_runguide.md` | [MAC-104](<TRACKER_URL>issues/MAC-104) | completed | **Should, post-hoc** | Codify apk-pure vs apk-mirror reachability + manifest BLE-permissions probe |
+| `conference_proceedings_admission_runguide.md` | [MAC-108](<TRACKER_URL>issues/MAC-108) | drafted, never dispatched | **Must, before first dispatch** | tesseract availability probe; PDF-archive reachability probe; OCR-grade self-test |
+| `muckrock_foia_admission_runguide.md` | [MAC-109](<TRACKER_URL>issues/MAC-109) | drafted, deferred (PII pre-pass safety) | **Must, before first dispatch** | MuckRock public-feed probe; PII-pre-pass tooling probe; FOIA-document schema probe |
 | `wave_g_prime_ios_admission_runguide.md` | Wave-G' iOS | drafted, deferred (Apple ID) | **Must, before first dispatch** | Apple App Store reachability probe; IPA-fetch tooling probe; iOS-decompilation-framework probe |
 
 **8 "Must" cases + 2 "Should" cases = 10 downstream consumers.** Per CEO disposition: the 8 "Must" cases enforce naturally at each runguide's next dispatch-firing gate — no separate tracking issue needed because the §2.4 contract halts §3.1 before fire (structurally self-enforcing). The 2 "Should" cases (MAC-101 + MAC-104, completed runguides) fire lazily next time those runguides are touched (e.g., MAC-101.v2 dispatch or Wave-G' v3 dispatch). Not gating MAC-178 close.
@@ -3253,10 +3253,10 @@ This CP27 entry is the §11 #11 amendment-log pairing for the new §2.4 Empirica
 ## Correction Pass 28 — Wave H desktop-axis vendor-registered non-BLE identifier_type cluster (3 net-new) + SAR-12 7-FP-class codification + wrapper ±90-char windowed-clipping discipline + CP28(a)/(b) deferrals
 
 **Date:** 2026-05-18
-**Source:** Wave H pre-v1 desktop static-analysis extraction (Cohort D drone tooling + Cohort F sanctioned-vendor v1) per [MAC-177](/MAC/issues/MAC-177) parent + [MAC-181](/MAC/issues/MAC-181) v1.3.0 release sweep. Three CP28 candidate flags surfaced empirically across 3 vendors × 4 binaries (Hikvision iVMS-4200 + DJI Assistant 2 Mavic + DJI Assistant 2 FPV + FileZilla FP-control); HANDOFF §11(a)(b)(c) in `extraction_outputs/wave_h_pre_v1/HANDOFF_TO_VALIDATOR.md`. CEO disposition on [MAC-177 comment 0d15de7b](/MAC/issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §7 "approve full path" routes CP28(c) to ratification + CP28(a) to hold-under-CP15-ceiling + CP28(b) to anchor-weakened deferral.
+**Source:** Wave H pre-v1 desktop static-analysis extraction (Cohort D drone tooling + Cohort F sanctioned-vendor v1) per [MAC-177](<TRACKER_URL>issues/MAC-177) parent + [MAC-181](<TRACKER_URL>issues/MAC-181) v1.3.0 release sweep. Three CP28 candidate flags surfaced empirically across 3 vendors × 4 binaries (Hikvision iVMS-4200 + DJI Assistant 2 Mavic + DJI Assistant 2 FPV + FileZilla FP-control); HANDOFF §11(a)(b)(c) in `extraction_outputs/wave_h_pre_v1/HANDOFF_TO_VALIDATOR.md`. CEO disposition on [MAC-177 comment 0d15de7b](<TRACKER_URL>issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §7 "approve full path" routes CP28(c) to ratification + CP28(a) to hold-under-CP15-ceiling + CP28(b) to anchor-weakened deferral.
 **Schema sibling:** Migration [`0023_identifier_type_check_extension_cp28.sql`](../../db/migrations/0023_identifier_type_check_extension_cp28.sql) — applied at commit `2795ebba7866ad164121668321e213308aa87936`. Cumulative CHECK enum 48 → 51 values per `feedback_cumulative_check_enum_across_sequenced_migrations`. PRAGMA integrity_check + quick_check both ok at apply time; 22,549 active rows preserved via INSERT SELECT *.
 **Bible commit:** This entry + the schema-sibling migration form the MAC-181 v1.3.0 cycle's amendment-log half. Bible HEAD bumps from the CP27 commit to the CP28 commit landed alongside this entry. Schema version bumps 22 → 23.
-**Status:** Ratified at [MAC-181](/MAC/issues/MAC-181) dispatch 2026-05-18 per CEO disposition [`comment-0d15de7b`](/MAC/issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §7 (board-class ratification of CP28(c) "approve full path" + CP28(a) "hold under CP15 ceiling" + CP28(b) "deferred post-Cohort-F"). The MAC-181 cycle is the coordinated-commit landing per the CP23/CP24/CP25 trio precedent + [[feedback_bible_amendment_downstream_consumer_audit]] §S.6.1 worker-autonomous absorption discipline.
+**Status:** Ratified at [MAC-181](<TRACKER_URL>issues/MAC-181) dispatch 2026-05-18 per CEO disposition [`comment-0d15de7b`](<TRACKER_URL>issues/MAC-177#comment-0d15de7b-25a9-4f1e-bb40-65f00bc30fce) §7 (board-class ratification of CP28(c) "approve full path" + CP28(a) "hold under CP15 ceiling" + CP28(b) "deferred post-Cohort-F"). The MAC-181 cycle is the coordinated-commit landing per the CP23/CP24/CP25 trio precedent + [[feedback_bible_amendment_downstream_consumer_audit]] §S.6.1 worker-autonomous absorption discipline.
 **Binds:** Validator + ExtractionWorker (the 3 new `identifier_type` enum values are first-class promotion targets at §8.4 strict-promotion confidence ≥80 for `vendor_document_uuid_cloud_reference`, ≥75 for the two Windows-registry classes per §8.2 sub-band ladder); Lynceus consumer (CP28(c) §4.4 posture: `vendor_document_uuid_cloud_reference` MAPS into the Lynceus export window via the cloud-hostname half; the two Windows-registry classes are DROPPED-class per CP16 disposition); future Wave-H Continuation + Wave-I scope discussions (CP28(a) `vendor_application_static_analysis` source_type enum is held under the CP15 `manufacturer_app` ceiling — band-distinction encoded via §8.2 sub-band ladder + `notes.session_admission` — until empirical density triggers re-fire; CP28(b) `sanctioned_vendor_public_distribution_facts_only` license-posture sentinel is deferred post-Cohort-F completion as CP-of-its-own).
 
 ### Why this Correction Pass exists
@@ -3288,7 +3288,7 @@ CP28 also codifies two operational disciplines that emerged during the wave:
 
 2. **`windows_com_clsid_vendor_registered`** — Windows COM Class IDs registered by vendor desktop installers (`Software\Classes\CLSID\{...}\LocalServer32` / `\InprocServer32` registry contexts; vendor-name-anchored token in the immediate path). §8.2 sub-band: **75–90** (same logic as ProductCode class; vendor-controlled, install-time-registered, cross-extraction stable). §4.4 posture: **DROPPED** — install/registry context only; low passive-scan utility. Empirical Wave H seed: 1 unique value in DJI Assistant 2 Mavic 2.0.14 (DJIBrowser COM server).
 
-3. **`vendor_document_uuid_cloud_reference`** — Vendor-controlled cloud-hosted document UUID embedded in vendor-owned cloud endpoint URL (e.g. `https://duss.djicorp.com/functional-document/<UUID>`). §8.2 sub-band: **80–95** (the cloud-hostname half is itself a vendor-controlled identifier worth cross-source-corroboration anchoring against FCC EAS filings + USAspending procurement records + court records; the per-document UUID-half raises the per-row provenance over registry-context classes). §4.4 posture: **MAP** — the vendor-controlled hostname half (`duss.djicorp.com`) lifts into Lynceus's relevance window as a passively-scannable vendor cloud endpoint signature; downstream consumers can surface "this network observed DJI cloud traffic" as a deployment signal. Empirical Wave H seed: 1 unique value (`f4d4dbf5-...`) with CP24 within-vendor-cross-product attestation (Mavic + FPV Assistant 2 binaries). **Metadata-key convention:** at promotion-time, every `vendor_document_uuid_cloud_reference` row MUST populate `notes.cloud_url_hostname` with the canonical vendor-cloud hostname (the host portion of `source_url`, lower-cased, no port), normalized as the queryable join key for §4.4 MAP-posture downstream consumers + future Wave I hostname-corpus extraction (the id=23059 inaugural row was backfilled at MAC-181 §8.10 commit per [MAC-182](/MAC/issues/MAC-182) operator directive 2026-05-19T02:27:53Z; the convention binds prospectively for all future promotions of this class).
+3. **`vendor_document_uuid_cloud_reference`** — Vendor-controlled cloud-hosted document UUID embedded in vendor-owned cloud endpoint URL (e.g. `https://duss.djicorp.com/functional-document/<UUID>`). §8.2 sub-band: **80–95** (the cloud-hostname half is itself a vendor-controlled identifier worth cross-source-corroboration anchoring against FCC EAS filings + USAspending procurement records + court records; the per-document UUID-half raises the per-row provenance over registry-context classes). §4.4 posture: **MAP** — the vendor-controlled hostname half (`duss.djicorp.com`) lifts into Lynceus's relevance window as a passively-scannable vendor cloud endpoint signature; downstream consumers can surface "this network observed DJI cloud traffic" as a deployment signal. Empirical Wave H seed: 1 unique value (`f4d4dbf5-...`) with CP24 within-vendor-cross-product attestation (Mavic + FPV Assistant 2 binaries). **Metadata-key convention:** at promotion-time, every `vendor_document_uuid_cloud_reference` row MUST populate `notes.cloud_url_hostname` with the canonical vendor-cloud hostname (the host portion of `source_url`, lower-cased, no port), normalized as the queryable join key for §4.4 MAP-posture downstream consumers + future Wave I hostname-corpus extraction (the id=23059 inaugural row was backfilled at MAC-181 §8.10 commit per [MAC-182](<TRACKER_URL>issues/MAC-182) operator directive 2026-05-19T02:27:53Z; the convention binds prospectively for all future promotions of this class).
 
 **CP28(a) — `vendor_application_static_analysis` source_type enum value: DEFERRED.** Wave G mobile (Android APKs) + Wave H desktop both land under the existing `manufacturer_app` source_type enum per CP15 source-type ceiling (HANDOFF §9 used `vendor_documentation` as descriptive shorthand for the band; the actual landed source_type at MAC-181 promotion-time is `manufacturer_app`, mirroring the Wave G Flock FS Installer + Getac BWC Viewer precedent at sid=13/14). With ~20+ vendors now extracted across Wave G + Wave H via static-analysis methodology, the empirical density is meaningful, but per CEO disposition the operational band-distinction is encoded via the §8.2 sub-band ladder + the `notes.session_admission` field on per-wave `sources` rows rather than via a new `source_type` CHECK enum value. **Re-fire candidate:** if Wave H Continuation + Wave I both close with substantive new-vendor admissions and Lynceus operationally requests a filterable `vendor_application_static_analysis` source_type class (separate from generic FCC/SEC/SAM-vendor-doc admissions), surface as CP-of-its-own.
 
@@ -3359,7 +3359,7 @@ Surfaced by CP28 (queued for future CP candidacy):
 
 ### §11 #11 self-binding satisfied
 
-This CP28 entry is the §11 #11 amendment-log pairing for migration `0023_identifier_type_check_extension_cp28` + the SAR-12 7-FP-class codification + the wrapper ±90-char windowed-clipping discipline + the CP28(a)/(b) deferrals. Bible HEAD bumps from the CP27 commit to the CP28 commit landed alongside this entry. CP-anchor: migration commit `2795ebba7866ad164121668321e213308aa87936` + [MAC-181](/MAC/issues/MAC-181) child issue ID. Schema version bumps 22 → 23.
+This CP28 entry is the §11 #11 amendment-log pairing for migration `0023_identifier_type_check_extension_cp28` + the SAR-12 7-FP-class codification + the wrapper ±90-char windowed-clipping discipline + the CP28(a)/(b) deferrals. Bible HEAD bumps from the CP27 commit to the CP28 commit landed alongside this entry. CP-anchor: migration commit `2795ebba7866ad164121668321e213308aa87936` + [MAC-181](<TRACKER_URL>issues/MAC-181) child issue ID. Schema version bumps 22 → 23.
 
 ═══════════════════════════════════════════════════════════════════════
 
@@ -3439,7 +3439,7 @@ Source_type CHECK enum maps to closest existing 13-value enum; semantic source_c
 
 ### §11 #11 self-binding satisfied
 
-This CP29 entry is the §11 #11 amendment-log pairing for migration `0024_cp29_vendor_hostname_corpus_value_classes` + SAR-13 entry + SAR-13.5 entry. CP-anchor: migration commit `<TBD-this-cycle>` + [MAC-183](/MAC/issues/MAC-183) child issue ID. Schema version bumps 23 → 24.
+This CP29 entry is the §11 #11 amendment-log pairing for migration `0024_cp29_vendor_hostname_corpus_value_classes` + SAR-13 entry + SAR-13.5 entry. CP-anchor: migration commit `<TBD-this-cycle>` + [MAC-183](<TRACKER_URL>issues/MAC-183) child issue ID. Schema version bumps 23 → 24.
 
 ═══════════════════════════════════════════════════════════════════════
 
@@ -3586,11 +3586,11 @@ This SAR-15.5 entry is the bible-amendment sibling of SAR-15 + the MAC-183 post-
 
 ### Scope
 
-CP31 codifies the FCC EAS grantee identifier_type cluster + the multi-arm manufacturer hub-and-spoke schema. Migration 0025 lands the schema (identifier_type CHECK enum 54 → 56, pair_kind 4 → 5, manufacturers +3 columns + Parrot conversion). 4-path downstream consumer audit at MAC-199 (commit `9a4eee0`) ratifies the runtime semantics. This commit closes the §11 #11 coordinated 2-commit shape per [MAC-197](/MAC/issues/MAC-197) board-accepted plan rev `d59e6af5`.
+CP31 codifies the FCC EAS grantee identifier_type cluster + the multi-arm manufacturer hub-and-spoke schema. Migration 0025 lands the schema (identifier_type CHECK enum 54 → 56, pair_kind 4 → 5, manufacturers +3 columns + Parrot conversion). 4-path downstream consumer audit at MAC-199 (commit `9a4eee0`) ratifies the runtime semantics. This commit closes the §11 #11 coordinated 2-commit shape per [MAC-197](<TRACKER_URL>issues/MAC-197) board-accepted plan rev `d59e6af5`.
 
 ### CP30 reservation footnote
 
-CP30 remains reserved for `vendor_asn_prefix` + `vendor_controlled_ip` codification per CP29 §3 — Wave I.10/I.13 falsified at zero-evidence, conservative ≥1-empirical-evidence gate holds. CP31 renumbers to skip CP30 without consuming the reservation slot; CP30 holds until ASN-prefix observation surfaces (likely Wave I-prime with RDAP url-pattern fix) and/or cert IP-SAN surface yields non-zero in a future cycle. Numbering precedent: CP29 reserved CP30 for these deferred items, CEO ratification at [MAC-184#comment-25b3ff0b](/MAC/issues/MAC-184#comment-25b3ff0b-f763-4291-90e9-490f1656a2c9) reclaimed CP31 for the FCC EAS cluster, deferred items re-reserved for CP32+ as they materialize.
+CP30 remains reserved for `vendor_asn_prefix` + `vendor_controlled_ip` codification per CP29 §3 — Wave I.10/I.13 falsified at zero-evidence, conservative ≥1-empirical-evidence gate holds. CP31 renumbers to skip CP30 without consuming the reservation slot; CP30 holds until ASN-prefix observation surfaces (likely Wave I-prime with RDAP url-pattern fix) and/or cert IP-SAN surface yields non-zero in a future cycle. Numbering precedent: CP29 reserved CP30 for these deferred items, CEO ratification at [MAC-184#comment-25b3ff0b](<TRACKER_URL>issues/MAC-184#comment-25b3ff0b-f763-4291-90e9-490f1656a2c9) reclaimed CP31 for the FCC EAS cluster, deferred items re-reserved for CP32+ as they materialize.
 
 ### §1 — Codified amendments (5)
 
@@ -3615,7 +3615,7 @@ Arm rows surface only via three explicit paths:
 - JOIN through `parent_manufacturer_id` (parent-child traversal)
 - Direct FK reference from `identifiers.manufacturer_id` (per-identifier attestation; future-FK migration pending — see §3 below)
 
-**Phase 7-bis attestation routing** (post-CP31, blocked on [MAC-196](/MAC/issues/MAC-196) Numerex close, which is landed at `1344f5d`): 2AG-attested fccid.io rows (177-row §7.2 cohort) point at the arm canonical (Parrot Automotive id=222), NOT the hub. Per-row `device_category` on those identifier rows depends on the §2.1 `identifiers.device_category` CHECK enum admitting an automotive-telematics value — see §6 below for the CP32 follow-up on this enum gap.
+**Phase 7-bis attestation routing** (post-CP31, blocked on [MAC-196](<TRACKER_URL>issues/MAC-196) Numerex close, which is landed at `1344f5d`): 2AG-attested fccid.io rows (177-row §7.2 cohort) point at the arm canonical (Parrot Automotive id=222), NOT the hub. Per-row `device_category` on those identifier rows depends on the §2.1 `identifiers.device_category` CHECK enum admitting an automotive-telematics value — see §6 below for the CP32 follow-up on this enum gap.
 
 ### §3 — Downstream consumer audit (4 paths) — post-MAC-199 actual
 
@@ -3658,7 +3658,7 @@ The CP31 plan §1 #1 stated "53 total values (51 CP29 + 2 CP31)" for the `identi
 - 40 char-prefix shape: 3-5 char `fcc_grantee_code` + 3-char `equipment_class_code` (FCC ID composition `grantee_code + product_code`; equipment_class_code sibling to grantee — paired via `pair_kind='fcc_grantee_equipment_class'`)
 - Single §7.0 api.dbeta.me Parrot-hub attestation pre-CP31 (no arm exposure risk at v1.4.1 ship-state)
 - 177-row Phase 7-bis §7.2 fccid.io cohort (out-of-scope future ship; unblocked post-this-CP + MAC-196 landed at `1344f5d`)
-- Board disposition: [MAC-184 comment 25b3ff0b](/MAC/issues/MAC-184#comment-25b3ff0b-f763-4291-90e9-490f1656a2c9) (Option 2C hub-and-spoke ratified)
+- Board disposition: [MAC-184 comment 25b3ff0b](<TRACKER_URL>issues/MAC-184#comment-25b3ff0b-f763-4291-90e9-490f1656a2c9) (Option 2C hub-and-spoke ratified)
 - Live DB verification post-migration 0025: 56 identifier_types, 5 pair_kinds, 52 mfgs (51 hub + 1 arm), schema_version=25
 
 ### §6 — Carry-forward (CP32 candidates; NOT codified here)
@@ -3686,7 +3686,7 @@ Surfaced by MAC-199 + held for CP32 (or single-purpose follow-ups) per CEO dispo
 
 ### §11 #11 self-binding satisfied
 
-This CP31 entry is the §11 #11 amendment-log pairing for migration 0025 (`db/migrations/0025_cp31_fcc_eas_identifier_type_cluster_plus_hub_and_spoke.sql` at commit `29abb27`) + 4-path consumer audit at commit `9a4eee0` + this bible commit. CP-anchor: this commit + [MAC-197](/MAC/issues/MAC-197) closure. Schema version bumps 24 → 25.
+This CP31 entry is the §11 #11 amendment-log pairing for migration 0025 (`db/migrations/0025_cp31_fcc_eas_identifier_type_cluster_plus_hub_and_spoke.sql` at commit `29abb27`) + 4-path consumer audit at commit `9a4eee0` + this bible commit. CP-anchor: this commit + [MAC-197](<TRACKER_URL>issues/MAC-197) closure. Schema version bumps 24 → 25.
 
 ═══════════════════════════════════════════════════════════════════════
 
@@ -3694,7 +3694,7 @@ This CP31 entry is the §11 #11 amendment-log pairing for migration 0025 (`db/mi
 
 ### Scope
 
-CP32 codifies a single bundled amendment with 10 sub-sections covering the Stage 2 Phase 1 dispatch ([MAC-220](/MAC/issues/MAC-220) parent [MAC-219](/MAC/issues/MAC-219)). Migration 0026 lands a single schema-level mutation — the `device_category` CHECK enum extension `+1 automotive_telematics` applied to BOTH `identifiers.device_category` and `behavioral_signatures.device_category`. The remaining nine sub-sections are narrative/discipline codifications folding three pending CP32 candidates (#6/#7/#8 from Stage 1 — MAC-206/MAC-207/MAC-209) plus six new amendments surfaced at MAC-217/MAC-198/MAC-199 close. Schema_version bumps 25 → 26.
+CP32 codifies a single bundled amendment with 10 sub-sections covering the Stage 2 Phase 1 dispatch ([MAC-220](<TRACKER_URL>issues/MAC-220) parent [MAC-219](<TRACKER_URL>issues/MAC-219)). Migration 0026 lands a single schema-level mutation — the `device_category` CHECK enum extension `+1 automotive_telematics` applied to BOTH `identifiers.device_category` and `behavioral_signatures.device_category`. The remaining nine sub-sections are narrative/discipline codifications folding three pending CP32 candidates (#6/#7/#8 from Stage 1 — MAC-206/MAC-207/MAC-209) plus six new amendments surfaced at MAC-217/MAC-198/MAC-199 close. Schema_version bumps 25 → 26.
 
 ### CP30 reservation footnote (preserved unchanged)
 
@@ -3758,7 +3758,7 @@ Data-only addendum migrations sharing a numeric slot with a schema-mutating migr
 
    Mechanism: `PROJECT_BIBLE.md` §11 #17 sub-rule clarification (added at MAC-206 in Stage 1) is now first-class codified. CP32 §6 confirms the class-2 deferred → MAC-208 fork language already landed at Stage 1 inline §11 #17 text (5 `identifiers` rows ids 554-558 RAVEN_*, plus 1 `sources` row sid=7, all `{json}<concat>text` defects). The §11 #17 wave_g_pre_v1 21-row carve-out invariant — every `identifiers` row has a `raw_observations` predecessor OR carries `notes.direct_admission_carve_out=true` referencing `sources.notes`-level provenance — is reaffirmed as session-bounded and explicitly NOT a future admission pathway. The Stage 1 inline edit at PROJECT_BIBLE.md §11 #17 footer reference "(CP32 candidate #6 — pending CP32 bundle landing)" is replaced this CP with "(CP32 §6 — codified)".
 
-   Origin: [MAC-206](/MAC/issues/MAC-206) Phase 10d Run 3 — β.3c CEO ratification at [MAC-206#90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) 2026-05-20; companion [MAC-205](/MAC/issues/MAC-205) 21-row enumeration + Option A.
+   Origin: [MAC-206](<TRACKER_URL>issues/MAC-206) Phase 10d Run 3 — β.3c CEO ratification at [MAC-206#90e6b70f](<TRACKER_URL>issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) 2026-05-20; companion [MAC-205](<TRACKER_URL>issues/MAC-205) 21-row enumeration + Option A.
 
    Affected paths: `PROJECT_BIBLE.md` §11 #17 (status pointer flip from candidate → codified).
 
@@ -3768,7 +3768,7 @@ Data-only addendum migrations sharing a numeric slot with a schema-mutating migr
 
    Mechanism: `PROJECT_BIBLE.md` §11 (dispatch-discipline envelope) gains a sub-rule — dispatch plan-inputs in cleaned `~/argus-internal/` (or analogous workspace-only) sandboxes → HALT-fast-path = default disposition, assuming the dispatch body anticipates this case with an explicit fast-path clause. The sandbox-clean condition is a discoverable precondition during pre-flight, not a mid-flight surprise; ratification can happen at HALT-comment time without per-record evidence enumeration. Forward-looking sub-rule: future dispatches that depend on `~/argus-internal/`-resident plan-inputs **SHOULD** specify a snapshot path under a versioned location (the argus repo) at dispatch time, with a fallback fast-path clause when the snapshot was not captured.
 
-    Origin: [MAC-207](/MAC/issues/MAC-207) Phase 11 HALT ratified at [MAC-207#c4ec8740](/MAC/issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) 2026-05-21 (Option A all-73 DROP single-cycle close). Precedent: [MAC-200](/MAC/issues/MAC-200) §9.2.c first surfaced the same `~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/` sandbox-absence (commit `2a49bab`); CP32 §7 codifies the discipline pattern MAC-200 exercised informally (n=2 precedent: MAC-200 + MAC-207).
+    Origin: [MAC-207](<TRACKER_URL>issues/MAC-207) Phase 11 HALT ratified at [MAC-207#c4ec8740](<TRACKER_URL>issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) 2026-05-21 (Option A all-73 DROP single-cycle close). Precedent: [MAC-200](<TRACKER_URL>issues/MAC-200) §9.2.c first surfaced the same `~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/` sandbox-absence (commit `2a49bab`); CP32 §7 codifies the discipline pattern MAC-200 exercised informally (n=2 precedent: MAC-200 + MAC-207).
 
    Affected paths: `PROJECT_BIBLE.md` §11 (sub-rule added as new bullet under dispatch-discipline section).
 
@@ -3780,7 +3780,7 @@ Data-only addendum migrations sharing a numeric slot with a schema-mutating migr
 
    This is the first post-execution dispatch-reasoning correction landed as a CP entry rather than a feedback memory — prior dispatch-reasoning errors (e.g., MAC-176 forecast error on Johnson Matthey MA-M routing) landed as feedback memories; this one earns a CP entry because it composes directly with §11 #17 and constrains future BLE-service identifier_type admission decisions.
 
-   Origin: [MAC-209](/MAC/issues/MAC-209) Phase 12 spot-check surfaced the mechanism correction; [[feedback_db_verify_dispatch_claims]] is the meta-discipline anchor.
+   Origin: [MAC-209](<TRACKER_URL>issues/MAC-209) Phase 12 spot-check surfaced the mechanism correction; [[feedback_db_verify_dispatch_claims]] is the meta-discipline anchor.
 
    Affected paths: `PROJECT_BIBLE.md` §7.5 (sub-rule added); export-generator code stamp (no code change required at CP32 time — the export generators already emit `_meta.dropped_in_export.type_mapping_unmapped` bin entries per the CP16 split-structure; the rule reference is documentation-discipline at audit-time).
 
@@ -3803,7 +3803,7 @@ Data-only addendum migrations sharing a numeric slot with a schema-mutating migr
 
     Forward-looking sub-rule: any §11 hard-rule that constrains export content shape SHOULD have a paired `_assert_no_<rule>_<violation>(path)` post-condition guard at every emission call site. This is the first framework-level codification of the pattern — prior PII-bounded checks lived only at the row-classification gate (`_classify_row` → drop bin), which is necessary but not sufficient: a bug in the classification gate or a future code-path that bypasses the gate (e.g., a custom export) would leak PII. The post-condition guard is defense-in-depth — it catches both classification-gate bugs AND new-code-path bypasses.
 
-    Origin: [MAC-217](/MAC/issues/MAC-217) Phase 5 (Stage 1) — `_assert_no_email_pii(path)` implemented at 6 emission call sites in the §8.2 PII-strip commit (`214f20f`); cross-ref to the 12 source_excerpt redactions + 4 VCH demotions + this guard pattern.
+    Origin: [MAC-217](<TRACKER_URL>issues/MAC-217) Phase 5 (Stage 1) — `_assert_no_email_pii(path)` implemented at 6 emission call sites in the §8.2 PII-strip commit (`214f20f`); cross-ref to the 12 source_excerpt redactions + 4 VCH demotions + this guard pattern.
 
     Affected paths: `PROJECT_BIBLE.md` §11 #3 (sub-rule added; code pattern reference). No new code in this CP — the guard pattern already lives at `db/validation/export_lynceus.py` post `214f20f`; CP32 §10 codifies it as a framework-level discipline rule.
 
@@ -3828,14 +3828,14 @@ Data-only addendum migrations sharing a numeric slot with a schema-mutating migr
 
 **Cross-references:**
 
-- [MAC-219](/MAC/issues/MAC-219) (v1.4.1 Stage 2 — CP32 + Docs + Final Tag parent)
-- [MAC-220](/MAC/issues/MAC-220) (Phase 1 — CP32 codification + mig-0026 + test refactor + bible — THIS dispatch)
-- [MAC-220 comment 5bb44924](/MAC/issues/MAC-220#comment-5bb44924-20fe-45b1-93bf-35ecdda2ee81) (CEO Option A-minimal disposition: 0026a_ rename + Na_ sub-slot convention)
-- [MAC-205](/MAC/issues/MAC-205) + [MAC-206](/MAC/issues/MAC-206) — CP32 §6 wave_g_pre_v1 carve-out lineage
-- [MAC-207](/MAC/issues/MAC-207) — CP32 §7 HALT-fast-path codification lineage
-- [MAC-209](/MAC/issues/MAC-209) — CP32 §8 export-drop attribution lineage
-- [MAC-217](/MAC/issues/MAC-217) — CP32 §9 tri-state semantic anchor (Track B 4 PII demotes) + CP32 §10 `_assert_no_email_pii(path)` precedent (commit `214f20f`)
-- [MAC-197](/MAC/issues/MAC-197) (CP31 — origin of §6 #1-#5 carry-forwards now codified at CP32 §1/§2/§3/§4/§5)
+- [MAC-219](<TRACKER_URL>issues/MAC-219) (v1.4.1 Stage 2 — CP32 + Docs + Final Tag parent)
+- [MAC-220](<TRACKER_URL>issues/MAC-220) (Phase 1 — CP32 codification + mig-0026 + test refactor + bible — THIS dispatch)
+- [MAC-220 comment 5bb44924](<TRACKER_URL>issues/MAC-220#comment-5bb44924-20fe-45b1-93bf-35ecdda2ee81) (CEO Option A-minimal disposition: 0026a_ rename + Na_ sub-slot convention)
+- [MAC-205](<TRACKER_URL>issues/MAC-205) + [MAC-206](<TRACKER_URL>issues/MAC-206) — CP32 §6 wave_g_pre_v1 carve-out lineage
+- [MAC-207](<TRACKER_URL>issues/MAC-207) — CP32 §7 HALT-fast-path codification lineage
+- [MAC-209](<TRACKER_URL>issues/MAC-209) — CP32 §8 export-drop attribution lineage
+- [MAC-217](<TRACKER_URL>issues/MAC-217) — CP32 §9 tri-state semantic anchor (Track B 4 PII demotes) + CP32 §10 `_assert_no_email_pii(path)` precedent (commit `214f20f`)
+- [MAC-197](<TRACKER_URL>issues/MAC-197) (CP31 — origin of §6 #1-#5 carry-forwards now codified at CP32 §1/§2/§3/§4/§5)
 - `db/migrations/0025_cp31_*.sql` (immediate-prior schema-mutating migration; baseline for CP32 §1 dual-table sweep)
 - `db/migrations/0026_cp32_device_category_automotive_telematics.sql` (this CP — schema-version 26)
 - `db/migrations/0026a_phase10_*.sql` (renamed from `0026_phase10_*.sql` at commit `c1ec6a5`; Na_ sub-slot precedent)
@@ -3854,7 +3854,7 @@ Data-only addendum migrations sharing a numeric slot with a schema-mutating migr
 
 ### §11 #11 self-binding satisfied
 
-This CP32 entry is the §11 #11 amendment-log pairing for migration 0026 (`db/migrations/0026_cp32_device_category_automotive_telematics.sql` at commit `9666a78`) + the 0026a_ rename (commit `c1ec6a5`) + the test refactor (commit `6874f84`) + this bible commit. CP-anchor: this commit + [MAC-220](/MAC/issues/MAC-220) closure. Schema version bumps 25 → 26.
+This CP32 entry is the §11 #11 amendment-log pairing for migration 0026 (`db/migrations/0026_cp32_device_category_automotive_telematics.sql` at commit `9666a78`) + the 0026a_ rename (commit `c1ec6a5`) + the test refactor (commit `6874f84`) + this bible commit. CP-anchor: this commit + [MAC-220](<TRACKER_URL>issues/MAC-220) closure. Schema version bumps 25 → 26.
 
 ═══════════════════════════════════════════════════════════════════════
 
@@ -3862,7 +3862,7 @@ This CP32 entry is the §11 #11 amendment-log pairing for migration 0026 (`db/mi
 
 **Date:** 2026-05-20
 **Commit:** `<this-commit>` — `docs(bible): MAC-203 Deferral Note 1 — §44.3 Honeywell product nomenclature corpus (no surviving §11 #7 evidence)` (self-referential per CP31 §5 precedent; resolve via `git log BIBLE_AMENDMENTS.md`)
-**Source:** [MAC-203](/MAC/issues/MAC-203) Validator verdict comment `0ac4e5ae` (Path 1 — intentional scope narrowing — confirmed) on top of [MAC-200](/MAC/issues/MAC-200) §9.2.c Phase 9 Wave I.13 carry-forward heartbeat surface.
+**Source:** [MAC-203](<TRACKER_URL>issues/MAC-203) Validator verdict comment `0ac4e5ae` (Path 1 — intentional scope narrowing — confirmed) on top of [MAC-200](<TRACKER_URL>issues/MAC-200) §9.2.c Phase 9 Wave I.13 carry-forward heartbeat surface.
 **Bible edit:** NONE — pure deferral note per §11 #11 amendment-log discipline for deliberate-deferral path. No PROJECT_BIBLE.md text mutated; no schema mutation; no DB writes. Schema_version unchanged at 25.
 
 ### §1 — What was deferred
@@ -3890,7 +3890,7 @@ The §44.3 spec's prescribed output artifact (`diagnostic_outputs/honeywell_prod
 
 ### §2 — Why it was deferred (Path 1 — intentional scope narrowing — confirmed)
 
-Phase 8 ([MAC-195](/MAC/issues/MAC-195)) was dispatched with a three-item scope, all of which were applied as written:
+Phase 8 ([MAC-195](<TRACKER_URL>issues/MAC-195)) was dispatched with a three-item scope, all of which were applied as written:
 
 1. **Honeywell admission** to canonical `manufacturers` lexicon (51 → 52 rows).
 2. **§6.4 alias enrichment** — `HoneywellSecurityGroup` tier-3 `ct_log_common_name` appended to `Honeywell.aliases` (key: `mac195_alias_enrichment`).
@@ -3949,7 +3949,7 @@ Per MAC-203 out-of-scope guard: **no** Phase-N+ re-application dispatch is queue
 
 ### §7 — Out-of-scope guard
 
-- No Phase 9 ([MAC-200](/MAC/issues/MAC-200)) back-fill (closed scope per CEO ratification at MAC-200 close).
+- No Phase 9 ([MAC-200](<TRACKER_URL>issues/MAC-200)) back-fill (closed scope per CEO ratification at MAC-200 close).
 - No mutation to any Honeywell id=211 notes key besides the (now-verified-deferred) `product_families` / `codenames` / `codesign_branches` triad — and that triad remains ABSENT by deliberate scope.
 - No CP-class amendment surfaced — the §44.3 spec's identifier-shape did not propose a new `identifier_type`; it was a `notes`-key enrichment proposal only.
 
@@ -3957,7 +3957,7 @@ Per MAC-203 out-of-scope guard: **no** Phase-N+ re-application dispatch is queue
 
 This deferral entry IS the §11 #11 amendment-log pairing for the deliberate-deferral path ratified at MAC-203. No bible text was edited; no migration was applied; no DB write was made. The entry exists solely to preserve the audit-trail invariant that an undocumented deferral (even one ratified as Path 1) is a process violation regardless of whether the deferral decision itself is correct.
 
-Branch: `v1.4.1-integration-stage-1` (MAC-203 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
+Branch: `v1.4.1-integration-stage-1` (MAC-203 is a v1.4.1 Stage 1 child of [MAC-184](<TRACKER_URL>issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
 
 ═══════════════════════════════════════════════════════════════════════
 
@@ -3966,11 +3966,11 @@ Branch: `v1.4.1-integration-stage-1` (MAC-203 is a v1.4.1 Stage 1 child of [MAC-
 
 **Date:** 2026-05-20
 **Branch:** `v1.4.1-integration-stage-1`
-**Commit:** Bible edit at `PROJECT_BIBLE.md §11 #17` landed at MAC-206 Phase 10d Run 3 heartbeat commit; CP32 bundle codification landed at [MAC-220](/MAC/issues/MAC-220) commit `<this-commit>`.
-**Source:** [MAC-206](/MAC/issues/MAC-206) Phase 10d Run 3 — β.3c ratified at [MAC-206 comment 90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) 2026-05-20 (CEO ratification)
+**Commit:** Bible edit at `PROJECT_BIBLE.md §11 #17` landed at MAC-206 Phase 10d Run 3 heartbeat commit; CP32 bundle codification landed at [MAC-220](<TRACKER_URL>issues/MAC-220) commit `<this-commit>`.
+**Source:** [MAC-206](<TRACKER_URL>issues/MAC-206) Phase 10d Run 3 — β.3c ratified at [MAC-206 comment 90e6b70f](<TRACKER_URL>issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) 2026-05-20 (CEO ratification)
 **Status:** **CODIFIED** — folded into CP32 §6 above. This candidate entry preserved as expanded archival detail per its original "If CP32 lands as a single bundle commit, this entry's title will be renumbered to a sub-section of the CP32 entry" anticipation.
-**Ratifying CEO comment:** [MAC-206#90e6b70f](/MAC/issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) — β.3c (verbatim applicability language ratified)
-**Companion CEO ratification:** [MAC-205](/MAC/issues/MAC-205) (disposition β + scope-handling Option A — 21 rows ratified for carve-out)
+**Ratifying CEO comment:** [MAC-206#90e6b70f](<TRACKER_URL>issues/MAC-206#comment-90e6b70f-9f4d-4374-9655-d498e56982d2) — β.3c (verbatim applicability language ratified)
+**Companion CEO ratification:** [MAC-205](<TRACKER_URL>issues/MAC-205) (disposition β + scope-handling Option A — 21 rows ratified for carve-out)
 
 ### §1 — What was edited
 
@@ -3979,7 +3979,7 @@ Branch: `v1.4.1-integration-stage-1` (MAC-203 is a v1.4.1 Stage 1 child of [MAC-
 1. **§11 #17 (top-level rule)** — Direct-admission carve-out clause. States the amended audit invariant (raw_observations predecessor OR `notes.direct_admission_carve_out=true` referencing sources.notes provenance); session-bounds to `wave_g_pre_v1` (sids 13, 14; 21 rows enumerated at MAC-205); declares non-future-pathway; cites wave_g_pre_v1 intentionality anchors (`mac_55_step_2_run` + `authority_chain` on sources rows); contrasts with the 16 apkpure-sourced identifiers admitted *outside* wave_g_pre_v1 (ids 23043–23058) that carry raw_observations predecessors per the canonical contract.
 2. **§11 #17 sub-bullet — Applicability scope** (CEO verbatim). Two excluded row classes:
     - **Class 1 (out-of-scope by era's convention):** 106 `identifiers` MAC-44 rationales + 21 `sources` MAC-63 templates + ~52,501 `raw_observations` FCC/IEEE address strings. **Future migrations MUST NOT JSON-ify them.** No backfill required or authorized.
-    - **Class 2 (deferred intended-JSON repair):** 5 `identifiers` (ids 554-558, RAVEN_* services) + 1 `sources` (sid=7). Backfill required, deferred to [MAC-208](/MAC/issues/MAC-208).
+    - **Class 2 (deferred intended-JSON repair):** 5 `identifiers` (ids 554-558, RAVEN_* services) + 1 `sources` (sid=7). Backfill required, deferred to [MAC-208](<TRACKER_URL>issues/MAC-208).
     - id=539 (Flock Safety, sid=13) is class 2 but was forward-repaired in MAC-206 (carve-out UPDATE mechanically requires `json_valid(notes)=1`). The MAC-206 repair lifted suffix verbatim into `notes.corroboration_note_2026_05_10` + added `notes.repair_audit.sweep_event_id='mac206_id539_repair_2026_05_20'`. repair_audit + carve_out_audit events cross-reference each other on id=539's row.
 3. **§11 #17 sub-bullet — Downstream-consumer applicability (MAC-206 Phase 3 sweep, 2026-05-20).** Records the in-heartbeat consumer sweep: `argus_cli.py`, `db/validation/export_lynceus.py`, `db/export/wave_a_snapshot_export.py` all read `identifiers.notes` as opaque-string (no json_extract); `db/validation/mac101_item_a_registry_xcheck.py` defensively guards with `WHERE json_valid(notes)` on raw_observations only. No consumer hard-requires global `json_valid(notes)=1` on identifiers. Adds an operational sub-rule binding future consumers that add `json_extract(notes,'$.X')` calls on columns where class-1 rows live.
 
@@ -3987,7 +3987,7 @@ Branch: `v1.4.1-integration-stage-1` (MAC-203 is a v1.4.1 Stage 1 child of [MAC-
 
 - **Backup:** `db/argus.db.mac206_pre_carveout_backup` sha256 = `f346940861995b740c301fc520aab3500e2acebb158fcbe7aecb88f088c51bab`.
 - **Phase 1.6 sibling repair (sweep_event_id `mac206_id539_repair_2026_05_20`):** 1 row UPDATEd (id=539). Pre-UPDATE: `json_valid(notes)=0`, length=446 chars, sha256=`7855e94df59f0642390a6d66481e23a98577aed560b0673a706c036262783786`. Post-UPDATE: `json_valid(notes)=1`, 4 original keys preserved (`apk_package`, `apk_version`, `sub_band`, `§8.3_boost_pending`) + `corroboration_note_2026_05_10` (suffix lifted verbatim) + `repair_audit` (with forward-ref to carve-out event + MAC-208 child-issue ref).
-- **Phase 2 carve-out (sweep_event_id `mac206_wave_g_carveout_2026_05_20`):** 21 rows UPDATEd via `json_patch(notes, ?)` (first-run affected=21; idempotency re-run affected=0). Composite WHERE: `id IN (533..553) AND source_url IN (<flock_url>, <getac_url>) AND json_extract(notes,'$.direct_admission_carve_out') IS NULL`. Each row gained 7 carve-out top-level keys + `carve_out_audit` sub-object with `precondition_event` back-ref to the id=539 repair event + `child_issue_ref` to [MAC-208](/MAC/issues/MAC-208).
+- **Phase 2 carve-out (sweep_event_id `mac206_wave_g_carveout_2026_05_20`):** 21 rows UPDATEd via `json_patch(notes, ?)` (first-run affected=21; idempotency re-run affected=0). Composite WHERE: `id IN (533..553) AND source_url IN (<flock_url>, <getac_url>) AND json_extract(notes,'$.direct_admission_carve_out') IS NULL`. Each row gained 7 carve-out top-level keys + `carve_out_audit` sub-object with `precondition_event` back-ref to the id=539 repair event + `child_issue_ref` to [MAC-208](<TRACKER_URL>issues/MAC-208).
 - **No migration applied.** No schema/enum change. The carve-out is a `notes` JSON addition only.
 - **No fabrication.** Per §11 #1 paste-not-cite: id=539 suffix lifted verbatim (not paraphrased); all 21 rows' pre-existing keys preserved (json_patch is additive); audit metadata is timestamped + sweep_event_id-anchored.
 
@@ -4000,7 +4000,7 @@ The bible text edit at §11 #17 has already been applied to `PROJECT_BIBLE.md` o
 ### §4 — Cross-references
 
 - MAC-206 Phase 10d execution heartbeat: `_phase_10_schema_anomaly/carve_out_execution.md` Run 3 (this same commit).
-- Sibling [MAC-208](/MAC/issues/MAC-208) (v1.4.2 hygiene — repair 6 intended-JSON rows broken by `{json}<concat>text` defect): filed at MAC-206 Phase 10d Run 3 Step 2 with title-only stub body containing the verbatim scan paste of the 5 RAVEN_* + sid=7 rows. Not a blocker on MAC-206 or v1.4.1 Stage 1.
+- Sibling [MAC-208](<TRACKER_URL>issues/MAC-208) (v1.4.2 hygiene — repair 6 intended-JSON rows broken by `{json}<concat>text` defect): filed at MAC-206 Phase 10d Run 3 Step 2 with title-only stub body containing the verbatim scan paste of the 5 RAVEN_* + sid=7 rows. Not a blocker on MAC-206 or v1.4.1 Stage 1.
 - MAC-205 scoping heartbeat: `_phase_10_schema_anomaly/orphan_scoping.md` §3 — 21-row enumeration.
 - MAC-202 (sid=13 investigation) + MAC-204 (sid=13 rebind) — sibling MAC-184 children, both `done`.
 
@@ -4015,11 +4015,11 @@ This entry IS the §11 #11 pairing for the bible §11 #17 edit. The git commit a
 
 **Date:** 2026-05-21
 **Branch:** `v1.4.1-integration-stage-1`
-**Commit:** CP32 bundle codification landed at [MAC-220](/MAC/issues/MAC-220) commit `<this-commit>`.
-**Source:** [MAC-207](/MAC/issues/MAC-207) Phase 11 HALT — plan-input JSON sandbox-absence; ratified at [MAC-207 comment c4ec8740](/MAC/issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) 2026-05-21 (CEO ratification of Option A single-cycle all-73 DROP close).
+**Commit:** CP32 bundle codification landed at [MAC-220](<TRACKER_URL>issues/MAC-220) commit `<this-commit>`.
+**Source:** [MAC-207](<TRACKER_URL>issues/MAC-207) Phase 11 HALT — plan-input JSON sandbox-absence; ratified at [MAC-207 comment c4ec8740](<TRACKER_URL>issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) 2026-05-21 (CEO ratification of Option A single-cycle all-73 DROP close).
 **Status:** **CODIFIED** — folded into CP32 §7 above. This candidate entry preserved as expanded archival detail per its original Stage 1 candidate-state framing.
-**Ratifying CEO comment:** [MAC-207#c4ec8740](/MAC/issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) — Option A approved (verbatim language ratified).
-**Companion precedent:** [MAC-200](/MAC/issues/MAC-200) heartbeat §9.2.c (commit `2a49bab`) — first surfacing of the same `~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/` sandbox-absence; CP32 candidate #7 codifies the discipline pattern that MAC-200 already exercised informally.
+**Ratifying CEO comment:** [MAC-207#c4ec8740](<TRACKER_URL>issues/MAC-207#comment-c4ec8740-36e4-42a9-bac6-cadd035bb110) — Option A approved (verbatim language ratified).
+**Companion precedent:** [MAC-200](<TRACKER_URL>issues/MAC-200) heartbeat §9.2.c (commit `2a49bab`) — first surfacing of the same `~/argus-internal/wave_i_pre_v1/wave_i_13_hard_id_v2/` sandbox-absence; CP32 candidate #7 codifies the discipline pattern that MAC-200 already exercised informally.
 
 ### §1 — Ratified amendment language (CEO verbatim, MAC-207#c4ec8740)
 
@@ -4086,7 +4086,7 @@ This sub-rule is **operational guidance**, not a hard CHECK constraint — enfor
 
 This entry IS the §11 #11 pairing for the MAC-207 HALT-fast-path ratification. The git commit applying this entry alongside the MAC-207 heartbeat close-out is recorded above (commit hash filled in when committed). No bible text edit was required (the rule lives only in BIBLE_AMENDMENTS.md as a candidate pending CP32 bundle close); no migration was applied; no DB write was made. Schema_version unchanged at 25.
 
-Branch: `v1.4.1-integration-stage-1` (MAC-207 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
+Branch: `v1.4.1-integration-stage-1` (MAC-207 is a v1.4.1 Stage 1 child of [MAC-184](<TRACKER_URL>issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
 
 ═══════════════════════════════════════════════════════════════════════
 
@@ -4095,8 +4095,8 @@ Branch: `v1.4.1-integration-stage-1` (MAC-207 is a v1.4.1 Stage 1 child of [MAC-
 
 **Date:** 2026-05-21
 **Branch:** `v1.4.1-integration-stage-1`
-**Commit:** Originally landed alongside MAC-209 Phase 12 follow-up fixup commit (`6d33fa8`); CP32 bundle codification landed at [MAC-220](/MAC/issues/MAC-220) commit `<this-commit>`.
-**Source:** [MAC-209](/MAC/issues/MAC-209) Phase 12 spot-check finding — surfaced by Validator at [comment ef215248](/MAC/issues/MAC-209#comment-ef215248-…) 2026-05-21.
+**Commit:** Originally landed alongside MAC-209 Phase 12 follow-up fixup commit (`6d33fa8`); CP32 bundle codification landed at [MAC-220](<TRACKER_URL>issues/MAC-220) commit `<this-commit>`.
+**Source:** [MAC-209](<TRACKER_URL>issues/MAC-209) Phase 12 spot-check finding — surfaced by Validator at [comment ef215248](<TRACKER_URL>issues/MAC-209#comment-ef215248-…) 2026-05-21.
 **Status:** **CODIFIED** — folded into CP32 §8 above. This candidate entry preserved as expanded archival detail per its original Stage 1 candidate-state framing.
 **Ratifying CEO note:** This candidate codifies a dispatch-reasoning correction surfaced post-execution: the MAC-206 dispatch implied carve-out rows would drop from Lynceus high-conf export via CP19 §8.2 crowdsourced-ceiling. Validator's MAC-209 spot-check found they actually drop at §4.4 type-mapping. CEO ratifies the corrected mechanism as the canonical explanation.
 
@@ -4145,7 +4145,7 @@ Future dispatches that assert "rows X drop from Lynceus export because of mechan
 
 ### §6 — Cross-references
 
-- MAC-209 Phase 12 close-out: [comment ef215248](/MAC/issues/MAC-209#comment-ef215248-…) — paste-not-cite spot-check that surfaced the mechanism.
+- MAC-209 Phase 12 close-out: [comment ef215248](<TRACKER_URL>issues/MAC-209#comment-ef215248-…) — paste-not-cite spot-check that surfaced the mechanism.
 - MAC-206 CP32 candidate #6 (this file, above) — §11 #17 carve-out clause this candidate composes with.
 - [[feedback_db_verify_dispatch_claims]] — meta-discipline this candidate operationalizes for Lynceus-export drops.
 
@@ -4153,7 +4153,7 @@ Future dispatches that assert "rows X drop from Lynceus export because of mechan
 
 This entry IS the §11 #11 pairing for the MAC-209 surfaced dispatch-reasoning correction. The git commit applying this entry alongside STAGE_1_FINAL_REPORT.md is recorded above (commit hash filled in when committed). No bible text edit; no migration; no DB write. Schema_version unchanged at 25.
 
-Branch: `v1.4.1-integration-stage-1` (MAC-209 is a v1.4.1 Stage 1 child of [MAC-184](/MAC/issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
+Branch: `v1.4.1-integration-stage-1` (MAC-209 is a v1.4.1 Stage 1 child of [MAC-184](<TRACKER_URL>issues/MAC-184); no commit lands on `main` from this entry until v1.4.1 ships).
 
 ═══════════════════════════════════════════════════════════════════════
 
@@ -4163,7 +4163,7 @@ Branch: `v1.4.1-integration-stage-1` (MAC-209 is a v1.4.1 Stage 1 child of [MAC-
 
 ### Scope
 
-CP33 codifies a single bundled amendment with 7 sub-sections covering the [MAC-232](/MAC/issues/MAC-232) v1.5.0 lexicon-expansion-wave integration (Stage 1 + Stage 2). The cycle was a two-session parallel dispatch (S1 military/federal cohort + S2 commercial/consumer cohort). Migration 0027 lands a single dual-table schema-level mutation — the `device_category` CHECK enum extension `+3 (cctv_camera, persistent_surveillance, through_wall_radar)` applied to BOTH `identifiers.device_category` and `behavioral_signatures.device_category` (second framework dual-table CHECK literal extension after the CP32 §1 precedent) plus the `identifiers.identifier_type` CHECK enum `+1 imei_tac` forward-compatible admission. Schema_version bumps 26 → 27. The remaining sub-sections codify 40 net new manufacturer admissions + Pelco arm-under-MSI (id=254 — second framework `hidden_arm` row after Parrot Automotive id=222) + 848 net active identifier promotions + Step 6 G-B retroactive `cctv_camera` recategorization sweep (7 mfg + 31 ident rows; NDAA §889 attribution preserved on Hikvision + Dahua; BriefCam deferred to v1.5.x) + Step 7 disambig + FP-class triage + Step 8 v1.5.x/v1.6.0 backlog queue (the new `PLANNED_AND_FUTURE_UPDATES.md` repo file).
+CP33 codifies a single bundled amendment with 7 sub-sections covering the [MAC-232](<TRACKER_URL>issues/MAC-232) v1.5.0 lexicon-expansion-wave integration (Stage 1 + Stage 2). The cycle was a two-session parallel dispatch (S1 military/federal cohort + S2 commercial/consumer cohort). Migration 0027 lands a single dual-table schema-level mutation — the `device_category` CHECK enum extension `+3 (cctv_camera, persistent_surveillance, through_wall_radar)` applied to BOTH `identifiers.device_category` and `behavioral_signatures.device_category` (second framework dual-table CHECK literal extension after the CP32 §1 precedent) plus the `identifiers.identifier_type` CHECK enum `+1 imei_tac` forward-compatible admission. Schema_version bumps 26 → 27. The remaining sub-sections codify 40 net new manufacturer admissions + Pelco arm-under-MSI (id=254 — second framework `hidden_arm` row after Parrot Automotive id=222) + 848 net active identifier promotions + Step 6 G-B retroactive `cctv_camera` recategorization sweep (7 mfg + 31 ident rows; NDAA §889 attribution preserved on Hikvision + Dahua; BriefCam deferred to v1.5.x) + Step 7 disambig + FP-class triage + Step 8 v1.5.x/v1.6.0 backlog queue (the new `PLANNED_AND_FUTURE_UPDATES.md` repo file).
 
 Three independent SAR codifications land alongside CP33 — **SAR-16** (alias-length-floor; lockheed-LM n=134 driving case), **SAR-17** (no-generic-product-aliases; mydefence-EAGLE n=41 driving case), **SAR-18** (classifier-predicate parity; Step 9 `oversized_mac_range` halt at id=9404 Eagle Eye Networks size=256 → Path β ratification within 50 minutes of halt-surface). SAR-16 + SAR-17 codify cohort-disambiguation extensions of SAR-15 GENERIC_RISK_CANONICALS pre-load; SAR-18 extends the CP21 cumulative-full-enum sweep spirit (CHECK constraint parity across migrations) to runtime classifier predicates and forward-binds future `_classify_row` additions to dual-table parity review at PR time.
 
@@ -4904,7 +4904,7 @@ This discipline extends the CP21 cumulative-full-enum sweep spirit (which govern
 
 **Origin:** MAC-239 Wave G/H v1 integration orchestration-completion pass, 2026-05-23.
 **Authority:** DBArchitect-surfaced HALT-class downstream-consumer-update gap at canonical Lynceus export regen (see `_dbarchitect_signoff.md` §Task 5).
-**Ratification:** [MAC-255](/MAC/issues/MAC-255) — CEO ratification dispatch 2026-05-24; disposition **option (b)** DROP with rationale `NDPP_pending_lynceus_v0_3_scanner_support`.
+**Ratification:** [MAC-255](<TRACKER_URL>issues/MAC-255) — CEO ratification dispatch 2026-05-24; disposition **option (b)** DROP with rationale `NDPP_pending_lynceus_v0_3_scanner_support`.
 **Commit:** `7666748` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]).
 **Status:** **RATIFIED** at this commit. `PROJECT_BIBLE.md` §4.4 amended in lockstep; `db/validation/export_lynceus.py` + `db/validation/coverage_matrix.py` updated with bin_label `NDPP_pending_lynceus_v0_3_scanner_support` per SAR-18 classifier-predicate parity.
 
@@ -5156,9 +5156,9 @@ This entry stages §11 #18 as draft. §11 #11 self-binding activates at CP34 rat
 
 **Date:** 2026-05-24
 **Commit:** `7e6160e` on `main` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]; backfilled in follow-up commit per CEO ratification at MAC-251)
-**Origin:** [MAC-249](/MAC/issues/MAC-249) Phase G Validator CPN-A — schema gap surfaced between `sources.source_type` (extended at CP23 / mig-0020 with `judicial_filing` + `disclosure_filing` + `procurement_disclosure`) and `identifiers.source_type` (still at the pre-CP23 10-value enum).
-**Surfaced again:** [MAC-250](/MAC/issues/MAC-250) Phase H — J-5 (CourtListener RECAP, sid=48) dispatch landed 116 rows with `source_type='foia'` as CEO-ratified §8.2 65-85 band-bucket proxy.
-**Authority:** [MAC-251](/MAC/issues/MAC-251) — CEO-authored dispatch; CP-slot disambiguation ratified at MAC-251 wake comment `cb228e69-2c07-4062-9e92-06009f9f9c48` (option (b) — CP35 remains reserved for the standing NDPP §4.4 Lynceus mapping draft entry at BIBLE_AMENDMENTS.md:4836; this enum-parity work re-anchors to CP36).
+**Origin:** [MAC-249](<TRACKER_URL>issues/MAC-249) Phase G Validator CPN-A — schema gap surfaced between `sources.source_type` (extended at CP23 / mig-0020 with `judicial_filing` + `disclosure_filing` + `procurement_disclosure`) and `identifiers.source_type` (still at the pre-CP23 10-value enum).
+**Surfaced again:** [MAC-250](<TRACKER_URL>issues/MAC-250) Phase H — J-5 (CourtListener RECAP, sid=48) dispatch landed 116 rows with `source_type='foia'` as CEO-ratified §8.2 65-85 band-bucket proxy.
+**Authority:** [MAC-251](<TRACKER_URL>issues/MAC-251) — CEO-authored dispatch; CP-slot disambiguation ratified at MAC-251 wake comment `cb228e69-2c07-4062-9e92-06009f9f9c48` (option (b) — CP35 remains reserved for the standing NDPP §4.4 Lynceus mapping draft entry at BIBLE_AMENDMENTS.md:4836; this enum-parity work re-anchors to CP36).
 **Status:** **RATIFIED** at this commit (schema-side mig-0029 + J-5 116-row relabel previously verified clean at MAC-251 wake comment `cb228e69`; CP-slot rename + bible amendment-log entry land coordinated here).
 
 ### Scope
@@ -5240,10 +5240,10 @@ Pre-mig backup: `db/argus.db.pre_mig0029_20260524T023858Z` (mig-0029 schema rebu
 
 ### Cross-references
 
-- Parent: [MAC-245](/MAC/issues/MAC-245) — New data 5.23
-- Schema gap surfacing: [MAC-249](/MAC/issues/MAC-249) Phase G Validator CPN-A
-- Phase H data landing: [MAC-250](/MAC/issues/MAC-250) — 116 J-5 rows admitted with `source_type='foia'` proxy
-- Dispatch + CP-slot ratification: [MAC-251](/MAC/issues/MAC-251) — wake comment `cb228e69-2c07-4062-9e92-06009f9f9c48`
+- Parent: [MAC-245](<TRACKER_URL>issues/MAC-245) — New data 5.23
+- Schema gap surfacing: [MAC-249](<TRACKER_URL>issues/MAC-249) Phase G Validator CPN-A
+- Phase H data landing: [MAC-250](<TRACKER_URL>issues/MAC-250) — 116 J-5 rows admitted with `source_type='foia'` proxy
+- Dispatch + CP-slot ratification: [MAC-251](<TRACKER_URL>issues/MAC-251) — wake comment `cb228e69-2c07-4062-9e92-06009f9f9c48`
 - Standing CP35 reservation (unchanged by this CP): [`BIBLE_AMENDMENTS.md:4836`](BIBLE_AMENDMENTS.md) — NDPP §4.4 Lynceus mapping draft
 - Sibling pending entries still anchored to CP35-NDPP (unaffected): SAR-19-pending (line 4925), §11 #18-pending (line 5018)
 - Predecessor enum mutation (CP23): `db/migrations/0020_source_type_enum_extension.sql` (the canonical-trio admission to `sources.source_type` that this CP brings `identifiers.source_type` to parity with)
@@ -5253,8 +5253,8 @@ Pre-mig backup: `db/argus.db.pre_mig0029_20260524T023858Z` (mig-0029 schema rebu
 
 **Date:** 2026-05-24
 **Commit:** `dda50b1` on `main` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]; backfilled in follow-up commit per CEO ratification at MAC-256)
-**Origin:** [MAC-255](/MAC/issues/MAC-255) DBArchitect close-out — out-of-scope discovery: CP36 mig-0029 relabeled the 116 J-5 rows to canonical `source_type='judicial_filing'` but `db/validation/coverage_matrix.py::SOURCE_TYPE_CEILINGS` was not updated in the same coordinated commit, leaving the `_compute_halts` §8.2-sanity check (line 763) firing an `unknown_source_type` halt against the 116 J-5 rows on every validator pass.
-**Authority:** [MAC-256](/MAC/issues/MAC-256) — CEO-ratified single-touch close-out.
+**Origin:** [MAC-255](<TRACKER_URL>issues/MAC-255) DBArchitect close-out — out-of-scope discovery: CP36 mig-0029 relabeled the 116 J-5 rows to canonical `source_type='judicial_filing'` but `db/validation/coverage_matrix.py::SOURCE_TYPE_CEILINGS` was not updated in the same coordinated commit, leaving the `_compute_halts` §8.2-sanity check (line 763) firing an `unknown_source_type` halt against the 116 J-5 rows on every validator pass.
+**Authority:** [MAC-256](<TRACKER_URL>issues/MAC-256) — CEO-ratified single-touch close-out.
 **Status:** **RATIFIED** at this commit. Closes the CP36 coordinated-commit gap surfaced one CP-cycle late; analogous to how CP35 closed CP34's §4.4 mapping gap one cycle late.
 
 #### Scope (single-touch fix)
@@ -5292,8 +5292,8 @@ Result: clean pass; the `unknown_source_type` halt at `coverage_matrix.py:763` n
 #### Cross-references
 
 - Parent CP: CP36 (`identifiers.source_type` CHECK enum parity, mig-0029, MAC-251)
-- Surfacing issue: [MAC-255](/MAC/issues/MAC-255) (CP35 NDPP §4.4 ratification close-out, out-of-scope discovery)
-- Authority issue: [MAC-256](/MAC/issues/MAC-256) (this CP-extension)
+- Surfacing issue: [MAC-255](<TRACKER_URL>issues/MAC-255) (CP35 NDPP §4.4 ratification close-out, out-of-scope discovery)
+- Authority issue: [MAC-256](<TRACKER_URL>issues/MAC-256) (this CP-extension)
 - Predecessor commits: `7e6160e` (CP36 mig-0029 schema + relabel), `94d612d` (CP36 hash-backfill follow-up)
 - Sibling memory: [[feedback_bible_amendment_downstream_consumer_audit]] (the coordinated-sibling-commit discipline whose CP36 execution missed this dict; this CP-extension closes the gap)
 
@@ -5303,8 +5303,8 @@ Result: clean pass; the `unknown_source_type` halt at `coverage_matrix.py:763` n
 
 **Date:** 2026-05-24
 **Commit:** `2f3c6d7` on `main` (single coordinated commit: migration file + this amendment-log stanza, per [[feedback_bible_amendment_downstream_consumer_audit]]; hash backfilled in follow-up commit)
-**Origin:** [MAC-273](/MAC/issues/MAC-273) Wave K+L combined Phase H canonical writes. Wave K cohort 3 (lawful-intercept / network-surveillance platforms) had no admitting `device_category`; `hacking_tool` (cohort-2/cohort-4 home) denotes offensive exploitation + forensic extraction and would blur the offensive-vs-passive distinction downstream consumers rely on.
-**Authority:** [MAC-273](/MAC/issues/MAC-273) — CEO/operator-ratified Option A (GATE-1), 2026-05-24, after Validator Phase F reverify ([MAC-272](/MAC/issues/MAC-272)) returned zero halt-class with all four gates PASS.
+**Origin:** [MAC-273](<TRACKER_URL>issues/MAC-273) Wave K+L combined Phase H canonical writes. Wave K cohort 3 (lawful-intercept / network-surveillance platforms) had no admitting `device_category`; `hacking_tool` (cohort-2/cohort-4 home) denotes offensive exploitation + forensic extraction and would blur the offensive-vs-passive distinction downstream consumers rely on.
+**Authority:** [MAC-273](<TRACKER_URL>issues/MAC-273) — CEO/operator-ratified Option A (GATE-1), 2026-05-24, after Validator Phase F reverify ([MAC-272](<TRACKER_URL>issues/MAC-272)) returned zero halt-class with all four gates PASS.
 **Status:** **RATIFIED** at this commit. Schema 29 → 30.
 
 #### Scope
@@ -5336,7 +5336,7 @@ Dry-run on a scratch copy first (all expected counts matched exactly), then iden
 #### Cross-references
 
 - Migration: `db/migrations/0030_cp37_device_category_network_surveillance.sql`
-- Reverify authority: [MAC-272](/MAC/issues/MAC-272) (Validator Phase F — zero halt-class, four gates PASS)
+- Reverify authority: [MAC-272](<TRACKER_URL>issues/MAC-272) (Validator Phase F — zero halt-class, four gates PASS)
 - Sibling gate: GATE-2 (Anduril Lattice OS arm `primary_category='unknown'`, operator-ratified Option A) applied in the same Phase H manufacturers batch.
 - Predecessor CP-cluster: CP32 (mig-0026 `automotive_telematics`), CP33 (mig-0027 `cctv_camera`/`persistent_surveillance`/`through_wall_radar`) — same dual-table parity discipline.
 
@@ -5346,8 +5346,8 @@ Dry-run on a scratch copy first (all expected counts matched exactly), then iden
 
 **Date:** 2026-05-25
 **Commit:** `8a89816` on `main` (single coordinated commit: the 14-row reclassification + this amendment-log stanza, per [[feedback_bible_amendment_downstream_consumer_audit]]; hash backfilled in this follow-up commit).
-**Origin:** [MAC-273](/MAC/issues/MAC-273) Step-2.3 ruling — Wave-K Phase H applied it to the **5 new** rows (ids 39582, 39583, 39610, 39613, 41839). [MAC-274](/MAC/issues/MAC-274) is the S.7 downstream-consumer sweep of the **14 pre-existing** identical-source rows (ids 35591–35604; `github.com/MaxwellDPS/Flock-You-Android`; landed MAC-192 `phase_6_wave_i_14a_retroactive_promotion`) that sat at `crowdsourced/85`.
-**Authority:** [MAC-274](/MAC/issues/MAC-274) — board/operator-ratified Option A in the [MAC-271](/MAC/issues/MAC-271) thread (operator comment 2026-05-25T02:06Z), relayed as the formal go-signal by the CEO on MAC-274.
+**Origin:** [MAC-273](<TRACKER_URL>issues/MAC-273) Step-2.3 ruling — Wave-K Phase H applied it to the **5 new** rows (ids 39582, 39583, 39610, 39613, 41839). [MAC-274](<TRACKER_URL>issues/MAC-274) is the S.7 downstream-consumer sweep of the **14 pre-existing** identical-source rows (ids 35591–35604; `github.com/MaxwellDPS/Flock-You-Android`; landed MAC-192 `phase_6_wave_i_14a_retroactive_promotion`) that sat at `crowdsourced/85`.
+**Authority:** [MAC-274](<TRACKER_URL>issues/MAC-274) — board/operator-ratified Option A in the [MAC-271](<TRACKER_URL>issues/MAC-271) thread (operator comment 2026-05-25T02:06Z), relayed as the formal go-signal by the CEO on MAC-274.
 **Status:** **RATIFIED** at this commit. No schema change (`schema_version` unchanged at 30); `notes`/classification reconciliation only.
 
 #### Rule (durable §8.2 classification sub-rule)
@@ -5386,7 +5386,7 @@ Verified pre- and post-write: §4.4 maps `ssid_pattern → (DROPPED)` ("Lynceus 
 
 #### Cross-references
 
-- Parent ruling: [MAC-273](/MAC/issues/MAC-273) Step-2.3 (5 Wave-K rows: ids 39582/39583/39610/39613/41839).
+- Parent ruling: [MAC-273](<TRACKER_URL>issues/MAC-273) Step-2.3 (5 Wave-K rows: ids 39582/39583/39610/39613/41839).
 - Predecessor CP: CP19 (§8.2 `crowdsourced`/`inferred` high-confidence-export exclusion); §4.4 `ssid_pattern` DROP.
 - Sibling memory: [[reference_ssid_pattern_excluded_from_both_lynceus_exports]], [[feedback_flockyou_ssid_pattern_policy_split]], [[feedback_bible_amendment_downstream_consumer_audit]].
 
@@ -5394,8 +5394,8 @@ Verified pre- and post-write: §4.4 maps `ssid_pattern → (DROPPED)` ("Lynceus 
 
 **Date:** 2026-05-30
 **Migration:** `0031_cp39_severity_column_flock_carveout.sql` (schema_version 30 → 31; +1 column `severity` on `identifiers`, optional enum `high`/`medium`/`low`/NULL)
-**Origin:** [MAC-292](/MAC/issues/MAC-292) board comment `6611f673` re: promoting crowdsourced Flock-hunt data into HIGH-conf export. Split to research-then-propose child [MAC-305](/MAC/issues/MAC-305); board ratified the narrow plan at [MAC-292 comment `61b382a3`](/MAC/issues/MAC-292#comment-61b382a3-bee5-46c1-ade1-ba33d39c2ad5) 2026-05-30T15:17Z.
-**Authority:** Board (operator `ve8D79nSrERcuRYUzld9JyB4lXghkKhx`), ratification chain `6611f673` → `8de80bbc` → `b4a3cf35` → `b07c5132` → `61b382a3`. CEO-proposed plan at [comment `e0a9fc98`](/MAC/issues/MAC-292#comment-e0a9fc98-0ccb-46da-87a8-c7628a6995f6).
+**Origin:** [MAC-292](<TRACKER_URL>issues/MAC-292) board comment `6611f673` re: promoting crowdsourced Flock-hunt data into HIGH-conf export. Split to research-then-propose child [MAC-305](<TRACKER_URL>issues/MAC-305); board ratified the narrow plan at [MAC-292 comment `61b382a3`](<TRACKER_URL>issues/MAC-292#comment-61b382a3-bee5-46c1-ade1-ba33d39c2ad5) 2026-05-30T15:17Z.
+**Authority:** Board (operator `ve8D79nSrERcuRYUzld9JyB4lXghkKhx`), ratification chain `6611f673` → `8de80bbc` → `b4a3cf35` → `b07c5132` → `61b382a3`. CEO-proposed plan at [comment `e0a9fc98`](<TRACKER_URL>issues/MAC-292#comment-e0a9fc98-0ccb-46da-87a8-c7628a6995f6).
 **Status:** **RATIFIED** at this commit. Schema mig-0031 + 4-step data-pass landed in this commit; bible amendment landed in same commit per [[feedback_bible_amendment_downstream_consumer_audit]].
 
 #### Rule (durable §7.5 carve-out + new severity axis)
@@ -5457,8 +5457,8 @@ Verified pre- and post-write: §4.4 maps `ssid_pattern → (DROPPED)` ("Lynceus 
 
 #### Cross-references
 
-- Parent dispatch: [MAC-292](/MAC/issues/MAC-292) board comments `6611f673` / `b4a3cf35` / `b07c5132` / `61b382a3`; CEO plan `e0a9fc98`; verification baseline `62ace6c4`.
-- Execution home: [MAC-305](/MAC/issues/MAC-305).
+- Parent dispatch: [MAC-292](<TRACKER_URL>issues/MAC-292) board comments `6611f673` / `b4a3cf35` / `b07c5132` / `61b382a3`; CEO plan `e0a9fc98`; verification baseline `62ace6c4`.
+- Execution home: [MAC-305](<TRACKER_URL>issues/MAC-305).
 - Predecessor CP: CP38 (the durable third-party-detection-app demotion rule); CP19 (the §8.2 crowdsourced/inferred high-confidence-export exclusion); CP21 (cumulative-full-enum migration pattern).
 - Sibling memory: [[feedback_high_confidence_export_floor]], [[feedback_bible_amendment_downstream_consumer_audit]], [[feedback_ratification_options_verify_live_state]], [[feedback_flockyou_ssid_pattern_policy_split]].
 - Future CP carry-forwards: (a) Qualcomm manufacturer-lexicon admission (currently 39 chipset_codenames attributed to Flock Safety with notes-captured chipset-family for future re-attribution); (b) `behavioral_signatures` severity-column parity (if board direction warrants); (c) broader severity-axis backfill across categories (board-gated, not in CP39 scope).
@@ -5540,8 +5540,8 @@ scope expansion).
 
 **Date:** 2026-06-03
 **Commit:** `fc50a341bb1b4f2b0fadfa551b6ecdeb73a9a702` on `main` (single coordinated sibling commit per [[feedback_bible_amendment_downstream_consumer_audit]]; backfilled in follow-up commit per existing dispatch cadence).
-**Origin:** [MAC-301](/MAC/issues/MAC-301) — FIX SOON: Avigilon arm-flip paper-trail gaps surfaced at MAC-292 Phase D REPORT as CP-cand 5. Three paper-trail gaps tracked in the issue body: (Gap 1) §11 #18 staging entry stuck in DRAFT despite CP34 → CP40 having shipped; (Gap 2) Avigilon audit doc absent on disk at the staging-block-cited path; (Gap 3) `manufacturers.notes.arm_flip_history` JSON absent on id=6 and id=254 despite §11 #18 protocol-step-4 requiring per-row pre/post-state capture.
-**Authority:** Board ratification at MAC-301 disambiguation comment [`56c89cc8`](/MAC/issues/MAC-301#comment-56c89cc8-b4d7-4a4a-abe3-1cec445f5237) (2026-06-03) — option (a) RATIFIED (append §11 #20 with mechanical apply-time reformat); supersedes the staging-block self-name `§11 #18-pending`.
+**Origin:** [MAC-301](<TRACKER_URL>issues/MAC-301) — FIX SOON: Avigilon arm-flip paper-trail gaps surfaced at MAC-292 Phase D REPORT as CP-cand 5. Three paper-trail gaps tracked in the issue body: (Gap 1) §11 #18 staging entry stuck in DRAFT despite CP34 → CP40 having shipped; (Gap 2) Avigilon audit doc absent on disk at the staging-block-cited path; (Gap 3) `manufacturers.notes.arm_flip_history` JSON absent on id=6 and id=254 despite §11 #18 protocol-step-4 requiring per-row pre/post-state capture.
+**Authority:** Board ratification at MAC-301 disambiguation comment [`56c89cc8`](<TRACKER_URL>issues/MAC-301#comment-56c89cc8-b4d7-4a4a-abe3-1cec445f5237) (2026-06-03) — option (a) RATIFIED (append §11 #20 with mechanical apply-time reformat); supersedes the staging-block self-name `§11 #18-pending`.
 **Status:** **RATIFIED** at this commit. Pre-mutation safety: PROJECT_BIBLE.md §11 head-count re-verified at HEAD `1468964` (runs #1–#19 with CP32 §7 (#18) and CP32 §10 (#19) shipped 2026-05-21; next free slot = #20); manufacturers id=6 and id=254 pre-state confirmed (`is_arm=1, parent_manufacturer_id=3, query_default='hidden_arm', json_valid(notes)=1, arm_flip_history IS NULL`); pre-mutation DB backup `db/argus.db.pre_mac301_ratification_20260603T053500Z` (sha256 byte-match against `db/argus.db` at apply-time).
 
 ### Scope
@@ -5587,7 +5587,7 @@ CP41 lands three coordinated discipline-class corrections in a single bundled am
 
 At ratification this entry's canonical §11 slot resolved to **§11 #20**, not §11 #18 as the staging block at `BIBLE_AMENDMENTS.md:5018-5085` predicted. CP32 §7 (Dispatch plan-input sandbox-absence HALT-fast-path, 2026-05-21) and CP32 §10 (export-time generator post-condition guard, 2026-05-21) had claimed slots #18 and #19 between staging-block authorship (MAC-239, 2026-05-23 — staging carried `§11 #18-pending` based on the staging-block-authoring CEO's then-stale snapshot of §11) and this MAC-301 ratification (2026-06-03). The "Append `#18` body" / "as new entry #18" wording in the MAC-301 Phase B.1 dispatch was likewise a dispatch-author-side staleness on the §11 head count; the dispatch's coexisting "appended after the highest existing #N enumeration" clause was the binding one and resolved to #20 at apply-time. CP41 prose body above preserved verbatim per [[feedback_apply_time_correction_when_prediction_diverges_from_reality]]; the slot shift is recorded here without editing the ratified body. Cross-references: the JSON `arm_flip_history` blocks on `manufacturers.notes` (id=6 + id=254) carry both `bible_staging_ref` (staging-block #18 self-name, frozen) and `bible_ref` (canonical §11 #20) for forward forensic resolution. The Operator-DML-override pattern itself is unchanged by the slot shift; only the enumeration label differs.
 
-**Apply-time correction (post-mutation verification predicate refinement):** The MAC-301 follow-on backfill dispatch authored at this CP entry's `### Post-commit backfill obligations` block (lines 5523-5531) specified a verification predicate over `docs/engineering/BIBLE_AMENDMENTS.md` quantifying surviving occurrences of two placeholder tokens — the ratification-commit-hash placeholder (rendered descriptively as `<RATIFICATION-COMMIT-HASH>` in this narrative; the shell-executed predicate uses the bit-exact underscored form) and the unratified-marker phrase (rendered descriptively as `Currently-UNRATIFIED`; the shell-executed predicate uses the bit-exact space-separated form) — with the in-paragraph quotation hyphenated per the CEO γ″ disposition at MAC-301 wake comment [`43aafcd3`](/MAC/issues/MAC-301#comment-43aafcd3-837d-43f9-b2f5-75847fb3fa56) to avoid grep-survivor self-recursion. That predicate cannot be satisfied at backfill apply-time because the §"Post-commit backfill obligations" block itself describes the placeholder syntax in quoted/backtick form (lines 5529, 5530, 5531 post-mutation) as part of enumerating the three load-bearing sites. Those mentions are **descriptive narrative references to the placeholder syntax** preserved verbatim per [[feedback_apply_time_correction_when_prediction_diverges_from_reality]], NOT load-bearing placeholder sites. **Refined invariant for self-referential narrative blocks of this shape (applicable to any future CP whose body enumerates its own post-commit token-replacement obligations):** the verification predicate is *"live placeholder sites in DRAFT / staging / header positions resolve to 0 after backfill"*, NOT *"raw grep count == 0"*; descriptive references in the §"Post-commit backfill obligations" or sibling instructional prose are expected survivors. Concrete post-backfill match-set at this commit MUST equal `{line 5529, line 5530, line 5531}` (post-append-shifted; the original pre-append positions enumerated in the dispatch's verification predicate were `{5527, 5528, 5529}`, +2 due to this paragraph's own append) for `<RATIFICATION-COMMIT-HASH>` ∪ `Currently-UNRATIFIED` (descriptive hyphenated forms; the executable predicate uses the underscored / un-hyphenated bit-exact strings); any other surviving match is a defect. CEO disposition recorded at this entry's CP41 ratification commit `fc50a341bb1b4f2b0fadfa551b6ecdeb73a9a702` (MAC-301 wake comment [`1adcf19f`](/MAC/issues/MAC-301#comment-1adcf19f-b0c0-443a-9a74-ef981668adab), Option γ refined); supersedes the dispatch's coarser `grep -c == 0` predicate without re-opening CP41.
+**Apply-time correction (post-mutation verification predicate refinement):** The MAC-301 follow-on backfill dispatch authored at this CP entry's `### Post-commit backfill obligations` block (lines 5523-5531) specified a verification predicate over `docs/engineering/BIBLE_AMENDMENTS.md` quantifying surviving occurrences of two placeholder tokens — the ratification-commit-hash placeholder (rendered descriptively as `<RATIFICATION-COMMIT-HASH>` in this narrative; the shell-executed predicate uses the bit-exact underscored form) and the unratified-marker phrase (rendered descriptively as `Currently-UNRATIFIED`; the shell-executed predicate uses the bit-exact space-separated form) — with the in-paragraph quotation hyphenated per the CEO γ″ disposition at MAC-301 wake comment [`43aafcd3`](<TRACKER_URL>issues/MAC-301#comment-43aafcd3-837d-43f9-b2f5-75847fb3fa56) to avoid grep-survivor self-recursion. That predicate cannot be satisfied at backfill apply-time because the §"Post-commit backfill obligations" block itself describes the placeholder syntax in quoted/backtick form (lines 5529, 5530, 5531 post-mutation) as part of enumerating the three load-bearing sites. Those mentions are **descriptive narrative references to the placeholder syntax** preserved verbatim per [[feedback_apply_time_correction_when_prediction_diverges_from_reality]], NOT load-bearing placeholder sites. **Refined invariant for self-referential narrative blocks of this shape (applicable to any future CP whose body enumerates its own post-commit token-replacement obligations):** the verification predicate is *"live placeholder sites in DRAFT / staging / header positions resolve to 0 after backfill"*, NOT *"raw grep count == 0"*; descriptive references in the §"Post-commit backfill obligations" or sibling instructional prose are expected survivors. Concrete post-backfill match-set at this commit MUST equal `{line 5529, line 5530, line 5531}` (post-append-shifted; the original pre-append positions enumerated in the dispatch's verification predicate were `{5527, 5528, 5529}`, +2 due to this paragraph's own append) for `<RATIFICATION-COMMIT-HASH>` ∪ `Currently-UNRATIFIED` (descriptive hyphenated forms; the executable predicate uses the underscored / un-hyphenated bit-exact strings); any other surviving match is a defect. CEO disposition recorded at this entry's CP41 ratification commit `fc50a341bb1b4f2b0fadfa551b6ecdeb73a9a702` (MAC-301 wake comment [`1adcf19f`](<TRACKER_URL>issues/MAC-301#comment-1adcf19f-b0c0-443a-9a74-ef981668adab), Option γ refined); supersedes the dispatch's coarser `grep -c == 0` predicate without re-opening CP41.
 
 ### Post-commit backfill obligations
 
@@ -5601,7 +5601,7 @@ The §11 #18-staging "open question" at line 5072 (audit-doc template standardiz
 
 ### Cross-references
 
-- Parent dispatch: [MAC-301](/MAC/issues/MAC-301); CEO disambiguation [`56c89cc8`](/MAC/issues/MAC-301#comment-56c89cc8-b4d7-4a4a-abe3-1cec445f5237).
+- Parent dispatch: [MAC-301](<TRACKER_URL>issues/MAC-301); CEO disambiguation [`56c89cc8`](<TRACKER_URL>issues/MAC-301#comment-56c89cc8-b4d7-4a4a-abe3-1cec445f5237).
 - Staging block (preserved verbatim, no in-place edit): `BIBLE_AMENDMENTS.md:5018-5086`.
 - DB backup (Avigilon): `db/argus.db.pre_avigilon_arm_patch_20260522T220908Z` (pre-existing on disk).
 - DB backup (CP41 pre-mutation): `db/argus.db.pre_mac301_ratification_20260603T053500Z` (sha256 byte-match captured at apply-time).
@@ -5612,12 +5612,12 @@ The §11 #18-staging "open question" at line 5072 (audit-doc template standardiz
 
 ## Correction Pass 42 §1 — `imei_tac` Lynceus §4.4 consumer-side disposition (MAC-300, CP33 §7 carry-forward closure) — **RATIFIED**
 
-**Issue**: [MAC-300](/MAC/issues/MAC-300) — `tests/test_export_lynceus.py::test_type_mapping_covers_every_identifier_type` failing because `imei_tac` has no entry in `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (MAP) or `DROPPED_REASONS` (DROP).
+**Issue**: [MAC-300](<TRACKER_URL>issues/MAC-300) — `tests/test_export_lynceus.py::test_type_mapping_covers_every_identifier_type` failing because `imei_tac` has no entry in `IDENTIFIER_TYPE_TO_PATTERN_TYPE` (MAP) or `DROPPED_REASONS` (DROP).
 
 **Authority chain**:
 - CP33 §2.2 (gate G-C, board-ratified) admitted `imei_tac` schema-side only — forward-compatible identifier_type CHECK enum slot opens for future v1.5.x cohort backfill from GSMA-derivative sources; no row-level promotion gated on the migration.
-- CP33 §7 backlog enumerates 7 CP34-pending candidates; `imei_tac` §4.4 consumer-side MAP-or-DROP is NOT among them (verified by ExtractionWorker [MAC-300 comment 7ffcb80f](/MAC/issues/MAC-300#comment-7ffcb80f-990f-4c13-b6f7-5f2fe9589dff) §"Fix #1").
-- CP-slot collision arbitration at [MAC-300 comment `f0680f59`](/MAC/issues/MAC-300#comment-f0680f59-cd04-4754-94ce-128c33e1f654) ratified Option A: MAC-300 work lands at CP42, MAC-301 keeps CP41 (richer cross-ref surface; DB-baked at `manufacturers.notes.arm_flip_history` on id=6 + id=254 + PROJECT_BIBLE.md §11 #20 prose).
+- CP33 §7 backlog enumerates 7 CP34-pending candidates; `imei_tac` §4.4 consumer-side MAP-or-DROP is NOT among them (verified by ExtractionWorker [MAC-300 comment 7ffcb80f](<TRACKER_URL>issues/MAC-300#comment-7ffcb80f-990f-4c13-b6f7-5f2fe9589dff) §"Fix #1").
+- CP-slot collision arbitration at [MAC-300 comment `f0680f59`](<TRACKER_URL>issues/MAC-300#comment-f0680f59-cd04-4754-94ce-128c33e1f654) ratified Option A: MAC-300 work lands at CP42, MAC-301 keeps CP41 (richer cross-ref surface; DB-baked at `manufacturers.notes.arm_flip_history` on id=6 + id=254 + PROJECT_BIBLE.md §11 #20 prose).
 - CP42 §1 closes the §4.4 consumer-side gap.
 
 **Decision**: DROP.
@@ -5635,13 +5635,13 @@ Per CP35 §215 precedent: DROP-with-reason preserves the canonical schema slot f
 
 ## Correction Pass 42 §2 — CP35 §215 supersedure: `DROPPED_REASONS` identity-keyed convention restored (MAC-300) — **RATIFIED**
 
-**Issue**: [MAC-300](/MAC/issues/MAC-300) — `tests/test_export_lynceus.py::test_type_mapping_drops_match_44_verbatim` failing because `DROPPED_REASONS["network_discovery_protocol_pattern"] = "NDPP_pending_lynceus_v0_3_scanner_support"` violates the test's canonical invariant `DROPPED_REASONS[k] == k`.
+**Issue**: [MAC-300](<TRACKER_URL>issues/MAC-300) — `tests/test_export_lynceus.py::test_type_mapping_drops_match_44_verbatim` failing because `DROPPED_REASONS["network_discovery_protocol_pattern"] = "NDPP_pending_lynceus_v0_3_scanner_support"` violates the test's canonical invariant `DROPPED_REASONS[k] == k`.
 
 **Authority chain**:
 - CP35 §215 (MAC-255) ratified the descriptive bin_label `NDPP_pending_lynceus_v0_3_scanner_support` as "the first DROPPED_REASONS entry whose bin_label differs from the identifier_type string".
-- SAR-18 (MAC-232 Step 9, board ratification 2026-05-22, comment [`d5de106b`](/MAC/issues/MAC-232#comment-d5de106b)) imposes classifier-predicate parity between `db/validation/coverage_matrix.py::_classify_row` and `db/validation/export_lynceus.py::_classify_row`.
-- Tension surfaced at MAC-292 Phase D REPORT as CP-cand 6 ([MAC-300](/MAC/issues/MAC-300)) — the SAR-18 parity discipline implies bin_label parity through the classifier-output contract.
-- CP-slot collision arbitration at [MAC-300 comment `f0680f59`](/MAC/issues/MAC-300#comment-f0680f59-cd04-4754-94ce-128c33e1f654) ratified Option A: MAC-300 work lands at CP42, MAC-301 keeps CP41.
+- SAR-18 (MAC-232 Step 9, board ratification 2026-05-22, comment [`d5de106b`](<TRACKER_URL>issues/MAC-232#comment-d5de106b)) imposes classifier-predicate parity between `db/validation/coverage_matrix.py::_classify_row` and `db/validation/export_lynceus.py::_classify_row`.
+- Tension surfaced at MAC-292 Phase D REPORT as CP-cand 6 ([MAC-300](<TRACKER_URL>issues/MAC-300)) — the SAR-18 parity discipline implies bin_label parity through the classifier-output contract.
+- CP-slot collision arbitration at [MAC-300 comment `f0680f59`](<TRACKER_URL>issues/MAC-300#comment-f0680f59-cd04-4754-94ce-128c33e1f654) ratified Option A: MAC-300 work lands at CP42, MAC-301 keeps CP41.
 
 **Decision**: restore identity-keyed convention (`DROPPED_REASONS[k] == k` invariant universal across all entries). Descriptive rationale moves to a sibling `DROPPED_REASONS_RATIONALE` dict at the same scope.
 
@@ -5714,7 +5714,7 @@ elevated tier); CP7 geographic_scope='US' filter unchanged.
 
 **Trigger (two independent surfacings of one defect class):**
 
-1. **[MAC-350](/MAC/issues/MAC-350) Gate-2** — the [MAC-348](/MAC/issues/MAC-348)-ratified
+1. **[MAC-350](<TRACKER_URL>issues/MAC-350) Gate-2** — the [MAC-348](<TRACKER_URL>issues/MAC-348)-ratified
    `258eafa5-e914-47da-95ca-c5ab0dc85b11` "SoundThinking `ble_service_uuid`" admission
    was found non-discriminating: the exact value is present in the dex of **9 distinct
    APKs spanning ≥6 unrelated corporate vendors** (`com.axon.one`, `com.evidence`,
@@ -5723,7 +5723,7 @@ elevated tier); CP7 geographic_scope='US' filter unchanged.
    `mac350_uuid_struct_map.json`). In the Axon dex it is a `const-string "258EAFA5-…"`
    inside obfuscated util class `ov/i` — a shared SDK/namespace/platform constant with
    **zero discriminating power**. Dropped at Gate-2; MAC-348 net = **+6, not +7**.
-2. **[MAC-371](/MAC/issues/MAC-371) D3** — `0000fe59-0000-1000-8000-00805f9b34fb`
+2. **[MAC-371](<TRACKER_URL>issues/MAC-371) D3** — `0000fe59-0000-1000-8000-00805f9b34fb`
    (16-bit `0xFE59`) is assigned in the Bluetooth SIG `member_uuids.yaml` to **Nordic
    Semiconductor ASA** — the **nRF52833 Buttonless Secure DFU** service shared across
    ALL nRF52833-based devices, NOT a Samsung-exclusive signal. USENIX'24 describes the
@@ -5765,7 +5765,7 @@ before attribution.
 > required before attribution.
 
 **Scope:** All identifier values from the APK/firmware binary-extraction channel
-([MAC-346](/MAC/issues/MAC-346) family and successors) AND all SIG-/standards-registered
+([MAC-346](<TRACKER_URL>issues/MAC-346) family and successors) AND all SIG-/standards-registered
 UUID/service-constant admissions. Does NOT retroactively re-open already-promoted rows
 except where a Gate pass surfaces a collision (as MAC-350 did for `258eafa5`).
 
@@ -6037,7 +6037,7 @@ measured against a **live-DB-43,142** baseline and reported `argus_export.json`
 **948→980** / `argus_export_high_confidence.json` **+3** — those are the
 **pre-isolation, Wave-6-inclusive** figures. The board subsequently chose to
 ISOLATE the CP51 flip out of the in-flight Wave-6 gate
-([MAC-517](/MAC/issues/MAC-517)), so v1.6.14 actually ships the flip regenerated
+([MAC-517](<TRACKER_URL>issues/MAC-517)), so v1.6.14 actually ships the flip regenerated
 on the **v1.6.13 / active-43,134** baseline, with Wave-6 ids 44659-44666 **NOT**
 present. The shipped isolated deltas are standard **945 → 977 (+32)**,
 high-confidence **478 → 481 (+3)**, active **43,134**. The **+32 / +3 deltas are
@@ -6134,7 +6134,7 @@ corruption; the migration file + this CP are the audit trail).
 
 **Slot reservation (per §11 #11 amendment-log discipline + CP-slot-reservation discipline).** Reserved slot **`§11 #21`** (next-free above landed `§11 #20` in `PROJECT_BIBLE.md` HEAD). `#21` verified free by direct working-tree read at MAC-535 authoring time. This entry IS the §11 #11 closure for the §11 #21 ratification; the §-text insertion into `PROJECT_BIBLE.md` §11 lands at the next coordinated CP cycle that also touches §11 (typically the CP that consumes this reservation).
 
-**Source.** [MAC-535](/MAC/issues/MAC-535) — CTO ratification of [MAC-533](/MAC/issues/MAC-533) §cto_ratification.md surfaced two defects: (Finding 1) `_alias_tokens_for_vendor` comma-splits alias values that contain commas, yielding bogus corporate-suffix tokens (`Ltd.`, `Inc.`, `LLC`, `THE`, `Co.`) that inflate §6.2 corroboration counts for 17 active vendors; (Finding 2) `db/migrations/0041_mac533_ipvm_public_directory_attribution_ingest.sql` is NOT re-apply-safe — the 6 `UPDATE manufacturers SET aliases = ...` statements on id=209 (Hikvision) lack a UNIQUE backstop, so a second apply re-appends the 6 tokens. Neither blocks v1.7.0; both ship as fixes here per the issue's scope-discipline clause (release-v1.7.0 regen prediction is already pinned to exactly one cell).
+**Source.** [MAC-535](<TRACKER_URL>issues/MAC-535) — CTO ratification of [MAC-533](<TRACKER_URL>issues/MAC-533) §cto_ratification.md surfaced two defects: (Finding 1) `_alias_tokens_for_vendor` comma-splits alias values that contain commas, yielding bogus corporate-suffix tokens (`Ltd.`, `Inc.`, `LLC`, `THE`, `Co.`) that inflate §6.2 corroboration counts for 17 active vendors; (Finding 2) `db/migrations/0041_mac533_ipvm_public_directory_attribution_ingest.sql` is NOT re-apply-safe — the 6 `UPDATE manufacturers SET aliases = ...` statements on id=209 (Hikvision) lack a UNIQUE backstop, so a second apply re-appends the 6 tokens. Neither blocks v1.7.0; both ship as fixes here per the issue's scope-discipline clause (release-v1.7.0 regen prediction is already pinned to exactly one cell).
 
 **Rule (new §11 hard rule — `§11 #21` — migration UPDATE idempotency-by-default).** Any `UPDATE` statement in a `db/migrations/*.sql` file that lacks a UNIQUE / NOT-NULL / CHECK backstop on the mutated column(s) MUST be written idempotently. The canonical idempotency shape is one of:
   (a) **Guard-on-absence append.** `UPDATE ... SET col = CASE WHEN col NOT LIKE '%token%' THEN col || ',token' ELSE col END`. Catches re-apply when the token-shaped substring is the indicator of prior-applied state. Mirrors the canonical form recommended for any migration that appends to a comma-separated string column.
@@ -6167,7 +6167,7 @@ Before/after corroboration table for all 17 affected vendors is in `operator_rev
 
 ### MAC-569 — `manufacturers.aliases` RFC-4180-lite wire-format normalization (data-side complement to MAC-535 §6.2 alias-tokenization defense)
 
-**Source.** [MAC-569](/MAC/issues/MAC-569) — defect: `manufacturers.aliases` is comma-delimited over comma-bearing values, producing phantom corporate-suffix alias tokens (`Ltd.`, `Inc.`, `LLC`, `THE`, `Co.`) on every naive-split consumer of the column. MAC-535's Finding 1 patch added a 3-layer defense in `coverage_matrix._alias_tokens_for_vendor` (quote-aware split + corp-suffix stop-list + min-length floor) that stopped the §6.2 corroboration inflation for 17 vendors, but left the underlying data defect in place. The other 4 consumers of the column (`extraction.vendor_name_disambig._split_aliases`, `validation.sar8_bulk_stage.<lexicon-build>`, `validation.phase3_inference_candidates.<lexicon-build>`, and the §6.2 path itself pre-MAC-535) still saw the phantom tokens. MAC-569 ships the data-side complement: the wire format is now RFC-4180-lite (comma-bearing alias values wrapped in `"..."`) and there is exactly one parser implementation (`db/alias_parser.split_aliases`) that every consumer re-exports.
+**Source.** [MAC-569](<TRACKER_URL>issues/MAC-569) — defect: `manufacturers.aliases` is comma-delimited over comma-bearing values, producing phantom corporate-suffix alias tokens (`Ltd.`, `Inc.`, `LLC`, `THE`, `Co.`) on every naive-split consumer of the column. MAC-535's Finding 1 patch added a 3-layer defense in `coverage_matrix._alias_tokens_for_vendor` (quote-aware split + corp-suffix stop-list + min-length floor) that stopped the §6.2 corroboration inflation for 17 vendors, but left the underlying data defect in place. The other 4 consumers of the column (`extraction.vendor_name_disambig._split_aliases`, `validation.sar8_bulk_stage.<lexicon-build>`, `validation.phase3_inference_candidates.<lexicon-build>`, and the §6.2 path itself pre-MAC-535) still saw the phantom tokens. MAC-569 ships the data-side complement: the wire format is now RFC-4180-lite (comma-bearing alias values wrapped in `"..."`) and there is exactly one parser implementation (`db/alias_parser.split_aliases`) that every consumer re-exports.
 
 **Rule (new binding discipline — `aliases` column wire format).** Effective immediately, the canonical wire format for `manufacturers.aliases` is **RFC-4180-lite**:
 
@@ -6231,7 +6231,7 @@ Whitespace surrounding each alias is stripped on read. Empty / NULL yields `[]`.
 
 **Date:** 2026-07-29
 **Commits:** `8e905cf` (initial), `da2b532` (review polish — phantom metrics, stricter idempotency, count correction).
-**Source:** [MAC-580](/MAC/issues/MAC-580) — MAC-569 follow-up. CTO ratification withheld under [MAC-578](/MAC/issues/MAC-578) §1.3 (the `<Name>, Inc.`-shape phantom tokens survived the predecessor-and-suffix merge predicate) and §1.4 (the post-condition (2) was vacuous by construction).
+**Source:** [MAC-580](<TRACKER_URL>issues/MAC-580) — MAC-569 follow-up. CTO ratification withheld under [MAC-578](<TRACKER_URL>issues/MAC-578) §1.3 (the `<Name>, Inc.`-shape phantom tokens survived the predecessor-and-suffix merge predicate) and §1.4 (the post-condition (2) was vacuous by construction).
 **Status:** **RATIFIED by CTO 2026-07-29** — `operator_review/MAC-580/cto_ratification.md`. This amendment-log entry IS the §11 #11 closure for the migration that landed. The zero-survivor claim was re-derived by the CTO against the live DB (not accepted as attested): **0 standalone corp-suffix tokens across all 240 manufacturer rows, 508 smart tokens**. The MAC-569-era "match `canonical_name` ONLY" vendor-screen bar is **WITHDRAWN**; consumers use `db.alias_parser.split_aliases`. STAGE-ONLY — no push, no tag; release authorization remains with the CEO.
 
 **Rule (binding refinement to MAC-569's wire format).** The MAC-569 merge predicate in `db.alias_parser.recombine_and_quote_normalize` is **relaxed**: any smart-parsed token matching `_FRAGMENT_SUFFIX_PATTERN` is merged back into its immediate predecessor with `", "` join, regardless of whether the predecessor ends in a corporate suffix. The previous MAC-569 predicate also required `_ends_with_corp_suffix(merged[-1])` — that captured the `<…> Co., Ltd.` shape but missed the dominant `<Name>, Inc.` shape. The relaxed predicate captures both.

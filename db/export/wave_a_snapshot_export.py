@@ -3,8 +3,7 @@
 Produces argus_export_wave_a_snapshot_<run-timestamp>.json per bible §7.5
 export contract. Distinct from Phase-5 v1 export via phase_marker.
 
-Authority: MAC-22 (https://paperclip.example/MAC/issues/MAC-22) Phase-4
-pre-deliverable; Wave-A close at MAC-25 + MAC-26 (2026-05-06T~00:44Z); board
+Authority: MAC-22 (Phase-4 pre-deliverable); Wave-A close at MAC-25 + MAC-26 (2026-05-06T~00:44Z); board
 ask at MAC-1 [`972afd90`] for Lynceus smoke-test ingest.
 
 Output shape:

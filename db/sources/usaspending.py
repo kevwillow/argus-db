@@ -4,7 +4,7 @@ Pulls federal contract awards mentioning canonical surveillance vendors
 (`manufacturers.canonical_name`) into the `procurement_records` staging
 table per PROJECT_BIBLE.md §6 Phase 3 + §4.5 procurement-only carveout
 + §7.2 (Source Worker contract). Ratified by CEO at MAC-8 Step 1
-([4816dd57-3a40-4dcc-98bf-c7df357cbec8](/MAC/issues/MAC-8#comment-4816dd57)).
+([4816dd57-3a40-4dcc-98bf-c7df357cbec8](<TRACKER_URL>issues/MAC-8#comment-4816dd57)).
 
 Source
 ──────

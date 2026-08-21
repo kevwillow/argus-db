@@ -1,7 +1,7 @@
 -- ============================================================================
 -- Script:    0063_mac765_44726_pineapple_branch_split.sql
 -- Status:    DRAFT, STAGED ONLY. Filed from
---            [/MAC/issues/MAC-765](/MAC/issues/MAC-765), the v1.9.0
+--            [<TRACKER_URL>issues/MAC-765](<TRACKER_URL>issues/MAC-765), the v1.9.0
 --            successor lane to MAC-761. v1.8.0 is published
 --            (`origin/main` = `v1.8.0^{}` = `3fbaada`), so the MAC-765
 --            hold ("do not start until v1.8.0 is pushed and tagged") is

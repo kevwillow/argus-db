@@ -1,6 +1,6 @@
 """MAC-172 §11 #8 strict-reading rollback — undo the 180-row +5 lift.
 
-CEO ratification at MAC-172 [`8db00702`](/MAC/issues/MAC-172#comment-8db00702-c710-49de-ac3f-d4d054d3dba8)
+CEO ratification at MAC-172 [`8db00702`](<TRACKER_URL>issues/MAC-172#comment-8db00702-c710-49de-ac3f-d4d054d3dba8)
 ruled Read B canon: within-source re-extraction (USAspending v1.0.0 admission
 vs deep-extension session, same upstream API at two times with different
 filter windows) is **not** a "second independent source" for §8.3 +5 lift

@@ -47,7 +47,7 @@ A gate that flagged those would be turned off within a day, which is the failure
 matters more than the false negatives of a narrow pattern.
 
 Known non-cite that the narrow pattern correctly ignores: `export_lynceus.py:2001` embeds
-`[`613ec532`](/MAC/issues/MAC-1#comment-613ec532-...)`, a Paperclip COMMENT uuid prefix. It
+`[`613ec532`](<TRACKER_URL>issues/MAC-1#comment-613ec532-...)`, a Paperclip COMMENT uuid prefix. It
 is backticked hex and it is not a commit; it is not preceded by the word `commit`, so it
 does not match. Widening the pattern to all backticked hex would fail this gate on a
 correct artifact.

@@ -2353,8 +2353,7 @@ def _build_coverage_report_md(
     )
     md_parts.append(
         "3. **Single-product §2.1 vendor categorization.** Strict §8.4 binds at "
-        "HB36 (board-ratified MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-"
-        "613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06). The narrow §11 #10 / "
+        "HB36 (board-ratified MAC-1 [`613ec532`] 2026-05-06). The narrow §11 #10 / "
         "Tier 4 read remains open for CP5 surface; quantified row counts per "
         "disposition are upstream input to the eventual decision per Bible §12 "
         "open-question 612-row item."

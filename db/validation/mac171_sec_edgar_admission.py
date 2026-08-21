@@ -709,7 +709,7 @@ def step_5_disk_stage(conn: sqlite3.Connection, *, commit: bool) -> StepResult:
         readme_dst.write_text(
             f"""# MAC-171 P3 SEC EDGAR — operator-review staging
 
-Dispatch: [{DISPATCH}](/MAC/issues/{DISPATCH})
+Dispatch: [{DISPATCH}](<TRACKER_URL>issues/{DISPATCH})
 Session: {SESSION}
 Staged at (UTC): {_now_iso()}
 
@@ -727,7 +727,7 @@ Source extraction outputs live at `~/argus-internal/extraction_outputs/sec_edgar
 - `aggregate_concentration_only.json` (28 rows)
 - `named_government_customers.json` (9 rows; 5 promoted to `procurement_records`, 3 FPs + 1 ambiguous staged here)
 
-CEO ratification at [`35ebb1bf`](/MAC/issues/MAC-171#comment-35ebb1bf-d99b-46d3-b31b-c15b2399dfa5); Validator §7.4 walkthrough at [`727ffcf0`](/MAC/issues/MAC-171#comment-727ffcf0-8875-4580-a4b8-908a06ee81cb).
+CEO ratification at [`35ebb1bf`](<TRACKER_URL>issues/MAC-171#comment-35ebb1bf-d99b-46d3-b31b-c15b2399dfa5); Validator §7.4 walkthrough at [`727ffcf0`](<TRACKER_URL>issues/MAC-171#comment-727ffcf0-8875-4580-a4b8-908a06ee81cb).
 """
         )
         notes_out.append(f"wrote {readme_dst.name}")

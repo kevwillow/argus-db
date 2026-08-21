@@ -71,12 +71,12 @@ DELIVERABLE_PATH = (
 VALIDATOR_AGENT_ID = "da137694-2efe-4589-8150-828dcab881fb"
 # Original strict-§8.4 ratification (MAC-41 predecessor).
 RATIFIED_BY_BOARD_APPROVAL_COMMENT = (
-    "MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d)"
+    "MAC-1 [`613ec532`](<TRACKER_URL>issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d)"
 )
 RATIFIED_AT_UTC = "2026-05-06T17:08:16Z"
 # SAR-9 codification ratification (MAC-44 dispatch + bulk-stage retry).
 SAR9_RATIFIED_BY_BOARD_APPROVAL = (
-    "[`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23)"
+    "[`234faaa7`](<TRACKER_URL>approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23)"
 )
 SAR9_RATIFIED_AT_UTC = "2026-05-06T18:05:53Z"
 

@@ -10,7 +10,7 @@ This Step-2 build delivers the module, the prioritized-anchor-list
 artifact in `wigle_anchor_priority`, and DRY_RUN-only smoke tests. Live
 queries do NOT fire in Step 2 — they gate on grant landing or 14d
 timeout (board pitch sent 2026-05-04 from personal inbox; 14d window
-ends 2026-05-18 per [MAC-1](/MAC/issues/MAC-1) board comment).
+ends 2026-05-18 per [MAC-1](<TRACKER_URL>issues/MAC-1) board comment).
 
 Source
 ──────

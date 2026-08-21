@@ -451,7 +451,7 @@ def is_fp_rejected(candidate: str, vendor_canonical: str) -> bool:
 # ---------------------------------------------------------------------------
 # MAC-101 Item A — multi-registry positive-evidence xcheck predicate.
 #
-# CEO ratification (MAC-102 [`ad5a564d`](/MAC/issues/MAC-102#comment-ad5a564d)
+# CEO ratification (MAC-102 [`ad5a564d`](<TRACKER_URL>issues/MAC-102#comment-ad5a564d)
 # 2026-05-14) ratified option β: extend Class-B corporate-entity confirmation
 # beyond the §2.1 ``manufacturers`` lexicon to broader in-DB registries
 # (``fcc_grantees`` and, when available, ``procurement_records``). Per-source

@@ -1,8 +1,8 @@
 -- ============================================================================
 -- Script:    0062_mac752_44720_duplicate_unsafe_supersede.sql
 -- Status:    DRAFT, STAGED ONLY. NOT APPLIED. Filed from
---            [/MAC/issues/MAC-752](/MAC/issues/MAC-752) which the CTO
---            [filed from MAC-747](/MAC/issues/MAC-747) and which is
+--            [<TRACKER_URL>issues/MAC-752](<TRACKER_URL>issues/MAC-752) which the CTO
+--            [filed from MAC-747](<TRACKER_URL>issues/MAC-747) and which is
 --            gating the v1.8.0 tag.
 --
 --            The stemmer fix in db/validation/export_lynceus.py and the

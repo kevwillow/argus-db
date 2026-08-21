@@ -6,7 +6,7 @@ rides the release), not after. Blocker edge moved from MAC-764 to
 MAC-783 (Validator's reconcile-and-polish lane) so we do not have two
 agents writing the DB and exports at once.**
 
-Lane: DB Architect ([MAC-781](/MAC/issues/MAC-781)).
+Lane: DB Architect ([MAC-781](<TRACKER_URL>issues/MAC-781)).
 Scope: `identifiers.notes` DML + `exports/argus_export.csv` regen.
 Stage: STAGE-ONLY. No push, no tag.
 
@@ -28,7 +28,7 @@ Stage: STAGE-ONLY. No push, no tag.
 | Cite path is `docs/engineering/BIBLE_AMENDMENTS.md#...` (full repo-relative) | CEO §Q1.1 — root `BIBLE_AMENDMENTS.md` is a 7-line stub. Bare-path cite reproduces the exact bug being fixed. |
 | Slug is `mac781-cp33-s2-1-cctv_camera` (ASCII only, no `§`) | CEO §Q1.2 — `§` percent-encodes to `%C2%A72.1` in URL fragments. Pattern is published in a CSV column read downstream by people who did not write it. |
 | Anchor+clause gate ships in this change | CEO §Q1.3 — previous "no new gate required" claim was false. `check_doc_anchors.py` explicitly does NOT cover anchor or section references; the previous drift detector was a human trip-wire, which is exactly the failure class MAC-781 exists to fix. |
-| Audit stamp uses `tracker URLs`, not `/MAC/` | CEO §Q2.1 — proposed stamp reintroduced the token it strips. `POST-4` (`0 /MAC/ URLs survive`) would fail under the proposal's own stamp. |
+| Audit stamp uses `tracker URLs`, not `<TRACKER_URL>` | CEO §Q2.1 — proposed stamp reintroduced the token it strips. `POST-4` (`0 <TRACKER_URL> URLs survive`) would fail under the proposal's own stamp. |
 | Strip rewrite is bare (no backticks) | CEO §Q2.2 — CSV data field, not rendered markdown. |
 | POST-5 (`json_valid(notes)` shape preserved) is load-bearing | CEO §Q3 — option (a) plain-text suffix, `json_valid=0` for all 62 rows. POST-5 mechanically enforces this; not decorative. |
 
@@ -37,10 +37,10 @@ Stage: STAGE-ONLY. No push, no tag.
 | Defect | Count | Affected rows (DB) | Affected notes |
 |---|---|---|---|
 | Half 1 — `BIBLE_AMENDMENTS.md:4197` is dead | 9 rows | `id IN (44677, 44703, 44704, 44705, 44706, 44707, 44708, 44709, 44710)` | JSON `$.category_correction_authority` |
-| Half 2 — `/MAC/` URLs in `notes` | 62 rows × 2 URLs = 124 occurrences | `id >= 413` board-ratification cohort | plain-text `Board ratifications:` line |
+| Half 2 — `<TRACKER_URL>` URLs in `notes` | 62 rows × 2 URLs = 124 occurrences | `id >= 413` board-ratification cohort | plain-text `Board ratifications:` line |
 
-The two halves are **disjoint** — none of the 9 `:4197` rows carry `/MAC/`
-URLs (verified via `SELECT id FROM identifiers WHERE notes LIKE '%:4197%' AND notes LIKE '%/MAC/%' AND superseded_by IS NULL` → 0 rows).
+The two halves are **disjoint** — none of the 9 `:4197` rows carry `<TRACKER_URL>`
+URLs (verified via `SELECT id FROM identifiers WHERE notes LIKE '%:4197%' AND notes LIKE '%<TRACKER_URL>%' AND superseded_by IS NULL` → 0 rows).
 
 `docs/engineering/BIBLE_AMENDMENTS.md:4197` resolves to an `adsb.lol`
 source bullet; the `cctv_camera` clause actually lives at `:4264` (off
@@ -149,12 +149,12 @@ the gate goes red with rc=1. Five pytest cases lock this behaviour at
 The 62 affected rows carry this plain-text ratification history:
 
 ```
-Board ratifications: strict-§8.4 MAC-1 [`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z; SAR-9 [`234faaa7`](/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23) 2026-05-06T18:05:53Z.
+Board ratifications: strict-§8.4 MAC-1 [`613ec532`](<TRACKER_URL>issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) 2026-05-06T17:08:16Z; SAR-9 [`234faaa7`](<TRACKER_URL>approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23) 2026-05-06T18:05:53Z.
 ```
 
 Two URL forms appear:
-- `/MAC/issues/MAC-N#comment-<32-hex>` — comment anchor
-- `/MAC/approvals/<uuid>` — approval anchor
+- `<TRACKER_URL>issues/MAC-N#comment-<32-hex>` — comment anchor
+- `<TRACKER_URL>approvals/<uuid>` — approval anchor
 
 ### Proposal — strip the URL, keep the textual reference, BARE
 
@@ -167,8 +167,8 @@ backticks** (CSV data field, not rendered markdown).
 Board ratifications: strict-§8.4 MAC-1 comment 613ec532 2026-05-06T17:08:16Z; SAR-9 approval 234faaa7 2026-05-06T18:05:53Z.
 ```
 
-- `/MAC/issues/MAC-1#comment-613ec532d8cb...` → `MAC-1 comment 613ec532` (drop the URL, keep 8-char hash prefix)
-- `/MAC/approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23` → `SAR-9 approval 234faaa7` (drop the URL, keep 8-char uuid prefix)
+- `<TRACKER_URL>issues/MAC-1#comment-613ec532d8cb...` → `MAC-1 comment 613ec532` (drop the URL, keep 8-char hash prefix)
+- `<TRACKER_URL>approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23` → `SAR-9 approval 234faaa7` (drop the URL, keep 8-char uuid prefix)
 
 ### Drift detection
 
@@ -178,10 +178,10 @@ The textual references are stable identifiers in their own right.
 canonical for `MAC-1 comment 613ec532` and locate the original cite in
 the operator's audit trail.
 
-### Audit stamp — uses `tracker URLs`, NOT `/MAC/`
+### Audit stamp — uses `tracker URLs`, NOT `<TRACKER_URL>`
 
 Appended per row in plain-text suffix form. **The literal string
-`/MAC/` does not appear in the stamp** (would re-introduce the token
+`<TRACKER_URL>` does not appear in the stamp** (would re-introduce the token
 the strip is removing, fail POST-4 under the proposal's own acceptance
 check).
 
@@ -203,7 +203,7 @@ Following the established pattern (MAC-705 dead-SHA drop, MAC-737 strict
 |---|---|
 | PRE-1 | `schema_version = 35` (no DDL bump) |
 | PRE-2 | 9 rows match the `:4197` contract (by `id`, `superseded_by IS NULL`) |
-| PRE-3 | 62 rows match the `/MAC/` contract (by `notes` LIKE + `superseded_by IS NULL`) |
+| PRE-3 | 62 rows match the `<TRACKER_URL>` contract (by `notes` LIKE + `superseded_by IS NULL`) |
 | PRE-4 | 0 rows overlap Half 1 and Half 2 |
 | PRE-5 | Every Half-1 `notes` is well-formed JSON; every Half-2 `notes` is plain text (`json_valid=0`) |
 | PRE-6 | Active row count = 43126 (DELTA = 0) |
@@ -238,10 +238,10 @@ UPDATE identifiers
            replace(
              replace(
                notes,
-               issues/MAC-1#comment-613ec532d8cb-4f0f-a35b-c811e2864d7d)',
+               '](<TRACKER_URL>issues/MAC-1#comment-613ec532d8cb-4f0f-a35b-c811e2864d7d)',
                '`MAC-1 comment 613ec532`'
              ),
-             approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23)',
+             '](<TRACKER_URL>approvals/234faaa7-e1c0-40fd-a247-f82cb588fc23)',
              '`SAR-9 approval 234faaa7`'
            ),
            ...
@@ -249,7 +249,7 @@ UPDATE identifiers
          || char(10) || 'mac781_audit: stripped 2 tracker URLs at <ISO8601>; pattern=mac781_v1_tracker_url_strip'
  WHERE (SELECT COUNT(*) FROM _mac781_go) = 1
    AND superseded_by IS NULL
-   AND notes LIKE '%/MAC/%'
+   AND notes LIKE '%<TRACKER_URL>%'
    AND json_valid(notes) = 0;
 ```
 
@@ -264,7 +264,7 @@ loads the contract and applies `replace()` per URL.
 | POST-1 | `schema_version = 35` (no DDL bump — DELTA from PRE-1) |
 | POST-2 | Active row count = 43126 (DELTA = 0) |
 | POST-3 | 9 rows carry the new anchor and 0 carry `:4197` |
-| POST-4 | 62 rows carry 0 `/MAC/` URLs AND 0 occurrences of `/MAC/` anywhere in `notes` |
+| POST-4 | 62 rows carry 0 `<TRACKER_URL>` URLs AND 0 occurrences of `<TRACKER_URL>` anywhere in `notes` |
 | POST-5 | No Half-2 row's `json_valid` flipped (was 0, still 0) — load-bearing per CEO §Q3 |
 | POST-6 | Every Half-1 `category_correction_authority` references `docs/engineering/BIBLE_AMENDMENTS.md#mac781-cp33-s2-1-cctv_camera` |
 | POST-7 | Every Half-2 row has the audit stamp (`mac781_audit:` substring present) |
@@ -285,7 +285,7 @@ Acceptance evidence (CEO-ratified acceptance grep lines):
 ```
 $ wc -l exports/argus_export.csv                                            # 47491
 $ head -1 exports/argus_export.csv                                          # record_count=43126
-$ grep -o '/MAC/' exports/argus_export.csv | wc -l                          # 124 -> 0
+$ grep -o '<TRACKER_URL>' exports/argus_export.csv | wc -l                          # 124 -> 0
 $ grep -c 'BIBLE_AMENDMENTS.md:4197' exports/argus_export.csv               # 9 -> 0
 $ grep -c 'mac781-cp33-s2-1-cctv_camera' exports/argus_export.csv            # 0 -> 9
 $ grep -c '%C2%A7' exports/argus_export.csv                                 # -> 0
@@ -307,7 +307,7 @@ proof; positive control against the pre-migration export confirms.
 | Cite path | `docs/engineering/BIBLE_AMENDMENTS.md#...` (full repo-relative) |
 | Slug form | `mac781-cp33-s2-1-cctv_camera` (ASCII only, no `§`) |
 | Drift gate | New `scripts/check_mac781_anchor_clause.py` ships in this change |
-| Audit stamp text | `mac781_audit: stripped N tracker URLs at <ISO8601>; pattern=mac781_v1_tracker_url_strip` (no `/MAC/` literal) |
+| Audit stamp text | `mac781_audit: stripped N tracker URLs at <ISO8601>; pattern=mac781_v1_tracker_url_strip` (no `<TRACKER_URL>` literal) |
 | Strip rewrite form | Bare, no backticks |
 | `notes` shape | Option (a) — plain-text suffix; `json_valid(notes)` stays 0 for all 62 rows |
 
@@ -336,7 +336,7 @@ Stated so omissions are not read as coverage:
 - **Not in scope**: any other `:NNNN` cite that may also be drifting in
   `identifiers.notes`. A tree-wide census is a CEO scope decision; this
   lane touches only the 9 rows the wake payload named.
-- **Not in scope**: the `/MAC/` URLs in any other file. The wake payload
+- **Not in scope**: the `<TRACKER_URL>` URLs in any other file. The wake payload
   scoped this to `exports/argus_export.csv` (the published feed). Other
   internal files are tracked elsewhere (e.g. `operator_review/MAC-773`
   for BIBLE_AMENDMENTS.md) or are out of scope.
@@ -354,7 +354,7 @@ Rev 2 applies the CEO ruling at comment `197bd963`:
 | 1 | Path correction: full repo-relative path | Applied |
 | 2 | Slug form: ASCII only, no `§` | Applied |
 | 3 | Anchor+clause gate ships in this change | Applied (`scripts/check_mac781_anchor_clause.py` + `tests/test_check_mac781_anchor_clause.py`) |
-| 4 | Audit stamp: no `/MAC/` literal | Applied |
+| 4 | Audit stamp: no `<TRACKER_URL>` literal | Applied |
 | 5 | Strip rewrite: bare, no backticks | Applied |
 | 6 | `notes` shape: option (a), POST-5 load-bearing | Applied |
 | 7 | Tooling rescue before MAC-764 force-push | Done (commit `bcee147`) |

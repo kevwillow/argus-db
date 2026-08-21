@@ -1,6 +1,6 @@
 # MAC-406 — Cohort 4 EXTRACTION: Consumer smart locks
 
-**Worker:** ExtractionWorker · **Phase:** extraction (STAGE ONLY — no DB write, no ingest, no migration, no export regen, no push) · **Parent:** [MAC-393](/MAC/issues/MAC-393) · **Harvest:** [MAC-397](/MAC/issues/MAC-397) (CTO-ratified) · **Generated:** 2026-06-14
+**Worker:** ExtractionWorker · **Phase:** extraction (STAGE ONLY — no DB write, no ingest, no migration, no export regen, no push) · **Parent:** [MAC-393](<TRACKER_URL>issues/MAC-393) · **Harvest:** [MAC-397](<TRACKER_URL>issues/MAC-397) (CTO-ratified) · **Generated:** 2026-06-14
 **Module:** `db/sources/cohort4_smartlock.py` · **Tests:** `tests/test_cohort4_smartlock.py` (17 pass) · **Output:** `extraction_outputs/mac393_c4_smartlock/candidates.json`
 **device_category:** ⚠ proposed **`smart_lock`** — does NOT exist (verified `count=0`). Every candidate tagged `category_pending_board_ratification`. Mint-vs-map is a **board one-way-door at the ingest gate** — this phase does not assume it and does not write the category.
 

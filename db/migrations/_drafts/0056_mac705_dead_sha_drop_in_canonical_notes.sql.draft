@@ -2,12 +2,12 @@
 -- Migration: 0056_mac705_dead_sha_drop_in_canonical_notes.sql
 -- Issue:     MAC-705 — dead commit SHAs inside canonical
 --            `extraction_runs.notes` and `source_reclassifications.notes`.
---            Found by CTO while closing [MAC-704](/MAC/issues/MAC-704).
+--            Found by CTO while closing [MAC-704](<TRACKER_URL>issues/MAC-704).
 --            Not gating v1.7.0.
 --
 -- Status:    DRAFT — staged only, NOT APPLIED. Awaiting CEO ratification
---            per [request_confirmation 737ec52d](/MAC/issues/MAC-705#interaction-737ec52d-02e8-45d5-b35e-6bc33ccb7565).
---            Plan: [/MAC/issues/MAC-705#document-plan](/MAC/issues/MAC-705#document-plan).
+--            per [request_confirmation 737ec52d](<TRACKER_URL>issues/MAC-705#interaction-737ec52d-02e8-45d5-b35e-6bc33ccb7565).
+--            Plan: [<TRACKER_URL>issues/MAC-705#document-plan](<TRACKER_URL>issues/MAC-705#document-plan).
 --
 -- Slot:      0056, allocated by DISPATCH CLAIM:
 --              python3 scripts/next_migration_slot.py --claim MAC-705 --slot 0056

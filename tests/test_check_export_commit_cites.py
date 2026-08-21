@@ -105,7 +105,7 @@ def test_t1_ignores_the_paperclip_comment_uuid_at_export_lynceus_2001():
     # Real bytes from a generated artifact. Backticked hex, NOT a commit.
     corpus = (
         "Strict §8.4 binds at HB36 (board-ratified MAC-1 "
-        "[`613ec532`](/MAC/issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) "
+        "[`613ec532`](<TRACKER_URL>issues/MAC-1#comment-613ec532-d8cb-4f0f-a35b-c811e2864d7d) "
         "2026-05-06)."
     )
     assert gate_mod.COMMIT_CITE_RE.findall(corpus) == []

@@ -2,7 +2,7 @@
 
 **Worker:** SourceWorker (`9cf8ff12-53c3-4f83-837f-3142d8d1d151`) · run `2026-07-28T23:42:35Z`
 **Brief:** `operator_review/MAC-559/single_line_registrant_brief.md` (binding)
-**Authority:** CEO ruling [MAC-554](/MAC/issues/MAC-554) comment `064f044c`
+**Authority:** CEO ruling [MAC-554](<TRACKER_URL>issues/MAC-554) comment `064f044c`
 
 ## Disposition
 

@@ -3,7 +3,7 @@
 **Worker:** SourceWorker (`9cf8ff12-53c3-4f83-837f-3142d8d1d151`) · correction run `a91705d9-d783-4f3c-b11d-76d2760437ea`
 **Brief:** `operator_review/MAC-559/single_line_registrant_brief.md` (binding contract)
 **Brief sha256:** `d09bb4eb2580eeb4daf4c68799233468b7b4cb6b31803621acdb8efd17d4279f`
-**Authority:** [MAC-554](/MAC/issues/MAC-554) comment `064f044c`
+**Authority:** [MAC-554](<TRACKER_URL>issues/MAC-554) comment `064f044c`
 **HEAD at corrected battery:** `ceff54f366fef26d6c884b15fb0e859f0c185895`
 **Issue-time DB sha256:** `73af91f6bf8405c13c692d6258530715817de8b83256b516aaa2c7e98828b731`
 **Final canonical DB sha256:** `2fad9f2eb2bb602ebe6b6bf4111304add313f2295a7a35bdb953c71bd3b396d7` (stable before/after fresh read-only revalidation)
