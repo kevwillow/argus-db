@@ -55,6 +55,8 @@ CSV is symlinked rather than copied; no test writes through the link.
 """
 from __future__ import annotations
 
+import ast
+import collections
 import importlib.util
 import json
 import re
@@ -836,6 +838,179 @@ def test_t7_missing_artifact_errors_rather_than_crashing(tmp_path):
     assert "feed_behavioral" in err
     claim = _find_claim("README.md", "behavioral feed")
     assert _status_of(out, claim) == "ERROR"
+
+
+# ---------------------------------------------------------------------------
+# T8 (MAC-777): the gate's ADVERTISED coverage must equal its real coverage.
+#
+# The defect: `TIER_1`, a tuple of 8 doc paths, sat at module level under the
+# comment "Same list as scripts/check_prose_dashes.py." It was never
+# referenced -- the gate iterates CLASS_A_CLAIMS, which named 3 files. The
+# comment was also false when written: the prose-dash gate did not exist yet
+# (this gate landed 0786f97 17:02:35, that one ae110a3 17:20:33, same day).
+#
+# The cost: MAC-773's brief cited `check_doc_anchors.py:197` -- a line INSIDE
+# that dead tuple, holding the string "docs/engineering/PROJECT_BIBLE.md" --
+# as a live `read_text`, and made this gate the acceptance instrument for a
+# 168-line redaction of the bible. The gate reported an identical
+# `21 PASS, 0 FAIL, 1 UNSETTLED` before and after.
+#
+# These fixtures make that failure mode non-recurrent: T8a proves the gate is
+# blind to the bible (with a positive control, so "identical" is not vacuous),
+# T8b binds the advertised surface to the reported surface, and T8c stops a
+# dead coverage constant from growing back.
+# ---------------------------------------------------------------------------
+
+
+_BIBLE_REL = "docs/engineering/PROJECT_BIBLE.md"
+
+
+def test_t8a_verdict_is_identical_whether_the_bible_is_absent_or_gutted(tmp_path):
+    """MAC-777/MAC-773: this gate is NOT an instrument for PROJECT_BIBLE.md.
+
+    Three arms over the same scratch surface -- bible absent, bible verbatim,
+    bible gutted to a single heading -- must produce a byte-identical verdict.
+    That is the property MAC-773's brief assumed was false.
+
+    The fourth arm is the positive control (R7): perturbing a file the gate
+    DOES cover must move the verdict. Without it, "identical across three
+    arms" would also hold for a gate that had simply stopped working.
+    """
+    verdicts = {}
+    for arm in ("absent", "verbatim", "gutted"):
+        work = _scratch_repo(tmp_path / arm)
+        bible = work / _BIBLE_REL
+        if arm == "absent":
+            assert not bible.exists(), "scratch surface should not carry the bible"
+        else:
+            bible.parent.mkdir(parents=True, exist_ok=True)
+            bible.write_bytes(
+                (REPO / _BIBLE_REL).read_bytes()
+                if arm == "verbatim"
+                else b"# gutted\n"
+            )
+        verdicts[arm] = _run_gate(work)
+
+    assert len({v for v in verdicts.values()}) == 1, (
+        "the gate's verdict moved with PROJECT_BIBLE.md, which would mean it "
+        f"reads the file after all:\n{verdicts}"
+    )
+    assert verdicts["absent"][0] == 0, verdicts["absent"]
+
+    # Positive control: the same harness DOES detect a change to a covered file.
+    control = _scratch_repo(tmp_path / "control")
+    covered = _SETTLEABLE[0]
+    _perturb_site(control, covered)
+    assert _run_gate(control) != verdicts["absent"], (
+        "positive control failed: perturbing a COVERED site did not move the "
+        "verdict either, so the three identical arms above prove nothing"
+    )
+
+
+def test_t8a_bible_is_in_no_claim_registry():
+    """The registry-level counterpart to the behavioral arm above.
+
+    Checks the three registries the gate consults, not the source text -- the
+    source names the bible in prose, explaining why MAC-777 removed it.
+    """
+    assert _BIBLE_REL not in gate_mod.checked_files()
+    assert _BIBLE_REL not in gate_mod.named_but_never_opened_files()
+    registered = {
+        c["file"]
+        for c in gate_mod.CLASS_A_CLAIMS + gate_mod.CLASS_B_SITES + gate_mod.CLASS_C_SITES
+    }
+    assert _BIBLE_REL not in registered, (
+        "the bible is registered as a claim site; if it is now genuinely "
+        "checked, this fixture and the MAC-777 docstring must both be updated "
+        "-- until then the gate must not read as an instrument for it"
+    )
+
+
+def test_t8b_advertised_coverage_equals_the_files_the_gate_reports_on():
+    """`checked_files()` must be the surface, not a claim about the surface."""
+    results = gate_mod.scan_docs(_live_settle(), REPO)
+    reported = tuple(sorted({r.file for r in results}))
+    assert reported == gate_mod.checked_files(), (
+        f"advertised {gate_mod.checked_files()} but reported on {reported}"
+    )
+
+
+def test_t8b_every_run_prints_its_coverage_beside_its_verdict(tmp_path):
+    """A verdict must not travel without its scope."""
+    rc, out, err = _run_gate(_scratch_repo(tmp_path))
+    assert rc == 0, err
+    assert gate_mod.coverage_line() in out, out
+    for rel in gate_mod.checked_files():
+        assert rel in gate_mod.coverage_line()
+
+
+def test_t8b_coverage_mode_runs_no_checks_and_needs_no_db(tmp_path):
+    """`--coverage` answers "what does this cover" without a settling run."""
+    rc = gate_mod.main(["--coverage", "--db-path", str(tmp_path / "nonexistent.db")])
+    assert rc == 0
+    report = gate_mod.format_coverage_report()
+    for rel in gate_mod.checked_files():
+        assert rel in report
+    for rel in gate_mod.named_but_never_opened_files():
+        assert rel in report
+    assert "NEVER OPENED" in report and "NOT COVERED" in report
+
+
+def _dead_doc_path_constants(source: str) -> dict:
+    """Module-level tuples/lists of ``.md`` paths that nothing ever reads.
+
+    Such a constant is a coverage contract written in a place the code does
+    not consult. ``TIER_1`` was one for its whole life.
+    """
+    tree = ast.parse(source)
+    suspects: dict[str, int] = {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(
+            node.targets[0], ast.Name
+        ):
+            name, value = node.targets[0].id, node.value
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name) and node.value:
+            name, value = node.target.id, node.value
+        else:
+            continue
+        if not isinstance(value, (ast.Tuple, ast.List)) or not value.elts:
+            continue
+        strings = [e.value for e in value.elts
+                   if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+        if len(strings) == len(value.elts) and any(s.endswith(".md") for s in strings):
+            suspects[name] = node.lineno
+    loads = collections.Counter(
+        n.id for n in ast.walk(tree) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load)
+    )
+    return {n: ln for n, ln in suspects.items() if loads[n] == 0}
+
+
+def test_t8c_detector_catches_a_dead_doc_path_constant():
+    """Positive control (R7): the T8c guard below is green on an empty set,
+    so it is worthless unless this arm shows it goes red on a real one."""
+    dead = _dead_doc_path_constants(
+        'TIER_1 = (\n    "README.md",\n    "docs/engineering/PROJECT_BIBLE.md",\n)\n'
+        'LIVE = ("CHANGELOG.md",)\nprint(LIVE)\n'
+    )
+    assert dead == {"TIER_1": 1}, dead
+
+
+def test_t8c_no_dead_doc_path_constant_in_the_gate():
+    """MAC-777: a doc-path list nothing reads is a false coverage signal."""
+    src = GATE.read_text(encoding="utf-8")
+    dead = _dead_doc_path_constants(src)
+    assert not dead, (
+        f"unreferenced doc-path constant(s) {dead} -- wire it or delete it; "
+        "a constant that names a coverage contract the gate does not honor is "
+        "the MAC-777 defect"
+    )
+    # Named regression guard. Bound to the AST, not the source text: the file
+    # discusses TIER_1 in prose to explain why it is gone.
+    bound = {
+        n.id for n in ast.walk(ast.parse(src))
+        if isinstance(n, ast.Name)
+    }
+    assert "TIER_1" not in bound, "the dead TIER_1 tuple is back"
 
 
 # ---------------------------------------------------------------------------

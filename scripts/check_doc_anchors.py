@@ -95,11 +95,54 @@ column header, and ``source_excerpt`` values contain embedded newlines.
 ``grep -vc '^#'``) overstates. Only a real CSV parse that skips the meta
 row and the header is correct.
 
+What this gate covers, and what it does NOT (MAC-777)
+-----------------------------------------------------
+
+Read this before citing the gate as an instrument for anything.
+
+COVERS. Numeric claim sites hand-registered in ``CLASS_A_CLAIMS``, and
+nothing else. The surface is therefore exactly what somebody remembered
+to enumerate. Run ``--coverage`` for the live list; it is derived from
+the registry at run time, so it cannot drift from what the gate does.
+
+DOES NOT COVER, and cannot be made to by reading harder:
+
+* Any file with no Class A site. A doc the registry never names is never
+  opened, so gutting it moves no counter. rc=0 says nothing about it.
+* Section (``§N``) anchors, cross-references, links, headings. The gate
+  resolves *content anchors to a numeric claim line*; it has no model of
+  a document's heading inventory. A ``§`` cite that stops resolving is
+  invisible here, and NO gate in ``scripts/`` currently answers that
+  question -- MAC-773 built ``anchor_resolve.py`` for it, but that lives
+  under ``operator_review/``, which MAC-763 untracked wholesale (2864473),
+  so it is operator scratch and absent from a fresh clone. Folding it in
+  here was considered and declined: it settles a cite against a heading
+  inventory, not an integer against a query, and putting two settling
+  models behind one exit code is how a gate starts meaning less than its
+  rc suggests. It wants its own tracked gate.
+* Class B and Class C sites. They are listed in the source for
+  explicit-skipped reasoning and never resolved. Being *named* in this
+  file is not being *checked* by it.
+* Prose, dashes, provenance strings, shas. Separate gates.
+
+The failure this section exists to prevent: MAC-773's brief cited
+``check_doc_anchors.py:197`` as a live ``read_text`` on
+``PROJECT_BIBLE.md``, and made the gate the acceptance instrument for a
+168-line redaction of that file. That line was inside the dead ``TIER_1``
+tuple, which this gate never read::
+
+    $ git show cac6ce6:scripts/check_doc_anchors.py | sed -n '197p'
+        "docs/engineering/PROJECT_BIBLE.md",
+
+The gate reported an identical ``21 PASS, 0 FAIL, 1 UNSETTLED`` before
+and after the rewrite. The rc=0 was vacuous.
+
 Usage
 -----
 
     python3 scripts/check_doc_anchors.py            # exit 0 on all-pass, 1 on any FAIL/ERROR
     python3 scripts/check_doc_anchors.py --list     # per-claim PASS/FAIL/UNSETTLED detail
+    python3 scripts/check_doc_anchors.py --coverage # print the covered surface; run no checks
 
 Capture the exit code on a bare invocation. Piping through ``tail``
 reports ``tail``'s exit code, not the gate's.
@@ -183,19 +226,30 @@ SETTLE_ARTIFACTS: dict[str, tuple[str, str]] = {
 
 
 # ---------------------------------------------------------------------------
-# Tier 1 doc surface. Same list as scripts/check_prose_dashes.py.
+# No doc-tier constant lives here (MAC-777).
+#
+# Until MAC-777 this block held ``TIER_1``, a tuple of 8 doc paths under the
+# comment "Same list as scripts/check_prose_dashes.py." It was dead in every
+# revision the tuple ever existed in -- one occurrence, defined, never
+# referenced -- and the comment was false when it was written:
+# ``check_prose_dashes.py`` did not exist yet. This gate landed at 0786f97
+# (2026-08-11 17:02:35 -0400); the prose-dash gate landed at ae110a3
+# (2026-08-11 17:20:33 -0400), 18 minutes later. The two lists have since
+# diverged anyway -- prose-dash Tier 1 gained ``exports/coverage_report.md``
+# at MAC-744 and is 9 entries to this one's 8.
+#
+# The cost was not cosmetic. A reader grepping this file found
+# ``docs/engineering/PROJECT_BIBLE.md`` at what was then line 197 and cited it
+# as proof the gate reads the bible. It never did. See the COVERAGE section of
+# the module docstring.
+#
+# If you want a doc-tier sweep here, WIRE it -- do not park a list that names
+# a coverage contract the code does not honor. A hand-maintained constant
+# describing coverage is an assertion about the code, and this file's own
+# discipline (no pinned canonical sha, no pinned row count) is that assertions
+# about live state belong in derivations, not constants. ``checked_files()``
+# below is the derivation.
 # ---------------------------------------------------------------------------
-
-TIER_1: tuple[str, ...] = (
-    "README.md",
-    "CHANGELOG.md",
-    "CREDITS.md",
-    "docs/USER_GUIDE.md",
-    "docs/engineering/SETUP.md",
-    "docs/engineering/DATA_DICTIONARY.md",
-    "docs/engineering/METHODOLOGY.md",
-    "docs/engineering/PROJECT_BIBLE.md",
-)
 
 
 # ---------------------------------------------------------------------------
@@ -478,6 +532,74 @@ CLASS_C_SITES: list[dict] = [
      "description": "schema_version 30",
      "reason": "DATA_DICTIONARY v1.6.5 row-count snapshot, pinned by design"},
 ]
+
+
+# ---------------------------------------------------------------------------
+# Coverage, DERIVED from the registries above (MAC-777).
+#
+# These read CLASS_A_CLAIMS / CLASS_B_SITES / CLASS_C_SITES rather than
+# restating them, so the coverage this gate advertises is the coverage it
+# has. Adding a claim site widens both at once; there is no second list to
+# forget to update.
+# ---------------------------------------------------------------------------
+
+
+def checked_files() -> tuple[str, ...]:
+    """Files the gate opens and checks. This is the whole covered surface."""
+    return tuple(sorted({c["file"] for c in CLASS_A_CLAIMS}))
+
+
+def named_but_never_opened_files() -> tuple[str, ...]:
+    """Files this source NAMES (Class B / Class C) but never opens.
+
+    Being listed for explicit-skipped reasoning is not coverage. A reader
+    who greps this file will hit these paths; the gate does not read them.
+    """
+    named = {c["file"] for c in CLASS_B_SITES} | {c["file"] for c in CLASS_C_SITES}
+    return tuple(sorted(named - set(checked_files())))
+
+
+def coverage_line() -> str:
+    """One-line, grep-able statement of the covered surface."""
+    files = checked_files()
+    return (
+        f"check_doc_anchors coverage: {len(files)} file(s) opened "
+        f"({', '.join(files)}); numeric claim sites only -- no section (§N) "
+        f"anchors, and no file outside that list"
+    )
+
+
+def format_coverage_report() -> str:
+    """Full coverage breakdown for ``--coverage``."""
+    opened = checked_files()
+    named = named_but_never_opened_files()
+    out = [
+        "check_doc_anchors -- covered surface (derived from the claim registry)",
+        "",
+        f"  OPENED AND CHECKED ({len(opened)} file(s), "
+        f"{len(CLASS_A_CLAIMS)} Class A claim sites):",
+    ]
+    per_file: dict[str, int] = {}
+    for claim in CLASS_A_CLAIMS:
+        per_file[claim["file"]] = per_file.get(claim["file"], 0) + 1
+    for rel in opened:
+        out.append(f"    {rel}  ({per_file[rel]} claim site(s))")
+    out += [
+        "",
+        f"  NAMED IN SOURCE, NEVER OPENED ({len(named)} file(s)):",
+    ]
+    for rel in named:
+        out.append(f"    {rel}  (Class B / Class C reasoning only -- not checked)")
+    out += [
+        "",
+        "  NOT COVERED, and not made covered by any flag:",
+        "    * any file with no Class A claim site -- gutting it moves no counter",
+        "    * section (§N) anchors, cross-references, headings, links",
+        "    * prose, dashes, provenance strings, shas -- separate gates",
+        "",
+        "  Do not cite this gate as an instrument for anything above.",
+    ]
+    return "\n".join(out)
 
 
 # ---------------------------------------------------------------------------
@@ -831,11 +953,23 @@ def main(argv: list[str]) -> int:
         help="Print every per-claim PASS/FAIL/UNSETTLED line; exit non-zero on any FAIL.",
     )
     parser.add_argument(
+        "--coverage",
+        action="store_true",
+        help=(
+            "Print the surface this gate actually covers (derived from the "
+            "claim registry) and exit 0. Runs no checks."
+        ),
+    )
+    parser.add_argument(
         "--db-path",
         default=str(REPO / "db" / "argus.db"),
         help="Path to argus.db (read-only URI form is used).",
     )
     args = parser.parse_args(argv)
+
+    if args.coverage:
+        print(format_coverage_report())
+        return 0
 
     db_path = Path(args.db_path)
     settle_results = run_settling_queries(db_path)
@@ -867,6 +1001,11 @@ def main(argv: list[str]) -> int:
         f"(of {len(results)} Class A claim sites; {len(CLASS_B_SITES)} Class B "
         f"skipped, {len(CLASS_C_SITES)} Class C skipped)"
     )
+    # MAC-777: the verdict never travels without its scope. The summary line
+    # above is quoted verbatim in the release runbooks, so it is unchanged;
+    # this is an ADDITIONAL line. rc=0 here means "these files' numeric claims
+    # settle", never "the doc surface is green".
+    print(coverage_line())
 
     return 1 if (n_fail or n_error) else 0
 
