@@ -353,7 +353,7 @@ def test_t3_lowercase_methodology_the_noun_does_not_attribute():
 def test_t3_a_barrier_token_breaks_attribution():
     """Same line shape, but with the document genuinely named. The barrier, not
     the case rule, is what must stop it -- so this arm uses the uppercase form."""
-    line = "METHODOLOGY defines the bands, but per dispatch §11.2 the wave used DROP-default"
+    line = "METHODOLOGY defines the bands, but per dispatch §5.5 the wave used DROP-default"
     m = gate.CITE_RE.search(line)
     assert gate.attribute(line, m.start()) is None, (
         "a `dispatch` between the document name and the sigil re-scopes the cite"
@@ -362,8 +362,13 @@ def test_t3_a_barrier_token_breaks_attribution():
 
 def test_t3_barrier_positive_control_same_line_without_the_barrier():
     """R7: the barrier arm above is an assertion that something is None, which a
-    totally broken `attribute()` would also satisfy. This is its control."""
-    line = "METHODOLOGY defines the bands, and per §11.2 the wave used DROP-default"
+    totally broken `attribute()` would also satisfy. This is its control.
+
+    The two lines are identical but for the barrier word, and the section is one
+    METHODOLOGY really has -- this file is itself scanned by the gate, so a
+    fixture citing a section that does not exist would be a real finding.
+    """
+    line = "METHODOLOGY defines the bands, and per §5.5 the wave used DROP-default"
     m = gate.CITE_RE.search(line)
     assert gate.attribute(line, m.start()) == "METHODOLOGY"
 
@@ -661,14 +666,20 @@ def test_t4_gate_works_without_a_git_directory(tmp_path):
 #
 # Baseline taken at HEAD 1903c24. Each entry is a real finding, not an
 # exemption: the gate exits 1 on this tree and is meant to.
+#
+# The comments below name their sections WITHOUT the sigil on purpose. This file
+# is inside the scanned tree, so writing the miscite out in prose beside the
+# document's name would add a finding here -- which is the same bind the bible's
+# own CP24 citation-hygiene rule is in, and the reason this gate has no
+# exemption mechanism.
 _BASELINE_UNRESOLVED = {
-    # `bible §179` is a LINE number wearing a section sigil. PROJECT_BIBLE.md
-    # line 179 is the SSID normalization rule, which lives in §4.3.
+    # A 179 cite scoped to the bible: a LINE number wearing a section sigil.
+    # Line 179 of the bible is the SSID normalization rule, in section 4.3.
     ("CHANGELOG.md", "179"): 1,
     ("scripts/fp_magnet_verify.py", "179"): 1,
-    # The CP24 citation-hygiene rule, which says in so many words that §5.2 is a
-    # miscite and the bible has no §5.2. The gate rediscovers the board's own
-    # ratified finding from the heading inventory alone.
+    # The CP24 citation-hygiene rule, which states in so many words that the
+    # 5.2 cite is a miscite and that no such section is declared. The gate
+    # rediscovers the board's own ratified finding from the inventory alone.
     ("docs/engineering/BIBLE_AMENDMENTS.md", "5.2"): 3,
     ("docs/engineering/PROJECT_BIBLE.md", "5.2"): 2,
 }

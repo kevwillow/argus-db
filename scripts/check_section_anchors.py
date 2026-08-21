@@ -236,8 +236,13 @@ LOOKBACK_WINDOW = 90
 #   db/validation/export_lynceus.py:156
 #     # (PROJECT_BIBLE.md:279, board e246a32a, MAC-101 §2.5). Un-held at MAC-360
 #
-# Without the barrier the leading `PROJECT_BIBLE.md` binds `§2.5` and the gate
-# emits a finding against a cite that was never a bible cite.
+# Without the barrier the leading document name binds that trailing section
+# cite and the gate emits a finding against a cite that was never a bible cite.
+#
+# (Note the shape of this very comment: naming the document and the section
+# together in prose would make THIS line an unresolvable cite. The gate scans
+# its own source. There is no exemption mechanism, by design -- the same
+# constraint the bible's own CP24 citation-hygiene rule lives under.)
 BARRIER_RE = re.compile(
     r"\b(?:dispatch|dispatches|brief|briefs|runguide|runguides"
     r"|amendment|amendments|this\s+issue|the\s+issue"
