@@ -114,9 +114,9 @@ DOES NOT COVER, and cannot be made to by reading harder:
   a document's heading inventory. A ``§`` cite that stops resolving is
   invisible here, and NO gate in ``scripts/`` currently answers that
   question -- MAC-773 built ``anchor_resolve.py`` for it, but that lives
-  under ``operator_review/``, which MAC-763 untracked wholesale (2864473),
-  so it is operator scratch and absent from a fresh clone. Folding it in
-  here was considered and declined: it settles a cite against a heading
+  under ``operator_review/``, untracked wholesale by commit 2864473
+  (MAC-763), so it is operator scratch and absent from a fresh clone.
+  Folding it in here was considered and declined: it settles a cite against a heading
   inventory, not an integer against a query, and putting two settling
   models behind one exit code is how a gate starts meaning less than its
   rc suggests. It wants its own tracked gate.
@@ -129,7 +129,8 @@ The failure this section exists to prevent: MAC-773's brief cited
 ``check_doc_anchors.py:197`` as a live ``read_text`` on
 ``PROJECT_BIBLE.md``, and made the gate the acceptance instrument for a
 168-line redaction of that file. That line was inside the dead ``TIER_1``
-tuple, which this gate never read::
+tuple, which this gate never read -- at commit cac6ce6, the last revision
+that carried the tuple::
 
     $ git show cac6ce6:scripts/check_doc_anchors.py | sed -n '197p'
         "docs/engineering/PROJECT_BIBLE.md",
@@ -232,8 +233,8 @@ SETTLE_ARTIFACTS: dict[str, tuple[str, str]] = {
 # comment "Same list as scripts/check_prose_dashes.py." It was dead in every
 # revision the tuple ever existed in -- one occurrence, defined, never
 # referenced -- and the comment was false when it was written:
-# ``check_prose_dashes.py`` did not exist yet. This gate landed at 0786f97
-# (2026-08-11 17:02:35 -0400); the prose-dash gate landed at ae110a3
+# ``check_prose_dashes.py`` did not exist yet. This gate landed in commit 0786f97
+# (2026-08-11 17:02:35 -0400); the prose-dash gate landed in commit ae110a3
 # (2026-08-11 17:20:33 -0400), 18 minutes later. The two lists have since
 # diverged anyway -- prose-dash Tier 1 gained ``exports/coverage_report.md``
 # at MAC-744 and is 9 entries to this one's 8.
