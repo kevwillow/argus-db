@@ -1,4 +1,4 @@
-ARGUS IS IN ACTIVE DEVELOPMENT AND IS NOT COMPLETE. MAY NOT BE 100% ACCURATE AND MAY CONTAIN ANAMOLIES
+ARGUS IS IN ACTIVE DEVELOPMENT AND IS NOT COMPLETE. MAY NOT BE 100% ACCURATE AND MAY CONTAIN ANOMALIES
 
 # Argus
 
@@ -28,10 +28,10 @@ At v1.8.0:
 
 - **43,126 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.8.0) bundles two migrations: `0059` lands the WAVE_9.0 carve-out harvest, and `0060` lands the strict-8.4 category amendment the board ratified. Active moves 43,088 → 43,126, the standard feed 983 → 1,014, high-confidence 501 → 504. Nothing was superseded this cycle, so the +38 is clean growth with no withdrawals. The high-confidence +3 is recategorization rather than new detection: those three rows were already in the database and shipped in no feed because `device_category='unknown'` binned them out first. See the release notes below for the breakdown.
 - **261 manufacturers**, surveillance vendors classified by what they make. 92 of those are OEM arms, the rebadging brands a parent vendor sells through, and they stay hidden from vendor lists by default.
-- **98 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation
+- **98 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation.
 - **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
 - **58 identifier types**, the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
-- **214 behavioral signatures**, cellular-control-plane patterns associated with IMSI-catcher detection
+- **214 behavioral signatures**, cellular-control-plane patterns associated with IMSI-catcher detection.
 
 An *identifier* is a piece of data that pinpoints a vendor's hardware on a wire or radio band: an OUI (the first 24 bits of a MAC address, which maps to a manufacturer), a BLE service UUID broadcast by a device, an FCC grantee code on a regulatory filing, or a hostname embedded in a vendor's companion app. When a downstream scanner observes one of these in the wild, it can use Argus to identify what vendor and what device category produced it.
 
