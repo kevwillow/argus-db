@@ -4261,7 +4261,7 @@ Three new values admitted with per-value rationale citing v1.5.0 sandbox-session
 
 | New value | Cohort | Origin session | Rationale |
 |-----------|--------|----------------|-----------|
-| `cctv_camera` | Commercial/consumer | S2 | Distinguishes general-purpose CCTV from existing `covert_cam`; opens slot for the G-B retroactive recategorization of 7 vendors (executes at Step 6 AFTER this migration lands). G-B was board-ratified at 0ba8150f. |
+| `cctv_camera` <a id="mac781-cp33-s2-1-cctv_camera"></a> | Commercial/consumer | S2 | Distinguishes general-purpose CCTV from existing `covert_cam`; opens slot for the G-B retroactive recategorization of 7 vendors (executes at Step 6 AFTER this migration lands). G-B was board-ratified at 0ba8150f. |
 | `persistent_surveillance` | Military/federal | S1 | Surveillance-blimp / wide-area-motion-imagery class (e.g., JLENS-lineage / Logos Technologies / Sierra Nevada Gorgon Stare derivatives). 0 rows promoted this cycle; schema slot opens for future v1.5.x evidence-arrival. |
 | `through_wall_radar` | Military/federal | S1 | FCC §15.519 UWB-LE (ultra-wideband, low-emission) hand-held imaging radar. Distinct from `imsi_catcher` / `gps_tracker`. 0 rows promoted this cycle; schema slot opens for future v1.5.x evidence-arrival. |
 
