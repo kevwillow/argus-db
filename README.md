@@ -1,16 +1,40 @@
-ARGUS IS IN ACTIVE DEVELOPMENT AND IS NOT COMPLETE. MAY NOT BE 100% ACCURATE AND MAY CONTAIN ANOMALIES
+<div align="center">
+
+<img src="docs/assets/argus-banner.png" alt="Argus" width="100%">
 
 # Argus
 
-> Open-source database of surveillance equipment identifiers
+**Open-source database of surveillance equipment identifiers**
 
-[![watching the watchers](https://img.shields.io/badge/watching-the%20watchers-black.svg)](#what-is-argus)
-[![flock around, find out](https://img.shields.io/badge/flock%20around-find%20out-red.svg)](#what-is-argus)
-[![argus never blinks](https://img.shields.io/badge/argus-never%20blinks-black.svg)](#what-is-argus)
-[![zero flocks given](https://img.shields.io/badge/zero-flocks%20given-red.svg)](#what-is-argus)
-[![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](LICENSE)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/code-AGPL--3.0--or--later-2f6f9f.svg)](LICENSE)
+[![Dataset: ODbL-1.0](https://img.shields.io/badge/data-ODbL--1.0-2f6f9f.svg)](LICENSE-DATA)
+[![Docs: CC-BY-SA-4.0](https://img.shields.io/badge/docs-CC--BY--SA--4.0-2f6f9f.svg)](LICENSE-DOCS)
+[![Release](https://img.shields.io/badge/release-v1.8.0-c8102e.svg)](CHANGELOG.md)
+[![Identifiers](https://img.shields.io/badge/identifiers-43%2C126-111111.svg)](#whats-in-the-dataset)
 
-> **New here?** Start with [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) for a plain-language overview of what Argus is and how to use the data. This README is a project summary; the user guide walks through concrete usage.
+[![watching the watchers](https://img.shields.io/badge/watching-the%20watchers-111111.svg)](#what-is-argus)
+[![flock around, find out](https://img.shields.io/badge/flock%20around-find%20out-c8102e.svg)](#what-is-argus)
+[![argus never blinks](https://img.shields.io/badge/argus-never%20blinks-111111.svg)](#what-is-argus)
+[![zero flocks given](https://img.shields.io/badge/zero-flocks%20given-c8102e.svg)](#what-is-argus)
+
+</div>
+
+> [!WARNING]
+> **Argus is in active development and is not complete.** The data may not be 100% accurate
+> and may contain anomalies. Treat every row as provenance-tracked evidence to verify, not
+> as ground truth.
+
+> **New here?** Start with [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) for a plain-language
+> overview of what Argus is and how to use the data. This README is a project summary; the
+> user guide walks through concrete usage.
+
+### At a glance
+
+| | | | |
+|---|--:|---|--:|
+| Active identifiers | **43,126** | Device categories | **20** |
+| Manufacturers | **261** | Identifier types | **58** |
+| Upstream sources | **98** | Behavioral signatures | **214** |
 
 ## What is Argus
 
@@ -21,6 +45,19 @@ Argus is a database rather than a real-time monitor. It lists the wireless and r
 Tools to surveil people are abundant; tools to detect surveillance are not. The asymmetry favors the surveillor. Argus narrows the gap by making vendor identifiers queryable in a single place with full provenance for every row.
 
 **Argus is for *detection* of public-record-derived surveillance equipment identifiers, NOT for evasion of legitimate law-enforcement interaction.** Argus operates as a passive identification database: identifiers and metadata only, no active interference, no jamming, no attack tooling, no deanonymization of individual officers or agencies. The scope is *equipment categories*, not people.
+
+## Quickstart
+
+```bash
+git clone https://github.com/kevwillow/argus-db.git
+cd argus-db
+# show DB path, schema version, row counts
+python3 argus_cli.py status
+# lookup a Flock Safety ALPR MAC
+python3 argus_cli.py query e4:aa:ea:80:a1:9b
+```
+
+The repo ships the export files under `exports/` already populated, so reading the data needs no `pip install`. The SQLite database `db/argus.db` is **not** distributed through this repository and is absent from the published tree, so a fresh clone has nothing for `argus_cli.py` to open; the exports are the published data artifact. See [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) for what a clone actually contains, the schema-rebuild path, the source-ingest pipeline dependencies, and optional API keys.
 
 ## What's in the dataset
 
@@ -82,80 +119,47 @@ Argus covers surveillance equipment used by US law enforcement and adjacent oper
 
 Coverage is intentionally narrow per category. Argus lists 261 vendors, 92 of them OEM arms that exist to attribute a rebadged device back to its real maker, and most categories carry 3-13 vendors rather than hundreds. Expansion comes from community contributions and future research.
 
-## Most recent release
+## Current release
 
-**v1.8.0** is the most recent release. It bundles two migrations that queued behind gates which closed after v1.7.0 shipped: `0059` lands the WAVE_9.0 carve-out harvest, and `0060` lands the strict-8.4 category amendment the board ratified.
+**v1.8.0** bundles two migrations that queued behind gates which closed after v1.7.0 shipped:
+`0059` lands the WAVE_9.0 carve-out harvest, and `0060` lands the strict-8.4 category
+amendment the board ratified.
 
-The part that matters if you run a scanner: **the standard feed grows by 31 entries and one pre-existing entry's stem is re-rendered (autel → autelevo + autelrobotics, +1 net).** The active count moves 43,088 → **43,126**, a clean +38 with no withdrawals, so every v1.7.0 feed entry is still present. Migration `0059` admits 38 rows and only 14 of them reach the feed: 18 `ble_local_name` rows drop at the CP50 template gate and 6 `ssid_pattern` rows route to `ssid_pattern_fp_hold` (1 was already FP-held by `xg`/`harris` shape from the harvest; the 4 added under MAC-752 are `flock`, `digital[_-]?ally`, `msab|xry`, and `stingray`, each of which was emitting a bare word or a 3-4 char token that matched ordinary network names; the sixth is the Hak5 row `pineapple|hak5|wifi[_-]?pineapple`, held under MAC-761 because the bare `pineapple` stem shipped as a `hacking_tool` label and matched ordinary names like `Pineapple Cafe WiFi`. The hold rejects the whole row, so **Hak5 ships in neither feed at v1.8.0**). That is the false-positive discipline from v1.7.0 doing its job on a fresh harvest, not a shortfall.
+| Feed | v1.7.0 | v1.8.0 | |
+|---|--:|--:|---|
+| Active identifiers | 43,088 | **43,126** | +38, no withdrawals |
+| Standard (Lynceus) | 983 | **1,014** | +31 |
+| High-confidence | 501 | **504** | +3 |
+| Behavioral signatures | 132 | **132** | flat |
 
-Feed movement: the standard Lynceus feed **983 → 1,014**; high-confidence **501 → 504**; the behavioral feed holds at **132**. `schema_version` is unchanged at **35**, because neither migration carries DDL.
+`schema_version` is unchanged at **35**, because neither migration carries DDL.
 
-**Read the high-confidence +3 carefully.** All 38 of `0059`'s rows are `crowdsourced` and carry NULL `geographic_scope`, so none of them can clear the high-confidence floor. The entire 501 → 504 movement is `0060`'s three `geographic_scope='global'` rows. Those rows were already in the database and shipped in no feed because `device_category='unknown'` bins out first; `0060` gave them a category, so they became eligible for the first time. That is rows becoming eligible, not devices newly found.
+**If you run a scanner:** the standard feed grows by 31 entries and one pre-existing stem is
+re-rendered (`autel` → `autelevo` + `autelrobotics`, +1 net). Every v1.7.0 feed entry is still
+present. Migration `0059` admits 38 rows and only 14 reach the feed: 18 `ble_local_name` rows
+drop at the CP50 template gate and 6 `ssid_pattern` rows route to `ssid_pattern_fp_hold`,
+because bare stems like `flock` and `stingray` were matching ordinary network names. The hold
+rejects the whole row, so **Hak5 ships in neither feed at v1.8.0**. That is the false-positive
+discipline from v1.7.0 doing its job on a fresh harvest, not a shortfall.
 
-### The release before it: v1.7.0
+**Read the high-confidence +3 carefully.** All 38 of `0059`'s rows are `crowdsourced` and carry
+NULL `geographic_scope`, so none can clear the high-confidence floor. The entire 501 → 504
+movement is `0060`'s three `geographic_scope='global'` rows, which were already in the database
+and shipped in no feed because `device_category='unknown'` bins out first. That is rows becoming
+eligible, not devices newly found.
 
-v1.7.0 bundled six lanes of work shipped together rather than as a run of small releases. The numbers in the rest of this section are v1.7.0's and are kept as the prior-release record.
+Full version-by-version history, from v1.0.0 through v1.8.0, lives in
+[`CHANGELOG.md`](CHANGELOG.md).
 
-The part that mattered if you ran a scanner: **the SSID patterns stop matching your neighbours.** A WiGLE re-mine (MAC-522) tested the 32 SSID substrings v1.6.14 shipped and found 14 of them hitting ordinary home and business WiFi. `flock` matched "Schneeflocke", `Penguin` matched 112,000 networks, `dji` matched "Fidji". Lynceus 0.9.2 compares these as bare substrings with no case or word-boundary check, so a v1.6.14 scanner could label a neighbour's router a license plate reader. Migration `0038` withdraws 9 of those rows and rewrites 8 into delimiter-anchored forms (`mavic_` and `mavic-` in place of bare `mavic`). Migration `0039` withdraws a second dead entry, the `ssid_exact` pattern `Flock-*`, where the `*` was a literal character rather than a wildcard and so never matched anything. Flock's working SSID identifiers are `Flock` and `Flock-230503`, alongside its 38 OUIs.
+## Downstream consumers
 
-The rest: **8 new identifiers** (ids 44659-44666, MAC-518 / MAC-519) covering a DriveCam OUI, two Tianjin Hualai camera OUIs and five FCC grantee codes for Chipolo, Pebblebee, PB Inc, Netradyne and Nauto; **44 more OUIs** from two research harvests (migrations `0044` and `0048`, MAC-523 / MAC-537), of which 11 reach the feeds and the rest drop at the export category gate; **junk rows** cleared (migration `0040`, MAC-531), mostly hostnames that were never vendor infrastructure; **three new sources** (95 → 98) from MuckRock's FOIA census, the ACLU stingray compilation and IPVM's camera directory, bringing 7 procurement records naming Harris and DRT hardware at seven agencies; and **84 OEM camera brands** mapped back to Hikvision and Dahua (migration `0041`, manufacturers 156 → 240, then 260 after MAC-641's support-class tranche), which changes attribution without adding coverage.
+Argus is designed as a producer of detection data for downstream RF-scanner consumers:
 
-Active identifiers move 43,134 → **43,088**; the standard Lynceus feed **977 → 983**; high-confidence **481 → 501**; the behavioral feed holds at **132**. `schema_version` moves **33 → 35**, both bumps recording alias-encoding normalizations rather than any DDL.
+- **[Lynceus](https://github.com/kevwillow/lynceus-warden)** (Raspberry-Pi-class RF security monitor), consumes the JSON exports; matches on `{pattern, pattern_type}` against live RF observations.
+- **[Rayhunter](https://github.com/EFForg/rayhunter)** (cellular IMSI-catcher detector on supported modems), consumes the behavioral signatures export.
+- **Operator-side combined deployment**, an operator may run Lynceus + Rayhunter together; the two exports are non-overlapping (wire-observable patterns vs cellular-control-plane behavior).
 
-**Read the high-confidence +20 carefully.** Twenty-five entries arrived and five left. Fourteen of the twenty-five are genuinely new OUI rows. The other eleven are BLE service UUIDs for Axon, Verkada, Rhombus, Motive and Samsara that the registry already held and that reached no feed because their `confidence` and `geographic_scope` were NULL; migrations `0051` and `0054` populated those fields. That half of the gain is rows becoming eligible, not devices newly found.
-
-**Consumer note:** the anchored SSID stems require **Lynceus 0.9.2 or newer**, and an anchored stem will miss a device whose SSID uses no delimiter, a recall trade-off we accept until Lynceus gets minimum-length and word-boundary matching (MAC-517 / MAC-356).
-
-A v1.6.15 was assembled in late July and then pulled before publication in favour of one bundled release. No tag was cut; its content ships here. See [`CHANGELOG.md`](CHANGELOG.md) for the full record, including a known limitation in the `coverage_report.md` §6.2 corroboration tiers.
-
-### Prior release, v1.6.14
-
-**v1.6.14** was the CP51 `ssid_pattern` export-layer capability flip (MAC-517), isolated out of the in-flight Wave-6 gate so it ships alone rather than riding a data cycle. It is **export-only** (zero admissions, zero withdrawals, no schema migration (schema_version stays 33), and no canonical write), so the database is byte-identical to v1.6.13 (DB post-sha `b406dff1...daa265`) and the standard feed's `argus_run_id` `10b46f03-3d3a-5646-9279-48cbb8d469aa` still matches the shipped v1.6.13 active set. CP51 re-pins the Lynceus `ssid_pattern` disposition from the stale "v0.2, no regex → DROP" assumption to **Lynceus 0.9.2 case-insensitive substring matching** (`? LIKE '%' || needle || '%' COLLATE NOCASE`, `db.py:1126`), after the live matcher was pinned at 0.9.2 on MAC-516. Previously section-4.4 export-dropped `ssid_pattern` rows now ship as leading-literal substring stems: the standard Lynceus feed moves **945 → 977** (+32, 100% `ssid_pattern`) and the high-confidence feed **478 → 481** (+3); the behavioral feed holds at 132. Short or generic stems (`lpr`, `ibr`, `rv50`, `mp70`) are FP-held and confirmed absent from the feed. **Consumer note:** these substring rows require **Lynceus 0.9.2 or newer** to match; `ble_local_name` templates stay deferred to Lynceus v1.4.3+. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
-
-### Prior release, v1.6.13
-
-**v1.6.13** was the Wave-5 data-quality cleanup (MAC-511), staged as canonical write `937fefe`. It **withdraws 43 junk identifier rows by supersession** (migration 0037): 22 `network_endpoint` rows that were APK string-pool concatenation glue, and 21 `vendor_controlled_hostname` rows made up of 10 scrape-glue concatenations, 10 RFC-2606 reserved-placeholder (`example.com`) domains, and 1 Java class token mis-typed as a hostname. None were real vendor identifiers. There is no schema migration (schema_version stays 33), and nothing is deleted: the withdrawn rows stay in the registry as superseded history under the CP32 section 9 self-loop mechanism. Active identifiers move 43,177 → **43,134** (-43); total identifiers stay 43,840. All three Lynceus feeds hold flat (standard 945, high-confidence 478, behavioral 132) because `network_endpoint` and `vendor_controlled_hostname` are section-4.4 export-dropped types that never reach the v0.2 feeds, so the cleanup moves the active and CSV counts without touching a single feed entry. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
-
-### Prior release, v1.6.12
-
-**v1.6.12** was a quality-correction and sourcing cycle that bundled two staged commits under one tag: the MAC-477 correction (`8cfed9f`) and the Wave-4 ingest (MAC-493, `7d3652d`). The MAC-477 correction **withdrew 108 string-pool `ble_service_uuid` false positives** by supersession (migrations 0034/0035/0036), GATT characteristic-UUID mis-types that were never advertised service UUIDs, and Wave-4 **admitted 11 net-new identifiers** (ids 44648-44658): eight fleet-telematics OUIs (CalAmp, Zonar, Lytx ×4, Verizon Connect, Verizon Telematics), the Neology ALPR OUI `00:17:3d` plus its FCC grantee code `2AKNF`, and the RetailNext people-counting OUI `20:c3:a4`, with the ELSAG ALPR MAC range recategorized `unknown → alpr`. There was no schema migration (schema_version stayed 33). Active identifiers moved 43,274 → 43,177 (-97 net): the drop was the contamination cleanup, not a regression. The standard export moved 1,042 → 945 and the high-confidence export 469 → 478. The CP47 / CP50 export-layer Bible amendments proposed in v1.6.11 remain pending on MAC-492. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
-
-### Prior release, v1.6.11
-
-**v1.6.11** was the Wave-3 multi-lane sourcing cycle (MAC-490): it admitted **19 net-new identifiers** (ids 44629-44647) across six harvest lanes and shipped two export-layer changes, with no schema migration (schema_version 33). Active identifiers moved 43,255 → 43,274; the standard export grew 1,014 → 1,042 and the high-confidence export 464 → 469. The new rows were drone Remote ID surfaces (the ASTM F3411 `0xFFFA` service UUID and the `org.opendroneid.remoteid` Wi-Fi Aware service, plus Teal and uAvionix OUIs), a Bosch camera OUI, two Utility body-cam OUIs with the Flock Safety gunshot-detection service UUID, five smart-lock OUIs (August, ASSA ABLOY, iRevo, Unilock, Côte Picarde), five `unknown`-category smart-home OUIs (Nest, Lumi, SimpliSafe), and the Google Find My Device anti-stalking sound UUID. The CP50 `ble_local_name` literal split made 12 literal local-names feed-visible while holding 14 templates; the proposed B7 `mesh_radio` category was declined on ethics grounds. See [`CHANGELOG.md`](CHANGELOG.md) for the full record.
-
-### Prior release, v1.6.10
-
-**v1.6.10** was the Wave-2 multi-cohort cycle (MAC-392), bundled under one tag with the ratified Axon body-cam GATT increment (MAC-352). It admits **132 net-new identifiers** across six device cohorts and mints two durable categories, `smart_lock` and `smart_home_hub` (migration 0033, CP46, schema_version 32 → 33). Active identifiers move 43,123 → 43,255; the standard export grows 900 → 1,014 and the high-confidence export 351 → 464. The new feed entries are smart locks (Kwikset, August, Ultraloq, Schlage, Yale; 56 rows), pet and kid cellular trackers (Fi, Whistle, Jiobit; 54 rows), a Samsung SmartThings hub, a Pebblebee Bluetooth tracker, and the two Axon body-cam service UUIDs. **Honest scope note:** the 10 cohort-1 spy-camera `ssid_pattern` families and the 5 cohort-6 `ble_local_name` rows are captured in the registry and the full CSV, but they do **not** reach the Lynceus JSON feeds under v0.2 (the writer drops regex and local-name patterns per `export_lynceus.py` §4.4), so a scanner does not alert on those spy-cam SSIDs today. Closing that gap is the deferred follow-up MAC-420. See [`CHANGELOG.md`](CHANGELOG.md) and `docs/engineering/BIBLE_AMENDMENTS.md` (CP46) for the full record.
-
-### Prior release, v1.6.9
-
-**v1.6.9** minted the `bluetooth_tracker` device category (schema_version 31 → 32) and made 46 captured tracker rows (AirTag, Tile, Samsung SmartTag, Chipolo, AirGuard) export-visible by absorbing the MAC-359 `ble_service_uuid → ble_uuid` map, with no net-new identifiers (active unchanged at 43,123). The standard export grew 737 → 900 and the high-confidence export 348 → 351. Validation held the Apple/Google Exposure-Notification UUID `0xFD6F` (a cross-vendor false-positive magnet) at `unknown`, absent from both feeds. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
-
-### Prior release, v1.6.8
-
-**v1.6.8** ran the widest-net sourcing cycle to date: **81 net-new identifiers** across five device cohorts (Bluetooth trackers and stalkerware, ALPR and cop-car, drones, body cams and acoustic, consumer surveillance) plus a deferred-revival cleanup, with 25 bad OUIs withdrawn from the standard feed (active 43,213 → 43,123). The 26 consumer-camera OUIs (Ring, Wyze, Arlo, Blink) grew the high-confidence export 322 → 348; the Bluetooth-tracker rows arrived captured-but-suppressed, with their feed-visibility deferred to the v1.6.9 fast-follow above. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
-
-### Prior release, v1.6.7
-
-**v1.6.7** layered +290 identifiers on v1.6.6 across two cohorts: the R2 SoC chipset set and the Flock/cop-car Android-app static-analysis cluster (active 42,923 → 43,213). The JSON feeds held flat because every new row remained an Argus-internal type outside the Lynceus watchlist schema. See [`CHANGELOG.md`](CHANGELOG.md) for the detail.
-
-### Prior release, v1.6.6
-
-**v1.6.6** registered 15 new surveillance brands and brought in the deferred R2 new-vendor cohort (+1,022) plus Reolink firmware at full volume. See [`CHANGELOG.md`](CHANGELOG.md) for the breakdown.
-
-## Quickstart
-
-```bash
-git clone https://github.com/kevwillow/argus-db.git
-cd argus
-# show DB path, schema version, row counts
-python3 argus_cli.py status
-# lookup a Flock Safety ALPR MAC
-python3 argus_cli.py query e4:aa:ea:80:a1:9b
-```
-
-The repo ships the export files under `exports/` already populated, so reading the data needs no `pip install`. The SQLite database `db/argus.db` is **not** distributed through this repository and is absent from the published tree, so a fresh clone has nothing for `argus_cli.py` to open; the exports are the published data artifact. See [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) for what a clone actually contains, the schema-rebuild path, the source-ingest pipeline dependencies, and optional API keys.
+**Operator-stack self-exclusion**: Argus operator-side hardware MUST NOT appear in the high-confidence export. That covers Lynceus host hardware (Raspberry Pi OUIs) and Rayhunter-supported modems (Orbic RC400L, FY UZ801, PinePhone Quectel, Wingtech CT2MHS01, T-Mobile TMOHS1, TP-Link M7350/M7310). This is mandatory regardless of source confidence.
 
 ## How to contribute
 
@@ -179,16 +183,6 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 - [`docs/engineering/PROJECT_BIBLE.md`](docs/engineering/PROJECT_BIBLE.md), formal canonical specification.
 - [`docs/engineering/BIBLE_AMENDMENTS.md`](docs/engineering/BIBLE_AMENDMENTS.md), append-only log of changes to the project's rules.
 
-## Downstream consumers
-
-Argus is designed as a producer of detection data for downstream RF-scanner consumers:
-
-- **[Lynceus](https://github.com/kevwillow/lynceus-warden)** (Raspberry-Pi-class RF security monitor), consumes the JSON exports; matches on `{pattern, pattern_type}` against live RF observations.
-- **[Rayhunter](https://github.com/EFForg/rayhunter)** (cellular IMSI-catcher detector on supported modems), consumes the behavioral signatures export.
-- **Operator-side combined deployment**, an operator may run Lynceus + Rayhunter together; the two exports are non-overlapping (wire-observable patterns vs cellular-control-plane behavior).
-
-**Operator-stack self-exclusion**: Argus operator-side hardware MUST NOT appear in the high-confidence export. That covers Lynceus host hardware (Raspberry Pi OUIs) and Rayhunter-supported modems (Orbic RC400L, FY UZ801, PinePhone Quectel, Wingtech CT2MHS01, T-Mobile TMOHS1, TP-Link M7350/M7310). This is mandatory regardless of source confidence.
-
 ## License
 
 Argus ships under three licenses by artifact class:
@@ -211,6 +205,8 @@ Every active identifier traces back to:
 4. **Per-row `notes` JSON** carrying license posture, promotion-time citation, and audit-trail anchors
 
 **No fabrication.** If a source doesn't yield concrete evidence, the answer is "no record," not "plausible record." See [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) §7 for the full discipline.
+
+---
 
 ---
 
