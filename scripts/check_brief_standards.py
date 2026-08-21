@@ -7,13 +7,30 @@ ratified R6 on MAC-573 and R7 on MAC-551, both 2026-07-29. Every rule this gate 
 ratified.
 
 Usage:  python3 scripts/check_brief_standards.py <brief.md> [<brief.md> ...]
-Exit 0 = all briefs pass. Exit 1 = at least one FAIL.
+Exit 0 = all briefs pass. Exit 1 = at least one FAIL. Exit 2 = the gate could
+not run: no brief named, a named brief is missing, or the standards file itself
+is absent from this tree (see STANDARDS_ABSENT_NOTE).
 """
 import re
 import sys
 from pathlib import Path
 
 STANDARDS = "operator_review/BRIEF_STANDARDS.md"
+# MAC-763 untracked ``operator_review/``, so in a fresh clone the standards file
+# this gate exists to enforce is simply not present. R0 is a regex over the
+# BRIEF's text, not a read of the standards file, so the gate would keep
+# printing PASS -- certifying that a brief correctly inherits rules from a
+# document this tree does not contain. That is the same silent-green shape as
+# the retired ``--tier 3`` in check_prose_dashes: a verdict about bytes nobody
+# opened. Refuse loudly instead. The gate stays whole; it only declines to
+# certify when its own subject is missing.
+STANDARDS_ABSENT_NOTE = (
+    f"{STANDARDS} is not present in this tree (MAC-763 untracked operator_review/). "
+    "R0 checks that a brief CITES the standards, which passes whether or not the "
+    "standards exist -- a PASS here would certify inheritance from a document that "
+    "is not in the checkout. Run this gate from an operator checkout that still "
+    "carries the standards file on disk."
+)
 # A brief one directory down cites `../BRIEF_STANDARDS.md`, which is a correct path citation.
 # R0 asks that the file be cited rather than restated, so match the basename with any prefix.
 STANDARDS_CITE = re.compile(r"(^|[`'\"(\s/])(?:[\w./-]*/)?BRIEF_STANDARDS\.md")
@@ -208,12 +225,37 @@ def check(path):
     return fails, warns
 
 
+def standards_present():
+    """True if the standards file this gate enforces is readable from this tree.
+
+    Checked both CWD-relative (the documented invocation, from the repo root)
+    and relative to the script's own repo root, so running the gate from a
+    subdirectory does not masquerade as an absent subject.
+    """
+    repo_root = Path(__file__).resolve().parents[1]
+    return Path(STANDARDS).is_file() or (repo_root / STANDARDS).is_file()
+
+
 def main(argv):
     if len(argv) < 2:
         print(__doc__)
         return 2
+    if not standards_present():
+        print(f"check_brief_standards: {STANDARDS_ABSENT_NOTE}", file=sys.stderr)
+        return 2
     worst = 0
     for path in argv[1:]:
+        # A brief that is not on disk is a gate that did not run. Report it as
+        # rc=2 (could not run), never rc=0, and never as an rc=1 FAIL -- FAIL
+        # means a brief was read and broke a rule.
+        if not Path(path).is_file():
+            print(f"MISSING  {path}", file=sys.stderr)
+            print(
+                "    MISSING  brief not found; nothing was checked for this path",
+                file=sys.stderr,
+            )
+            worst = max(worst, 2)
+            continue
         fails, warns = check(path)
         status = "FAIL" if fails else ("WARN" if warns else "PASS")
         worst = max(worst, 1 if fails else 0)

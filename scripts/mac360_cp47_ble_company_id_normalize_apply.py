@@ -72,6 +72,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import sqlite3
 import sys
@@ -320,6 +321,10 @@ def run_apply(db_path: str) -> int:
     }
     suffix = "" if is_canonical else "_VERIFY"
     proof_path = f"operator_review/mac360/mac360_cp47_normalize_proof{suffix}.json"
+    # MAC-763 untracked operator_review/, so a fresh clone has no directory to
+    # write into and this open() raised FileNotFoundError AFTER the DB mutation
+    # had already committed -- the apply succeeded and lost its proof artifact.
+    os.makedirs(os.path.dirname(proof_path), exist_ok=True)
     with open(proof_path, "w", encoding="utf-8") as f:
         json.dump(proof, f, indent=2, ensure_ascii=False)
     print(f"[ok] applied. post-sha256={post_sha}")
