@@ -42,7 +42,7 @@ would be worse than no gate.
 
 Paid for by MAC-573 `cf9031a`, which staged three paths it had every right to stage and
 swept the MAC-579 lane's uncommitted `marker = last_out or started` fix out of
-`scripts/run_liveness_probe.py` along the way. MAC-579's own commit `9fad501` landed six
+`scripts/run_liveness_probe.py` along the way. MAC-579's own commit `b0be89b` landed six
 minutes later carrying only `tests/test_run_liveness_probe.py` -- the test for a fix that
 was no longer in the tree. Disclosed at `8082d32`, not repaired.
 

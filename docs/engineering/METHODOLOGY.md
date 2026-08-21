@@ -576,7 +576,7 @@ The three SARs compose: SAR-15 (per-vendor probe-scope, v1.4.0) → SAR-16 (alia
 
 ## §14: `Na_` sub-slot migration convention (CP32 §1, first application at v1.4.1)
 
-Mig-0026a (`db/migrations/0026a_phase10_vendor_apk_sources_admission.sql`) is the framework's first application of the **`Na_` sub-slot migration convention** codified inline at CP32 §1 (renamed from `0026_phase10_vendor_apk_sources_admission.sql` at commit `398c8b8`):
+Mig-0026a (`db/migrations/0026a_phase10_vendor_apk_sources_admission.sql`) is the framework's first application of the **`Na_` sub-slot migration convention** codified inline at CP32 §1 (renamed from `0026_phase10_vendor_apk_sources_admission.sql` at commit `c1ec6a5`):
 
 > **Data-only addendum migrations sharing a numeric slot with a schema-mutating migration use a sub-letter suffix (`Na_…`) and apply after the main `N_` slot (lexical: `_` < `a`).**
 
@@ -599,7 +599,7 @@ def _emit_export(path: Path, rows: list[dict]) -> None:
 
 `_assert_no_email_pii(path)` re-reads the written file from disk, applies the regex predicate `\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b`, and raises `Halt` (not return-false) if any match survives. The guard is defense-in-depth: it catches BOTH (a) classification-gate bugs (a stale `_classify_row` predicate would leak PII at the row-emission layer if the guard didn't fire); and (b) new-code-path bypasses (a custom export script that bypasses the gate would still be caught at write-time).
 
-**Forward-looking sub-rule (CP32 §10):** any §11 hard-rule that constrains export content shape SHOULD have a paired `_assert_no_<rule>_<violation>(path)` post-condition guard at every emission call site. The pattern lives at `db/validation/export_lynceus.py` + `db/validation/export_behavioral_signatures.py` (7 live call sites at v1.4.1; commit `50b8232`); it composes with the existing row-classification gate per a defense-in-depth pattern.
+**Forward-looking sub-rule (CP32 §10):** any §11 hard-rule that constrains export content shape SHOULD have a paired `_assert_no_<rule>_<violation>(path)` post-condition guard at every emission call site. The pattern lives at `db/validation/export_lynceus.py` + `db/validation/export_behavioral_signatures.py` (7 live call sites at v1.4.1; commit `214f20f`); it composes with the existing row-classification gate per a defense-in-depth pattern.
 
 **Empirical anchor:** `argus_export.csv` regex-scan returns **0 email-shape matches** at v1.4.1 ship: the guard is active and clean.
 

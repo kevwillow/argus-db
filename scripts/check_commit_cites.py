@@ -235,8 +235,36 @@ def in_repair_scope(path: str) -> str | None:
 
 
 @functools.lru_cache(maxsize=None)
+def reachable(sha: str) -> bool:
+    """True when ``sha`` is reachable from at least one ref in this repository.
+
+    ``git cat-file -t <sha>`` only asks whether the object is in the local object
+    database — it answers yes for *dangling* objects, leftovers from past history
+    rewrites that no ref points at and that clone / fetch / push never transfer. A
+    gate that treats those as live passes green locally and red for anyone who
+    clones; a ``git gc`` would turn the local verdict red too. Reachability is the
+    check the gate owed in the first place. MAC-774.
+    """
+    proc = subprocess.run(
+        ["git", "for-each-ref", "--contains", sha],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return bool(proc.stdout.strip())
+
+
+@functools.lru_cache(maxsize=None)
 def resolves(sha: str) -> bool:
-    """True when ``sha`` names a commit object in this repository."""
+    """True when ``sha`` names a commit object in this repository *and* that
+    object is reachable from at least one ref.
+
+    ``cat-file -t = commit`` alone is not enough: it admits dangling objects. The
+    gate reported those as ``live`` for years and printed PASS over a coordinate
+    that resolved for nobody outside the working repo. Reachability is the
+    property a reader can actually use — see ``reachable`` above.
+    """
     proc = subprocess.run(
         ["git", "cat-file", "-t", sha],
         cwd=REPO,
@@ -244,7 +272,9 @@ def resolves(sha: str) -> bool:
         text=True,
         check=False,
     )
-    return proc.stdout.strip() == "commit"
+    if proc.stdout.strip() != "commit":
+        return False
+    return reachable(sha)
 
 
 @functools.lru_cache(maxsize=None)
@@ -472,6 +502,68 @@ def _subject_tally() -> dict[str, int]:
     return tally
 
 
+def _dangling_commit() -> str | None:
+    """Return a sha that exists as a commit but is reachable from no ref, or None.
+
+    Two paths, in priority order:
+
+    1. **Reuse a real dangling commit** (``git fsck --dangling --no-reflogs``).
+       The working repo accumulates these from history rewrites; whatever the
+       gate's own reachability check calls dangling, this arm points at. The
+       ``--unreachable`` flag is intentionally omitted because in git's fsck it
+       shadows ``--dangling`` and reports everything as ``unreachable``, which
+       would let the test pass for the wrong reason (an object reachable only
+       from another unreachable is not what the MAC-774 defect ships).
+
+    2. **Synthesize one.** A fresh clone transfers nothing dangling, so path 1
+       returns nothing and the arm would fail to construct — but the defect
+       shape itself (exists locally, reachable from no ref) is reproducible on
+       demand with ``git commit-tree`` against HEAD. The synthesized commit is
+       never pointed at by any ref, so it sits as a dangling object for the
+       rest of the selftest run. ``gc`` during the run would invalidate it,
+       but ``gc`` is not part of the selftest's surface.
+
+    ``sorted()[0]`` keeps the path-1 pick deterministic across runs.
+    """
+    out = _git("fsck", "--dangling", "--no-reflogs")
+    real = sorted(
+        line.split()[2]
+        for line in out.splitlines()
+        if line.startswith("dangling commit ")
+    )
+    if real:
+        return real[0]
+
+    # Synthesize a dangling commit: write a blob, build a tree, commit it against
+    # HEAD without ever creating a ref. The object exists locally and is reachable
+    # from no ref by construction.
+    blob = subprocess.run(
+        ["git", "hash-object", "-w", "--stdin"],
+        cwd=REPO, input="MAC-774 selftest: synthetic dangling-commit payload\n",
+        capture_output=True, text=True, check=False,
+    ).stdout.strip()
+    tree = subprocess.run(
+        ["git", "mktree"], cwd=REPO,
+        input=f"100644 blob {blob}\tMAC-774-synthetic.md\n",
+        capture_output=True, text=True, check=False,
+    ).stdout.strip()
+    parent = _git("rev-parse", "HEAD").strip()
+    env = {
+        "GIT_AUTHOR_NAME": "MAC-774 selftest",
+        "GIT_AUTHOR_EMAIL": "selftest@MAC-774.local",
+        "GIT_COMMITTER_NAME": "MAC-774 selftest",
+        "GIT_COMMITTER_EMAIL": "selftest@MAC-774.local",
+        "GIT_AUTHOR_DATE": "2026-01-01T00:00:00Z",
+        "GIT_COMMITTER_DATE": "2026-01-01T00:00:00Z",
+    }
+    commit = subprocess.run(
+        ["git", "commit-tree", tree, "-p", parent,
+         "-m", "MAC-774 selftest: synthetic dangling commit (not pointed at by any ref)"],
+        cwd=REPO, env=env, capture_output=True, text=True, check=False,
+    ).stdout.strip()
+    return commit or None
+
+
 def selftest() -> int:
     """R7 positive control — show the instrument firing on both arms.
 
@@ -600,6 +692,42 @@ def selftest() -> int:
     if not flipped:
         failures.append("subject-verdict-flip")
 
+    # ---- MAC-774: the dangling-object arm ----------------------------------------
+    #
+    # The arm A "live" fixture is the reachable HEAD, which by construction reaches
+    # some ref. The arm B "dead" fixture is a random sha-like token that does not
+    # even resolve, so it never had a chance to be reachable. Neither exercises the
+    # MAC-774 defect shape — an object that exists locally but is reachable from no
+    # ref. Before the fix ``resolves`` returned True for such objects and they
+    # printed ``live``; the gate's blind spot was structural, the kind that
+    # reproduces the moment a literal fixture is removed.
+    #
+    # The control is derived from ``git fsck --dangling``: whatever the gate's own
+    # reachability check calls dangling, this arm points at. If none exist in this
+    # repo, the control cannot be built and the arm fails to construct — the same
+    # discipline the subject arm uses for unique/dup fixtures. The expected status
+    # is ``dead``: an object that exists locally but is reachable from no ref
+    # does not exist for anyone who clones, fetches, or pushes.
+    dangling = _dangling_commit()
+    if not dangling:
+        print(
+            "  FAIL  dangling-object control not constructible: no dangling commit "
+            "in object graph (run ``git fsck --dangling`` to confirm)"
+        )
+        print("selftest FAIL  MAC-774  (dangling-object positive control could not be built)")
+        return 2
+    dangling_hit = ("synthetic/dangling.md", 1, f"landed at commit `{dangling}` per the ledger")  # dead-cite exemplar
+    dangling_got = classify([dangling_hit])
+    dangling_status = dangling_got.get(dangling, {}).get("status")
+    print(
+        f"  {'PASS' if dangling_status == 'dead' else 'FAIL'}  dangling-object: "
+        f"{dangling}  expected=dead got={dangling_status}  "
+        f"(cat-file -t={_git('cat-file', '-t', dangling).strip()!r}, "
+        f"reachable={reachable(dangling)})"
+    )
+    if dangling_status != "dead":
+        failures.append(f"dangling-object:{dangling_status}")
+
     # The guard must fail on an input it should reject, or it is decoration.
     mutated = assert_selector_covers_hits(
         [("synthetic/nocite.md", 1, "no cite token here")],
@@ -625,7 +753,7 @@ def selftest() -> int:
     if not want_arms <= fired:
         failures.append("guard-mutation")
 
-    total = len(expected) + len(expected_subjects) + 2
+    total = len(expected) + len(expected_subjects) + 3
     if failures:
         print(f"selftest FAIL  MAC-710  ({len(failures)}/{total} arm(s) did not fire)")
         return 2
