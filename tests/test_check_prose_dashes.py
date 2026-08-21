@@ -277,3 +277,126 @@ def _minimal_tier1(body: str) -> dict[str, str]:
         "docs/engineering/METHODOLOGY.md": "meth\n",
         "docs/engineering/PROJECT_BIBLE.md": "bible\n",
     }
+
+
+def _minimal_tier3(body: str) -> dict[str, str]:
+    """Build a minimal Tier-3 corpus holding only ``docs/internal/notes.md``.
+
+    The tier-3 list was emptied by MAC-763 (the tree is no longer tracked),
+    so without the retirement guard ``--tier 3`` would open nothing and print
+    PASS. The positive control here is the inverse: a tree the gate CAN
+    still scan, so a test that hard-codes ``return 2`` would fail loudly.
+    """
+    return {"docs/internal/notes.md": body}
+
+
+# MAC-778 (CEO dispatch): the four arms that pin both directions of the
+# --tier 3 retirement guard added at MAC-763. Without them, the guard reads
+# as decoration: someone rewording the retirement note, deleting the guard,
+# or hard-coding ``return 2`` would not flag in CI. The four arms are:
+#
+#   A  subject absent (the gated tree is gone)  -> rc=2, stderr names the
+#      retired tier so the operator can act on it
+#   B  subject present (the gated tree still has files, addressed via the
+#      ``--files`` escape hatch the gate documents for this case)  -> rc=0,
+#      proves the guard did not blind the gate in the other direction
+#   C  argument missing/invalid (e.g. --added-only with a ref git cannot
+#      resolve)  -> rc=2, never an uncaught traceback
+#   D  no trigger (no --tier 3 argument)  -> rc=0 on a clean default run, the
+#      negative control that proves the guard only fires when its trigger is
+#      pulled
+#
+# The three-tier 'no args returns rc=2' shape from check_brief_standards does
+# not apply here: check_prose_dashes' default is tier 1, which has no
+# absence-guard. D is therefore rc=0, not rc=2, and is the negative control
+# arm. The ``--tier 3`` exit is *unconditional* rc=2 by design -- the gate
+# exists to refuse the flag, not to scan files behind it -- so the
+# positive-control arm has to use ``--files`` to address the same paths
+# directly, exactly the escape hatch the gate's docstring recommends.
+
+
+class TestTier3RetirementGuard:
+    """The absence-guard added at MAC-763: ``--tier 3`` prints rc=2 because
+    the gated ``docs/internal/`` tree is no longer tracked (line 391-393)."""
+
+    def test_arm_a_rc2_when_tier3_subject_absent(self, tmp_path):
+        """A: subject absent. rc=2, stderr names the retired tier.
+
+        Without this guard, ``--tier 3`` would resolve ``docs/internal/...``
+        to an empty list, walk zero files, and print rc=0 -- certifying
+        prose the gate never read. The guard converts that silent-green
+        into rc=2.
+        """
+        work = _seed_repo(tmp_path, {})
+        rc, _, err = _run_gate(work, ["--tier", "3"])
+        assert rc == 2, err
+        assert "tier 3" in err.lower(), err
+        assert "retired" in err.lower(), err
+        assert "MAC-763" in err, err
+
+    def test_arm_a_rc2_even_when_tier3_subject_pretends_present(self, tmp_path):
+        """The retirement is unconditional: a stray ``docs/internal/`` file
+        in a working checkout does not change the verdict. Pins that the
+        guard refuses the flag, not the files.
+        """
+        clean = "Internal notes. No dashes here.\n"
+        work = _seed_repo(tmp_path, _minimal_tier3(clean))
+        rc, _, err = _run_gate(work, ["--tier", "3"])
+        assert rc == 2, err
+        assert "retired" in err.lower(), err
+
+    def test_arm_b_rc0_when_subject_addressed_via_paths(self, tmp_path):
+        """B: subject present. rc=0 via the ``--paths`` escape hatch.
+
+        ``--tier 3`` is unconditional rc=2 by design, so the positive
+        control has to address the same paths via ``--paths`` -- the
+        flag the gate actually exposes for ad-hoc path overrides, and
+        the escape hatch the gate's docstring recommends for working
+        checkouts that still have ``docs/internal/`` on disk. A test that
+        hard-codes ``return 2`` would fail loudly here, which is the
+        load-bearing direction.
+        """
+        clean = "Internal notes. No dashes here.\n"
+        work = _seed_repo(tmp_path, _minimal_tier3(clean))
+        rc, _, err = _run_gate(work, ["--paths", "docs/internal/notes.md"])
+        assert rc == 0, err
+
+    def test_arm_b_dash_in_tier3_still_fires_via_paths(self, tmp_path):
+        """Cross-check: with the subject present and addressed via
+        ``--paths``, the gate still catches a real dash. Without this,
+        arm B's rc=0 could be vacuous green -- the gate could be opening
+        nothing and reading zero.
+        """
+        dirty = f"Internal notes with a real dash {EM} here.\n"
+        work = _seed_repo(tmp_path, _minimal_tier3(dirty))
+        rc, _, _ = _run_gate(work, ["--paths", "docs/internal/notes.md", "--list"])
+        assert rc == 1
+
+    def test_arm_c_rc2_when_added_only_ref_invalid(self, tmp_path):
+        """C: subject present, argument missing. rc=2, not a traceback.
+
+        With ``--tier 1 --added-only NO_SUCH_REF`` the gate cannot run
+        ``git diff`` and must surface that as rc=2 (could not run), not
+        as rc=1 (FAIL) and never an uncaught traceback. The throwaway
+        tree has no git repo, so ``git diff`` itself fails -- the same
+        shape the operator would see if a ref was misspelled.
+        """
+        work = _seed_repo(tmp_path, _minimal_tier1("# README\n\nclean.\n"))
+        rc, _, err = _run_gate(work, ["--tier", "1", "--added-only", "NO_SUCH_REF"])
+        assert rc == 2, err
+        assert "Traceback" not in err, err
+        # The gate names the failing command so the operator can act.
+        assert "git diff" in err or "NO_SUCH_REF" in err, err
+
+    def test_arm_d_rc0_when_no_trigger(self, tmp_path):
+        """D: no trigger. rc=0 on a clean default run.
+
+        The negative control for the four-arm matrix. ``--tier 3`` is not
+        invoked, so the retirement guard does not fire; the gate runs
+        default tier 1 and exits rc=0 on a clean corpus. A test that
+        hard-codes ``return 2`` would fail loudly here, which is the
+        point.
+        """
+        work = _seed_repo(tmp_path, _minimal_tier1("# README\n\nclean. no dashes.\n"))
+        rc, _, err = _run_gate(work, [])
+        assert rc == 0, err
