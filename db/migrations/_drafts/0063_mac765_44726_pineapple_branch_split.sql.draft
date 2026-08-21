@@ -18,9 +18,22 @@
 --            standing "do NOT apply 0061" rule is untouched here) and
 --            0062 is CLAIMED by MAC-752. Gaps 0046/0047/0050/0053/0056/
 --            0058 are contested or claimed and are NOT auto-reused.
---            Re-scan at commit time per the mig-0049 / mig-0055 standing
---            rule — a slot verified at WRITE time is not verified at
---            COMMIT time.
+--            RE-SCANNED AT COMMIT TIME per the mig-0049 / mig-0055
+--            standing rule — a slot verified at WRITE time is not
+--            verified at COMMIT time. Commit-time result:
+--
+--              0063  CLAIMED   MAC-765
+--                      [DRAFT] db/migrations/_drafts/0063_mac765_...draft
+--              next free slot       : 0064
+--
+--            Read that carefully before concluding the slot moved. The
+--            scanner reads `db/migrations/_drafts/`, so once THIS file
+--            exists it reports 0063 as claimed BY THIS LANE and hands
+--            out 0064 next. That is a self-claim, not a collision: the
+--            claimant is MAC-765. The generator is poisoned by its own
+--            output, so `next free slot` can never re-confirm the slot
+--            a written draft already holds — check the CLAIMANT, not
+--            the `next free slot` line. No other lane claims 0063.
 --
 -- schema_version: NOT bumped (data-only in-place refine; no DDL). Stays
 --            at 35.
@@ -115,6 +128,51 @@
 --            coverage today and still fails closed if a future harvest
 --            re-admits a bare `pineapple`-based row. Retention is a
 --            deny-list policy statement, not a decorative assertion.
+--
+-- APPLY ORDER — MANDATORY, and it is NOT optional hygiene. Applying this
+--            migration WITHOUT first regenerating the MAC-45 coverage
+--            matrix makes the Lynceus export HALT. Measured, not
+--            predicted (MAC-765, apply rehearsal on a DB copy):
+--
+--              $ export_lynceus.py --db <split.db>          # stale matrix
+--              Halt: argus_export.json: row id=44726 writer-classified
+--              as None but MAC-45 drop_assignments map says
+--              'ssid_pattern_fp_hold' — STOP-THE-LINE per dispatch
+--              (do NOT silently re-tally).
+--
+--            Cause: `extraction_outputs/mac45/coverage_matrix_report.json`
+--            is a TRACKED, FROZEN reconciliation baseline that pins
+--            44726 into the `ssid_pattern_fp_hold` drop bin. After the
+--            split the writer correctly classifies 44726 as a SURVIVOR,
+--            and `export_lynceus.py::_reconcile` halts on the
+--            disagreement. That halt is the gate working as designed —
+--            it is not a defect in this migration and MUST NOT be
+--            worked around by editing the map by hand.
+--
+--            Correct order (the standing matrix -> lynceus -> behavioral
+--            rule, which this migration makes load-bearing):
+--              1. apply this migration
+--              2. python3 db/validation/coverage_matrix.py   # regen map
+--              3. python3 db/validation/export_lynceus.py    # regen feed
+--
+--            Regen is MINIMAL and was verified non-vacuous: at the
+--            pre-apply state the regenerated map is IDENTICAL to the
+--            committed one, and post-apply the ONLY differing id is
+--            44726, moving 'ssid_pattern_fp_hold' -> survivor. The
+--            `ssid_pattern_fp_hold` bin goes 7 -> 6 in BOTH tallies and
+--            `pre_active_count` stays 43126 (delta 0).
+--
+-- CP7 / high-confidence: this migration restores Hak5 to the STANDARD
+--            feed ONLY. Row 44726 carries `geographic_scope IS NULL`,
+--            and `_passes_geographic_filter` returns
+--            `not is_high_confidence` for an empty scope, so the row
+--            passes standard and FAILS high-confidence. Measured
+--            end-to-end: standard 1014 -> 1016 (+2, both Hak5),
+--            high-confidence 504 -> 504 (+0, Hak5 stays at ZERO).
+--            "Hak5 ships again" is therefore true of the standard feed
+--            and still FALSE of the high-confidence feed. Closing that
+--            gap is a geography question (MAC-742 / 0061), which is
+--            explicitly out of scope here and deferred to v2.0.
 --
 -- Reversibility: to revert, restore the identifier verbatim and drop the
 --            notes key:
@@ -274,6 +332,23 @@ COMMIT;
 --   Emitted ssid_pattern substrings: row 44726 moves from FP-held (None)
 --   to ['hak5', 'wifipineapple'], so the emitted-row count rises by 1 and
 --   the distinct-substring count by 2. Bare `pineapple` stays OUT.
---   Feed deltas are MEASURED post-apply and reported on MAC-765 — they
---   are deliberately NOT pinned here, per the MAC-765 instruction to
---   measure rather than predict.
+--   Feed deltas were MEASURED by end-to-end apply rehearsal on a DB copy
+--   (never against canonical), running the REAL coverage_matrix.py and
+--   export_lynceus.py in that order, and are reported on MAC-765:
+--
+--     standard          argus_export.json                1014 -> 1016  (+2)
+--     high-confidence   argus_export_high_confidence.json 504 ->  504  (+0)
+--
+--   The corpus multiset diff on the standard feed is GAINED=2 / LOST=0,
+--   and BOTH gained entries are Hak5:
+--     + ('hak5',          'ssid_pattern', 'Hak5 hacking_tool')
+--     + ('wifipineapple', 'ssid_pattern', 'Hak5 hacking_tool')
+--   so the union delta EQUALS the per-entity delta and hides no
+--   attribution. Per-entity Hak5 standard: 0 -> 2. High-confidence
+--   Hak5: 0 -> 0 (CP7 NULL geo — see above). Bare `pineapple` is absent
+--   from both feeds and from argus_export.csv after the split.
+--
+--   argus_export.csv is NOT a feed-delta instrument for this change: it
+--   publishes the full active set at threshold=0, so 44726 was always
+--   present and only its `identifier` text changes. Line count is
+--   47491 before AND after.
