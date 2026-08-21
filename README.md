@@ -41,12 +41,10 @@ A *manufacturer* is a vendor that ships surveillance equipment. A *device catego
 
 Argus ships four export files for downstream consumption. Pick the one that matches your use case.
 
-| Export | Records | Best for |
-|---|---:|---|
-| `exports/argus_export_high_confidence.json` | 504 | Runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise). |
-| `exports/argus_export.json` | 1,014 | Broader scanner watchlists. Looser confidence floor (≥30); US scope filter. |
-| `exports/argus_export.csv` | 43,126 | Bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import. |
-| `exports/argus_export_behavioral_signatures.json` | 132 | Cellular-band scanners (Rayhunter). Sibling export with threshold rules. |
+- **`exports/argus_export_high_confidence.json`** (504 records) — runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise).
+- **`exports/argus_export.json`** (1,014 records) — broader scanner watchlists. Looser confidence floor (≥30); US scope filter.
+- **`exports/argus_export.csv`** (43,126 records) — bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import.
+- **`exports/argus_export_behavioral_signatures.json`** (132 records) — cellular-band scanners (Rayhunter). Sibling export with threshold rules.
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
 
@@ -151,8 +149,10 @@ A v1.6.15 was assembled in late July and then pulled before publication in favou
 ```bash
 git clone https://github.com/kevwillow/argus-db.git
 cd argus
-python3 argus_cli.py status                        # show DB path, schema version, row counts
-python3 argus_cli.py query e4:aa:ea:80:a1:9b       # lookup a Flock Safety ALPR MAC
+# show DB path, schema version, row counts
+python3 argus_cli.py status
+# lookup a Flock Safety ALPR MAC
+python3 argus_cli.py query e4:aa:ea:80:a1:9b
 ```
 
 The repo ships the export files under `exports/` already populated, so reading the data needs no `pip install`. The SQLite database `db/argus.db` is **not** distributed through this repository and is absent from the published tree, so a fresh clone has nothing for `argus_cli.py` to open; the exports are the published data artifact. See [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) for what a clone actually contains, the schema-rebuild path, the source-ingest pipeline dependencies, and optional API keys.
