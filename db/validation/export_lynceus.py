@@ -932,6 +932,24 @@ def _ble_local_name_is_template(value: str) -> bool:
 # which is a DATA change and a migration, not a hold-set change — the
 # hold-set is row-level and cannot express it.  MAC-765 owns that
 # restoration.
+#
+# MAC-765 DISPOSITION (2026-08-20) — the hold on `pineapple` is RETAINED.
+# The restoration above is written as
+# `db/migrations/_drafts/0063_mac765_44726_pineapple_branch_split.sql.draft`
+# (STAGED, NOT APPLIED — applying to canonical is a CEO ruling).  MAC-765
+# required an explicit retire-or-keep decision on this stem once the branch
+# is gone, rather than leaving it open.  Decision: KEEP, and the reason is
+# measured, not assumed.  After the split the two surviving branches have
+# strict bases `hak5` and `wifi` (the latter stops at the `[` metachar), so
+# NO surviving branch has strict base `pineapple` — removing the stem from
+# this set leaves row 44726 emitting a byte-identical
+# `['hak5', 'wifipineapple']`.  Retention therefore costs ZERO coverage,
+# and it still fails closed if a later harvest re-admits a row whose strict
+# base is bare `pineapple` (0059's WAVE-9 harvest did exactly that class of
+# re-admission for `msab`/`xry`, cf. mig-0062).  A deny-list entry that
+# currently matches nothing is a forward-looking policy statement, which is
+# NOT the same defect as a hardcoded metric that no input can move — that
+# one was arm (a)'s literal `7/7`, repaired under MAC-765.
 # MUST be byte-identical to coverage_matrix.py::_ssid_pattern_to_substring
 # — the `_reconcile` map-vs-writer cross-check halts on any divergence.
 _SSID_STEM_METACHARS = set(".^$*+?()[]{}|\\%")

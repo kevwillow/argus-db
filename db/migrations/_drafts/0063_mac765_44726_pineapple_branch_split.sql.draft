@@ -1,0 +1,279 @@
+-- ============================================================================
+-- Script:    0063_mac765_44726_pineapple_branch_split.sql
+-- Status:    DRAFT, STAGED ONLY. Filed from
+--            [/MAC/issues/MAC-765](/MAC/issues/MAC-765), the v1.9.0
+--            successor lane to MAC-761. v1.8.0 is published
+--            (`origin/main` = `v1.8.0^{}` = `3fbaada`), so the MAC-765
+--            hold ("do not start until v1.8.0 is pushed and tagged") is
+--            discharged and this touches a file inside the certified
+--            tree deliberately.
+--
+--            Applying this draft to canonical is a CEO/board ruling.
+--
+-- Slot:      0063, allocated by DISPATCH CLAIM.
+--              python3 scripts/next_migration_slot.py
+--            reports `next free slot : 0063` at write time. The naive
+--            `ls db/migrations/` answer (0061) is WRONG: 0061 is CLAIMED
+--            by MAC-742 (geography, deferred to v2.0 by CEO ruling; the
+--            standing "do NOT apply 0061" rule is untouched here) and
+--            0062 is CLAIMED by MAC-752. Gaps 0046/0047/0050/0053/0056/
+--            0058 are contested or claimed and are NOT auto-reused.
+--            Re-scan at commit time per the mig-0049 / mig-0055 standing
+--            rule — a slot verified at WRITE time is not verified at
+--            COMMIT time.
+--
+-- schema_version: NOT bumped (data-only in-place refine; no DDL). Stays
+--            at 35.
+--
+-- Purpose:   Restore Hak5 SSID coverage by dropping ONE alternation
+--            branch from row 44726.
+--
+--                before  (?i)^(pineapple|hak5|wifi[_-]?pineapple).*
+--                after   (?i)^(hak5|wifi[_-]?pineapple).*
+--
+--            Row 44726 carries THREE alternation branches in ONE row.
+--            The export-side FP hold is ROW-LEVEL: at
+--            `db/validation/export_lynceus.py:1149-1151` the exporter
+--            takes `_strict_base(branch)` for each branch and, on the
+--            first branch whose strict base is in
+--            `_SSID_PATTERN_FP_HOLD_STEMS`, does `return None` for the
+--            WHOLE ROW. Holding the bare `pineapple` stem (MAC-761, CEO
+--            Option A) therefore withdrew its two innocent co-branches
+--            with it, and Hak5 shipped in ZERO Lynceus feeds at v1.8.0:
+--
+--                'hak5'          | ssid_pattern | Hak5 hacking_tool
+--                'pineapple'     | ssid_pattern | Hak5 hacking_tool
+--                'wifipineapple' | ssid_pattern | Hak5 hacking_tool
+--
+--            The hold-set cannot express "hold one branch": it is keyed
+--            on the strict base and scoped to the row. Only a DATA
+--            change can split the row, which is why MAC-761 deferred it
+--            here rather than widening the hold-set.
+--
+--            Measured against the REAL emitter (not predicted):
+--              before  _ssid_pattern_to_substring(44726) -> None
+--              after   _ssid_pattern_to_substring(44726) -> ['hak5',
+--                                                           'wifipineapple']
+--            Bare `pineapple` is NOT emitted after the split: the strict
+--            bases of the two surviving branches are `hak5` and `wifi`
+--            (the latter stops at the `[` metachar), and the emitted
+--            stem for the second branch is the delimiter-collapsed
+--            `wifipineapple`.
+--
+-- Shape:     IN-PLACE `identifier` UPDATE, not a supersession. Precedent
+--            is section (B) of
+--            `db/migrations/0038_mac527_ssid_pattern_fp_magnet_refine_demote.sql`,
+--            which refines 8 `ssid_pattern` rows in place for exactly
+--            this FP-magnet class (e.g. id 39613
+--            `(?i)^(msab|xry)[_-]?.*` -> `(?i)^(msab_|msab-|xry_|xry-).*`).
+--            A refine keeps the row's id, cites, confidence and
+--            provenance intact; the branch drop is recorded in `notes`.
+--            Idempotent by construction: the UPDATE matches only the
+--            verbatim original value, so a second run matches 0 rows.
+--
+-- superseded_by SEMANTICS — stated explicitly per the tri-semantic rule
+--            (NULL = active / <other_id> = successor / self-loop =
+--            withdrawn): this draft uses NONE of them. `superseded_by`
+--            is NOT written. Row 44726 stays ACTIVE and stays itself;
+--            only its `identifier` narrows. No row is withdrawn, no row
+--            is folded, no row is created.
+--
+-- Confidence: deliberately UNCHANGED (75). This is a precision refine,
+--            not a demotion — the surviving branches are the
+--            HIGH-precision ones. There is no §8.3 corroboration uplift
+--            either: the independent-source basis was not re-adjudicated,
+--            and one source issuing the same row is hub-and-spoke, not
+--            value-level corroboration.
+--
+-- Cite faithfulness: `source_excerpt` on row 44726 retains the VERBATIM
+--            upstream pattern `"(?i)^(pineapple|hak5|wifi[_-]?pineapple).*"`
+--            and is NOT rewritten. The canonical `identifier` now
+--            deliberately diverges from its cite, exactly as mig-0038's
+--            refines do. The divergence and its reason are recorded in
+--            `notes.$.mac765_branch_split` so a later audit reading the
+--            excerpt against the identifier finds the ruling instead of
+--            a discrepancy.
+--
+-- Scope:     1 row updated in place. 0 rows superseded. 0 rows created.
+--            Net ACTIVE count change: 0 (asserted below as a DELTA
+--            against an apply-time baseline, not as a pinned absolute).
+--
+-- Fan-out:   re-queried at write time — 0 rows reference 44726 via
+--            `superseded_by`, and 0 via `paired_identifier_id`.
+--
+-- Export-side hold: `pineapple` is RETAINED in the three
+--            `_SSID_PATTERN_FP_HOLD_STEMS` mirrors
+--            (`db/validation/export_lynceus.py`,
+--            `db/validation/coverage_matrix.py`,
+--            `operator_review/MAC-532/fp_magnet_verify.py`) as
+--            forward-looking defense in depth. MAC-765 required this be
+--            decided explicitly rather than left open. Measured: after
+--            the split, removing `pineapple` from the hold set changes
+--            the emitted output of row 44726 by NOTHING (byte-identical
+--            `['hak5', 'wifipineapple']`), because no surviving branch
+--            has strict base `pineapple`. So retention costs zero
+--            coverage today and still fails closed if a future harvest
+--            re-admits a bare `pineapple`-based row. Retention is a
+--            deny-list policy statement, not a decorative assertion.
+--
+-- Reversibility: to revert, restore the identifier verbatim and drop the
+--            notes key:
+--              UPDATE identifiers
+--                 SET identifier = '(?i)^(pineapple|hak5|wifi[_-]?pineapple).*',
+--                     notes = json_remove(notes, '$.mac765_branch_split')
+--               WHERE id = 44726;
+--            No row is deleted, no confidence altered, every cite
+--            retained (§11 #1).
+--
+-- Re-apply safety: the UPDATE pins the verbatim BEFORE value and
+--            `superseded_by IS NULL`, and the strict pre-guard requires
+--            EXACTLY 1 such row — a second run finds 0, CHECK(ok=1)
+--            fails, and `.bail on` rolls the whole transaction back with
+--            zero mutation. Both guard arms are present per
+--            scripts/check_migration_guards.py: arm 1 `.bail on` (CLI)
+--            and arm 2 the per-write
+--            `AND (SELECT COUNT(*) FROM _mig0063_pre) = 1` (portable,
+--            for the conn.executescript() apply path where `.bail on`
+--            is a syntax error).
+-- ============================================================================
+
+.bail on
+
+BEGIN TRANSACTION;
+
+-- ---- apply-time baseline capture -------------------------------------------
+-- Captured INSIDE the transaction so the post-condition compares against the
+-- state this migration actually started from, not a number pinned at write
+-- time. A pinned absolute goes stale the moment any other lane lands.
+CREATE TEMP TABLE _mig0063_baseline AS
+  SELECT (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL)
+           AS active_before,
+         (SELECT COUNT(*) FROM identifiers
+           WHERE identifier_type = 'ssid_pattern' AND superseded_by IS NULL)
+           AS ssid_active_before;
+
+CREATE TEMP TABLE _mig0063_conf_before AS
+  SELECT id, confidence, superseded_by, source_excerpt
+    FROM identifiers WHERE id = 44726;
+
+-- ---- strict pre-condition guard (all-or-nothing) ---------------------------
+-- (1) exactly 1 row 44726, ssid_pattern, ACTIVE, carrying the verbatim
+--     three-branch identifier;
+-- (2) its notes are valid JSON (so the json_set below cannot corrupt them);
+-- (3) NO active row already carries the post-split identifier — this migration
+--     must not create a duplicate emitted key;
+-- (4) fan-out is zero on both reference columns.
+CREATE TEMP TABLE _mig0063_pre (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mig0063_pre(ok) SELECT CASE WHEN (
+      (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44726 AND identifier_type = 'ssid_pattern'
+          AND identifier = '(?i)^(pineapple|hak5|wifi[_-]?pineapple).*'
+          AND superseded_by IS NULL) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44726 AND json_valid(notes) = 1) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE identifier = '(?i)^(hak5|wifi[_-]?pineapple).*'
+          AND superseded_by IS NULL) = 0
+  AND (SELECT COUNT(*) FROM identifiers WHERE superseded_by = 44726) = 0
+  AND (SELECT COUNT(*) FROM identifiers WHERE paired_identifier_id = 44726) = 0
+) THEN 1 ELSE 0 END;
+
+-- ==== The split: drop the bare `pineapple` branch from row 44726 ============
+UPDATE identifiers SET
+  identifier = '(?i)^(hak5|wifi[_-]?pineapple).*',
+  notes = json_set(notes, '$.mac765_branch_split', json_object(
+    'audit_issue','MAC-765','source_issue','MAC-761',
+    'mig','0063_mac765_44726_pineapple_branch_split',
+    'mechanism','in_place_alternation_branch_drop',
+    'shape','refine_not_supersession',
+    'identifier_before','(?i)^(pineapple|hak5|wifi[_-]?pineapple).*',
+    'identifier_after','(?i)^(hak5|wifi[_-]?pineapple).*',
+    'branch_dropped','pineapple',
+    'branches_kept','hak5,wifi[_-]?pineapple',
+    'emitted_before','(row FP-held: _ssid_pattern_to_substring returned None)',
+    'emitted_after','hak5,wifipineapple',
+    'source_excerpt_divergence','INTENTIONAL. source_excerpt retains the verbatim upstream three-branch pattern and is not rewritten; the canonical identifier deliberately narrows away from its cite, per the mig-0038 (MAC-527) refine precedent. This key is the record of that divergence.',
+    'reason','The export-side FP hold is ROW-level, not branch-level: export_lynceus.py takes _strict_base(branch) per alternation branch and returns None for the WHOLE row on the first held base. Holding the bare 9-char English noun `pineapple` (MAC-761 CEO Option A) therefore also withdrew the innocent co-branches `hak5` and `wifi[_-]?pineapple`, so Hak5 -- the canonical rogue-AP vendor Lynceus exists to catch -- shipped in zero v1.8.0 feeds. The hold-set cannot express a single-branch hold, so the correction is a data change. Dropping the bare branch restores the two precise branches while keeping bare `pineapple` out of the emitted set.',
+    'fp_hold_disposition','RETAINED in all three _SSID_PATTERN_FP_HOLD_STEMS mirrors as forward-looking defense in depth. Measured no-op post-split: no surviving branch has strict base `pineapple`, so removing it from the hold set leaves row 44726 emitting a byte-identical [hak5, wifipineapple].',
+    'confidence_uplift','none','date','2026-08-20'))
+WHERE id = 44726 AND identifier_type = 'ssid_pattern'
+  AND identifier = '(?i)^(pineapple|hak5|wifi[_-]?pineapple).*'
+  AND superseded_by IS NULL
+  AND (SELECT COUNT(*) FROM _mig0063_pre) = 1;
+
+-- ---- strict post-condition guard -------------------------------------------
+-- (1) DEFECT CLASS GONE — no active row carries the three-branch identifier.
+-- (2) exactly 1 active row carries the post-split identifier, and it is 44726.
+-- (3) row 44726 is STILL ACTIVE — this is a refine, so superseded_by stays
+--     NULL. Explicitly NOT a self-loop and NOT a successor pointer.
+-- (4) notes stayed valid JSON and the audit key landed and is readable.
+-- (5) CONFIDENCE and SOURCE_EXCERPT UNTOUCHED — the exact multiset of
+--     (id, confidence, superseded_by, source_excerpt) is unchanged, which is
+--     what makes the cite-faithfulness claim above checkable rather than
+--     asserted.
+-- (6) NO COLLATERAL, AS A DELTA: the active row count and the active
+--     ssid_pattern row count are each EQUAL to their apply-time baseline
+--     (delta 0). Asserted against _mig0063_baseline, never against a pinned
+--     absolute such as 43126 -- a pinned number would silently pass or
+--     silently fail depending on what else landed first.
+CREATE TEMP TABLE _mig0063_post (ok INTEGER CHECK (ok = 1));
+INSERT INTO _mig0063_post(ok) SELECT CASE WHEN (
+      (SELECT COUNT(*) FROM identifiers
+        WHERE identifier = '(?i)^(pineapple|hak5|wifi[_-]?pineapple).*'
+          AND superseded_by IS NULL) = 0
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE identifier = '(?i)^(hak5|wifi[_-]?pineapple).*'
+          AND superseded_by IS NULL) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44726
+          AND identifier = '(?i)^(hak5|wifi[_-]?pineapple).*'
+          AND identifier_type = 'ssid_pattern'
+          AND superseded_by IS NULL) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44726 AND superseded_by = 44726) = 0
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44726 AND json_valid(notes) = 1) = 1
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE id = 44726
+          AND json_extract(notes, '$.mac765_branch_split.branch_dropped')
+              = 'pineapple') = 1
+  AND (SELECT COUNT(*) FROM (
+          SELECT id, confidence, superseded_by, source_excerpt
+            FROM _mig0063_conf_before
+          EXCEPT
+          SELECT id, confidence, superseded_by, source_excerpt
+            FROM identifiers WHERE id = 44726)) = 0
+  AND (SELECT COUNT(*) FROM (
+          SELECT id, confidence, superseded_by, source_excerpt
+            FROM identifiers WHERE id = 44726
+          EXCEPT
+          SELECT id, confidence, superseded_by, source_excerpt
+            FROM _mig0063_conf_before)) = 0
+  AND (SELECT COUNT(*) FROM _mig0063_conf_before) = 1
+  AND (SELECT COUNT(*) FROM identifiers WHERE superseded_by IS NULL)
+      = (SELECT active_before FROM _mig0063_baseline)
+  AND (SELECT COUNT(*) FROM identifiers
+        WHERE identifier_type = 'ssid_pattern' AND superseded_by IS NULL)
+      = (SELECT ssid_active_before FROM _mig0063_baseline)
+) THEN 1 ELSE 0 END;
+
+DROP TABLE _mig0063_pre;
+DROP TABLE _mig0063_post;
+DROP TABLE _mig0063_baseline;
+DROP TABLE _mig0063_conf_before;
+
+COMMIT;
+
+-- Post-apply expected state:
+--   Row 44726 stays ACTIVE, id unchanged, confidence unchanged (75),
+--   source_excerpt unchanged, superseded_by still NULL.
+--   identifier: (?i)^(pineapple|hak5|wifi[_-]?pineapple).*
+--            -> (?i)^(hak5|wifi[_-]?pineapple).*
+--   Active identifiers: UNCHANGED (delta 0). Active ssid_pattern rows:
+--   UNCHANGED (delta 0). No schema change (schema_version stays 35).
+--   Emitted ssid_pattern substrings: row 44726 moves from FP-held (None)
+--   to ['hak5', 'wifipineapple'], so the emitted-row count rises by 1 and
+--   the distinct-substring count by 2. Bare `pineapple` stays OUT.
+--   Feed deltas are MEASURED post-apply and reported on MAC-765 — they
+--   are deliberately NOT pinned here, per the MAC-765 instruction to
+--   measure rather than predict.
