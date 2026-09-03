@@ -11,6 +11,37 @@ import re
 
 import pytest
 
+# The undistributed inputs are read during module-body execution (c2.build()
+# below), before pytest ever looks at a marker, so the guard has to run here --
+# above the import that raises.
+#
+# It probes EVERY input this module cannot degrade without, not just raw/. That
+# distinction is load-bearing: cohort2 also reads
+# extraction_outputs/mac321_v166/raw/fcc_grantee_full.json
+# (db/sources/cohort2_alpr_copcar.py:53 A_FCC_JSON, read at line 217), which is
+# gitignored by the same raw/ rule and undistributed for the same reason. A
+# guard that only asked "is raw/ there?" passed on a tree that had raw/ but not
+# that file, and the module then raised FileNotFoundError at import: pytest
+# reported "Interrupted: 1 error during collection" and the ENTIRE session
+# aborted, taking every unrelated test with it.
+#
+# ARGUS_REQUIRE_ALL=1 deliberately lets the import proceed so the real
+# FileNotFoundError still surfaces instead of being papered over by a skip.
+import os  # noqa: E402
+
+from conftest import (  # noqa: E402
+    have_module_artifacts,
+    module_artifacts_skip_reason,
+)
+
+_C2 = "db.sources.cohort2_alpr_copcar"
+
+pytestmark = pytest.mark.raw_artifacts
+
+if not have_module_artifacts(_C2) and os.environ.get("ARGUS_REQUIRE_ALL") != "1":
+    pytest.skip(module_artifacts_skip_reason(_C2), allow_module_level=True)
+
+
 # MAC-755: read frozen extraction-time canonical, not live db/argus.db. These
 # candidates have since been promoted, so a live read makes every net-new
 # assertion below permanently false. See tests/cohort_frozen_db.py.

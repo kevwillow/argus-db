@@ -108,6 +108,7 @@ def test_epoch_boundary_both_arms(epoch):
 # --- 4. counterfactual: the snapshot is genuinely pre-promotion --------------
 @pytest.mark.skipif(not LIVE_DB.exists(), reason="live db/argus.db absent")
 @pytest.mark.parametrize("epoch", sorted(EPOCHS))
+@pytest.mark.canonical_db
 def test_snapshot_is_not_a_live_rebaseline(epoch):
     """The probe must be HELD in live canonical but ABSENT from the snapshot.
 

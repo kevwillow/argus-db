@@ -134,6 +134,7 @@ def _get_identifier_type_enum(db_path: str) -> frozenset[str]:
     )
 
 
+@pytest.mark.canonical_db
 def test_type_mapping_covers_every_identifier_type() -> None:
     """CP32 §3 (MAC-220): dynamic enum read replaces hardcoded mig-0019 baseline.
 

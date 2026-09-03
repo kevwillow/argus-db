@@ -1,0 +1,105 @@
+name: lint
+
+# Deliberately advisory-light. The goal is to catch things that are broken --
+# syntax errors, undefined names -- not to impose a style rewrite on a tree that
+# has never had a linter. Introducing a giant style diff here would bury the
+# signal this repo actually needs.
+#
+# ruff rules: E9 (syntax/IO errors), F63 (bad comparisons), F7 (syntax
+# constructs), F82 (undefined names). These are the "this code cannot possibly
+# work" rules, not opinions about formatting.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: ruff + py_compile over tracked python
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the public tree
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ruff
+        run: python3 -m pip install --disable-pip-version-check ruff
+
+      - name: List tracked python files
+        # git ls-files, not a filesystem walk. Untracked scratch files and the
+        # gitignored raw/ tree (which vendors third-party python) must never
+        # influence this repo's lint result.
+        run: |
+          set -euo pipefail
+          git ls-files '*.py' > tracked_py.txt
+          count=$(wc -l < tracked_py.txt)
+          echo "tracked python files: $count"
+          if [ "$count" -lt 50 ]; then
+            echo "::error::only $count tracked .py files found; the file list looks wrong"
+            exit 1
+          fi
+
+      - name: Positive control — ruff must actually flag a known defect
+        # WITHOUT THIS, the lint step below is unfalsifiable. Its success
+        # criterion is "ruff exited 0", and ruff also exits 0 when it inspected
+        # nothing: a --select code that a future ruff release renames or removes
+        # is downgraded to a warning, leaving the gate green while enforcing
+        # none of the rules it names. Same for an empty selection.
+        #
+        # So plant a file with a genuine F821 (undefined name, inside the F82
+        # group this job selects) and require ruff to REPORT it. This asserts the
+        # specific expected finding, not merely a non-zero exit -- a ruff that
+        # crashed on a bad flag also exits non-zero.
+        #
+        # Written under RUNNER_TEMP so it can never be picked up by the tracked
+        # file list or committed by accident.
+        run: |
+          set -euo pipefail
+          ctl="${RUNNER_TEMP:-/tmp}/ruff_positive_control.py"
+          printf 'def f():\n    return this_name_is_not_defined\n' > "$ctl"
+
+          ruff check --select E9,F63,F7,F82 --no-cache "$ctl" \
+            > ctl.txt 2>&1 && ctl_rc=0 || ctl_rc=$?
+          cat ctl.txt
+          rm -f "$ctl"
+
+          if [ "$ctl_rc" -eq 0 ]; then
+            echo "::error::ruff exited 0 on a file containing an undefined name."
+            echo "::error::The E9,F63,F7,F82 selection is not enforcing F821, so the"
+            echo "::error::lint step below would pass without checking anything."
+            exit 1
+          fi
+          if ! grep -qF 'F821' ctl.txt; then
+            echo "::error::ruff exited $ctl_rc but did not report F821 on a file whose"
+            echo "::error::only defect is an undefined name. A non-zero exit here is not"
+            echo "::error::proof the rule fired — ruff also exits non-zero on a bad flag."
+            exit 1
+          fi
+          echo "OK: ruff reports F821 under this job's --select list, so the rules"
+          echo "OK: really are in force."
+
+      - name: ruff — errors and undefined names only
+        run: |
+          set -euo pipefail
+          xargs -a tracked_py.txt ruff check --select E9,F63,F7,F82 --no-cache --output-format=github
+
+      - name: py_compile — every tracked python file must parse
+        run: |
+          set -euo pipefail
+          xargs -a tracked_py.txt python3 -m py_compile
+          echo "OK: every tracked .py file compiles."

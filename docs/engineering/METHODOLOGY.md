@@ -382,9 +382,31 @@ Every `raw_observations` row must carry a `source_url` that:
 
 - Was fetched and yielded a 200 OK at extraction time.
 - Contains the verbatim text from which the identifier was extracted (re-fetching the URL must return content containing the `source_excerpt`, modulo upstream content-rotation; if the upstream rotates content, an archive snapshot URL is added as `source_url_archive`).
-- Points DIRECTLY at the source: no aggregator URLs, no redirect chains, no shortened-URL services.
+- Points DIRECTLY at the source: no aggregator URLs, no redirect chains, no shortened-URL services. This is the ingest RULE. It is not a description of the corpus as shipped: 865 rows do not meet it, and the exception is disclosed below rather than left for a consumer to discover.
 
 When a `source_url` is later confirmed dead (404 / domain expiration / paywall) at re-verification time, the original `source_url` is preserved verbatim and an archive snapshot URL (preferably Internet Archive `web.archive.org`) is added as `source_url_archive`. Dead-link rows are not deleted; their canonical attribution stays in `identifiers` with `last_verified` updated and the archive-snapshot URL serving as the working citation.
+
+#### Disclosed exception: 865 shipped rows carry no fetchable URL
+
+The rule above is stated as a requirement and holds going forward. The corpus as shipped does not fully satisfy it. Publishing the rule without publishing the shortfall would be the more comfortable option and the dishonest one, so the numbers are here.
+
+Measured on the shipped `exports/argus_export.csv`, whose 43,126 rows are exactly the active `identifiers` rows (`superseded_by IS NULL`):
+
+- **42,261 rows** carry an `http(s)` `source_url`, the intended shape.
+- **865 rows** carry a value no reader can fetch, in five forms: `wave_i_aggregate://` (660), `apkcombo` (188), `APK extract` (12), `argus-internal://` (3), `manufacturer_app://` (2).
+
+All 865 carry `source_type = 'manufacturer_app'`. They are companion-app static-analysis rows whose evidence is a decompiled APK or an internal analysis artifact rather than a web page, so there was never a URL to cite. Two of the five forms breach §7.2 in a way worth naming separately:
+
+- `apkcombo` (188 rows) records a third-party APK redistribution site as the acquisition channel instead of the vendor's own distribution point. That is the aggregator case this section bars, not merely a formatting deviation.
+- `argus-internal://` (3 rows) cites a working file that ships with no release, so the citation cannot be checked from outside the project at all.
+
+The same shortfall exists one layer down. Measured live against the canonical `db/argus.db` at the v1.8.1 export epoch (the DB is not distributed, so this figure is not reader-reproducible): 147,586 of 148,427 `raw_observations` rows carry an `http(s)` `source_url` and 841 carry an internal handle (`wave_i_aggregate://` 838, `argus-internal://` 3).
+
+**What the exception does and does not cost.** It costs independent verifiability: a reader cannot re-fetch these 865 citations and confirm the excerpt, which is the whole point of §7.2. It does not void §7.1 or §7.3: each row still binds to a `raw_observations` row, and no identifier here was synthesized. Confidence for these rows follows the §5 band for `manufacturer_app` exactly as for any other row; the unfetchable `source_url` carries no separate penalty today, which is a decision a future correction pass may want to revisit.
+
+**Consumer guidance.** Excluding `source_type = 'manufacturer_app'` removes every non-public `source_url`, but it is a blunt cut: 1,131 active rows carry that band and 266 of them do have an `http(s)` URL. A consumer who needs only fetchable citations should filter on the `source_url` value directly, keeping rows that start `http://` or `https://`.
+
+Per-scheme counts are reproducible from the shipped tree with no database; the snippet is under `DATA_DICTIONARY.md` §4.1, in the `source_url` disclosed-limitation note.
 
 ### §7.3 No-fabrication rule
 

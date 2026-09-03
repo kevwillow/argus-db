@@ -128,14 +128,14 @@ The canonical Argus identifier table. Every row represents one identifier-to-att
 
 | Column | Type | NOT NULL | Default | Description |
 |---|---|---|---|---|
-| `id` | INTEGER | yes (PK) | autoincrement | Primary key. Stable per row; not directly exported to downstream consumers (consumer-facing stable identifier is `argus_record_id`, a 16-hex-char SHA-256 prefix; algorithm documented in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md), see Canonical sources at end). |
+| `id` | INTEGER | yes (PK) | autoincrement | Primary key, and the only per-row identity this dataset has. It IS exported: `argus_export.csv` carries it as the `id` column, and that column is what identifies a row (unique across all 43,126 CSV rows). The JSON feeds do not carry it. The 16-hex-char `argus_record_id` shipped alongside it is a content-derived **pattern** key and is **not** a row primary key; see the `argus_record_id` note below this table. Algorithm documented in [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) SAR-10, see Canonical sources at end. |
 | `identifier` | TEXT | yes | — | The identifier value itself (e.g., `aa:bb:cc:dd:ee:ff` MAC, `aa:bb:cc` OUI, `1581Fxxx` FAA RID drone prefix, `0x004C` BLE manufacturer ID, BLE service UUID, vendor SSID pattern). Normalization rules per identifier_type documented in METHODOLOGY §6.1 dedup-key normalization. |
 | `identifier_type` | TEXT | yes | — | Enum extended cumulatively across migrations 0001 to 0028 (**58 canonical values at `schema_version=30`** : unchanged by mig-0029/0030; the v1.6.0 ship state). Baseline migration 0001: `oui`, `mac`, `mac_range`, `bssid`, `ssid_exact`, `ssid_pattern`, `ble_uuid`, `ble_service`, `device_fingerprint`. Migration 0009: `ble_local_name`, `ble_characteristic`, `product_family_codename`. Migration 0011: `ble_manufacturer_id`. Migration 0013: `drone_id_prefix`, `icao_24bit_address`, `rf_channel`, `burst_cadence_ms`, `bandwidth_mhz`, `device_class_id`, `rf_burst_duration`, `rf_protocol_constant`, `wifi_aware_service_name`, `wifi_ie_element_id`, `bluetooth_le_pdu_type`, `wifi_frame_control_subtype`, `wifi_nan_param_signature`. Migration 0014: `alpr_model`. Migration 0018: `ble_protocol_byte_table`, `ble_service_uuid`, `ble_company_id`, `frequency_band`, `ble_protocol_byte`, `operator_profile`, `x509_cert_sha256_prefix`, `ble_adv_interval`, `ble_payload_offset`, `firmware_sha256_hash`, `network_endpoint`, `firmware_image_variant`, `qualcomm_chip_format_id`, `firmware_branded_string`. Migration 0019 (CP21 round-2 vocab): `asdstan_message_type`, `asdstan_enum_value`, `dji_protocol_struct_format`, `gpt_partition_uuid`, `chipset_codename`, `firmware_build_string`, `firmware_build_uuid`. Migration 0023 (CP28 Wave H desktop-axis): `windows_installer_productcode_vendor_registered`, `windows_com_clsid_vendor_registered`, `vendor_document_uuid_cloud_reference`. Migration 0024 (CP29 Wave I vendor cloud-infrastructure hostname corpus): `vendor_controlled_hostname`, `vendor_cloud_endpoint_url`, `vendor_controlled_hostname_deprecated`. Migration 0025 (CP31 FCC EAS identifier-type cluster): `fcc_grantee_code`, `equipment_class_code` : both DROPPED per §4.4 default at `device_category='unknown'` (CP32 §3 codified the disposition + landed DROPPED stubs in `db/validation/export_lynceus.py:DROPPED_REASONS`). **Migration 0027 (CP33 §2): `imei_tac`** : 8-digit IMEI Type Allocation Code; GSMA-allocated per manufacturer/model; structurally distinct from `device_class_id` at the RF protocol level and `firmware_branded_string` post-hoc strings; forward-compatible admission per gate G-C with 0 promoted rows at v1.5.0 ship, schema slot opens for future Wave G/H companion-app extraction surface. **Migration 0028 (CP34): `network_discovery_protocol_pattern`** : camera-discovery protocol pattern (Hikvision SADP port 8000, Dahua AirKiss/SmartConfig multicast, Tiandy SADP-style, Axis ONVIF WS-Discovery); 18 high-confidence rows promoted at CP34 (live `network_discovery_protocol_pattern` active count = 18); 627 lower-conf staged to `disambig_review_queue.json` for next-cycle review. The forward-codified `vendor_template_namespace_uuid` value (per the vendor-companion-app sub-banding amendment) is not in the current CHECK; it lands at first-promotion-time per the forward-looking-codification caveat. |
 | `device_category` | TEXT | yes | — | Enum (**17 values** per on-disk CHECK constraint, post-mig-0030 / CP37): `alpr`, `imsi_catcher`, `body_cam`, `police_radio`, `drone`, `gunshot_detect`, `hacking_tool`, `covert_cam`, `gps_tracker`, `face_recog`, `drone_detect`, `unknown`, **`automotive_telematics`** (CP32 §1**: admitted via mig-0026 for enum parity with `manufacturers.primary_category` on the Parrot Automotive arm id=222), **`cctv_camera`** (CP33 §2**: admitted via mig-0027 for enum parity with the v1.5.0 camera_vms cohort manufacturers + retroactive cctv_camera recategorization (gate G-B) on 7 existing vendors with 31 identifier rows recategorized), **`persistent_surveillance`** (CP33 §2, aerostat / lighter-than-air persistent platforms + tower-mounted persistent imaging + strategic-altitude aerial persistent surveillance), **`through_wall_radar`** (CP33 §2, UWB through-wall radar systems; FCC §15.519 ultra-wideband regulatory carveout), **`network_surveillance`** (CP37 / mig-0030**: lawful-intercept / network-surveillance vendor cohort: Cognyte, Pen-Link, Polaris Wireless, SS8 Networks, Trovicor, Utimaco; 131 active rows at v1.6.0 ship, **404 active rows at the v1.6.2 stack** : live 2026-05-29 `SELECT COUNT(*) FROM identifiers WHERE device_category='network_surveillance' AND superseded_by IS NULL`). `unknown` rows are excluded from the Lynceus export per the multi-purpose-vendor discipline (canonical-only). Note: `behavioral_signatures.device_category` shares the same 17-value enum via the mig-0030 dual-table CHECK literal sweep (continuing the CP32 §1 / CP33 §2 precedent, CP21 cumulative-full-enum spirit applied across two separate CHECK literals in a single migration); 0 row promotions to `network_surveillance` on `behavioral_signatures` through the v1.6.2 stack (schema slot open for future evidence-arrival). |
 | `manufacturer` | TEXT | no | NULL | Vendor name in canonical form. Logical FK to `manufacturers.canonical_name` (not enforced). |
 | `model` | TEXT | no | NULL | Vendor's product name in marketing or internal form. Composes with METHODOLOGY §5.4 product-family taxonomy. |
-| `confidence` | INTEGER | no | NULL | Integer per schema-level CHECK `BETWEEN 0 AND 100`. **Operational cap at 99** per METHODOLOGY §5 confidence model: the corroboration-boost formula `min(99, max(...) + 5)` + the §5.6 ceiling rule cap effective confidence at 99 (humility-margin invariant). Schema-level CHECK permits 0-100 to give the operational layer flexibility; the 99-cap is enforced at write-time by the validator/dedup pass, not the schema. |
-| `source_url` | TEXT | yes | — | Working URL where the identifier was extracted. Per METHODOLOGY §7.2: direct citation, no aggregators. |
+| `confidence` | INTEGER | no | NULL | Integer per schema-level CHECK `BETWEEN 0 AND 100`. **Operational cap at 99** per METHODOLOGY §5 confidence model: the corroboration-boost formula `min(99, max(...) + 5)` + the §5.6 ceiling rule cap effective confidence at 99 (humility-margin invariant). Schema-level CHECK permits 0-100 to give the operational layer flexibility; the 99-cap is enforced at write-time by the validator/dedup pass, not the schema. **Nullable, and 174 rows ship NULL. Blank means UNSCORED, not zero.** Measured on the shipped `exports/argus_export.csv`: 174 of 43,126 rows carry an empty `confidence` field, which is SQL NULL round-tripped through the CSV writer. That is a distinct state from an explicit `0`, which 262 rows carry. The blank rows are otherwise fully provenanced: all 174 carry an `http(s)` `source_url`. Consumers MUST NOT coerce blank to `0` (that files 174 attributed rows as lowest-confidence) or to `100` (that ships them to a scanner as strong attributions). Filter them out explicitly, or route them to review as their own class. |
+| `source_url` | TEXT | yes | — | Where the identifier was extracted. NOT NULL, but **not guaranteed to be a fetchable public URL.** METHODOLOGY §7.2 states the ingest rule (points directly at the source, no aggregators, no redirect chains); the shipped corpus does not fully satisfy it. Measured on `exports/argus_export.csv`: 42,261 of 43,126 rows carry an `http(s)` URL and **865 carry a non-public value a reader cannot fetch**. Per-scheme counts and the consumer consequence are in the disclosed-limitation note below this table. |
 | `source_type` | TEXT | yes | — | Enum (**13 values**): `official`, `regulatory`, `procurement`, `academic`, `foia`, `crowdsourced`, `inferred`, `manufacturer_doc` (baseline); `manufacturer_app` (migration 0009); `primary_registry` (migration 0015); **`judicial_filing`, `disclosure_filing`, `procurement_disclosure` (CP36 / migration 0029**: enum parity with `sources.source_type`, closing the CPN-A gap from MAC-249 Phase G)**. Drives confidence band per METHODOLOGY §5.1. Live: 116 rows carry `judicial_filing` (J-5 CourtListener RECAP); `disclosure_filing` + `procurement_disclosure` are forward-compat (0 identifier rows). |
 | `source_excerpt` | TEXT | no | NULL | Verbatim excerpt. Schema-level CHECK: `IS NULL OR length(source_excerpt) <= 200`. PII-sanitized per the no-PII hard rule. |
 | `geographic_scope` | TEXT | no | NULL | Country-level scope: `US`, `EU`, `UK`, `global`, `unknown`, or specific ISO-3166 country code. Default export-time filter: `['US']`. |
@@ -145,6 +145,82 @@ The canonical Argus identifier table. Every row represents one identifier-to-att
 | `superseded_by` | INTEGER | no | NULL | Self-reference FK: if non-NULL, this row was superseded per METHODOLOGY §6.4. Exports filter on `superseded_by IS NULL`. |
 | `paired_identifier_id` | INTEGER | no | NULL | Self-reference FK to a paired identifier per `pair_kind`. |
 | `pair_kind` | TEXT | no | NULL | Enum (**5 non-NULL values + NULL** per on-disk CHECK constraint, post-mig-0025 / CP31): `la_bit_flip`, `frdid_sibling`, `vendor_as_container`, `firmware_generation` (all from migration 0012); **`fcc_grantee_equipment_class`** (CP31 mig-0025; extends CP14 paired-identifier discipline to regulatory entity pairing, `grantee_code` row is one identifier; `equipment_class_code` is a sibling row with `paired_identifier_id` pointing back to the grantee row and `pair_kind='fcc_grantee_equipment_class'`). `static_mac_tracker` is a deferred item (queued for future canonical-bible §-text codification) and is NOT currently in the enum. |
+
+#### `argus_record_id`: a pattern key, not a row key
+
+`argus_record_id` is not a column of `identifiers`. It is computed at export time as a 16-hex-char SHA-256 prefix over the emitted pattern (algorithm per [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) SAR-10) and exists only in the shipped artifacts under `exports/`.
+
+It keys a **pattern**, not a row. Measured on the shipped `exports/argus_export.csv`: 43,096 distinct `argus_record_id` values across 43,126 rows: 15 ids are shared by more than one row, covering 45 rows in total.
+
+Read that sentence carefully, because the arithmetic has a trap that has already shipped as a false claim. The difference `43,126 - 43,096 = 30` is the SURPLUS, meaning rows beyond one-per-id. It is **not** the number of rows that share an id. That number is 45, and the number of ids involved is 15. Multiplicity histogram, which reconciles both figures: 8 ids appear on 2 rows, 2 ids on 3 rows, 3 ids on 4 rows, 1 id on 5 rows, 1 id on 6 rows, giving `8*2 + 2*3 + 3*4 + 5 + 6 = 45` rows and `45 - 15 = 30` surplus.
+
+Consequence for consumers: `argus_record_id` is **not a row primary key**. Do not use it as one, and do not join on it without expecting fan-out of up to six rows. The `id` column of `argus_export.csv` is the canonical `identifiers.id`, is unique across all 43,126 CSV rows, and is what identifies a row.
+
+Reproduce all of it from the shipped tree, with no database:
+
+```sh
+python3 - <<'PY'
+import csv, collections
+with open("exports/argus_export.csv", newline="") as fh:
+    fh.readline()                       # skip the leading "# meta:" comment
+    rows = list(csv.DictReader(fh))
+c = collections.Counter(r["argus_record_id"] for r in rows)
+shared = {k: v for k, v in c.items() if v > 1}
+print("rows", len(rows), "distinct", len(c),
+      "shared ids", len(shared), "rows covered", sum(shared.values()),
+      "hist", dict(sorted(collections.Counter(shared.values()).items())))
+print("id column distinct", len({r["id"] for r in rows}))
+PY
+```
+
+Expected: `rows 43126 distinct 43096 shared ids 15 rows covered 45 hist {2: 8, 3: 2, 4: 3, 5: 1, 6: 1}` and `id column distinct 43126`.
+
+#### `source_url`: a disclosed limitation, not a guarantee
+
+METHODOLOGY §7.2 states the ingest rule: a `source_url` is fetched at extraction time and points directly at the source, with no aggregator URLs, no redirect chains and no shortened-URL services. **The shipped corpus does not fully satisfy that rule.** The shortfall is disclosed here rather than described away, because a consumer who trusts the rule will write a fetcher that fails on 865 rows.
+
+Measured on the shipped `exports/argus_export.csv`, whose 43,126 rows are exactly the active `identifiers` rows (`superseded_by IS NULL`):
+
+| `source_url` form | Rows | What the value is | Fetchable by a reader |
+|---|---:|---|---|
+| `http(s)://...` | 42,261 | a public URL, the intended shape | yes |
+| `wave_i_aggregate://...` | 660 | an internal path into the Wave I aggregate observation corpus, e.g. `wave_i_aggregate://wave_i_main/A/account.dji.com` | no |
+| `apkcombo:...` | 188 | an APK filename plus the redistribution site it was pulled from, e.g. `apkcombo:com.evidence__5.18.1__apkcombo.xapk` | no |
+| `APK extract: ...` | 12 | a prose provenance string naming the analysed APK and usually its SHA-256, e.g. `APK extract: com.axis.companion@8.0.17.apk SHA-256 489791b78a...` | no |
+| `argus-internal://...` | 3 | a path into an Argus working file that is not distributed with the release, e.g. `argus-internal://wave_h_pre_v1/per_vendor/dji_assistant_2_mavic/fp_findings.json` | no |
+| `manufacturer_app://...` | 2 | a package id, version and short hash of the analysed app, e.g. `manufacturer_app://com.avigilon.acc_mobile@3.26.42#0dd7bd87` | no |
+
+Total non-public: **865 rows**, which is 2.0% of the corpus.
+
+Two of the six forms are worse than merely unfetchable, and saying so is the point of disclosing this:
+
+- `apkcombo` (188 rows) names a third-party APK redistribution site as the acquisition channel rather than the vendor's own distribution point. That is the aggregator case §7.2 bars, not just a formatting deviation.
+- `argus-internal://` (3 rows) cites a file that ships with no release, so the citation is unverifiable from outside the project.
+
+**Scope of the limitation.** All 865 rows carry `source_type = 'manufacturer_app'`: they are companion-app static-analysis rows whose evidence is a decompiled APK or an internal analysis artifact, not a web page. The band is not wholly affected: 1,131 active rows carry `source_type = 'manufacturer_app'` and 266 of those do carry an `http(s)` URL. So excluding `source_type = 'manufacturer_app'` removes every non-public `source_url` but also removes 266 rows that are fine; a consumer wanting the narrow cut should filter on the `source_url` value itself.
+
+**What this does not affect.** The 865 rows are otherwise fully populated and are not confidence-degraded by this alone; their confidence follows the METHODOLOGY §5 band for `manufacturer_app` like any other row. The limitation is one of independent verifiability by a reader, not of internal provenance: each row still binds to `raw_observations` per the promotion gate.
+
+Reproduce the per-scheme counts from the shipped tree:
+
+```sh
+python3 - <<'PY'
+import csv, collections
+def form(u):
+    if u.startswith(("http://", "https://")):     return "http(s)"
+    for p in ("wave_i_aggregate://", "argus-internal://",
+              "manufacturer_app://", "apkcombo", "APK extract"):
+        if u.startswith(p):                       return p
+    return "UNEXPECTED: " + u[:40]
+with open("exports/argus_export.csv", newline="") as fh:
+    fh.readline()
+    rows = list(csv.DictReader(fh))
+for k, n in collections.Counter(form(r["source_url"]) for r in rows).most_common():
+    print(f"{n:>7}  {k}")
+PY
+```
+
+Expected: `42261 http(s)`, `660 wave_i_aggregate://`, `188 apkcombo`, `12 APK extract`, `3 argus-internal://`, `2 manufacturer_app://`, and no `UNEXPECTED` line.
 
 #### Indexes
 
@@ -167,7 +243,7 @@ Provenance layer per METHODOLOGY §7.1. Every promoted `identifiers` row is anch
 | `id` | INTEGER | yes (PK) | autoincrement | Primary key. |
 | `source_id` | INTEGER | no | NULL | FK → `sources.id`. |
 | `extraction_run_id` | INTEGER | no | NULL | FK → `extraction_runs.id`. |
-| `source_url` | TEXT | yes | — | Working URL fetched at ingest time. |
+| `source_url` | TEXT | yes | — | Where the observation was captured. NOT NULL. Usually a URL fetched at ingest time, but not always fetchable: measured live against the canonical `db/argus.db` at the v1.8.1 export epoch, 147,586 of 148,427 rows carry an `http(s)` value and 841 carry a non-public internal handle (`wave_i_aggregate://` 838, `argus-internal://` 3). Same disclosed limitation as `identifiers.source_url`; see the note under §4.1. |
 | `raw_payload` | TEXT | no | NULL | Verbatim source bytes (or JSON-encoded). PII-sanitized at ingest. |
 | `candidate_identifier` | TEXT | no | NULL | Extracted identifier value. NULL when row is non-identifier metadata. |
 | `candidate_type` | TEXT | no | NULL | Proposed `identifier_type`. |
@@ -187,7 +263,7 @@ Primary on `(id)`. Additional indexes on `(source_id, source_row_key)` for idemp
 #### Composition with METHODOLOGY rules
 
 - Append-only per METHODOLOGY §7.1; rows never mutate post-ingest.
-- Direct citation per METHODOLOGY §7.2 (no aggregators); archive snapshots in `notes`.
+- Direct citation per METHODOLOGY §7.2 (no aggregators) is the ingest RULE, not a description of the shipped corpus: 841 of the 148,427 `raw_observations` rows carry a non-public internal handle rather than a fetchable URL, and 865 of the 43,126 active `identifiers` rows do. Both are disclosed limitations, scoped to the companion-app static-analysis surface. See the disclosed-limitation note under §4.1 and METHODOLOGY §7.2. Archive snapshots for dead public URLs live in `notes`.
 - No fabrication per the no-fabrication hard rule: extraction yielding no concrete value routes to `conflicts` (§4.11), not to a synthetic `raw_observations` row.
 - PII-sanitization at ingest per the no-PII hard rule.
 

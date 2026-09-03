@@ -72,25 +72,32 @@ The sibling export for cellular-band scanners. Where the other three exports key
 
 ### What each row represents
 
-Every row in the JSON exports carries a stable shape:
+The two identifier JSON exports (`argus_export.json` and
+`argus_export_high_confidence.json`) carry the same four-key shape, and only those four keys:
 
 ```json
 {
   "pattern": "e4:aa:ea:80:a1:9b",
   "pattern_type": "mac",
   "description": "Flock Safety ALPR camera",
-  "argus_record_id": "1234abcd5678ef90",
-  "confidence": 95,
-  "device_category": "alpr",
-  "source_type": "primary_registry"
+  "argus_record_id": "1234abcd5678ef90"
 }
 ```
+
+The behavioral-signatures export is a different shape and is described in its own section above.
 
 - **`pattern`**: the actual identifier (the MAC, the OUI prefix, the BLE UUID, the FCC grantee code, the hostname, etc.).
 - **`pattern_type`**: what kind of identifier this is (`mac`, `oui`, `mac_range`, `bssid`, `ssid_exact`, `ble_uuid`, `ble_service`, `fcc_grantee_code`, `vendor_controlled_hostname`, etc.). **58 values total at v1.8.0**, of which 51 carry active rows.
 - **`description`**: a human-readable label. Usually "Vendor Name: model or category context".
-- **`argus_record_id`**: a 16-hex-character stable identifier. It survives source-attribution changes, confidence drift, and most schema migrations. Bind to this when you need to track a specific row across export versions.
-- **`confidence`**: the 0-99 confidence score. ≥70 = strong attribution from at least one canonical source. ≥85 = cross-corroborated by independent second source.
+- **`argus_record_id`**: a 16-hex-character stable hash of the pattern. It survives source-attribution changes, confidence drift, and most schema migrations, which makes it the right handle for tracking a *pattern* across export versions. It is **not** a row id. `argus_export.csv` carries 43,096 distinct `argus_record_id` values across 43,126 rows: 15 ids are shared by more than one row, covering 45 rows in total. Use the CSV's `id` column when you need row identity.
+
+**What the JSON exports do not carry.** `confidence`, `device_category` and `source_type` are
+export-time filter inputs, not emitted fields. They appear in no record of either identifier JSON
+export. The floors are already applied for you: `argus_export.json` is floored at confidence ≥30
+and `argus_export_high_confidence.json` at ≥70. If you need those values per row, read
+`exports/argus_export.csv`, which carries all three as columns:
+
+- **`confidence`**: the 0-99 confidence score. ≥70 = strong attribution from at least one canonical source. ≥85 = cross-corroborated by independent second source. 174 of the 43,126 CSV rows leave it blank, which means unscored rather than zero; 262 rows carry an explicit `0`.
 - **`device_category`**: what kind of equipment this is (`alpr`, `imsi_catcher`, `body_cam`, `drone`, `cctv_camera`, `persistent_surveillance`, `through_wall_radar`, `gps_tracker`, `network_surveillance` (added at v1.6.2 for lawful-intercept and monitoring-center vendors), and others). **20 values total at v1.8.0**, of which 19 carry active rows.
 - **`source_type`**: the source-class band (`primary_registry`, `regulatory`, `academic`, `manufacturer_doc`, `manufacturer_app`, `crowdsourced`, `inferred`, `judicial_filing`, `disclosure_filing`, `procurement_disclosure`, and others, **13 values total at v1.8.0** on both the `identifiers` and `sources` tables, of which 10 carry active rows). Different bands have different confidence ceilings.
 
@@ -115,7 +122,7 @@ You're running Lynceus or a similar RF security monitor and you want to alert wh
 
 1. Pull `exports/argus_export_high_confidence.json` on your scanner's startup or per refresh cycle.
 2. For each row, match `pattern` + `pattern_type` against your scanner's observed identifiers. The shape is designed for direct integration; no transformation is needed.
-3. Enrich alerts with `description` + `argus_record_id`. The `argus_record_id` is the stable handle for the row across Argus version bumps.
+3. Enrich alerts with `description` + `argus_record_id`. The `argus_record_id` is the stable handle for the *pattern* across Argus version bumps, not a unique row id. The CSV carries 43,096 distinct `argus_record_id` values across 43,126 rows: 15 ids are shared by more than one row, covering 45 rows in total.
 4. Apply severity rules operator-side via your scanner's configuration. Argus does not ship severity rankings; that's intentionally an operator decision (a Flock camera in a friendly neighborhood and one in a hostile context warrant different responses).
 5. Honor the operator-stack self-exclude discipline: Argus operator-side hardware (Raspberry Pi OUIs, Rayhunter-supported modem VID:PIDs) MUST NOT appear in the high-confidence export and your scanner should NOT alert on its own hardware.
 
@@ -164,7 +171,7 @@ A few things Argus is deliberately not:
 ## 6. Where to learn more
 
 - [`../README.md`](../README.md): project overview, headline metrics, downstream consumer architecture.
-- [`../CHANGELOG.md`](../CHANGELOG.md): version-by-version release history (v1.0.0 through v1.8.0).
+- [`../CHANGELOG.md`](../CHANGELOG.md): version-by-version release history (v1.0.0 through v1.8.1).
 - [`../CREDITS.md`](../CREDITS.md): per-source attribution, per-vendor canonical lexicon, license posture for downstream consumers.
 - [`engineering/METHODOLOGY.md`](engineering/METHODOLOGY.md): how source admissions work, confidence model, dedup logic, provenance discipline.
 - [`engineering/DATA_DICTIONARY.md`](engineering/DATA_DICTIONARY.md): schema reference (every table, column, enum value).

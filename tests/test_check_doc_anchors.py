@@ -195,6 +195,7 @@ def test_t1_no_feed_count_is_settled_by_sql():
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.canonical_db
 def test_t2_settling_runner_opens_db_read_only():
     """The runner opens `db/argus.db` via the `file:...?mode=ro` URI form.
 
@@ -232,6 +233,7 @@ def test_t2_gate_source_contains_no_sql_write_ops():
     assert "executemany" not in src, "gate source contains executemany"
 
 
+@pytest.mark.canonical_db
 def test_t2_settling_runner_returns_expected_keys():
     """The runner returns a dict keyed by every bundle key, including the
     two CHECK-parsing entries. Each CHECK-parsing entry's value is the int
@@ -631,6 +633,7 @@ def test_t5_section_window_stops_at_the_next_h2_not_at_an_h3():
     assert res.line == 3
 
 
+@pytest.mark.canonical_db
 def test_t5_live_tree_resolves_every_class_a_site_uniquely():
     """Against the real doc surface, all 22 anchors resolve with no ERROR."""
     results = gate_mod.scan_docs(_live_settle(), REPO)
@@ -723,6 +726,7 @@ _SETTLEABLE = [
 ]
 
 
+@pytest.mark.canonical_db
 def test_t6_negative_control_unperturbed_scratch_copy_is_green(tmp_path):
     """The scratch copy of the live docs exits 0 -- so a red arm means the
     perturbation, not the copy."""
@@ -734,6 +738,7 @@ def test_t6_negative_control_unperturbed_scratch_copy_is_green(tmp_path):
 @pytest.mark.parametrize(
     "claim", _SETTLEABLE, ids=[f"{c['file']}::{c['description']}" for c in _SETTLEABLE]
 )
+@pytest.mark.canonical_db
 def test_t6_every_settleable_site_goes_red_when_perturbed(claim, tmp_path):
     """Per-site positive control (MAC-717 acceptance #4).
 
@@ -750,6 +755,7 @@ def test_t6_every_settleable_site_goes_red_when_perturbed(claim, tmp_path):
     )
 
 
+@pytest.mark.canonical_db
 def test_t6_halts_is_the_only_unsettleable_site(tmp_path):
     """The one remaining hole, pinned so a future site cannot quietly join it.
 
@@ -773,6 +779,7 @@ def test_t6_halts_is_the_only_unsettleable_site(tmp_path):
     assert _status_of(out, claim) == "UNSETTLED"
 
 
+@pytest.mark.canonical_db
 def test_t7_perturbing_the_standard_feed_artifact_reddens_its_doc_sites(tmp_path):
     """Artifact-side positive control: docs untouched, artifact moved.
 
@@ -795,6 +802,7 @@ def test_t7_perturbing_the_standard_feed_artifact_reddens_its_doc_sites(tmp_path
         assert _status_of(out, claim) == "FAIL", claim["description"]
 
 
+@pytest.mark.canonical_db
 def test_t7_csv_and_canonical_are_distinct_instruments(tmp_path):
     """Perturbing the CSV artifact must NOT move the canonical-settled sites.
 
@@ -828,6 +836,7 @@ def test_t7_csv_and_canonical_are_distinct_instruments(tmp_path):
     )
 
 
+@pytest.mark.canonical_db
 def test_t7_missing_artifact_errors_rather_than_crashing(tmp_path):
     """A deleted export names the claims it could not settle, exit 1, no traceback."""
     work = _scratch_repo(tmp_path)
@@ -865,6 +874,7 @@ def test_t7_missing_artifact_errors_rather_than_crashing(tmp_path):
 _BIBLE_REL = "docs/engineering/PROJECT_BIBLE.md"
 
 
+@pytest.mark.canonical_db
 def test_t8a_verdict_is_identical_whether_the_bible_is_absent_or_gutted(tmp_path):
     """MAC-777/MAC-773: this gate is NOT an instrument for PROJECT_BIBLE.md.
 
@@ -926,6 +936,7 @@ def test_t8a_bible_is_in_no_claim_registry():
     )
 
 
+@pytest.mark.canonical_db
 def test_t8b_advertised_coverage_equals_the_files_the_gate_reports_on():
     """`checked_files()` must be the surface, not a claim about the surface."""
     results = gate_mod.scan_docs(_live_settle(), REPO)
@@ -935,6 +946,7 @@ def test_t8b_advertised_coverage_equals_the_files_the_gate_reports_on():
     )
 
 
+@pytest.mark.canonical_db
 def test_t8b_every_run_prints_its_coverage_beside_its_verdict(tmp_path):
     """A verdict must not travel without its scope."""
     rc, out, err = _run_gate(_scratch_repo(tmp_path))

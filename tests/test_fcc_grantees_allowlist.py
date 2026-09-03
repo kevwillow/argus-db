@@ -61,6 +61,7 @@ class TestStopListSAR7_1:
             f"{matched_id}: expected `{expected_substr}` in reason; got `{reason}`"
         )
 
+    @pytest.mark.canonical_db
     def test_real_grantee_passes(self):
         # `2AA22` is a real grantee in argus.db (verified by direct query).
         ok, reason = validate_fcc_id_match("2AA22-RX1234", db_path=DB_PATH)
@@ -172,6 +173,7 @@ class TestCommercialModelNameFP:
 
     # ─── Positive cases — predicate fires ────────────────────────────────
 
+    @pytest.mark.canonical_db
     def test_cradlepoint_mbr_1200_fires(self):
         # Wave-E e5_stackexchange Cradlepoint_serverfault seed case.
         ok, reason = validate_fcc_id_match(
@@ -184,6 +186,7 @@ class TestCommercialModelNameFP:
         assert "cradlepoint" in reason.lower()
         assert "Esselte Dymo" in reason  # MBR's actual grantee
 
+    @pytest.mark.canonical_db
     def test_cradlepoint_mbr_1000_fires(self):
         ok, reason = validate_fcc_id_match(
             "MBR-1000",
@@ -193,6 +196,7 @@ class TestCommercialModelNameFP:
         assert ok is False
         assert reason.startswith("commercial_model_name_fp:"), reason
 
+    @pytest.mark.canonical_db
     def test_cradlepoint_ibr_sibling_fires(self):
         # Sibling SAR-7 #3 family: Cradlepoint IBR-N.
         # `IBR` → ACK Technologies in fcc_grantees (verified).
@@ -204,6 +208,7 @@ class TestCommercialModelNameFP:
         assert is_fp is True, reason
         assert "cradlepoint" in reason.lower()
 
+    @pytest.mark.canonical_db
     def test_motorola_apx_sibling_fires(self):
         # Motorola APX-6000 — `APX` → Morse Electro Products
         # (Montgomery Ward), not Motorola. Predicate must fire.
@@ -216,6 +221,7 @@ class TestCommercialModelNameFP:
         assert "motorola" in reason.lower()
         assert "Morse" in reason or "Montgomery" in reason
 
+    @pytest.mark.canonical_db
     def test_motorola_apx_7000_sibling_fires(self):
         is_fp, _ = is_commercial_model_name_fp(
             "APX-7000",
@@ -224,6 +230,7 @@ class TestCommercialModelNameFP:
         )
         assert is_fp is True
 
+    @pytest.mark.canonical_db
     def test_motorola_apx_8000_sibling_fires(self):
         is_fp, _ = is_commercial_model_name_fp(
             "APX-8000",
@@ -234,6 +241,7 @@ class TestCommercialModelNameFP:
 
     # ─── Negative cases — predicate does NOT fire ────────────────────────
 
+    @pytest.mark.canonical_db
     def test_no_vendor_in_context_does_not_fire(self):
         # SAR-7 #3 item 1 fails: no canonical vendor in surrounding prose.
         ok, reason = validate_fcc_id_match(
@@ -278,6 +286,7 @@ class TestCommercialModelNameFP:
         # below the FCC product-code 4-char minimum, so shape_mismatch fires.
         assert is_fp is False
 
+    @pytest.mark.canonical_db
     def test_5_char_post_2013_grantee_passes_through(self):
         # SAR-7 #3 false-negative leaning: a real 5-char post-2013 grantee
         # filing must pass through (not flagged as commercial-model-name FP).
@@ -314,6 +323,7 @@ class TestCommercialModelNameFP:
         assert is_fp is False
         assert reason == "empty_context"
 
+    @pytest.mark.canonical_db
     def test_prefix_not_in_grantees_does_not_claim_sar7_3(self):
         # SAR-7 #3 explicitly defers to the allowlist when prefix is absent.
         is_fp, reason = is_commercial_model_name_fp(
@@ -343,6 +353,7 @@ class TestValidateFCCIDMatchIntegration:
         assert ok is False
         assert reason.startswith("stop_list:")
 
+    @pytest.mark.canonical_db
     def test_sar7_3_fires_before_allowlist(self):
         # MBR is a real grantee — without SAR-7 #3, this would pass the
         # allowlist. With SAR-7 #3, the FP gate catches it first.
@@ -357,6 +368,7 @@ class TestValidateFCCIDMatchIntegration:
         ok2, reason2 = validate_fcc_id_match("MBR-1200", db_path=DB_PATH)
         assert ok2 is True
 
+    @pytest.mark.canonical_db
     def test_no_context_param_preserves_legacy_behavior(self):
         # Backward compat: callers that don't pass context_text get the
         # pre-SAR-7 #3 behavior (stop-list + allowlist only).
@@ -373,11 +385,13 @@ class TestModuleSurface:
                   "sierra wireless", "hak5", "dji", "cellebrite"):
             assert v in CANONICAL_VENDOR_LEXICON, f"missing: {v}"
 
+    @pytest.mark.canonical_db
     def test_grantee_name_lookup_real_codes(self):
         assert grantee_name_for_prefix("MBR", db_path=DB_PATH) == "Esselte Dymo N V"
         assert grantee_name_for_prefix("DJI", db_path=DB_PATH) == "Seragen Diagnostics"
         assert grantee_name_for_prefix("IBR", db_path=DB_PATH) == "ACK Technologies Inc"
 
+    @pytest.mark.canonical_db
     def test_grantee_name_lookup_unknown_returns_none(self):
         assert grantee_name_for_prefix("0AA00", db_path=DB_PATH) is None
         assert grantee_name_for_prefix("9ZZ99", db_path=DB_PATH) is None

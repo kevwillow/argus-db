@@ -1,0 +1,179 @@
+name: export-contract
+
+# Validate the SHIPPED artifacts against their documented schema.
+#
+# This is the job that makes "verifiable data product" mean something: it reads
+# only files tracked in git, so anyone can reproduce it with a clone and a
+# python interpreter. No canonical DB, no raw/, no network, no secrets.
+#
+# It asserts the artifacts' TRUE semantics. Notably it does NOT assert that
+# argus_record_id is unique -- it is a content-derived pattern key, and the CSV
+# carries 43,096 distinct `argus_record_id` values across 43,126 rows: 15 ids
+# are shared by more than one row, covering 45 rows in total. The contract pins
+# the distinct-id count and the 30 SURPLUS rows (43,126 - 43,096, i.e. rows
+# beyond one-per-id -- which is NOT the number of rows that share an id), so
+# drift is caught without the CI itself shipping a false claim.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "exports/**"
+      - "scripts/ci/**"
+      - "tests/test_export_contract.py"
+      - ".github/workflows/export-contract.yml"
+  pull_request:
+    paths:
+      - "exports/**"
+      - "scripts/ci/**"
+      - "tests/test_export_contract.py"
+      - ".github/workflows/export-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    name: export artifacts match their documented shape
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the public tree
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Confirm every artifact under test is tracked in git
+        # A contract validated against an untracked file proves nothing about
+        # what users actually download.
+        run: |
+          set -euo pipefail
+          for f in exports/argus_export.csv \
+                   exports/argus_export.json \
+                   exports/argus_export_high_confidence.json \
+                   exports/argus_export_behavioral_signatures.json; do
+            git ls-files --error-unmatch "$f" > /dev/null
+            echo "tracked: $f"
+          done
+
+      - name: Validate the export contract
+        # Exit 0 is necessary but NOT sufficient. A validator whose pins were
+        # emptied, or that returned early before reaching them, also exits 0
+        # having checked nothing. Assert its own summary line: that it ran to
+        # completion, that no pin failed, that PASS + FAIL accounts for every
+        # pinned fact, and that the number of pins has not collapsed.
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/check_export_contract.py | tee contract.txt
+
+          # Deliberately NOT anchored at end-of-line: the summary line gains
+          # trailing clauses as the validator grows. The fields below are parsed
+          # out and asserted individually, so a longer line is fine but a
+          # missing or unparseable one is not.
+          summary=$(grep -E '^check_export_contract: [0-9]+ PASS, [0-9]+ FAIL \(of [0-9]+ pinned facts\)' \
+                    contract.txt | tail -1 || true)
+          if [ -z "${summary:-}" ]; then
+            echo "::error::check_export_contract.py exited 0 but printed no summary line."
+            echo "::error::It did not run to completion, so its exit code proves nothing."
+            exit 1
+          fi
+          echo "summary: $summary"
+
+          passed=$(printf '%s\n' "$summary" | sed -n 's/^check_export_contract: \([0-9]*\) PASS.*/\1/p')
+          failed=$(printf '%s\n' "$summary" | sed -n 's/^.*PASS, \([0-9]*\) FAIL.*/\1/p')
+          total=$(printf '%s\n' "$summary" | sed -n 's/^.*(of \([0-9]*\) pinned facts).*/\1/p')
+
+          if [ -z "${passed:-}" ] || [ -z "${failed:-}" ] || [ -z "${total:-}" ]; then
+            echo "::error::could not parse PASS/FAIL/total out of the summary line."
+            echo "::error::line was: $summary"
+            exit 1
+          fi
+
+          if [ "$failed" -ne 0 ]; then
+            echo "::error::$failed pinned fact(s) FAILED but the script exited 0."
+            grep -F 'FAIL' contract.txt || true
+            exit 1
+          fi
+          if [ "$((passed + failed))" -ne "$total" ]; then
+            echo "::error::summary does not add up: $passed PASS + $failed FAIL != $total pinned facts."
+            echo "::error::Some pin was neither checked nor reported."
+            exit 1
+          fi
+
+          # MEASURED on 2026-09-03 against the working tree at 9b32212: 36 PASS
+          # of 36 pinned facts at 03:2xZ, then 41 of 41 at 03:39Z — the contract
+          # was being extended while this was written. The floor is set well
+          # under the SMALLER of those, so it survives that churn in either
+          # direction and still catches a collapse to a handful of pins. It is a
+          # vacuity floor, not a pin: re-derive the real count at HEAD.
+          if [ "$passed" -lt 20 ]; then
+            echo "::error::only $passed pinned facts were checked (36 and 41 were the"
+            echo "::error::counts measured on 2026-09-03). The contract has been hollowed"
+            echo "::error::out — this job is now near-vacuous."
+            exit 1
+          fi
+          echo "OK: $passed pinned facts checked, 0 FAIL, summary self-consistent."
+
+      - name: Confirm the pytest configuration arrived with the clone
+        # The pytest step below silently changes meaning without these: no
+        # pytest.ini means no --strict-markers, so a typo'd resource marker
+        # becomes an unknown marker that pytest merely warns about; no
+        # conftest.py means no repo root on sys.path and no resource gating.
+        # Either way pytest still runs and can still exit 0.
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in pytest.ini conftest.py; do
+            if [ ! -f "$f" ]; then
+              echo "::error::$f is missing from the checkout; the pytest step below"
+              echo "::error::would run with default config and still be able to exit 0."
+              fail=1
+            elif ! git ls-files --error-unmatch "$f" > /dev/null 2>&1; then
+              echo "::error::$f exists but is NOT tracked, so it never reaches a clone."
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] || exit 1
+          echo "OK: pytest.ini and conftest.py are present and tracked."
+
+      - name: Install test dependencies
+        run: python3 -m pip install --disable-pip-version-check pytest
+
+      - name: Run the same contract through the local suite
+        # The validator and the test import the same module. Running both
+        # confirms the test path has not drifted away from the CI path.
+        #
+        # pytest exits 0 for "5 passed" and, on some paths, for a run in which
+        # everything was skipped or deselected. Assert that tests actually
+        # passed, and that pytest resolved pytest.ini rather than its defaults.
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python3 -m pytest tests/test_export_contract.py \
+            > suite.txt 2>&1 && rc=0 || rc=$?
+          cat suite.txt
+
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::tests/test_export_contract.py exited $rc"
+            exit 1
+          fi
+          if ! grep -qE '^configfile: pytest\.ini$' suite.txt; then
+            echo "::error::pytest did not report 'configfile: pytest.ini'; it ran with"
+            echo "::error::different config than the rest of the repo's CI."
+            exit 1
+          fi
+          passed=$(grep -oE '[0-9]+ passed' suite.txt | tail -1 | grep -oE '[0-9]+' || true)
+          if [ -z "${passed:-}" ] || [ "$passed" -eq 0 ]; then
+            echo "::error::pytest exited 0 but no test in tests/test_export_contract.py"
+            echo "::error::reported PASSED. A run that executed nothing is not a check."
+            exit 1
+          fi
+          echo "OK: $passed contract tests passed via the local suite path."

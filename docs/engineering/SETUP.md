@@ -1,10 +1,10 @@
 # SETUP.md: Argus
 
-> **TL;DR.** Argus ships pre-generated export files under `exports/`. It does not ship the SQLite database; `db/argus.db` is absent from the published tree. A fresh clone has no database, so `argus_cli.py` won't run until you supply one. The exports are the published data artifact; they need no pipeline run. Clone the repo and read them. This document covers the developer setup path: clone, verify the shipped exports, build the schema from migrations, run the tests, and regenerate the exports. To use the data only, read [USER_GUIDE.md](../USER_GUIDE.md) instead; this document is for contributors and downstream-integration developers.
+> **TL;DR.** Argus ships pre-generated export files under `exports/`. It does not ship the SQLite database; `db/argus.db` is absent from the published tree. A fresh clone therefore has no database, and `argus_cli.py` works anyway: with no `db/argus.db` present it falls back to the tracked `exports/` automatically, so `status` and `query` run out of the box. What still needs a database is `--source db`, an explicitly named `--db-path`, and export regeneration (§6). The exports are the published data artifact; they need no pipeline run. Clone the repo and read them. This document covers the developer setup path: clone, verify the shipped exports, build the schema from migrations, run the tests, and regenerate the exports. To use the data only, read [USER_GUIDE.md](../USER_GUIDE.md) instead; this document is for contributors and downstream-integration developers.
 
 This guide is for anyone who cloned the repo and wants to read the exports or extend the database. That includes downstream consumers (Lynceus, Rayhunter, other scanners), research collaborators, and developers extending Argus.
 
-Verified against `schema_version=30` (v1.6.2 ship state, CP37 ratified). With Python 3.11+ already installed, export verification (§3) takes about 2 minutes. Paths requiring a populated database (`argus_cli.py`, export regeneration in §6) are not reachable from a clone alone; see §3.1.
+Verified against `schema_version=30` (v1.6.2 ship state, CP37 ratified). With Python 3.11+ already installed, export verification (§3) takes about 2 minutes. The paths that require a populated database are `--source db`, an explicitly named `--db-path`, and export regeneration (§6); those are not reachable from a clone alone. The default `argus_cli.py status` and `argus_cli.py query` path IS reachable, through the exports fallback. See §3.1.
 
 For semantics (confidence bands, dedup logic, provenance discipline), read [METHODOLOGY.md](METHODOLOGY.md). For the schema (every table + every column), read [DATA_DICTIONARY.md](DATA_DICTIONARY.md).
 
@@ -64,10 +64,19 @@ If the files are present and parse, the shipped data works end-to-end. You can s
 
 ### §3.1. The database is not included, and what that rules out
 
-`db/argus.db` is not distributed through this repository (§2). Two consequences worth stating plainly, because both look like installation faults and neither is one:
+`db/argus.db` is not distributed through this repository (§2). What that does and does not rule out, stated plainly, because the answer is not the same for every entry point:
 
-- **`argus_cli.py` will not run from a clone.** It defaults to `db/argus.db` (`argus_cli.py:29`) and raises `argus_cli: database not found at …` when the path is absent (`argus_cli.py:51-55`). This is expected on a fresh clone, not a broken install.
+- **`argus_cli.py status` and `argus_cli.py query` DO run from a clone.** With no argument naming a database, the CLI probes the default `db/argus.db`; when that file is absent it falls back to the tracked `exports/` directory, prints `argus_cli: canonical DB not found, reading shipped exports/ instead` on stderr, and exits 0. The fallback is implemented in `_resolve_source()` in `argus_cli.py`; the default path itself is the `DEFAULT_DB_PATH` constant in the same file. (Line numbers are deliberately not cited here: `argus_cli.py` is an actively edited file and a line anchor into it goes stale silently. Grep the symbol.)
+- **The fallback is narrower than the database, and says so.** Anything `exports/` cannot see, per-table row counts, the superseded tail, the migration name, the extraction-run log, prints as `unavailable (requires canonical DB)` rather than as a zero.
+- **`--source db` and an explicit `--db-path` still require the database.** Both are read as a demand for a specific database, not a suggestion: if it is missing they raise `argus_cli: database not found at <path>.` from `_open()` and exit 1, with no substitution of export data. That is the correct behaviour and not a broken install. Use `--source exports` to read `exports/` deliberately and silence the fallback notice.
 - **§6 export regeneration needs a database you supply.** The export worker reads canonical rows; it cannot reconstruct them from `exports/`.
+
+Verify the fallback on your own clone in one command:
+
+```sh
+python3 argus_cli.py status          # no db/argus.db needed; exits 0
+python3 argus_cli.py --source db status   # exits 1: "database not found at ..."
+```
 
 There is no route in this repository that reproduces the populated database. §4 rebuilds the schema and yields a *fresh, empty* database, and §5's upstream ingest is a research project rather than a setup step, as that section says. If you need canonical rows, ask the maintainers; do not infer a download location from this document.
 
@@ -104,7 +113,7 @@ python3 argus_cli.py query e4:aa:ea:80:a1:9b
 
 Expected first line: `1 exact match(es) for e4:aa:ea:80:a1:9b:` followed by a row showing `manufacturer=Flock Safety` + `category=alpr`.
 
-If both commands succeed, the database you supplied is wired up correctly.
+If both commands succeed, the database you supplied is wired up correctly. The same `query` command also works on a bare clone with no database, answering from `exports/argus_export.csv` through the fallback described in §3.1.
 
 ## §4. Regenerate the database from migrations (optional)
 
@@ -202,14 +211,14 @@ For the canonical Lynceus integration shape (file paths, refresh cadence, `sever
 - [DATA_DICTIONARY.md](DATA_DICTIONARY.md): full schema reference, every table + column + enum
 - [PROJECT_BIBLE.md](PROJECT_BIBLE.md): canonical specification (source-of-truth at any disagreement)
 - [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md): amendment ledger (Correction Pass entries + SAR series)
-- [CHANGELOG.md](../../CHANGELOG.md): release ledger (v1.0.0 through v1.6.2 ship state + post-ship CP entries)
+- [CHANGELOG.md](../../CHANGELOG.md): release ledger, spanning v1.0.0 through v1.8.1 (verify with `grep -nE '^## \[?v' CHANGELOG.md`)
 - [CREDITS.md](../../CREDITS.md): per-source attribution + upstream license chain
 
 ## §10. Common gotchas
 
 - **README.md Quickstart references `requirements.txt`** which does not exist at the repo root. The two pinned-dependency files (`requirements-vendor-docs.txt`, `requirements-wigle.txt`) are domain-specific (vendor-app static analysis + WiGLE planning) and are not required for the read-path or for export regeneration. If you hit a `pip install -r requirements.txt` failure, skip that step; the read-path in §3 requires no install.
 - **Migration count grows per release**: at v1.0.0 there were 19 migrations; at v1.5.0 there were 27; at v1.6.2 there are 30 (32 `.sql` files; two slots: `0026`/`0026a` and `0029_cp36_identifiers_source_type_enum_parity`/`0029_cp36_j5_proxy_relabel` carry two files apiece). Migration numbering is sequential and append-only; older migrations don't change.
-- **`identifier_type` and `device_category` enums are CHECK-constrained**: 58 `identifier_type` values and 17 `device_category` values (CHECK-enum cardinality) as of v1.6.2. Adding new values requires a rebuild-pattern migration; see [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) Correction Pass entries (CP13/CP14/CP20/CP28/CP29/CP31/CP33/CP34/CP37) for the canonical examples. (See [`reference_readme_stats_enum_vs_populated.md`](../../docs_audit/) discipline: README/SETUP convention quotes CHECK-enum cardinality, not populated cardinality: live populated counts at HEAD are 49 / 16.)
+- **`identifier_type` and `device_category` enums are CHECK-constrained**: 58 `identifier_type` values and 17 `device_category` values (CHECK-enum cardinality) as of v1.6.2. Adding new values requires a rebuild-pattern migration; see [BIBLE_AMENDMENTS.md](BIBLE_AMENDMENTS.md) Correction Pass entries (CP13/CP14/CP20/CP28/CP29/CP31/CP33/CP34/CP37) for the canonical examples. (Convention, per the README/SETUP stats discipline: these documents quote CHECK-enum cardinality, not populated cardinality; live populated counts at the v1.6.2 anchor were 49 / 16.)
 - **Active vs total identifiers**: the `superseded_by` column tracks soft-deletes. Active rows are `superseded_by IS NULL`. Total = 41,890; active = 41,508; the gap (382 rows) is the post-MAC-217 tri-semantic mix: 342 successor-pointer demotes + 40 self-loop demotes (4 pre-MAC-217 PII self-loops + 36 MAC-291 §11 #1 strip self-loops). See [`docs/engineering/DATA_DICTIONARY.md`](DATA_DICTIONARY.md) §3.4.1.
 
 ---

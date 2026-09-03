@@ -9,13 +9,16 @@
 [![License: AGPL-3.0-or-later](https://img.shields.io/badge/code-AGPL--3.0--or--later-2f6f9f.svg)](LICENSE)
 [![Dataset: ODbL-1.0](https://img.shields.io/badge/data-ODbL--1.0-2f6f9f.svg)](LICENSE-DATA)
 [![Docs: CC-BY-SA-4.0](https://img.shields.io/badge/docs-CC--BY--SA--4.0-2f6f9f.svg)](LICENSE-DOCS)
-[![Release](https://img.shields.io/badge/release-v1.8.0-c8102e.svg)](CHANGELOG.md)
+[![Release](https://img.shields.io/badge/release-v1.8.1-c8102e.svg)](CHANGELOG.md)
 [![Identifiers](https://img.shields.io/badge/identifiers-43%2C126-111111.svg)](#whats-in-the-dataset)
 
-[![watching the watchers](https://img.shields.io/badge/watching-the%20watchers-111111.svg)](#what-is-argus)
+[![public-suite](https://github.com/kevwillow/argus-db/actions/workflows/public-suite.yml/badge.svg)](https://github.com/kevwillow/argus-db/actions/workflows/public-suite.yml)
+[![export-contract](https://github.com/kevwillow/argus-db/actions/workflows/export-contract.yml/badge.svg)](https://github.com/kevwillow/argus-db/actions/workflows/export-contract.yml)
+[![doc-claims](https://github.com/kevwillow/argus-db/actions/workflows/doc-claims.yml/badge.svg)](https://github.com/kevwillow/argus-db/actions/workflows/doc-claims.yml)
+[![cli-smoke](https://github.com/kevwillow/argus-db/actions/workflows/cli-smoke.yml/badge.svg)](https://github.com/kevwillow/argus-db/actions/workflows/cli-smoke.yml)
+[![lint](https://github.com/kevwillow/argus-db/actions/workflows/lint.yml/badge.svg)](https://github.com/kevwillow/argus-db/actions/workflows/lint.yml)
+
 [![flock around, find out](https://img.shields.io/badge/flock%20around-find%20out-c8102e.svg)](#what-is-argus)
-[![argus never blinks](https://img.shields.io/badge/argus-never%20blinks-111111.svg)](#what-is-argus)
-[![zero flocks given](https://img.shields.io/badge/zero-flocks%20given-c8102e.svg)](#what-is-argus)
 
 </div>
 
@@ -51,13 +54,17 @@ Tools to surveil people are abundant; tools to detect surveillance are not. The 
 ```bash
 git clone https://github.com/kevwillow/argus-db.git
 cd argus-db
-# show DB path, schema version, row counts
+
+# what this clone ships: schema version, export timestamps, record counts
 python3 argus_cli.py status
-# lookup a Flock Safety ALPR MAC
+
+# look up a Flock Safety ALPR MAC
 python3 argus_cli.py query e4:aa:ea:80:a1:9b
 ```
 
-The repo ships the export files under `exports/` already populated, so reading the data needs no `pip install`. The SQLite database `db/argus.db` is **not** distributed through this repository and is absent from the published tree, so a fresh clone has nothing for `argus_cli.py` to open; the exports are the published data artifact. See [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) for what a clone actually contains, the schema-rebuild path, the source-ingest pipeline dependencies, and optional API keys.
+Both commands work on a bare clone, with no `pip install` and no database. The export files under `exports/` are tracked and populated, and `status` and `query` read them.
+
+**About the database.** The SQLite database `db/argus.db` is **not** distributed through this repository and is absent from the published tree; the exports are the published data artifact. `status` and `query` fall back to `exports/` automatically when the database is missing, and say so on stderr. `--source exports` forces that fallback, `--source db` requires the canonical database and fails without it. Counts the exports genuinely cannot see (the manufacturer and source registries, raw observations, extraction-run history) print as `unavailable (requires canonical DB)`, never as a fabricated zero. See [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) for what a clone actually contains, the schema-rebuild path, the source-ingest pipeline dependencies, and optional API keys.
 
 ## What's in the dataset
 
@@ -65,7 +72,7 @@ At v1.8.0:
 
 - **43,126 active canonical identifiers**, the things you query against (MAC ranges, BLE service UUIDs, FCC grantee codes, vendor-controlled hostnames, and more). The most recent release (v1.8.0) bundles two migrations: `0059` lands the WAVE_9.0 carve-out harvest, and `0060` lands the strict-8.4 category amendment the board ratified. Active moves 43,088 → 43,126, the standard feed 983 → 1,014, high-confidence 501 → 504. Nothing was superseded this cycle, so the +38 is clean growth with no withdrawals. The high-confidence +3 is recategorization rather than new detection: those three rows were already in the database and shipped in no feed because `device_category='unknown'` binned them out first. See the release notes below for the breakdown.
 - **261 manufacturers**, surveillance vendors classified by what they make. 92 of those are OEM arms, the rebadging brands a parent vendor sells through, and they stay hidden from vendor lists by default.
-- **98 upstream sources**, every identifier traces back to at least one of these public sources, with a direct URL citation.
+- **98 upstream sources.** Every identifier traces back to at least one of them. 42,261 of the 43,126 CSV rows cite that source with a direct `http(s)` URL you can open. The remaining 865 cite a non-URL provenance token instead: `wave_i_aggregate:` (660 rows), `apkcombo:` (188), `APK extract:` (12), `argus-internal:` (3), `manufacturer_app:` (2). All 865 are `source_type='manufacturer_app'` rows whose upstream artifact is a vendor application package rather than a web page, so there is no page to link. They are attributed and auditable, but not one-click verifiable. [Provenance discipline](#provenance-discipline) decodes each token.
 - **20 device categories**, what kind of surveillance equipment each identifier is associated with (ALPR, IMSI catcher, body cam, drone, CCTV camera, network surveillance, fleet telematics, Bluetooth tracker, smart lock, smart-home hub, etc.)
 - **58 identifier types**, the kinds of identifiers tracked (MAC, OUI, FCC grantee code, hostname, BLE UUID, IMEI TAC, network discovery protocol pattern, etc.)
 - **214 behavioral signatures**, cellular-control-plane patterns associated with IMSI-catcher detection.
@@ -78,14 +85,16 @@ A *manufacturer* is a vendor that ships surveillance equipment. A *device catego
 
 Argus ships four export files for downstream consumption. Pick the one that matches your use case.
 
-- **`exports/argus_export_high_confidence.json`** (504 records) — runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Each row carries a `severity` field (`"high"` for Flock-attested rows, `null` otherwise).
-- **`exports/argus_export.json`** (1,014 records) — broader scanner watchlists. Looser confidence floor (≥30); US scope filter.
-- **`exports/argus_export.csv`** (43,126 records) — bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import.
-- **`exports/argus_export_behavioral_signatures.json`** (132 records) — cellular-band scanners (Rayhunter). Sibling export with threshold rules.
+- **`exports/argus_export_high_confidence.json`** (504 records), runtime scanners (Lynceus). Strict confidence floor (≥70); excludes crowdsourced and inferred sources, except for named community Flock-hunt sources. Every record carries exactly four keys: `argus_record_id`, `description`, `pattern`, `pattern_type`. There is no severity field and no per-row confidence value in this feed. Severity ranking is deliberately left to the operator.
+- **`exports/argus_export.json`** (1,014 records), broader scanner watchlists. Looser confidence floor (≥30); US scope filter. Same four-key record shape as the high-confidence feed.
+- **`exports/argus_export.csv`** (43,126 records), bulk import, analysis, or re-derivation. All active rows. Apply your own filters at import.
+- **`exports/argus_export_behavioral_signatures.json`** (132 records), cellular-band scanners (Rayhunter). Different record shape from the other two JSON feeds: `argus_record_id`, `signature_name`, `cellular_generation`, `confidence`, `threshold_json`. `threshold_json` is populated on 55 of the 132 and null on the rest, and `cellular_generation` on 19 of the 132, so treat both as optional.
 
 **Confidence scores in plain language:** confidence is on a 0-99 scale. Anything ≥70 is strong attribution from at least one canonical source. Anything ≥85 has been cross-corroborated by an independent second source. The high-confidence export is what you ship to a scanner that's going to alert; the rich CSV is what you query against when you want all the context.
 
-**Stable identifier across exports:** `argus_record_id` is a 16-hex-char stable hash. Bind to it when you need to track a specific row across export versions or source-attribution changes.
+**`argus_record_id` is a pattern key, not a row id.** It is a 16-hex-char stable hash that survives export regeneration and source-attribution changes, which makes it the right handle for tracking a *pattern* across export versions. It is **not** unique per row. The CSV carries 43,096 distinct `argus_record_id` values across 43,126 rows: 15 ids are shared by more than one row, covering 45 rows in total. The most-shared id covers six rows. Do not use it as a primary key and do not join on it without expecting fan-out. For row identity, use the `id` column, which is the canonical `identifiers` row id.
+
+**Blank `confidence` means unscored, not zero.** 174 of the 43,126 CSV rows ship an empty `confidence`. That is a distinct state from an explicit `0`, which 262 rows do carry. The blank rows are otherwise fully provenanced: all 174 carry an `http(s)` `source_url`. Handle them as their own class. Coercing blank to `0` buckets 174 attributed rows as lowest-confidence; coercing to `100` ships them to a scanner. Neither is right, so filter them out explicitly or route them to review.
 
 For walkthroughs (querying the CSV, building a watchlist, integrating with a scanner), see [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md). For the engineering setup, see [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md).
 
@@ -148,7 +157,19 @@ movement is `0060`'s three `geographic_scope='global'` rows, which were already 
 and shipped in no feed because `device_category='unknown'` bins out first. That is rows becoming
 eligible, not devices newly found.
 
-Full version-by-version history, from v1.0.0 through v1.8.0, lives in
+**Since the v1.8.0 tag.** `main` is 18 commits ahead of the `v1.8.0` tag. Migration
+`0064_mac781_argus_export_anchor_repair` was applied after the tag and the exports were
+regenerated from it. Three of the four export files carry `exported_at 2026-08-21T12:06:18Z`
+rather than the v1.8.0 fingerprint recorded in the changelog: `argus_export.csv`,
+`argus_export.json` and `argus_export_high_confidence.json`.
+`argus_export_behavioral_signatures.json` was not regenerated. Its blob is identical at the
+`v1.8.0` tag and at `main`, and it still carries its own earlier
+`exported_at 2026-08-20T17:48:39Z`. No feed count moved: 43,126 active
+identifiers, 1,014 standard, 504 high-confidence, 132 behavioral, `schema_version` still 35. That
+work and this documentation-accuracy pass are written up as **v1.8.1** in the changelog. Nothing
+is tagged.
+
+Full version-by-version history, from v1.0.0 through v1.8.1, lives in
 [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Downstream consumers
@@ -160,6 +181,27 @@ Argus is designed as a producer of detection data for downstream RF-scanner cons
 - **Operator-side combined deployment**, an operator may run Lynceus + Rayhunter together; the two exports are non-overlapping (wire-observable patterns vs cellular-control-plane behavior).
 
 **Operator-stack self-exclusion**: Argus operator-side hardware MUST NOT appear in the high-confidence export. That covers Lynceus host hardware (Raspberry Pi OUIs) and Rayhunter-supported modems (Orbic RC400L, FY UZ801, PinePhone Quectel, Wingtech CT2MHS01, T-Mobile TMOHS1, TP-Link M7350/M7310). This is mandatory regardless of source confidence.
+
+## Testing
+
+The suite is tiered by the resource a test needs, so a bare clone can run it.
+
+```bash
+# public tier: everything that runs on a fresh clone, no database, no raw artifacts
+python3 -m pytest tests/ -q
+
+# maintainer tier: turn every resource skip into a hard failure
+ARGUS_REQUIRE_ALL=1 python3 -m pytest tests/ -q
+```
+
+Tests that need the canonical database are marked `canonical_db`. Tests that need the ingest
+inputs under `raw/` are marked `raw_artifacts`. Neither resource is distributed: `db/argus.db` is
+not published and `raw/` is gitignored. On a public clone those tests **skip** rather than fail,
+so the public tier is green on a clone that contains only what this repository ships.
+
+`ARGUS_REQUIRE_ALL=1` is the maintainer switch. It converts those skips into failures, so a
+machine that is supposed to hold both resources cannot pass the suite by silently skipping the
+part of it that touches them. Run both from the repository root.
 
 ## How to contribute
 
@@ -175,7 +217,7 @@ For schema-impacting changes (new tables, new `identifier_type` enum values, new
 ## Documentation map
 
 - [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md), start here. Plain-language overview, walkthroughs, coverage caveats.
-- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.8.0).
+- [`CHANGELOG.md`](CHANGELOG.md), version-by-version history (v1.0.0 through v1.8.1).
 - [`CREDITS.md`](CREDITS.md), per-source attribution and per-vendor lexicon.
 - [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md), developer setup (clone, verify, migrations, tests).
 - [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md), how Argus integrates sources, confidence model, dedup logic.
@@ -203,6 +245,22 @@ Every active identifier traces back to:
 2. **A `source_type` band** with a calibrated confidence ceiling per band
 3. **A `confidence` integer** in 0-99 with corroboration-lift math when independent second sources arrive
 4. **Per-row `notes` JSON** carrying license posture, promotion-time citation, and audit-trail anchors
+
+**Non-URL `source_url` values.** 865 of the 43,126 CSV rows carry a provenance token in
+`source_url` instead of a fetchable URL. All 865 are `source_type='manufacturer_app'` rows whose
+upstream artifact is a vendor application package, not a web page. A parser that assumes
+`source_url` always starts with `http` has to handle these five prefixes:
+
+| Prefix | Rows | Form | What it identifies |
+|---|--:|---|---|
+| `wave_i_aggregate:` | 660 | `wave_i_aggregate://<batch>/<shard>/<value>` | A row promoted through the Wave-I aggregate ingest. The token names the ingest batch and shard; the per-row upstream page is not carried on the row. |
+| `apkcombo:` | 188 | `apkcombo:<package>__<version>__apkcombo.xapk` | The vendor Android package the identifier was extracted from, named by package id and version. 7 distinct packages across the 188 rows. |
+| `APK extract:` | 12 | `APK extract: <package>@<version>.apk SHA-256 <digest>` | Static analysis of a named vendor APK, pinned by SHA-256 where the digest was recorded. The 12 rows are written 10 different ways but name 6 distinct artifacts: 5 pinned by a SHA-256 digest, plus one Hanwha Wisenet APK named with no version and no digest. |
+| `argus-internal:` | 3 | `argus-internal://<wave>/<vendor>/<file>` | A findings file inside the Argus build tree. Not resolvable by a downstream consumer. |
+| `manufacturer_app:` | 2 | `manufacturer_app://<package>@<version>#<hash>` | A vendor companion-app binary, pinned by package, version and a short content hash. |
+
+The prefix is not a proxy for the source band: 266 of the 1,131 `manufacturer_app` rows do carry
+an `http(s)` URL.
 
 **No fabrication.** If a source doesn't yield concrete evidence, the answer is "no record," not "plausible record." See [`docs/engineering/METHODOLOGY.md`](docs/engineering/METHODOLOGY.md) §7 for the full discipline.
 

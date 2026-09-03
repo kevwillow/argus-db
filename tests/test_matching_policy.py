@@ -374,6 +374,7 @@ def test_guard_fires_on_short_only_alias_blob():
         assert_policy_is_applicable(rows)
 
 
+@pytest.mark.canonical_db
 def test_guard_passes_on_real_registry_state():
     if not DB.exists():
         pytest.skip("db/argus.db not present")
@@ -386,6 +387,7 @@ def test_guard_passes_on_real_registry_state():
 
 # ── 5. measured behaviour against HEAD registry state ─────────────────────
 
+@pytest.mark.canonical_db
 def test_deferred_vendors_would_lose_their_footprint():
     """The reason the deferred seven are deferred, asserted not narrated."""
     if not DB.exists():
@@ -408,6 +410,7 @@ def test_deferred_vendors_would_lose_their_footprint():
     assert len([a for a in dji if not is_qualified_alias(a)]) > len(dji) / 2
 
 
+@pytest.mark.canonical_db
 def test_applied_vendors_all_have_a_qualified_alias():
     if not DB.exists():
         pytest.skip("db/argus.db not present")
@@ -614,6 +617,7 @@ def test_promoted_rule_separates_the_measured_examples():
                 "Axon", AXON_ALIASES, "SOME RESELLER LLC", excerpt) is None, excerpt
 
 
+@pytest.mark.canonical_db
 def test_promotion_would_not_lose_a_single_adjudicated_true_positive():
     """The load-bearing claim, asserted against HEAD rather than narrated.
 
@@ -697,6 +701,7 @@ def test_basis_rule_is_live_and_pins_what_the_promotion_removed():
                           "AXON X26P TASERS") == "description"
 
 
+@pytest.mark.canonical_db
 def test_basis_differentiation_is_a_narrowing_not_an_expansion():
     """Every row the applied rule attributes must already have matched before.
 
@@ -740,6 +745,7 @@ def test_basis_differentiation_is_a_narrowing_not_an_expansion():
     assert len(rb) - len(r0) == -196
 
 
+@pytest.mark.canonical_db
 def test_description_basis_drop_cohort_is_recomputed_and_reconciles():
     """MAC-622 discharges the MAC-595 sweep obligation AS CODE, not as prose.
 
@@ -924,6 +930,7 @@ def test_prefix_neutral_allowlist_is_reachable():
         mp.PREFIX_NEUTRAL_TOKENS = saved
 
 
+@pytest.mark.canonical_db
 def test_prefix_neutral_shape_occurs_in_the_live_corpus():
     """The allowlist is not hypothetical — assert the shape exists in the DB."""
     if not DB.exists():
@@ -942,6 +949,7 @@ def test_non_match_and_substring_are_distinguished():
     assert extension_verdict("Axis", None) is None
 
 
+@pytest.mark.canonical_db
 def test_guard_verdicts_over_the_live_corpus_are_stable():
     """Pin the measured blast radius on the keywords that actually reach T3.
 

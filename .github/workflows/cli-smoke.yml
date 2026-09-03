@@ -1,0 +1,180 @@
+name: cli-smoke
+
+# Run the README quickstart VERBATIM on a bare checkout with no canonical DB.
+#
+# This is the first thing a new user does. If it fails, nothing else in the
+# repo matters. A fresh clone has exports/ (tracked) but no db/argus.db
+# (gitignored), so the CLI must fall back to the shipped exports on its own --
+# with no flags, exactly as the README prints the commands.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "argus_cli.py"
+      - "exports/**"
+      - "README.md"
+      - ".github/workflows/cli-smoke.yml"
+  pull_request:
+    paths:
+      - "argus_cli.py"
+      - "exports/**"
+      - "README.md"
+      - ".github/workflows/cli-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quickstart:
+    name: README quickstart on a bare clone
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the public tree
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Confirm this really is the no-DB path
+        # Without this, a checkout that somehow carried db/argus.db would make
+        # the smoke test pass through the DB path and prove nothing about the
+        # exports fallback the README promises.
+        run: |
+          set -euo pipefail
+          if [ -e db/argus.db ]; then
+            echo "::error::db/argus.db exists; this run would not exercise the"
+            echo "::error::exports fallback the README quickstart depends on."
+            exit 1
+          fi
+          git ls-files --error-unmatch argus_cli.py > /dev/null
+          git ls-files --error-unmatch exports/argus_export.csv > /dev/null
+          echo "OK: no canonical DB, argus_cli.py and exports/ are tracked."
+
+      - name: 'Quickstart step 1: python3 argus_cli.py status'
+        # The check is AGREEMENT, not a pinned constant.
+        #
+        # This step used to grep the CLI's stdout for the literal '43126'. That
+        # verified nothing about the CLI -- it only asserted that the corpus had
+        # not changed size, so one legitimate new identifier turned CI red. Worse,
+        # a bare substring match would also be satisfied by an unrelated number
+        # that happens to contain those digits.
+        #
+        # The expected count is now read from the artifact's OWN `# meta:` line
+        # and compared with the number the CLI reports, so the check catches the
+        # defect that matters: the CLI and the file it reads disagreeing.
+        run: |
+          set -euo pipefail
+
+          # The meta line is line 1 of the CSV, and only line 1. Do not grep the
+          # whole file for '^# ': quoted source_excerpt fields contain lines that
+          # begin with '#' too (there is one at line 45053).
+          meta_line=$(head -n 1 exports/argus_export.csv)
+          case "$meta_line" in
+            '# meta: '*) ;;
+            *) echo "::error::exports/argus_export.csv line 1 is not a '# meta: ' header."
+               echo "::error::got: $meta_line"
+               exit 1 ;;
+          esac
+          expected=$(printf '%s\n' "$meta_line" \
+                     | grep -oE 'record_count=[0-9]+' | head -1 | cut -d= -f2 || true)
+          if [ -z "${expected:-}" ] || [ "$expected" -le 0 ]; then
+            echo "::error::could not read a positive record_count= from the CSV meta line."
+            echo "::error::line 1 was: $meta_line"
+            exit 1
+          fi
+          echo "artifact meta line declares record_count=$expected"
+
+          python3 argus_cli.py status | tee status.txt
+          echo "status exited 0"
+
+          # `Identifiers: <N> rows in argus_export.csv / ...`
+          ident=$(sed -n 's/^Identifiers: \([0-9][0-9]*\) rows in argus_export\.csv .*/\1/p' \
+                  status.txt | head -1)
+          # `  argus_export.csv: <N>` under "Export record counts:"
+          reported=$(sed -n 's/^  argus_export\.csv: \([0-9][0-9]*\).*/\1/p' status.txt | head -1)
+
+          if [ -z "${ident:-}" ] || [ -z "${reported:-}" ]; then
+            echo "::error::status output no longer carries the two CSV row-count lines"
+            echo "::error::this check reads ('Identifiers: N rows in argus_export.csv'"
+            echo "::error::and '  argus_export.csv: N'). Either the CLI stopped reporting"
+            echo "::error::them or its output format changed; update this workflow."
+            exit 1
+          fi
+
+          if [ "$ident" -ne "$expected" ] || [ "$reported" -ne "$expected" ]; then
+            echo "::error::the CLI and the artifact disagree about the CSV row count."
+            echo "::error::  argus_export.csv '# meta:' record_count = $expected"
+            echo "::error::  CLI 'Identifiers:' line                 = $ident"
+            echo "::error::  CLI 'Export record counts:' line        = $reported"
+            echo "::error::One of them is wrong. Regenerate the export or fix the CLI;"
+            echo "::error::do not relax this comparison."
+            exit 1
+          fi
+
+          # The CLI counts the rows itself and appends this marker when its own
+          # count disagrees with the meta line. Its absence is a third,
+          # independent statement that the artifact is internally consistent.
+          if grep -qF '[WARNING: meta line claims record_count=' status.txt; then
+            echo "::error::the CLI flagged a meta/row-count mismatch inside the export:"
+            grep -F '[WARNING: meta line claims record_count=' status.txt
+            exit 1
+          fi
+          echo "OK: CLI and argus_export.csv agree on $expected rows, no meta warning."
+
+      - name: 'Quickstart step 2: python3 argus_cli.py query e4:aa:ea:80:a1:9b'
+        # `query` exits 0 even when it finds NOTHING -- a miss prints
+        # "No records for identifier: ..." and returns 0. So the exit code proves
+        # nothing here and the output assertion is the entire check. Assert the
+        # match-count line rather than just the presence of a vendor string
+        # somewhere in the output.
+        run: |
+          set -euo pipefail
+          python3 argus_cli.py query e4:aa:ea:80:a1:9b | tee query.txt
+          echo "query exited 0"
+
+          if grep -qF 'No records for identifier' query.txt; then
+            echo "::error::the README quickstart MAC resolves to NOTHING. query exits 0"
+            echo "::error::on a miss, so this is the only thing that catches it."
+            exit 1
+          fi
+
+          if ! grep -qE '^1 exact match\(es\) for e4:aa:ea:80:a1:9b:$' query.txt; then
+            echo "::error::expected exactly one exact match for e4:aa:ea:80:a1:9b."
+            echo "::error::Either the quickstart identifier no longer resolves 1:1 or the"
+            echo "::error::query output format changed; update this workflow."
+            exit 1
+          fi
+
+          # The manufacturer must appear on the matched record's detail line, not
+          # merely somewhere in the output.
+          if ! grep -qE '^  id=[0-9]+ type=mac category=[a-z_]+ manufacturer=Flock Safety confidence=[0-9]+$' \
+               query.txt; then
+            echo "::error::the exact match is not attributed to 'Flock Safety' on its own"
+            echo "::error::detail line. A bare substring match anywhere in the output"
+            echo "::error::would also be satisfied by the OUI-parent section below it."
+            exit 1
+          fi
+          echo "OK: quickstart MAC resolves to exactly one Flock Safety record with"
+          echo "OK: no canonical DB."
+
+      - name: Confirm the quickstart commands are the ones the README prints
+        # Guard against the workflow and the README drifting apart: the smoke
+        # test is only meaningful if it runs what the doc actually tells people
+        # to run.
+        run: |
+          set -euo pipefail
+          grep -qF 'python3 argus_cli.py status' README.md || {
+            echo "::error::README no longer contains 'python3 argus_cli.py status'"; exit 1; }
+          grep -qF 'python3 argus_cli.py query e4:aa:ea:80:a1:9b' README.md || {
+            echo "::error::README quickstart query changed; update this workflow"; exit 1; }
+          echo "OK: workflow matches the README quickstart verbatim."

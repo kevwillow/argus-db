@@ -103,6 +103,7 @@ def test_missing_manufacturer_never_holds():
 # ── 2. the alias arm is guarded ───────────────────────────────────────────────
 
 
+@pytest.mark.canonical_db
 def test_dji_alias_blob_cannot_import_another_vendor(con):
     """The live contamination case. DJI's alias blob carries `Autel`, `Parrot`,
     `Axon`, `Yuneec`. A row whose manufacturer is `Autel Robotics` must not keep
@@ -118,6 +119,7 @@ def test_dji_alias_blob_cannot_import_another_vendor(con):
     assert flag_holds("Autel Robotics", "DJI", sf).holds is False
 
 
+@pytest.mark.canonical_db
 def test_alias_arm_does_real_work_where_it_is_safe(con):
     """Non-vacuity: at least one pool vendor must actually carry aliases, or the
     guard tests above prove nothing about a guard that just returns empty."""
@@ -146,6 +148,7 @@ def test_alias_that_is_another_canonical_is_dropped_as_conflation(con):
 # ── 3. the live delta, asserted as a DELTA ────────────────────────────────────
 
 
+@pytest.mark.canonical_db
 def test_acceptance_property_holds_on_canonical(con):
     """THE acceptance property, asserted as a property of the data and not as the
     status of an issue: no row carries `surveillance_vendor_flag` on the basis of
@@ -171,6 +174,7 @@ def test_acceptance_property_holds_on_canonical(con):
     )
 
 
+@pytest.mark.canonical_db
 def test_the_corrected_rows_stayed_corrected(con):
     """NEGATIVE arm, post-apply. Each of these carried a bare-containment flag and
     must now carry none, plus the provenance of what was withdrawn."""
@@ -185,6 +189,7 @@ def test_the_corrected_rows_stayed_corrected(con):
         assert was == flag, f"id={rid} lost the record of what was withdrawn"
 
 
+@pytest.mark.canonical_db
 def test_the_positive_control_rows_still_carry_their_flag(con):
     """POSITIVE arm, post-apply. Without this the correction would also pass by
     having wiped the column."""
@@ -196,6 +201,7 @@ def test_the_positive_control_rows_still_carry_their_flag(con):
         )
 
 
+@pytest.mark.canonical_db
 def test_alias_arm_is_not_load_bearing_for_the_live_delta(con):
     """Measured: the alias arm rescues 0 of the 63. Recorded as a test so that if
     a future alias edit makes it load-bearing, that shows up as a deliberate
@@ -205,6 +211,7 @@ def test_alias_arm_is_not_load_bearing_for_the_live_delta(con):
     assert {x["id"] for x in full.kept} - {x["id"] for x in bare.kept} == set()
 
 
+@pytest.mark.canonical_db
 def test_pool_is_read_from_the_column_not_hardcoded(con):
     pool = pool_from_db(con)
     assert "Ring" in pool and "Bosch" in pool

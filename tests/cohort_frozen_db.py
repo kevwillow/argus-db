@@ -28,10 +28,10 @@ re-proves each epoch boundary from canonical's published history;
 
 Two epochs, because the cohorts promoted in two waves
 -----------------------------------------------------
-``v167``  — ``da74f43``, exported 2026-06-12T14:46:32Z, 43,213 rows.
+``v167``  — ``d4d16563d413288b2a8bc90ca4ca91d69e04aef4``, exported 2026-06-12T14:46:32Z, 43,213 rows.
             Last published export before the MAC-364/365/366/368 wave landed.
             Cohorts 1, 2, 3-drones, 5.
-``wave2`` — ``58648b7``, exported 2026-06-14T05:32:23Z, 43,123 rows.
+``wave2`` — ``65a9c976954d39b986d22007143d9b0fc2c97e64``, exported 2026-06-14T05:32:23Z, 43,123 rows.
             Last published export before the MAC-419 Wave-2 ingestion.
             Cohorts 3-bletracker, 4, 6.
 
@@ -68,13 +68,13 @@ EPOCHS = {
     "v167": {
         "sha256": "8d9a3cba59d4322270cf614587d9ac89d29d002ec9992da35ea93ced729a67e4",
         "rows": 43213,
-        "commit": "da74f43",
+        "commit": "d4d16563d413288b2a8bc90ca4ca91d69e04aef4",  # v1.6.7 tag; byte-identical to the former da74f43 pin, which is not an ancestor of main and so is unresolvable in a public clone
         "exported_at": "2026-06-12T14:46:32Z",
     },
     "wave2": {
         "sha256": "206c8a4ead6e2bf9b2f2830f971e8dc7537aea9b5db87de1f5b721d02c443899",
         "rows": 43123,
-        "commit": "58648b7",
+        "commit": "65a9c976954d39b986d22007143d9b0fc2c97e64",  # v1.6.9 tag; byte-identical to the former 58648b7 pin, which is not an ancestor of main and so is unresolvable in a public clone
         "exported_at": "2026-06-14T05:32:23Z",
     },
 }

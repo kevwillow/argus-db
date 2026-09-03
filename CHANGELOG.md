@@ -14,6 +14,139 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v1.8.1 - 2026-09-03
+
+A maintenance release covering the 18 commits between the `v1.8.0` tag and `main`. One migration
+landed after the tag was cut and forced an export regeneration; the rest is repository hygiene,
+tracker-URL redaction, release-gate repair and a documentation-accuracy pass. No identifier was
+admitted, withdrawn or recategorized this cycle: every feed count is identical to v1.8.0, and
+`schema_version` is unchanged at **35**. Nothing in this entry is tagged.
+
+### If you consume the feeds, read this part
+
+**Nothing in the data moved.** Active identifiers **43,126**, standard feed **1,014**,
+high-confidence feed **504**, behavioral feed **132**. Three of the four export files were
+rewritten by the `0064` regeneration: `argus_export.csv`, `argus_export.json` and
+`argus_export_high_confidence.json`. `git diff --stat v1.8.0 HEAD -- exports/` reports those three
+plus the generated `coverage_report.md`, 4 files changed, 157 insertions and 136 deletions.
+`argus_export_behavioral_signatures.json` was **not** regenerated: its blob is byte-identical at
+the `v1.8.0` tag and at `main`. So if you diff v1.8.0's feeds against these, expect a fingerprint
+delta on the standard and high-confidence feeds, none on the behavioral feed, and no record delta
+anywhere.
+
+**Two documented record shapes were wrong and are corrected.** `README.md` claimed each
+high-confidence record carries a `severity` field. It does not, and no shipped export ever did:
+every record in `argus_export_high_confidence.json` and in `argus_export.json` carries exactly
+four keys, `argus_record_id`, `description`, `pattern`, `pattern_type`. The behavioral feed
+carries a different five-key shape (`argus_record_id`, `signature_name`, `cellular_generation`,
+`confidence`, `threshold_json`), and two of those five are sparse: `threshold_json` is populated on
+55 of the 132 entries and `cellular_generation` on 19. Code that branched on a documented
+`severity` was branching on a field absent from all 504 records.
+
+**`argus_record_id` is a pattern key, not a row id.** The CSV carries 43,096 distinct
+`argus_record_id` values across 43,126 rows: 15 ids are shared by more than one row, covering 45
+rows in total. The most-shared id covers six rows. The README previously told integrators to bind
+to it to track a specific row. Use the `id` column for row identity; `argus_record_id` remains
+correct for tracking a pattern across export versions.
+
+**865 of the 43,126 CSV rows carry a non-URL `source_url`.** 42,261 carry a direct `http(s)`
+citation. The other 865 carry a provenance token instead: `wave_i_aggregate:` (660),
+`apkcombo:` (188), `APK extract:` (12), `argus-internal:` (3), `manufacturer_app:` (2). All 865 are
+`source_type='manufacturer_app'` rows whose upstream artifact is a vendor application package
+rather than a web page. The five token forms are now decoded in `README.md`. A parser that assumes
+`source_url` always begins with `http` needs to handle them.
+
+**174 CSV rows ship a blank `confidence`.** Blank means unscored. It is a distinct state from an
+explicit `0`, which 262 rows carry. All 174 blank rows carry an `http(s)` `source_url`, so they are
+provenanced, just unranked. Coercing blank to `0` or to `100` both misclassify them.
+
+### Schema
+
+- **`0064_mac781_argus_export_anchor_repair`** ([MAC-781](<TRACKER_URL>issues/MAC-781)). Applied
+  after the `v1.8.0` tag was cut, which is why the tag and `main` disagree on export bytes. No DDL:
+  `schema_version` is unchanged at **35**.
+
+### Data
+
+- **`identifiers` active:** **43,126** (no change). **Lynceus standard feed:** **1,014** (no
+  change). **high-confidence feed:** **504** (no change). **behavioral-signatures feed:** **132**
+  (no change). **CSV:** **43,126** rows, matching the active count.
+- **Fingerprint.** The standard and high-confidence feeds carry `argus_run_id`
+  `78b127fe-7dab-5d27-9c83-a93e8c80f46d` and `exported_at` `2026-08-21T12:06:18Z`; the behavioral
+  feed carries `260b5777-99c8-5f75-8023-f4012242e7f4` at `2026-08-20T17:48:39Z`. The CSV meta line
+  reads `schema_version=35, exported_at=2026-08-21T12:06:18Z, record_count=43126`. Both run ids are
+  unchanged from v1.8.0 and only `exported_at` moved, so the run id is not a regeneration signal.
+  Read export provenance from the `exported_at` field in each artifact, never from file mtime.
+
+### Repository and tooling
+
+Eighteen commits sit between the `v1.8.0` tag and `main`. Beyond `0064` and the documentation
+pass below, this is what landed. None of it changes a shipped export record; it changes what the
+repository tracks and what the release gates can see.
+
+- **Internal material untracked** ([MAC-763](<TRACKER_URL>issues/MAC-763)). 17 files leave the
+  tree: 15 run logs under `logs/` and the two `docs/_archive/redirect-stubs/` files. `.gitignore`
+  is widened to keep them out, and two clean-tree breaks the scrub exposed are guarded. Across the
+  whole range the tree moves from 361 tracked files at the `v1.8.0` tag to 368 at `main` (24
+  added, 17 deleted, 42 modified), so the net is an increase: this is a hygiene pass on internal
+  material, not a reduction in what ships.
+- **Tracker URLs redacted** ([MAC-764](<TRACKER_URL>issues/MAC-764),
+  [MAC-787](<TRACKER_URL>issues/MAC-787)). Issue links in tracked files are replaced with the
+  `<TRACKER_URL>` placeholder and the generator that emitted the raw form is fixed, so a
+  regeneration does not put them back. At `main` `<TRACKER_URL>` appears 502 times across 24
+  tracked files.
+- **Release-gate repair** ([MAC-774](<TRACKER_URL>issues/MAC-774),
+  [MAC-777](<TRACKER_URL>issues/MAC-777), [MAC-778](<TRACKER_URL>issues/MAC-778),
+  [MAC-779](<TRACKER_URL>issues/MAC-779), [MAC-781](<TRACKER_URL>issues/MAC-781)).
+  `check_commit_cites.py` now tests reachability rather than mere object existence, and 9
+  dangling-object cites are repointed. `check_doc_anchors.py` loses a dead constant and prints the
+  coverage it actually has. `check_section_anchors.py`, `check_mac781_anchor_clause.py`,
+  `anchor_resolve.py`, `strip_tracker_links.py` and `step0_check_release_docs.py` are new. Nine
+  test files under `tests/` are added or amended across the range.
+- **`0063` staged but not applied** ([MAC-765](<TRACKER_URL>issues/MAC-765)). The migration that
+  would split row 44726's `pineapple` branch and restore Hak5 coverage sits in
+  `db/migrations/_drafts/0063_mac765_44726_pineapple_branch_split.sql.draft`. It is a draft and it
+  is absent from `db/migrations/`, so it is not in the applied ledger, and the exports agree:
+  neither `argus_export.json` nor `argus_export_high_confidence.json` contains a `hak5` or
+  `pineapple` entry, so **Hak5 still ships in neither feed**. The apply-order halt and the CP7
+  high-confidence gap that hold it there are written up under the same issue.
+
+### Documentation
+
+- **`README.md` claim repair.** Deleted the `severity` claim; replaced the "direct URL citation"
+  claim with the measured 42,261 / 865 split and a table decoding all five non-URL `source_url`
+  prefixes; demoted `argus_record_id` from row handle to pattern key and pointed row identity at
+  `id`; documented the 174 unscored rows; rewrote the Quickstart so the first commands shown run on
+  a bare clone and the database caveat follows a working example.
+- **`README.md` testing section added**, documenting the resource-tiered suite: the public tier
+  runs on a fresh clone, `canonical_db` and `raw_artifacts` tests skip because neither resource is
+  distributed, and `ARGUS_REQUIRE_ALL=1` converts those skips into failures for maintainers.
+- **CI badges added** for `public-suite`, `export-contract`, `doc-claims`, `cli-smoke` and `lint`.
+  The decorative badge block is cut from four to one.
+- **Four numbers that pass introduced are repaired here.** (1) "30 rows share an
+  `argus_record_id`" counted the surplus, not the sharers. The measurement over
+  `exports/argus_export.csv` is 43,096 distinct `argus_record_id` values across 43,126 rows: 15
+  ids are shared by more than one row, covering 45 rows in total (8 ids on 2 rows, 2 on 3, 3 on 4,
+  1 on 5, 1 on 6). (2) The changelog range was moved from a correct "v1.0.0 through v1.8.0" to a
+  false "v1.6.0 through v1.8.1". This file spans **v1.0.0 through v1.8.1** and both `README.md`
+  cites and the `docs/USER_GUIDE.md` cite now say so. (3) "The files under `exports/` carry
+  `exported_at 2026-08-21T12:06:18Z`" is false for `argus_export_behavioral_signatures.json`,
+  which carries `2026-08-20T17:48:39Z`; the claim is now scoped to the three files it holds for.
+  (4) The `APK extract:` table row read "10 distinct artifacts", which counted distinct strings.
+  The 12 rows are written 10 different ways and name 6 distinct artifacts. The release badge is
+  moved to `v1.8.1` so it stops contradicting this entry.
+
+### Bible amendments
+
+- None. No schema change, no source admission, no ratification this cycle.
+
+### Halts encountered
+
+- None in the data. The doc-claim audit that motivated this release is not a halt class: it found
+  no defect in the shipped artifacts, only in the documents describing them.
+
+---
+
 ## v1.8.0 - 2026-08-20
 
 Two migrations, both of them queued behind gates that closed after v1.7.0 shipped. `0059` lands the

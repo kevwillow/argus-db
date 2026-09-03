@@ -275,6 +275,7 @@ def test_continent_token_never_reaches_the_row_comparison():
     )
 
 
+@pytest.mark.canonical_db
 def test_rollup_yield_against_canonical_is_zero():
     """MAC-742 said to build it and be honest that it yields nothing. Measured.
 

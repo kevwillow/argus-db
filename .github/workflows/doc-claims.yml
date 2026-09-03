@@ -1,0 +1,156 @@
+name: doc-claims
+
+# The anti-drift job. Every numeric and structural claim the README makes about
+# the exports is re-measured against the shipped files.
+#
+# Claims are EXTRACTED from README.md by regex, never hardcoded. If someone
+# edits a README number, the claim moves with it and the measurement decides
+# who is right. A hardcoded expectation would silently agree with a wrong doc.
+#
+# This header used to assert the job was "EXPECTED TO BE RED", and named three
+# specific false claims -- one of which described argus_record_id as a per-row
+# binding key "when 30 rows share an id". That description was itself wrong and
+# is the reason this note now carries no standing verdict. The measured truth is
+# that the CSV has 43,096 distinct `argus_record_id` values across 43,126 rows:
+# 15 ids are shared by more than one row, covering 45 rows in total. 30 is the
+# SURPLUS (43,126 - 43,096), i.e. rows beyond one-per-id, NOT the number of rows
+# that share an id.
+#
+# So: this job has no expected colour. Whatever check_doc_claims.py reports at
+# HEAD is the answer, and a red run means README.md states something the shipped
+# files contradict. The fix is always to correct the doc, never to loosen the
+# check and never to add continue-on-error.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - "CHANGELOG.md"
+      - "exports/**"
+      - "db/migrations/**"
+      - "scripts/ci/**"
+      - ".github/workflows/doc-claims.yml"
+  pull_request:
+    paths:
+      - "README.md"
+      - "CHANGELOG.md"
+      - "exports/**"
+      - "db/migrations/**"
+      - "scripts/ci/**"
+      - ".github/workflows/doc-claims.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  claims:
+    name: README claims match the shipped data
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the public tree
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Re-measure every README claim
+        # This job's whole premise is that claims are EXTRACTED from README.md by
+        # regex. That makes it uniquely exposed to a silent no-op: reword the
+        # README and the extraction regexes stop matching, so zero claims get
+        # measured and the script exits 0 having verified nothing. Exit code
+        # alone cannot tell that apart from a genuine pass.
+        #
+        # So assert the script's own summary: that it ran to completion, that no
+        # claim FAILED, that PASS + FAIL accounts for every claim it says it
+        # measured, and that the number of measured claims has not collapsed.
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/check_doc_claims.py | tee claims.txt
+
+          # Not anchored at end-of-line: the summary gains trailing clauses as
+          # the checker grows. The fields are parsed and asserted individually.
+          summary=$(grep -E '^check_doc_claims: [0-9]+ PASS, [0-9]+ FAIL \(of [0-9]+ independently measured claims\)' \
+                    claims.txt | tail -1 || true)
+          if [ -z "${summary:-}" ]; then
+            echo "::error::check_doc_claims.py exited 0 but printed no summary line."
+            echo "::error::It did not run to completion, so its exit code proves nothing."
+            exit 1
+          fi
+          echo "summary: $summary"
+
+          passed=$(printf '%s\n' "$summary" | sed -n 's/^check_doc_claims: \([0-9]*\) PASS.*/\1/p')
+          failed=$(printf '%s\n' "$summary" | sed -n 's/^.*PASS, \([0-9]*\) FAIL.*/\1/p')
+          total=$(printf '%s\n' "$summary" | sed -n 's/^.*(of \([0-9]*\) independently measured claims).*/\1/p')
+          if [ -z "${passed:-}" ] || [ -z "${failed:-}" ] || [ -z "${total:-}" ]; then
+            echo "::error::could not parse PASS/FAIL/total out of the summary line."
+            echo "::error::line was: $summary"
+            exit 1
+          fi
+
+          if [ "$failed" -ne 0 ]; then
+            echo "::error::$failed claim(s) FAILED but the script exited 0."
+            grep -F 'FAIL' claims.txt || true
+            exit 1
+          fi
+          if [ "$((passed + failed))" -ne "$total" ]; then
+            echo "::error::summary does not add up: $passed PASS + $failed FAIL != $total"
+            echo "::error::independently measured claims. Some claim was extracted but"
+            echo "::error::never adjudicated."
+            exit 1
+          fi
+
+          # MEASURED on 2026-09-03 against the working tree at 9b32212: 15 PASS
+          # of 15 independently measured claims at 03:2xZ, then 41 of 41 at
+          # 03:41Z — the checker was being extended while this was written. The
+          # floor sits well under the SMALLER of those so it survives that churn
+          # in either direction while still catching a regex-drift collapse. It
+          # is a vacuity floor, not a pin: re-derive the real count at HEAD.
+          if [ "$passed" -lt 10 ]; then
+            echo "::error::only $passed README claims were independently measured (15 and"
+            echo "::error::41 were the counts measured on 2026-09-03). The extraction"
+            echo "::error::regexes have almost certainly stopped matching the README, so"
+            echo "::error::this job is passing without checking the doc."
+            exit 1
+          fi
+          echo "OK: $passed README claims independently measured, 0 FAIL,"
+          echo "OK: summary self-consistent."
+
+      - name: Confirm the doc-vs-doc rows are not being counted as verification
+        # The script reports some claims as CONSISTENT: README agrees with
+        # CHANGELOG. That is doc-vs-doc agreement, NOT measurement -- those
+        # numbers need db/argus.db, which this repo does not distribute. If that
+        # disclaimer ever disappears, CONSISTENT rows start reading as verified
+        # facts and this job begins overstating what it proved.
+        run: |
+          set -euo pipefail
+          if grep -qF 'CONSISTENT' claims.txt; then
+            if ! grep -qF 'NOT VERIFICATION' claims.txt; then
+              echo "::error::the output contains CONSISTENT verdicts but no"
+              echo "::error::'NOT VERIFICATION' disclaimer. Doc-vs-doc agreement would be"
+              echo "::error::read as measurement."
+              exit 1
+            fi
+            echo "OK: CONSISTENT rows are present and explicitly disclaimed as"
+            echo "OK: doc-vs-doc only."
+          else
+            echo "OK: no CONSISTENT (doc-vs-doc) rows in this run."
+          fi
+
+      - name: Explain a failure
+        if: failure()
+        run: |
+          echo "::notice::doc-claims failed. Either the README states something the"
+          echo "::notice::shipped files contradict, or the checker stopped measuring."
+          echo "::notice::The fix is to correct README.md, never to loosen this check."
+          echo "::notice::Claims marked CONSISTENT are doc-vs-doc only and are NOT"
+          echo "::notice::verification -- they need the canonical DB."

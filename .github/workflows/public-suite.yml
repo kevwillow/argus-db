@@ -1,0 +1,374 @@
+name: public-suite
+
+# The headline job: prove the advertised test path is reproducible by a
+# stranger. It checks out ONLY the public tree -- db/argus.db is gitignored and
+# raw/ is gitignored, so neither arrives with the clone. That is the point. If
+# this job is green, "clone it and run the tests" is a true statement.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  suite:
+    name: pytest (python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Check out the public tree
+        uses: actions/checkout@v4
+        with:
+          # Full history: 12 test modules shell out to git (commit-cite,
+          # section-anchor and fingerprint gates). On a shallow clone they go
+          # red, or worse, vacuously green against a truncated history.
+          fetch-depth: 0
+
+      - name: Confirm the pytest configuration arrived with the clone
+        # FAIL EARLY AND LOUD. Everything below depends on pytest.ini and
+        # conftest.py: pytest.ini supplies `testpaths`, `--strict-markers` and
+        # the three resource markers; conftest.py supplies the skip logic and
+        # the ARGUS_REQUIRE_ALL escape hatch the positive control exercises.
+        #
+        # If either is missing from the checkout, pytest does NOT fail -- it
+        # falls back to defaults, collects a DIFFERENT suite with no marker
+        # enforcement and no resource gating, and still exits 0. That green is
+        # meaningless. Existence is checked on disk AND in the index, because a
+        # file that is present locally but untracked would never reach a user.
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in pytest.ini conftest.py; do
+            if [ ! -f "$f" ]; then
+              echo "::error::$f is missing from the checkout. pytest would run with"
+              echo "::error::default config and collect a different suite, still exiting 0."
+              fail=1
+              continue
+            fi
+            if ! git ls-files --error-unmatch "$f" > /dev/null 2>&1; then
+              echo "::error::$f exists but is NOT tracked in git, so it does not reach"
+              echo "::error::a user's clone. This job would then test a config that only"
+              echo "::error::exists on the runner."
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] || exit 1
+
+          # The specific settings this job's assertions depend on. A pytest.ini
+          # that exists but no longer declares these is the same false green.
+          for needle in 'testpaths = tests' '--strict-markers' \
+                        'canonical_db:' 'raw_artifacts:' 'public:'; do
+            if ! grep -qF -- "$needle" pytest.ini; then
+              echo "::error::pytest.ini no longer contains '$needle'"
+              fail=1
+            fi
+          done
+          # The two conftest.py hooks the control step below depends on.
+          for needle in 'ARGUS_REQUIRE_ALL' 'def pytest_collection(' \
+                        'def pytest_collection_modifyitems('; do
+            if ! grep -qF -- "$needle" conftest.py; then
+              echo "::error::conftest.py no longer contains '$needle'"
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] || exit 1
+          echo "OK: pytest.ini and conftest.py are present, tracked, and declare"
+          echo "OK: the markers, addopts and hooks this job asserts against."
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install test dependencies
+        run: python3 -m pip install --disable-pip-version-check pytest
+
+      - name: Confirm the undistributed resources really are absent
+        # Guard the guard. Every skip in this job is only meaningful if the
+        # resources are genuinely missing. If a future change ever commits
+        # db/argus.db or raw/, this job would start passing for the wrong
+        # reason and stop proving anything about a public clone.
+        run: |
+          set -euo pipefail
+          fail=0
+          if [ -e db/argus.db ]; then
+            echo "::error::db/argus.db is present in a fresh checkout. It is supposed"
+            echo "::error::to be undistributed; this job no longer tests the public path."
+            fail=1
+          fi
+          if [ -d raw ]; then
+            echo "::error::raw/ is present in a fresh checkout. It is gitignored and"
+            echo "::error::must not ship; this job no longer tests the public path."
+            fail=1
+          fi
+          if [ "$fail" -eq 0 ]; then
+            echo "OK: db/argus.db and raw/ are both absent, as a public clone requires."
+          fi
+          exit "$fail"
+
+      - name: Assert ZERO collection errors and that pytest.ini was actually loaded
+        # Collection errors are not test failures -- pytest reports them
+        # separately and a careless `|| true` hides them entirely. Three cohort
+        # modules used to raise FileNotFoundError at IMPORT time, before any
+        # skip could fire. This step exists so that class of breakage can never
+        # be mistaken for a passing suite again.
+        #
+        # Run WITHOUT -q on purpose: the verbose header carries `configfile:`,
+        # which is the only direct evidence that pytest resolved pytest.ini
+        # rather than falling back to its defaults. The previous step proves the
+        # file is on disk; this proves pytest read it.
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python3 -m pytest tests/ --collect-only \
+            > collect.txt 2>&1 && rc=0 || rc=$?
+
+          echo "--- head of collection output ---"
+          head -n 10 collect.txt
+          echo "--- tail of collection output ---"
+          tail -n 25 collect.txt
+
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::pytest collection exited $rc — the suite does not even collect"
+            echo "::group::full collection output"
+            cat collect.txt
+            echo "::endgroup::"
+            exit 1
+          fi
+
+          # pytest prints `configfile: pytest.ini` only when it actually
+          # resolved that file as the config source.
+          if ! grep -qE '^configfile: pytest\.ini$' collect.txt; then
+            echo "::error::pytest did not report 'configfile: pytest.ini'. It ran with"
+            echo "::error::some other config (or none), so testpaths, --strict-markers"
+            echo "::error::and the resource markers were not in force. This collection"
+            echo "::error::is not the suite this job claims to be validating."
+            grep -E '^(rootdir|configfile|inifile):' collect.txt || \
+              echo "(no rootdir/configfile header found at all)"
+            exit 1
+          fi
+
+          # rc=0 is necessary but not sufficient: assert the summary line too.
+          if grep -qiE 'errors? during collection|ERROR collecting|items / [0-9]+ errors?' collect.txt; then
+            echo "::error::collection reported errors despite exit 0"
+            grep -iE 'ERROR collecting|errors? during collection|items / [0-9]+ errors?' collect.txt || true
+            exit 1
+          fi
+
+          # Parse the count from pytest's own summary. There is deliberately NO
+          # fallback heuristic here: a previous version fell back to counting
+          # lines containing '::', so an unparseable summary satisfied the floor
+          # below on the strength of "800 lines looked test-shaped". If the
+          # summary cannot be read, that is a failure, not a licence to guess.
+          collected=$(grep -oE '^collected [0-9]+ items?' collect.txt | head -1 \
+                      | grep -oE '[0-9]+' || true)
+          if [ -z "${collected:-}" ]; then
+            echo "::error::could not parse pytest's 'collected N items' summary line."
+            echo "::error::Refusing to estimate the count from the output shape."
+            echo "::group::full collection output"
+            cat collect.txt
+            echo "::endgroup::"
+            exit 1
+          fi
+          echo "collected $collected tests, 0 collection errors, config = pytest.ini"
+
+          # A suite that collects almost nothing would satisfy every assertion
+          # below by vacuum. Pin a floor well under the real count.
+          if [ "$collected" -lt 800 ]; then
+            echo "::error::only $collected tests collected; expected >800 on the public tree"
+            exit 1
+          fi
+
+      - name: Run the public suite
+        # rc=0 is necessary but NOT sufficient. On this runner every
+        # resource-gated test skips, and a suite in which EVERYTHING skipped
+        # also exits 0. Assert that real tests actually passed.
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python3 -m pytest tests/ -q > run.txt 2>&1 && rc=0 || rc=$?
+
+          echo "--- tail of suite output ---"
+          tail -n 40 run.txt
+
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::the public suite exited $rc"
+            echo "::group::full suite output"
+            cat run.txt
+            echo "::endgroup::"
+            exit 1
+          fi
+
+          if grep -qiE 'no tests ran' run.txt; then
+            echo "::error::pytest exited 0 but reported 'no tests ran'. A suite that"
+            echo "::error::executed nothing is not a passing suite."
+            exit 1
+          fi
+
+          passed=$(grep -oE '[0-9]+ passed' run.txt | tail -1 | grep -oE '[0-9]+' || true)
+          if [ -z "${passed:-}" ] || [ "$passed" -eq 0 ]; then
+            echo "::error::pytest exited 0 but no test reported PASSED. Everything"
+            echo "::error::skipped or deselected is a vacuous green, not a green suite."
+            echo "::group::full suite output"
+            cat run.txt
+            echo "::endgroup::"
+            exit 1
+          fi
+          echo "OK: public suite green with $passed passed."
+
+      - name: Prove the skip guards are not vacuous
+        # ARGUS_REQUIRE_ALL=1 must turn a missing resource from a skip into a
+        # loud failure. This is a POSITIVE CONTROL: on this runner the DB and
+        # raw/ are genuinely absent, so setting the flag MUST make collection
+        # fail -- and fail in ONE SPECIFIC WAY.
+        #
+        # The old version of this step accepted ANY non-zero exit as proof. That
+        # made it unfalsifiable in the other direction: a syntax error, a missing
+        # dependency, a plugin that refuses to load, or an unrelated collection
+        # crash all exit non-zero, and every one of them read as "the escape
+        # hatch works". It is asserted precisely now:
+        #
+        #   arm A  the SAME command WITHOUT the flag must exit 0, so any failure
+        #          in arm B is attributable to the flag and not to a broken tree;
+        #   arm B  with the flag it must exit 4 -- pytest's USAGE_ERROR, the code
+        #          for the pytest.UsageError conftest.py raises, not the generic
+        #          1 (tests failed), 2 (interrupted) or 3 (internal error) --
+        #          AND print conftest.py's message naming BOTH missing resources,
+        #          AND have collected nothing, proving the hatch fired at
+        #          collection start rather than after importing modules.
+        run: |
+          set -euo pipefail
+
+          # MEASURED: running the suite leaves a ZERO-BYTE db/argus.db behind --
+          # something opens the default DB path and sqlite creates the file. On a
+          # second run in the same workspace that stub flips resource-gated tests
+          # from skip to fail (65 failed/59 skipped becomes 67 failed/56 skipped).
+          #
+          # This is exactly why have_canonical_db() is specified as "exists AND
+          # non-empty". A guard written as bare .exists() would see the stub, and
+          # THIS control step would then pass for entirely the wrong reason.
+          # Handle the stub explicitly rather than letting it decide the verdict.
+          # Re-checked before BOTH arms, because arm A can recreate the stub.
+          require_resources_absent() {
+            if [ -s db/argus.db ]; then
+              echo "::error::a NON-EMPTY db/argus.db exists ($1)."
+              echo "::error::Something provisioned a real database, so this control is"
+              echo "::error::no longer exercising the missing-resource path."
+              exit 1
+            fi
+            if [ -e db/argus.db ]; then
+              echo "::notice::$1: removing $(stat -c%s db/argus.db)-byte db/argus.db stub"
+              rm -f db/argus.db
+            fi
+            if [ -d raw ] && [ -n "$(ls -A raw 2>/dev/null)" ]; then
+              echo "::error::raw/ is non-empty ($1); this control is not exercising"
+              echo "::error::the missing-resource path."
+              exit 1
+            fi
+          }
+
+          # ---- arm A: counterfactual --------------------------------------
+          # Without the flag, on this same tree, collection must SUCCEED. This
+          # is what stops an unrelated breakage from masquerading as a working
+          # escape hatch: if the tree is broken, both arms fail and arm A says so
+          # first, with a message that names the real cause.
+          require_resources_absent "before the no-flag arm"
+          PYTHONPATH=. python3 -m pytest tests/ --collect-only -q \
+            > baseline.txt 2>&1 && base_rc=0 || base_rc=$?
+          if [ "$base_rc" -ne 0 ]; then
+            echo "::error::WITHOUT ARGUS_REQUIRE_ALL, collection exited $base_rc."
+            echo "::error::The tree is broken for a reason unrelated to the escape"
+            echo "::error::hatch, so a non-zero exit WITH the flag would prove nothing."
+            echo "::error::This control is inconclusive until collection is clean."
+            echo "::group::no-flag collection output"
+            cat baseline.txt
+            echo "::endgroup::"
+            exit 1
+          fi
+          echo "arm A OK: collection exits 0 without the flag."
+
+          # ---- arm B: positive control ------------------------------------
+          require_resources_absent "before the ARGUS_REQUIRE_ALL arm"
+          ARGUS_REQUIRE_ALL=1 PYTHONPATH=. python3 -m pytest tests/ \
+            --collect-only -q > require_all.txt 2>&1 && rc=0 || rc=$?
+
+          echo "--- ARGUS_REQUIRE_ALL=1 output ---"
+          cat require_all.txt
+
+          fail=0
+
+          # B1. The exit code must be pytest's usage-error code, 4. Anything
+          # else -- including 1, 2, 3 and 5 -- means something OTHER than
+          # conftest.py's UsageError ended the run.
+          if [ "$rc" -ne 4 ]; then
+            if [ "$rc" -eq 0 ]; then
+              echo "::error::ARGUS_REQUIRE_ALL=1 exited 0 with db/argus.db and raw/ absent."
+              echo "::error::The anti-vacuous escape hatch does not work: the resource"
+              echo "::error::guards can go green without the resources ever being present."
+            else
+              echo "::error::ARGUS_REQUIRE_ALL=1 exited $rc; expected 4 (pytest USAGE_ERROR,"
+              echo "::error::the code for the pytest.UsageError conftest.py raises)."
+              echo "::error::A non-zero exit that is not 4 means the run died of something"
+              echo "::error::else -- a crash, a plugin, a syntax error -- and this control"
+              echo "::error::must NOT credit that to the escape hatch."
+            fi
+            fail=1
+          fi
+
+          # B2. The message must be conftest.py's, not some other UsageError
+          # (a bad -p, an unknown option and a missing rootdir all exit 4 too).
+          if ! grep -qF 'ARGUS_REQUIRE_ALL=1 requires every undistributed resource to be present' \
+               require_all.txt; then
+            echo "::error::output does not carry conftest.py's ARGUS_REQUIRE_ALL message."
+            echo "::error::Exit 4 alone is not proof: a malformed pytest invocation also"
+            echo "::error::exits 4. The message is what identifies the escape hatch."
+            fail=1
+          fi
+
+          # B3. It must NAME the resources it is refusing to run without.
+          for needle in 'canonical DB (db/argus.db)' 'raw source artifacts (raw/)'; do
+            if ! grep -qF -- "$needle" require_all.txt; then
+              echo "::error::the failure does not name the missing resource '$needle'."
+              echo "::error::An unnamed refusal cannot be traced back to the guard that"
+              echo "::error::produced it."
+              fail=1
+            fi
+          done
+
+          # B4. Both resources were proved absent above, so conftest.py must
+          # report exactly two. One would mean a guard stopped looking.
+          if ! grep -qF 'but 2 is missing' require_all.txt; then
+            echo "::error::expected conftest.py to report exactly 2 missing resources"
+            echo "::error::(db/argus.db and raw/ were both proved absent moments ago)."
+            fail=1
+          fi
+
+          # B5. The hatch must fire at collection START. If tests were collected
+          # first, the refusal came too late to stop a module that hard-imports
+          # an undistributed artifact at import time.
+          if grep -qE '^[1-9][0-9]* tests? collected' require_all.txt; then
+            echo "::error::tests were collected before ARGUS_REQUIRE_ALL refused. The"
+            echo "::error::hatch is firing after module import, not at collection start."
+            fail=1
+          fi
+
+          if [ "$fail" -ne 0 ]; then
+            echo "::group::full ARGUS_REQUIRE_ALL output"
+            cat require_all.txt
+            echo "::endgroup::"
+            exit 1
+          fi
+          echo "OK: ARGUS_REQUIRE_ALL=1 exits 4 with conftest.py's message, names both"
+          echo "OK: missing resources, and collects nothing — while the same command"
+          echo "OK: without the flag exits 0. The escape hatch is doing exactly its job."

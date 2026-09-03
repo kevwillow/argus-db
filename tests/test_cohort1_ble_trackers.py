@@ -24,6 +24,23 @@ from pathlib import Path
 
 import pytest
 
+# raw/ is gitignored and absent from a public clone, and this module reads a raw
+# artifact during module-body execution (mod.build() below) -- before pytest ever
+# looks at a marker. So the guard has to run here, above the import that raises.
+# ARGUS_REQUIRE_ALL=1 deliberately lets the import proceed so the real
+# FileNotFoundError still surfaces instead of being papered over by a skip.
+import os  # noqa: E402
+
+from conftest import have_raw_artifacts  # noqa: E402
+
+pytestmark = pytest.mark.raw_artifacts
+
+if not have_raw_artifacts() and os.environ.get("ARGUS_REQUIRE_ALL") != "1":
+    pytest.skip(
+        "raw source artifacts (raw/) are not distributed", allow_module_level=True
+    )
+
+
 # MAC-755: read frozen extraction-time canonical, not live db/argus.db. These
 # candidates have since been promoted, so a live read makes every net-new
 # assertion below permanently false. See tests/cohort_frozen_db.py.

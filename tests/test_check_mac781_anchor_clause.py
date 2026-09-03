@@ -124,6 +124,7 @@ def test_gate_fails_when_anchor_ambiguous(scratch_doc_two_anchors: Path) -> None
     assert "OVERALL: FAIL" in proc.stdout
 
 
+@pytest.mark.canonical_db
 def test_gate_canonical_anchor_resolves_to_one_line() -> None:
     """Run the gate against the canonical BIBLE_AMENDMENTS.md. The HTML
     anchor was added by the MAC-781 commit, so the doc-side arms (anchor
@@ -151,6 +152,7 @@ def test_gate_canonical_anchor_resolves_to_one_line() -> None:
     assert "OVERALL: PASS" in proc.stdout or "FAIL db" in proc.stdout
 
 
+@pytest.mark.canonical_db
 def test_gate_post_migration_overall_pass() -> None:
     """End-to-end canonical check: if mig-0064 has been applied to
     db/argus.db, the gate reports OVERALL: PASS on all three arms

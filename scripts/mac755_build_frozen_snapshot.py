@@ -24,11 +24,11 @@ the expectations it checks.
 
 Two epochs are needed because the cohorts promoted in two separate waves:
 
-* ``v167`` — ``da74f43`` (v1.6.7, exported 2026-06-12T14:46:32Z, 43,213 rows).
+* ``v167`` — ``d4d16563d413288b2a8bc90ca4ca91d69e04aef4`` (v1.6.7, exported 2026-06-12T14:46:32Z, 43,213 rows).
   The last published export *before* the MAC-364/365/366/368 cohort wave landed.
   Serves cohorts 1, 2, 3-drones and 5.
-* ``wave2`` — ``58648b7`` (v1.6.9, exported 2026-06-14T05:32:23Z, 43,123 rows).
-  The last published export *before* the MAC-419 Wave-2 ingestion (``3d5785b``,
+* ``wave2`` — ``65a9c976954d39b986d22007143d9b0fc2c97e64`` (v1.6.9, exported 2026-06-14T05:32:23Z, 43,123 rows).
+  The last published export *before* the MAC-419 Wave-2 ingestion (``cab606c628c3ceda86746fbb449ffe97bb4176d3``,
   2026-06-15T00:47Z) landed.  Serves cohorts 3-bletracker, 4 and 6.
 
 The epoch boundaries are derived from canonical's own published history, not
@@ -110,23 +110,23 @@ class Epoch:
 EPOCHS = [
     Epoch(
         key="v167",
-        commit="da74f43",
+        commit="d4d16563d413288b2a8bc90ca4ca91d69e04aef4",
         blob="0ac66cbe79d368d53f569324584a2ec8449b7a9e",
         sha256="320dc53623d8d241eea112038bcaba8583afd4218a371b25b1384f3a76c4d259",
         exported_at="2026-06-12T14:46:32Z",
         rows=43213,
-        next_commit="e9231a7",
+        next_commit="4d1dde208efa980ae9ac5dbf034c466f1c1b353c",
         probe="7dfc9000-7d1c-4951-86aa-8d9728f8d66c",
         probe_note="cohort-1 true 128-bit AirTag sound UUID (MAC-364 net-new)",
     ),
     Epoch(
         key="wave2",
-        commit="58648b7",
+        commit="65a9c976954d39b986d22007143d9b0fc2c97e64",
         blob="781e83ec51f85e60ccc29efb8d7349a6cbf694fb",
         sha256="cdf486114d155705ba865f4bb5e31844d3c5027d1e3ce245eadb0ec406c96755",
         exported_at="2026-06-14T05:32:23Z",
         rows=43123,
-        next_commit="3d5785b",
+        next_commit="cab606c628c3ceda86746fbb449ffe97bb4176d3",
         probe="4d050010-766c-42c4-8944-42bc98fc2d09",
         probe_note="cohort-4 Kwikset GATT profile base UUID (MAC-406 net-new)",
     ),
