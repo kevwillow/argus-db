@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Check out the public tree
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # Full history: 12 test modules shell out to git (commit-cite,
           # section-anchor and fingerprint gates). On a shallow clone they go
@@ -89,7 +89,7 @@ jobs:
           echo "OK: the markers, addopts and hooks this job asserts against."
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
