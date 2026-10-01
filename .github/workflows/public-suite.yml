@@ -70,7 +70,7 @@ jobs:
           # The specific settings this job's assertions depend on. A pytest.ini
           # that exists but no longer declares these is the same false green.
           for needle in 'testpaths = tests' '--strict-markers' \
-                        'canonical_db:' 'raw_artifacts:' 'public:'; do
+                        'canonical_db:' 'raw_artifacts:' 'public:' 'browser:'; do
             if ! grep -qF -- "$needle" pytest.ini; then
               echo "::error::pytest.ini no longer contains '$needle'"
               fail=1
@@ -113,6 +113,20 @@ jobs:
             echo "::error::raw/ is present in a fresh checkout. It is gitignored and"
             echo "::error::must not ship; this job no longer tests the public path."
             fail=1
+          fi
+          # Playwright is deliberately NOT asserted absent here. This job's claim
+          # is "clone it and run the tests, it is green" -- and that holds either
+          # way: without Playwright the browser tier skips, with it the tier runs
+          # and passes. Failing the job on an ENVIRONMENT property the repo does
+          # not control would make it brittle for no gain, and the property that
+          # actually matters -- that browser tests are never counted as `public`
+          # -- is asserted in browser-suite.yml. Report the mode, do not gate on it.
+          if python3 -c 'import playwright' 2>/dev/null; then
+            echo "::notice::playwright is importable on this runner, so the browser"
+            echo "::notice::tier will RUN rather than skip. Still a valid green, but"
+            echo "::notice::this run is not exercising the skip path."
+          else
+            echo "OK: playwright absent, so the browser tier exercises its skip path."
           fi
           if [ "$fail" -eq 0 ]; then
             echo "OK: db/argus.db and raw/ are both absent, as a public clone requires."
@@ -227,6 +241,55 @@ jobs:
           fi
           echo "OK: public suite green with $passed passed."
 
+      - name: Prove the browser tier SKIPS rather than errors without Playwright
+        # THE SKIP PATH IS OTHERWISE NEVER EXERCISED ANYWHERE IN CI. browser-suite
+        # installs Playwright before running; this job runs the `public` complement,
+        # which deselects browser items entirely. So the whole apparatus the repo
+        # relies on -- have_browser() returning False, the skip marker, "reports as
+        # a skip, not a red" -- had no coverage at all: if the False direction
+        # broke, or the marker were dropped, every job stayed green and only a
+        # contributor's laptop would find out.
+        #
+        # This runner genuinely has no Playwright (asserted above), so selecting
+        # `-m browser` here is the missing control.
+        run: |
+          set -euo pipefail
+          if python3 -c 'import playwright' 2>/dev/null; then
+            echo "::notice::playwright present on this runner, so the skip path cannot"
+            echo "::notice::be exercised here. Skipping this control rather than"
+            echo "::notice::reporting a pass it did not earn."
+            exit 0
+          fi
+          PYTHONPATH=. python3 -m pytest tests/ -m browser -rs -q > skiprun.txt 2>&1 && rc=0 || rc=$?
+          echo "--- browser tier without playwright ---"
+          tail -n 15 skiprun.txt
+
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::selecting -m browser without Playwright exited $rc. The guard"
+            echo "::error::is supposed to SKIP these, not error. A missing optional"
+            echo "::error::dependency must never make the public suite red."
+            cat skiprun.txt; exit 1
+          fi
+          if grep -qiE '[0-9]+ (failed|error)' skiprun.txt; then
+            echo "::error::browser tier reported failures/errors without Playwright"
+            cat skiprun.txt; exit 1
+          fi
+          skipped=$(grep -oE '[0-9]+ skipped' skiprun.txt | tail -1 | grep -oE '[0-9]+' || echo 0)
+          if [ "${skipped:-0}" -lt 1 ]; then
+            echo "::error::no browser test skipped. Either the marker was dropped or"
+            echo "::error::have_browser() wrongly reported the resource as present."
+            cat skiprun.txt; exit 1
+          fi
+          # the skip must carry conftest.py's reason, not a bare pytest.skip
+          if ! grep -qF 'requires Playwright and a downloaded Chromium' skiprun.txt; then
+            echo "::error::the skip does not carry conftest.py's reason string, so it"
+            echo "::error::came from somewhere other than the resource guard."
+            cat skiprun.txt; exit 1
+          fi
+          echo "OK: $skipped browser test(s) skipped with the resource guard's own"
+          echo "OK: reason, and nothing errored. The False direction of have_browser()"
+          echo "OK: is exercised."
+
       - name: Prove the skip guards are not vacuous
         # ARGUS_REQUIRE_ALL=1 must turn a missing resource from a skip into a
         # loud failure. This is a POSITIVE CONTROL: on this runner the DB and
@@ -337,7 +400,8 @@ jobs:
           fi
 
           # B3. It must NAME the resources it is refusing to run without.
-          for needle in 'canonical DB (db/argus.db)' 'raw source artifacts (raw/)'; do
+          for needle in 'canonical DB (db/argus.db)' 'raw source artifacts (raw/)' \
+                        'browser automation'; do
             if ! grep -qF -- "$needle" require_all.txt; then
               echo "::error::the failure does not name the missing resource '$needle'."
               echo "::error::An unnamed refusal cannot be traced back to the guard that"
@@ -346,11 +410,17 @@ jobs:
             fi
           done
 
-          # B4. Both resources were proved absent above, so conftest.py must
-          # report exactly two. One would mean a guard stopped looking.
-          if ! grep -qF 'but 2 is missing' require_all.txt; then
-            echo "::error::expected conftest.py to report exactly 2 missing resources"
-            echo "::error::(db/argus.db and raw/ were both proved absent moments ago)."
+          # B4. THREE resources are undistributed: db/argus.db, raw/, and the
+          # Playwright + Chromium pair the `browser` marker declares. All three
+          # are absent on this runner, so conftest.py must report exactly three.
+          # Fewer would mean a guard stopped looking; this assertion is pinned to
+          # an exact number precisely so that adding a resource without updating
+          # the control cannot pass silently.
+          if ! grep -qF 'but 3 is missing' require_all.txt; then
+            echo "::error::expected conftest.py to report exactly 3 missing resources"
+            echo "::error::(db/argus.db, raw/ and browser automation were all proved"
+            echo "::error::absent moments ago). If a resource was added or removed,"
+            echo "::error::update THIS assertion deliberately rather than loosening it."
             fail=1
           fi
 
@@ -369,6 +439,6 @@ jobs:
             echo "::endgroup::"
             exit 1
           fi
-          echo "OK: ARGUS_REQUIRE_ALL=1 exits 4 with conftest.py's message, names both"
-          echo "OK: missing resources, and collects nothing — while the same command"
-          echo "OK: without the flag exits 0. The escape hatch is doing exactly its job."
+          echo "OK: ARGUS_REQUIRE_ALL=1 exits 4 with conftest.py's message, names all"
+          echo "OK: three missing resources, and collects nothing — while the same"
+          echo "OK: command without the flag exits 0. The escape hatch is doing its job."

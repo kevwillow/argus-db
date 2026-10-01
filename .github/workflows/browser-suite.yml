@@ -1,0 +1,163 @@
+name: browser-suite
+
+# The browser tier. `public-suite` proves a bare clone is green WITHOUT
+# Playwright -- these tests skip there, by design, because a 150 MB browser is
+# not a repository dependency. This job is the other half: it installs the
+# resource and proves the tests actually PASS rather than only skip.
+#
+# Without it the browser tier is unfalsifiable. Eleven tests that skip in every
+# environment CI ever runs are indistinguishable from eleven tests that are
+# broken, and every regression they were written to catch would ship green.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser:
+    name: playwright end-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Confirm the GUI and its data source arrived with the clone
+        # argus_gui.py reads exports/argus_export.csv. Both are tracked; if
+        # either is missing the tests would SKIP on their own skipif and this
+        # job would exit 0 having proved nothing.
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in argus_gui.py exports/argus_export.csv tests/test_argus_gui_browser.py; do
+            if [ ! -f "$f" ]; then
+              echo "::error::$f is missing from the checkout"; fail=1; continue
+            fi
+            if ! git ls-files --error-unmatch "$f" > /dev/null 2>&1; then
+              echo "::error::$f exists but is NOT tracked, so it never reaches a clone"
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] || exit 1
+          echo "OK: GUI, export and browser test module are present and tracked."
+
+      - name: Install pytest and Playwright
+        run: |
+          python3 -m pip install --disable-pip-version-check pytest playwright
+          python3 -m playwright install --with-deps chromium
+
+      - name: Prove the browser resource is genuinely available
+        # The mirror image of public-suite's absence guard. Every assertion below
+        # is only meaningful if Playwright AND a Chromium binary are really here;
+        # conftest.py checks both separately because the package can be installed
+        # while the browser is not, and launch() then raises INSIDE the test.
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+              exe = p.chromium.executable_path
+              if not exe or not Path(exe).exists():
+                  print(f"::error::chromium binary missing at {exe!r}")
+                  sys.exit(1)
+              b = p.chromium.launch(headless=True)
+              b.close()
+          print("OK: playwright imported and chromium launches.")
+          PY
+
+      - name: Run the browser tier
+        # rc=0 is not sufficient. If conftest.py skipped these -- because the
+        # resource check disagreed with the step above -- pytest still exits 0.
+        # Assert that eleven tests actually RAN and that none skipped.
+        run: |
+          set -euo pipefail
+          # -rs so skips are REPORTED with their module, not just counted.
+          PYTHONPATH=. python3 -m pytest tests/ -m browser -rs -q > run.txt 2>&1 && rc=0 || rc=$?
+          echo "--- browser tier output ---"
+          tail -n 30 run.txt
+
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::browser tier exited $rc"
+            echo "::group::full output"; cat run.txt; echo "::endgroup::"
+            exit 1
+          fi
+
+          passed=$(grep -oE '[0-9]+ passed' run.txt | tail -1 | grep -oE '[0-9]+' || true)
+
+          # The evidence channel must be as wide as the property being claimed.
+          # Two earlier versions of this check were narrower than the claim:
+          #   v1 counted the GLOBAL skip total, so test_cohort1/2/3 skipping at
+          #      collection time on a missing raw/ was blamed on the browser guard;
+          #   v2 grepped the FILENAME test_argus_gui_browser, so a second module
+          #      carrying @pytest.mark.browser would be invisible, and any
+          #      unrelated skipif INSIDE that file would be misreported as a
+          #      have_browser() fault.
+          # Key on the MARKER instead: collect `-m browser` and require that every
+          # selected item passed. collected == passed proves nothing was skipped,
+          # regardless of which file the items live in.
+          PYTHONPATH=. python3 -m pytest tests/ -m browser -q --collect-only > col.txt 2>&1
+          collected=$(grep -oE '^[0-9]+ tests? collected' col.txt | grep -oE '^[0-9]+' || true)
+          if [ -z "${collected:-}" ]; then
+            echo "::error::could not parse the browser-tier collected count; refusing to guess"
+            cat col.txt; exit 1
+          fi
+
+          if [ -z "${passed:-}" ] || [ "$passed" -eq 0 ]; then
+            echo "::error::the browser tier exited 0 but nothing PASSED. This job exists"
+            echo "::error::specifically to stop 'skipped everywhere' reading as green."
+            echo "::group::full output"; cat run.txt; echo "::endgroup::"
+            exit 1
+          fi
+
+          if [ "$passed" -ne "$collected" ]; then
+            echo "::error::$collected browser-marked tests were selected but only"
+            echo "::error::$passed passed on a runner where Playwright and Chromium"
+            echo "::error::were just proved working. Something skipped or failed that"
+            echo "::error::should have run."
+            grep -E 'SKIPPED|FAILED' run.txt || true
+            echo "::group::full output"; cat run.txt; echo "::endgroup::"
+            exit 1
+          fi
+
+          # A one-sided floor lets tests be silently ADDED as well as lost, and an
+          # added-but-mismarked test becomes tomorrow's false red. The equality
+          # above already pins skips; this pins disappearance.
+          if [ "$passed" -lt 11 ]; then
+            echo "::error::only $passed browser tests ran; expected at least 11. A test"
+            echo "::error::that disappears takes its regression guard with it."
+            exit 1
+          fi
+          echo "OK: browser tier green — $collected selected, $passed passed, 0 skipped."
+
+      - name: Prove the tier is excluded from the public marker
+        # `public` means "passes on a fresh clone with no undistributed
+        # resource". conftest.py computes it as the complement of the resource
+        # markers, so a browser test must never carry it -- otherwise
+        # public-suite would claim a green it cannot deliver.
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python3 -m pytest tests/test_argus_gui_browser.py \
+            -m public -q --collect-only > pub.txt 2>&1 || true
+          cat pub.txt
+          if ! grep -qE 'no tests ran|11 deselected|deselected' pub.txt; then
+            echo "::error::browser tests were collected under -m public. The public tier"
+            echo "::error::would then claim to pass on a clone that has no Playwright."
+            exit 1
+          fi
+          echo "OK: the browser tier is excluded from -m public."

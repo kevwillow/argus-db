@@ -1,23 +1,23 @@
 {
   "_meta": {
     "argus_version": "35",
-    "exported_at": "2026-08-21T12:06:18Z",
-    "record_count": 504,
+    "exported_at": "2026-09-30T20:10:38Z",
+    "record_count": 507,
     "confidence_threshold": 70,
     "geographic_scope_filter": [
       "US"
     ],
-    "argus_run_id": "78b127fe-7dab-5d27-9c83-a93e8c80f46d",
-    "source_record_count": 43126,
+    "argus_run_id": "2f50615e-cd59-5aa5-b3f1-97e14b00dcf6",
+    "source_record_count": 45809,
     "dropped_in_export": {
-      "unknown_category": 33300,
+      "unknown_category": 35901,
       "generic_reserved_uuid": 0,
       "ssid_pattern": 0,
       "ssid_pattern_fp_hold": 7,
       "device_fingerprint": 6,
       "ble_local_name": 32,
       "ble_characteristic": 20,
-      "product_family_codename": 156,
+      "product_family_codename": 235,
       "oversized_mac_range": 49,
       "icao_24bit_address": 2,
       "rf_channel": 24,
@@ -518,6 +518,12 @@
       "argus_record_id": "1d9a2dc1707f4ac2"
     },
     {
+      "pattern": "00:0a:b1",
+      "pattern_type": "oui",
+      "description": "Genetec alpr",
+      "argus_record_id": "1de6dddda174cc81"
+    },
+    {
       "pattern": "1581F5BK",
       "pattern_type": "drone_id_prefix",
       "description": "DJI drone",
@@ -858,6 +864,12 @@
       "pattern_type": "ble_uuid",
       "description": "Verkada cctv_camera",
       "argus_record_id": "3cf3589f0841c21a"
+    },
+    {
+      "pattern": "00:40:de",
+      "pattern_type": "oui",
+      "description": "ELSAG (Leonardo) alpr",
+      "argus_record_id": "3d0dcfd933642c27"
     },
     {
       "pattern": "1748CH",
@@ -1428,6 +1440,12 @@
       "pattern_type": "drone_id_prefix",
       "description": "Leica Geosystems AG drone",
       "argus_record_id": "6b281f228c552457"
+    },
+    {
+      "pattern": "00:c0:c9",
+      "pattern_type": "oui",
+      "description": "ELSAG (Leonardo) alpr",
+      "argus_record_id": "6b2ddbd427878dde"
     },
     {
       "pattern": "98:df:82",

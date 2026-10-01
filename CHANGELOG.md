@@ -14,6 +14,91 @@ All notable changes to Argus are documented in this file. The format is loosely 
 
 ---
 
+## v2.0.0 - 2026-09-30
+
+Bundles everything landed since v1.8.1: a local search GUI **and** a data landing. The GUI
+(`argus_gui.py`) is new; three data migrations (0065-0067) add 2,683 active identifiers, and the
+`exports/` were regenerated. `schema_version` is unchanged at **35** (data-only, no DDL change).
+
+### If you consume the feeds, read this part
+
+**The data moved.** Active identifiers **43,126 -> 45,809**. The standard feed gained **3** rows
+and the high-confidence feed gained **3** (the Genetec + Elsag ALPR vendor OUIs). The other new
+rows — 79 product_family_codename and 2,601 vendor_controlled_hostname — are export-dropped types,
+so they enter the CSV / registry corpus (and the GUI) but **not** the JSON feeds. The behavioral
+feed is unchanged.
+
+### Added
+
+- **`argus_gui.py`** - a single-file, dependency-free browser UI for searching the dataset.
+  Stdlib only; no `pip install`. Serves `http://127.0.0.1:8787`.
+  - Reads `exports/argus_export.csv` by default, so it works on a bare clone for the same reason
+    `argus_cli.py status` and `query` do: `db/argus.db` is gitignored and not published. `--db`
+    reads the canonical database when one is present.
+  - Faceted filtering on `identifier_type`, `device_category`, `source_type` and
+    `geographic_scope`; manufacturer type-ahead; free-text search across identifier, manufacturer,
+    model, description, category, source URL and notes; confidence floor.
+  - Every row expands to full provenance: source type, source URL, excerpt, geographic scope,
+    first seen, last verified, record id and notes.
+  - **`notes` is humanised rather than dumped.** The field is machine-written and published
+    verbatim: 99.6% of rows are JSON, 132 carry a prose suffix after the closing brace (the CP39
+    shape, which `json.loads` rejects outright and would otherwise drop the structured half), and
+    43 are plain text. All four shapes are parsed; keys are translated to plain English
+    (`ieee_registry` becomes "IEEE registry block", `cp29_confidence_band` becomes "Confidence
+    band") and grouped under Note, Attribution, Confidence and Provenance. `confidence_history`
+    entries render as `85 -> 95 (2026-05-20)` with the rationale beneath. Internal workflow keys
+    (`dispatch`, `wave`, `session_admission`) are retained but demoted behind a disclosure, and
+    the verbatim value stays available under "raw notes".
+  - **Binds `127.0.0.1` by default and logs no requests.** A hosted instance would accumulate a
+    record of who searched which surveillance identifiers from which address. `--host` is
+    available and warns. The page loads no remote asset, ships no JavaScript and works offline.
+  - Facet choice is driven by the data rather than the schema: 77% of rows carry
+    `device_category=unknown`, so identifier type leads. `model` is populated on 0.1% of rows and
+    is not offered as a facet.
+
+- **`tests/test_argus_gui.py`** - 18 tests covering the failure modes that would let the GUI
+  display *wrong* data rather than no data.
+  - The export's first physical line is a `# meta:` comment, not the header. Passing it to
+    `csv.DictReader` yields one bogus column and every value empty, which renders as an empty
+    database instead of an error. The loader asserts the parsed header contains `identifier` and
+    raises rather than serving misaligned rows; a test pins that.
+  - `notes` and `source_excerpt` are published verbatim and contain arbitrary text, so a hostile
+    row is rendered through the escaper and asserted not to produce markup.
+  - `source_url` carries internal schemes (`argus-internal://`, `manufacturer_app://`,
+    `apkcombo:`) that must not become clickable links; `javascript:` must not either.
+  - Row count is asserted against the meta `record_count` rather than line count, because `notes`
+    is multi-line.
+  - The suite was mutation-checked: breaking `linkify` fails 3 tests, removing HTML escaping
+    fails 2, and removing the meta-line skip fails or errors 13. The tests are not vacuous.
+
+### Schema
+
+Three data migrations, `schema_version` unchanged at **35** (no DDL change):
+
+- **0065** — +79 `product_family_codename` (DJI thermal-drone + Digital Watchdog camera models;
+  `device_category` drone / cctv_camera). Export-dropped type: DB/CSV/watchlist only.
+- **0066** — +3 `oui` `alpr` rows (Genetec 00:0a:b1; Elsag/Leonardo 00:c0:c9, 00:40:de),
+  IEEE-assignee verified, confidence 85, `geographic_scope=global`. Reaches both JSON feeds.
+- **0067** — +2,601 `vendor_controlled_hostname` from Certificate Transparency logs (7 PII-shaped
+  excluded). Export-dropped type: DB/CSV/watchlist only.
+
+All three guard fail-closed on both arms (`check_migration_guards.py`) and are idempotent;
+`check_export_integrity.py` clean on the applied state.
+
+### Data
+
+Active identifiers **43,126 -> 45,809** (+2,683). Standard feed **1,014 -> 1,017**,
+high-confidence feed **504 -> 507**, behavioral feed **132** (unchanged).
+
+### Deferred (not in this release)
+
+56 `ble_service_uuid` (held for the manual FP-magnet pass), 4 `ssid_pattern` (duplicate /
+over-generic / FP-hold / unknown-category), the `g6_sweep` bulk batch (~99.9% noise by its own
+findings). 1,746 extractor-flagged credential strings were quarantined **outside** the repo and
+are not shipped.
+
+---
+
 ## v1.8.1 - 2026-09-03
 
 A maintenance release covering the 18 commits between the `v1.8.0` tag and `main`. One migration

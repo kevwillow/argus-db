@@ -62,9 +62,46 @@ python3 argus_cli.py status
 python3 argus_cli.py query e4:aa:ea:80:a1:9b
 ```
 
-Both commands work on a bare clone, with no `pip install` and no database. The export files under `exports/` are tracked and populated, and `status` and `query` read them.
+Both commands work on a bare clone, with no `pip install` and no database.
+There is also an optional browser UI, [described below](#optional-gui); it is kept out of this
+block because `cli-smoke` runs these commands verbatim in CI and a UI server does not terminate. The export files under `exports/` are tracked and populated, and `status` and `query` read them.
 
 **About the database.** The SQLite database `db/argus.db` is **not** distributed through this repository and is absent from the published tree; the exports are the published data artifact. `status` and `query` fall back to `exports/` automatically when the database is missing, and say so on stderr. `--source exports` forces that fallback, `--source db` requires the canonical database and fails without it. Counts the exports genuinely cannot see (the manufacturer and source registries, raw observations, extraction-run history) print as `unavailable (requires canonical DB)`, never as a fabricated zero. See [`docs/engineering/SETUP.md`](docs/engineering/SETUP.md) for what a clone actually contains, the schema-rebuild path, the source-ingest pipeline dependencies, and optional API keys.
+
+## Optional GUI
+
+`argus_gui.py` is a single-file, dependency-free browser UI for searching the dataset. It needs
+nothing but Python.
+
+```bash
+python3 argus_gui.py              # serves http://127.0.0.1:8787 and opens a browser
+python3 argus_gui.py --port 9000  # different port
+python3 argus_gui.py --db db/argus.db   # read the canonical database instead of the export
+```
+
+It reads `exports/argus_export.csv`, so it works on a bare clone for the same reason `status` and
+`query` do: the database is not published. Faceted filters cover identifier type, device category,
+source type and geographic scope, with a manufacturer type-ahead, a free-text search across
+identifier, model, description and notes, and a confidence floor. Every row expands to its full
+provenance, source type, source URL, excerpt, first seen, last verified and notes.
+
+`notes` is machine-written and published verbatim, so the UI renders it rather than dumping it:
+99.6% of rows are JSON, 132 carry a prose suffix after the closing brace, 43 are plain text. The
+GUI parses all four shapes, translates the key names to plain English, and groups them under
+Note, Attribution, Confidence and Provenance. Internal workflow fields (`dispatch`, `wave`,
+`session_admission`) are kept but demoted behind a disclosure, and the verbatim value is always
+one click away under "raw notes" so nothing is hidden from you.
+
+**It binds `127.0.0.1` and is meant to stay there.** Argus exists so people can detect surveillance
+equipment; a shared or hosted instance would accumulate a log of who searched which surveillance
+identifiers from which address, which is a record of people checking whether they are being
+surveilled. The server logs no requests, makes no outbound connection, loads no remote asset and
+ships no JavaScript, so it works fully offline. `--host` exists for the case where you genuinely
+want otherwise, and prints a warning explaining what you are taking on.
+
+A note on what you will see: 77% of rows carry `device_category=unknown`, so category is a weak
+way to navigate. Identifier type and manufacturer partition the corpus far better, and the facet
+order reflects that. `model` is populated on 0.1% of rows and is deliberately not a facet.
 
 ## What's in the dataset
 

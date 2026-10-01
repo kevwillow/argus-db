@@ -261,15 +261,57 @@ def module_artifacts_skip_reason(module_name: str) -> str:
     )
 
 
+def have_browser() -> tuple[bool, str]:
+    """Is Playwright importable AND is a Chromium build actually present?
+
+    Two separate failures with the same symptom: the package can be installed
+    while the browser binary is not, and `launch()` then raises at call time --
+    inside the test, as an error rather than a skip. Both are checked here so a
+    missing browser reports as a skip with a reason, not a red test.
+    """
+    try:
+        from playwright.sync_api import sync_playwright  # noqa: F401
+    except Exception:
+        return False, "playwright is not installed (pip install playwright)"
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            path = p.chromium.executable_path
+            if not path or not Path(path).exists():
+                return False, ("playwright present but chromium is not downloaded "
+                               "(playwright install chromium)")
+            # ACTUALLY LAUNCH. The docstring above promises that a browser which
+            # cannot start reports as a skip rather than raising inside the test,
+            # and only a launch establishes that: a present binary still fails on
+            # missing system libraries, a stale cache after an upgrade, or the
+            # wrong architecture. Checking executable_path alone made the
+            # docstring a claim the code did not support.
+            p.chromium.launch(headless=True).close()
+    except Exception as exc:  # pragma: no cover - depends on host state
+        return False, f"playwright present but chromium will not launch: {exc!r}"[:200]
+    return True, ""
+
+
+BROWSER_SKIP_REASON = (
+    "requires Playwright and a downloaded Chromium, neither of which is a "
+    "repository dependency; run `pip install playwright && playwright install "
+    "chromium` to enable, or set ARGUS_REQUIRE_ALL=1 to demand them"
+)
+
+
 def missing_resources() -> list[str]:
     """The undistributed resources that are absent, in report order.
 
-    Two entries maximum, one per resource the repo declares undistributed. The
+    One entry per undistributed resource the repo declares -- currently THREE:
+    the canonical DB, the raw artifacts, and the browser pair. The
     raw entry NAMES the individual artifacts that are missing -- including the
     one under extraction_outputs/ -- so a partially provisioned tree reports
     which files to fetch rather than "raw/ is missing" when raw/ is right there.
     """
     missing: list[str] = []
+    browser_ok, browser_why = have_browser()
+    if not browser_ok:
+        missing.append(f"browser automation -- {browser_why}")
     if not have_canonical_db():
         missing.append(f"canonical DB (db/argus.db) expected at {ARGUS_DB_PATH}")
     absent = missing_artifacts(all_raw_artifacts())
@@ -307,7 +349,7 @@ def pytest_collection(session):
 def pytest_collection_modifyitems(config, items):
     """Skip items whose declared resource is absent -- unless ARGUS_REQUIRE_ALL=1.
 
-    Also applies the ``public`` marker, which is the complement of the two
+    Also applies the ``public`` marker, which is the complement of the three
     resource markers and is therefore COMPUTED rather than hand-written. Before
     this it was declared in pytest.ini, applied to one module, read by nothing,
     and selected on by no CI job -- a label asserting "passes on a fresh public
@@ -323,7 +365,8 @@ def pytest_collection_modifyitems(config, items):
         item.nodeid
         for item in items
         if "public" in item.keywords
-        and ("canonical_db" in item.keywords or "raw_artifacts" in item.keywords)
+        and ("canonical_db" in item.keywords or "raw_artifacts" in item.keywords
+             or "browser" in item.keywords)
     ]
     if contradictions:
         raise pytest.UsageError(
@@ -333,7 +376,9 @@ def pytest_collection_modifyitems(config, items):
         )
     public = pytest.mark.public
     for item in items:
-        if "canonical_db" not in item.keywords and "raw_artifacts" not in item.keywords:
+        if ("canonical_db" not in item.keywords
+                and "raw_artifacts" not in item.keywords
+                and "browser" not in item.keywords):
             item.add_marker(public)
 
     if require_all():
@@ -343,6 +388,8 @@ def pytest_collection_modifyitems(config, items):
     raw_ok = have_raw_artifacts()
     skip_db = pytest.mark.skip(reason=CANONICAL_DB_SKIP_REASON)
     skip_raw = pytest.mark.skip(reason=RAW_ARTIFACTS_SKIP_REASON)
+    browser_ok, browser_why = have_browser()
+    skip_browser = pytest.mark.skip(reason=f"{BROWSER_SKIP_REASON} [{browser_why}]")
 
     # Per-module skips: an item in a cohort test module is skipped when THAT
     # module's own artifacts are incomplete, even if the rest of raw/ is fine.
@@ -354,6 +401,8 @@ def pytest_collection_modifyitems(config, items):
             )
 
     for item in items:
+        if not browser_ok and "browser" in item.keywords:
+            item.add_marker(skip_browser)
         if not db_ok and "canonical_db" in item.keywords:
             item.add_marker(skip_db)
         if "raw_artifacts" in item.keywords:
