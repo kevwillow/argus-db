@@ -2,9 +2,10 @@
 """
 README banner + logo mark for the Argus repo.
 
-The mark is an eye rendered as a radar aperture: a vesica outline, concentric
-sweep rings for the iris, and a solid pupil. Argus was the hundred-eyed
-watchman; the rings say the eye is *scanning* rather than merely watching.
+The mark is an eye with target rings: a silver eye, a crimson iris, a dark
+ring and a red pupil. Argus was the hundred-eyed watchman; the rings say the
+eye is *scanning* rather than merely watching. It is drawn low-poly, as flat
+shaded facets, to match the other project marks on gurutechnology.services.
 
 PNG rather than SVG on purpose: GitHub sanitises SVG in markdown, and text in
 an SVG depends on fonts the reader may not have. A PNG renders identically
@@ -15,6 +16,8 @@ looks soft on a HiDPI screen.
 Usage:
     python3 scripts/make_banner.py            # writes docs/assets/{argus-banner,argus-logo}.png
 """
+import colorsys
+import math
 import os
 import sys
 from PIL import Image, ImageDraw, ImageFont
@@ -24,7 +27,6 @@ GROUND        = (13, 13, 15)             # near-black page ground
 TEXT          = (242, 240, 238)
 MUTED         = (139, 134, 128)
 ACCENT        = (200, 16, 46)            # the repo's red
-RING          = (58, 58, 64)             # cool grey for the outer rings
 
 FONT_DIRS = ["/usr/share/fonts", "/usr/local/share/fonts", os.path.expanduser("~/.fonts")]
 FONT_PREFS = {
@@ -43,60 +45,124 @@ def font(kind, size):
     return ImageFont.load_default()
 
 
-def _vesica(cx, cy, w, hgt, n=160):
-    """Points of a true vesica (pointed lens): two circular arcs meeting at (+-w, 0).
+# ---- the low-poly mark ------------------------------------------------------
+# Every shape is split into flat triangles, and each triangle is shaded by how
+# much it faces one light from the top left, so the mark reads as a faceted
+# solid. Geometry is in a 64-unit box; draw_mark scales it to pixels. The same
+# geometry is the SVG mark on gurutechnology.services.
+LIGHT = (-0.45, -0.65, 0.62)
+_ln = math.sqrt(sum(c * c for c in LIGHT))
+LIGHT = tuple(c / _ln for c in LIGHT)
 
-    Upper arc passes through (-w,0), (0,-hgt), (w,0). Solving for a circle through
-    those three points gives centre (0, k) with k = (w^2 - hgt^2) / (2*hgt).
+
+def _shade(rgb, p, q, r, spread):
+    (x1, y1, z1), (x2, y2, z2), (x3, y3, z3) = p, q, r
+    ux, uy, uz = x2 - x1, y2 - y1, z2 - z1
+    vx, vy, vz = x3 - x1, y3 - y1, z3 - z1
+    nx, ny, nz = uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx
+    if nz < 0:
+        nx, ny, nz = -nx, -ny, -nz
+    m = math.sqrt(nx * nx + ny * ny + nz * nz) or 1
+    d = (nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]) / m
+    hue, lum, sat = colorsys.rgb_to_hls(*(c / 255 for c in rgb))
+    delta = spread * (d - 0.62) * 1.6
+    if delta < 0:
+        delta *= 0.55                     # the shaded side darkens gently, so colours stay even
+    lum = min(0.93, max(0.08, lum + delta))
+    return tuple(round(c * 255) for c in colorsys.hls_to_rgb(hue, lum, sat))
+
+
+def _ngon(cx, cy, r, n, rot=0):
+    return [(cx + r * math.cos(math.radians(rot + 360 * k / n)),
+             cy + r * math.sin(math.radians(rot + 360 * k / n))) for k in range(n)]
+
+
+class _Facets:
+    """Collects shaded triangles as (colour, [(x, y), (x, y), (x, y)])."""
+
+    def __init__(self):
+        self.tris = []
+
+    def tri(self, a, b, c, rgb, spread):
+        self.tris.append((_shade(rgb, a, b, c, spread), [a[:2], b[:2], c[:2]]))
+
+    def fan(self, poly, apex, h, rgb, spread):
+        """A pyramid: every edge of poly joined to a raised apex."""
+        top = (apex[0], apex[1], h)
+        for i in range(len(poly)):
+            p, q = poly[i], poly[(i + 1) % len(poly)]
+            self.tri((p[0], p[1], 0), (q[0], q[1], 0), top, rgb, spread)
+
+    def dome(self, poly, apex, h, rgb, spread, k=0.5, kz=0.72):
+        """Two rings of facets: an outer band rising to an inner ring, then a pyramid."""
+        inner = [(x + (apex[0] - x) * k, y + (apex[1] - y) * k) for x, y in poly]
+        top = (apex[0], apex[1], h)
+        n = len(poly)
+        for i in range(n):
+            p, q = poly[i], poly[(i + 1) % n]
+            a, b = inner[i], inner[(i + 1) % n]
+            P, Q = (p[0], p[1], 0), (q[0], q[1], 0)
+            A, B = (a[0], a[1], h * kz), (b[0], b[1], h * kz)
+            self.tri(P, Q, B, rgb, spread)
+            self.tri(P, B, A, rgb, spread)
+            self.tri(A, B, top, rgb, spread)
+
+    def ridge_arc(self, cx, cy, r, t, a0, a1, segs, h, rgb, spread=0.30):
+        """A band along an arc with a raised ridge down its middle."""
+        for i in range(segs):
+            b0 = math.radians(a0 + (a1 - a0) * i / segs)
+            b1 = math.radians(a0 + (a1 - a0) * (i + 1) / segs)
+
+            def P(rad, ang, z=0):
+                return (cx + rad * math.cos(ang), cy + rad * math.sin(ang), z)
+            i0, i1 = P(r - t / 2, b0), P(r - t / 2, b1)
+            o0, o1 = P(r + t / 2, b0), P(r + t / 2, b1)
+            m0, m1 = P(r, b0, h), P(r, b1, h)
+            self.tri(i0, i1, m1, rgb, spread)
+            self.tri(i0, m1, m0, rgb, spread)
+            self.tri(m0, m1, o1, rgb, spread)
+            self.tri(m0, o1, o0, rgb, spread)
+
+
+def _mark_facets():
+    """Silver eye, crimson iris, dark ring, red pupil, every facet on one centre."""
+    f = _Facets()
+    top = [(4 + 56 * k / 8, 32 - 18 * math.sin(math.pi * k / 8)) for k in range(9)]
+    bot = [(60 - 56 * k / 8, 32 + 18 * math.sin(math.pi * k / 8)) for k in range(1, 8)]
+    f.dome(top + bot, (32, 32), 9, (0xc3, 0xc7, 0xda), 0.20)
+    f.dome(_ngon(32, 32, 14, 12, -90), (32, 32), 7, (0xb8, 0x15, 0x2f), 0.20, 0.45, 0.8)
+    f.fan(_ngon(32, 32, 9, 12, -75), (32, 32), 5, (0x2b, 0x2d, 0x42), 0.14)
+    f.fan(_ngon(32, 32, 5, 6, -90), (32, 32), 3.5, (0xf4, 0x24, 0x46), 0.18)
+    return f.tris
+
+
+MARK_BOX = (4, 14, 60, 50)               # the eye's extent in the 64-unit box
+
+
+def draw_mark(d, cx, cy, size):
+    """Draw the mark centred on (cx, cy), its longer side `size` pixels.
+
+    Each facet is filled and outlined in its own colour, so no seam shows
+    between neighbours after the LANCZOS downsample.
     """
-    import math
-    k = (w * w - hgt * hgt) / (2.0 * hgt)
-    R = k + hgt
-    a0 = math.atan2(0 - k, -w)            # angle to the left corner
-    a1 = math.atan2(0 - k, w)             # angle to the right corner
-    top, bot = [], []
-    for i in range(n + 1):
-        t = a0 + (a1 - a0) * i / n
-        x, y = cx + R * math.cos(t), cy + k + R * math.sin(t)
-        top.append((x, y))
-        bot.append((x, 2 * cy - y))       # mirror across the horizontal axis
-    return top + bot[::-1]
+    x0, y0, x1, y1 = MARK_BOX
+    s = size / max(x1 - x0, y1 - y0)
+    mx, my = (x0 + x1) / 2, (y0 + y1) / 2
+    for rgb, pts in _mark_facets():
+        xy = [(cx + (x - mx) * s, cy + (y - my) * s) for x, y in pts]
+        d.polygon(xy, fill=rgb, outline=rgb)
 
 
-def draw_mark(d, cx, cy, r, hole=GROUND, outline=TEXT):
-    """The eye-aperture mark, centred on (cx, cy) with iris radius r.
+def make_logo(path, size=512):
+    """Square mark on a transparent ground, for a favicon, avatar or docs header.
 
-    The lens outline is drawn as two FILLED vesicas (outer in TEXT, inner in the
-    background colour) rather than a stroked polyline -- stroking a dense polyline
-    leaves visible lumps at this scale, filling does not.
+    The faceted mark is filled, so one drawing reads on light and dark pages.
+    The -dark file is kept under its old name for anything that links to it.
     """
-    import math
-    lw = max(2.0, r * 0.150)
-    W, Hh = r * 1.72, r * 1.16
-    d.polygon(_vesica(cx, cy, W, Hh), fill=outline)
-    d.polygon(_vesica(cx, cy, W - lw * 1.30, Hh - lw), fill=hole)
-
-    for frac, col, wid in [(1.00, RING, 0.085), (0.72, RING, 0.075), (0.47, ACCENT, 0.095)]:
-        rr = r * frac
-        d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr],
-                  outline=col, width=max(2, int(r * wid)))
-
-    pr = r * 0.20
-    d.ellipse([cx - pr, cy - pr, cx + pr, cy + pr], fill=ACCENT)
-
-
-def make_logo(path, size=512, outline=(42, 42, 48)):
-    """Square mark on transparent ground, for a favicon / avatar / docs header.
-
-    Two variants ship: the default dark outline reads on light backgrounds, and
-    argus-logo-dark.png uses the light outline for dark backgrounds. A single
-    mark cannot do both -- the lens outline has to contrast with the page.
-    """
-    S = size * SS
-    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    s = size * SS
+    img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    # dark outline so the standalone mark survives on a light background too
-    draw_mark(d, S / 2, S / 2, S * 0.26, hole=(0, 0, 0, 0), outline=outline)
+    draw_mark(d, s / 2, s / 2, s * 0.90)
     img.resize((size, size), Image.LANCZOS).save(path)
     return path
 
@@ -121,13 +187,13 @@ def make_banner(path, W=1280, H=320):
     PAD = w * 0.055
     r = h * 0.180
     cx, cy = PAD + r * 1.72, h * 0.47
-    draw_mark(d, cx, cy, r)
+    draw_mark(d, cx, cy, r * 3.44)
 
     x = cx + r * 2.45
     avail = w - x - PAD                       # hard right bound; nothing may exceed it
 
     tagline = "Open-source database of surveillance equipment identifiers"
-    facts   = "43,126 identifiers   \u00b7   261 manufacturers   \u00b7   98 sources   \u00b7   full provenance"
+    facts   = "45,809 identifiers   \u00b7   261 manufacturers   \u00b7   98 sources   \u00b7   full provenance"
 
     f_word = fit(d, "ARGUS", "bold",    int(h * 0.255), avail)
     f_sub  = fit(d, tagline, "regular", int(h * 0.085), avail)
@@ -146,7 +212,7 @@ if __name__ == "__main__":
     os.makedirs(out, exist_ok=True)
     b = make_banner(os.path.join(out, "argus-banner.png"))
     l = make_logo(os.path.join(out, "argus-logo.png"))
-    make_logo(os.path.join(out, "argus-logo-dark.png"), outline=TEXT)
+    make_logo(os.path.join(out, "argus-logo-dark.png"))
     for px in (128, 64, 32):
         make_logo(os.path.join(out, f"argus-logo-{px}.png"), size=px)
     import glob
