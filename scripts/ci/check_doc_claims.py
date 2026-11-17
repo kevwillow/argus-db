@@ -142,11 +142,11 @@ DB_ONLY_SPECS = (
 # contract constants so the doc, the contract and this extractor state the same
 # numbers by construction. See export_contract.DUPLICATION_SENTENCE.
 #
-#   "43,096 distinct `argus_record_id` values across 43,126 rows: 15 ids are
+#   "45,779 distinct `argus_record_id` values across 45,809 rows: 15 ids are
 #    shared by more than one row, covering 45 rows in total."
 #
 # The old wording said "so 30 rows share an id with another row". 30 is the
-# SURPLUS (43,126 - 43,096), not the number of rows that share. It is forbidden
+# SURPLUS (45,809 - 45,779), not the number of rows that share. It is forbidden
 # below.
 DUPLICATION_CLAIM_RE = (
     r"([\d,]+)\s+distinct\s+`argus_record_id`\s+values\s+across\s+([\d,]+)\s+rows:\s*"
@@ -188,7 +188,7 @@ STATIC_CLAIM_IDS = (
     "readme.url_provenance.public_rows",
     "readme.url_provenance.non_public_rows",
     "readme.url_provenance.non_public_rows_restated",
-    "readme.url_provenance.all_non_public_are_manufacturer_app",
+    "readme.url_provenance.non_public_source_types",
     "readme.url_provenance.manufacturer_app_http_rows",
     "readme.record_id.pattern_key_not_row_id",
     "readme.record_id.hash_format",
@@ -529,23 +529,33 @@ def check_claims(
                "the same pair of numbers is stated twice in the README; both "
                "sites are gated so one cannot be corrected without the other")
 
+    # v2.0.0 added 70 non-URL rows with source_type='manufacturer_doc', so the
+    # README no longer says every non-URL row is manufacturer_app; it gives the
+    # split. Both counts are measured, and together they must cover every
+    # non-URL row.
     m = cs.require(
-        "readme.url_provenance.all_non_public_are_manufacturer_app",
-        r"All\s+([\d,]+)\s+are\s+`source_type='manufacturer_app'`\s+rows",
+        "readme.url_provenance.non_public_source_types",
+        # one paragraph only: the gap may wrap lines but never cross a blank one
+        r"([\d,]+)\s+are\s+`source_type='manufacturer_app'`\s+rows\s+whose"
+        r"(?:(?!\n[ \t]*\n)[\s\S])*?"
+        r"the\s+other\s+([\d,]+)\s+are\s+`source_type='manufacturer_doc'`",
         readme, rn,
-        f"All {non_public} are `source_type='manufacturer_app'` rows",
+        "N are `source_type='manufacturer_app'` rows ... the other M are "
+        "`source_type='manufacturer_doc'`",
     )
     if m:
-        claimed = _int(m.group(1))
-        strays = [r for r in non_public_rows
-                  if (r.get("source_type") or "").strip() != "manufacturer_app"]
-        cs.add("readme.url_provenance.all_non_public_are_manufacturer_app",
-               f"all {claimed:,} are manufacturer_app",
-               f"{non_public - len(strays):,} of {non_public:,} are "
-               f"manufacturer_app",
-               PASS if (claimed == non_public and not strays) else FAIL, src(m),
-               f"stray source_types={sorted({(r.get('source_type') or '') for r in strays})[:5]}"
-               if strays else "every non-URL row is a manufacturer_app row")
+        claimed_app, claimed_doc = _int(m.group(1)), _int(m.group(2))
+        types = Counter((r.get("source_type") or "").strip() for r in non_public_rows)
+        app = types.get("manufacturer_app", 0)
+        doc = types.get("manufacturer_doc", 0)
+        others = sorted(t for t in types if t not in ("manufacturer_app", "manufacturer_doc"))
+        cs.add("readme.url_provenance.non_public_source_types",
+               f"{claimed_app:,} manufacturer_app + {claimed_doc:,} manufacturer_doc",
+               f"{app:,} manufacturer_app + {doc:,} manufacturer_doc of {non_public:,}",
+               PASS if (claimed_app == app and claimed_doc == doc and not others)
+               else FAIL, src(m),
+               f"other source_types={others[:5]}" if others
+               else "every non-URL row is manufacturer_app or manufacturer_doc")
 
     m = cs.require(
         "readme.url_provenance.manufacturer_app_http_rows",

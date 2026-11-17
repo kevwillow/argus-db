@@ -8,9 +8,9 @@ name: export-contract
 #
 # It asserts the artifacts' TRUE semantics. Notably it does NOT assert that
 # argus_record_id is unique -- it is a content-derived pattern key, and the CSV
-# carries 43,096 distinct `argus_record_id` values across 43,126 rows: 15 ids
+# carries 45,779 distinct `argus_record_id` values across 45,809 rows: 15 ids
 # are shared by more than one row, covering 45 rows in total. The contract pins
-# the distinct-id count and the 30 SURPLUS rows (43,126 - 43,096, i.e. rows
+# the distinct-id count and the 30 SURPLUS rows (45,809 - 45,779, i.e. rows
 # beyond one-per-id -- which is NOT the number of rows that share an id), so
 # drift is caught without the CI itself shipping a false claim.
 
