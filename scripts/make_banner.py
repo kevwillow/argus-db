@@ -16,9 +16,8 @@ looks soft on a HiDPI screen.
 Usage:
     python3 scripts/make_banner.py            # writes docs/assets/{argus-banner,argus-logo}.png
 """
-import colorsys
-import math
 import os
+import xml.etree.ElementTree as ET
 import sys
 from PIL import Image, ImageDraw, ImageFont
 
@@ -46,111 +45,37 @@ def font(kind, size):
 
 
 # ---- the low-poly mark ------------------------------------------------------
-# Every shape is split into flat triangles, and each triangle is shaded by how
-# much it faces one light from the top left, so the mark reads as a faceted
-# solid. Geometry is in a 64-unit box; draw_mark scales it to pixels. The same
-# geometry is the SVG mark on gurutechnology.services.
-LIGHT = (-0.45, -0.65, 0.62)
-_ln = math.sqrt(sum(c * c for c in LIGHT))
-LIGHT = tuple(c / _ln for c in LIGHT)
+# The mark is docs/assets/argus-mark.svg, the same file gurutechnology.services
+# shows: flat shaded polygons in a 64-unit box. draw_mark reads those polygons
+# and scales them to pixels, so these PNGs cannot drift from the site's mark.
+MARK_SVG = os.path.join(os.path.dirname(__file__), "..", "docs", "assets", "argus-mark.svg")
 
 
-def _shade(rgb, p, q, r, spread):
-    (x1, y1, z1), (x2, y2, z2), (x3, y3, z3) = p, q, r
-    ux, uy, uz = x2 - x1, y2 - y1, z2 - z1
-    vx, vy, vz = x3 - x1, y3 - y1, z3 - z1
-    nx, ny, nz = uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx
-    if nz < 0:
-        nx, ny, nz = -nx, -ny, -nz
-    m = math.sqrt(nx * nx + ny * ny + nz * nz) or 1
-    d = (nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]) / m
-    hue, lum, sat = colorsys.rgb_to_hls(*(c / 255 for c in rgb))
-    delta = spread * (d - 0.62) * 1.6
-    if delta < 0:
-        delta *= 0.55                     # the shaded side darkens gently, so colours stay even
-    lum = min(0.93, max(0.08, lum + delta))
-    return tuple(round(c * 255) for c in colorsys.hls_to_rgb(hue, lum, sat))
-
-
-def _ngon(cx, cy, r, n, rot=0):
-    return [(cx + r * math.cos(math.radians(rot + 360 * k / n)),
-             cy + r * math.sin(math.radians(rot + 360 * k / n))) for k in range(n)]
-
-
-class _Facets:
-    """Collects shaded triangles as (colour, [(x, y), (x, y), (x, y)])."""
-
-    def __init__(self):
-        self.tris = []
-
-    def tri(self, a, b, c, rgb, spread):
-        self.tris.append((_shade(rgb, a, b, c, spread), [a[:2], b[:2], c[:2]]))
-
-    def fan(self, poly, apex, h, rgb, spread):
-        """A pyramid: every edge of poly joined to a raised apex."""
-        top = (apex[0], apex[1], h)
-        for i in range(len(poly)):
-            p, q = poly[i], poly[(i + 1) % len(poly)]
-            self.tri((p[0], p[1], 0), (q[0], q[1], 0), top, rgb, spread)
-
-    def dome(self, poly, apex, h, rgb, spread, k=0.5, kz=0.72):
-        """Two rings of facets: an outer band rising to an inner ring, then a pyramid."""
-        inner = [(x + (apex[0] - x) * k, y + (apex[1] - y) * k) for x, y in poly]
-        top = (apex[0], apex[1], h)
-        n = len(poly)
-        for i in range(n):
-            p, q = poly[i], poly[(i + 1) % n]
-            a, b = inner[i], inner[(i + 1) % n]
-            P, Q = (p[0], p[1], 0), (q[0], q[1], 0)
-            A, B = (a[0], a[1], h * kz), (b[0], b[1], h * kz)
-            self.tri(P, Q, B, rgb, spread)
-            self.tri(P, B, A, rgb, spread)
-            self.tri(A, B, top, rgb, spread)
-
-    def ridge_arc(self, cx, cy, r, t, a0, a1, segs, h, rgb, spread=0.30):
-        """A band along an arc with a raised ridge down its middle."""
-        for i in range(segs):
-            b0 = math.radians(a0 + (a1 - a0) * i / segs)
-            b1 = math.radians(a0 + (a1 - a0) * (i + 1) / segs)
-
-            def P(rad, ang, z=0):
-                return (cx + rad * math.cos(ang), cy + rad * math.sin(ang), z)
-            i0, i1 = P(r - t / 2, b0), P(r - t / 2, b1)
-            o0, o1 = P(r + t / 2, b0), P(r + t / 2, b1)
-            m0, m1 = P(r, b0, h), P(r, b1, h)
-            self.tri(i0, i1, m1, rgb, spread)
-            self.tri(i0, m1, m0, rgb, spread)
-            self.tri(m0, m1, o1, rgb, spread)
-            self.tri(m0, o1, o0, rgb, spread)
-
-
-def _mark_facets():
-    """Silver eye, crimson iris, dark ring, red pupil, every facet on one centre."""
-    f = _Facets()
-    top = [(4 + 56 * k / 8, 32 - 18 * math.sin(math.pi * k / 8)) for k in range(9)]
-    bot = [(60 - 56 * k / 8, 32 + 18 * math.sin(math.pi * k / 8)) for k in range(1, 8)]
-    f.dome(top + bot, (32, 32), 9, (0xc3, 0xc7, 0xda), 0.20)
-    f.dome(_ngon(32, 32, 14, 12, -90), (32, 32), 7, (0xb8, 0x15, 0x2f), 0.20, 0.45, 0.8)
-    f.fan(_ngon(32, 32, 9, 12, -75), (32, 32), 5, (0x2b, 0x2d, 0x42), 0.14)
-    f.fan(_ngon(32, 32, 5, 6, -90), (32, 32), 3.5, (0xf4, 0x24, 0x46), 0.18)
-    return f.tris
-
-
-MARK_BOX = (4, 14, 60, 50)               # the eye's extent in the 64-unit box
+def _mark_polygons():
+    """[(rgb, [(x, y), ...]), ...] from MARK_SVG, in drawing order."""
+    polys = []
+    for el in ET.parse(MARK_SVG).iter("{http://www.w3.org/2000/svg}polygon"):
+        nums = [float(v) for v in el.get("points").replace(",", " ").split()]
+        fill = el.get("fill").lstrip("#")
+        polys.append((tuple(int(fill[i:i + 2], 16) for i in (0, 2, 4)), list(zip(nums[::2], nums[1::2]))))
+    if not polys:
+        raise SystemExit(f"no polygons found in {MARK_SVG}")
+    return polys
 
 
 def draw_mark(d, cx, cy, size):
     """Draw the mark centred on (cx, cy), its longer side `size` pixels.
 
-    Each facet is filled and outlined in its own colour, so no seam shows
-    between neighbours after the LANCZOS downsample.
+    Each polygon is outlined in its own colour, so no seam shows between
+    neighbours after the LANCZOS downsample.
     """
-    x0, y0, x1, y1 = MARK_BOX
-    s = size / max(x1 - x0, y1 - y0)
-    mx, my = (x0 + x1) / 2, (y0 + y1) / 2
-    for rgb, pts in _mark_facets():
-        xy = [(cx + (x - mx) * s, cy + (y - my) * s) for x, y in pts]
-        d.polygon(xy, fill=rgb, outline=rgb)
+    polys = _mark_polygons()
+    xs = [x for _, pts in polys for x, _ in pts]
+    ys = [y for _, pts in polys for _, y in pts]
+    s = size / max(max(xs) - min(xs), max(ys) - min(ys))
+    mx, my = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    for rgb, pts in polys:
+        d.polygon([(cx + (x - mx) * s, cy + (y - my) * s) for x, y in pts], fill=rgb, outline=rgb)
 
 
 def make_logo(path, size=512):
