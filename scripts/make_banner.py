@@ -57,7 +57,8 @@ def _mark_polygons():
     for el in ET.parse(MARK_SVG).iter("{http://www.w3.org/2000/svg}polygon"):
         nums = [float(v) for v in el.get("points").replace(",", " ").split()]
         fill = el.get("fill").lstrip("#")
-        polys.append((tuple(int(fill[i:i + 2], 16) for i in (0, 2, 4)), list(zip(nums[::2], nums[1::2]))))
+        rgb = tuple(int(fill[i:i + 2], 16) for i in (0, 2, 4))
+        polys.append((rgb, list(zip(nums[::2], nums[1::2], strict=True))))
     if not polys:
         raise SystemExit(f"no polygons found in {MARK_SVG}")
     return polys
