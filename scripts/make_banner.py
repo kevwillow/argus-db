@@ -2,9 +2,10 @@
 """
 README banner + logo mark for the Argus repo.
 
-The mark is an eye rendered as a radar aperture: a vesica outline, concentric
-sweep rings for the iris, and a solid pupil. Argus was the hundred-eyed
-watchman; the rings say the eye is *scanning* rather than merely watching.
+The mark is an eye with target rings: a silver eye, a crimson iris, a dark
+ring and a red pupil. Argus was the hundred-eyed watchman; the rings say the
+eye is *scanning* rather than merely watching. It is drawn low-poly, as flat
+shaded facets, to match the other project marks on gurutechnology.services.
 
 PNG rather than SVG on purpose: GitHub sanitises SVG in markdown, and text in
 an SVG depends on fonts the reader may not have. A PNG renders identically
@@ -16,6 +17,7 @@ Usage:
     python3 scripts/make_banner.py            # writes docs/assets/{argus-banner,argus-logo}.png
 """
 import os
+import xml.etree.ElementTree as ET
 import sys
 from PIL import Image, ImageDraw, ImageFont
 
@@ -24,7 +26,6 @@ GROUND        = (13, 13, 15)             # near-black page ground
 TEXT          = (242, 240, 238)
 MUTED         = (139, 134, 128)
 ACCENT        = (200, 16, 46)            # the repo's red
-RING          = (58, 58, 64)             # cool grey for the outer rings
 
 FONT_DIRS = ["/usr/share/fonts", "/usr/local/share/fonts", os.path.expanduser("~/.fonts")]
 FONT_PREFS = {
@@ -43,60 +44,51 @@ def font(kind, size):
     return ImageFont.load_default()
 
 
-def _vesica(cx, cy, w, hgt, n=160):
-    """Points of a true vesica (pointed lens): two circular arcs meeting at (+-w, 0).
+# ---- the low-poly mark ------------------------------------------------------
+# The mark is docs/assets/argus-mark.svg, the same file gurutechnology.services
+# shows: flat shaded polygons in a 64-unit box. draw_mark reads those polygons
+# and scales them to pixels, so these PNGs cannot drift from the site's mark.
+MARK_SVG = os.path.join(os.path.dirname(__file__), "..", "docs", "assets", "argus-mark.svg")
 
-    Upper arc passes through (-w,0), (0,-hgt), (w,0). Solving for a circle through
-    those three points gives centre (0, k) with k = (w^2 - hgt^2) / (2*hgt).
+
+def _mark_polygons():
+    """[(rgb, [(x, y), ...]), ...] from MARK_SVG, in drawing order."""
+    polys = []
+    for el in ET.parse(MARK_SVG).iter("{http://www.w3.org/2000/svg}polygon"):
+        nums = [float(v) for v in el.get("points").replace(",", " ").split()]
+        fill = el.get("fill").lstrip("#")
+        rgb = tuple(int(fill[i:i + 2], 16) for i in (0, 2, 4))
+        polys.append((rgb, list(zip(nums[::2], nums[1::2], strict=True))))
+    if not polys:
+        raise SystemExit(f"no polygons found in {MARK_SVG}")
+    return polys
+
+
+def draw_mark(d, cx, cy, size):
+    """Draw the mark centred on (cx, cy), its longer side `size` pixels.
+
+    Each polygon is outlined in its own colour, so no seam shows between
+    neighbours after the LANCZOS downsample.
     """
-    import math
-    k = (w * w - hgt * hgt) / (2.0 * hgt)
-    R = k + hgt
-    a0 = math.atan2(0 - k, -w)            # angle to the left corner
-    a1 = math.atan2(0 - k, w)             # angle to the right corner
-    top, bot = [], []
-    for i in range(n + 1):
-        t = a0 + (a1 - a0) * i / n
-        x, y = cx + R * math.cos(t), cy + k + R * math.sin(t)
-        top.append((x, y))
-        bot.append((x, 2 * cy - y))       # mirror across the horizontal axis
-    return top + bot[::-1]
+    polys = _mark_polygons()
+    xs = [x for _, pts in polys for x, _ in pts]
+    ys = [y for _, pts in polys for _, y in pts]
+    s = size / max(max(xs) - min(xs), max(ys) - min(ys))
+    mx, my = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    for rgb, pts in polys:
+        d.polygon([(cx + (x - mx) * s, cy + (y - my) * s) for x, y in pts], fill=rgb, outline=rgb)
 
 
-def draw_mark(d, cx, cy, r, hole=GROUND, outline=TEXT):
-    """The eye-aperture mark, centred on (cx, cy) with iris radius r.
+def make_logo(path, size=512):
+    """Square mark on a transparent ground, for a favicon, avatar or docs header.
 
-    The lens outline is drawn as two FILLED vesicas (outer in TEXT, inner in the
-    background colour) rather than a stroked polyline -- stroking a dense polyline
-    leaves visible lumps at this scale, filling does not.
+    The faceted mark is filled, so one drawing reads on light and dark pages.
+    The -dark file is kept under its old name for anything that links to it.
     """
-    import math
-    lw = max(2.0, r * 0.150)
-    W, Hh = r * 1.72, r * 1.16
-    d.polygon(_vesica(cx, cy, W, Hh), fill=outline)
-    d.polygon(_vesica(cx, cy, W - lw * 1.30, Hh - lw), fill=hole)
-
-    for frac, col, wid in [(1.00, RING, 0.085), (0.72, RING, 0.075), (0.47, ACCENT, 0.095)]:
-        rr = r * frac
-        d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr],
-                  outline=col, width=max(2, int(r * wid)))
-
-    pr = r * 0.20
-    d.ellipse([cx - pr, cy - pr, cx + pr, cy + pr], fill=ACCENT)
-
-
-def make_logo(path, size=512, outline=(42, 42, 48)):
-    """Square mark on transparent ground, for a favicon / avatar / docs header.
-
-    Two variants ship: the default dark outline reads on light backgrounds, and
-    argus-logo-dark.png uses the light outline for dark backgrounds. A single
-    mark cannot do both -- the lens outline has to contrast with the page.
-    """
-    S = size * SS
-    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    s = size * SS
+    img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    # dark outline so the standalone mark survives on a light background too
-    draw_mark(d, S / 2, S / 2, S * 0.26, hole=(0, 0, 0, 0), outline=outline)
+    draw_mark(d, s / 2, s / 2, s * 0.90)
     img.resize((size, size), Image.LANCZOS).save(path)
     return path
 
@@ -121,13 +113,13 @@ def make_banner(path, W=1280, H=320):
     PAD = w * 0.055
     r = h * 0.180
     cx, cy = PAD + r * 1.72, h * 0.47
-    draw_mark(d, cx, cy, r)
+    draw_mark(d, cx, cy, r * 3.44)
 
     x = cx + r * 2.45
     avail = w - x - PAD                       # hard right bound; nothing may exceed it
 
     tagline = "Open-source database of surveillance equipment identifiers"
-    facts   = "43,126 identifiers   \u00b7   261 manufacturers   \u00b7   98 sources   \u00b7   full provenance"
+    facts   = "45,809 identifiers   \u00b7   261 manufacturers   \u00b7   98 sources   \u00b7   full provenance"
 
     f_word = fit(d, "ARGUS", "bold",    int(h * 0.255), avail)
     f_sub  = fit(d, tagline, "regular", int(h * 0.085), avail)
@@ -146,7 +138,7 @@ if __name__ == "__main__":
     os.makedirs(out, exist_ok=True)
     b = make_banner(os.path.join(out, "argus-banner.png"))
     l = make_logo(os.path.join(out, "argus-logo.png"))
-    make_logo(os.path.join(out, "argus-logo-dark.png"), outline=TEXT)
+    make_logo(os.path.join(out, "argus-logo-dark.png"))
     for px in (128, 64, 32):
         make_logo(os.path.join(out, f"argus-logo-{px}.png"), size=px)
     import glob
