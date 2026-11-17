@@ -72,10 +72,10 @@ CSV_COLUMNS = [
 # json.load()['_meta'] on each JSON feed):
 #
 #   argus_export.csv                          schema_version=35,
-#                                             exported_at=2026-08-21T12:06:18Z
-#   argus_export.json                         2026-08-21T12:06:18Z
-#   argus_export_high_confidence.json         2026-08-21T12:06:18Z
-#   argus_export_behavioral_signatures.json   2026-08-20T17:48:39Z
+#                                             exported_at=2026-09-30T20:10:38Z
+#   argus_export.json                         2026-09-30T20:10:38Z
+#   argus_export_high_confidence.json         2026-09-30T20:10:38Z
+#   argus_export_behavioral_signatures.json   2026-09-30T20:10:41Z
 #
 # These are the values a fabricating implementation would hard-code, because
 # they are the values a developer sees on their own machine. If the synthetic
@@ -85,13 +85,13 @@ CSV_COLUMNS = [
 # the tests assert BOTH that the fixture's values are reported AND that the
 # shipped ones are absent.
 SHIPPED_SCHEMA_VERSION = "35"
-SHIPPED_EXPORTED_AT = "2026-08-21T12:06:18Z"
-SHIPPED_BEHAVIORAL_EXPORTED_AT = "2026-08-20T17:48:39Z"
+SHIPPED_EXPORTED_AT = "2026-09-30T20:10:38Z"
+SHIPPED_BEHAVIORAL_EXPORTED_AT = "2026-09-30T20:10:41Z"
 
 FIXTURE_SCHEMA_VERSION = "97"
 FIXTURE_EXPORTED_AT = "1999-01-02T03:04:05Z"
 # Per-file divergence is a real property of the shipped exports (the
-# behavioral feed is stamped a day earlier than the other three), so the
+# behavioral feed is stamped three seconds after the other three), so the
 # fixture reproduces the SHAPE with values of its own. There is no single
 # repo-wide exported_at to print, and nothing may pretend otherwise.
 FIXTURE_JSON_EXPORTED_AT = "1999-01-02T03:04:05Z"
@@ -684,7 +684,7 @@ def test_embedded_newlines_do_not_inflate_the_row_count(
     fake_exports: Path,
 ) -> None:
     """`source_excerpt` and `notes` carry embedded newlines inside quoted
-    fields, so `wc -l` is not a row count (47,534 lines vs 43,126 rows in the
+    fields, so `wc -l` is not a row count (50,217 lines vs 45,809 rows in the
     shipped CSV). Proves the reader goes through the csv module."""
     csv_path = fake_exports / "argus_export.csv"
     raw_lines = csv_path.read_text(encoding="utf-8").count("\n")
@@ -724,7 +724,7 @@ def test_status_reports_the_files_exported_at_not_a_hard_coded_one(
     assert rc == 0, out
     line = _line_starting(out, "Exported at:")
     assert line == f"Exported at: {FIXTURE_EXPORTED_AT} (argus_export.csv)", line
-    # Kills `exported_at = "2026-08-21T12:06:18Z"` wherever it is planted:
+    # Kills `exported_at = "2026-09-30T20:10:38Z"` wherever it is planted:
     # the shipped stamps appear nowhere in the whole of stdout.
     assert SHIPPED_EXPORTED_AT not in out, out
     assert SHIPPED_BEHAVIORAL_EXPORTED_AT not in out, out
@@ -736,8 +736,8 @@ def test_status_reports_each_json_feeds_own_exported_at(
     """There is no single repo-wide exported_at, so nothing may print one.
 
     Measured on the shipped exports: the CSV and two JSON feeds carry
-    2026-08-21T12:06:18Z, but argus_export_behavioral_signatures.json carries
-    2026-08-20T17:48:39Z. The fixture reproduces that divergence with its own
+    2026-09-30T20:10:38Z, but argus_export_behavioral_signatures.json carries
+    2026-09-30T20:10:41Z. The fixture reproduces that divergence with its own
     values, and each feed must be stamped from its own file.
     """
     rc, out, _ = _run_inproc("--exports-dir", str(fake_exports), "status")

@@ -286,7 +286,7 @@ def test_header_is_the_second_line_with_the_documented_columns(csv_data):
 def test_physical_line_count_is_not_the_row_count(csv_rows):
     """Trap 2: quoted source_excerpt fields contain embedded newlines.
 
-    A CI step that counts rows with `wc -l` gets ~47.5k for 43,126 rows. This
+    A CI step that counts rows with `wc -l` gets ~50.2k for 45,809 rows. This
     test exists so that mistake fails loudly instead of quietly re-pinning a
     wrong number.
     """
@@ -307,8 +307,8 @@ def test_argus_record_id_is_a_pattern_key_not_a_row_id(csv_rows):
     is what shipped a false number into the README, the CHANGELOG, the user
     guide and the doc validator. The three numbers are DIFFERENT:
 
-        43,096  distinct ids
-            30  SURPLUS rows (43,126 - 43,096), rows beyond one-per-id
+        45,779  distinct ids
+            30  SURPLUS rows (45,809 - 45,779), rows beyond one-per-id
             15  ids that appear on more than one row
             45  rows carrying one of those 15 ids
 
@@ -416,7 +416,7 @@ def test_public_and_non_public_url_rows_account_for_every_row(csv_rows):
 
 
 def test_non_public_rows_exist_so_the_url_claim_stays_honest(csv_rows):
-    """865 rows have provenance but no direct URL.
+    """935 rows have provenance but no direct URL.
 
     This is the measurement behind the README's false "direct URL citation"
     claim. It lives in the suite so that fixing the README cannot quietly

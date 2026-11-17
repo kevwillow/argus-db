@@ -88,7 +88,7 @@ def page(server):
 def test_page_loads_with_full_corpus(page, server):
     page.goto(server, wait_until="networkidle")
     assert page.locator("tbody tr").count() == 50
-    assert "43,126" in page.content()
+    assert "45,809" in page.content()
     assert not page.errors, page.errors[:3]
 
 

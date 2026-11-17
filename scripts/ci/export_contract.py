@@ -16,7 +16,7 @@ Four traps are encoded here because every one of them has already bitten:
    through :func:`read_csv_rows`, which consumes the meta line first.
 
 2. ``wc -l`` is NOT the row count. Quoted ``source_excerpt`` fields contain
-   embedded newlines, so the file has ~47.5k physical lines for 43,126 rows.
+   embedded newlines, so the file has ~50.2k physical lines for 45,809 rows.
    Count with the ``csv`` module or the number is wrong.
 
 3. ``argus_record_id`` is NOT row-unique. It is a content-derived pattern key
@@ -25,13 +25,13 @@ Four traps are encoded here because every one of them has already bitten:
    population instead of asserting uniqueness, which would be a false claim.
 
 4. The duplicate population has THREE different numbers and they are routinely
-   confused. Measured at HEAD 9b32212 over ``exports/argus_export.csv``:
+   confused. Measured at cdab02f (the v2.0.0 export) over ``exports/argus_export.csv``:
 
-     43,126  data rows
-     43,096  distinct argus_record_id values
+     45,809  data rows
+     45,779  distinct argus_record_id values
          15  ids that appear on more than one row
          45  rows carrying one of those 15 ids
-         30  SURPLUS rows (43,126 - 43,096), i.e. rows beyond one-per-id
+         30  SURPLUS rows (45,809 - 45,779), i.e. rows beyond one-per-id
 
    30 is the surplus, NOT "the number of rows that share an id". That
    conflation shipped into the README, the CHANGELOG, the user guide and the
@@ -130,13 +130,13 @@ CSV_COLUMNS = (
     "notes",
 )
 
-CSV_ROW_COUNT = 43_126
+CSV_ROW_COUNT = 45_809
 CSV_BLANK_CONFIDENCE = 174
 CSV_ZERO_CONFIDENCE = 262
 
 # --- the argus_record_id duplicate population; see trap 4 in the docstring ---
-CSV_DISTINCT_RECORD_IDS = 43_096
-# Rows beyond one-per-id: 43,126 - 43,096. This is a SURPLUS, and it is NOT the
+CSV_DISTINCT_RECORD_IDS = 45_779
+# Rows beyond one-per-id: 45,809 - 45,779. This is a SURPLUS, and it is NOT the
 # number of rows that share an id -- that is CSV_ROWS_WITH_SHARED_ID, below.
 CSV_DUPLICATE_EXCESS_ROWS = 30
 # Ids that appear on more than one row.
@@ -176,16 +176,16 @@ NON_PUBLIC_URL_SCHEMES = (
 ALL_URL_SCHEMES = PUBLIC_URL_SCHEMES + NON_PUBLIC_URL_SCHEMES
 
 URL_SCHEME_COUNTS = {
-    "https://": 42_201,
+    "https://": 44_814,
     "http://": 60,
     "wave_i_aggregate:": 660,
     "apkcombo:": 188,
     "APK extract:": 12,
-    "argus-internal:": 3,
+    "argus-internal:": 73,
     "manufacturer_app:": 2,
 }
-PUBLIC_URL_ROWS = 42_261
-NON_PUBLIC_URL_ROWS = 865
+PUBLIC_URL_ROWS = 44_874
+NON_PUBLIC_URL_ROWS = 935
 
 # The three JSON feeds. Each is an OBJECT of shape {"_meta": {...},
 # "entries": [...]} -- never a bare array. Records live under "entries".
@@ -201,8 +201,8 @@ BEHAVIORAL_KEYS = frozenset(
 )
 
 JSON_FEEDS = {
-    "argus_export.json": (STANDARD_JSON, 1_014, FEED_KEYS),
-    "argus_export_high_confidence.json": (HIGH_CONF_JSON, 504, FEED_KEYS),
+    "argus_export.json": (STANDARD_JSON, 1_017, FEED_KEYS),
+    "argus_export_high_confidence.json": (HIGH_CONF_JSON, 507, FEED_KEYS),
     "argus_export_behavioral_signatures.json": (BEHAVIORAL_JSON, 132, BEHAVIORAL_KEYS),
 }
 
